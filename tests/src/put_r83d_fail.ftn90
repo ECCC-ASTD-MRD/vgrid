@@ -1,0 +1,16 @@
+program constructor
+  use Grid_Descriptors, only: grid_descriptor,gd_new,gd_put,GD_ERROR
+  use Unit_Testing, only: ut_report
+
+  implicit none
+
+  type(grid_descriptor) :: d
+  integer :: stat
+  real(kind=8), dimension(:,:,:), pointer :: tbl
+
+  ! Construct a new set of 3D coordinate descriptors
+  stat = gd_new(d,unit=10,format='fst',ip1=100,ip2=200)
+  stat = gd_put(d,key='VT - vertical coordinate table',value=tbl)
+  call ut_report(stat==GD_ERROR,'Grid_Descriptors::gd_new constructor')
+
+end program constructor

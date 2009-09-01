@@ -1,0 +1,53 @@
+program tests
+  use Grid_Descriptors, only: grid_descriptor,gd_new,gd_put,gd_get,gd_print,gd_levels, &
+       gd_write,GD_LEN_NAME,GD_OK
+  implicit none
+
+  ! Variable declarations
+  type(grid_descriptor) :: d
+  integer, parameter :: STDERR=0
+  integer :: status,fstkey,ni,nj,nk,iun=0,oun=0
+  real, dimension(:,:,:), pointer :: lev
+  character(len=GD_LEN_NAME) :: vname
+
+  ! External functions
+  integer, external :: fstinf,fnom,fstouv,fstfrm,fclos
+
+   ! Open file and get FST key for field of interest (in this case TT)
+   status = fnom(iun,'../tests/data/dm_5002_from_model_run','STD',0)
+   status = fstouv(iun,'RND')
+   status = fnom(oun,'test_output.fst','STD',0)
+   status = fstouv(oun,'RND')
+   fstkey = fstinf(iun,ni,nj,nk,-1,' ',-1,-1,-1,' ','TT')
+
+  ! Construct a new set of 3D coordinate descriptors
+  status = gd_new(d,unit=iun,format='fst',ip1=2009,ip2=1000)
+  if (status /= GD_OK) write(STDERR,*) 'WARNING - error during construction'
+
+  ! Get information about the coordinate
+  status = gd_get(d,key='NAME - descriptor name',value=vname,dir='z')
+  if (status /= GD_OK) write(STDERR,*) 'WARNING - error during get operation'
+
+  ! Change an element of the structure
+  status = gd_put(d,key='NAME - descriptor name',value='VCRD',dir='z')
+  if (status /= GD_OK) write(STDERR,*) 'WARNING - error during put operation'
+
+  ! Print information about the instance
+  status = gd_print(d)
+  if (status /= GD_OK) write(STDERR,*) 'WARNING - error during print'
+
+  ! Get physical levelling information
+  status = gd_levels(d,unit=iun,fstkeys=(/fstkey/),levels=lev)
+  if (status /= GD_OK) write(STDERR,*) 'WARNING - error during level calculation'
+
+  ! Write descriptors to an output file
+  status = gd_write(d,unit=oun,format='fst')
+  if (status /= GD_OK) write(STDERR,*) 'WARNING - error during write'
+
+  ! Close files
+  status = fstfrm(iun)
+  status = fclos(iun)
+  status = fstfrm(oun)
+  status = fclos(oun)
+
+end program tests

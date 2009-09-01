@@ -1,0 +1,46 @@
+program get_levels_from_keys
+  use Grid_Descriptors, only: grid_descriptor,gd_new,gd_levels
+  use Unit_Testing, only: ut_report
+
+  implicit none
+
+  type(grid_descriptor) :: d
+  integer, parameter :: lu=10, nmax=1000
+  integer, dimension(nmax) :: liste
+  integer :: stat,infon,ier
+  integer :: ni,nj,nk,fnom,fstouv,fstfrm,fstinf,key,fstluk,fstinl
+  real, dimension(:,:,:), pointer :: pres
+  logical :: ok
+
+  stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
+  if(stat.lt.0)then
+     print*,'ERROR with fnom'
+     call abort
+  endif
+  stat=fstouv(lu,'RND')
+  if(stat.le.0)then
+     print*,'No record in RPN file'
+     call abort
+  endif
+
+  ! Get vertical grid descriptor
+  stat = gd_new(d,unit=lu,format="fst",ip1=2009,ip2=1000)
+  if(stat < 0 )then
+     print*,'Problem getting vertical grid descriptor'
+     stop
+  endif
+
+  ier = fstinl(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ','TT',liste,infon,nmax)
+
+  if(infon == 0 )then
+     print*,'pas de record de TT'
+     stop
+  endif
+
+  stat = gd_levels(d,unit=lu,fstkeys=liste(1:infon),levels=pres)
+
+  call ut_report(stat,'Grid_Descriptors, gd_new')
+
+  stat=fstfrm(lu)
+
+end program get_levels_from_keys

@@ -1,0 +1,15 @@
+program constructor
+  use Grid_Descriptors, only: grid_descriptor,gd_new,GD_ERROR
+  use Unit_Testing, only: ut_report
+
+  implicit none
+
+  type(grid_descriptor) :: d
+  integer :: stat
+  real(kind=8), dimension(:) :: ip1s
+
+  ! Construct a new set of 3D coordinate descriptors
+  stat = gd_new(d,kind=5,version=1,nk=10)
+  call ut_report(stat == GD_ERROR,'Grid_Descriptors::gd_new vertical build initializer')
+
+end program constructor

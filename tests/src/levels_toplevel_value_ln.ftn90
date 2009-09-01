@@ -1,0 +1,35 @@
+program tests
+  use Grid_Descriptors, only: gd_levels
+  use Unit_Testing, only: ut_report
+
+  implicit none
+
+  integer :: stat,lu=0,ni,nj,nk,fnom,fstouv,fstfrm,fclos,fstkey,fstlir,fstinf
+  real :: epsilon=.001
+  real, dimension(:,:), allocatable :: px
+  real, dimension(:,:,:), pointer :: lev
+
+  stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
+  if(stat.lt.0)then
+     print*,'ERROR with fnom'
+     call abort
+  endif
+  stat=fstouv(lu,'RND')
+  if(stat.lt.0)then
+     print*,'No record in RPN file'
+     call abort
+  endif
+
+  ! Get physical levelling information
+  fstkey = fstinf(lu,ni,nj,nk,-1,'',93423264,-1,-1,'','TT')
+
+  stat = gd_levels(unit=lu,fstkeys=(/fstkey/),levels=lev,in_log=.true.)
+
+  allocate(px(ni,nj))
+  stat = fstlir(px,lu,ni,nj,nk,-1,'',93423264,-1,-1,'','PX')
+  call ut_report(abs(lev(22,15,1)-log(px(22,15)*100.))<epsilon,message='Grid_Descriptors::gd_levels level calculation status')
+
+  stat=fstfrm(lu)
+  stat=fclos(lu)
+
+end program tests

@@ -1,0 +1,30 @@
+program constructor
+  use Grid_Descriptors, only: grid_descriptor,gd_new,gd_get
+  use Unit_Testing, only: ut_report
+
+  implicit none
+
+  type(grid_descriptor) :: d
+  integer :: stat,lu=0,fnom,fstouv,fstfrm,fclos
+  real(kind=8), dimension(:,:,:), pointer :: tbl
+
+  stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
+  if(stat.lt.0)then
+     print*,'ERROR with fnom'
+     call abort
+  endif
+  stat=fstouv(lu,'RND')
+  if(stat.le.0)then
+     print*,'No record in RPN file'
+     call abort
+  endif
+
+  ! Construct a new set of 3D coordinate descriptors
+  stat = gd_new(d,unit=lu,format="fst",ip1=2009,ip2=1000)
+  stat = gd_get(d,key='VTBL - vertical coordinate table',value=tbl)
+  call ut_report(stat,'Grid_Descriptors::gd_new constructor')
+
+  stat = fstfrm(lu)
+  stat = fclos(lu)
+
+end program constructor
