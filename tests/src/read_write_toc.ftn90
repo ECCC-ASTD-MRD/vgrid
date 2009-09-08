@@ -1,5 +1,5 @@
 program constructor
-  use Grid_Descriptors, only: grid_descriptor,gd_new,write_desc
+  use Grid_Descriptors, only: grid_descriptor,gd_new,gd_write
   use Unit_Testing, only: ut_report
 
   implicit none
@@ -31,7 +31,7 @@ program constructor
 
   ! Construct a new set of 3D coordinate descriptors
   stat = gd_new(d,unit=lu,format="fst",ip1=2009,ip2=1000)
-  stat = write_desc(d,unit=lu2,format="fst")
+  stat = gd_write(d,unit=lu2,format="fst")
   call ut_report(stat,'Grid_Descriptors, gd_new, gd_get CA')
 
   stat=fstfrm(lu)

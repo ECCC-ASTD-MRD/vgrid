@@ -90,7 +90,6 @@ module Grid_Descriptors
      integer :: unit                            !file unit associated with this 3D descriptor
   end type grid_descriptor
 
-  ! Class constructors
   interface gd_new
      module procedure new_read
      module procedure new_build_vert
@@ -157,6 +156,11 @@ module Grid_Descriptors
 
   interface fstd_init
      module procedure fstd_init_v
+  end interface
+
+  interface flip_transfer
+     module procedure flip_transfer_r8
+     module procedure flip_transfer_char
   end interface
 
 contains
@@ -1742,6 +1746,7 @@ contains
      integer :: nn,error,k,ind
      integer, parameter :: skip=3
      real*8 :: for_char_8
+     character(len=8) :: ref_name,ref_name_flip
 
      ! Set error status
      status = GD_ERROR
@@ -1796,7 +1801,15 @@ contains
         write(STDERR,*) 'ERROR: wrong size for b_t_8, is ',nn,'should be ',nk+2
         return
      endif
-     for_char_8=transfer(self%zz%ref_name,for_char_8)
+     if (len_trim(self%zz%ref_name) > len(ref_name)) then
+        write(STDERR,*) 'ERROR: reference field name '//trim(self%zz%ref_name)//' longer than limit: ',len(ref_name)
+        return
+     endif
+     error = flip_transfer(self%zz%ref_name,for_char_8)
+     if (error /= GD_OK) then
+        write(STDERR,*) 'ERROR: flip_transfer function returned error code from encode ',error
+        return
+     endif
 
      ! Fill header
      self%zz%table(1:3,1,1)=(/dble(self%zz%kind),dble(self%zz%version),dble(skip)/)
@@ -1908,7 +1921,7 @@ contains
      type(grid_descriptor), intent(inout) :: self   !Descriptor instance
      
      ! Local variables
-     integer :: skip,nj,nk,k,ind
+     integer :: skip,nj,nk,k,ind,error
 
      ! Set error status
      status = GD_ERROR
@@ -1924,9 +1937,12 @@ contains
      self%zz%rcoef1_8 = self%zz%table(3,2,1)
 
      ! Read header line 3
-     self%zz%rcoef2_8 =          self%zz%table(1,3,1)
-     self%zz%ref_name = transfer(self%zz%table(2,3,1),self%zz%ref_name)
-
+     self%zz%rcoef2_8 =     self%zz%table(1,3,1)
+     error = flip_transfer(self%zz%table(2,3,1),self%zz%ref_name)
+     if (error /= GD_OK) then
+        write(STDERR,*) 'ERROR: flip_transfer function returned an error code from decode ',error
+        return
+     endif
      nj=size(self%zz%table,dim=2)
 
      nk=(nj-3-skip)/2
@@ -2292,6 +2308,80 @@ contains
     if (self%ip1 < 0 .or. self%ip2 < 0) match = .false.
     return
   end function match_descriptor
+
+  logical function is_big_endian() result(bend)
+    ! Determine the endianness of the machine
+    character(len=4) :: str
+    select case (transfer(1094861636,str))
+    case ('ABCD')
+       bend = .true.
+    case ('DCBA')
+       bend = .false.
+    case DEFAULT
+       write(STDERR,*) 'WARNING: unable to determine bit ordering in is_big_endian'
+       bend = .false.
+    end select
+    return
+  end function is_big_endian
+
+  integer function flip_transfer_r8(str,val_out) result(status)
+    ! Convert string to a little-endian 8-byte real
+    character(len=*), intent(in) :: str                 !string to convert
+    real*8, intent(out) :: val_out                      !8-byte real for output
+    integer :: i,cnt
+    character(len=8) :: str_cvt
+    status = GD_ERROR; val_out = 0.d0
+    if (len_trim(str) > len(str_cvt)) then
+       write(STDERR,*) 'ERROR: string length to flip_transfer (',len_trim(str),') exceeds limit: ',len(str)
+       return
+    endif
+    if (is_big_endian()) then
+       cnt = 1
+       do i=len(str_cvt),1,-1
+          if (cnt <= len_trim(str)) then
+             str_cvt(i:i) = str(cnt:cnt)
+             cnt = cnt+1
+          else
+             str_cvt(i:i) = ' '
+          endif
+       enddo
+    else
+       str_cvt = str
+    endif
+    val_out = transfer(str_cvt,val_out)
+    status = GD_OK
+    return
+  end function flip_transfer_r8
+
+  integer function flip_transfer_char(val,str_out) result(status)
+    ! Convert a little-endian 8-byte real to a string
+    real*8, intent(in) :: val                           !8-byte real to convert
+    character(len=*), intent(out) :: str_out            !string for output
+    integer :: i,cnt
+    character(len=8) :: str_cvt
+    logical :: overflow
+    status = GD_ERROR; str_out = ''
+    str_cvt = transfer(val,str_cvt)
+    if (is_big_endian()) then
+       cnt = 1; overflow = .false.
+       do i=len(str_cvt),1,-1
+          if (cnt < len(str_out)) then
+             str_out(cnt:cnt) = str_cvt(i:i)
+             cnt = cnt+1
+          else
+             if (str_cvt(i:i) /= '') overflow = .true.
+          endif
+       enddo
+    else
+       str_out = str_cvt
+    endif
+    if (overflow) then
+       write(STDERR,*) 'ERROR: string length to flip_transfer (',len(str_out),') is insufficient: ',len_trim(str_cvt)
+!!$       return    !FIXME -- once we get a new data file, this should be an error
+    endif
+    status = GD_OK
+    return
+  end function flip_transfer_char
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! (PRIVATE) Pressure computation functions

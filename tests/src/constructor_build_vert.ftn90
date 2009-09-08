@@ -6,7 +6,6 @@ program constructor
 
   type(grid_descriptor) :: d
   integer :: stat
-  real(kind=8), dimension(:) :: ip1s
 
   ! Construct a new set of 3D coordinate descriptors
   stat = gd_new(d,kind=5,version=1,nk=10)

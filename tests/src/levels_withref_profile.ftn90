@@ -11,7 +11,7 @@ program tests
   real :: epsilon=.005
   real, dimension(:,:), allocatable :: p0,px
   real, dimension(:,:,:), pointer :: lev
-  real, local_pres
+  real :: local_pres
   type(grid_descriptor) :: d
   logical :: ok
 
