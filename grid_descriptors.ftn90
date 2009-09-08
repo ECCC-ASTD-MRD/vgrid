@@ -31,17 +31,17 @@ module Grid_Descriptors
   character(len=1), dimension(3), parameter :: MATCH_GRTYP=(/'X','Y','Z'/) !grid types with ip1,2 to ig1,2 mapping
 
   ! Validity table
-  integer, dimension(1), parameter :: ptop_8_valid=(/5002/)
-  integer, dimension(1), parameter :: pref_8_valid=(/5002/)
-  integer, dimension(1), parameter :: rcoef1_8_valid=(/5002/)
+  integer, dimension(2), parameter :: ptop_8_valid=(/5001,5002/)
+  integer, dimension(2), parameter :: pref_8_valid=(/5001,5002/)
+  integer, dimension(2), parameter :: rcoef1_8_valid=(/5001,5002/)
   integer, dimension(1), parameter :: rcoef2_8_valid=(/5002/)
-  integer, dimension(2), parameter :: a_m_8_valid=(/2001,5002/)
-  integer, dimension(2), parameter :: b_m_8_valid=(/2001,5002/)
+  integer, dimension(3), parameter :: a_m_8_valid=(/2001,5001,5002/)
+  integer, dimension(3), parameter :: b_m_8_valid=(/2001,5001,5002/)
   integer, dimension(1), parameter :: a_t_8_valid=(/5002/)
   integer, dimension(1), parameter :: b_t_8_valid=(/5002/)
-  integer, dimension(2), parameter :: ip1_m_valid=(/2001,5002/)
+  integer, dimension(3), parameter :: ip1_m_valid=(/2001,5001,5002/)
   integer, dimension(1), parameter :: ip1_t_valid=(/5002/)
-  integer, dimension(1), parameter :: ref_name_valid=(/5002/)
+  integer, dimension(2), parameter :: ref_name_valid=(/5001,5002/)
 
   ! FST file record structure
   type FSTD
@@ -266,6 +266,12 @@ contains
     select case (self%zz%vcode)
     case (2001)
        istat=decode_vert_2001(self)
+    case (5001)
+       istat=decode_vert_5001(self)
+       if(istat < 0)then
+          write(STDERR,*) 'ERROR: problem with fstluk on '//trim(self%zz%rec%nomvar)
+          return
+       endif
     case (5002)
        istat=decode_vert_5002(self)
        if(istat < 0)then
@@ -471,6 +477,8 @@ contains
       select case (self%zz%vcode)
       case (2001)
          error = encode_vert_2001(self)
+      case (5001)
+         error = encode_vert_5001(self,nk)
       case (5002)
          error = encode_vert_5002(self,nk)
       case DEFAULT
@@ -1169,6 +1177,10 @@ contains
           nk=size(self%zz%ip1_m)
           write(my_stdout,*)'  Number of levels (pressure levels)',nk
           write(my_stdout,*)'  Equation to pressure (P): P = A'
+       case (5001)
+          nk=size(self%zz%ip1_m)
+          write(my_stdout,*)'  Number of levels (momentum levels)',nk
+          write(my_stdout,*)'  Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100'
        case (5002)
           nk=size(self%zz%ip1_m)
           write(my_stdout,*)'  Number of levels (momentum levels)',nk-1
@@ -1506,6 +1518,8 @@ contains
     select case (self%zz%vcode)
     case (2001)
        istat = compute_pressure_2001(self,ip1_list,levels,my_in_log)
+    case (5001)
+       istat = compute_pressure_5001(self,sfc_field,ip1_list,levels,my_in_log)
     case (5002)
        istat = compute_pressure_5002(self,sfc_field,ip1_list,levels,my_in_log)
     case DEFAULT
@@ -1654,6 +1668,72 @@ contains
      return
    end function encode_vert_2001
 
+  integer function encode_vert_5001(self,nk) result(status)
+     type(grid_descriptor), intent(inout) :: self       !Descriptor instance
+     integer, intent(in) :: nk                          !Number of levels
+
+     ! Local variables
+     integer :: nn,error,k,ind
+     integer, parameter :: skip=3
+     real*8 :: for_char_8
+
+     ! Set error status
+     status = GD_ERROR
+
+     print*,'DANS GRID nk=',nk
+
+     ! Allocate table space
+     if (associated(self%zz%table)) deallocate(self%zz%table)         
+     allocate(self%zz%table(3,nk+skip,1),stat=error)
+     if(error < 0)then
+        write(STDERR,*) 'ERROR: cannot allocate self%zz%table in encode_vert_5001'
+        return
+     endif
+
+     ! Fill standard file record entries
+     error = fstd_init(self%zz,etiket='HYB_GEMV3',   &
+          ig2=nint(self%zz%ptop_8*10.d0),            &
+          ig3=nint(self%zz%rcoef1_8*100.d0),         &
+          ig4=0)
+     if (error /= GD_OK) then
+        write(STDERR,*) 'ERROR: cannot initialize fstd record entries'
+        return
+     end if
+     self%zz%ref_name="P0"
+     
+     ! Vector size checks
+     nn=size(self%zz%ip1_m)
+     if(nn.ne.nk)then
+        write(STDERR,*) 'ERROR: wrong size for ip1_m, is ',nn,'should be ',nk
+        return
+     endif
+     nn=size(self%zz%a_m_8)
+     if(nn.ne.nk)then
+        write(STDERR,*) 'ERROR: wrong size for a_m_8, is ',nn,'should be ',nk
+        return
+     endif
+     nn=size(self%zz%b_m_8)
+     if(nn.ne.nk)then
+        write(STDERR,*) 'ERROR: wrong size for b_m_8, is ',nn,'should be ',nk
+        return
+     endif
+     for_char_8=transfer(self%zz%ref_name,for_char_8)
+
+     ! Fill header
+     self%zz%table(1:3,1,1)=(/dble(self%zz%kind),dble(self%zz%version),dble(skip)/)
+     self%zz%table(1:3,2,1)=(/self%zz%ptop_8    ,self%zz%pref_8       ,self%zz%rcoef1_8/)     
+     self%zz%table(1:3,3,1)=(/for_char_8        ,0.d0                 ,0.d0/)
+
+     ! Fill level data
+     do k=1,nk
+        ind=k+skip
+        self%zz%table(1:3,ind,1)=(/dble(self%zz%ip1_m(k)),self%zz%a_m_8(k),self%zz%b_m_8(k)/)
+     enddo     
+
+     ! Set status and return
+     status = GD_OK
+  end function encode_vert_5001
+
   integer function encode_vert_5002(self,nk) result(status)
      type(grid_descriptor), intent(inout) :: self       !Descriptor instance
      integer, intent(in) :: nk                          !Number of levels
@@ -1778,6 +1858,52 @@ contains
 
   end function decode_vert_2001
        
+  integer function decode_vert_5001(self) result(status)
+     type(grid_descriptor), intent(inout) :: self   !Descriptor instance
+     
+     ! Local variables
+     integer :: skip,nj,nk,k,ind
+
+     ! Set error status
+     status = GD_ERROR
+
+     ! Read header line 1
+     self%zz%kind     = nint(self%zz%table(1,1,1))
+     self%zz%version  = nint(self%zz%table(2,1,1))
+     skip             = nint(self%zz%table(3,1,1))
+     
+     ! Read header line 2
+     self%zz%ptop_8   = self%zz%table(1,2,1)
+     self%zz%pref_8   = self%zz%table(2,2,1)
+     self%zz%rcoef1_8 = self%zz%table(3,2,1)
+
+     ! Read header line 3
+     self%zz%ref_name = transfer(self%zz%table(1,3,1),self%zz%ref_name)
+
+     nj=size(self%zz%table,dim=2)
+
+     nk=nj-skip
+
+     ! Allocate and assign level data
+     if (associated(self%zz%ip1_m)) deallocate(self%zz%ip1_m)
+     allocate(self%zz%ip1_m(nk))
+     if (associated(self%zz%a_m_8)) deallocate(self%zz%a_m_8)
+     allocate(self%zz%a_m_8(nk))
+     if (associated(self%zz%b_m_8)) deallocate(self%zz%b_m_8)
+     allocate(self%zz%b_m_8(nk))     
+
+     do k=1,nk
+        ind=k+skip
+        self%zz%ip1_m(k) = nint(self%zz%table(1,ind,1))
+        self%zz%a_m_8(k) =      self%zz%table(2,ind,1)
+        self%zz%b_m_8(k) =      self%zz%table(3,ind,1)
+     enddo
+
+     ! Set status and return
+     status = GD_OK
+
+  end function decode_vert_5001
+
   integer function decode_vert_5002(self) result(status)
      type(grid_descriptor), intent(inout) :: self   !Descriptor instance
      
@@ -2214,6 +2340,54 @@ contains
     status = GD_OK
     return
   end function compute_pressure_2001
+
+  integer function compute_pressure_5001(self,sfc_field,ip1_list,levels,in_log) result(status)
+    ! Compute pressure for all levels specified in ip1_list
+    type(grid_descriptor), intent(in) :: self           !Descriptor instance
+    real, dimension(:,:), intent(in) :: sfc_field       !Surface field reference for coordinate
+    integer, dimension(:), intent(in) :: ip1_list       !List of IP1 levels to calculate on
+    real, dimension(:,:,:), pointer  :: levels          !Physical level values
+    logical, intent(in) :: in_log                       !Compute level values in ln()
+
+    ! Internal variables
+    integer :: i,j,error,nk
+    real*8, dimension(size(sfc_field,dim=1),size(sfc_field,dim=2)) :: s_8
+    real*8, dimension(size(ip1_list)) :: aa_8,bb_8
+    logical :: found,my_in_log
+
+    ! Set error status
+    status = GD_ERROR
+
+    ! Set size of output
+    nk = size(ip1_list)
+    
+    ! Find ip1 values
+    do i=1,nk
+       found = .false.
+       do j=1,size(self%zz%ip1_m)
+          if (self%zz%ip1_m(j) == ip1_list(i)) then
+             found = .true.
+             aa_8(i) = self%zz%a_m_8(j)
+             bb_8(i) = self%zz%b_m_8(j)
+             exit
+          endif
+       enddo
+       if (.not.found) then
+          write(STDERR,*) 'ERROR: cannot find ip1 ',ip1_list(i),' in compute_pressure_5001'
+          return
+       endif
+    enddo
+
+    ! Compute pressure
+    do i=1,nk
+       levels(:,:,i) = aa_8(i) + bb_8(i)*sfc_field
+    enddo
+    if (in_log) levels = log(levels)
+
+    ! Set status and return
+    status = GD_OK
+    return
+ end function compute_pressure_5001
 
   integer function compute_pressure_5002(self,sfc_field,ip1_list,levels,in_log) result(status)
     ! Compute pressure for all levels specified in ip1_list
