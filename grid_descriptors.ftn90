@@ -2377,7 +2377,7 @@ contains
     endif
     if (overflow) then
        write(STDERR,*) 'ERROR: string length to flip_transfer (',len(str_out),') is insufficient: ',len_trim(str_cvt)
-!!$       return    !FIXME -- once we get a new data file, this should be an error
+       return
     endif
     status = GD_OK
     return

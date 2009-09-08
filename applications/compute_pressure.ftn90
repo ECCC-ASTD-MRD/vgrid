@@ -69,7 +69,7 @@ program compute_pressure
   endif
 
   ! Get vertical grid descriptor
-  stat = gd_new(d,unit=lui,format="fst",ip1=2009,ip2=1000)
+  stat = gd_new(d,unit=lui,format="fst",ip1=229,ip2=0)
   if(stat .ne. GD_OK )then
      print*,'Problem getting vertical grid descriptor'
      call exit(1)
@@ -95,7 +95,7 @@ program compute_pressure
         stat=fstprm(liste(k),dateo,deet,npas,ni,nj,nk,nbits,datyp,ip1,&
              ip2,ip3,typvar,nomvar,etiket,grtyp,ig1,ig2,ig3, &
              ig4,swa,lng,dltf,ubc,extra1,extra2,extra3)
-        stat=fstecr(pres(1,1,k),dummy,-nbits,luo,dateo,deet,npas,ni,nj,nk, &
+        stat=fstecr(pres(1,1,k),dummy,-64,luo,dateo,deet,npas,ni,nj,nk, &
              ip1,ip2,ip3,typvar,'PX','RECOMPUTED',grtyp,ig1,ig2,ig3,ig4,datyp,.true.)
      enddo
   enddo

@@ -6,8 +6,8 @@ program constructor
   implicit none
 
   type(grid_descriptor) :: d
-  integer :: lu=0
-  integer :: stat
+  integer :: lu=0,lutxt=69
+  integer :: stat,ip1,ip2
   integer :: fnom,fstouv,fstfrm
   logical :: ok
 
@@ -21,9 +21,12 @@ program constructor
      print*,'No record in RPN file'
      call abort
   endif
+  open(unit=lutxt,file='data/dm_5002_ips.txt',status='OLD')
+  read(lutxt,*) ip1,ip2
+  close(lutxt)
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = gd_new(d,unit=lu,format="fst",ip1=2009,ip2=1000)
+  stat = gd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
   call ut_report(stat,'Grid_Descriptors, gd_new, gd_get CA')
 
   stat=fstfrm(lu)

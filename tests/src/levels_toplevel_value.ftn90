@@ -27,7 +27,18 @@ program tests
 
   allocate(px(ni,nj))
   stat = fstlir(px,lu,ni,nj,nk,-1,'',93423264,-1,-1,'','PX')
-  call ut_report(abs(lev(22,15,1)/100.-px(22,15))<epsilon,message='Grid_Descriptors::gd_levels level calculation status')
+
+  
+
+  print*, lev(10,10,1)/100.,px(10,10)
+
+
+  stat = fstlir(px,lu,ni,nj,nk,-1,'',-1,-1,-1,'','P0')
+
+  print*, px(10,10)
+
+
+  call ut_report(abs(lev(10,10,1)/100.-px(10,10)   + 1.)<epsilon,message='Grid_Descriptors::gd_levels level calculation status')
 
   stat=fstfrm(lu)
   stat=fclos(lu)

@@ -2,6 +2,7 @@
 FCFLAGS='=-C -g'
 RCOMPILE = r.compile
 DESCRIP_PATH = ../
+DATA_ARCH=$(EC_ARCH)
 
 # Override incorrect implicits
 %.o : %.mod
@@ -20,6 +21,10 @@ $(DESCRIP_PATH)grid_descriptors.o: $(DESCRIP_PATH)grid_descriptors.ftn90
 	exit
 
 tests:
+	rm -f data/* 2>/dev/null; \
+	cd data ; \
+        ln -s $(DATA_ARCH)/* . ; \
+	cd .. ; \
 	run_tests.ksh $(ONLY)
 
 clean:

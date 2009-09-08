@@ -5,9 +5,9 @@ program get_levels_from_keys
   implicit none
 
   type(grid_descriptor) :: d
-  integer, parameter :: lu=10, nmax=1000
+  integer, parameter :: lu=10, nmax=1000, lutxt=69
   integer, dimension(nmax) :: liste
-  integer :: stat,infon,ier
+  integer :: stat,infon,ier,ip1,ip2
   integer :: ni,nj,nk,fnom,fstouv,fstfrm,fstinf,key,fstluk,fstinl
   real, dimension(:,:,:), pointer :: pres
   logical :: ok
@@ -22,9 +22,12 @@ program get_levels_from_keys
      print*,'No record in RPN file'
      call abort
   endif
+  open(unit=lutxt,file='data/dm_5002_ips.txt',status='OLD')
+  read(lutxt,*) ip1,ip2
+  close(lutxt)
 
   ! Get vertical grid descriptor
-  stat = gd_new(d,unit=lu,format="fst",ip1=2009,ip2=1000)
+  stat = gd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
   if(stat < 0 )then
      print*,'Problem getting vertical grid descriptor'
      stop

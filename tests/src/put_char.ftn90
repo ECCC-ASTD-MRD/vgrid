@@ -5,7 +5,7 @@ program tests
   implicit none
 
   type(grid_descriptor) :: d
-  integer :: stat,fstkey,lu=0,fnom,fstouv,fstfrm,fclos
+  integer :: stat,fstkey,lu=0,fnom,fstouv,fstfrm,fclos,lutxt=69,ip1,ip2
   real, dimension(:,:,:), allocatable :: lev
   character(len=GD_LEN_NAME) :: rfld
 
@@ -19,9 +19,12 @@ program tests
      print*,'No record in RPN file'
      call abort
   endif
+  open(unit=lutxt,file='data/dm_5002_ips.txt',status='OLD')
+  read(lutxt,*) ip1,ip2
+  close(lutxt)
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = gd_new(d,unit=lu,format="fst",ip1=2009,ip2=1000)
+  stat = gd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
 
   ! Change an element of the structure
   stat = gd_put(d,key='RFLD - reference field name',value='TEST')

@@ -4,7 +4,7 @@ program tests
 
   implicit none
 
-  integer :: stat,lu=0,ni,nj,fnom,fstouv,fstfrm,fclos,fstlir,fstinf,k
+  integer :: stat,lu=0,ni,nj,fnom,fstouv,fstfrm,fclos,fstlir,fstinf,k,lutxt=69,ip1,ip2
   integer, parameter :: i0=20,j0=10,nk=5
   integer, dimension(:), pointer :: ip1_list
   real, dimension(:), pointer :: pres_profil
@@ -25,9 +25,12 @@ program tests
      print*,'No record in RPN file'
      call abort
   endif
+  open(unit=lutxt,file='data/dm_5001_ips.txt',status='OLD')
+  read(lutxt,*) ip1,ip2
+  close(lutxt)
 
   ! Get physical levelling information
-  stat = gd_new(d,unit=lu,format="fst",ip1=2009,ip2=1000)
+  stat = gd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
   
   stat = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',"UU")
 

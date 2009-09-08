@@ -5,7 +5,7 @@ program tests
   implicit none
 
   type(grid_descriptor) :: d
-  integer :: stat,lu=0
+  integer :: stat,lu=0,lutxt=69,ip1,ip2
 
   integer, external :: fnom,fstouv,fclos,fstfrm
 
@@ -20,9 +20,12 @@ program tests
      print*,'No record in RPN file'
      call abort()
   endif
+  open(unit=lutxt,file='data/dm_5002_ips.txt',status='OLD')
+  read(lutxt,*) ip1,ip2
+  close(lutxt)
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = gd_new(d,unit=lu,format="fst",ip1=2009,ip2=1000)
+  stat = gd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
 
   ! Print information about the instance
   stat = gd_write(d,unit=lu,format='fst')
