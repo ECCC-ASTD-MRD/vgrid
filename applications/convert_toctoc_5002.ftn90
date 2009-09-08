@@ -43,13 +43,13 @@ program convert_toctoc_5002
    
    info_L=.false.
    if(val(1).eq.'undef')then
-      print*,'usage :    convert_toctoc_5002 -s sorce_file -d destination_file'
-      print*,'        or convert_toctoc_5002 -s sorce_file -samefile'
+      print*,'usage :    convert_toctoc_5002 -s source_file -d destination_file'
+      print*,'        or convert_toctoc_5002 -s source_file -samefile'
       stop
    endif
    
    if(val(2).eq.'undef'.and.val(3).eq.'NO')then
-      print*,'usage :    convert_toctoc_5002 -s sorce_file -d destination_file'
+      print*,'usage :    convert_toctoc_5002 -s source_file -d destination_file'
       stop
    endif
    
