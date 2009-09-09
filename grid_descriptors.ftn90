@@ -89,7 +89,7 @@ module Grid_Descriptors
      type(vcoord) :: zz                         !vertical coordinate descriptor
      integer :: ip1=0,ip2=0                     !ip1,2 values given to the 3D descriptor
      integer :: unit                            !file unit associated with this 3D descriptor
-     logical :: match_ipig=.true.               !do ip/ig matching for records
+     logical :: match_ipig                      !do ip/ig matching for records
   end type grid_descriptor
 
   interface gd_new
@@ -189,7 +189,11 @@ contains
 
       ! Set instance variables
       self%unit = unit
-      if (any((/ip1,ip2/) < 0)) self%match_ipig = .false.
+      if (any((/ip1,ip2/) < 0)) then
+         self%match_ipig = .false.
+      else
+         self%match_ipig = .true.
+      endif
 
       ! Construct horizontal descriptors
       self%xx%rec%nomvar = '>>'
@@ -355,6 +359,7 @@ contains
       if (present(ip1)) self%ip1 = ip1
       if (present(ip2)) self%ip2 = ip2
       self%unit = -1      
+      self%match_ipig=.true.
 
       ! Check for required inputs
       error = set_vcode(self,kind,version)
