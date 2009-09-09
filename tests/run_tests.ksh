@@ -51,6 +51,7 @@ rm -f fort.* test.bin
 total=$((passed + failed))
 if [[ ${failed} > 0 ]] ; then
   printf " * Failed ${failed}/${total} Tests\n"
+  exit
 else
   printf " * All Tests Succeeded\n"
   rm -f Makefile.test
