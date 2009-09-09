@@ -14,7 +14,7 @@ RMN = rmn_010
 
 OBJECTS = $(DESCRIP_PATH)grid_descriptors.o
 
-all: topLevel_levels lowLevel_levels
+all: compute_pressure convert_toctoc_5002
 
 convert_toctoc_5002: convert_toctoc_5002.ftn90 $(OBJECTS)
 	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $< -o $@ -librmn $(RMN)
@@ -30,5 +30,5 @@ clean:
 	rm -f *.f90 *.o *.mod test_output.fst
 
 distclean: clean
-	rm -f topLevel_levels lowLevel_levels compute_pressure_form_keys
+	rm -f compute_pressure convert_toctoc_5002
 

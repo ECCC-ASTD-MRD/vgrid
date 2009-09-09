@@ -1,9 +1,8 @@
 program compute_pressure
-  use Grid_Descriptors, only: grid_descriptor,gd_new,gd_levels,GD_OK
+  use Grid_Descriptors, only: gd_levels,GD_OK
   
   implicit none
 
-  type(grid_descriptor) :: d
   integer, parameter :: ncle=3,lui=10,luo=11, nmax=1000
   integer, dimension(nmax) :: liste
   integer :: stat,infon,ier,npos,i,k,exdb,exfin
@@ -68,13 +67,6 @@ program compute_pressure
      call exit(1)
   endif
 
-  ! Get vertical grid descriptor
-  stat = gd_new(d,unit=lui,format="fst",ip1=229,ip2=0)
-  if(stat .ne. GD_OK )then
-     print*,'Problem getting vertical grid descriptor'
-     call exit(1)
-  endif
-
   do i=1,2
      
      ier = fstinl(lui,ni,nj,nk,-1,' ',-1,-1,-1,' ',my_var(i),liste,infon,nmax)
@@ -85,7 +77,8 @@ program compute_pressure
      endif
      
      if(allocated(pres))deallocate(pres)
-     stat = gd_levels(d,unit=lui,fstkeys=liste(1:infon),levels=pres)
+
+     stat = gd_levels(unit=lui,fstkeys=liste(1:infon),levels=pres)
      if(stat .ne. GD_OK )then
         print*,'Problem with gd_levels'
         call exit(1)
@@ -95,7 +88,7 @@ program compute_pressure
         stat=fstprm(liste(k),dateo,deet,npas,ni,nj,nk,nbits,datyp,ip1,&
              ip2,ip3,typvar,nomvar,etiket,grtyp,ig1,ig2,ig3, &
              ig4,swa,lng,dltf,ubc,extra1,extra2,extra3)
-        stat=fstecr(pres(1,1,k),dummy,-64,luo,dateo,deet,npas,ni,nj,nk, &
+        stat=fstecr(pres(:,:,k),dummy,-nbits,luo,dateo,deet,npas,ni,nj,nk, &
              ip1,ip2,ip3,typvar,'PX','RECOMPUTED',grtyp,ig1,ig2,ig3,ig4,datyp,.true.)
      enddo
   enddo

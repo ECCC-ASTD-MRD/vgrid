@@ -1566,7 +1566,7 @@ contains
     character(len=*), intent(in) :: string      !Input string to upper-case
     character(len=LONG_STRING) :: upper_string  !Upper-cased result
     integer :: i
-    if (len_trim(string) > len_trim(upper_string)) then
+    if (len_trim(string) > len(upper_string)) then
        write(STDERR,*) 'WARNING: long string truncated in up() ',trim(string)
     endif
     upper_string = string
@@ -1683,8 +1683,6 @@ contains
 
      ! Set error status
      status = GD_ERROR
-
-     print*,'DANS GRID nk=',nk
 
      ! Allocate table space
      if (associated(self%zz%table)) deallocate(self%zz%table)         

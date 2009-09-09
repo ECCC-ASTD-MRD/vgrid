@@ -3,20 +3,20 @@
    implicit none
    !
    ! Variable declarations
-   integer :: status,key,ni,nj,nk,iun=0,count
-   integer, dimension(1000) :: keyList
+   integer :: status,count,ni,nj,nk,iun=0
+   integer, dimension(1000) :: keys
    real, dimension(:,:,:), pointer :: lev
    !
    ! External functions
    integer, external :: fstinl,fnom,fstouv,fstfrm,fclos
    !
    ! Open file and get FST key for field of interest (in this case TT)
-   status = fnom(iun,'../tests/data/dm_5002_from_model_run','STD',0)
+   status = fnom(iun,'../tests/data/Linux_pgi611/dm_5002_from_model_run','STD',0)
    status = fstouv(iun,'RND')
-   key = fstinl(iun,ni,nj,nk,-1,' ',-1,-1,-1,' ','TT',keyList,count,size(keyList))
+   status = fstinl(iun,ni,nj,nk,-1,' ',-1,-1,-1,' ','TT',keys,count,size(keys))
    !
    ! Calculate level information for this field
-   status = gd_levels(unit=iun,fstkeys=keyList(1:count),levels=lev)
+   status = gd_levels(unit=iun,fstkeys=keys(1:count),levels=lev)
    if (status /= GD_OK) write(0,*) 'WARNING - error during level calculation'
    !
    ! Generate a bit of output

@@ -6,7 +6,7 @@ program tests
   ! Variable declarations
   type(grid_descriptor) :: d
   integer, parameter :: STDERR=0
-  integer :: status,fstkey,ni,nj,nk,iun=0,oun=0
+  integer :: status,fstkey,ni,nj,nk,ip1,ip2,iun=0,oun=0,tun=69
   real, dimension(:,:,:), pointer :: lev
   character(len=GD_LEN_NAME) :: vname
 
@@ -14,14 +14,19 @@ program tests
   integer, external :: fstinf,fnom,fstouv,fstfrm,fclos
 
    ! Open file and get FST key for field of interest (in this case TT)
-   status = fnom(iun,'../tests/data/dm_5002_from_model_run','STD',0)
+   status = fnom(iun,'../tests/data/Linux_pgi611/dm_5002_from_model_run','STD',0)
    status = fstouv(iun,'RND')
    status = fnom(oun,'test_output.fst','STD',0)
    status = fstouv(oun,'RND')
    fstkey = fstinf(iun,ni,nj,nk,-1,' ',-1,-1,-1,' ','TT')
 
+   ! Open associated text file to get ip1/2 values of descriptors
+   open(unit=tun,file='../tests/data/Linux_pgi611/dm_5002_ips.txt',status='OLD')
+   read(tun,*) ip1,ip2
+   close(tun)
+
   ! Construct a new set of 3D coordinate descriptors
-  status = gd_new(d,unit=iun,format='fst',ip1=2009,ip2=1000)
+  status = gd_new(d,unit=iun,format='fst',ip1=ip1,ip2=ip2)
   if (status /= GD_OK) write(STDERR,*) 'WARNING - error during construction'
 
   ! Get information about the coordinate

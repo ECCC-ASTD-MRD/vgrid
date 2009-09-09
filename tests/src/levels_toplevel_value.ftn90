@@ -5,7 +5,7 @@ program tests
   implicit none
 
   integer :: stat,lu=0,ni,nj,nk,fnom,fstouv,fstfrm,fclos,fstkey,fstlir,fstinf
-  real :: epsilon=.001
+  real :: epsilon=.01
   real, dimension(:,:), allocatable :: px
   real, dimension(:,:,:), pointer :: lev
 
@@ -22,23 +22,11 @@ program tests
 
   ! Get physical levelling information
   fstkey = fstinf(lu,ni,nj,nk,-1,'',93423264,-1,-1,'','TT')
-
   stat = gd_levels(unit=lu,fstkeys=(/fstkey/),levels=lev)
-
   allocate(px(ni,nj))
   stat = fstlir(px,lu,ni,nj,nk,-1,'',93423264,-1,-1,'','PX')
-
-  
-
-  print*, lev(10,10,1)/100.,px(10,10)
-
-
   stat = fstlir(px,lu,ni,nj,nk,-1,'',-1,-1,-1,'','P0')
-
-  print*, px(10,10)
-
-
-  call ut_report(abs(lev(10,10,1)/100.-px(10,10)   + 1.)<epsilon,message='Grid_Descriptors::gd_levels level calculation status')
+  call ut_report(abs(lev(10,10,1)/100.-px(10,10))<epsilon,message='Grid_Descriptors::gd_levels level calculation status')
 
   stat=fstfrm(lu)
   stat=fclos(lu)
