@@ -28,6 +28,7 @@ module Grid_Descriptors
   integer, parameter :: MAX_VKIND=100           !maximum number of 'kind' (used in error check)
   integer, parameter :: KEY_LENGTH=4            !length of key string considered for get/put operations
   integer, parameter :: DIR_LENGTH=1            !length of directional identifier for get/put operations
+  integer, parameter :: MAX_DESC_REC=10000      !maximum number of descriptor records in a single file
   character(len=1), dimension(3), parameter :: MATCH_GRTYP=(/'X','Y','Z'/) !grid types with ip1,2 to ig1,2 mapping
 
   ! Validity table
@@ -86,8 +87,9 @@ module Grid_Descriptors
      private
      type(hcoord) :: xx,yy                      !x,y direction coordinate descriptors
      type(vcoord) :: zz                         !vertical coordinate descriptor
-     integer :: ip1=0,ip2=0                     !ip1,2 values associated with this 3D descriptor
+     integer :: ip1=0,ip2=0                     !ip1,2 values given to the 3D descriptor
      integer :: unit                            !file unit associated with this 3D descriptor
+     logical :: match_ipig=.true.               !do ip/ig matching for records
   end type grid_descriptor
 
   interface gd_new
@@ -168,132 +170,158 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Class constructor
 
-  integer function new_read(self,unit,format,ip1,ip2) result(status)
-    ! Coordinate constructor - read from a file and initialize instance
-    type(grid_descriptor), intent(out) :: self  !Descriptor instance
-    integer, intent(in) :: unit                 !File unit to read descriptor information from
-    character(len=*), intent(in) :: format      !File format ('fst' or 'bin')
-    integer, intent(in) :: ip1,ip2              !ip1,2 values of the desired descriptors
+   integer function new_read(self,unit,format,ip1,ip2) result(status)
+      ! Coordinate constructor - read from a file and initialize instance
+      type(grid_descriptor), intent(out) :: self  !Descriptor instance
+      integer, intent(in) :: unit                 !File unit to read descriptor information from
+      character(len=*), intent(in) :: format      !File format ('fst' or 'bin')
+      integer, intent(in) :: ip1,ip2              !ip1,2 values of the desired descriptors
 
-    ! Internal variables
-    integer :: istat,key,error,kind,version,my_ip1,my_ip2,count
-    integer :: fstinf,fstinl,fstluk,fstprm,ni,nj,nk,swa,lng,ubc,dltf,extra1,extra2,extra3
-    integer, dimension(2) :: keyList
+      ! Internal variables
+      integer :: istat,key,error,kind,version,count,i
+      integer :: fstinf,fstinl,fstluk,fstprm,ni,nj,nk,swa,lng,ubc,dltf,extra1,extra2,extra3
+      integer, dimension(MAX_DESC_REC) :: keyList
+      type(FSTD_ext) :: var
+      real*8, dimension(:,:,:), allocatable :: l_table
 
-    ! Set error status
-    status = GD_ERROR
+      ! Set error status
+      status = GD_ERROR
 
-    ! Set instance variables
-    self%ip1 = ip1
-    self%ip2 = ip2
-    self%unit = unit
+      ! Set instance variables
+      self%unit = unit
+      if (any((/ip1,ip2/) < 0)) self%match_ipig = .false.
 
-    ! Construct horizontal descriptors
-    self%xx%rec%nomvar = '>>'
-    self%yy%rec%nomvar = '^^'
-    self%xx%hcode = -1
-    self%yy%hcode = -1
+      ! Construct horizontal descriptors
+      self%xx%rec%nomvar = '>>'
+      self%yy%rec%nomvar = '^^'
+      self%xx%hcode = -1
+      self%yy%hcode = -1
 
-    ! Construct vertical descriptor
-    self%zz%rec%nomvar = ZNAME
-    select case (trim(up(format)))
-    
-    ! RPN Standard file input
-    case ('FST')
-       if(.not.match_descriptor(self)) then
-          error = fstinl(unit,ni,nj,nk,-1,' ',ip1,ip2,-1,' ',self%zz%rec%nomvar,keyList,count,size(keyList))
-          if (error < 0) then
-             write(STDERR,*) 'ERROR: problem retrieving '//trim(self%zz%rec%nomvar)//' keys for ip1,ip2: ',ip1,ip2
-             self%zz%vcode = -1
-             return
-          endif
-          if (count > 1) then
-             write(STDERR,*) 'ERROR: multiple descriptors found during wildcard construction with ip1,ip2: ',ip1,ip2
-             self%zz%vcode = -1
-             return
-          endif
-       endif
-       key=fstinf(unit,ni,nj,nk,-1,' ',ip1,ip2,-1,' ',self%zz%rec%nomvar)
-       if(key < 0)then
-          write(STDERR,'("WARNING: cannot find '//trim(self%zz%rec%nomvar)//' with the following: ip1=",i10,",ip2=",i10)')ip1,ip2
-          self%zz%vcode = -1
-          return
-       endif
-       allocate(self%zz%table(ni,nj,nk),stat=istat)
-       if (istat /= 0) then
-          write(STDERR,*) 'ERROR: unable to allocate self%zz%table'
-          return
-       endif
-       istat=fstluk(self%zz%table,key,ni,nj,nk)
-       if(istat < 0)then
-          write(STDERR,*) 'ERROR: problem with fstluk on '//trim(self%zz%rec%nomvar)
-          return
-       endif
-       ! Sorry, I have to use fstprm!
-       istat=fstprm(key, self%zz%rec%dateo, self%zz%rec%deet, self%zz%rec%npas, &
-            ni, nj, nk, self%zz%rec%nbits, self%zz%rec%datyp, my_ip1, my_ip2, self%zz%rec%ip3, &
-            self%zz%rec%typvar,self%zz%rec%nomvar, self%zz%rec%etiket, self%zz%rec%grtyp,&
-            self%zz%rec%ig1, self%zz%rec%ig2, self%zz%rec%ig3, self%zz%rec%ig4, &
-            swa,lng,dltf,ubc,extra1,extra2,extra3)
+      ! Construct vertical descriptor
+      self%zz%rec%nomvar = ZNAME
+      select case (trim(up(format)))
 
-    ! Fortran binary file input (must already be in the correct position)
-    case ('BIN')
-       read(unit) ni,nj,nk
-       allocate(self%zz%table(ni,nj,nk),stat=istat)
-       if (istat /= 0) then
-          write(STDERR,*) 'ERROR: unable to allocate self%zz%table'
-          return
-       endif
-       read(unit) self%zz%table
-       self%zz%rec%dateo = 0
-       self%zz%rec%deet = 0
-       self%zz%rec%npas = 0
-       self%zz%rec%nbits = 32
-       self%zz%rec%datyp = 1
-       self%zz%rec%ip3 = 0
-       self%zz%rec%typvar = 'X'
-       self%zz%rec%etiket = ''
-       self%zz%rec%grtyp = 'X'
-       self%zz%rec%ig1 = 0
-       self%zz%rec%ig2 = 0
-       self%zz%rec%ig3 = 0
-       self%zz%rec%ig4 = 0
+         ! RPN Standard file input
+      case ('FST')
+         key=fstinf(unit,ni,nj,nk,-1,' ',ip1,ip2,-1,' ',self%zz%rec%nomvar)
+         if(key < 0)then
+            write(STDERR,'("WARNING: cannot find '//trim(self%zz%rec%nomvar)//' with the following: ip1=",i10,",ip2=",i10)')ip1,ip2
+            self%zz%vcode = -1
+            return
+         endif
+         allocate(self%zz%table(ni,nj,nk),stat=istat)
+         if (istat /= 0) then
+            write(STDERR,*) 'ERROR: unable to allocate self%zz%table'
+            return
+         endif
+         istat=fstluk(self%zz%table,key,ni,nj,nk)
+         if(istat < 0)then
+            write(STDERR,*) 'ERROR: problem with fstluk on '//trim(self%zz%rec%nomvar)
+            return
+         endif
+         ! Sorry, I have to use fstprm!
+         istat=fstprm(key, self%zz%rec%dateo, self%zz%rec%deet, self%zz%rec%npas, &
+              ni, nj, nk, self%zz%rec%nbits, self%zz%rec%datyp, self%ip1, self%ip2, self%zz%rec%ip3, &
+              self%zz%rec%typvar,self%zz%rec%nomvar, self%zz%rec%etiket, self%zz%rec%grtyp,&
+              self%zz%rec%ig1, self%zz%rec%ig2, self%zz%rec%ig3, self%zz%rec%ig4, &
+              swa,lng,dltf,ubc,extra1,extra2,extra3)         
 
-    ! Warn user on invalid input format specification
-    case DEFAULT
-       write(STDERR,*) 'ERROR: invalid constructor format request ',trim(format)
-       return
-    end select
+         ! Check for multiple (different) descriptors
+         error = fstinl(unit,ni,nj,nk,-1,' ',ip1,ip2,-1,' ',self%zz%rec%nomvar,keyList,count,size(keyList))
+         if (error < 0) then
+            write(STDERR,*) 'ERROR: problem retrieving '//trim(self%zz%rec%nomvar)//' keys for ip1,ip2: ',ip1,ip2
+            self%zz%vcode = -1
+            return
+         endif
+         if(count>1)then
+            do i=2,count
+               error=my_fstprm(keyList(i),var)
+               if (error < 0) then
+                  write(STDERR,*) 'ERROR: problem with my_fstprm in new_read'
+                  self%zz%vcode = -1
+                  return
+               endif
+               if(var%ip1 /= self%ip1 .or. var%ip2 /= self%ip2 .or. &
+                    var%ni  /= ni     .or. var%nj  /= nj     .or.  var%nk  /= nk )then
+                  write(STDERR,*) 'ERROR: found different vertical descriptors after wildcard (-1) search'
+                  self%zz%vcode = -1
+                  return
+               endif
+               allocate(l_table(ni,nj,nk),stat=istat)
+               if (istat /= 0) then
+                  write(STDERR,*) 'ERROR: unable to allocate l_table'
+                  return
+               endif
+               istat=fstluk(l_table,keyList(i),ni,nj,nk)
+               if(istat < 0)then
+                  write(STDERR,*) 'ERROR: problem with fstluk on l_table i=',i
+                  return
+               endif
+               if(any(l_table /= self%zz%table))then
+                  write(STDERR,*) 'ERROR: found different entries in vertical descriptors after wildcard (-1) search'
+                  return
+               endif
+            enddo
+         endif
 
-    ! Set internal vcode (if all above was successful)
-    error = set_vcode(self)
-    select case (self%zz%vcode)
-    case (2001)
-       istat=decode_vert_2001(self)
-    case (5001)
-       istat=decode_vert_5001(self)
-       if(istat < 0)then
-          write(STDERR,*) 'ERROR: problem with fstluk on '//trim(self%zz%rec%nomvar)
-          return
-       endif
-    case (5002)
-       istat=decode_vert_5002(self)
-       if(istat < 0)then
-          write(STDERR,*) 'ERROR: problem with fstluk on '//trim(self%zz%rec%nomvar)
-          return
-       endif
-    case DEFAULT
-       istat = get_version_info(self,kind,version)
-       write(STDERR,*) 'ERROR: kind or version invalid :',kind,version
-       return
-    end select
+         ! Fortran binary file input (must already be in the correct position)
+      case ('BIN')
+         read(unit) ni,nj,nk
+         allocate(self%zz%table(ni,nj,nk),stat=istat)
+         if (istat /= 0) then
+            write(STDERR,*) 'ERROR: unable to allocate self%zz%table'
+            return
+         endif
+         read(unit) self%zz%table
+         self%zz%rec%dateo = 0
+         self%zz%rec%deet = 0
+         self%zz%rec%npas = 0
+         self%zz%rec%nbits = 32
+         self%zz%rec%datyp = 1
+         self%zz%rec%ip3 = 0
+         self%zz%rec%typvar = 'X'
+         self%zz%rec%etiket = ''
+         self%zz%rec%grtyp = 'X'
+         self%zz%rec%ig1 = 0
+         self%zz%rec%ig2 = 0
+         self%zz%rec%ig3 = 0
+         self%zz%rec%ig4 = 0
 
-    ! Set status and return
-    if ( found_descriptor(self,'x') .or. &
-         found_descriptor(self,'y') .or. &
-         found_descriptor(self,'z')) status = GD_OK
-    return
-  end function new_read
+         ! Warn user on invalid input format specification
+      case DEFAULT
+         write(STDERR,*) 'ERROR: invalid constructor format request ',trim(format)
+         return
+      end select
+
+      ! Set internal vcode (if all above was successful)
+      error = set_vcode(self)
+      select case (self%zz%vcode)
+      case (2001)
+         istat=decode_vert_2001(self)
+      case (5001)
+         istat=decode_vert_5001(self)
+         if(istat < 0)then
+            write(STDERR,*) 'ERROR: problem with fstluk on '//trim(self%zz%rec%nomvar)
+            return
+         endif
+      case (5002)
+         istat=decode_vert_5002(self)
+         if(istat < 0)then
+            write(STDERR,*) 'ERROR: problem with fstluk on '//trim(self%zz%rec%nomvar)
+            return
+         endif
+      case DEFAULT
+         istat = get_version_info(self,kind,version)
+         write(STDERR,*) 'ERROR: kind or version invalid :',kind,version
+         return
+      end select
+
+      ! Set status and return
+      if ( found_descriptor(self,'x') .or. &
+           found_descriptor(self,'y') .or. &
+           found_descriptor(self,'z')) status = GD_OK
+      return
+   end function new_read
 
    integer function new_build_vert(self,kind,version,nk,ip1,ip2, &
         ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8, &
@@ -1369,7 +1397,7 @@ contains
           return
        endif
     enddo check_times
-    if (match_descriptor(self)) then
+    if (self%match_ipig) then
        if (prmk%ig1 /= self%ip1 .or. prmk%ig2 /= self%ip2) then
           write(STDERR,*) 'ERROR: fstkeys do not correspond to the correct grid descriptor'
           return
@@ -1389,7 +1417,7 @@ contains
           write(STDERR,*) 'ERROR: horizontal grid mismatch for '//trim(self%zz%ref_name),ni,nj,' vs',prmk%ni,prmk%nj
           return
        endif
-       if (match_descriptor(self)) then
+       if (self%match_ipig) then
           if (prm_p0%ig1 /= self%ip1 .or. prm_p0%ig2 /= self%ip2) then
              write(STDERR,*) 'ERROR: sfc_field ig1-2 do not correspond to the correct grid descriptor'
              return
@@ -2298,14 +2326,6 @@ contains
     call incdatr(record%datev,record%dateo,nhours)
     status = GD_OK
   end function my_fstprm
-
-  logical function match_descriptor(self) result(match)
-    ! Decide whether the descriptor IP1,IP2 should match the record IG1,IG2
-    type(grid_descriptor), intent(in) :: self           !Descriptor instance
-    match = .true.
-    if (self%ip1 < 0 .or. self%ip2 < 0) match = .false.
-    return
-  end function match_descriptor
 
   logical function is_big_endian() result(bend)
     ! Determine the endianness of the machine

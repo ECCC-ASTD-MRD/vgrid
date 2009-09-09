@@ -93,8 +93,6 @@ program compute_pressure
      enddo
   enddo
 
-  
-
   stat=fstfrm(lui)
   stat=fstfrm(luo)
   

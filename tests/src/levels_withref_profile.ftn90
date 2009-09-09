@@ -4,7 +4,7 @@ program tests
 
   implicit none
 
-  integer :: stat,lu=0,ni,nj,fnom,fstouv,fstfrm,fclos,fstlir,fstinf,k,lutxt=69,ip1,ip2
+  integer :: stat,lu=0,ni,nj,nkk,fnom,fstouv,fstfrm,fclos,fstlir,fstinf,k,lutxt=69,ip1,ip2
   integer, parameter :: i0=20,j0=10,nk=5
   integer, dimension(:), pointer :: ip1_list
   real, dimension(:), pointer :: pres_profil
@@ -31,12 +31,12 @@ program tests
 
   ! Get physical levelling information
   stat = gd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
-  stat = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',"UU")
+  stat = fstinf(lu,ni,nj,nkk,-1,' ',-1,-1,-1,' ',"UU")
   allocate(p0(ni,nj),ip1_list(nk),px(ni,nj))
 
   ip1_list=(/95294347,95327133,95351970,95364885,93423264/)
 
-  stat = fstlir(p0,lu,ni,nj,nk,-1,'',-1,-1,-1,'','P0')
+  stat = fstlir(p0,lu,ni,nj,nkk,-1,'',-1,-1,-1,'','P0')
   p0 = p0*100. !mb to Pa
   
   local_pres=p0(i0,j0)  
@@ -47,10 +47,10 @@ program tests
 
   OK=.true.
   do k=1,nk
-     stat = fstlir(px,lu,ni,nj,nk,-1,'',ip1_list(k),-1,-1,'','PX')
+     stat = fstlir(px,lu,ni,nj,nkk,-1,'',ip1_list(k),-1,-1,'','PX')
      print*,px(i0,j0),pres_profil(k)
      if(abs(pres_profil(k)-px(i0,j0))>epsilon)then
-        print*,'OUPS'
+        print*,'****** OUPS ******'
         OK=.false.
      endif
   enddo
