@@ -38,9 +38,6 @@ program tests
   allocate(px(ni,nj))
   stat = fstlir(px,lu,ni,nj,nk,-1,'',ip1s(testLev),-1,-1,'','PX')
   stat = gd_levels(d,unit=lu,fstkeys=fstkeys(1:count),levels=lev)
-
-  print*, lev(10,5,testLev)/100.,px(10,5)
-
   call ut_report(abs(lev(10,5,testLev)/100.-px(10,5))<epsilon,message='Grid_Descriptors::gd_levels level calculation status')
 
   stat=fstfrm(lu)
