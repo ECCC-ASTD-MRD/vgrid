@@ -5,7 +5,7 @@ program tests
   implicit none
 
   integer :: stat,lu=0,ni,nj,nk,fnom,fstouv,fstfrm,fclos,fstkey,fstlir,fstinf,lutxt=69,ip1,ip2
-  real :: epsilon=.01
+  real :: epsilon=0.01
   real, dimension(:,:), allocatable :: p0,px
   real, dimension(:,:,:), pointer :: lev
   type(grid_descriptor) :: d

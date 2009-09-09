@@ -10,7 +10,7 @@ program tests
   integer :: testLev=10
   integer, dimension(100) :: fstkeys
   integer, dimension(:), allocatable :: ip1s
-  real :: epsilon=.001
+  real :: epsilon=0.01
   real, dimension(:,:), allocatable :: p0,px
   real, dimension(:,:,:), pointer :: lev
   character(len=12) :: typvar,nomvar,etiket,grtyp

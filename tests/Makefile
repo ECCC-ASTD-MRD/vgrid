@@ -14,6 +14,10 @@ DATA_ARCH=$(EC_ARCH)
 
 OBJECTS = $(DESCRIP_PATH)grid_descriptors.o unit_testing.o
 
+all:
+	make tests DATA_ARCH=Linux_pgi611; \
+	make tests DATA_ARCH=AIX
+
 unit_testing.o: unit_testing.ftn90
 
 $(DESCRIP_PATH)grid_descriptors.o: $(DESCRIP_PATH)grid_descriptors.ftn90

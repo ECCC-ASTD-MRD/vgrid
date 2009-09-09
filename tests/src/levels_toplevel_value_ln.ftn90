@@ -5,7 +5,7 @@ program tests
   implicit none
 
   integer :: stat,lu=0,ni,nj,nk,fnom,fstouv,fstfrm,fclos,fstkey,fstlir,fstinf
-  real :: epsilon=.001
+  real :: epsilon=0.01
   real, dimension(:,:), allocatable :: px
   real, dimension(:,:,:), pointer :: lev
 
