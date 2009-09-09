@@ -302,7 +302,7 @@ contains
       type(grid_descriptor), intent(out) :: self        !Descriptor instance    
       integer, intent(in) :: kind,version               !Kind,version to create
       integer, intent(in) :: nk                         !Number of levels
-      integer, optional, intent(in) :: ip1,ip2          !IP1,2 values for FST file record [0,0,0]
+      integer, optional, intent(in) :: ip1,ip2          !IP1,2 values for FST file record [0,0]
       real, optional, intent(in) :: rcoef1,rcoef2       !R-coefficient values for rectification
       real*8, optional, intent(in) :: ptop_8            !Top-level pressure (Pa)
       real*8, optional, intent(in) :: pref_8            !Reference-level pressure (Pa)

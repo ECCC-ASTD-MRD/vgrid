@@ -14,17 +14,18 @@ DATA_ARCH=$(EC_ARCH)
 
 OBJECTS = $(DESCRIP_PATH)grid_descriptors.o unit_testing.o
 
-all:
-	make tests DATA_ARCH=Linux_pgi611; \
-	make tests DATA_ARCH=AIX
-
 unit_testing.o: unit_testing.ftn90
+
+tests:
+	make local_tests DATA_ARCH=Linux_pgi611; \
+        make local_tests DATA_ARCH=AIX
+
 
 $(DESCRIP_PATH)grid_descriptors.o: $(DESCRIP_PATH)grid_descriptors.ftn90
 	echo "STOP: $(DESCRIP_PATH)grid_descriptors has been updated ... recompilation needed in $(DESCRIP_PATH)"; \
 	exit
 
-tests:
+local_tests:
 	rm -f data/* 2>/dev/null; \
 	cd data ; \
         ln -s $(DATA_ARCH)/* . ; \
