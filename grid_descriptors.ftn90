@@ -238,6 +238,11 @@ contains
             return
          endif
          if(count>1)then
+            allocate(l_table(ni,nj,nk),stat=istat)
+            if (istat /= 0) then
+               write(STDERR,*) 'ERROR: unable to allocate l_table'
+               return
+            endif
             do i=2,count
                error=my_fstprm(keyList(i),var)
                if (error < 0) then
@@ -251,11 +256,6 @@ contains
                   self%zz%vcode = -1
                   return
                endif
-               allocate(l_table(ni,nj,nk),stat=istat)
-               if (istat /= 0) then
-                  write(STDERR,*) 'ERROR: unable to allocate l_table'
-                  return
-               endif
                istat=fstluk(l_table,keyList(i),ni,nj,nk)
                if(istat < 0)then
                   write(STDERR,*) 'ERROR: problem with fstluk on l_table i=',i
@@ -266,6 +266,7 @@ contains
                   return
                endif
             enddo
+            deallocate(l_table)
          endif
 
          ! Fortran binary file input (must already be in the correct position)
