@@ -1,0 +1,165 @@
+program constructor
+
+  use Grid_Descriptors, only: grid_descriptor,gd_new,gd_write,GD_OK
+  use Unit_Testing, only: ut_report
+
+  implicit none
+
+  type(grid_descriptor) :: d
+  integer, parameter :: lui=10,luo=20,nmax=1000
+  integer, dimension(nmax) :: liste
+  integer :: stat,k,infon,ind,kind,keyhy,keypt,nii,njj,nkk,ig1tt,ig2tt
+  integer :: fnom,fstouv,fstfrm,fstinl,fstprm,fstinf,fstluk
+  logical :: ok
+  real, dimension(:),allocatable :: eta
+  real, dimension(:,:,:),allocatable :: ptop
+  real*8, dimension(:),allocatable :: a_m_8,b_m_8
+  real*8, dimension(:),allocatable :: a_t_8, b_t_8
+  real*8 :: ptop_8
+  real :: pp,rcoef1
+  integer, dimension(:),allocatable :: ip1_m,ip1_t
+  character(len=10) :: blk_S
+
+  ! For fstprm
+  integer :: ig1,ig2,ig3,ig4,dateo,deet,npas,datyp,nbits
+  integer :: ni,nj,nk,ni2,nj2,nk2,nit,njt,nkt,nkmod
+  integer :: ip1,ip2,ip3,swa,lng,dltf,ubc,extra1,extra2,extra3,datev
+  character(len=1) :: grtyp
+  character(len=2) :: typvar
+  character(len=4) :: nomvar
+  character(len=12) :: etiket
+
+  stat=fnom(lui,"data/dm_1002_from_model_run","RND+OLD",0)
+  if(stat.lt.0)then
+     print*,'ERROR with fnom 1'
+     call abort
+  endif
+  stat=fstouv(lui,'RND')
+
+  stat=fnom(luo,"data/dm_1002","RND",0)
+  if(stat.lt.0)then
+     print*,'ERROR with fnom 2'
+     call abort
+  endif
+  stat=fstouv(luo,'RND')
+
+  stat=fstinl(lui,ni,nj,nk,-1,' ',-1,-1,-1,' ','TT',liste,infon,nmax)
+  if(stat.lt.0)then
+     print*,'ERROR with fstinl'
+     call close_fst(lui,luo)
+     call abort
+  endif
+  
+  nk=infon
+
+  if(nk.le.0)then
+     print*,'ERROR no TT records'
+     call close_fst(lui,luo)
+     call abort
+  endif
+
+  allocate(ip1_m(nk),a_m_8(nk),b_m_8(nk),eta(nk))
+
+  do k=1,nk
+     stat=fstprm(liste(k),dateo,deet,npas,nii,njj,nkk,nbits,datyp,ip1,&
+          ip2,ip3,typvar,nomvar,etiket,grtyp,ig1tt,ig2tt,ig3, &
+          ig4,swa,lng,dltf,ubc,extra1,extra2,extra3)
+     if(stat.lt.0)then
+        print*,'ERROR with fstprm'
+        call close_fst(lui,luo)
+        call abort
+     endif
+     call convip(ip1,eta(k),kind,-1,blk_S,.false.)
+     ip1_m(k)=ip1
+     print*,eta(k)
+     if(kind.ne.1)then
+        print*,'ERROR wrong kind:',kind
+        call close_fst(lui,luo)
+        call abort
+     endif
+  enddo
+
+  keypt=fstinf(lui,nii,njj,nkk,-1,' ',-1,-1,-1,' ','PT')
+  if(keypt.lt.0)then
+     print*,'WARNING cannot find PT. Will look for HY'
+     keyhy=fstinf(lui,nii,njj,nkk,-1,' ',-1,-1,-1,' ','HY')
+     if(keyhy.lt.0)then
+        print*,'ERROR with fstinf on HY. Will abort'
+        call close_fst(lui,luo)
+        call abort
+     endif
+  endif
+
+  if (keypt.ge.0) then
+     stat=fstprm(keypt,dateo,deet,npas,nii,njj,nkk,nbits,datyp,ip1,&
+          ip2,ip3,typvar,nomvar,etiket,grtyp,ig1,ig2,ig3, &
+          ig4,swa,lng,dltf,ubc,extra1,extra2,extra3)
+     allocate(ptop(nii,njj,nkk))
+     stat=fstluk(ptop,keypt,nii,njj,nkk)
+     ptop_8=ptop(1,1,1)*100.d0
+  endif
+  if (keypt.lt.0 .and. keyhy.ge.0) then
+     stat=fstprm(keyhy,dateo,deet,npas,nii,njj,nkk,nbits,datyp,ip1,&
+          ip2,ip3,typvar,nomvar,etiket,grtyp,ig1,ig2,ig3, &
+          ig4,swa,lng,dltf,ubc,extra1,extra2,extra3)
+     rcoef1=ig2/1000.
+     if (ig2.ne.1000) then
+        print*,'ERROR with rcoef not equal 1.0 from HY. rcoef= ',rcoef1
+        call close_fst(lui,luo)
+        call abort
+     endif
+     call convip(ip1,pp,kind,-1,blk_S,.false.)
+     ptop_8=pp*100.d0
+  endif
+  print*,'nk,ptop_8',nk,ptop_8
+
+  do k=1,nk
+     b_m_8(k)= eta(k)
+     a_m_8(k)= ptop_8*(1.0-eta(k))
+     print*,'k,b_m_8(k),a_m_8(k)=',k,b_m_8(k),a_m_8(k)
+     call flush(6)
+  enddo
+
+  stat=gd_new(&
+       d,                  &
+       kind    = 1,        &
+       version = 2,        &
+       nk      = nk,       &
+       ip1    = ig1tt,     &
+       ip2    = ig2tt,     &
+       ptop_8  = ptop_8,   &
+       a_m_8   = a_m_8,    &
+       b_m_8   = b_m_8,    &
+       ip1_m   = ip1_m)
+
+  if(stat.ne.GD_OK)then
+     print*,'ERROR: problem with gd_new'
+     call close_fst(lui,luo)
+     call abort
+  endif
+
+  ! Construct a new set of 3D coordinate descriptors
+  stat = gd_write(d,luo,format='fst')
+  if(stat.ne.GD_OK)then
+     print*,'ERROR: problem with gd_write'
+     call close_fst(lui,luo)
+     call abort
+  endif
+
+  call ut_report(stat,'Grid_Descriptors, gd_new, gd_write')
+
+  call close_fst(lui,luo)
+
+end program constructor
+
+subroutine close_fst(lui,luo)
+
+   implicit none
+   integer lui,luo,fstfrm,stat
+
+   stat=fstfrm(lui)
+   stat=fstfrm(luo)
+
+   print*,'fst files closed'
+
+end subroutine close_fst
