@@ -2508,11 +2508,11 @@ contains
     if (is_big_endian()) then
        cnt = 1; overflow = .false.
        do i=len(str_cvt),1,-1
-          if (cnt < len(str_out)) then
+          if (cnt <= len(str_out)) then
              str_out(cnt:cnt) = str_cvt(i:i)
              cnt = cnt+1
           else
-             if (str_cvt(i:i) /= '') overflow = .true.
+             if (ichar(str_cvt(i:i)) > 32) overflow = .true.
           endif
        enddo
     else
