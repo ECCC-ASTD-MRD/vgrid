@@ -17,12 +17,12 @@ OBJECTS = $(DESCRIP_PATH)grid_descriptors.o
 all: topLevel_levels lowLevel_levels
 
 topLevel_levels: topLevel_levels.ftn90 $(OBJECTS)
-	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $< -o $@ -librmn $(RMN)
+	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90 -o $@ -librmn $(RMN)
 
 lowLevel_levels: lowLevel_levels.ftn90 $(OBJECTS)
-	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $< -o $@ -librmn $(RMN)
+	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90 -o $@ -librmn $(RMN)
 compute_pressure_form_keys: compute_pressure_form_keys.ftn90 $(OBJECTS)
-	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $< -o $@ -librmn $(RMN)
+	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90 -o $@ -librmn $(RMN)
 
 $(DESCRIP_PATH)grid_descriptors.o: $(DESCRIP_PATH)grid_descriptors.ftn90
 	echo "STOP: $(DESCRIP_PATH)grid_descriptors has been updated ... recompilation needed in $(DESCRIP_PATH)"; \
