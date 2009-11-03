@@ -161,6 +161,11 @@ program convert_toctoc_5002
       nkmod=(nj-3)/2
       print*,'njmod',nkmod
 
+      ! Looks like last momentum level is badly described in !! !!sf format
+      toctoc(1,nkmod+1)=toctoc(1,nj)
+      toctoc(2,nkmod+1)=toctoc(2,nj)
+      toctoc(3,nkmod+1)=toctoc(3,nj)
+
       istat=new_build_vert(&
            gdv,&            
            kind     = 5,&
