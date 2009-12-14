@@ -1,5 +1,5 @@
 program convert_toctoc_5002
-   use grid_descriptors, only: grid_descriptor,gd_new,gd_write,GD_OK,new_build_vert
+   use grid_descriptors, only: grid_descriptor,gd_new,gd_write,GD_OK
    implicit none
    integer, parameter :: ncle=3,lui=10,nmax=1000
    integer, dimension(nmax) :: liste
@@ -27,8 +27,8 @@ program convert_toctoc_5002
    type(grid_descriptor) :: gdv
    
    cle=(/'s.      ','d.      ','samefile'/)
-   val=(/'undef'   ,'undef'   ,'NO'      /)
-   def=(/'undef'   ,'undef'   ,'YES'     /)
+   val=(/'undef   ','undef   ','NO      '/)
+   def=(/'undef   ','undef   ','YES     '/)
 
    ind_to_erase=0
 
@@ -166,7 +166,7 @@ program convert_toctoc_5002
       toctoc(2,nkmod+1)=toctoc(2,nj)
       toctoc(3,nkmod+1)=toctoc(3,nj)
 
-      istat=new_build_vert(&
+      istat=gd_new(&
            gdv,&            
            kind     = 5,&
            version  = 2,&
