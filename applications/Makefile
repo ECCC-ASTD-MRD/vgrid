@@ -17,10 +17,10 @@ OBJECTS = $(DESCRIP_PATH)grid_descriptors.o
 all: compute_pressure convert_toctoc_5002
 
 convert_toctoc_5002: convert_toctoc_5002.ftn90 $(OBJECTS)
-	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $< -o $@ -librmn $(RMN)
+	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90  -o $@ -librmn $(RMN)
 
 compute_pressure: compute_pressure.ftn90 $(OBJECTS)
-	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $< -o $@ -librmn $(RMN)
+	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90 -o $@ -librmn $(RMN)
 
 $(DESCRIP_PATH)grid_descriptors.o: $(DESCRIP_PATH)grid_descriptors.ftn90
 	echo "STOP: $(DESCRIP_PATH)grid_descriptors has been updated ... recompilation needed in $(DESCRIP_PATH)"; \
