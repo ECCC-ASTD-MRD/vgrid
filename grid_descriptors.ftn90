@@ -173,15 +173,16 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Class constructor
 
-   integer function new_read(self,unit,format,ip1,ip2) result(status)
+   integer function new_read(self,unit,format,ip1,ip2,ip3) result(status)
       ! Coordinate constructor - read from a file and initialize instance
       type(grid_descriptor), intent(out) :: self  !Descriptor instance
       integer, intent(in) :: unit                 !File unit to read descriptor information from
       character(len=*), intent(in) :: format      !File format ('fst' or 'bin')
       integer, intent(in) :: ip1,ip2              !ip1,2 values of the desired descriptors
+      integer, optional, intent(in) :: ip3        !ip3 value of the desired descriptors
 
       ! Internal variables
-      integer :: istat,key,error,kind,version,count,i
+      integer :: istat,key,error,kind,version,count,i,my_ip3
       integer :: fstinf,fstinl,fstluk,fstprm,ni,nj,nk,swa,lng,ubc,dltf,extra1,extra2,extra3
       integer, dimension(MAX_DESC_REC) :: keyList
       type(FSTD_ext) :: var
@@ -197,6 +198,8 @@ contains
       else
          self%match_ipig = .true.
       endif
+      my_ip3=-1
+      if(present(ip3)) my_ip3=ip3
 
       ! Construct horizontal descriptors
       self%xx%rec%nomvar = '>>'
@@ -210,7 +213,7 @@ contains
 
          ! RPN Standard file input
       case ('FST')
-         key=fstinf(unit,ni,nj,nk,-1,' ',ip1,ip2,-1,' ',self%zz%rec%nomvar)
+         key=fstinf(unit,ni,nj,nk,-1,' ',ip1,ip2,my_ip3,' ',self%zz%rec%nomvar)
          if(key < 0)then
             write(STDERR,'("WARNING: cannot find '//trim(self%zz%rec%nomvar)//' with the following: ip1=",i10,",ip2=",i10)')ip1,ip2
             self%zz%vcode = -1
@@ -234,9 +237,9 @@ contains
               swa,lng,dltf,ubc,extra1,extra2,extra3)         
 
          ! Check for multiple (different) descriptors
-         error = fstinl(unit,ni,nj,nk,-1,' ',ip1,ip2,-1,' ',self%zz%rec%nomvar,keyList,count,size(keyList))
+         error = fstinl(unit,ni,nj,nk,-1,' ',ip1,ip2,my_ip3,' ',self%zz%rec%nomvar,keyList,count,size(keyList))
          if (error < 0) then
-            write(STDERR,*) 'ERROR: problem retrieving '//trim(self%zz%rec%nomvar)//' keys for ip1,ip2: ',ip1,ip2
+            write(STDERR,*) 'ERROR: problem retrieving '//trim(self%zz%rec%nomvar)//' keys for ip1,ip2,ip3: ',ip1,ip2,my_ip3
             self%zz%vcode = -1
             return
          endif
