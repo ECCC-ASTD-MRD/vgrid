@@ -96,6 +96,7 @@ module Grid_Descriptors
   interface gd_new
      module procedure new_read
      module procedure new_build_vert
+     module procedure new_gen
   end interface
 
   interface gd_get
@@ -343,7 +344,7 @@ contains
       type(grid_descriptor), intent(out) :: self        !Descriptor instance    
       integer, intent(in) :: kind,version               !Kind,version to create
       integer, intent(in) :: nk                         !Number of levels
-      integer, optional, intent(in) :: ip1,ip2,ip3      !IP1,2 values for FST file record [0,0]
+      integer, optional, intent(in) :: ip1,ip2,ip3      !IP1,2 values for FST file record [0,0,0]
       real, optional, intent(in) :: rcoef1,rcoef2       !R-coefficient values for rectification
       real*8, optional, intent(in) :: ptop_8            !Top-level pressure (Pa)
       real*8, optional, intent(in) :: pref_8            !Reference-level pressure (Pa)
@@ -544,6 +545,79 @@ contains
       status = GD_OK
       return
    end function new_build_vert
+
+   integer function new_gen(self,kind,version,hyb,rcoef,ptop_8,pref_8,ip1,ip2,ip3,stdout_unit) result(status)
+     use vdescript
+      ! Coordinate constructor - build vertical descriptor from hybrid coordinate entries
+      type(grid_descriptor), intent(out) :: self        !Descriptor instance    
+      integer, intent(in) :: kind,version               !Kind,version to create
+      real, dimension(:), intent(in) :: hyb             !List of hybrid levels
+      real, dimension(:), intent(in) :: rcoef           !R-coefficient values for rectification
+      real*8, intent(in) :: ptop_8                      !Top-level pressure (Pa)
+      real*8, intent(in) :: pref_8                      !Reference-level pressure (Pa)
+      integer, optional, intent(in) :: ip1,ip2,ip3      !IP1,2,3 values for FST file record [0,0,0]
+      integer, intent(in), optional :: stdout_unit      !Unit number for verbose output [STDERR]
+
+      ! Internal variables
+      integer :: myip1,myip2,myip3,mystdout_unit,error
+      integer, dimension(:), pointer :: ip1_m,ip1_t
+      real, dimension(:), pointer :: hybm,hybt
+      real*8, dimension(:), pointer :: a_m_8,b_m_8,a_t_8,b_t_8
+      logical :: gen_ok
+
+!why not put directly into the structure?
+!!$ aha...  because I want to make a call to the build constructor right after this - pass in the components
+!!$ I'm going to need a bunch more arguments to fulfill the build constructor requirements... no problem.
+!!$ btw - looks like the "kind" and "version" should be used to create the code, rather than having
+!!$ it passed in by the user.
+
+      ! Set error status
+      status = GD_ERROR
+
+      ! Set default values
+      myip1 = 0
+      if (present(ip1)) myip1 = ip1
+      myip2 = 0
+      if (present(ip2)) myip2 = ip2
+      myip1 = 0
+      if (present(ip3)) myip3 = ip3
+      mystdout_unit = STDERR
+      if (present(stdout_unit)) mystdout_unit = stdout_unit
+
+      ! Call appropriate support module to compute required values
+      error = GD_ERROR
+      select case (kind)
+      case (5)
+         if (version == 2) then
+            if (size(rcoef) /= 2) then
+               write(STDERR,*) 'ERROR: expected 2 entries in rcoef and found ',size(rcoef)
+               return
+            endif
+            call vgrid_genab2(6,mystdout_unit,hyb,rcoef,ptop_8,pref_8, &
+                 hybm,hybt,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,error)
+            if (error /= VDESC_OK) return
+            error = gd_new(self,kind,version,size(hyb), &
+                 ip1=myip1,           &
+                 ip2=myip2,           &
+                 ip3=myip3,           &
+                 ptop_8=ptop_8,       &
+                 pref_8=pref_8,       &
+                 rcoef1=rcoef(1),     &
+                 rcoef2=rcoef(2),     &
+                 a_m_8=a_m_8,         &
+                 b_m_8=b_m_8,         &
+                 a_t_8=a_t_8,         &
+                 b_t_8=b_t_8,         &
+                 ip1_m=ip1_m,         &
+                 ip1_t=ip1_t)
+            if (error /= GD_OK) return
+         endif
+      end select
+
+      ! Set status and return
+      status = GD_OK
+      return
+    end function new_gen
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Get methods

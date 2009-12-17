@@ -28,6 +28,7 @@ module vdescript
   interface reallocate
      module procedure PRIV_reallocate4
      module procedure PRIV_reallocate8
+     module procedure PRIV_reallocateI
   end interface
 
 contains
@@ -36,7 +37,7 @@ contains
 !                      for momentun and thermodymic levels
 !
   subroutine vgrid_genab2 (F_code,F_unout,F_hybuser,F_rcoef,F_ptop_8,F_pref_8, &
-       F_hybm,F_hybt,F_am_8,F_bm_8,F_at_8,F_bt_8,F_err)
+       F_hybm,F_hybt,F_am_8,F_bm_8,F_at_8,F_bt_8,F_ip1_m,F_ip1_t,F_err)
 
     implicit none
     !      
@@ -51,6 +52,7 @@ contains
     real, dimension(:), pointer :: F_hybm, F_hybt         ! model hyb values
     real*8, dimension(:), pointer :: F_am_8, F_bm_8       ! model As and Bs on momentum levels
     real*8, dimension(:), pointer :: F_at_8, F_bt_8       ! model As and Bs on thermodynamic levels
+    integer, dimension(:), pointer :: F_ip1_m,F_ip1_t     ! ip1 values for momentum and thermodynamic levels
 
     ! Local variables
     integer :: k, status, nk
@@ -81,6 +83,10 @@ contains
     status = reallocate(F_at_8,1,nk+2)
     if (status /= VDESC_OK) return
     status = reallocate(F_bt_8,1,nk+2)
+    if (status /= VDESC_OK) return
+    status = reallocate(F_ip1_m,1,nk+1)
+    if (status /= VDESC_OK) return
+    status = reallocate(F_ip1_t,1,nk+2)
     if (status /= VDESC_OK) return
 
     code: if (F_code.eq.6) then
@@ -192,6 +198,12 @@ contains
        if (stdout.ge.0) write (stdout,4001) F_code
     endif code
 
+    ! Compute ip1 values
+    do k=1,nk+1
+       call convip(F_ip1_m(k),F_hybm(k),5,2,'',.false.)
+       call convip(F_ip1_t(k),F_hybt(k),5,2,'',.false.)
+    enddo
+
 4001 format (/'ERROR: Unrecognized F_code= ',i/)
 9100 format (/'ERROR: Insufficient number of vertical levels in variable hyb'/)
 9250 format (/' ===> WRONG SPECIFICATION OF HYB VERTICAL LEVELS:'/ &
@@ -259,6 +271,35 @@ contains
     status = VDESC_OK
     return
   end function PRIV_reallocate8
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  function PRIV_reallocateI(v,low,high) result(status)
+    ! Allocate space for outputs
+    integer, dimension(:), pointer :: v         !vector to allocate
+    integer, intent(in) :: low,high             !bounds for vector
+    integer :: status                           !return status of function
+    
+    ! Internal variables
+    integer :: check
+
+    ! Deallocate and re-allocate with the correct size
+    status = VDESC_ERROR
+    if (associated(v)) then
+       deallocate(v,stat=check)
+       if (check /= 0) then
+          write(stdout,*) 'Error in deallocate() from vdescript::reallocate()'
+          return
+       endif
+    endif
+    allocate(v(low:high),stat=check)
+    if (check /= 0) then
+       write(stdout,*) 'Error in allocate() from vdescript::reallocate()'
+       return
+    endif
+    status = VDESC_OK
+    return
+  end function PRIV_reallocateI
 
 end module vdescript
 
