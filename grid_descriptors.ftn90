@@ -103,6 +103,7 @@ module Grid_Descriptors
      module procedure get_int
      module procedure get_int_1d
      module procedure get_real
+     module procedure get_real_1d
      module procedure get_real8
      module procedure get_real8_1d
      module procedure get_real8_3d
@@ -112,6 +113,7 @@ module Grid_Descriptors
   interface gd_put
      module procedure put_int
      module procedure put_int_1d
+     module procedure put_real_1d
      module procedure put_real8
      module procedure put_real8_1d
      module procedure put_real8_3d
@@ -150,6 +152,7 @@ module Grid_Descriptors
 
   interface get_allocate
      module procedure get_allocate_i1d
+     module procedure get_allocate_r1d
      module procedure get_allocate_r81d
      module procedure get_allocate_r83d
   end interface
@@ -568,12 +571,6 @@ contains
       real*8, dimension(:), pointer :: a_m_8,b_m_8,a_t_8,b_t_8
       logical :: gen_ok
 
-!why not put directly into the structure?
-!!$ aha...  because I want to make a call to the build constructor right after this - pass in the components
-!!$ I'm going to need a bunch more arguments to fulfill the build constructor requirements... no problem.
-!!$ btw - looks like the "kind" and "version" should be used to create the code, rather than having
-!!$ it passed in by the user.
-
       ! Set error status
       status = GD_ERROR
 
@@ -765,6 +762,74 @@ contains
     status = GD_OK
     return
   end function get_real
+
+  integer function get_real_1d(self,key,value,dir) result(status)
+    ! Retrieve the value of the requested instance variable
+    type(grid_descriptor), intent(in) :: self   !Descriptor instance
+    character(len=*), intent(in) :: key         !Descriptor key to retrieve
+    real, dimension(:), pointer :: value        !Retrieved value
+    character(len=*), intent(in), optional :: dir !Directional descriptor specification ['']
+
+    ! Internal variables
+    integer :: k,istat,error
+
+    ! Set error status
+    status = GD_ERROR
+
+    ! Check for an invalid direction specification
+    if (present(dir)) write(STDERR,*) 'WARNING: ignoring dir= specified for '//trim(key)
+
+    ! Garbage collection
+    if (associated(value)) deallocate(value)
+    nullify(value)
+    
+    ! Map key name to derived-type element
+    select case (up(key(1:KEY_LENGTH)))
+    case ('VCDM')
+       if (is_valid(self,ip1_m_valid)) then
+          istat = get_allocate(key,value,size(self%zz%ip1_m))
+          if (istat /= 0) return
+          call convip(k,value(1),self%zz%kind,0,'',.false.)
+          do k=1,size(value)
+             call convip(self%zz%ip1_m(k),value(k),self%zz%kind,-1,'',.false.)
+          enddo
+       else
+          error = int(get_error(key))
+          return
+       endif
+    case ('VCDT')
+       if (is_valid(self,ip1_t_valid)) then
+          istat = get_allocate(key,value,size(self%zz%ip1_t))
+          if (istat /= 0) return
+          call convip(k,value(1),self%zz%kind,0,'',.false.)
+          do k=1,size(value)
+             call convip(self%zz%ip1_t(k),value(k),self%zz%kind,-1,'',.false.)
+          enddo
+       else
+          error = int(get_error(key))
+          return
+       endif
+    case ('VCRD')
+       if (is_valid(self,ip1_m_valid)) then
+          istat = get_allocate(key,value,size(self%zz%ip1_m))
+          if (istat /= 0) return
+          call convip(k,value(1),self%zz%kind,0,'',.false.)
+          do k=1,size(value)
+             call convip(self%zz%ip1_m(k),value(k),self%zz%kind,-1,'',.false.)
+          enddo
+       else
+          error = int(get_error(key))
+          return
+       endif
+    case DEFAULT
+       write(STDERR,*) 'ERROR: invalid key '//trim(key)//' given to gd_get (real8 1D)'
+       return
+    end select
+
+    ! Set status and return
+    status = GD_OK
+    return
+  end function get_real_1d
 
   integer function get_real8(self,key,value,dir) result(status)
     ! Retrieve the value of the requested instance variable
@@ -1087,6 +1152,49 @@ contains
     status = GD_OK
     return
   end function put_int_1d
+
+  integer function put_real_1d(self,key,value,dir) result(status)
+    ! Set the value of the requested instance variable
+    type(grid_descriptor), intent(inout) :: self!Descriptor instance
+    character(len=*), intent(in) :: key         !Descriptor key to set
+    real(kind=8), dimension(:), pointer :: value !Value to set
+    character(len=*), intent(in), optional :: dir !Directional descriptor specification ['']
+
+    ! Local variables
+    integer :: error
+    
+    ! Set error status
+    status = GD_ERROR
+
+    ! Check for an invalid direction specification
+    if (present(dir)) write(STDERR,*) 'WARNING: ignoring dir= specified for '//trim(key)
+
+    ! Check for valid value
+    if (.not.associated(value)) then
+       write(STDERR,*) 'ERROR: unallocated value sent to gd_put for '//trim(key)
+       return
+    endif
+
+    ! Map key name to derived-type element
+    select case (up(key(1:KEY_LENGTH)))
+    case ('VCDM')
+       write(STDERR,*) 'ERROR: '//trim(key)//' cannot be set - modify VIPM instead'
+       return
+    case ('VCDT')
+       write(STDERR,*) 'ERROR: '//trim(key)//' cannot be set - modify VIPT instead'
+       return
+    case ('VCRD')
+       write(STDERR,*) 'ERROR: '//trim(key)//' cannot be set - modify VIP1 instead'
+       return
+    case DEFAULT
+       write(STDERR,*) 'ERROR: invalid key '//trim(key)//' given to gd_put (real8 1D)'
+       return
+    end select
+
+    ! Set status and return
+    status = GD_OK
+    return
+  end function put_real_1d
 
   integer function put_real8(self,key,value,dir) result(status)
     ! Set the value of the requested instance variable
@@ -2491,6 +2599,17 @@ contains
     endif
   end function get_allocate_i1d
   
+  integer function get_allocate_r1d(key,value,len) result(istat)
+    ! Allocate space for the result value and report error
+    character(len=*), intent(in) :: key
+    real, dimension(:), pointer :: value
+    integer, intent(in) :: len
+    allocate(value(len),stat=istat)
+    if (istat /= 0) then
+       write(STDERR,*) 'ERROR: unable to allocate space for '//trim(key)//' request'
+    endif
+  end function get_allocate_r1d
+
   integer function get_allocate_r81d(key,value,len) result(istat)
     ! Allocate space for the result value and report error
     character(len=*), intent(in) :: key

@@ -1,0 +1,40 @@
+program tests
+  use Grid_Descriptors, only: grid_descriptor,gd_new,gd_get,GD_LEN_NAME
+  use Unit_Testing, only: ut_report
+
+  implicit none
+
+  type(grid_descriptor) :: d
+  integer :: stat,lu=10,lutxt=69,ip1,ip2
+  real :: epsilon=0.0001
+  real, dimension(:), pointer :: hybm
+
+  integer, external :: fnom,fstouv,fclos,fstfrm
+
+  ! Open test file
+  stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
+  if(stat.lt.0)then
+     print*,'ERROR with fnom'
+     call abort()
+  endif
+  stat=fstouv(lu,'RND')
+  if(stat.le.0)then
+     print*,'No record in RPN file'
+     call abort()
+  endif
+  open(unit=lutxt,file='data/dm_5002_ips.txt',status='OLD')
+  read(lutxt,*) ip1,ip2
+  close(lutxt)
+
+  ! Construct a new set of 3D coordinate descriptors
+  stat = gd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
+
+  ! Get information about the coordinate
+  stat = gd_get(d,key='VCDM - vertical coordinate (M)',value=hybm)
+  call ut_report(abs(hybm(6)-0.106844)<epsilon,message='Grid_Descriptors::gd_get IP1 retrieved coordinate')
+
+  ! Close files
+  stat = fstfrm(lu)
+  stat = fclos(lu)
+
+end program tests

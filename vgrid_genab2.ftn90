@@ -36,6 +36,25 @@ contains
 !**s/r vgrid_genab2  - Generates GEM model vertical grid parameters A, B and hyb
 !                      for momentun and thermodymic levels
 !
+!     ----------------------------------------------------------
+!    |                                                          |
+!    |   Set A, B and Z for momentum and thermodynamic levels   |
+!    |                                                          |
+!    |   according to the formulae:                             |
+!    |                                                          |
+!    |                Z = Zsrf + log(hyb)                       |
+!    |                                                          |
+!    |                A = Z                                     |
+!    |                                                          |
+!    |                B = (Z - Ztop)/(Zsrf-Ztop)**R             |
+!    |                                                          |
+!    |                Z = A(Z) + B(Z) * Zsrf                    |
+!    |                                                          |
+!    |                R = Rmax-(Rmax-Rmin)*(Z-Ztop)/(Zsrf-Ztop) |
+!    |                                                          |
+!    |   Ver_code=6 is assigned to this formula                 |
+!     ----------------------------------------------------------
+
   subroutine vgrid_genab2 (F_code,F_unout,F_hybuser,F_rcoef,F_ptop_8,F_pref_8, &
        F_hybm,F_hybt,F_am_8,F_bm_8,F_at_8,F_bt_8,F_ip1_m,F_ip1_t,F_err)
 
@@ -203,6 +222,7 @@ contains
        call convip(F_ip1_m(k),F_hybm(k),5,2,'',.false.)
        call convip(F_ip1_t(k),F_hybt(k),5,2,'',.false.)
     enddo
+    call convip(F_ip1_t(nk+2),F_hybt(nk+2),5,2,'',.false.)
 
 4001 format (/'ERROR: Unrecognized F_code= ',i/)
 9100 format (/'ERROR: Insufficient number of vertical levels in variable hyb'/)
