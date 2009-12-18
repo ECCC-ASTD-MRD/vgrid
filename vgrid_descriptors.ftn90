@@ -1054,7 +1054,7 @@ contains
     ! Set the value of the requested instance variable
     type(vgrid_descriptor), intent(inout) :: self!Descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to set
-    real(kind=8), dimension(:), pointer :: value !Value to set
+    real, dimension(:), pointer :: value !Value to set
 
     ! Local variables
     integer :: error

@@ -28,7 +28,7 @@ $(DESCRIP_PATH)grid_descriptors.o: $(DESCRIP_PATH)grid_descriptors.ftn90
 tests:
 	rm -f data/* 2>/dev/null; \
 	cd data ; \
-        ln -s $(DATA_ARCH)/* . ; \
+        ln -s ../data_$(DATA_ARCH)/* . ; \
 	cd .. ; \
 	run_tests.ksh $(ONLY)
 
