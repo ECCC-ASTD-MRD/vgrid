@@ -28,7 +28,7 @@ program tests
   stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
 
   ! Get information about the coordinate
-  stat = vgd_get(d,key='IG_1 - record ig1',value=ig1,dir='z')
+  stat = vgd_get(d,key='IG_1 - record ig1',value=ig1)
   call ut_report(ig1==5002,message='Grid_Descriptors::vgd_get get dimensional entry')
 
   ! Close files

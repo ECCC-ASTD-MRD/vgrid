@@ -28,8 +28,8 @@ program tests
   stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
 
   ! Get information about the coordinate
-  stat = vgd_put(d,key='DATE - date stamp',value=2000,dir='z')
-  stat = vgd_get(d,key='DATE - date stamp',value=date,dir='z')
+  stat = vgd_put(d,key='DATE - date stamp',value=2000)
+  stat = vgd_get(d,key='DATE - date stamp',value=date)
   call ut_report(date==2000,message='Grid_Descriptors::vgd_get put dimensional entry')
 
   ! Close files
