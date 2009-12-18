@@ -1,5 +1,5 @@
 program tests
-  use vGrid_Descriptors, only: grid_descriptor,gd_new,gd_levels,GD_OK
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_levels,VGD_OK
   use Unit_Testing, only: ut_report
 
   implicit none
@@ -12,7 +12,7 @@ program tests
   real, dimension(:,:), allocatable :: p0,px
   real, dimension(:,:,:), pointer :: lev
   real :: local_pres
-  type(grid_descriptor) :: d
+  type(vgrid_descriptor) :: d
   logical :: ok
 
   stat=fnom(lu,"data/gg_5001_from_model_run_plus_toc","RND",0)
@@ -30,7 +30,7 @@ program tests
   close(lutxt)
 
   ! Get physical levelling information
-  stat = gd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
+  stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
   
   stat = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',"UU")
 
@@ -43,9 +43,9 @@ program tests
   
   local_pres=p0(i0,j0)  
 
-  stat = gd_levels(d,sfc_field=local_pres,ip1_list=ip1_list,levels=pres_profil)
-  if(stat.ne.GD_OK)then
-     print*,'ERROR: problem with gd_levels'
+  stat = vgd_levels(d,sfc_field=local_pres,ip1_list=ip1_list,levels=pres_profil)
+  if(stat.ne.VGD_OK)then
+     print*,'ERROR: problem with vgd_levels'
      stat=fstfrm(lu)
      call abort
   endif
@@ -64,7 +64,7 @@ program tests
   enddo
 
 
-  call ut_report(ok,message='Grid_Descriptors::gd_levels level calculation status')
+  call ut_report(ok,message='Grid_Descriptors::vgd_levels level calculation status')
 
   stat=fstfrm(lu)
 

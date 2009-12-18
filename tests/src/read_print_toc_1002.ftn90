@@ -1,10 +1,10 @@
 program constructor
-  use vGrid_Descriptors, only: grid_descriptor,gd_new,gd_print,GD_OK
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_print,VGD_OK
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(grid_descriptor) :: d
+  type(vgrid_descriptor) :: d
   integer, parameter :: lu=10
   integer :: stat
   integer :: fnom,fstouv,fstfrm
@@ -22,15 +22,15 @@ program constructor
   endif
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = gd_new(d,unit=lu,format="fst",ip1=2009,ip2=1000)
-  if(stat.ne.GD_OK)then
-     print*,'ERROR: problem with gd_new'
+  stat = vgd_new(d,unit=lu,format="fst",ip1=2009,ip2=1000)
+  if(stat.ne.VGD_OK)then
+     print*,'ERROR: problem with vgd_new'
      stat=fstfrm(lu)
      call abort
   endif
-  stat = gd_print(d)
+  stat = vgd_print(d)
 
-  call ut_report(stat,'Grid_Descriptors, gd_new, gd_print 1002')
+  call ut_report(stat,'Grid_Descriptors, vgd_new, vgd_print 1002')
 
   stat=fstfrm(lu)
 

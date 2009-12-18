@@ -1,10 +1,10 @@
 program get_levels_from_keys
-  use vGrid_Descriptors, only: grid_descriptor,gd_new,gd_levels
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_levels
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(grid_descriptor) :: d
+  type(vgrid_descriptor) :: d
   integer, parameter :: lu=10, nmax=1000, lutxt=69
   integer, dimension(nmax) :: liste
   integer :: stat,infon,ier,ip1,ip2
@@ -27,7 +27,7 @@ program get_levels_from_keys
   close(lutxt)
 
   ! Get vertical grid descriptor
-  stat = gd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
+  stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
   if(stat < 0 )then
      print*,'Problem getting vertical grid descriptor'
      stop
@@ -40,9 +40,9 @@ program get_levels_from_keys
      stop
   endif
 
-  stat = gd_levels(d,unit=lu,fstkeys=liste(1:infon),levels=pres)
+  stat = vgd_levels(d,unit=lu,fstkeys=liste(1:infon),levels=pres)
 
-  call ut_report(stat,'Grid_Descriptors, gd_new')
+  call ut_report(stat,'Grid_Descriptors, vgd_new')
 
   stat=fstfrm(lu)
 

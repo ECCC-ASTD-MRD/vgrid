@@ -1,10 +1,10 @@
 program constructor
-  use vGrid_Descriptors, only: grid_descriptor,gd_new,gd_write,gd_get
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_write,vgd_get
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(grid_descriptor) :: d
+  type(vgrid_descriptor) :: d
   integer, parameter :: lu=10,lu2=20,lutxt=69
   integer :: stat,nk,ip1,ip2,kind,version
   integer :: fnom,fstouv,fstfrm
@@ -36,28 +36,28 @@ program constructor
   stat=fstouv(lu2,'RND')
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = gd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
+  stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
 
   ! Get everyting needed to simulate construction of !! but with a different ip3
-  stat = gd_get(d,key='PREF',value=pref_8)
-  stat = gd_get(d,key='PTOP',value=ptop_8)
-  stat = gd_get(d,key='IP_1',value=ip1)
-  stat = gd_get(d,key='IP_2',value=ip2)
-  stat = gd_get(d,key='RC_1',value=rc_1)
-  stat = gd_get(d,key='RC_2',value=rc_2)
-  stat = gd_get(d,key='VIPM',value=ip1m)
-  stat = gd_get(d,key='VIPT',value=ip1t)
-  stat = gd_get(d,key='CA_M',value=am)
-  stat = gd_get(d,key='CB_M',value=bm)
-  stat = gd_get(d,key='CA_T',value=at)
-  stat = gd_get(d,key='CB_T',value=bt)
+  stat = vgd_get(d,key='PREF',value=pref_8)
+  stat = vgd_get(d,key='PTOP',value=ptop_8)
+  stat = vgd_get(d,key='IP_1',value=ip1)
+  stat = vgd_get(d,key='IP_2',value=ip2)
+  stat = vgd_get(d,key='RC_1',value=rc_1)
+  stat = vgd_get(d,key='RC_2',value=rc_2)
+  stat = vgd_get(d,key='VIPM',value=ip1m)
+  stat = vgd_get(d,key='VIPT',value=ip1t)
+  stat = vgd_get(d,key='CA_M',value=am)
+  stat = vgd_get(d,key='CB_M',value=bm)
+  stat = vgd_get(d,key='CA_T',value=at)
+  stat = vgd_get(d,key='CB_T',value=bt)
 
   nk=size(ip1m)-1
   print*,'nk=',nk
   kind=5
   version=2
 
-  stat = gd_new(d,        &
+  stat = vgd_new(d,        &
        kind     = kind,   &
        version  = version,&
        nk       = nk,     &
@@ -75,8 +75,8 @@ program constructor
        ip1_m    = ip1m,   &
        ip1_t    = ip1t)
 
-  stat = gd_write(d,unit=lu2,format="fst")
-  call ut_report(stat,'Grid_Descriptors, gd_new, gd_get CA')
+  stat = vgd_write(d,unit=lu2,format="fst")
+  call ut_report(stat,'Grid_Descriptors, vgd_new, vgd_get CA')
 
   stat=fstfrm(lu)
   stat=fstfrm(lu2)

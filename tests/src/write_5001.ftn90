@@ -1,11 +1,11 @@
 program constructor
 
-  use vGrid_Descriptors, only: grid_descriptor,gd_new,gd_write,GD_OK
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_write,VGD_OK
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(grid_descriptor) :: d
+  type(vgrid_descriptor) :: d
   integer, parameter :: lui=10,luo=20,nmax=1000
   integer, dimension(nmax) :: liste
   integer :: stat,k,infon,ind,kind,keyhy,nii,njj,nkk,ig1tt,ig2tt
@@ -102,7 +102,7 @@ program constructor
      call flush(6)
   enddo
 
-  stat=gd_new(&
+  stat=vgd_new(&
        d,                  &
        kind    = 5,        &
        version = 1,        &
@@ -116,21 +116,21 @@ program constructor
        b_m_8   = b_m_8,    &
        ip1_m   = ip1_m)
 
-  if(stat.ne.GD_OK)then
-     print*,'ERROR: problem with gd_new'
+  if(stat.ne.VGD_OK)then
+     print*,'ERROR: problem with vgd_new'
      call close_fst(lui,luo)
      call abort
   endif
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = gd_write(d,luo,format='fst')
-  if(stat.ne.GD_OK)then
-     print*,'ERROR: problem with gd_write'
+  stat = vgd_write(d,luo,format='fst')
+  if(stat.ne.VGD_OK)then
+     print*,'ERROR: problem with vgd_write'
      call close_fst(lui,luo)
      call abort
   endif
 
-  call ut_report(stat,'Grid_Descriptors, gd_new, gd_write')
+  call ut_report(stat,'Grid_Descriptors, vgd_new, vgd_write')
 
   call close_fst(lui,luo)
 

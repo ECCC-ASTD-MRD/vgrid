@@ -4,27 +4,27 @@ module vGrid_Descriptors
   private
 
   ! Public methods
-  public :: grid_descriptor                     !grid descriptor structure
-  public :: gd_new                              !class constructor
-  public :: gd_get                              !get instance variable value
-  public :: gd_put                              !set instance variable value
-  public :: gd_print                            !dump plain-text contents of instance
-  public :: gd_write                            !write coordinates to a file
-  public :: gd_levels                           !compute physical level information
-  public :: gd_position                         !compute horizontal position information
+  public :: vgrid_descriptor                    !vertical grid descriptor structure
+  public :: vgd_new                             !class constructor
+  public :: vgd_get                             !get instance variable value
+  public :: vgd_put                             !set instance variable value
+  public :: vgd_print                           !dump plain-text contents of instance
+  public :: vgd_write                           !write coordinates to a file
+  public :: vgd_levels                          !compute physical level information
+  public :: vgd_position                        !compute horizontal position information
 
   ! Public class variables
-  integer, parameter, public :: GD_LEN_NAME=4   !maximum length of a variable name in the data file
-  integer, parameter, public :: GD_OK=0         !method return value on success
-  integer, parameter, public :: GD_ERROR=-1     !method return value on error
-  real, parameter, public :: GD_MISSING=-9999.  !missing value returned for invalid entries
+  integer, parameter, public :: VGD_LEN_NAME=4  !maximum length of a variable name in the data file
+  integer, parameter, public :: VGD_OK=0        !method return value on success
+  integer, parameter, public :: VGD_ERROR=-1    !method return value on error
+  real, parameter, public :: VGD_MISSING=-9999. !missing value returned for invalid entries
 
   ! Private class variables
   integer, parameter :: STDERR=0                !STDERR output unit
   integer, parameter :: LONG_STRING=1024        !number of characters in a long string
-  character(len=GD_LEN_NAME) :: XNAME='>>'      !name of the x-direction coodinate
-  character(len=GD_LEN_NAME) :: YNAME='^^'      !name of the y-direction coodinate
-  character(len=GD_LEN_NAME) :: ZNAME='!!'      !name of the vertical coodinate
+  character(len=VGD_LEN_NAME) :: XNAME='>>'     !name of the x-direction coodinate
+  character(len=VGD_LEN_NAME) :: YNAME='^^'     !name of the y-direction coodinate
+  character(len=VGD_LEN_NAME) :: ZNAME='!!'     !name of the vertical coodinate
   integer, parameter :: MAX_VKIND=100           !maximum number of 'kind' (used in error check)
   integer, parameter :: KEY_LENGTH=4            !length of key string considered for get/put operations
   integer, parameter :: DIR_LENGTH=1            !length of directional identifier for get/put operations
@@ -73,7 +73,7 @@ module vGrid_Descriptors
   ! Vertical coordinate structure
   type vcoord
      private
-     character(len=GD_LEN_NAME) :: ref_name
+     character(len=VGD_LEN_NAME) :: ref_name
      integer, dimension(:), pointer :: ip1_m=>null(),ip1_t=>null()
      real(kind=8), dimension(:), pointer :: a_m_8=>null(),b_m_8=>null(),a_t_8=>null(),b_t_8=>null()
      real(kind=8), dimension(:,:,:), pointer :: table=>null()
@@ -84,22 +84,22 @@ module vGrid_Descriptors
   end type vcoord
 
   ! Combined coordinate structure
-  type grid_descriptor
+  type vgrid_descriptor
      private
      type(hcoord) :: xx,yy                      !x,y direction coordinate descriptors
      type(vcoord) :: zz                         !vertical coordinate descriptor
      integer :: ip1=0,ip2=0,ip3                 !ip1,2 values given to the 3D descriptor
      integer :: unit                            !file unit associated with this 3D descriptor
      logical :: match_ipig                      !do ip/ig matching for records
-  end type grid_descriptor
+  end type vgrid_descriptor
 
-  interface gd_new
+  interface vgd_new
      module procedure new_read
      module procedure new_build_vert
      module procedure new_gen
   end interface
 
-  interface gd_get
+  interface vgd_get
      module procedure get_int
      module procedure get_int_1d
      module procedure get_real
@@ -110,7 +110,7 @@ module vGrid_Descriptors
      module procedure get_char
   end interface
 
-  interface gd_put
+  interface vgd_put
      module procedure put_int
      module procedure put_int_1d
      module procedure put_real_1d
@@ -120,22 +120,22 @@ module vGrid_Descriptors
      module procedure put_char
   end interface
 
-  interface gd_print
+  interface vgd_print
      module procedure print_desc
   end interface
 
-  interface gd_write
+  interface vgd_write
      module procedure write_desc
   end interface
 
-  interface gd_levels
+  interface vgd_levels
      module procedure levels_toplevel
      module procedure levels_readref
      module procedure levels_withref
      module procedure levels_withref_prof
   end interface
 
-  interface gd_position
+  interface vgd_position
      module procedure position
   end interface
 
@@ -178,7 +178,7 @@ contains
 
    integer function new_read(self,unit,format,ip1,ip2,ip3) result(status)
       ! Coordinate constructor - read from a file and initialize instance
-      type(grid_descriptor), intent(out) :: self  !Descriptor instance
+      type(vgrid_descriptor), intent(out) :: self  !Descriptor instance
       integer, intent(in) :: unit                 !File unit to read descriptor information from
       character(len=*), intent(in) :: format      !File format ('fst' or 'bin')
       integer, intent(in) :: ip1,ip2              !ip1,2 values of the desired descriptors
@@ -192,7 +192,7 @@ contains
       real*8, dimension(:,:,:), allocatable :: l_table
 
       ! Set error status
-      status = GD_ERROR
+      status = VGD_ERROR
 
       ! Set instance variables
       self%unit = unit
@@ -339,7 +339,7 @@ contains
       ! Set status and return
       if ( found_descriptor(self,'x') .or. &
            found_descriptor(self,'y') .or. &
-           found_descriptor(self,'z')) status = GD_OK
+           found_descriptor(self,'z')) status = VGD_OK
       return
    end function new_read
 
@@ -347,7 +347,7 @@ contains
         ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8, &
         ip1_m,ip1_t) result(status)
       ! Coordinate constructor - build vertical descriptor from arguments
-      type(grid_descriptor), intent(out) :: self        !Descriptor instance    
+      type(vgrid_descriptor), intent(out) :: self        !Descriptor instance    
       integer, intent(in) :: kind,version               !Kind,version to create
       integer, intent(in) :: nk                         !Number of levels
       integer, optional, intent(in) :: ip1,ip2,ip3      !IP1,2 values for FST file record [0,0,0]
@@ -364,7 +364,7 @@ contains
       logical :: missingInput
 
       ! Set error status
-      status = GD_ERROR
+      status = VGD_ERROR
 
       ! Initializations
       self%zz%rec%nomvar = ZNAME
@@ -541,21 +541,21 @@ contains
          write(STDERR,*) 'ERROR: unsupported kind and version : ',kind,version,' (vcode) ',self%zz%vcode
          return
       end select
-      if (error /= GD_OK) then
+      if (error /= VGD_OK) then
          write(cvcode,'(i4)') self%zz%vcode
          write(STDERR,*) 'ERROR: problem with encode_vert_'//trim(cvcode)
          return
       endif
 
       ! Set status and return
-      status = GD_OK
+      status = VGD_OK
       return
    end function new_build_vert
 
    integer function new_gen(self,kind,version,hyb,rcoef,ptop_8,pref_8,ip1,ip2,ip3,stdout_unit) result(status)
      use vdescript
       ! Coordinate constructor - build vertical descriptor from hybrid coordinate entries
-      type(grid_descriptor), intent(out) :: self        !Descriptor instance    
+      type(vgrid_descriptor), intent(out) :: self        !Descriptor instance    
       integer, intent(in) :: kind,version               !Kind,version to create
       real, dimension(:), intent(in) :: hyb             !List of hybrid levels
       real, dimension(:), intent(in) :: rcoef           !R-coefficient values for rectification
@@ -572,7 +572,7 @@ contains
       logical :: gen_ok
 
       ! Set error status
-      status = GD_ERROR
+      status = VGD_ERROR
 
       ! Set default values
       myip1 = 0
@@ -585,7 +585,7 @@ contains
       if (present(stdout_unit)) mystdout_unit = stdout_unit
 
       ! Call appropriate support module to compute required values
-      error = GD_ERROR
+      error = VGD_ERROR
       select case (kind)
       case (5)
          if (version == 2) then
@@ -596,7 +596,7 @@ contains
             call vgrid_genab2(6,mystdout_unit,hyb,rcoef,ptop_8,pref_8, &
                  hybm,hybt,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,error)
             if (error /= VDESC_OK) return
-            error = gd_new(self,kind,version,size(hyb), &
+            error = vgd_new(self,kind,version,size(hyb), &
                  ip1=myip1,           &
                  ip2=myip2,           &
                  ip3=myip3,           &
@@ -610,12 +610,12 @@ contains
                  b_t_8=b_t_8,         &
                  ip1_m=ip1_m,         &
                  ip1_t=ip1_t)
-            if (error /= GD_OK) return
+            if (error /= VGD_OK) return
          endif
       end select
 
       ! Set status and return
-      status = GD_OK
+      status = VGD_OK
       return
     end function new_gen
 
@@ -624,7 +624,7 @@ contains
 
   integer function get_int(self,key,value,dir) result(status)
     ! Retrieve the value of the requested instance variable
-    type(grid_descriptor), intent(in) :: self           !Descriptor instance
+    type(vgrid_descriptor), intent(in) :: self           !Descriptor instance
     character(len=*), intent(in) :: key                 !Descriptor key to retrieve
     integer, intent(out) :: value                       !Retrieved value
     character(len=*), intent(in), optional :: dir       !Directional descriptor specification ['']
@@ -634,7 +634,7 @@ contains
     character(len=LONG_STRING) :: mydir
 
     ! Set error status
-    status = GD_ERROR
+    status = VGD_ERROR
 
     ! Set default values
     mydir = ''
@@ -670,13 +670,13 @@ contains
     end select
 
     ! Set status and return
-    status = GD_OK
+    status = VGD_OK
     return
   end function get_int
 
   integer function get_int_1d(self,key,value,dir) result(status)
     ! Retrieve the value of the requested instance variable
-    type(grid_descriptor), intent(in) :: self           !Descriptor instance
+    type(vgrid_descriptor), intent(in) :: self           !Descriptor instance
     character(len=*), intent(in) :: key                 !Descriptor key to retrieve
     integer, dimension(:), pointer :: value             !Retrieved value
     character(len=*), intent(in), optional :: dir       !Directional descriptor specification ['']
@@ -685,7 +685,7 @@ contains
     integer :: istat,error
 
     ! Set error status
-    status = GD_ERROR
+    status = VGD_ERROR
 
     ! Check for an invalid direction specification
     if (present(dir)) write(STDERR,*) 'WARNING: ignoring dir= specified for '//trim(key)
@@ -720,19 +720,19 @@ contains
     end select
 
     ! Set status and return
-    status = GD_OK
+    status = VGD_OK
     return
   end function get_int_1d
 
   integer function get_real(self,key,value,dir) result(status)
     ! Retrieve the value of the requested instance variable
-    type(grid_descriptor), intent(in) :: self   !Descriptor instance
+    type(vgrid_descriptor), intent(in) :: self   !Descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to retrieve
     real, intent(out) :: value                   !Retrieved value
     character(len=*), intent(in), optional :: dir !Directional descriptor specification ['']
 
     ! Set error status
-    status = GD_ERROR
+    status = VGD_ERROR
 
     ! Check for an invalid direction specification
     if (present(dir)) write(STDERR,*) 'WARNING: ignoring dir= specified for '//trim(key)
@@ -759,13 +759,13 @@ contains
     end select
 
     ! Set status and return
-    status = GD_OK
+    status = VGD_OK
     return
   end function get_real
 
   integer function get_real_1d(self,key,value,dir) result(status)
     ! Retrieve the value of the requested instance variable
-    type(grid_descriptor), intent(in) :: self   !Descriptor instance
+    type(vgrid_descriptor), intent(in) :: self   !Descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to retrieve
     real, dimension(:), pointer :: value        !Retrieved value
     character(len=*), intent(in), optional :: dir !Directional descriptor specification ['']
@@ -774,7 +774,7 @@ contains
     integer :: k,istat,error
 
     ! Set error status
-    status = GD_ERROR
+    status = VGD_ERROR
 
     ! Check for an invalid direction specification
     if (present(dir)) write(STDERR,*) 'WARNING: ignoring dir= specified for '//trim(key)
@@ -827,19 +827,19 @@ contains
     end select
 
     ! Set status and return
-    status = GD_OK
+    status = VGD_OK
     return
   end function get_real_1d
 
   integer function get_real8(self,key,value,dir) result(status)
     ! Retrieve the value of the requested instance variable
-    type(grid_descriptor), intent(in) :: self   !Descriptor instance
+    type(vgrid_descriptor), intent(in) :: self   !Descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to retrieve
     real(kind=8), intent(out) :: value          !Retrieved value
     character(len=*), intent(in), optional :: dir !Directional descriptor specification ['']
 
     ! Set error status
-    status = GD_ERROR
+    status = VGD_ERROR
 
     ! Check for an invalid direction specification
     if (present(dir)) write(STDERR,*) 'WARNING: ignoring dir= specified for '//trim(key)
@@ -880,13 +880,13 @@ contains
     end select
 
     ! Set status and return
-    status = GD_OK
+    status = VGD_OK
     return
   end function get_real8
 
   integer function get_real8_1d(self,key,value,dir) result(status)
     ! Retrieve the value of the requested instance variable
-    type(grid_descriptor), intent(in) :: self   !Descriptor instance
+    type(vgrid_descriptor), intent(in) :: self   !Descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to retrieve
     real(kind=8), dimension(:), pointer :: value !Retrieved value
     character(len=*), intent(in), optional :: dir !Directional descriptor specification ['']
@@ -895,7 +895,7 @@ contains
     integer :: istat,error
 
     ! Set error status
-    status = GD_ERROR
+    status = VGD_ERROR
 
     ! Check for an invalid direction specification
     if (present(dir)) write(STDERR,*) 'WARNING: ignoring dir= specified for '//trim(key)
@@ -966,13 +966,13 @@ contains
     end select
 
     ! Set status and return
-    status = GD_OK
+    status = VGD_OK
     return
   end function get_real8_1d
 
   integer function get_real8_3d(self,key,value,dir) result(status)
     ! Retrieve the value of the requested instance variable
-    type(grid_descriptor), intent(in) :: self   !Descriptor instance
+    type(vgrid_descriptor), intent(in) :: self   !Descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to retrieve
     real(kind=8), dimension(:,:,:), pointer :: value !Retrieved value
     character(len=*), intent(in), optional :: dir !Directional descriptor specification ['']
@@ -981,7 +981,7 @@ contains
     integer :: istat
 
     ! Set error status
-    status = GD_ERROR
+    status = VGD_ERROR
 
     ! Check for an invalid direction specification
     if (present(dir)) write(STDERR,*) 'WARNING: ignoring dir= specified for '//trim(key)
@@ -1002,13 +1002,13 @@ contains
     end select
 
     ! Set status and return
-    status = GD_OK
+    status = VGD_OK
     return
   end function get_real8_3d
 
   integer function get_char(self,key,value,dir) result(status)
     ! Retrieve the value of the requested instance variable
-    type(grid_descriptor), intent(in) :: self   !Descriptor instance
+    type(vgrid_descriptor), intent(in) :: self   !Descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to retrieve
     character(len=*), intent(out) :: value      !Retrieved value
     character(len=*), intent(in), optional :: dir !Directional descriptor specification ['']
@@ -1018,7 +1018,7 @@ contains
     character(len=LONG_STRING) :: mydir,cx,cy,cz
 
     ! Set error status
-    status = GD_ERROR
+    status = VGD_ERROR
 
     ! Set default values
     mydir = ''
@@ -1045,7 +1045,7 @@ contains
     end select
 
     ! Set status and return
-    status = GD_OK
+    status = VGD_OK
     return
   end function get_char
 
@@ -1054,7 +1054,7 @@ contains
 
   integer function put_int(self,key,value,dir) result(status)
     ! Set the value of the requested instance variable
-    type(grid_descriptor), intent(inout) :: self!Descriptor instance
+    type(vgrid_descriptor), intent(inout) :: self!Descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to set
     integer, intent(in) :: value                !Value to set
     character(len=*), intent(in), optional :: dir !Directional descriptor specification ['']
@@ -1064,7 +1064,7 @@ contains
     character(len=LONG_STRING) :: mydir
 
     ! Set error status
-    status = GD_ERROR
+    status = VGD_ERROR
 
     ! Set default values
     mydir = ''
@@ -1101,13 +1101,13 @@ contains
     end select
 
     ! Set status and return
-    status = GD_OK
+    status = VGD_OK
     return
   end function put_int
 
   integer function put_int_1d(self,key,value,dir) result(status)
     ! Set the value of the requested instance variable
-    type(grid_descriptor), intent(inout) :: self        !Descriptor instance
+    type(vgrid_descriptor), intent(inout) :: self        !Descriptor instance
     character(len=*), intent(in) :: key                 !Descriptor key to set
     integer, dimension(:), pointer :: value             !Value to set
     character(len=*), intent(in), optional :: dir       !Directional descriptor specification ['']
@@ -1116,7 +1116,7 @@ contains
     integer :: error
     
     ! Set error status
-    status = GD_ERROR
+    status = VGD_ERROR
 
     ! Check for an invalid direction specification
     if (present(dir)) write(STDERR,*) 'WARNING: ignoring dir= specified for '//trim(key)
@@ -1149,13 +1149,13 @@ contains
     end select
 
     ! Set status and return
-    status = GD_OK
+    status = VGD_OK
     return
   end function put_int_1d
 
   integer function put_real_1d(self,key,value,dir) result(status)
     ! Set the value of the requested instance variable
-    type(grid_descriptor), intent(inout) :: self!Descriptor instance
+    type(vgrid_descriptor), intent(inout) :: self!Descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to set
     real(kind=8), dimension(:), pointer :: value !Value to set
     character(len=*), intent(in), optional :: dir !Directional descriptor specification ['']
@@ -1164,7 +1164,7 @@ contains
     integer :: error
     
     ! Set error status
-    status = GD_ERROR
+    status = VGD_ERROR
 
     ! Check for an invalid direction specification
     if (present(dir)) write(STDERR,*) 'WARNING: ignoring dir= specified for '//trim(key)
@@ -1192,13 +1192,13 @@ contains
     end select
 
     ! Set status and return
-    status = GD_OK
+    status = VGD_OK
     return
   end function put_real_1d
 
   integer function put_real8(self,key,value,dir) result(status)
     ! Set the value of the requested instance variable
-    type(grid_descriptor), intent(inout) :: self!Descriptor instance
+    type(vgrid_descriptor), intent(inout) :: self!Descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to set
     real(kind=8), intent(in) :: value           !Value to set
     character(len=*), intent(in), optional :: dir !Directional descriptor specification ['']
@@ -1207,13 +1207,13 @@ contains
     integer :: error
 
     ! Set error status
-    status = GD_ERROR
+    status = VGD_ERROR
 
     ! Check for an invalid direction specification
     if (present(dir)) write(STDERR,*) 'WARNING: ignoring dir= specified for '//trim(key)
 
     ! Map key name to derived-type element
-    error = GD_OK
+    error = VGD_OK
     select case (up(key(1:KEY_LENGTH)))
     case ('PTOP')
        self%zz%ptop_8 = value
@@ -1233,16 +1233,16 @@ contains
     end select
 
     ! Check for sets of invalid values
-    if (error /= GD_OK) return
+    if (error /= VGD_OK) return
 
     ! Set status and return
-    status = GD_OK
+    status = VGD_OK
     return
   end function put_real8
 
   integer function put_real8_1d(self,key,value,dir) result(status)
     ! Set the value of the requested instance variable
-    type(grid_descriptor), intent(inout) :: self!Descriptor instance
+    type(vgrid_descriptor), intent(inout) :: self!Descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to set
     real(kind=8), dimension(:), pointer :: value !Value to set
     character(len=*), intent(in), optional :: dir !Directional descriptor specification ['']
@@ -1251,7 +1251,7 @@ contains
     integer :: error
     
     ! Set error status
-    status = GD_ERROR
+    status = VGD_ERROR
 
     ! Check for an invalid direction specification
     if (present(dir)) write(STDERR,*) 'WARNING: ignoring dir= specified for '//trim(key)
@@ -1312,19 +1312,19 @@ contains
     end select
 
     ! Set status and return
-    status = GD_OK
+    status = VGD_OK
     return
   end function put_real8_1d
 
   integer function put_real8_3d(self,key,value,dir) result(status)
     ! Set the value of the requested instance variable
-    type(grid_descriptor), intent(inout) :: self!Descriptor instance
+    type(vgrid_descriptor), intent(inout) :: self!Descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to set
     real(kind=8), dimension(:,:,:), pointer :: value !Value to set
     character(len=*), intent(in), optional :: dir !Directional descriptor specification ['']
 
     ! Set error status
-    status = GD_ERROR
+    status = VGD_ERROR
 
     ! Check for an invalid direction specification
     if (present(dir)) write(STDERR,*) 'WARNING: ignoring dir= specified for '//trim(key)
@@ -1349,13 +1349,13 @@ contains
     end select
 
     ! Set status and return
-    status = GD_OK
+    status = VGD_OK
     return
   end function put_real8_3d
 
   integer function put_char(self,key,value,dir) result(status)
     ! Set the value of the requested instance variable
-    type(grid_descriptor), intent(inout) :: self!Descriptor instance
+    type(vgrid_descriptor), intent(inout) :: self!Descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to set
     character(len=*), intent(in) :: value       !Value to set
     character(len=*), intent(in), optional :: dir !Directional descriptor specification ['']
@@ -1365,7 +1365,7 @@ contains
     character(len=LONG_STRING) :: mydir,myvalue
 
     ! Set error status
-    status = GD_ERROR
+    status = VGD_ERROR
 
     ! Set default values
     mydir = ''
@@ -1392,7 +1392,7 @@ contains
     end select
 
     ! Set status and return
-    status = GD_OK
+    status = VGD_OK
     return
   end function put_char
 
@@ -1401,16 +1401,16 @@ contains
 
   integer function print_desc(self,stdout) result(status)
     ! Dump plain text grid descriptor information to the requested file unit
-    type(grid_descriptor), intent(in) :: self   !Descriptor instance
+    type(vgrid_descriptor), intent(in) :: self   !Descriptor instance
     integer, intent(in), optional :: stdout     !Output unit to write to [6]
 
     ! Internal variables
     integer :: my_stdout,stat,nk,k
     character(len=64) :: hr
-    character(len=GD_LEN_NAME) :: name
+    character(len=VGD_LEN_NAME) :: name
 
     ! Set error status
-    status = GD_ERROR
+    status = VGD_ERROR
 
     ! Set default values
     my_stdout = 6
@@ -1483,7 +1483,7 @@ contains
     endif vertical
 
     ! Set status and return
-    status = GD_OK
+    status = VGD_OK
     return
   end function print_desc
 
@@ -1492,7 +1492,7 @@ contains
   
   integer function write_desc(self,unit,format) result(status)     
     ! Write descriptors to the requested file
-    type(grid_descriptor), intent(in) :: self   !Descriptor instance
+    type(vgrid_descriptor), intent(in) :: self   !Descriptor instance
     integer, intent(in) :: unit                 !File unit to write to
     character(len=*), intent(in) :: format      !File format ('fst' or 'bin')
 
@@ -1501,7 +1501,7 @@ contains
     real :: dummy
 
     ! Set error status
-    status = GD_ERROR
+    status = VGD_ERROR
 
     ! Array size from table
     ni=size(self%zz%table,dim=1)
@@ -1534,7 +1534,7 @@ contains
     end select
 
     ! Set status and return
-    status = GD_OK
+    status = VGD_OK
     return
   end function write_desc
 
@@ -1552,11 +1552,11 @@ contains
     integer :: error,ig1,ig2,ig3,i
     character(len=LONG_STRING) :: grtyp
     logical :: construct,multiple_grids,my_in_log
-    type(grid_descriptor) :: gd
+    type(vgrid_descriptor) :: gd
     type(FSTD_ext) :: var
 
     ! Set error status
-    status = GD_ERROR
+    status = VGD_ERROR
 
     ! Set default values
     my_in_log = .false.
@@ -1566,7 +1566,7 @@ contains
     multiple_grids = .false.
     grids: do i=1,size(fstkeys)
        error = my_fstprm(fstkeys(i),var)
-       if (error /= GD_OK) then
+       if (error /= VGD_OK) then
           write(STDERR,*) 'ERROR: error return from fstprm wrapper for fst key ',fstkeys(i)
           return
        endif
@@ -1588,24 +1588,24 @@ contains
     else
        error = new_read(gd,unit=unit,format='fst',ip1=-1,ip2=-1)
     endif
-    if (error /= GD_OK) then
+    if (error /= VGD_OK) then
        write(STDERR,*) 'ERROR: cannot build grid descriptor instance for fst key ',fstkeys(i)
        return
     endif
     error = levels_readref(gd,unit=unit,fstkeys=fstkeys,levels=levels,in_log=my_in_log)
-    if (error /= GD_OK) then
+    if (error /= VGD_OK) then
        write(STDERR,*) 'ERROR: problem computing level information for fst key ',fstkeys(i)
        return
     endif
 
     ! Set status and return
-    status = GD_OK
+    status = VGD_OK
     return
   end function levels_toplevel
 
   integer function levels_readref(self,unit,fstkeys,levels,in_log) result(status)
     ! Reading referent, compute physical levelling information from the vertical description
-    type(grid_descriptor), intent(in) :: self           !Descriptor instance
+    type(vgrid_descriptor), intent(in) :: self           !Descriptor instance
     integer, intent(in) :: unit                         !File unit associated with the key
     integer, dimension(:), intent(in) :: fstkeys        !Key of prototype field
     real, dimension(:,:,:), pointer :: levels           !Physical level values
@@ -1619,7 +1619,7 @@ contains
     logical :: my_in_log
 
     ! Set error status
-    status = GD_ERROR
+    status = VGD_ERROR
 
     ! Set default values
     my_in_log = .false.
@@ -1685,24 +1685,24 @@ contains
           write(STDERR,*) 'ERROR: cannot allocate space for p0 in levels_readref'
           return
        endif
-       p0 = GD_MISSING
+       p0 = VGD_MISSING
     endif sfc_valid
    
     ! Wrap call to level calculator
     error = levels_withref(self,sfc_field=p0,ip1_list=ip1_list,levels=levels,in_log=my_in_log)
-    if (error /= GD_OK) then
+    if (error /= VGD_OK) then
        write(STDERR,*) 'ERROR: got error return from levels_withref in levels_readref'
        return
     endif
 
     ! Set status and return
-    status = GD_OK
+    status = VGD_OK
     return
   end function levels_readref
 
   integer function levels_withref_prof(self,ip1_list,levels,sfc_field,in_log) result(status)
      ! profile wraper for levels_withref
-     type(grid_descriptor), intent(in) :: self                   !Descriptor instance
+     type(vgrid_descriptor), intent(in) :: self                   !Descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
      real, dimension(:), pointer :: levels                       !Physical level values
      real, optional, intent(in) :: sfc_field                     !Surface field reference for coordinate [none]
@@ -1714,7 +1714,7 @@ contains
      real, dimension(:,:,:), pointer :: levels_3d
      
      ! Set error status
-     status = GD_ERROR
+     status = VGD_ERROR
 
      nk=size(ip1_list)
 
@@ -1744,14 +1744,14 @@ contains
      levels=levels_3d(1,1,1:nk)
 
      ! Set status and return
-     status = GD_OK
+     status = VGD_OK
      return
 
   end function levels_withref_prof
 
   integer function levels_withref(self,ip1_list,levels,sfc_field,in_log) result(status)
     ! Given referent, compute physical levelling information from the vertical description
-    type(grid_descriptor), intent(in) :: self                   !Descriptor instance
+    type(vgrid_descriptor), intent(in) :: self                   !Descriptor instance
     integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
     real, dimension(:,:,:), pointer :: levels                   !Physical level values
     real, dimension(:,:), optional, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
@@ -1762,7 +1762,7 @@ contains
     logical :: my_in_log
 
     ! Set error status
-    status = GD_ERROR
+    status = VGD_ERROR
 
     ! Set default values
     my_in_log = .false.
@@ -1806,13 +1806,13 @@ contains
        write(STDERR,*) 'ERROR: kind or version invalid :',kind,version
        return 
     end select
-    if (istat /= GD_OK) then
+    if (istat /= VGD_OK) then
        write(STDERR,*) 'ERROR: error computing pressure in levels_withref'
        return
     endif
 
     ! Set status and return
-    status = GD_OK
+    status = VGD_OK
     return
   end function levels_withref
 
@@ -1821,15 +1821,15 @@ contains
 
   integer function position(self,lat,lon) result(status)
     ! Compute the horizontal position based on the coordinate descriptors
-    type(grid_descriptor), intent(in) :: self   !Descriptor instance
+    type(vgrid_descriptor), intent(in) :: self   !Descriptor instance
     real, dimension(:,:), intent(out), optional :: lat !Latitude array of grid
     real, dimension(:,:), intent(out), optional :: lon !Longitude array of grid
 
     ! Set error status
-    status = GD_ERROR
+    status = VGD_ERROR
 
     ! Set status and return
-    status = GD_OK
+    status = VGD_OK
     return
   end function position
 
@@ -1901,7 +1901,7 @@ contains
 !!! (PRIVATE) Encoding functions
 
   integer function encode_vert_1002(self,nk) result(status)
-     type(grid_descriptor), intent(inout) :: self       !Descriptor instance
+     type(vgrid_descriptor), intent(inout) :: self       !Descriptor instance
      integer, intent(in) :: nk                          !Number of levels
 
      ! Local variables
@@ -1910,7 +1910,7 @@ contains
      real*8 :: for_char_8
 
      ! Set error status
-     status = GD_ERROR
+     status = VGD_ERROR
 
      ! Allocate table space
      if (associated(self%zz%table)) deallocate(self%zz%table)         
@@ -1925,7 +1925,7 @@ contains
           ig2=nint(self%zz%ptop_8*10.d0),            &
           ig3=0,         &
           ig4=0)
-     if (error /= GD_OK) then
+     if (error /= VGD_OK) then
         write(STDERR,*) 'ERROR: cannot initialize fstd record entries'
         return
      end if
@@ -1948,7 +1948,7 @@ contains
         return
      endif
      error = flip_transfer(self%zz%ref_name,for_char_8)
-     if (error /= GD_OK) then
+     if (error /= VGD_OK) then
         write(STDERR,*) 'ERROR: flip_transfer function returned an error code from encode ',error
         return
      endif
@@ -1964,18 +1964,18 @@ contains
      enddo     
 
      ! Set status and return
-     status = GD_OK
+     status = VGD_OK
   end function encode_vert_1002
 
   integer function encode_vert_2001(self) result(status)
-     type(grid_descriptor), intent(inout) :: self       !Descriptor instance
+     type(vgrid_descriptor), intent(inout) :: self       !Descriptor instance
 
      ! Local variables
      integer :: nn,ip1,nk,k,ind,error
      integer, parameter :: skip=1
 
      ! Set error status
-     status = GD_ERROR
+     status = VGD_ERROR
 
      ! Allocate table space
      nk = size(self%zz%a_m_8)
@@ -1988,7 +1988,7 @@ contains
 
      ! Fill standard file record entries
      error = fstd_init(self%zz,etiket='PRESSURE',ig2=0,ig3=0,ig4=0)
-     if (error /= GD_OK) then
+     if (error /= VGD_OK) then
         write(STDERR,*) 'ERROR: cannot initialize fstd record entries'
         return
      end if
@@ -2010,12 +2010,12 @@ contains
      enddo
 
      ! Set status and return
-     status = GD_OK
+     status = VGD_OK
      return
    end function encode_vert_2001
 
   integer function encode_vert_5001(self,nk) result(status)
-     type(grid_descriptor), intent(inout) :: self       !Descriptor instance
+     type(vgrid_descriptor), intent(inout) :: self       !Descriptor instance
      integer, intent(in) :: nk                          !Number of levels
 
      ! Local variables
@@ -2024,7 +2024,7 @@ contains
      real*8 :: for_char_8
 
      ! Set error status
-     status = GD_ERROR
+     status = VGD_ERROR
 
      ! Allocate table space
      if (associated(self%zz%table)) deallocate(self%zz%table)         
@@ -2039,7 +2039,7 @@ contains
           ig2=nint(self%zz%ptop_8*10.d0),            &
           ig3=nint(self%zz%rcoef1*100.),           &
           ig4=0)
-     if (error /= GD_OK) then
+     if (error /= VGD_OK) then
         write(STDERR,*) 'ERROR: cannot initialize fstd record entries'
         return
      end if
@@ -2062,7 +2062,7 @@ contains
         return
      endif
      error = flip_transfer(self%zz%ref_name,for_char_8)
-     if (error /= GD_OK) then
+     if (error /= VGD_OK) then
         write(STDERR,*) 'ERROR: flip_transfer function returned an error code from encode ',error
         return
      endif
@@ -2079,11 +2079,11 @@ contains
      enddo     
 
      ! Set status and return
-     status = GD_OK
+     status = VGD_OK
   end function encode_vert_5001
 
   integer function encode_vert_5002(self,nk) result(status)
-     type(grid_descriptor), intent(inout) :: self       !Descriptor instance
+     type(vgrid_descriptor), intent(inout) :: self       !Descriptor instance
      integer, intent(in) :: nk                          !Number of levels
 
      ! Local variables
@@ -2093,7 +2093,7 @@ contains
      character(len=8) :: ref_name,ref_name_flip
 
      ! Set error status
-     status = GD_ERROR
+     status = VGD_ERROR
 
      ! Allocate table space
      if (associated(self%zz%table)) deallocate(self%zz%table)         
@@ -2108,7 +2108,7 @@ contains
           ig2=nint(self%zz%ptop_8*10.d0),               &
           ig3=nint(self%zz%rcoef1*100.),            &
           ig4=nint(self%zz%rcoef2*100.))
-     if (error /= GD_OK) then
+     if (error /= VGD_OK) then
         write(STDERR,*) 'ERROR: cannot initialize fstd record entries'
         return
      end if
@@ -2150,7 +2150,7 @@ contains
         return
      endif
      error = flip_transfer(self%zz%ref_name,for_char_8)
-     if (error /= GD_OK) then
+     if (error /= VGD_OK) then
         write(STDERR,*) 'ERROR: flip_transfer function returned error code from encode ',error
         return
      endif
@@ -2173,20 +2173,20 @@ contains
      enddo
 
      ! Set status and return
-     status = GD_OK
+     status = VGD_OK
   end function encode_vert_5002
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! (PRIVATE) Decoding functions
 
   integer function decode_vert_1002(self) result(status)
-     type(grid_descriptor), intent(inout) :: self   !Descriptor instance
+     type(vgrid_descriptor), intent(inout) :: self   !Descriptor instance
      
      ! Local variables
      integer :: skip,nj,nk,k,ind,error
 
      ! Set error status
-     status = GD_ERROR
+     status = VGD_ERROR
 
      ! Read header line 1
      self%zz%kind     = nint(self%zz%table(1,1,1))
@@ -2196,7 +2196,7 @@ contains
      ! Read header line 2
      self%zz%ptop_8   = self%zz%table(1,2,1)
      error = flip_transfer(self%zz%table(2,2,1),self%zz%ref_name)
-     if (error /= GD_OK) then
+     if (error /= VGD_OK) then
         write(STDERR,*) 'ERROR: flip_transfer function returned an error code from decode ',error
         return
      endif
@@ -2219,18 +2219,18 @@ contains
      enddo
 
      ! Set status and return
-     status = GD_OK
+     status = VGD_OK
 
   end function decode_vert_1002
 
   integer function decode_vert_2001(self) result(status)
-    type(grid_descriptor), intent(inout) :: self   !Descriptor instance
+    type(vgrid_descriptor), intent(inout) :: self   !Descriptor instance
 
     ! Local variables
     integer :: skip,nj,nk,k,ind
     
     ! Set error status
-    status = GD_ERROR
+    status = VGD_ERROR
     
     ! Read header line 1
     self%zz%kind     = nint(self%zz%table(1,1,1))
@@ -2255,18 +2255,18 @@ contains
     end do
 
     ! Set status and return
-    status = GD_OK
+    status = VGD_OK
 
   end function decode_vert_2001
        
   integer function decode_vert_5001(self) result(status)
-     type(grid_descriptor), intent(inout) :: self   !Descriptor instance
+     type(vgrid_descriptor), intent(inout) :: self   !Descriptor instance
      
      ! Local variables
      integer :: skip,nj,nk,k,ind,error
 
      ! Set error status
-     status = GD_ERROR
+     status = VGD_ERROR
 
      ! Read header line 1
      self%zz%kind     = nint(self%zz%table(1,1,1))
@@ -2280,7 +2280,7 @@ contains
 
      ! Read header line 3
      error = flip_transfer(self%zz%table(1,3,1),self%zz%ref_name)
-     if (error /= GD_OK) then
+     if (error /= VGD_OK) then
         write(STDERR,*) 'ERROR: flip_transfer function returned an error code from decode ',error
         return
      endif
@@ -2303,18 +2303,18 @@ contains
      enddo
 
      ! Set status and return
-     status = GD_OK
+     status = VGD_OK
 
   end function decode_vert_5001
 
   integer function decode_vert_5002(self) result(status)
-     type(grid_descriptor), intent(inout) :: self   !Descriptor instance
+     type(vgrid_descriptor), intent(inout) :: self   !Descriptor instance
      
      ! Local variables
      integer :: skip,nj,nk,k,ind,error
 
      ! Set error status
-     status = GD_ERROR
+     status = VGD_ERROR
 
      ! Read header line 1
      self%zz%kind     = nint(self%zz%table(1,1,1))
@@ -2329,7 +2329,7 @@ contains
      ! Read header line 3
      self%zz%rcoef2   = real(self%zz%table(1,3,1))
      error = flip_transfer(self%zz%table(2,3,1),self%zz%ref_name)
-     if (error /= GD_OK) then
+     if (error /= VGD_OK) then
         write(STDERR,*) 'ERROR: flip_transfer function returned an error code from decode ',error
         return
      endif
@@ -2368,7 +2368,7 @@ contains
      enddo     
 
      ! Set status and return
-     status = GD_OK
+     status = VGD_OK
 
   end function decode_vert_5002
 
@@ -2377,13 +2377,13 @@ contains
   
   integer function set_vcode_d(self) result(status)
      ! Compute the internal vertical code from table
-     type(grid_descriptor), intent(inout) :: self       !Descriptor instance
+     type(vgrid_descriptor), intent(inout) :: self       !Descriptor instance
 
      ! Local variables
      integer :: kind,version
      
      ! Set error status and check initialization
-     status = GD_ERROR
+     status = VGD_ERROR
      if (.not.associated(self%zz%table)) then
         write(STDERR,*) 'ERROR: set_vcode called before constructor'
         return
@@ -2391,24 +2391,24 @@ contains
 
      ! Wrap call to integer mangling
      status = get_version_info(self,kind,version)
-     if (status /= GD_OK) then
+     if (status /= VGD_OK) then
         write(STDERR,*) 'ERROR: cannot decode table to read kind and version: ',kind,version
         return
      endif
      status = set_vcode(self,kind,version)
 
      ! Set status and return
-     status = GD_OK
+     status = VGD_OK
      return
   end function set_vcode_d
 
   integer function set_vcode_i(self,kind,version) result(status)
      ! Compute the internal vertical code from kind and version
-     type(grid_descriptor), intent(inout) :: self       !Descriptor instance
+     type(vgrid_descriptor), intent(inout) :: self       !Descriptor instance
      integer, intent(in) :: kind,version                !Kind and version of vertical coord
 
      ! Set error status
-     status = GD_ERROR
+     status = VGD_ERROR
 
      ! Check for valid entries (version is limited by the mangling equation)
      if (kind > MAX_VKIND .or. kind < 0 .or. version > 999 .or. version < 0) then
@@ -2420,24 +2420,24 @@ contains
      self%zz%vcode = kind*1000+version
 
      ! Set status and return
-     status = GD_OK
+     status = VGD_OK
      return
   end function set_vcode_i
 
   integer function get_version_info(self,kind,version) result(status)
     ! Retrieve kind and version information from the table
-    type(grid_descriptor), intent(in) :: self          !Descriptor instance
+    type(vgrid_descriptor), intent(in) :: self          !Descriptor instance
     integer, intent(out) :: kind,version               !Kind and version of vertical coord
 
     ! Set error status
-    status = GD_ERROR
+    status = VGD_ERROR
     
     ! Retrieve kind and version information from table
     kind = nint(self%zz%table(1,1,1))
     version = nint(self%zz%table(2,1,1))
 
     ! Set status and return
-    status = GD_OK
+    status = VGD_OK
     return
   end function get_version_info
 
@@ -2446,7 +2446,7 @@ contains
 
   logical function found_descriptor(self,dir) result(found)
      ! Is the descriptor for the specified dimension valid?
-     type(grid_descriptor), intent(in) :: self          !Descriptor instance
+     type(vgrid_descriptor), intent(in) :: self          !Descriptor instance
      character(len=*), intent(in) :: dir                !Direction 'x','y','z'
      found = .false.
      select case (up(dir))
@@ -2465,7 +2465,7 @@ contains
 
   character(len=1) function desc_direction(self,key,dir) result(ok_dir)
     ! Return a valid direction if one exists, otherwise return a blank string
-    type(grid_descriptor), intent(in) :: self           !Descriptor instance
+    type(vgrid_descriptor), intent(in) :: self           !Descriptor instance
     character(len=*), intent(in) :: key                 !Key to retrieve
     character(len=*), intent(in) :: dir                 !Direction 'x','y','z'
     character(len=LONG_STRING) :: mydir
@@ -2503,13 +2503,13 @@ contains
 
   integer function desc_direction_getput_int(self,key,dir,valx,valy,valz,value,getput) result(status)
     ! Perform get/put operations for directional descriptor keys
-    type(grid_descriptor), intent(in) :: self           !Descriptor instance
+    type(vgrid_descriptor), intent(in) :: self           !Descriptor instance
     character(len=*), intent(in) :: key                 !Key to retrieve
     character(len=*), intent(in) :: dir                 !Direction 'x','y','z'
     integer, intent(inout) :: valx,valy,valz            !x,y,z direction values of the element
     integer, intent(inout) :: value                     !get/put value of the element
     character(len=*), intent(in) :: getput              !'get' or 'put' operation
-    status = GD_ERROR
+    status = VGD_ERROR
     if (.not.any(getput == (/'get','put'/))) then
        write(STDERR,*) 'ERROR: invalid operation '//trim(getput)//' attempted in desc_direction_getput for '//trim(key)
        return
@@ -2541,13 +2541,13 @@ contains
 
   integer function desc_direction_getput_char(self,key,dir,valx,valy,valz,value,getput) result(status)
     ! Perform get/put operations for directional descriptor keys
-    type(grid_descriptor), intent(in) :: self           !Descriptor instance
+    type(vgrid_descriptor), intent(in) :: self           !Descriptor instance
     character(len=*), intent(in) :: key                 !Key to retrieve
     character(len=*), intent(in) :: dir                 !Direction 'x','y','z'
     character(len=*), intent(inout) :: valx,valy,valz   !x,y,z direction values of the element
     character(len=*), intent(inout) :: value            !get/put value of the element
     character(len=*), intent(in) :: getput              !'get' or 'put' operation
-    status = GD_ERROR
+    status = VGD_ERROR
     if (.not.any(getput == (/'get','put'/))) then
        write(STDERR,*) 'ERROR: invalid operation '//trim(getput)//' attempted in desc_direction_getput for '//trim(key)
        return
@@ -2583,8 +2583,8 @@ contains
   real function get_error(key) result(value)
     ! Write error message and return a missing value
     character(len=*), intent(in) :: key
-    write(STDERR,*) 'WARNING: attempt to retrieve invalid key '//trim(key)//' returns GD_MISSING'
-    value = dble(GD_MISSING)
+    write(STDERR,*) 'WARNING: attempt to retrieve invalid key '//trim(key)//' returns VGD_MISSING'
+    value = dble(VGD_MISSING)
     return
   end function get_error
 
@@ -2640,7 +2640,7 @@ contains
   integer function put_error(key) result(error)
     character(len=*), intent(in) :: key
     write(STDERR,*) 'WARNING: attempt to set useless value for '//trim(key)
-    error = GD_ERROR
+    error = VGD_ERROR
     return
   end function put_error
 
@@ -2649,7 +2649,7 @@ contains
 
   logical function is_valid(self,element_valid) result(valid)
      ! Check for validity of the element
-     type(grid_descriptor) :: self           !Descriptor instance
+     type(vgrid_descriptor) :: self           !Descriptor instance
      integer, dimension(:) :: element_valid
      valid = .false.
      if (any(element_valid == self%zz%vcode) .or. &
@@ -2666,7 +2666,7 @@ contains
     type(vcoord), intent(inout) :: self         !Descriptor instance (directional)
     character(len=*), intent(in) :: etiket      !Stamp (etiket) entry
     integer, intent(in) :: ig2,ig3,ig4          !IG2-4 values
-    status = GD_ERROR
+    status = VGD_ERROR
     self%rec%grtyp='X'
     self%rec%deet=0
     self%rec%npas=0
@@ -2676,7 +2676,7 @@ contains
     self%rec%ig2=ig2
     self%rec%ig3=ig3
     self%rec%ig4=ig4
-    status = GD_OK
+    status = VGD_OK
   end function fstd_init_v
 
   integer function my_fstprm(fstkey,record) result(status)
@@ -2686,7 +2686,7 @@ contains
     integer :: error,ni,nj,nk
     integer, external :: fstprm,fstinf
     real*8 :: nhours
-    status = GD_ERROR
+    status = VGD_ERROR
     error=fstprm(fstkey,record%dateo,record%deet,record%npas, &
          record%ni,record%nj,record%nk,record%nbits,record%datyp,record%ip1,record%ip2, &
          record%ip3,record%typvar,record%nomvar,record%etiket,record%grtyp, &
@@ -2699,7 +2699,7 @@ contains
     end if
     nhours=record%deet*record%npas/3600.d0
     call incdatr(record%datev,record%dateo,nhours)
-    status = GD_OK
+    status = VGD_OK
   end function my_fstprm
 
   logical function is_big_endian() result(bend)
@@ -2723,7 +2723,7 @@ contains
     real*8, intent(out) :: val_out                      !8-byte real for output
     integer :: i,cnt
     character(len=8) :: str_cvt
-    status = GD_ERROR; val_out = 0.d0
+    status = VGD_ERROR; val_out = 0.d0
     if (len_trim(str) > len(str_cvt)) then
        write(STDERR,*) 'ERROR: string length to flip_transfer (',len_trim(str),') exceeds limit: ',len(str)
        return
@@ -2742,7 +2742,7 @@ contains
        str_cvt = str
     endif
     val_out = transfer(str_cvt,val_out)
-    status = GD_OK
+    status = VGD_OK
     return
   end function flip_transfer_r8
 
@@ -2753,7 +2753,7 @@ contains
     integer :: i,cnt
     character(len=8) :: str_cvt
     logical :: overflow
-    status = GD_ERROR; str_out = ''
+    status = VGD_ERROR; str_out = ''
     str_cvt = transfer(val,str_cvt)
     if (is_big_endian()) then
        cnt = 1; overflow = .false.
@@ -2772,7 +2772,7 @@ contains
        write(STDERR,*) 'ERROR: string length to flip_transfer (',len(str_out),') is insufficient: ',len_trim(str_cvt)
        return
     endif
-    status = GD_OK
+    status = VGD_OK
     return
   end function flip_transfer_char
 
@@ -2781,7 +2781,7 @@ contains
 
   integer function compute_pressure_1002(self,sfc_field,ip1_list,levels,in_log) result(status)
     ! Compute pressure for all levels specified in ip1_list
-    type(grid_descriptor), intent(in) :: self           !Descriptor instance
+    type(vgrid_descriptor), intent(in) :: self           !Descriptor instance
     real, dimension(:,:), intent(in) :: sfc_field       !Surface field reference for coordinate
     integer, dimension(:), intent(in) :: ip1_list       !List of IP1 levels to calculate on
     real, dimension(:,:,:), pointer  :: levels          !Physical level values
@@ -2794,7 +2794,7 @@ contains
     logical :: found,my_in_log
 
     ! Set error status
-    status = GD_ERROR
+    status = VGD_ERROR
 
     ! Set size of output
     nk = size(ip1_list)
@@ -2823,13 +2823,13 @@ contains
     if (in_log) levels = log(levels)
 
     ! Set status and return
-    status = GD_OK
+    status = VGD_OK
     return
  end function compute_pressure_1002
 
   integer function compute_pressure_2001(self,ip1_list,levels,in_log) result(status)
     ! Compute pressure for all levels specified in ip1_list
-    type(grid_descriptor), intent(in) :: self           !Descriptor instance
+    type(vgrid_descriptor), intent(in) :: self           !Descriptor instance
     integer, dimension(:), intent(in) :: ip1_list       !List of IP1 levels to calculate on
     real, dimension(:,:,:), pointer  :: levels          !Physical level values
     logical, intent(in) :: in_log                       !Compute level values in ln()
@@ -2840,7 +2840,7 @@ contains
     logical :: found
     
     ! Set error status
-    status = GD_ERROR
+    status = VGD_ERROR
     
     ! Set size of output
     nk = size(ip1_list)
@@ -2868,14 +2868,14 @@ contains
     if (in_log) levels = log(levels)
 
     ! Set status and return
-    status = GD_OK
+    status = VGD_OK
     return
 
   end function compute_pressure_2001
 
   integer function compute_pressure_5001(self,sfc_field,ip1_list,levels,in_log) result(status)
     ! Compute pressure for all levels specified in ip1_list
-    type(grid_descriptor), intent(in) :: self           !Descriptor instance
+    type(vgrid_descriptor), intent(in) :: self           !Descriptor instance
     real, dimension(:,:), intent(in) :: sfc_field       !Surface field reference for coordinate
     integer, dimension(:), intent(in) :: ip1_list       !List of IP1 levels to calculate on
     real, dimension(:,:,:), pointer  :: levels          !Physical level values
@@ -2888,7 +2888,7 @@ contains
     logical :: found,my_in_log
 
     ! Set error status
-    status = GD_ERROR
+    status = VGD_ERROR
 
     ! Set size of output
     nk = size(ip1_list)
@@ -2917,13 +2917,13 @@ contains
     if (in_log) levels = log(levels)
 
     ! Set status and return
-    status = GD_OK
+    status = VGD_OK
     return
  end function compute_pressure_5001
 
   integer function compute_pressure_5002(self,sfc_field,ip1_list,levels,in_log) result(status)
     ! Compute pressure for all levels specified in ip1_list
-    type(grid_descriptor), intent(in) :: self           !Descriptor instance
+    type(vgrid_descriptor), intent(in) :: self           !Descriptor instance
     real, dimension(:,:), intent(in) :: sfc_field       !Surface field reference for coordinate
     integer, dimension(:), intent(in) :: ip1_list       !List of IP1 levels to calculate on
     real, dimension(:,:,:), pointer  :: levels          !Physical level values
@@ -2936,7 +2936,7 @@ contains
     logical :: found,my_in_log
 
     ! Set error status
-    status = GD_ERROR
+    status = VGD_ERROR
 
     ! Set size of output
     nk = size(ip1_list)
@@ -2976,7 +2976,7 @@ contains
     if (.not.in_log) levels = exp(levels)
 
     ! Set status and return
-    status = GD_OK
+    status = VGD_OK
     return
  end function compute_pressure_5002
 

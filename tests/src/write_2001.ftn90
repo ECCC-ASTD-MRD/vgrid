@@ -1,10 +1,10 @@
 program constructor
-  use vGrid_Descriptors, only: grid_descriptor,gd_new,gd_get,gd_write,GD_ERROR
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_write,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(grid_descriptor) :: d,d_rtn
+  type(vgrid_descriptor) :: d,d_rtn
   integer :: stat,lu=0,fnom,fstouv,fstfrm,fclos,k
   integer, parameter :: LEVS=4
   integer, dimension(LEVS) :: ip1s
@@ -27,11 +27,11 @@ program constructor
      call convip(ip1s(k),pres(k),2,2,'',.false.)
   enddo
   pres = pres*100. !convert mb to Pa
-  stat = gd_new(d,kind=2,version=1,nk=size(pres),ip1_m=ip1s,a_m_8=pres,b_m_8=b)
-  stat = gd_write(d,unit=lu,format='fst')
-  stat = gd_new(d_rtn,unit=lu,format='fst',ip1=0,ip2=0)
-  stat = gd_get(d_rtn,key='COFA - vertical A coefficient',value=pres_rtn)
-  call ut_report(abs(pres_rtn(1)-pres(1)) < epsilon(pres),'Grid_Descriptors::gd_new vertical build initializer (2001) value')
+  stat = vgd_new(d,kind=2,version=1,nk=size(pres),ip1_m=ip1s,a_m_8=pres,b_m_8=b)
+  stat = vgd_write(d,unit=lu,format='fst')
+  stat = vgd_new(d_rtn,unit=lu,format='fst',ip1=0,ip2=0)
+  stat = vgd_get(d_rtn,key='COFA - vertical A coefficient',value=pres_rtn)
+  call ut_report(abs(pres_rtn(1)-pres(1)) < epsilon(pres),'Grid_Descriptors::vgd_new vertical build initializer (2001) value')
 
   stat=fstfrm(lu)
   stat=fclos(lu)

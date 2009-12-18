@@ -1,5 +1,5 @@
 program tests
-  use vGrid_Descriptors, only: grid_descriptor,gd_new,gd_levels
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_levels
   use Unit_Testing, only: ut_report
 
   implicit none
@@ -8,7 +8,7 @@ program tests
   real :: epsilon=0.01
   real, dimension(:,:), allocatable :: p0,px
   real, dimension(:,:,:), pointer :: lev
-  type(grid_descriptor) :: d
+  type(vgrid_descriptor) :: d
 
   stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
   if(stat.lt.0)then
@@ -25,15 +25,15 @@ program tests
   close(lutxt)
 
   ! Get physical levelling information
-  stat = gd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
+  stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
   fstkey = fstinf(lu,ni,nj,nk,-1,'',93423264,-1,-1,'','TT')
   allocate(p0(ni,nj))
   stat = fstlir(p0,lu,ni,nj,nk,-1,'',-1,-1,-1,'','P0')
   p0 = p0*100. !mb to Pa
   allocate(px(ni,nj))
   stat = fstlir(px,lu,ni,nj,nk,-1,'',93423264,-1,-1,'','PX')
-  stat = gd_levels(d,sfc_field=p0,ip1_list=(/93423264/),levels=lev,in_log=.true.)
-  call ut_report(abs(lev(2,5,1)-log(px(2,5)*100.))<epsilon,message='Grid_Descriptors::gd_levels level calculation status')
+  stat = vgd_levels(d,sfc_field=p0,ip1_list=(/93423264/),levels=lev,in_log=.true.)
+  call ut_report(abs(lev(2,5,1)-log(px(2,5)*100.))<epsilon,message='Grid_Descriptors::vgd_levels level calculation status')
 
   stat=fstfrm(lu)
   stat=fclos(lu)

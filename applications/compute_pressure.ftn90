@@ -1,5 +1,5 @@
 program compute_pressure
-  use vGrid_Descriptors, only: gd_levels,GD_OK
+  use vGrid_Descriptors, only: vgd_levels,VGD_OK
   
   implicit none
 
@@ -78,9 +78,9 @@ program compute_pressure
      
      if(allocated(pres))deallocate(pres)
 
-     stat = gd_levels(unit=lui,fstkeys=liste(1:infon),levels=pres)
-     if(stat .ne. GD_OK )then
-        print*,'Problem with gd_levels'
+     stat = vgd_levels(unit=lui,fstkeys=liste(1:infon),levels=pres)
+     if(stat .ne. VGD_OK )then
+        print*,'Problem with vgd_levels'
         call exit(1)
      endif
      pres=pres/100.

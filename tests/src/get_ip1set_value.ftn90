@@ -1,10 +1,10 @@
 program constructor
-  use vGrid_Descriptors, only: grid_descriptor,gd_new,gd_get,GD_ERROR
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(grid_descriptor) :: d
+  type(vgrid_descriptor) :: d
   integer :: stat,i,ip1
   integer, dimension(:), allocatable :: ip1s
   real(kind=8), dimension(4) :: pres=(/1000.,925.,850.,700./),b=(/0.,0.,0.,0./)
@@ -15,8 +15,8 @@ program constructor
   do i=1,size(ip1s)
      call convip(ip1s(i),pres(i),2,2,'',.false.)
   enddo
-  stat = gd_new(d,kind=2,version=1,nk=size(pres),ip1=999,ip1_m=ip1s,a_m_8=pres,b_m_8=b)
-  stat = gd_get(d,key='IP_1',value=ip1)
-  call ut_report(ip1==999,'Grid_Descriptors::gd_new vertical build initializer (2001) value')
+  stat = vgd_new(d,kind=2,version=1,nk=size(pres),ip1=999,ip1_m=ip1s,a_m_8=pres,b_m_8=b)
+  stat = vgd_get(d,key='IP_1',value=ip1)
+  call ut_report(ip1==999,'Grid_Descriptors::vgd_new vertical build initializer (2001) value')
 
 end program constructor

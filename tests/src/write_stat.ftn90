@@ -1,10 +1,10 @@
 program tests
-  use vGrid_Descriptors, only: grid_descriptor,gd_new,gd_write
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_write
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(grid_descriptor) :: d
+  type(vgrid_descriptor) :: d
   integer :: stat,lu=0,lutxt=69,ip1,ip2
 
   integer, external :: fnom,fstouv,fclos,fstfrm
@@ -25,10 +25,10 @@ program tests
   close(lutxt)
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = gd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
+  stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
 
   ! Print information about the instance
-  stat = gd_write(d,unit=lu,format='fst')
-  call ut_report(stat,message='Grid_Descriptors::gd_write write descriptors')
+  stat = vgd_write(d,unit=lu,format='fst')
+  call ut_report(stat,message='Grid_Descriptors::vgd_write write descriptors')
 
 end program tests

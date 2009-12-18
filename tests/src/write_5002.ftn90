@@ -1,11 +1,11 @@
 program constructor
 
-  use vGrid_Descriptors, only: grid_descriptor,gd_new,gd_write
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_write
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(grid_descriptor) :: d
+  type(vgrid_descriptor) :: d
   integer, parameter :: lu=10,nk=3
   integer :: stat,ip1,k
   integer :: fnom,fstouv,fstfrm
@@ -61,7 +61,7 @@ program constructor
      !print*,pp,ip1_t(k)
   enddo
   
-  stat=gd_new(&
+  stat=vgd_new(&
        d,                  &
        kind    = 5,        &
        version = 2,        &
@@ -80,8 +80,8 @@ program constructor
        ip1_t   = ip1_t)
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = gd_write(d,lu,format='fst')
-  call ut_report(stat,'Grid_Descriptors, gd_new, gd_write')
+  stat = vgd_write(d,lu,format='fst')
+  call ut_report(stat,'Grid_Descriptors, vgd_new, vgd_write')
 
   stat=fstfrm(lu)
 

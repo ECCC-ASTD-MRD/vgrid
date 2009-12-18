@@ -1,10 +1,10 @@
 program tests
-  use vGrid_Descriptors, only: grid_descriptor,gd_new,gd_get,GD_MISSING
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,VGD_MISSING
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(grid_descriptor) :: d
+  type(vgrid_descriptor) :: d
   integer :: stat,lu=0,ig1,lutxt=69,ip1,ip2
   
   integer, external :: fnom,fstouv,fclos,fstfrm
@@ -25,11 +25,11 @@ program tests
   close(lutxt)
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = gd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
+  stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
 
   ! Get information about the coordinate
-  stat = gd_get(d,key='IG_1 - record ig1',value=ig1,dir='z')
-  call ut_report(ig1==5002,message='Grid_Descriptors::gd_get get dimensional entry')
+  stat = vgd_get(d,key='IG_1 - record ig1',value=ig1,dir='z')
+  call ut_report(ig1==5002,message='Grid_Descriptors::vgd_get get dimensional entry')
 
   ! Close files
   stat = fstfrm(lu)

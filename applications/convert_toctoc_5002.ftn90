@@ -1,5 +1,5 @@
 program convert_toctoc_5002
-   use vGrid_Descriptors, only: grid_descriptor,gd_new,gd_write,GD_OK
+   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_write,VGD_OK
    implicit none
    integer, parameter :: ncle=3,lui=10,nmax=1000
    integer, dimension(nmax) :: liste
@@ -24,7 +24,7 @@ program convert_toctoc_5002
    character(len=4) :: nomvar
    character(len=12) :: etiket
 
-   type(grid_descriptor) :: gdv
+   type(vgrid_descriptor) :: gdv
    
    cle=(/'s.      ','d.      ','samefile'/)
    val=(/'undef   ','undef   ','NO      '/)
@@ -166,7 +166,7 @@ program convert_toctoc_5002
       toctoc(2,nkmod+1)=toctoc(2,nj)
       toctoc(3,nkmod+1)=toctoc(3,nj)
 
-      istat=gd_new(&
+      istat=vgd_new(&
            gdv,&            
            kind     = 5,&
            version  = 2,&
@@ -183,16 +183,16 @@ program convert_toctoc_5002
            b_t_8    = toctoc(3,nkmod+2:nj),&
            ip1_m    = nint(toctoc(1,1:nkmod+1)),&
            ip1_t    = nint(toctoc(1,nkmod+2:nj)))
-      if(istat.ne.GD_OK)then
-         print*,'ERROR problem with gd_new'
+      if(istat.ne.VGD_OK)then
+         print*,'ERROR problem with vgd_new'
          istat=fstfrm(lui)
          if(.not.samefile_L)istat=fstfrm(luo)
          call exit(1)
       endif
       print*,'Writing converted !!'
-      istat = gd_write(gdv,luo,'fst')
-      if(istat.ne.GD_OK)then
-         print*,'ERROR problem with gd_write'
+      istat = vgd_write(gdv,luo,'fst')
+      if(istat.ne.VGD_OK)then
+         print*,'ERROR problem with vgd_write'
          istat=fstfrm(lui)
          if(.not.samefile_L)istat=fstfrm(luo)
          call exit(1)

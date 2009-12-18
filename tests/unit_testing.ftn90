@@ -16,7 +16,7 @@ contains
   
   subroutine report_stat(status,message)
     ! Report on the exit status of a test
-    use vGrid_Descriptors, only: GD_OK
+    use vGrid_Descriptors, only: VGD_OK
     integer, intent(in) :: status                       !Test status
     character(len=*), intent(in), optional :: message   !Message to report on failure
 
@@ -31,7 +31,7 @@ contains
     open(unit=REPORT_FILE_UNIT,file=trim(REPORT_FILE_NAME))
 
     ! Check status and report
-    if (status == GD_OK) then
+    if (status == VGD_OK) then
        write(REPORT_FILE_UNIT,*) 'ok'
     else
        write(REPORT_FILE_UNIT,*) 'failed'//trim(my_message)

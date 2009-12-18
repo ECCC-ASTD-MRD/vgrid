@@ -1,18 +1,18 @@
 program tests
-  use vGrid_Descriptors, only: grid_descriptor,gd_new,gd_position
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_position
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(grid_descriptor) :: d
+  type(vgrid_descriptor) :: d
   integer :: stat
   real, dimension(:,:), pointer :: lat,lon
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = gd_new(d,unit=10,format='fst',ip1=100,ip2=200)
+  stat = vgd_new(d,unit=10,format='fst',ip1=100,ip2=200)
 
   ! Get information about the coordinate
-  stat = gd_position(d,lat=lat,lon=lon)
-  call ut_report(stat,message='Grid_Descriptors::gd_position get horizontal position stat')
+  stat = vgd_position(d,lat=lat,lon=lon)
+  call ut_report(stat,message='Grid_Descriptors::vgd_position get horizontal position stat')
 
 end program tests
