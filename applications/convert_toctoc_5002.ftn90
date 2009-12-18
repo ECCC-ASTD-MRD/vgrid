@@ -1,5 +1,5 @@
 program convert_toctoc_5002
-   use grid_descriptors, only: grid_descriptor,gd_new,gd_write,GD_OK
+   use vGrid_Descriptors, only: grid_descriptor,gd_new,gd_write,GD_OK
    implicit none
    integer, parameter :: ncle=3,lui=10,nmax=1000
    integer, dimension(nmax) :: liste
