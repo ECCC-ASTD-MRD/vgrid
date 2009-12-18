@@ -62,7 +62,7 @@ module vGrid_Descriptors
   ! Combined coordinate structure
   type vgrid_descriptor
      private
-     integer :: ip1=0,ip2=0,ip3=0                       !ip1,2 values given to the 3D descriptor
+     integer :: ip1=0,ip2=0                             !ip1,2 values given to the 3D descriptor
      integer :: unit                                    !file unit associated with this 3D descriptor
      logical :: match_ipig                              !do ip/ig matching for records
      character(len=VGD_LEN_NAME) :: ref_name            !reference field name
@@ -149,16 +149,15 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Class constructor
 
-   integer function new_read(self,unit,format,ip1,ip2,ip3) result(status)
+   integer function new_read(self,unit,format,ip1,ip2) result(status)
       ! Coordinate constructor - read from a file and initialize instance
       type(vgrid_descriptor), intent(out) :: self !Vertical descriptor instance
       integer, intent(in) :: unit                 !File unit to read descriptor information from
       character(len=*), intent(in) :: format      !File format ('fst' or 'bin')
       integer, intent(in) :: ip1,ip2              !ip1,2 values of the desired descriptors
-      integer, optional, intent(in) :: ip3        !ip3 value of the desired descriptors
 
       ! Internal variables
-      integer :: istat,key,error,kind,version,count,i,my_ip3
+      integer :: istat,key,error,kind,version,count,i
       integer :: fstinf,fstinl,fstluk,fstprm,ni,nj,nk,swa,lng,ubc,dltf,extra1,extra2,extra3
       integer, dimension(MAX_DESC_REC) :: keyList
       type(FSTD_ext) :: var
@@ -174,8 +173,6 @@ contains
       else
          self%match_ipig = .true.
       endif
-      my_ip3=-1
-      if(present(ip3)) my_ip3=ip3
 
       ! Construct vertical descriptor
       self%rec%nomvar = ZNAME
@@ -183,7 +180,7 @@ contains
 
          ! RPN Standard file input
       case ('FST')
-         key=fstinf(unit,ni,nj,nk,-1,' ',ip1,ip2,my_ip3,' ',self%rec%nomvar)
+         key=fstinf(unit,ni,nj,nk,-1,' ',ip1,ip2,-1,' ',self%rec%nomvar)
          if(key < 0)then
             write(STDERR,'("WARNING: cannot find '//trim(self%rec%nomvar)//' with the following: ip1=",i10,",ip2=",i10)')ip1,ip2
             self%vcode = -1
@@ -207,9 +204,9 @@ contains
               swa,lng,dltf,ubc,extra1,extra2,extra3)         
 
          ! Check for multiple (different) descriptors
-         error = fstinl(unit,ni,nj,nk,-1,' ',ip1,ip2,my_ip3,' ',self%rec%nomvar,keyList,count,size(keyList))
+         error = fstinl(unit,ni,nj,nk,-1,' ',ip1,ip2,-1,' ',self%rec%nomvar,keyList,count,size(keyList))
          if (error < 0) then
-            write(STDERR,*) 'ERROR: problem retrieving '//trim(self%rec%nomvar)//' keys for ip1,ip2,ip3: ',ip1,ip2,my_ip3
+            write(STDERR,*) 'ERROR: problem retrieving '//trim(self%rec%nomvar)//' keys for ip1,ip2: ',ip1,ip2
             self%vcode = -1
             return
          endif
@@ -308,14 +305,14 @@ contains
       return
    end function new_read
 
-   integer function new_build_vert(self,kind,version,nk,ip1,ip2,ip3, &
+   integer function new_build_vert(self,kind,version,nk,ip1,ip2, &
         ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8, &
         ip1_m,ip1_t) result(status)
       ! Coordinate constructor - build vertical descriptor from arguments
       type(vgrid_descriptor), intent(out) :: self       !Vertical descriptor instance    
       integer, intent(in) :: kind,version               !Kind,version to create
       integer, intent(in) :: nk                         !Number of levels
-      integer, optional, intent(in) :: ip1,ip2,ip3      !IP1,2 values for FST file record [0,0,0]
+      integer, optional, intent(in) :: ip1,ip2          !IP1,2 values for FST file record [0,0]
       real, optional, intent(in) :: rcoef1,rcoef2       !R-coefficient values for rectification
       real*8, optional, intent(in) :: ptop_8            !Top-level pressure (Pa)
       real*8, optional, intent(in) :: pref_8            !Reference-level pressure (Pa)
@@ -339,7 +336,6 @@ contains
       self%rec%ip3=0
       if (present(ip1)) self%ip1 = ip1
       if (present(ip2)) self%ip2 = ip2
-      if (present(ip3)) self%rec%ip3 = ip3
       self%unit = -1      
       self%match_ipig=.true.
 
@@ -517,7 +513,7 @@ contains
       return
    end function new_build_vert
 
-   integer function new_gen(self,kind,version,hyb,rcoef,ptop_8,pref_8,ip1,ip2,ip3,stdout_unit) result(status)
+   integer function new_gen(self,kind,version,hyb,rcoef,ptop_8,pref_8,ip1,ip2,stdout_unit) result(status)
      use vdescript
       ! Coordinate constructor - build vertical descriptor from hybrid coordinate entries
       type(vgrid_descriptor), intent(out) :: self       !Vertical descriptor instance    
@@ -526,11 +522,11 @@ contains
       real, dimension(:), intent(in) :: rcoef           !R-coefficient values for rectification
       real*8, intent(in) :: ptop_8                      !Top-level pressure (Pa)
       real*8, intent(in) :: pref_8                      !Reference-level pressure (Pa)
-      integer, optional, intent(in) :: ip1,ip2,ip3      !IP1,2,3 values for FST file record [0,0,0]
+      integer, optional, intent(in) :: ip1,ip2          !IP1,2 values for FST file record [0,0]
       integer, intent(in), optional :: stdout_unit      !Unit number for verbose output [STDERR]
 
       ! Internal variables
-      integer :: myip1,myip2,myip3,mystdout_unit,error
+      integer :: myip1,myip2,mystdout_unit,error
       integer, dimension(:), pointer :: ip1_m,ip1_t
       real, dimension(:), pointer :: hybm,hybt
       real*8, dimension(:), pointer :: a_m_8,b_m_8,a_t_8,b_t_8
@@ -544,8 +540,6 @@ contains
       if (present(ip1)) myip1 = ip1
       myip2 = 0
       if (present(ip2)) myip2 = ip2
-      myip1 = 0
-      if (present(ip3)) myip3 = ip3
       mystdout_unit = STDERR
       if (present(stdout_unit)) mystdout_unit = stdout_unit
 
@@ -564,7 +558,6 @@ contains
             error = vgd_new(self,kind,version,size(hyb), &
                  ip1=myip1,           &
                  ip2=myip2,           &
-                 ip3=myip3,           &
                  ptop_8=ptop_8,       &
                  pref_8=pref_8,       &
                  rcoef1=rcoef(1),     &
@@ -1379,8 +1372,8 @@ contains
     ! Write to an RPN Standard file
     case ('FST')
     error=fstecr(self%table,dummy,-64,unit, &
-         self%rec%dateo,self%rec%deet,self%rec%npas,&
-         ni,nj,nk,self%ip1,self%ip2,self%rec%ip3,&
+         self%rec%dateo,self%rec%deet,self%rec%npas, &
+         ni,nj,nk,self%ip1,self%ip2,self%rec%ip3, &
          self%rec%typvar,self%rec%nomvar,self%rec%etiket,self%rec%grtyp, &
          self%rec%ig1,self%rec%ig2,self%rec%ig3,self%rec%ig4,5,.true.)
     if(error < 0)then
@@ -1502,7 +1495,7 @@ contains
           write(STDERR,*) 'ERROR: multiple valid times given in fstkeys vector'
           return
        endif
-       if (prm_check%ig1 /= prmk%ig1 .or. prm_check%ig2 /= prmk%ig2 .or. prm_check%ig3 /= prmk%ig3) then
+       if (prm_check%ig1 /= prmk%ig1 .or. prm_check%ig2 /= prmk%ig2) then
           write(STDERR,*) 'ERROR: multiple grids given in fstkeys vector'
           return
        endif

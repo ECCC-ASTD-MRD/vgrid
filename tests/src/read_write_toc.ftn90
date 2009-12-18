@@ -11,7 +11,7 @@ program constructor
   real*8, dimension(:), pointer :: my_a
   logical :: ok
 
-  stat=fnom(lu,"data/toc_toc_ip3.rpn","RND",0)
+  stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
      call abort
@@ -33,7 +33,7 @@ program constructor
   stat=fstouv(lu2,'RND')
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2,ip3=1)
+  stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
   stat = vgd_write(d,unit=lu2,format="fst")
   call ut_report(stat,'Grid_Descriptors, vgd_new, vgd_get CA')
 
