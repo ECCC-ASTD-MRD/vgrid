@@ -16,7 +16,7 @@ contains
   
   subroutine report_stat(status,message)
     ! Report on the exit status of a test
-    use Grid_Descriptors, only: GD_OK
+    use vGrid_Descriptors, only: GD_OK
     integer, intent(in) :: status                       !Test status
     character(len=*), intent(in), optional :: message   !Message to report on failure
 

@@ -1,5 +1,5 @@
 program tests
-  use Grid_Descriptors, only: grid_descriptor,gd_new,gd_put,GD_ERROR
+  use vGrid_Descriptors, only: grid_descriptor,gd_new,gd_put,GD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none

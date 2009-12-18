@@ -1,5 +1,5 @@
 program constructor
-  use Grid_Descriptors, only: grid_descriptor,gd_new,gd_print,GD_OK
+  use vGrid_Descriptors, only: grid_descriptor,gd_new,gd_print,GD_OK
   use Unit_Testing, only: ut_report
 
   implicit none
