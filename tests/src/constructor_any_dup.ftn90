@@ -13,7 +13,7 @@ program constructor
   integer, dimension(nmax) :: liste
   logical :: ok  
 
-  stat=fnom(lu,"data/Linux_pgi611/dm_5002_from_model_run-interp_dup","RND",0)
+  stat=fnom(lu,"data/dm_5002_from_model_run-interp_dup","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
      call abort
