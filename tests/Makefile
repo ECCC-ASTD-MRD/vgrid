@@ -2,7 +2,7 @@
 FCFLAGS='=-C -g'
 RCOMPILE = r.compile
 DESCRIP_PATH = ../
-DATA_ARCH=$(EC_ARCH)
+DATA_ARCH=`uname -s`
 
 # Override incorrect implicits
 %.o : %.mod
