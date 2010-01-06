@@ -2,7 +2,7 @@
 FCFLAGS='=-C -g'
 RCOMPILE = r.compile
 DESCRIP_PATH = ../
-DATA_ARCH=$(EC_ARCH)
+DATA_ARCH=`uname -s`
 
 # Override incorrect implicits
 %.o : %.mod
@@ -17,7 +17,7 @@ OBJECTS = $(DESCRIP_PATH)grid_descriptors.o unit_testing.o
 unit_testing.o: unit_testing.ftn90
 
 alltests:
-	make tests DATA_ARCH=Linux_pgi611; \
+	make tests DATA_ARCH=Linux; \
         make tests DATA_ARCH=AIX
 
 
