@@ -10,10 +10,10 @@ RCOMPILE = r.compile
 .ftn90.o:
 	$(RCOMPILE) -optf $(FCFLAGS) -src $<
 
-OBJECTS = vgrid_descriptors.o vgrid_genab2.o
+OBJECTS = vgrid_descriptors.o vgrid_genab.o
 
-vgrid_descriptors.o: vgrid_descriptors.ftn90 vgrid_genab2.o
-vgrid_genab2.o: vgrid_genab2.ftn90
+vgrid_descriptors.o: vgrid_descriptors.ftn90 vgrid_genab.o
+vgrid_genab.o: vgrid_genab.ftn90
 
 clean:
 	rm -f *.f90 *.o *.mod
