@@ -24,7 +24,7 @@ module vdescript
   integer, private :: stdout
 
   ! Define and publicize interfaces
-  public vgrid_genab2
+  public :: vgrid_genab2
   interface reallocate
      module procedure PRIV_reallocate4
      module procedure PRIV_reallocate8
