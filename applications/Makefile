@@ -12,7 +12,7 @@ RMN = rmn_010
 .ftn90.o:
 	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -src $<
 
-OBJECTS = $(DESCRIP_PATH)vgrid_descriptors.o $(DESCRIP_PATH)vgrid_genab2.o
+OBJECTS = $(DESCRIP_PATH)vgrid_descriptors.o $(DESCRIP_PATH)vgrid_genab.o
 
 all: compute_pressure convert_toctoc_5002
 
@@ -26,8 +26,8 @@ $(DESCRIP_PATH)vgrid_descriptors.o: $(DESCRIP_PATH)vgrid_descriptors.ftn90
 	echo "STOP: $(DESCRIP_PATH)vgrid_descriptors has been updated ... recompilation needed in $(DESCRIP_PATH)"; \
 	exit
 
-$(DESCRIP_PATH)vgrid_genab2.o: $(DESCRIP_PATH)vgrid_genab2.ftn90
-	echo "STOP: $(DESCRIP_PATH)vgrid_genab2.o has been updated ... recompilation needed in $(DESCRIP_PATH)"; \
+$(DESCRIP_PATH)vgrid_genab.o: $(DESCRIP_PATH)vgrid_genab.ftn90
+	echo "STOP: $(DESCRIP_PATH)vgrid_genab.o has been updated ... recompilation needed in $(DESCRIP_PATH)"; \
 	exit
 
 clean:
