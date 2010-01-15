@@ -173,7 +173,7 @@ program convert_toctoc_5002
            nk       = nkmod,&
            ip1      = ip1,&
            ip2      = ip2,&
-           ptop_8   = dble(ig2)/1000.d0,&
+           ptop_8   = dble(ig2),&
            pref_8   = 100000.d0,&
            rcoef1   = real(ig3)/1000.,&    
            rcoef2   = real(ig4)/1000.,&
