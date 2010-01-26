@@ -1,5 +1,5 @@
 program convert_toctoc_5002
-   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_write,VGD_OK
+   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_write,vgd_print,VGD_OK
    implicit none
    integer, parameter :: ncle=3,lui=10,nmax=1000
    integer, dimension(nmax) :: liste
@@ -13,7 +13,7 @@ program convert_toctoc_5002
    real :: dummy
    real*8 :: nhours
    logical :: samefile_L
-   character(len=12), parameter :: version='v_1.0.0'
+   character(len=12), parameter :: version='v_1.0.1'
 
    ! For fstprm
    integer :: ig1,ig2,ig3,ig4,dateo,deet,npas,datyp,nbits
@@ -189,6 +189,7 @@ program convert_toctoc_5002
          if(.not.samefile_L)istat=fstfrm(luo)
          call exit(1)
       endif
+      istat = vgd_print(gdv)
       print*,'Writing converted !!'
       istat = vgd_write(gdv,luo,'fst')
       if(istat.ne.VGD_OK)then
