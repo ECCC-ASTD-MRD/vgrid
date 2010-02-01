@@ -224,7 +224,7 @@ contains
     enddo
     call convip(F_ip1_t(nk+2),F_hybt(nk+2),5,2,'',.false.)
 
-4001 format (/'ERROR: Unrecognized F_code= ',i/)
+4001 format (/'ERROR: Unrecognized F_code= ',i10/)
 9100 format (/'ERROR: Insufficient number of vertical levels in variable hyb'/)
 9250 format (/' ===> WRONG SPECIFICATION OF HYB VERTICAL LEVELS:'/ &
          '      LEVELS MUST BE MONOTONICALLY INCREASING'/     &

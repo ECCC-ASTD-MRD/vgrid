@@ -26,6 +26,9 @@ program constructor
 
   ! Construct a new set of 3D coordinate descriptors
   stat = vgd_new(d,unit=lu,format="fst",ip1=-1,ip2=-1)
+
+  print*, stat
+
   call ut_report(stat==VGD_ERROR,'Grid_Descriptors, vgd_new, vgd_get CA')
 
   stat=fstfrm(lu)
