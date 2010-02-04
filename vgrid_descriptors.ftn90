@@ -154,10 +154,10 @@ contains
       type(vgrid_descriptor), intent(out) :: self !Vertical descriptor instance
       integer, intent(in) :: unit                 !File unit to read descriptor information from
       character(len=*), intent(in) :: format      !File format ('fst' or 'bin')
-      integer, intent(in) :: ip1,ip2              !ip1,2 values of the desired descriptors
+      integer,optional :: ip1,ip2                 !ip1,2 values of the desired descriptors
 
       ! Internal variables
-      integer :: istat,key,error,kind,version,count,i
+      integer :: istat,key,error,kind,version,count,i,myip1,myip2
       integer :: fstinf,fstinl,fstluk,fstprm,ni,nj,nk,swa,lng,ubc,dltf,extra1,extra2,extra3
       integer, dimension(MAX_DESC_REC) :: keyList
       type(FSTD_ext) :: var
@@ -166,9 +166,15 @@ contains
       ! Set error status
       status = VGD_ERROR
 
+      ! Set default values
+      myip1 = -1
+      if (present(ip1)) myip1 = ip1
+      myip2 = -1
+      if (present(ip2)) myip2 = ip2
+
       ! Set instance variables
       self%unit = unit
-      if (any((/ip1,ip2/) < 0)) then
+      if (any((/myip1,myip2/) < 0)) then
          self%match_ipig = .false.
       else
          self%match_ipig = .true.
@@ -180,9 +186,9 @@ contains
 
          ! RPN Standard file input
       case ('FST')
-         key=fstinf(unit,ni,nj,nk,-1,' ',ip1,ip2,-1,' ',self%rec%nomvar)
+         key=fstinf(unit,ni,nj,nk,-1,' ',myip1,myip2,-1,' ',self%rec%nomvar)
          if(key < 0)then
-            write(STDERR,'("WARNING: cannot find '//trim(self%rec%nomvar)//' with the following: ip1=",i10,",ip2=",i10)')ip1,ip2
+            write(STDERR,'("WARNING: cannot find '//trim(self%rec%nomvar)//' with the following: ip1=",i10,",ip2=",i10)')myip1,myip2
             self%vcode = -1
             return
          endif
@@ -204,9 +210,9 @@ contains
               swa,lng,dltf,ubc,extra1,extra2,extra3)         
 
          ! Check for multiple (different) descriptors
-         error = fstinl(unit,ni,nj,nk,-1,' ',ip1,ip2,-1,' ',self%rec%nomvar,keyList,count,size(keyList))
+         error = fstinl(unit,ni,nj,nk,-1,' ',myip1,myip2,-1,' ',self%rec%nomvar,keyList,count,size(keyList))
          if (error < 0) then
-            write(STDERR,*) 'ERROR: problem retrieving '//trim(self%rec%nomvar)//' keys for ip1,ip2: ',ip1,ip2
+            write(STDERR,*) 'ERROR: problem retrieving '//trim(self%rec%nomvar)//' keys for ip1,ip2: ',myip1,myip2
             self%vcode = -1
             return
          endif

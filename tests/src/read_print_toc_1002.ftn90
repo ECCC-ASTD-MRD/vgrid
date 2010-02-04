@@ -22,7 +22,7 @@ program constructor
   endif
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = vgd_new(d,unit=lu,format="fst",ip1=2009,ip2=1000)
+  stat = vgd_new(d,unit=lu,format="fst")
   if(stat.ne.VGD_OK)then
      print*,'ERROR: problem with vgd_new'
      stat=fstfrm(lu)
