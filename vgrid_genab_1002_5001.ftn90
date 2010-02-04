@@ -1,0 +1,266 @@
+!-------------------------------------- LICENCE BEGIN ------------------------------------
+!Environment Canada - Atmospheric Science and Technology License/Disclaimer, 
+!                     version 3; Last Modified: May 7, 2008.
+!This is free but copyrighted software; you can use/redistribute/modify it under the terms 
+!of the Environment Canada - Atmospheric Science and Technology License/Disclaimer 
+!version 3 or (at your option) any later version that should be found at: 
+!http://collaboration.cmc.ec.gc.ca/science/rpn.comm/license.html 
+!
+!This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+!without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+!See the above mentioned License/Disclaimer for more details.
+!You should have received a copy of the License/Disclaimer along with this software; 
+!if not, you can write to: EC-RPN COMM Group, 2121 TransCanada, suite 500, Dorval (Quebec), 
+!CANADA, H9P 1J3; or send e-mail to service.rpn@ec.gc.ca
+!-------------------------------------- LICENCE END --------------------------------------
+module vdescript_1002_5001
+
+  implicit none
+  private
+
+  ! Define class variables
+  integer, parameter, public :: VDESC_1002_5001_ERROR=-1
+  integer, parameter, public :: VDESC_1002_5001_OK=0
+  integer, private :: stdout
+
+  ! Define and publicize interfaces
+  public :: vgrid_genab_1002_5001
+  interface reallocate
+     module procedure PRIV_reallocate4
+     module procedure PRIV_reallocate8
+     module procedure PRIV_reallocateI
+  end interface
+
+contains   
+
+   subroutine vgrid_genab_1002_5001 (F_unout,F_hybuser,F_rcoef, &
+        F_ptop_8,F_pref_8,F_hyb,F_a_8,F_b_8,F_ip1,F_err)
+
+      !    Using Laprise & Girard, generates de A and B of the hybrid coordinate
+      !    see: Laprise & Girard, 1990, J. of Climate, eq. 5.1
+      !    Based on subroutine genab, genab2 also includes the evaluation of the 
+      !    analytical derivative of psurf*B with respect to Z
+      
+      implicit none
+      !      
+      ! Arguments
+      integer, intent(out) :: F_err
+      integer, intent(in) :: F_unout                        ! stdout fortran unit for messaging
+      real, dimension(:), intent(in) :: F_hybuser          ! user specification for vertical layering hyb
+      real, intent(in) :: F_rcoef                           ! user specification for rcoef
+      real*8 :: F_ptop_8                                    ! user specification for lid pressures
+      real*8, intent(in) :: F_pref_8                        ! user specification for lid and reference pressures
+      real, dimension(:), pointer :: F_hyb            ! model hyb values (cannot be normalides)
+      real, dimension(:), pointer :: F_hyb_fst              ! standard file hyb values (can be normalised)
+      real*8, dimension(:), pointer :: F_a_8, F_b_8         ! model As and Bs
+      integer, dimension(:), pointer :: F_ip1               ! ip1 values
+      
+      ! Local variables
+      integer :: k,i, status, nk, kind
+      logical :: monotone=.true.,wronghyb=.false.,cptop_L=.true.
+      real    :: rcoef,pres,pr1,pr2
+      real*8  :: ztop_8, zsrf_8, eta_8, zeta_8
+      real*8, parameter :: psurf_8=100000.d0                ! psurf was set bye gem_settings via Cstv_pisrf
+                                                            ! However, its value in all operational models
+                                                            ! was set to its default 1000 hPa. Therefore
+                                                            ! it is set here as it default and not carried
+                                                            ! in the !!
+      character*16 dumc_S
+      real, dimension(:), pointer :: dpba
+
+      !     __________________________________________________________________
+      
+      F_err = VDESC_1002_5001_ERROR
+      stdout = F_unout
+
+      ! Set size of the problem
+      nk = size(F_hybuser)
+      
+      ! Check and allocate as required
+      status = reallocate(F_hyb,1,nk)
+      if (status /= VDESC_1002_5001_OK) return
+      status = reallocate(F_hyb_fst,1,nk)
+      if (status /= VDESC_1002_5001_OK) return
+      status = reallocate(F_a_8,1,nk)
+      if (status /= VDESC_1002_5001_OK) return
+      status = reallocate(F_b_8,1,nk)
+      if (status /= VDESC_1002_5001_OK) return
+      status = reallocate(F_ip1,1,nk)
+      status = reallocate(dpba,1,nk)
+      if (status /= VDESC_1002_5001_OK) return
+      
+      !
+      ! Code from gemdm_config.ftn
+      !
+      if((F_ptop_8.gt.0.d0).and.(F_hybuser(1).ne.0))then
+         wronghyb = .true.
+         if(F_unout.gt.0)write(F_unout,9200)
+      endif
+      if((F_ptop_8.eq.0.d0).and.(F_hybuser(1).eq.0))then
+         wronghyb = .true.
+         if(F_unout.gt.0)write(F_unout,9201)
+      endif
+      if(F_hybuser(nk).ne.1.d0)then
+         wronghyb = .true.
+         if(F_unout.gt.0)write(F_unout,9202)
+      endif
+      do k=2, nk
+         if (F_hybuser(k).le.F_hybuser(k-1))monotone = .false.
+      end do
+      if(.not.monotone)then
+         wronghyb = .true.
+         if(F_unout.gt.0)write(F_unout,9203)
+      endif
+      if (wronghyb) then
+         if (F_unout.gt.0) then
+            write(F_unout,9204)
+            do k=1, nk
+               write (F_unout,*) F_hybuser(k),k
+            end do
+         endif
+         return
+      endif
+      !
+      if (F_ptop_8 .lt. 0.d0) then
+         do k=1,nk
+            call convip(i,F_hybuser (k),5   , 2,dumc_S,.false.)
+            call convip(i,F_hyb(k),kind,-1,dumc_S,.false.)
+            F_ip1(k)=i
+         end do
+         F_ptop_8=F_hyb(1)*F_pref_8
+      else
+         do k=1,nk
+            call convip(i,F_hybuser(k),1   , 1,dumc_S,.false.)
+            call convip(i,pres        ,kind,-1,dumc_S,.false.)
+            F_ip1(k)=i
+            F_hyb(k)=pres+(1.-pres)*F_ptop_8/F_pref_8
+         end do
+      endif
+      
+      !
+      ! Code from genab2
+      !
+      pr1=1./(1.-F_hyb(1))
+      do k=1,nk
+         F_b_8(k)=((F_hyb(k)-F_hyb(1))*pr1)**F_rcoef
+         F_a_8(k)=F_pref_8*(F_hyb(k)-F_b_8(k))
+         print*,F_b_8(k),F_a_8(k)
+      enddo
+      !
+      ! Note dpba could be an output of this s/r
+      if (F_rcoef.gt.1.0) then
+         do k=1,nk
+            pr2=F_rcoef*(F_hyb(k)-F_hyb(1))**(F_rcoef-1.)
+            dpba(k)=psurf_8*pr2/&
+                 (F_pref_8*(1.-F_hyb(1))**F_rcoef+(psurf_8-F_pref_8)*pr2)
+         enddo
+      else 
+         do k = 1,nk
+            dpba(k)=psurf_8/(psurf_8-F_pref_8*F_hyb(1))
+         enddo
+      endif
+
+      F_err = VDESC_1002_5001_OK
+      return
+
+9200  format (/' ===> WRONG SPECIFICATION OF HYB VERTICAL LEVELS:'/&
+               '      HYB(1) MUST BE 0.0')
+      
+9201  format (/' ===> WRONG SPECIFICATION OF HYB VERTICAL LEVELS:'/&
+               '      HYB(1) MUST BE > 0.0')
+
+9202  format (/' ===> WRONG SPECIFICATION OF HYB VERTICAL LEVELS:'/&
+               '      HYB(NK) MUST BE 1.0')
+      
+9203  format (/' ===> WRONG SPECIFICATION OF HYB VERTICAL LEVELS:'/&
+               '      LEVELS MUST BE MONOTONICALLY INCREASING')
+9204  format (/'      Current choice:')
+
+    end subroutine vgrid_genab_1002_5001
+   
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ function PRIV_reallocate4(v,low,high) result(status)
+    ! Allocate space for outputs
+    real, dimension(:), pointer :: v            !vector to allocate
+    integer, intent(in) :: low,high             !bounds for vector
+    integer :: status                           !return status of function
+    
+    ! Internal variables
+    integer :: check
+
+    ! Deallocate and re-allocate with the correct size
+    status = VDESC_1002_5001_ERROR
+    if (associated(v)) then
+       deallocate(v,stat=check)
+       if (check /= 0) then
+          write(stdout,*) 'Error in deallocate() from vdescript_1002_5001::reallocate()'
+          return
+       endif
+    endif
+    allocate(v(low:high),stat=check)
+    if (check /= 0) then
+       write(stdout,*) 'Error in allocate() from vdescript_1002_5001::reallocate()'
+       return
+    endif
+    status = VDESC_1002_5001_OK
+    return
+  end function PRIV_reallocate4
+
+  function PRIV_reallocate8(v,low,high) result(status)
+    ! Allocate space for outputs
+    real*8, dimension(:), pointer :: v          !vector to allocate
+    integer, intent(in) :: low,high             !bounds for vector
+    integer :: status                           !return status of function
+    
+    ! Internal variables
+    integer :: check
+
+    ! Deallocate and re-allocate with the correct size
+    status = VDESC_1002_5001_ERROR
+    if (associated(v)) then
+       deallocate(v,stat=check)
+       if (check /= 0) then
+          write(stdout,*) 'Error in deallocate() from vgrid_genab_1002_5001:reallocate()'
+          return
+       endif
+    endif
+    allocate(v(low:high),stat=check)
+    if (check /= 0) then
+       write(stdout,*) 'Error in allocate() from vgrid_genab_1002_5001::reallocate()'
+       return
+    endif
+    status = VDESC_1002_5001_OK
+    return
+  end function PRIV_reallocate8
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  function PRIV_reallocateI(v,low,high) result(status)
+    ! Allocate space for outputs
+    integer, dimension(:), pointer :: v         !vector to allocate
+    integer, intent(in) :: low,high             !bounds for vector
+    integer :: status                           !return status of function
+    
+    ! Internal variables
+    integer :: check
+
+    ! Deallocate and re-allocate with the correct size
+    status = VDESC_1002_5001_ERROR
+    if (associated(v)) then
+       deallocate(v,stat=check)
+       if (check /= 0) then
+          write(stdout,*) 'Error in deallocate() from vdescript_1002_5001::reallocate()'
+          return
+       endif
+    endif
+    allocate(v(low:high),stat=check)
+    if (check /= 0) then
+       write(stdout,*) 'Error in allocate() from vdescript_1002_5001::reallocate()'
+       return
+    endif
+    status = VDESC_1002_5001_OK
+    return
+  end function PRIV_reallocateI
+
+end module vdescript_1002_5001
+
