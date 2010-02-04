@@ -7,7 +7,7 @@ program constructor
 
   type(vgrid_descriptor) :: d
   integer :: stat
-  real :: epsilon=1.e-6
+  real :: epsilon=1.e-5
   !From /home/binops/afsi/sio/datafiles/constants/modeles/GEMDM/glb_033L80_g1_20090922/gem_settings.nml
   real, dimension(28) :: hyb_D=(/&
        0.0125000,0.0233625,0.0391625,0.0628625,0.0865625,&
