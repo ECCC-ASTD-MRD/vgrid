@@ -513,15 +513,16 @@ contains
       return
    end function new_build_vert
 
-   integer function new_gen(self,kind,version,hyb,rcoef,ptop_8,pref_8,ip1,ip2,stdout_unit) result(status)
-     use vdescript
+   integer function new_gen(self,kind,version,hyb,rcoef1,rcoef2,ptop_8,pref_8,ip1,ip2,stdout_unit) result(status)
+     use vdescript_1002_5001
+     use vdescript_5002
       ! Coordinate constructor - build vertical descriptor from hybrid coordinate entries
       type(vgrid_descriptor), intent(out) :: self       !Vertical descriptor instance    
       integer, intent(in) :: kind,version               !Kind,version to create
       real, dimension(:), intent(in) :: hyb             !List of hybrid levels
-      real, dimension(:), intent(in) :: rcoef           !R-coefficient values for rectification
-      real*8, intent(in) :: ptop_8                      !Top-level pressure (Pa)
-      real*8, intent(in) :: pref_8                      !Reference-level pressure (Pa)
+      real, optional, intent(in) :: rcoef1,rcoef2       !R-coefficient values for rectification
+      real*8, optional, intent(in) :: ptop_8            !Top-level pressure (Pa)
+      real*8, optional, intent(in) :: pref_8            !Reference-level pressure (Pa)
       integer, optional, intent(in) :: ip1,ip2          !IP1,2 values for FST file record [0,0]
       integer, intent(in), optional :: stdout_unit      !Unit number for verbose output [STDERR]
 
@@ -530,7 +531,7 @@ contains
       integer, dimension(:), pointer :: ip1_m,ip1_t
       real, dimension(:), pointer :: hybm,hybt
       real*8, dimension(:), pointer :: a_m_8,b_m_8,a_t_8,b_t_8
-      logical :: gen_ok
+      logical :: gen_ok,missingInput=.false.
 
       ! Set error status
       status = VGD_ERROR
@@ -543,39 +544,111 @@ contains
       mystdout_unit = STDERR
       if (present(stdout_unit)) mystdout_unit = stdout_unit
 
-      ! Call appropriate support module to compute required values
       error = VGD_ERROR
-      select case (kind)
-      case (5)
-         if (version == 2) then
-            if (size(rcoef) /= 2) then
-               write(STDERR,*) 'ERROR: expected 2 entries in rcoef and found ',size(rcoef)
-               return
-            endif
-            call vgrid_genab2(6,mystdout_unit,hyb,rcoef,ptop_8,pref_8, &
-                 hybm,hybt,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,error)
-            if (error /= VDESC_OK) return
-            error = vgd_new(self,kind,version,size(hyb), &
-                 ip1=myip1,           &
-                 ip2=myip2,           &
-                 ptop_8=ptop_8,       &
-                 pref_8=pref_8,       &
-                 rcoef1=rcoef(1),     &
-                 rcoef2=rcoef(2),     &
-                 a_m_8=a_m_8,         &
-                 b_m_8=b_m_8,         &
-                 a_t_8=a_t_8,         &
-                 b_t_8=b_t_8,         &
-                 ip1_m=ip1_m,         &
-                 ip1_t=ip1_t)
-            if (error /= VGD_OK) return
+      ! Check for required inputs
+      error = set_vcode(self,kind,version)
+      missingInput = .false.
+      if(is_valid(self,ptop_8_valid)) then
+         if(.not.present(ptop_8))then
+            write(STDERR,*) 'ERROR: ptop_8 is a required constructor entry'
+            missingInput = .true.
          endif
-      end select
+      endif
+      if(is_valid(self,pref_8_valid)) then
+         if(.not.present(pref_8))then
+            write(STDERR,*) 'ERROR: pref_8 is a required constructor entry'
+            missingInput = .true.
+         endif
+      endif
+      if(is_valid(self,rcoef1_valid)) then
+         if(.not.present(rcoef1))then
+            write(STDERR,*) 'ERROR: rcoef1 is a required constructor entry'
+            missingInput = .true.
+         endif
+      endif
+      if(is_valid(self,rcoef2_valid)) then
+         if(.not.present(rcoef2))then
+            write(STDERR,*) 'ERROR: rcoef2 is a required constructor entry'
+            missingInput = .true.
+         endif
+      endif
+      if (missingInput) return
 
+      ! Call appropriate support module to compute required values
+      select case (self%vcode)
+      case (1002)
+         if (present(rcoef1).or.present(rcoef2))then
+            write(STDERR,*) 'ERROR: rcoef1 nor rcoef2 should not be passed for version ',self%vcode
+            return
+         endif
+         if (present(pref_8))then
+            write(STDERR,*) 'ERROR: pref should not be passed for version ',self%vcode
+            return
+         endif
+         call vgrid_genab_1002_5001(6,hyb,1.,ptop_8,1.d0, &
+              hybm,a_m_8,b_m_8,ip1_m,error)
+         if (error /= VDESC_1002_5001_OK)then
+            return
+         endif
+         error = vgd_new(self,kind,version,size(hyb), &
+              ip1=myip1,           &
+              ip2=myip2,           &
+              ptop_8=ptop_8,       &
+              a_m_8=a_m_8,         &
+              b_m_8=b_m_8,         &
+              ip1_m=ip1_m)
+         if (error /= VGD_OK) return
+      case (5001)
+         if (present(rcoef2))then
+            write(STDERR,*) 'ERROR: rcoef2 should not be passed for this version'
+            return
+         endif
+         call vgrid_genab_1002_5001(6,hyb,rcoef1,ptop_8,pref_8, &
+              hybm,a_m_8,b_m_8,ip1_m,error)
+         if (error /= VDESC_1002_5001_OK)then
+            return
+         endif
+         error = vgd_new(self,kind,version,size(hyb), &
+              ip1=myip1,           &
+              ip2=myip2,           &
+              ptop_8=ptop_8,       &
+              pref_8=pref_8,       &
+              rcoef1=rcoef1,       &
+              a_m_8=a_m_8,         &
+              b_m_8=b_m_8,         &
+              ip1_m=ip1_m)
+         if (error /= VGD_OK) return
+      case (5002)
+         if (.not.present(rcoef2))then
+            write(STDERR,*) 'ERROR: expected rcoef2'
+            return
+         endif
+         call vgrid_genab_5002(mystdout_unit,hyb,(/rcoef1,rcoef2/),ptop_8,pref_8, &
+              hybm,hybt,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,error)
+         if (error /= VDESC_5002_OK) return
+         error = vgd_new(self,kind,version,size(hyb), &
+              ip1=myip1,           &
+              ip2=myip2,           &
+              ptop_8=ptop_8,       &
+              pref_8=pref_8,       &
+              rcoef1=rcoef1,       &
+              rcoef2=rcoef2,       &
+              a_m_8=a_m_8,         &
+              b_m_8=b_m_8,         &
+              a_t_8=a_t_8,         &
+              b_t_8=b_t_8,         &
+              ip1_m=ip1_m,         &
+              ip1_t=ip1_t)
+         if (error /= VGD_OK) return
+      case DEFAULT
+         write(STDERR,*)'ERROR: unsuported IP1 kind = ',kind,', AND/OR version = ',version
+         return
+      end select
+      
       ! Set status and return
       status = VGD_OK
       return
-    end function new_gen
+   end function new_gen
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Get methods
