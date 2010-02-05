@@ -39,18 +39,19 @@ contains
       !    Using Laprise & Girard, generates de A and B of the hybrid coordinate
       !    see: Laprise & Girard, 1990, J. of Climate, eq. 5.1
       !    Based on subroutine genab, genab2 also includes the evaluation of the 
-      !    analytical derivative of psurf*B with respect to Z
+      !    analytical derivative of psurf*B with respect to Z which is not
+      !    part of this function
       
       implicit none
       !      
       ! Arguments
       integer, intent(out) :: F_err
       integer, intent(in) :: F_unout                        ! stdout fortran unit for messaging
-      real, dimension(:), intent(in) :: F_hybuser          ! user specification for vertical layering hyb
+      real, dimension(:), intent(in) :: F_hybuser           ! user specification for vertical layering hyb
       real, intent(in) :: F_rcoef                           ! user specification for rcoef
       real*8 :: F_ptop_8                                    ! user specification for lid pressures
       real*8, intent(in) :: F_pref_8                        ! user specification for lid and reference pressures
-      real, dimension(:), pointer :: F_hyb            ! model hyb values (cannot be normalides)
+      real, dimension(:), pointer :: F_hyb                  ! model hyb values (cannot be normalides)
       real, dimension(:), pointer :: F_hyb_fst              ! standard file hyb values (can be normalised)
       real*8, dimension(:), pointer :: F_a_8, F_b_8         ! model As and Bs
       integer, dimension(:), pointer :: F_ip1               ! ip1 values
@@ -58,15 +59,10 @@ contains
       ! Local variables
       integer :: k,i, status, nk, kind
       logical :: monotone=.true.,wronghyb=.false.,cptop_L=.true.
-      real    :: rcoef,pres,pr1,pr2
+      real    :: rcoef,pres,pr1
       real*8  :: ztop_8, zsrf_8, eta_8, zeta_8
-      real*8, parameter :: psurf_8=100000.d0                ! psurf was set bye gem_settings via Cstv_pisrf
-                                                            ! However, its value in all operational models
-                                                            ! was set to its default 1000 hPa. Therefore
-                                                            ! it is set here as it default and not carried
-                                                            ! in the !!
+
       character*16 dumc_S
-      real, dimension(:), pointer :: dpba
 
       !     __________________________________________________________________
       
@@ -86,8 +82,6 @@ contains
       status = reallocate(F_b_8,1,nk)
       if (status /= VDESC_1002_5001_OK) return
       status = reallocate(F_ip1,1,nk)
-      status = reallocate(dpba,1,nk)
-      if (status /= VDESC_1002_5001_OK) return
       
       !
       ! Code from gemdm_config.ftn
@@ -146,19 +140,6 @@ contains
          F_a_8(k)=F_pref_8*(F_hyb(k)-F_b_8(k))
          print*,F_b_8(k),F_a_8(k)
       enddo
-      !
-      ! Note dpba could be an output of this s/r
-      if (F_rcoef.gt.1.0) then
-         do k=1,nk
-            pr2=F_rcoef*(F_hyb(k)-F_hyb(1))**(F_rcoef-1.)
-            dpba(k)=psurf_8*pr2/&
-                 (F_pref_8*(1.-F_hyb(1))**F_rcoef+(psurf_8-F_pref_8)*pr2)
-         enddo
-      else 
-         do k = 1,nk
-            dpba(k)=psurf_8/(psurf_8-F_pref_8*F_hyb(1))
-         enddo
-      endif
 
       F_err = VDESC_1002_5001_OK
       return
