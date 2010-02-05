@@ -591,7 +591,7 @@ contains
             write(STDERR,*) 'ERROR: pref should not be passed for version ',self%vcode
             return
          endif
-         call vgrid_genab_1002_5001(6,hyb,1.,ptop_8,1.d0, &
+         call vgrid_genab_1002_5001(6,hyb,1.,ptop_8,80000.d0, &
               hybm,a_m_8,b_m_8,ip1_m,error)
          if (error /= VDESC_1002_5001_OK)then
             return
