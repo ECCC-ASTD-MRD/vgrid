@@ -94,6 +94,7 @@ module vGrid_Descriptors
      module procedure get_real8_1d
      module procedure get_real8_3d
      module procedure get_char
+     module procedure get_logical
   end interface
 
   interface vgd_put
@@ -658,6 +659,40 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Get methods
+
+  integer function get_logical(self,key,value) result(status)
+    ! Retrieve the value of the requested instance variable
+    type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
+    character(len=*), intent(in) :: key                 !Descriptor key to retrieve
+    logical, intent(out) :: value                       !Retrieved value
+    
+    ! Local variables
+    integer :: error
+
+    ! Set error status
+    status = VGD_ERROR
+
+    ! Map key name to derived-type element
+    select case (up(key(1:KEY_LENGTH)))
+    case ('LOGP')
+       select case (self%vcode)
+       case (1001,1002,5001)
+          value=.false.
+       case (5002)
+          value=.true.
+       case DEFAULT
+          write(STDERR,*) 'ERROR: unsupported vcode for LOGP: ',self%vcode
+          return
+       end select
+    case DEFAULT
+       write(STDERR,*) 'ERROR: invalid key '//trim(key)//' given to gd_get (int)'
+       return
+    end select
+
+    ! Set status and return
+    status = VGD_OK
+    return
+ end function get_logical
 
   integer function get_int(self,key,value) result(status)
     ! Retrieve the value of the requested instance variable
