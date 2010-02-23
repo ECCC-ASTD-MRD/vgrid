@@ -32,13 +32,13 @@ module vGrid_Descriptors
   integer, dimension(2), parameter :: pref_8_valid=(/5001,5002/)
   integer, dimension(2), parameter :: rcoef1_valid=(/5001,5002/)
   integer, dimension(1), parameter :: rcoef2_valid=(/5002/)
-  integer, dimension(4), parameter :: a_m_8_valid=(/1002,2001,5001,5002/)
-  integer, dimension(4), parameter :: b_m_8_valid=(/1002,2001,5001,5002/)
+  integer, dimension(5), parameter :: a_m_8_valid=(/1001,1002,2001,5001,5002/)
+  integer, dimension(5), parameter :: b_m_8_valid=(/1001,1002,2001,5001,5002/)
   integer, dimension(1), parameter :: a_t_8_valid=(/5002/)
   integer, dimension(1), parameter :: b_t_8_valid=(/5002/)
-  integer, dimension(4), parameter :: ip1_m_valid=(/1002,2001,5001,5002/)
+  integer, dimension(5), parameter :: ip1_m_valid=(/1001,1002,2001,5001,5002/)
   integer, dimension(1), parameter :: ip1_t_valid=(/5002/)
-  integer, dimension(3), parameter :: ref_name_valid=(/1002,5001,5002/)
+  integer, dimension(4), parameter :: ref_name_valid=(/1001,1002,5001,5002/)
 
   ! FST file record structure
   type FSTD
@@ -281,6 +281,12 @@ contains
       ! Set internal vcode (if all above was successful)
       error = set_vcode(self)
       select case (self%vcode)
+      case (1001)
+         istat=decode_vert_1001(self)
+         if(istat < 0)then
+            write(STDERR,*) 'ERROR: problem with fstluk on '//trim(self%rec%nomvar)
+            return
+         endif
       case (1002)
          istat=decode_vert_1002(self)
          if(istat < 0)then
@@ -497,6 +503,8 @@ contains
 
       ! Fill table with version-specific encoder
       select case (self%vcode)
+      case (1001)
+         error = encode_vert_1001(self,nk)
       case (1002)
          error = encode_vert_1002(self,nk)
       case (2001)
@@ -521,8 +529,9 @@ contains
    end function new_build_vert
 
    integer function new_gen(self,kind,version,hyb,rcoef1,rcoef2,ptop_8,pref_8,ip1,ip2,stdout_unit) result(status)
-     use vdescript_1002_5001
-     use vdescript_5002
+      use vdescript_1001
+      use vdescript_1002_5001
+      use vdescript_5002
       ! Coordinate constructor - build vertical descriptor from hybrid coordinate entries
       type(vgrid_descriptor), intent(out) :: self       !Vertical descriptor instance    
       integer, intent(in) :: kind,version               !Kind,version to create
@@ -538,7 +547,7 @@ contains
       integer, dimension(:), pointer :: ip1_m,ip1_t
       real, dimension(:), pointer :: hybm,hybt
       real*8, dimension(:), pointer :: a_m_8,b_m_8,a_t_8,b_t_8
-      logical :: gen_ok,missingInput=.false.
+      logical :: gen_ok,errorInput=.false.
 
       ! Set error status
       status = VGD_ERROR
@@ -553,45 +562,67 @@ contains
 
       error = VGD_ERROR
       ! Check for required inputs
+
       error = set_vcode(self,kind,version)
-      missingInput = .false.
+      errorInput = .false.
       if(is_valid(self,ptop_8_valid)) then
          if(.not.present(ptop_8))then
             write(STDERR,*) 'ERROR: ptop_8 is a required constructor entry'
-            missingInput = .true.
+            errorInput = .true.
          endif
       endif
       if(is_valid(self,pref_8_valid)) then
          if(.not.present(pref_8))then
             write(STDERR,*) 'ERROR: pref_8 is a required constructor entry'
-            missingInput = .true.
+            errorInput = .true.
          endif
       endif
       if(is_valid(self,rcoef1_valid)) then
          if(.not.present(rcoef1))then
             write(STDERR,*) 'ERROR: rcoef1 is a required constructor entry'
-            missingInput = .true.
+            errorInput = .true.
          endif
       endif
       if(is_valid(self,rcoef2_valid)) then
          if(.not.present(rcoef2))then
             write(STDERR,*) 'ERROR: rcoef2 is a required constructor entry'
-            missingInput = .true.
+            errorInput = .true.
          endif
       endif
-      if (missingInput) return
+      if(present(ptop_8).and.(.not.is_valid(self,ptop_8_valid)))then
+         write(STDERR,*) 'ERROR: ptop_8 is not a required constructor entry'
+         errorInput = .true.
+      endif
+      if(present(pref_8).and.(.not.is_valid(self,pref_8_valid)))then
+         write(STDERR,*) 'ERROR: pref_8 is not a required constructor entry'
+         errorInput = .true.
+      endif
+      if(present(rcoef1).and.(.not.is_valid(self,rcoef1_valid)))then
+         write(STDERR,*) 'ERROR: rcoef1 is not a required constructor entry'
+         errorInput = .true.
+      endif
+      if(present(rcoef2).and.(.not.is_valid(self,rcoef2_valid)))then
+         write(STDERR,*) 'ERROR: rcoef2 is not a required constructor entry'
+         errorInput = .true.
+      endif
+      if (errorInput) return
 
       ! Call appropriate support module to compute required values
       select case (self%vcode)
+      case(1001)
+         call vgrid_genab_1001(6,hyb,hybm,a_m_8,b_m_8,ip1_m,error)
+         if (error /= VDESC_1001_OK)then
+            return
+         endif
+         print*,b_m_8
+         error = vgd_new(self,kind,version,size(hyb), &
+              ip1=myip1,           &
+              ip2=myip2,           &
+              a_m_8=a_m_8,         &
+              b_m_8=b_m_8,         &
+              ip1_m=ip1_m)
+         if (error /= VGD_OK) return        
       case (1002)
-         if (present(rcoef1).or.present(rcoef2))then
-            write(STDERR,*) 'ERROR: rcoef1 nor rcoef2 should not be passed for version ',self%vcode
-            return
-         endif
-         if (present(pref_8))then
-            write(STDERR,*) 'ERROR: pref should not be passed for version ',self%vcode
-            return
-         endif
          call vgrid_genab_1002_5001(6,hyb,1.,ptop_8,80000.d0, &
               hybm,a_m_8,b_m_8,ip1_m,error)
          if (error /= VDESC_1002_5001_OK)then
@@ -606,10 +637,6 @@ contains
               ip1_m=ip1_m)
          if (error /= VGD_OK) return
       case (5001)
-         if (present(rcoef2))then
-            write(STDERR,*) 'ERROR: rcoef2 should not be passed for this version'
-            return
-         endif
          call vgrid_genab_1002_5001(6,hyb,rcoef1,ptop_8,pref_8, &
               hybm,a_m_8,b_m_8,ip1_m,error)
          if (error /= VDESC_1002_5001_OK)then
@@ -626,10 +653,6 @@ contains
               ip1_m=ip1_m)
          if (error /= VGD_OK) return
       case (5002)
-         if (.not.present(rcoef2))then
-            write(STDERR,*) 'ERROR: expected rcoef2'
-            return
-         endif
          call vgrid_genab_5002(mystdout_unit,hyb,(/rcoef1,rcoef2/),ptop_8,pref_8, &
               hybm,hybt,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,error)
          if (error /= VDESC_5002_OK) return
@@ -1418,6 +1441,10 @@ contains
        if (is_valid(self,rcoef2_valid))  write(my_stdout,*)'  rcoef2=',self%rcoef2
        if (is_valid(self,ref_name_valid))write(my_stdout,*)'  Surface field nomvar ',self%ref_name
        select case (self%vcode)
+       case (1001)
+          nk=size(self%ip1_m)
+          write(my_stdout,*)'  Number of levels (momentum levels)',nk
+          write(my_stdout,*)'  Equation to compute hydrostatic pressure (pi): pi = B * P0*100'
        case (1002)
           nk=size(self%ip1_m)
           write(my_stdout,*)'  Number of levels (momentum levels)',nk
@@ -1765,6 +1792,8 @@ contains
 
     ! Compute levels for known vertical coordinates
     select case (self%vcode)
+    case (1001)
+       istat = compute_pressure_1001(self,sfc_field,ip1_list,levels,my_in_log)
     case (1002)
        istat = compute_pressure_1002(self,sfc_field,ip1_list,levels,my_in_log)
     case (2001)
@@ -1854,6 +1883,73 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! (PRIVATE) Encoding functions
+
+  integer function encode_vert_1001(self,nk) result(status)
+     type(vgrid_descriptor), intent(inout) :: self      !Vertical descriptor instance
+     integer, intent(in) :: nk                          !Number of levels
+
+     ! Local variables
+     integer :: nn,error,k,ind
+     integer, parameter :: skip=2
+     real*8 :: for_char_8
+
+     ! Set error status
+     status = VGD_ERROR
+
+     ! Allocate table space
+     if (associated(self%table)) deallocate(self%table)         
+     allocate(self%table(3,nk+skip,1),stat=error)
+     if(error < 0)then
+        write(STDERR,*) 'ERROR: cannot allocate self%table in encode_vert_1001'
+        return
+     endif
+
+     ! Fill standard file record entries
+     error = fstd_init(self,etiket='ETA_GEMV3',   &
+          ig2=0,            &
+          ig3=0,         &
+          ig4=0)
+     if (error /= VGD_OK) then
+        write(STDERR,*) 'ERROR: cannot initialize fstd record entries'
+        return
+     end if
+     self%ref_name="P0"
+     
+     ! Vector size checks
+     nn=size(self%ip1_m)
+     if(nn.ne.nk)then
+        write(STDERR,*) 'ERROR: wrong size for ip1_m, is ',nn,'should be ',nk
+        return
+     endif
+     nn=size(self%a_m_8)
+     if(nn.ne.nk)then
+        write(STDERR,*) 'ERROR: wrong size for a_m_8, is ',nn,'should be ',nk
+        return
+     endif
+     nn=size(self%b_m_8)
+     if(nn.ne.nk)then
+        write(STDERR,*) 'ERROR: wrong size for b_m_8, is ',nn,'should be ',nk
+        return
+     endif
+     error = flip_transfer(self%ref_name,for_char_8)
+     if (error /= VGD_OK) then
+        write(STDERR,*) 'ERROR: flip_transfer function returned an error code from encode ',error
+        return
+     endif
+
+     ! Fill header
+     self%table(1:3,1,1)=(/dble(self%kind),dble(self%version),dble(skip)/)
+     self%table(1:3,2,1)=(/for_char_8     , 0.d0             ,0.d0/)
+
+     ! Fill level data
+     do k=1,nk
+        ind=k+skip
+        self%table(1:3,ind,1)=(/dble(self%ip1_m(k)),self%a_m_8(k),self%b_m_8(k)/)
+     enddo     
+
+     ! Set status and return
+     status = VGD_OK
+  end function encode_vert_1001
 
   integer function encode_vert_1002(self,nk) result(status)
      type(vgrid_descriptor), intent(inout) :: self      !Vertical descriptor instance
@@ -2133,6 +2229,49 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! (PRIVATE) Decoding functions
+
+  integer function decode_vert_1001(self) result(status)
+     type(vgrid_descriptor), intent(inout) :: self  !Vertical descriptor instance
+     
+     ! Local variables
+     integer :: skip,nj,nk,k,ind,error
+
+     ! Set error status
+     status = VGD_ERROR
+
+     ! Read header line 1
+     self%kind     = nint(self%table(1,1,1))
+     self%version  = nint(self%table(2,1,1))
+     skip             = nint(self%table(3,1,1))
+     
+     ! Read header line 2
+     error = flip_transfer(self%table(1,2,1),self%ref_name)
+     if (error /= VGD_OK) then
+        write(STDERR,*) 'ERROR: flip_transfer function returned an error code from decode ',error
+        return
+     endif
+     nj=size(self%table,dim=2)
+     nk=nj-skip
+
+     ! Allocate and assign level data
+     if (associated(self%ip1_m)) deallocate(self%ip1_m)
+     allocate(self%ip1_m(nk))
+     if (associated(self%a_m_8)) deallocate(self%a_m_8)
+     allocate(self%a_m_8(nk))
+     if (associated(self%b_m_8)) deallocate(self%b_m_8)
+     allocate(self%b_m_8(nk))     
+
+     do k=1,nk
+        ind=k+skip
+        self%ip1_m(k) = nint(self%table(1,ind,1))
+        self%a_m_8(k) =      self%table(2,ind,1)
+        self%b_m_8(k) =      self%table(3,ind,1)
+     enddo
+
+     ! Set status and return
+     status = VGD_OK
+
+  end function decode_vert_1001
 
   integer function decode_vert_1002(self) result(status)
      type(vgrid_descriptor), intent(inout) :: self  !Vertical descriptor instance
@@ -2611,6 +2750,54 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! (PRIVATE) Pressure computation functions
+
+  integer function compute_pressure_1001(self,sfc_field,ip1_list,levels,in_log) result(status)
+    ! Compute pressure for all levels specified in ip1_list
+    type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
+    real, dimension(:,:), intent(in) :: sfc_field       !Surface field reference for coordinate
+    integer, dimension(:), intent(in) :: ip1_list       !List of IP1 levels to calculate on
+    real, dimension(:,:,:), pointer  :: levels          !Physical level values
+    logical, intent(in) :: in_log                       !Compute level values in ln()
+
+    ! Internal variables
+    integer :: i,j,error,nk
+    real*8, dimension(size(sfc_field,dim=1),size(sfc_field,dim=2)) :: s_8
+    real*8, dimension(size(ip1_list)) :: aa_8,bb_8
+    logical :: found,my_in_log
+
+    ! Set error status
+    status = VGD_ERROR
+
+    ! Set size of output
+    nk = size(ip1_list)
+    
+    ! Find ip1 values
+    do i=1,nk
+       found = .false.
+       do j=1,size(self%ip1_m)
+          if (self%ip1_m(j) == ip1_list(i)) then
+             found = .true.
+             aa_8(i) = self%a_m_8(j)
+             bb_8(i) = self%b_m_8(j)
+             exit
+          endif
+       enddo
+       if (.not.found) then
+          write(STDERR,*) 'ERROR: cannot find ip1 ',ip1_list(i),' in compute_pressure_1001'
+          return
+       endif
+    enddo
+
+    ! Compute pressure
+    do i=1,nk
+       levels(:,:,i) = aa_8(i) + bb_8(i)*sfc_field
+    enddo
+    if (in_log) levels = log(levels)
+
+    ! Set status and return
+    status = VGD_OK
+    return
+ end function compute_pressure_1001
 
   integer function compute_pressure_1002(self,sfc_field,ip1_list,levels,in_log) result(status)
     ! Compute pressure for all levels specified in ip1_list
