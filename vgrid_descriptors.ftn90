@@ -623,6 +623,10 @@ contains
               ip1_m=ip1_m)
          if (error /= VGD_OK) return        
       case (1002)
+         if(ptop_8.lt.0.d0)then
+            write(STDERR,*) 'ERROR: ptop_8 must >=0 for kind=1 and version=2'
+            return
+         endif
          call vgrid_genab_1002_5001(6,hyb,1.,ptop_8,80000.d0, &
               hybm,a_m_8,b_m_8,ip1_m,error)
          if (error /= VDESC_1002_5001_OK)then
@@ -637,6 +641,10 @@ contains
               ip1_m=ip1_m)
          if (error /= VGD_OK) return
       case (5001)
+         if(ptop_8.gt.0.d0)then
+            write(STDERR,*) 'ERROR: ptop_8 must be set to -1 for kind=5 and version=1'
+            return
+         endif
          call vgrid_genab_1002_5001(6,hyb,rcoef1,ptop_8,pref_8, &
               hybm,a_m_8,b_m_8,ip1_m,error)
          if (error /= VDESC_1002_5001_OK)then
