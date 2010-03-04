@@ -783,6 +783,14 @@ contains
 
     ! Map key name to derived-type element
     select case (up(key(1:KEY_LENGTH)))
+    case ('VIP1')
+       if (is_valid(self,ip1_m_valid)) then
+          write(STDERR,*) 'ERROR: depricated key '//trim(key)//', use VIPM instead'
+          return
+       else
+          write(STDERR,*) 'ERROR: invalid key '//trim(key)//' given to gd_get (int 1D)'
+          return
+       endif
     case ('VIPM')
        if (is_valid(self,ip1_m_valid)) then
           istat = get_allocate(key,value,size(self%ip1_m))
@@ -890,12 +898,8 @@ contains
        endif
     case ('VCRD')
        if (is_valid(self,ip1_m_valid)) then
-          istat = get_allocate(key,value,size(self%ip1_m))
-          if (istat /= 0) return
-          call convip(k,value(1),self%kind,0,'',.false.)
-          do k=1,size(value)
-             call convip(self%ip1_m(k),value(k),self%kind,-1,'',.false.)
-          enddo
+          write(STDERR,*) 'ERROR: depricated key '//trim(key)//', use VCDM instead'
+          return
        else
           error = int(get_error(key))
           return
@@ -1222,7 +1226,7 @@ contains
        write(STDERR,*) 'ERROR: '//trim(key)//' cannot be set - modify VIPT instead'
        return
     case ('VCRD')
-       write(STDERR,*) 'ERROR: '//trim(key)//' cannot be set - modify VIP1 instead'
+       write(STDERR,*) 'ERROR: '//trim(key)//' cannot be set - modify VIPM instead'
        return
     case DEFAULT
        write(STDERR,*) 'ERROR: invalid key '//trim(key)//' given to gd_put (real8 1D)'
