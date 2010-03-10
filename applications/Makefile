@@ -12,7 +12,7 @@ RMN = rmn_010
 .ftn90.o:
 	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -src $<
 
-OBJECTS = $(DESCRIP_PATH)vgrid_descriptors.o $(DESCRIP_PATH)vgrid_genab.o
+OBJECTS = $(DESCRIP_PATH)vgrid_descriptors.o $(DESCRIP_PATH)vgrid_genab_5002.o $(DESCRIP_PATH)vgrid_genab_1002_5001.o $(DESCRIP_PATH)vgrid_genab_1001.o
 
 all: compute_pressure convert_toctoc_5002
 

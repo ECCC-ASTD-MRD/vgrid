@@ -12,7 +12,7 @@ program compute_pressure
   logical :: ok
   character(len=256), dimension(ncle) :: cle,val,def
   character(len=4), dimension(2) :: my_var=(/'TT','UU'/)
-  character(len=12), parameter :: version='v_1.0.0'
+  character(len=12), parameter :: version='v_1.0.1'
 
   ! For fstprm
   integer :: ig1,ig2,ig3,ig4,dateo,deet,npas,datyp,nbits
@@ -89,7 +89,7 @@ program compute_pressure
              ip2,ip3,typvar,nomvar,etiket,grtyp,ig1,ig2,ig3, &
              ig4,swa,lng,dltf,ubc,extra1,extra2,extra3)
         stat=fstecr(pres(:,:,k),dummy,-nbits,luo,dateo,deet,npas,ni,nj,nk, &
-             ip1,ip2,ip3,typvar,'PX','RECOMPUTED',grtyp,ig1,ig2,ig3,ig4,datyp,.true.)
+             ip1,ip2,ip3,typvar,'PX',etiket,grtyp,ig1,ig2,ig3,ig4,datyp,.true.)
      enddo
   enddo
 
