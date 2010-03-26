@@ -9,7 +9,7 @@ program constructor
   integer :: stat
   real :: epsilon=1.e-6
   !From /home/binops/afsi/sio/datafiles/constants/modeles/GEMDM/glb_033L80_g1_20090922/gem_settings.nml
-  real, dimension(28) :: hyb_D=(/&
+  real, dimension(28) :: hyb=(/&
        0.0125000,0.0233625,0.0391625,0.0628625,0.0865625,&
        0.1122375,0.1379125,0.1655625,0.1951875,0.2287625,&
        0.2672750,0.3107250,0.3591125,0.4124375,0.4667500,&
@@ -25,39 +25,106 @@ program constructor
        0.796,   0.842,    0.884,    0.922,    0.955,&
        0.980,   0.993,    1.000&
        /)
-  real :: rcoef1=1.6  
-  real*8 :: ptop_D=-1,ptop_N=1000.d0,pref=80000.d0
+  real :: rcoef1=1.6
+  real*8 :: ptop=-1,ptop_N=1000.d0,pref=80000.d0,w1
   real*8, dimension(:), pointer :: b_m_8,a_m_8
   logical :: OK=.true.
   
   ! Testing 1002
+  !
+  print*,''
+  print*,'===== 1002 Test on Error ptop<0, error message is normal ===='
+  stat = vgd_new(d,kind=1,version=2,hyb=hyb_N,ptop_8=-1.d0)
+  if(stat.ne.VGD_ERROR)OK=.false.  
+  !
+  print*,''  
+  print*,'===== 1002 Test on complete level set ===='
   stat = vgd_new(d,kind=1,version=2,hyb=hyb_N,ptop_8=ptop_N)
   stat = vgd_get(d,key='CB_M - vertical B coefficient',value=b_m_8)
   stat = vgd_get(d,key='CA_M - vertical A coefficient',value=a_m_8)
-  print*,b_m_8(2),' should equal ',1.1000001E-02
   if(.not.(abs(b_m_8(2)-1.1000001E-02)/1.1000001E-02<epsilon))then
      OK=.false.
      print*,'Probleme avec B 1002'
+     print*,b_m_8(2),' should equal ',1.1000001E-02
   endif
-  print*,a_m_8(2),' should equal ',989.0000
   if(.not.(abs(a_m_8(2)-989.0000)/989.0000<epsilon))then
      OK=.false.
      print*,'Probleme avec A 1002'
+     print*,a_m_8(2),' should equal ',989.0000
+  endif
+  !
+  print*,''  
+  print*,'===== 1002 Test on incomplete level set ===='
+  stat = vgd_new(d,kind=1,version=2,hyb=hyb_N(10:28),ptop_8=ptop_N)
+  stat = vgd_get(d,key='CB_M - vertical B coefficient',value=b_m_8)
+  stat = vgd_get(d,key='CA_M - vertical A coefficient',value=a_m_8)
+  w1=0.2189999967813492
+  if(.not.(abs(b_m_8(1)-w1)/w1<epsilon))then
+     OK=.false.
+     print*,'Probleme avec B 1002'
+     print*,b_m_8(1),' should equal ',w1
+  endif
+  w1=780.9996604919434
+  if(.not.(abs(a_m_8(1)-w1)/w1<epsilon))then
+     OK=.false.
+     print*,'Probleme avec A 1002'
+     print*,a_m_8(1),' should equal ',w1
   endif
 
   ! Testing 5001
-  stat = vgd_new(d,kind=5,version=1,hyb=hyb_D,rcoef1=rcoef1,ptop_8=ptop_D,pref_8=pref)
+  !
+  print*,''
+  print*,'===== Test on Error ptop>hyb(1), error message is normal ===='
+  ptop=100000.
+
+  stat = vgd_new(d,kind=5,version=1,hyb=hyb,rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
+  if(stat.ne.VGD_ERROR)OK=.false.
+  !
+  print*,''
+  print*,'===== Test on Error ptop<=0, error message is normal ===='
+  ptop=-1.
+  stat = vgd_new(d,kind=5,version=1,hyb=hyb,rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
+  if(stat.ne.VGD_ERROR)OK=.false.
+  !
+  print*,''
+  print*,'===== Test complete level set ===='
+  ptop=hyb(1)*pref
+  w1=ptop
+  stat = vgd_new(d,kind=5,version=1,hyb=hyb,rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
+  if(.not.(abs(ptop-w1)/w1<epsilon))then
+     OK=.false.
+     print*,'Probleme avec ptop 5001'
+     print*,ptop,' should equal ',w1
+  endif
   stat = vgd_get(d,key='CB_M - vertical B coefficient',value=b_m_8)
   stat = vgd_get(d,key='CA_M - vertical A coefficient',value=a_m_8)
-  print*,b_m_8(2),' should equal ',7.3490012E-04
   if(.not.(abs(b_m_8(2)-7.3490012E-04)/7.3490012E-04<epsilon))then
      OK=.false.
      print*,'Probleme avec B 5001'
+     print*,b_m_8(2),' should equal ',7.3490012E-04
   endif
-  print*,a_m_8(2),' should equal ',1810.208
   if(.not.(abs(a_m_8(2)-1810.208)/1810.208<epsilon))then
      OK=.false.
      print*,'Probleme avec A 5001'
+     print*,a_m_8(2),' should equal ',1810.208
+  endif
+  !
+  print*,''
+  print*,'===== Test incomplete level set ===='
+  stat = vgd_new(d,kind=5,version=1,hyb=hyb(10:28),rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
+  stat = vgd_get(d,key='CB_M - vertical B coefficient',value=b_m_8)
+  stat = vgd_get(d,key='CA_M - vertical A coefficient',value=a_m_8)
+  w1=8.8046513497829437E-002
+  if(.not.(abs(b_m_8(1)-w1)/w1<epsilon))then
+     OK=.false.
+     print*,'Probleme avec B 5001'
+     print*,b_m_8(1),' should equal ',w1
+  endif
+  w1=11257.31885433197
+  if(.not.(abs(a_m_8(1)-w1)/w1<epsilon))then
+     OK=.false.
+     print*,'Probleme avec A 5001'
+     print*,a_m_8(1),' should equal ',w1
   endif
 
   call ut_report(OK,'Grid_Descriptors::vgd_new vertical generate initializer (5001) value')
