@@ -623,11 +623,7 @@ contains
               ip1_m=ip1_m)
          if (error /= VGD_OK) return        
       case (1002)
-         if(ptop_8.lt.0.d0)then
-            write(STDERR,*) 'ERROR: ptop_8 must >=0 for kind=1 and version=2'
-            return
-         endif
-         call vgrid_genab_1002_5001(6,hyb,1.,ptop_8,80000.d0, &
+         call vgrid_genab_1002_5001(6,self%vcode,hyb,1.,ptop_8,80000.d0, &
               hybm,a_m_8,b_m_8,ip1_m,error)
          if (error /= VDESC_1002_5001_OK)then
             return
@@ -641,11 +637,7 @@ contains
               ip1_m=ip1_m)
          if (error /= VGD_OK) return
       case (5001)
-         if(ptop_8.gt.0.d0)then
-            write(STDERR,*) 'ERROR: ptop_8 must be set to -1 for kind=5 and version=1'
-            return
-         endif
-         call vgrid_genab_1002_5001(6,hyb,rcoef1,ptop_8,pref_8, &
+         call vgrid_genab_1002_5001(6,self%vcode,hyb,rcoef1,ptop_8,pref_8, &
               hybm,a_m_8,b_m_8,ip1_m,error)
          if (error /= VDESC_1002_5001_OK)then
             return
@@ -738,6 +730,7 @@ contains
     status = VGD_ERROR
 
     ! Map key name to derived-type element
+
     select case (up(key(1:KEY_LENGTH)))
     case ('DATE')
        value = self%rec%dateo
@@ -755,6 +748,10 @@ contains
        value = self%ip2
     case ('IP_3')
        value = self%rec%ip3
+    case ('KIND')
+       value = self%kind
+    case ('VERS')
+       value = self%version
     case DEFAULT
        write(STDERR,*) 'ERROR: invalid key '//trim(key)//' given to gd_get (int)'
        return
