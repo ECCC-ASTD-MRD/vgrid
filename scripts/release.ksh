@@ -36,7 +36,9 @@ case $(uname) in
           exit 1;;
 esac
 
+set +e
 . r.ssmuse.dot ${COMPILER}
+set -e
 
 #==============================================================================
 # Check for version already there
