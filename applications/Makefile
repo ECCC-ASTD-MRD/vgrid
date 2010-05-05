@@ -22,6 +22,9 @@ convert_toctoc_5002: convert_toctoc_5002.ftn90 $(OBJECTS)
 compute_pressure: compute_pressure.ftn90 $(OBJECTS)
 	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90 -o $@ -librmn $(RMN)
 
+print_toctoc: print_toctoc.ftn90 $(OBJECTS)
+	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90 -o $@ -librmn $(RMN)
+
 $(DESCRIP_PATH)vgrid_descriptors.o: $(DESCRIP_PATH)vgrid_descriptors.ftn90
 	echo "STOP: $(DESCRIP_PATH)vgrid_descriptors has been updated ... recompilation needed in $(DESCRIP_PATH)"; \
 	exit
@@ -34,5 +37,5 @@ clean:
 	rm -f *.f90 *.o *.mod test_output.fst
 
 distclean: clean
-	rm -f compute_pressure convert_toctoc_5002
+	rm -f compute_pressure print_toctoc convert_toctoc_5002
 
