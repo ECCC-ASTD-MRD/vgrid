@@ -30,7 +30,7 @@ program tests
   close(lutxt)
 
   ! Get physical levelling information
-  stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
+  stat = vgd_new(d,unit=lu,ip1=ip1,ip2=ip2)
   
   stat = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',"UU")
 
