@@ -1,0 +1,38 @@
+# User options
+FCFLAGS='=-C -g'
+RCOMPILE = r.compile
+DESCRIP_PATH = ../
+
+# Override incorrect implicits
+%.o : %.mod
+
+# Define suffix rules
+.SUFFIXES: .ftn90 .o
+.ftn90.o:
+	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -src $<
+
+OBJECTS = $(DESCRIP_PATH)vgrid_descriptors.o $(DESCRIP_PATH)vgrid_genab_5002.o $(DESCRIP_PATH)vgrid_genab_1002_5001.o $(DESCRIP_PATH)vgrid_genab_1001.o unit_testing.o
+
+UNIT_TEST: UNIT_TEST.ftn90 $(OBJECTS)
+	$(RCOMPILE) -librmn rmn_010 -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src UNIT_TEST.ftn90 -o UNIT_TEST
+
+unit_testing.o: unit_testing.ftn90
+
+$(DESCRIP_PATH)vgrid_descriptors.o: $(DESCRIP_PATH)vgrid_descriptors.ftn90
+	echo "STOP: $(DESCRIP_PATH)vgrid_descriptors has been updated ... recompilation needed in $(DESCRIP_PATH)"; \
+	exit
+
+$(DESCRIP_PATH)vgrid_genab_5002.o: $(DESCRIP_PATH)vgrid_genab_5002.ftn90
+	echo "STOP: $(DESCRIP_PATH)vgrid_genab_5002.ftn90 has been updated ... recompilation needed in $(DESCRIP_PATH)"; \
+	exit
+
+$(DESCRIP_PATH)vgrid_genab_1002_5001.o: $(DESCRIP_PATH)vgrid_genab_1002_5001.ftn90
+	echo "STOP: $(DESCRIP_PATH)vgrid_genab_1002_5001.ftn90 has been updated ... recompilation needed in $(DESCRIP_PATH)"; \
+	exit
+
+$(DESCRIP_PATH)vgrid_genab_1001.o: $(DESCRIP_PATH)vgrid_genab_1001.ftn90
+	echo "STOP: $(DESCRIP_PATH)vgrid_genab_1001.ftn90 has been updated ... recompilation needed in $(DESCRIP_PATH)"; \
+	exit
+
+clean:
+	rm -f *.f90 *.o *.mod

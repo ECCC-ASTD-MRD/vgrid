@@ -1,0 +1,37 @@
+program constructor
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_print,VGD_OK
+  use Unit_Testing, only: ut_report
+
+  implicit none
+
+  type(vgrid_descriptor) :: d
+  integer, parameter :: lu=10
+  integer :: stat
+  integer :: fnom,fstouv,fstfrm
+  logical :: ok
+
+  stat=fnom(lu,"data/gg_5001_from_model_run_plus_toc","RND",0)
+  if(stat.lt.0)then
+     print*,'ERROR with fnom'
+     call abort
+  endif
+  stat=fstouv(lu,'RND')
+  if(stat.le.0)then
+     print*,'No record in RPN file'
+     call abort
+  endif
+
+  ! Construct a new set of 3D coordinate descriptors
+  stat = vgd_new(d,unit=lu,format="fst",ip1=-1,ip2=-1)
+  if(stat.ne.VGD_OK)then
+     print*,'ERROR: problem with vgd_new'
+     stat=fstfrm(lu)
+     call abort
+  endif
+  stat = vgd_print(d)
+ 
+  call ut_report(stat,'Grid_Descriptors, vgd_new, vgd_print 5001')
+
+  stat=fstfrm(lu)
+
+end program constructor
