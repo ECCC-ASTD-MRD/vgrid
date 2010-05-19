@@ -154,7 +154,7 @@ contains
       ! Coordinate constructor - read from a file and initialize instance
       type(vgrid_descriptor), intent(out) :: self !Vertical descriptor instance
       integer, intent(in) :: unit                 !File unit to read descriptor information from
-      character(len=*), intent(in) :: format      !File format ('fst' or 'bin')
+      character(len=*), optional, intent(in) :: format !File format ('fst' or 'bin')
       integer,optional :: ip1,ip2                 !ip1,2 values of the desired descriptors
 
       ! Internal variables
@@ -163,11 +163,14 @@ contains
       integer, dimension(MAX_DESC_REC) :: keyList
       type(FSTD_ext) :: var
       real*8, dimension(:,:,:), allocatable :: l_table
+      character(len=100) :: myformat
 
       ! Set error status
       status = VGD_ERROR
 
       ! Set default values
+      myformat='FST'
+      if (present(format)) myformat = format
       myip1 = -1
       if (present(ip1)) myip1 = ip1
       myip2 = -1
@@ -183,7 +186,7 @@ contains
 
       ! Construct vertical descriptor
       self%rec%nomvar = ZNAME
-      select case (trim(up(format)))
+      select case (trim(up(myformat)))
 
          ! RPN Standard file input
       case ('FST')
@@ -274,7 +277,7 @@ contains
 
          ! Warn user on invalid input format specification
       case DEFAULT
-         write(STDERR,*) 'ERROR: invalid constructor format request ',trim(format)
+         write(STDERR,*) 'ERROR: invalid constructor format request ',trim(myformat)
          return
       end select
 
@@ -309,7 +312,7 @@ contains
          endif
       case DEFAULT
          istat = get_version_info(self,kind,version)
-         write(STDERR,*) 'ERROR: kind or version invalid :',kind,version
+         write(STDERR,*) 'ERROR: invalid kind or version:',kind,version
          return
       end select
 
@@ -1452,23 +1455,23 @@ contains
        select case (self%vcode)
        case (1001)
           nk=size(self%ip1_m)
-          write(my_stdout,*)'  Number of levels (momentum levels)',nk
+          write(my_stdout,*)'  Number of sigma levels',nk
           write(my_stdout,*)'  Equation to compute hydrostatic pressure (pi): pi = B * P0*100'
        case (1002)
           nk=size(self%ip1_m)
-          write(my_stdout,*)'  Number of levels (momentum levels)',nk
+          write(my_stdout,*)'  Number of levels eta levels',nk
           write(my_stdout,*)'  Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100'
        case (2001)
           nk=size(self%ip1_m)
-          write(my_stdout,*)'  Number of levels (pressure levels)',nk
+          write(my_stdout,*)'  Number of pressure levels',nk
           write(my_stdout,*)'  Equation to pressure (P): P = A'
        case (5001)
           nk=size(self%ip1_m)
-          write(my_stdout,*)'  Number of levels (momentum levels)',nk
+          write(my_stdout,*)'  Number of levels hybrid levels',nk
           write(my_stdout,*)'  Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100'
        case (5002)
           nk=size(self%ip1_m)
-          write(my_stdout,*)'  Number of levels (momentum levels)',nk-1
+          write(my_stdout,*)'  Number of levels hybrid levels (momentum levels)',nk-1
           write(my_stdout,*)'  Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref)'
        end select
        
@@ -2515,7 +2518,7 @@ contains
 
      ! Check for valid entries (version is limited by the mangling equation)
      if (kind > MAX_VKIND .or. kind < 0 .or. version > 999 .or. version < 0) then
-        write(STDERR,*) 'ERROR: invalid kind or version ',kind,version
+        write(STDERR,*) 'ERROR: invalid kind or version: ',kind,version
         return
      endif
 

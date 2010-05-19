@@ -3,7 +3,7 @@ FCFLAGS='=-C -g'
 RCOMPILE = r.compile
 RELEASE_SCR = ./scripts/release.ksh
 COMPILERS_AIX = xlf10 Xlf12
-COMPILERS_LINUX = pgi6xx pgi9xx
+COMPILERS_LINUX = pgi6xx pgi9xx svn_tag
 VERSION = 
 
 # Override incorrect implicits
