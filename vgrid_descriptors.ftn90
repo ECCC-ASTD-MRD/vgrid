@@ -19,7 +19,7 @@ module vGrid_Descriptors
   real, parameter, public :: VGD_MISSING=-9999. !missing value returned for invalid entries
 
   ! Private class variables
-  integer, parameter :: STDERR=0                !STDERR output unit
+  integer, parameter :: STDERR=6                !STDERR output unit
   integer, parameter :: LONG_STRING=1024        !number of characters in a long string
   character(len=VGD_LEN_NAME) :: ZNAME='!!'     !name of the vertical coodinate
   integer, parameter :: MAX_VKIND=100           !maximum number of 'kind' (used in error check)
@@ -158,7 +158,7 @@ contains
       integer,optional :: ip1,ip2                 !ip1,2 values of the desired descriptors
 
       ! Internal variables
-      integer :: istat,key,error,kind,version,count,i,myip1,myip2
+      integer :: istat,key,error,kind,version,count,i,myip1,myip2,vgd_vintage
       integer :: fstinf,fstinl,fstluk,fstprm,ni,nj,nk,swa,lng,ubc,dltf,extra1,extra2,extra3
       integer, dimension(MAX_DESC_REC) :: keyList
       type(FSTD_ext) :: var
@@ -193,6 +193,9 @@ contains
          key=fstinf(unit,ni,nj,nk,-1,' ',myip1,myip2,-1,' ',self%rec%nomvar)
          if(key < 0)then
             write(STDERR,'("WARNING: cannot find '//trim(self%rec%nomvar)//' with the following: ip1=",i10,",ip2=",i10)')myip1,myip2
+            write(STDERR,'("Trying to construct vgrid descriptor from vintage encoding (HY,PT ...)")')
+            istat=vgd_vintage(self,unit)
+            if(istat.eq.VGD_OK)return
             self%vcode = -1
             return
          endif
@@ -3012,4 +3015,127 @@ contains
     return
  end function compute_pressure_5002
 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!! (PRIVATE) Construct vertical structure from vintage encoding (PT,HY...)
+ 
+ integer function vgd_vintage(self,F_lu) result(status)
+    ! Construct vertical structure from vintage encoding (PT,HY...)
+    
+    implicit none
+    !      
+    ! Arguments
+    type(vgrid_descriptor), intent(out) :: self !Vertical descriptor instance    
+    integer, intent(in)    :: F_lu  ! fst lu containing records
+    
+    ! Local variables
+    integer, dimension(MAX_DESC_REC) :: keyList,Ip1List,Ip1ListUniq
+    integer :: fstinl,count,error,ni,nj,nk,i,j,kind,nip1,nb,itmp,imin
+    integer, parameter :: nb_kind=100
+    integer, dimension(0:nb_kind) :: num_in_kind
+    real :: pres
+    type(FSTD_ext) :: var
+
+    num_in_kind=0
+
+    status=VGD_ERROR
+    error = fstinl(F_lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',' ',keyList,count,size(keyList))
+    if (error < 0) then
+       write(STDERR,*) 'ERROR: problem fstinl in vgd_vintage'
+       return
+    endif
+    nip1=0
+    do i=1,count
+       error = my_fstprm(keyList(i),var)
+       if (error /= VGD_OK) then
+          write(STDERR,*) 'ERROR: in vgd_vintage, error return from fstprm wrapper for fst key ',keyList(i)
+          return
+       endif
+       call convip(var%ip1,pres,kind,-1,'',.false.)
+       if(var%nomvar == '>>')cycle
+       if(var%nomvar == '^^')cycle
+       if(var%nomvar == 'P0')cycle
+       if(var%nomvar == 'PT')cycle
+       if(var%nomvar == 'HY')cycle
+       if(kind==2.and.pres==0.)cycle
+       if(kind==1.or.kind==2.or.kind==5)then
+          num_in_kind(kind)=num_in_kind(kind)+1
+          nip1=nip1+1
+          Ip1List(nip1)=var%ip1
+       endif
+    enddo
+
+    if(maxval(num_in_kind) /= nip1)then       
+       write(STDERR,*) 'ERROR: more than one pressure/sigma/hyb coordinate in file'
+       do i=0,nb_kind
+          if(num_in_kind(i) > 0)write(STDERR,'("There are",i10," records of kind ",i3)')num_in_kind(i),i
+       enddo
+       return
+    endif
+    
+    ! Remove duplictate
+    do i=1,nip1-1
+       if(Ip1List(i)/=-1)then
+          do j=i+1,nip1
+             if(Ip1List(j)==Ip1List(i))then
+                Ip1List(j)=-1
+             endif
+          enddo
+       endif
+    enddo
+    nb=0
+    do i=1,nip1
+       if(Ip1List(i)/=-1)then
+          nb=nb+1
+          Ip1ListUniq(nb)=Ip1List(i)
+       endif
+    enddo
+    if(nb==0)then
+       write(STDERR,*) 'No record of type pressure/sigma/hyb in file'
+       return
+    endif
+    write(STDERR,'("Found",i10," uniq ip1 of kind ",i2," among the ",i10," records in file")')nb,kind,count
+
+    !=========================
+    ! Vivian's code stats here
+    !=========================
+    
+    print*,'REMOVE THIS PRINT DEFORE RELEASE : Here is the list of ip1s in logical unit F_lu'
+    print*,Ip1ListUniq(1:nb)
+    
+    ! Note for Vivian
+    ! If more than one PT HY and not the same datev print error message and return
+
+    select case (kind)    
+
+    case(1)
+       error = fstinl(F_lu,ni,nj,nk,-1,' ',-1,-1,-1,' ','PT',keyList,count,size(keyList))
+       if (error < 0) then
+          write(STDERR,*) 'ERROR: with fstinl on PT in vgd_vintage'
+          return
+       endif
+       if(count.eq.0)then
+          ! 1001
+          print*,'Sigma coordinate detected'
+       else
+          ! 1002
+          print*,'Eta coordinate detected'
+       endif
+    case(2)
+       print*,'Pressure coordinate detected'
+    case(5)
+       ! 5001
+       print*,'Hybdrid coordinate detected'
+    case DEFAULT
+       write(STDERR,*) 'ERROR: only kind 1,2 and 5 are supported got kind=',kind
+       return
+    end select
+
+    !========================
+    ! Vivian's code ends here
+    !========================
+    
+    status=VGD_OK
+
+ end function vgd_vintage
+ 
 end module vGrid_Descriptors
