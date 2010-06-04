@@ -18,7 +18,7 @@ OBJECTS = vgrid_descriptors.o vgrid_genab_5002.o vgrid_genab_1002_5001.o vgrid_g
 
 all: $(OBJECTS)
 
-vgrid_descriptors.o: vgrid_descriptors.ftn90 vgrid_genab_5002.o vgrid_genab_1002_5001.o vgrid_genab_1001.o
+vgrid_descriptors.o: vgrid_descriptors.ftn90 vgrid_genab_5002.o vgrid_genab_1002_5001.o vgrid_genab_1001.o 
 
 clean:
 	rm -f *.f90 *.o *.mod
