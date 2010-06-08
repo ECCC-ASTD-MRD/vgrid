@@ -157,7 +157,7 @@ contains
             call convip(i,hybtop,kind,-1,dumc_S,.false.)
          endif
       else
-         write(F_unout,"Wrong vcode, must be 1002 or 5001")
+         write(F_unout,'("Wrong vcode, must be 1002 or 5001")')
          return
       endif
       !
@@ -167,7 +167,7 @@ contains
       do k=1,nk
          F_b_8(k)=((F_hyb(k)-hybtop)*pr1)**F_rcoef
          F_a_8(k)=F_pref_8*(F_hyb(k)-F_b_8(k))
-         print*,F_b_8(k),F_a_8(k)
+         !print*,F_a_8(k),F_b_8(k)
       enddo
 
       F_err = VDESC_1002_5001_OK
