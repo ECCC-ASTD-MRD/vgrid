@@ -28,17 +28,17 @@ module vGrid_Descriptors
   character(len=1), dimension(3), parameter :: MATCH_GRTYP=(/'X','Y','Z'/) !grid types with ip1,2 to ig1,2 mapping
 
   ! Validity table
-  integer, dimension(3), parameter :: ptop_8_valid=(/1002,5001,5002/)
-  integer, dimension(2), parameter :: pref_8_valid=(/5001,5002/)
-  integer, dimension(2), parameter :: rcoef1_valid=(/5001,5002/)
+  integer, dimension(4), parameter :: ptop_8_valid=(/1002,1003,5001,5002/)
+  integer, dimension(3), parameter :: pref_8_valid=(/1003,5001,5002/)
+  integer, dimension(3), parameter :: rcoef1_valid=(/1003,5001,5002/)
   integer, dimension(1), parameter :: rcoef2_valid=(/5002/)
-  integer, dimension(5), parameter :: a_m_8_valid=(/1001,1002,2001,5001,5002/)
-  integer, dimension(5), parameter :: b_m_8_valid=(/1001,1002,2001,5001,5002/)
+  integer, dimension(6), parameter :: a_m_8_valid=(/1001,1002,1003,2001,5001,5002/)
+  integer, dimension(6), parameter :: b_m_8_valid=(/1001,1002,1003,2001,5001,5002/)
   integer, dimension(1), parameter :: a_t_8_valid=(/5002/)
   integer, dimension(1), parameter :: b_t_8_valid=(/5002/)
-  integer, dimension(5), parameter :: ip1_m_valid=(/1001,1002,2001,5001,5002/)
+  integer, dimension(6), parameter :: ip1_m_valid=(/1001,1002,1003,2001,5001,5002/)
   integer, dimension(1), parameter :: ip1_t_valid=(/5002/)
-  integer, dimension(4), parameter :: ref_name_valid=(/1001,1002,5001,5002/)
+  integer, dimension(5), parameter :: ref_name_valid=(/1001,1002,1003,5001,5002/)
 
   ! FST file record structure
   type FSTD
@@ -154,11 +154,11 @@ contains
       ! Coordinate constructor - read from a file and initialize instance
       type(vgrid_descriptor), intent(out) :: self !Vertical descriptor instance
       integer, intent(in) :: unit                 !File unit to read descriptor information from
-      character(len=*), optional, intent(in) :: format !File format ('fst' or 'bin')
+      character(len=*), optional, intent(in) :: format !File format ('fst' or 'bin') default is 'fst'
       integer,optional :: ip1,ip2                 !ip1,2 values of the desired descriptors
 
       ! Internal variables
-      integer :: istat,key,error,kind,version,count,i,myip1,myip2,vgd_vintage
+      integer :: istat,key,error,kind,version,count,i,myip1,myip2,vgd_legacy
       integer :: fstinf,fstinl,fstluk,fstprm,ni,nj,nk,swa,lng,ubc,dltf,extra1,extra2,extra3
       integer, dimension(MAX_DESC_REC) :: keyList
       type(FSTD_ext) :: var
@@ -193,66 +193,68 @@ contains
          key=fstinf(unit,ni,nj,nk,-1,' ',myip1,myip2,-1,' ',self%rec%nomvar)
          if(key < 0)then
             write(STDERR,'("WARNING: cannot find '//trim(self%rec%nomvar)//' with the following: ip1=",i10,",ip2=",i10)')myip1,myip2
-            write(STDERR,'("Trying to construct vgrid descriptor from vintage encoding (HY,PT ...)")')
-            istat=vgd_vintage(self,unit)
-            if(istat.eq.VGD_OK)return
-            self%vcode = -1
-            return
-         endif
-         allocate(self%table(ni,nj,nk),stat=istat)
-         if (istat /= 0) then
-            write(STDERR,*) 'ERROR: unable to allocate self%table'
-            return
-         endif
-         istat=fstluk(self%table,key,ni,nj,nk)
-         if(istat < 0)then
-            write(STDERR,*) 'ERROR: problem with fstluk on '//trim(self%rec%nomvar)
-            return
-         endif
-         ! Sorry, I have to use fstprm!
-         istat=fstprm(key, self%rec%dateo, self%rec%deet, self%rec%npas, &
-              ni, nj, nk, self%rec%nbits, self%rec%datyp, self%ip1, self%ip2, self%rec%ip3, &
-              self%rec%typvar,self%rec%nomvar, self%rec%etiket, self%rec%grtyp,&
-              self%rec%ig1, self%rec%ig2, self%rec%ig3, self%rec%ig4, &
-              swa,lng,dltf,ubc,extra1,extra2,extra3)         
-
-         ! Check for multiple (different) descriptors
-         error = fstinl(unit,ni,nj,nk,-1,' ',myip1,myip2,-1,' ',self%rec%nomvar,keyList,count,size(keyList))
-         if (error < 0) then
-            write(STDERR,*) 'ERROR: problem retrieving '//trim(self%rec%nomvar)//' keys for ip1,ip2: ',myip1,myip2
-            self%vcode = -1
-            return
-         endif
-         if(count>1)then
-            allocate(l_table(ni,nj,nk),stat=istat)
-            if (istat /= 0) then
-               write(STDERR,*) 'ERROR: unable to allocate l_table'
+            write(STDERR,'("Trying to construct vgrid descriptor from legacy encoding (HY,PT ...)")')
+            istat=vgd_legacy(self,unit)
+            if(istat.eq.VGD_ERROR)then
+               self%vcode = -1
                return
             endif
-            do i=2,count
-               error=my_fstprm(keyList(i),var)
-               if (error < 0) then
-                  write(STDERR,*) 'ERROR: problem with my_fstprm in new_read'
-                  self%vcode = -1
+         else
+            allocate(self%table(ni,nj,nk),stat=istat)
+            if (istat /= 0) then
+               write(STDERR,*) 'ERROR: unable to allocate self%table'
+               return
+            endif
+            istat=fstluk(self%table,key,ni,nj,nk)
+            if(istat < 0)then
+               write(STDERR,*) 'ERROR: problem with fstluk on '//trim(self%rec%nomvar)
+               return
+            endif
+            ! Sorry, I have to use fstprm!
+            istat=fstprm(key, self%rec%dateo, self%rec%deet, self%rec%npas, &
+                 ni, nj, nk, self%rec%nbits, self%rec%datyp, self%ip1, self%ip2, self%rec%ip3, &
+                 self%rec%typvar,self%rec%nomvar, self%rec%etiket, self%rec%grtyp,&
+                 self%rec%ig1, self%rec%ig2, self%rec%ig3, self%rec%ig4, &
+                 swa,lng,dltf,ubc,extra1,extra2,extra3)         
+            
+            ! Check for multiple (different) descriptors
+            error = fstinl(unit,ni,nj,nk,-1,' ',myip1,myip2,-1,' ',self%rec%nomvar,keyList,count,size(keyList))
+            if (error < 0) then
+               write(STDERR,*) 'ERROR: problem retrieving '//trim(self%rec%nomvar)//' keys for ip1,ip2: ',myip1,myip2
+               self%vcode = -1
+               return
+            endif
+            if(count>1)then
+               allocate(l_table(ni,nj,nk),stat=istat)
+               if (istat /= 0) then
+                  write(STDERR,*) 'ERROR: unable to allocate l_table'
                   return
                endif
-               if(var%ip1 /= self%ip1 .or. var%ip2 /= self%ip2 .or. &
-                    var%ni  /= ni     .or. var%nj  /= nj     .or.  var%nk  /= nk )then
-                  write(STDERR,*) 'ERROR: found different vertical descriptors after wildcard (-1) search'
-                  self%vcode = -1
-                  return
-               endif
-               istat=fstluk(l_table,keyList(i),ni,nj,nk)
-               if(istat < 0)then
-                  write(STDERR,*) 'ERROR: problem with fstluk on l_table i=',i
-                  return
-               endif
-               if(any(l_table /= self%table))then
-                  write(STDERR,*) 'ERROR: found different entries in vertical descriptors after wildcard (-1) search'
-                  return
-               endif
-            enddo
-            deallocate(l_table)
+               do i=2,count
+                  error=my_fstprm(keyList(i),var)
+                  if (error < 0) then
+                     write(STDERR,*) 'ERROR: problem with my_fstprm in new_read'
+                     self%vcode = -1
+                     return
+                  endif
+                  if(var%ip1 /= self%ip1 .or. var%ip2 /= self%ip2 .or. &
+                       var%ni  /= ni     .or. var%nj  /= nj     .or.  var%nk  /= nk )then
+                     write(STDERR,*) 'ERROR: found different vertical descriptors after wildcard (-1) search'
+                     self%vcode = -1
+                     return
+                  endif
+                  istat=fstluk(l_table,keyList(i),ni,nj,nk)
+                  if(istat < 0)then
+                     write(STDERR,*) 'ERROR: problem with fstluk on l_table i=',i
+                     return
+                  endif
+                  if(any(l_table /= self%table))then
+                     write(STDERR,*) 'ERROR: found different entries in vertical descriptors after wildcard (-1) search'
+                     return
+                  endif
+               enddo
+               deallocate(l_table)
+            endif
          endif
 
          ! Fortran binary file input (must already be in the correct position)
@@ -301,7 +303,7 @@ contains
          endif
       case (2001)
          istat=decode_vert_2001(self)
-      case (5001)
+      case (1003,5001)
          istat=decode_vert_5001(self)
          if(istat < 0)then
             write(STDERR,*) 'ERROR: problem with fstluk on '//trim(self%rec%nomvar)
@@ -513,6 +515,8 @@ contains
          error = encode_vert_1001(self,nk)
       case (1002)
          error = encode_vert_1002(self,nk)
+      case (1003)
+         error = encode_vert_5001(self,nk)
       case (2001)
          error = encode_vert_2001(self)
       case (5001)
@@ -541,7 +545,7 @@ contains
       ! Coordinate constructor - build vertical descriptor from hybrid coordinate entries
       type(vgrid_descriptor), intent(out) :: self       !Vertical descriptor instance    
       integer, intent(in) :: kind,version               !Kind,version to create
-      real, dimension(:), intent(in) :: hyb             !List of hybrid levels
+      real, dimension(:),intent(in) :: hyb              !List of hybrid levels
       real, optional, intent(in) :: rcoef1,rcoef2       !R-coefficient values for rectification
       real*8, optional, intent(in) :: ptop_8            !Top-level pressure (Pa)
       real*8, optional, intent(in) :: pref_8            !Reference-level pressure (Pa)
@@ -1462,19 +1466,23 @@ contains
           write(my_stdout,*)'  Equation to compute hydrostatic pressure (pi): pi = B * P0*100'
        case (1002)
           nk=size(self%ip1_m)
-          write(my_stdout,*)'  Number of levels eta levels',nk
+          write(my_stdout,*)'  Number of eta levels',nk
+          write(my_stdout,*)'  Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100'
+       case (1003)
+          nk=size(self%ip1_m)
+          write(my_stdout,*)'  Number of hybrid normalized levels',nk
           write(my_stdout,*)'  Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100'
        case (2001)
           nk=size(self%ip1_m)
           write(my_stdout,*)'  Number of pressure levels',nk
-          write(my_stdout,*)'  Equation to pressure (P): P = A'
+          write(my_stdout,*)'  Equation to compute hydrostatic pressure (P): P = A'
        case (5001)
           nk=size(self%ip1_m)
-          write(my_stdout,*)'  Number of levels hybrid levels',nk
+          write(my_stdout,*)'  Number of hybrid levels',nk
           write(my_stdout,*)'  Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100'
        case (5002)
           nk=size(self%ip1_m)
-          write(my_stdout,*)'  Number of levels hybrid levels (momentum levels)',nk-1
+          write(my_stdout,*)'  Number of hybrid levels (momentum levels)',nk-1
           write(my_stdout,*)'  Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref)'
        end select
        
@@ -1506,24 +1514,29 @@ contains
   
   integer function write_desc(self,unit,format) result(status)     
     ! Write descriptors to the requested file
-    type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
-    integer, intent(in) :: unit                 !File unit to write to
-    character(len=*), intent(in) :: format      !File format ('fst' or 'bin')
+    type(vgrid_descriptor), intent(in) :: self       !Vertical descriptor instance
+    integer, intent(in) :: unit                      !File unit to write to
+    character(len=*), optional, intent(in) :: format !File format ('fst' or 'bin' ) default is 'fst'
 
     ! Local variables
     integer :: error,ni,nj,nk,fstecr
     real :: dummy
-
+    character(len=100) :: myformat
+    
     ! Set error status
     status = VGD_ERROR
 
+    ! Set default values                                                                                  
+    myformat='FST'                                                                                        
+    if (present(format)) myformat = format 
+    
     ! Array size from table
     ni=size(self%table,dim=1)
     nj=size(self%table,dim=2)
     nk=size(self%table,dim=3)
 
     ! Write to the desired output file type
-    select case (trim(up(format)))
+    select case (trim(up(myformat)))
 
     ! Write to an RPN Standard file
     case ('FST')
@@ -1544,7 +1557,7 @@ contains
 
     ! Warn user for unknown format
     case DEFAULT
-       write(STDERR,*) 'WARNING: no write done for unknown format ',trim(format)
+       write(STDERR,*) 'WARNING: no write done for unknown format ',trim(myformat)
     end select
 
     ! Set status and return
@@ -1640,6 +1653,10 @@ contains
     if (present(in_log)) my_in_log=in_log
 
     ! Check input keys
+    if(size(fstkeys)<1)then
+       write(STDERR,*) 'ERROR: fstkeys vector passed to vgd_levels is null'                             
+       return                                                                
+    endif
     istat=my_fstprm(fstkeys(1),prmk)
     if(istat < 0)then
        write(STDERR,*) 'ERROR: problem with my_fstprm in levels_readref'
@@ -1813,7 +1830,7 @@ contains
        istat = compute_pressure_1002(self,sfc_field,ip1_list,levels,my_in_log)
     case (2001)
        istat = compute_pressure_2001(self,ip1_list,levels,my_in_log)
-    case (5001)
+    case (1003,5001)
        istat = compute_pressure_5001(self,sfc_field,ip1_list,levels,my_in_log)
     case (5002)
        istat = compute_pressure_5002(self,sfc_field,ip1_list,levels,my_in_log)
@@ -2101,14 +2118,23 @@ contains
      endif
 
      ! Fill standard file record entries
-     error = fstd_init(self,etiket='HYB_GEMV3',   &
-          ig2=nint(self%ptop_8*10.d0),            &
-          ig3=nint(self%rcoef1*100.),           &
-          ig4=0)
+     select case (self%vcode)
+     case (1003)
+        error = fstd_init(self,etiket='HYBNORM_GEM3',   &
+             ig2=nint(self%ptop_8*10.d0),            &
+             ig3=nint(self%rcoef1*100.),           &
+             ig4=0)
+     case (5001)
+        error = fstd_init(self,etiket='HYB_GEMV3',   &
+             ig2=nint(self%ptop_8*10.d0),            &
+             ig3=nint(self%rcoef1*100.),           &
+             ig4=0)
+     end select
      if (error /= VGD_OK) then
         write(STDERR,*) 'ERROR: cannot initialize fstd record entries'
         return
      end if
+
      self%ref_name="P0"
      
      ! Vector size checks
@@ -2135,7 +2161,7 @@ contains
 
      ! Fill header
      self%table(1:3,1,1)=(/dble(self%kind),dble(self%version),dble(skip)/)
-     self%table(1:3,2,1)=(/self%ptop_8    ,self%pref_8       ,dble(self%rcoef1)/)     
+     self%table(1:3,2,1)=(/self%ptop_8*100.d0,self%pref_8*100.d0   ,dble(self%rcoef1)/)     
      self%table(1:3,3,1)=(/for_char_8        ,0.d0                 ,0.d0/)
 
      ! Fill level data
@@ -2148,7 +2174,7 @@ contains
      status = VGD_OK
   end function encode_vert_5001
 
-  integer function encode_vert_5002(self,nk) result(status)
+  Integer function encode_vert_5002(self,nk) result(status)
      type(vgrid_descriptor), intent(inout) :: self      !Vertical descriptor instance
      integer, intent(in) :: nk                          !Number of levels
 
@@ -3016,10 +3042,10 @@ contains
  end function compute_pressure_5002
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!! (PRIVATE) Construct vertical structure from vintage encoding (PT,HY...)
+!!! (PRIVATE) Construct vertical structure from legacy encoding (PT,HY...)
  
- integer function vgd_vintage(self,F_lu) result(status)
-    ! Construct vertical structure from vintage encoding (PT,HY...)
+ integer function vgd_legacy(self,F_lu) result(status)
+    ! Construct vertical structure from legacy encoding (PT,HY...)
     
     implicit none
     !      
@@ -3028,11 +3054,13 @@ contains
     integer, intent(in)    :: F_lu  ! fst lu containing records
     
     ! Local variables
-    integer, dimension(MAX_DESC_REC) :: keyList,Ip1List,Ip1ListUniq
-    integer :: fstinl,count,error,ni,nj,nk,i,j,kind,nip1,nb,itmp,imin
+    integer, dimension(MAX_DESC_REC) :: KeyList,Ip1List
+    real,    dimension(MAX_DESC_REC) :: PresList
+    integer :: fstinl,count,error,ni,nj,nk,i,j,k,m,kind,nip1,nb,itmp,imin
     integer, parameter :: nb_kind=100
     integer, dimension(0:nb_kind) :: num_in_kind
-    real :: pres
+
+    real :: x1
     type(FSTD_ext) :: var
 
     num_in_kind=0
@@ -3040,27 +3068,29 @@ contains
     status=VGD_ERROR
     error = fstinl(F_lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',' ',keyList,count,size(keyList))
     if (error < 0) then
-       write(STDERR,*) 'ERROR: problem fstinl in vgd_vintage'
+       write(STDERR,*) 'ERROR: problem fstinl in vgd_legacy'
        return
     endif
     nip1=0
     do i=1,count
        error = my_fstprm(keyList(i),var)
        if (error /= VGD_OK) then
-          write(STDERR,*) 'ERROR: in vgd_vintage, error return from fstprm wrapper for fst key ',keyList(i)
+          write(STDERR,*) 'ERROR: in vgd_legacy, error return from fstprm wrapper for fst key ',keyList(i)
           return
        endif
-       call convip(var%ip1,pres,kind,-1,'',.false.)
+       call convip(var%ip1,PresList(i),kind,-1,'',.false.)
        if(var%nomvar == '>>')cycle
        if(var%nomvar == '^^')cycle
        if(var%nomvar == 'P0')cycle
        if(var%nomvar == 'PT')cycle
        if(var%nomvar == 'HY')cycle
-       if(kind==2.and.pres==0.)cycle
+       if(kind==2.and.PresList(i)==0.)cycle
        if(kind==1.or.kind==2.or.kind==5)then
           num_in_kind(kind)=num_in_kind(kind)+1
           nip1=nip1+1
           Ip1List(nip1)=var%ip1
+          KeyList(nip1)=keyList(i)
+          PresList(nip1)=PresList(i)
        endif
     enddo
 
@@ -3071,8 +3101,33 @@ contains
        enddo
        return
     endif
-    
-    ! Remove duplictate
+
+    !    Sort levels in ascending order    
+    do i=1,nip1-1
+       k=i
+       do j=i+1,nip1
+          if(PresList(j).lt.PresList(k))k=j
+       enddo
+       if(k.ne.i) then
+          ! hyb
+          x1     =PresList(k)
+          PresList(k)=PresList(i)
+          PresList(i)=x1
+
+          ! ip1
+          m         = Ip1List(k)
+          Ip1List(k)= Ip1List(i)
+          Ip1List(i)= m
+
+          ! fstkey
+          m           = KeyList(k)
+          KeyList(k)= KeyList(i)
+          KeyList(i)= m
+          
+       endif
+    enddo
+
+    ! Remove duplictate (there must be a better way to do this)
     do i=1,nip1-1
        if(Ip1List(i)/=-1)then
           do j=i+1,nip1
@@ -3086,56 +3141,242 @@ contains
     do i=1,nip1
        if(Ip1List(i)/=-1)then
           nb=nb+1
-          Ip1ListUniq(nb)=Ip1List(i)
+          Ip1List(nb)=Ip1List(i)
+          KeyList(nb)=KeyList(i)
+          ! pres is not used below but adjusting for consistency and possible future use.
+          PresList(nb)=PresList(i)
        endif
     enddo
+
     if(nb==0)then
        write(STDERR,*) 'No record of type pressure/sigma/hyb in file'
        return
     endif
     write(STDERR,'("Found",i10," uniq ip1 of kind ",i2," among the ",i10," records in file")')nb,kind,count
-
-    !=========================
-    ! Vivian's code stats here
-    !=========================
     
-    print*,'REMOVE THIS PRINT DEFORE RELEASE : Here is the list of ip1s in logical unit F_lu'
-    print*,Ip1ListUniq(1:nb)
+    status = gen_legacy_desc(self,F_lu,Ip1List(1:nb),KeyList(1:nb),nb)
+
+ end function vgd_legacy
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!! (PRIVATE) !s/r gen_legacy_desc - to return a grid descriptor given
+ ! a unit number and a list of fstkeys of the RPN standard file
+ !*********************************************************************
+ !
+ integer function gen_legacy_desc(self,iun,ip1s,fstkeys,nlev) result(status)
+    use vdescript_1001
+    use vdescript_1002_5001
+    use vdescript_1004
+    use vdescript_2001
+    !
+    implicit none
+    !
+    ! Arguments
+    type(vgrid_descriptor), intent(out) :: self !Vertical descriptor
+    integer, intent(in)    :: iun               ! unit containing records
+    integer, dimension(:), intent(in):: ip1s    ! list of ips
+    integer, dimension(:), intent(in):: fstkeys ! list of fstkeys (matching ip1s)
+    integer, intent(in)    :: nlev              ! number of fstkeys given
+    !
+    !author
+    !     V.Lee-A.Plante 2010 
+    !
+    ! Local variables
+
+    integer   fstinf,fstprm,fstluk,fnom,read_decode_hyb,hyb_to_pres,eta_to_pres,&
+         sigma_to_pres,etasef_to_pres 
+    external  fstinf,fstprm,fstluk,fnom,read_decode_hyb,hyb_to_pres,eta_to_pres,&
+         sigma_to_pres,etasef_to_pres
     
-    ! Note for Vivian
-    ! If more than one PT HY and not the same datev print error message and return
+    integer :: ier,nvar,error,origkind
+    integer,dimension(:),pointer :: ip1
+    real :: x1
+    real,dimension(:),pointer :: hyb,hybm
+    real*8 :: ptop_8
+    real, dimension(:,:),allocatable :: work
+    integer :: nia,nja,nka,ni1,nj1,nk1,i,j,k,ni,nj,nk,m,n
+    integer :: e1_key,hy_key,pt_key,p0_key,xx_key
+    integer :: datev, dateo, deet, ipas, ip1a, ip2a, ip3a, &
+         ig1a, ig2a, ig3a, ig4a, bit, datyp, &
+         swa, lng, dlf, ubc, ex1, ex2, ex3, kind
+    real :: lev,ptop,pref,rcoef,etatop
+    character(len=1) :: tva, grda, blk_S
+    character(len=4) :: var
+    character(len=12) :: etik_S
+    real(kind=8), dimension(:), pointer :: a_m_8=>null()!A-coefficients for momentum levels
+    real(kind=8), dimension(:), pointer :: b_m_8=>null()!B-coefficients for momentum levels
+    
+    status=VGD_ERROR
+    
+    allocate(ip1(nlev),hyb(nlev),hybm(nlev))
 
-    select case (kind)    
-
-    case(1)
-       error = fstinl(F_lu,ni,nj,nk,-1,' ',-1,-1,-1,' ','PT',keyList,count,size(keyList))
-       if (error < 0) then
-          write(STDERR,*) 'ERROR: with fstinl on PT in vgd_vintage'
+    ier = fstprm (fstkeys(1), dateo, deet, ipas, nia, nja, nka, &
+         bit, datyp, ip1a,ip2a,ip3a, tva, var, etik_S, grda, &
+         ig1a,ig2a,ig3a,ig4a, swa,lng, dlf, ubc, ex1, ex2, ex3 )
+    if (ier.lt.0) then
+       print *,'vgd_old error: fstprm on key',fstkeys(1)
+       return
+    else
+       call convip (ip1a, lev, kind,-1, blk_S, .false.)
+       if (kind.ne.1.and.kind.ne.2.and.kind.ne.5) then
+          print *,'vgd_old error: kind = ',kind,' has to be 1,2 or 5'
+          deallocate(ip1,hyb,hybm)
           return
        endif
-       if(count.eq.0)then
-          ! 1001
-          print*,'Sigma coordinate detected'
-       else
-          ! 1002
-          print*,'Eta coordinate detected'
+       origkind=kind
+       ip1(1)=ip1a
+       hyb(1)=lev
+    endif
+    do k=2,nlev
+       ier = fstprm (fstkeys(k), dateo, deet, ipas, ni1, nj1, nk1, &
+            bit, datyp, ip1a,ip2a,ip3a, tva, var, etik_S, grda, &
+            ig1a,ig2a,ig3a,ig4a, swa,lng, dlf, ubc, ex1, ex2, ex3 )
+       if (ni1.ne.nia.and.nj1.ne.nja.and.nk1.ne.nka.or.&
+            ier.lt.0) then
+          print *,'vgd_old error: fstprm on key',fstkeys(k),'dim mismatch'
+          goto 999
        endif
-    case(2)
-       print*,'Pressure coordinate detected'
-    case(5)
-       ! 5001
-       print*,'Hybdrid coordinate detected'
-    case DEFAULT
-       write(STDERR,*) 'ERROR: only kind 1,2 and 5 are supported got kind=',kind
-       return
-    end select
-
-    !========================
-    ! Vivian's code ends here
-    !========================
+       call convip (ip1a, lev, kind,-1, blk_S, .false.)
+       if (kind.ne.origkind) then
+          print *,'vgd_old error: orig kind=',origkind,'kind found=',kind
+          goto 999
+       endif
+       ip1(k)=ip1a
+       hyb(k)=lev
+    enddo
+    ni=nia
+    nj=nja
     
-    status=VGD_OK
+    hy_key=fstinf (iun,ni,nj,nk,-1,' ',-1,  -1,  -1,' ','HY')
+    pt_key=fstinf (iun,ni,nj,nk,-1,' ',-1,  -1,  -1,' ','PT')
+    e1_key=fstinf (iun,ni,nj,nk,-1,' ',-1,  -1,  -1,' ','E1')
 
- end function vgd_vintage
+    call incdatr(datev,dateo,ipas*deet/3600.0d0)
+    
+    if (kind.eq.1) then
+       if (pt_key.ge.0) then
+          allocate(work(ni,nj))
+          ier = fstluk(work,pt_key,ni,nj,nk)
+          if (ier.lt.0) then
+             print *,'vgd_old error: in fstluk PT'
+             deallocate(work)
+             goto 999
+          endif
+          ptop = work(1,1)
+          deallocate(work)
+          if (e1_key.ge.0) then
+! etasef coordinate found
+             allocate(work(ni,nj))
+             ier = fstluk(work,e1_key,ni,nj,nk)
+             if (ier.lt.0) then
+                print *,'vgd_old error: in fstluk E1'
+                deallocate(work)
+                goto 999
+             endif
+             etatop = work(1,1)
+             deallocate(work)
+             call vgrid_genab_1004(6,hyb,etatop,ptop,a_m_8,b_m_8,error)
+             if (error /= VDESC_1004_OK)goto 999
+             !        ier = vgd_new(self,kind=1,version=4,nk=nlev, &
+             !                     ip1=ig1a,
+             !                     ip2=ig2a,
+             !                     etatop_8=dble(etatop), &
+             !                     ptop_8=dble(ptop),     &
+             !                     a_m_8=a_m_8,           &
+             !                     b_m_8=b_m_8,           &
+             !                     ip1_m=ip1s)
+             goto 999
+          else
+             ! eta coordinate found
+             call vgrid_genab_1002_5001(6,1002,hyb,1.,ptop*100.d0,80000.d0,&
+                  hybm,a_m_8,b_m_8,ip1,error)
+             if (error /= VDESC_1002_5001_OK)goto 999
+             status = vgd_new(self,kind=1,version=2,nk=nlev, &
+                  ip1=ig1a,              &
+                  ip2=ig2a,              &
+                  ptop_8=ptop*100.d0,    &
+                  a_m_8=a_m_8,           &
+                  b_m_8=b_m_8,           &
+                  ip1_m=ip1s)
+             goto 999
+          endif
+       else if (hy_key.ge.0) then
+! hybrid (normalized) coordinate found
+          ier=read_decode_hyb(iun,'HY',-1,-1,' ',-1,ptop,pref,rcoef)
+          if (ier.lt.0) then
+             print *,'vgd_old error: in read_decode_hyb'
+             goto 999
+          endif
+          call vgrid_genab_1002_5001(6,1002,hyb,rcoef,ptop*100.d0,pref*100.d0,&
+               hybm,a_m_8,b_m_8,ip1,error)
+          if (error /= VDESC_1002_5001_OK)goto 999
+          status = vgd_new(self,kind=1,version=3,nk=nlev, &
+               ip1=ig1a,          &
+               ip2=ig2a,          &
+               ptop_8=ptop*100d0, &
+               pref_8=pref*100d0, &
+               rcoef1=rcoef, &
+               a_m_8=a_m_8,       &
+               b_m_8=b_m_8,       &
+               ip1_m=ip1s)          
+          goto 999
+       else 
+! sigma coordinate found
+          call vgrid_genab_1001(6,hyb,hybm,a_m_8,b_m_8,ip1,error)
+          if (error /= VDESC_1001_OK)goto 999
+          status = vgd_new(self,kind=1,version=1, nk=nlev,&
+               ip1=ig1a,          &
+               ip2=ig2a,          &
+               a_m_8=a_m_8,       &
+               b_m_8=b_m_8,       &
+               ip1_m=ip1s)
+          goto 999
+       endif
+    endif
+    
+    if (kind.eq.2) then
+! pressure coordinate found
+       call vgrid_genab_2001(6,hyb,a_m_8,b_m_8,error)
+       if (error /= VDESC_2001_OK)then
+          goto 999
+       endif
+       status = vgd_new(self,kind=2,version=1,nk=nlev, &
+            ip1=ig1a,          &
+            ip2=ig2a,          &
+            a_m_8=a_m_8,       &
+            b_m_8=b_m_8,       &
+            ip1_m=ip1s)
+       goto 999
+    endif
+    
+    if (kind.eq.5.and.hy_key.ge.0) then
+       ! hybrid (un-normalized) coordinate found
+       ier=read_decode_hyb(iun,'HY',-1,-1,' ',-1,ptop,pref,rcoef)
+       if (ier.lt.0) then
+          print *,'vgd_old error: in read_decode_hyb'
+          goto 999
+       endif
+       call vgrid_genab_1002_5001(6,5001,hyb,rcoef,ptop*100.d0,pref*100.d0,&
+            hybm,a_m_8,b_m_8,ip1,error)
+       if (error /= VDESC_1002_5001_OK)then
+          goto 999
+       endif
+       status = vgd_new(self,kind=5,version=1,nk=nlev, &
+            ip1=ig1a,          &
+            ip2=ig2a,          &
+            ptop_8=dble(ptop), &
+            pref_8=dble(pref), &
+            rcoef1=rcoef, &
+            a_m_8=a_m_8,       &
+            b_m_8=b_m_8,       &
+            ip1_m=ip1s)       
+       goto 999
+    else
+       print *,'vgd_old error: kind=5 but no HY found'
+       goto 999
+    endif
+
+999 deallocate(ip1,hyb,hybm)              
+
+ end function gen_legacy_desc
  
 end module vGrid_Descriptors
