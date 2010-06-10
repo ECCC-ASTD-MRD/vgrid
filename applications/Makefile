@@ -2,7 +2,7 @@
 FCFLAGS='=-C -g'
 RCOMPILE = r.compile
 DESCRIP_PATH = ../
-RMN = rmn_010
+RMN = rmnbeta_011
 
 # Override incorrect implicits
 %.o : %.mod
@@ -14,18 +14,18 @@ RMN = rmn_010
 
 OBJECTS = $(DESCRIP_PATH)vgrid_descriptors.o $(DESCRIP_PATH)vgrid_genab_5002.o $(DESCRIP_PATH)vgrid_genab_1002_5001.o $(DESCRIP_PATH)vgrid_genab_1001.o  $(DESCRIP_PATH)vgrid_genab_2001.o $(DESCRIP_PATH)vgrid_genab_1004.o 
 
-all: compute_pressure convert_toctoc_5002 add_toctoc
+all: compute_pressure convert_toctoc_5002 add_toctoc print_toctoc
 
 convert_toctoc_5002: convert_toctoc_5002.ftn90 $(OBJECTS)
-	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90  -o $@ -librmn $(RMN)
+	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90  -o r.$@ -librmn $(RMN)
+
+print_toctoc: print_toctoc.ftn90 $(OBJECTS)
+	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90 -o r.$@ -librmn $(RMN)
+
+add_toctoc: add_toctoc.ftn90 $(OBJECTS)
+	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90 -o r.$@ -librmn $(RMN)
 
 compute_pressure: compute_pressure.ftn90 $(OBJECTS)
-	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90 -o $@ -librmn $(RMN)
-
-r.print_toctoc: print_toctoc.ftn90 $(OBJECTS)
-	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90 -o $@ -librmn $(RMN)
-
-r.add_toctoc: add_toctoc.ftn90 $(OBJECTS)
 	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90 -o $@ -librmn $(RMN)
 
 $(DESCRIP_PATH)vgrid_descriptors.o: $(DESCRIP_PATH)vgrid_descriptors.ftn90

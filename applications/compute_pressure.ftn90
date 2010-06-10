@@ -24,8 +24,8 @@ program compute_pressure
   character(len=12) :: etiket
   
   cle=(/'s.      ','d.      ','samefile'/)
-  val=(/'undef'   ,'undef'   ,'NO'      /)
-  def=(/'undef'   ,'undef'   ,'YES'     /)
+  val=(/'undef'   ,'undef'   ,'NO   '   /)
+  def=(/'undef'   ,'undef'   ,'YES  '   /)
   
   !==========================================================================
   
@@ -73,11 +73,9 @@ program compute_pressure
 
      if(infon == 0 )then
         print*,'pas de record de',my_var(i)
-        call exit(1)
+        cycle
      endif
      
-     if(allocated(pres))deallocate(pres)
-
      stat = vgd_levels(unit=lui,fstkeys=liste(1:infon),levels=pres)
      if(stat .ne. VGD_OK )then
         print*,'Problem with vgd_levels'
