@@ -1,0 +1,19 @@
+program tests
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_put,VGD_LEN_NAME
+  use Unit_Testing, only: ut_report
+
+  implicit none
+
+  type(vgrid_descriptor) :: d
+  integer :: stat,fstkey
+  real, dimension(:,:,:), allocatable :: lev
+  character(len=VGD_LEN_NAME) :: vname
+
+  ! Construct a new set of 3D coordinate descriptors
+  stat = vgd_new(d,unit=10,format='fst',ip1=100,ip2=200)
+
+  ! Change an element of the structure
+  stat = vgd_put(d,key='NAME - vertical coordinate name',value='VCRD')
+  call ut_report(stat,message='Grid_Descriptors::vgd_put put character value')
+
+end program tests

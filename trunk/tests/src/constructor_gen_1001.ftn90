@@ -1,0 +1,48 @@
+program constructor
+
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,VGD_ERROR
+  use Unit_Testing, only: ut_report
+
+  implicit none
+
+  type(vgrid_descriptor) :: d
+  integer, parameter :: nk=27
+  integer :: stat,k,i
+  integer, dimension(:), pointer :: vipm
+  real :: epsilon=1.e-6
+  real, dimension(:), pointer :: sigma
+  real*8, dimension(:), pointer :: b_m_8,a_m_8
+  logical :: OK=.true.
+  character (len=1) :: dumc_S
+  
+  allocate(sigma(nk))
+  sigma=(/0.011000, 0.027000, 0.051000, 0.075000, 0.101000, 0.127000, 0.155000, 0.185000, 0.219000, 0.258000, 0.302000, 0.351000, 0.405000, 0.460000, 0.516000, 0.574000, 0.631000, 0.688000, 0.744000, 0.796000, 0.842000, 0.884000, 0.922000, 0.955000, 0.980000, 0.993000, 1.000000/)
+
+  stat = vgd_new(d,kind=1,version=1,hyb=sigma)
+  stat = vgd_get(d,key='CB_M - vertical B coefficient',value=b_m_8)
+  stat = vgd_get(d,key='CA_M - vertical A coefficient',value=a_m_8)
+  stat = vgd_get(d,key='VIPM - level ip1 list (m)'    ,value=vipm)
+
+  do k=1,nk
+     if(abs(b_m_8(k)-sigma(k))/sigma(k)>epsilon)then
+        OK=.false.
+        print*,'Probleme avec B 1001',b_m_8(k),' vs ',sigma(k)
+     endif
+  enddo
+  do k=1,nk
+     if(a_m_8(1).ne.0.d0)then
+        OK=.false.
+        print*,'Probleme avec A 1001, should be 0 got',a_m_8(k)
+     endif
+  enddo
+  do k=1,nk
+     call convip(i,sigma(k),1   ,2,dumc_S,.false.)
+     if(i.ne.vipm(k))then
+        OK=.false.
+        print*,'Probleme avec ip1 1001, should be',i,'got',vipm(k)
+     endif
+  enddo
+
+  call ut_report(OK,'Grid_Descriptors::vgd_new vertical generate initializer (1001) value')
+
+end program constructor
