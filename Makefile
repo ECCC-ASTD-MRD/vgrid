@@ -6,6 +6,9 @@ COMPILERS_AIX = xlf10 Xlf12
 COMPILERS_LINUX = pgi6xx pgi9xx svn_tag
 VERSION = 
 
+# Set default target
+default: all
+
 # Override incorrect implicits
 %.o : %.mod
 

@@ -13,13 +13,13 @@ module vGrid_Descriptors
   public :: vgd_levels                          !compute physical level information
 
   ! Public class variables
-  integer, parameter, public :: VGD_LEN_NAME=4  !maximum length of a variable name in the data file
+  integer, parameter, public :: VGD_LEN_NAME=8  !maximum length of a variable name in the data file
   integer, parameter, public :: VGD_OK=0        !method return value on success
   integer, parameter, public :: VGD_ERROR=-1    !method return value on error
   real, parameter, public :: VGD_MISSING=-9999. !missing value returned for invalid entries
 
   ! Private class variables
-  integer, parameter :: STDERR=6                !STDERR output unit
+  integer, parameter :: STDERR=0                !STDERR output unit
   integer, parameter :: LONG_STRING=1024        !number of characters in a long string
   character(len=VGD_LEN_NAME) :: ZNAME='!!'     !name of the vertical coodinate
   integer, parameter :: MAX_VKIND=100           !maximum number of 'kind' (used in error check)
@@ -624,7 +624,6 @@ contains
          if (error /= VDESC_1001_OK)then
             return
          endif
-         print*,b_m_8
          error = vgd_new(self,kind,version,size(hyb), &
               ip1=myip1,           &
               ip2=myip2,           &
@@ -1104,7 +1103,7 @@ contains
        value = self%rec%nomvar
     case ('RFLD')
        if (is_valid(self,ref_name_valid)) then
-          value = self%ref_name
+          value = printingCharacters(self%ref_name)
        else
           write(value,'(i8)') get_error(key)
           return
@@ -2182,7 +2181,7 @@ contains
      integer :: nn,error,k,ind
      integer, parameter :: skip=3
      real*8 :: for_char_8
-     character(len=8) :: ref_name,ref_name_flip
+     character(len=8) :: ref_name
 
      ! Set error status
      status = VGD_ERROR
@@ -2659,6 +2658,24 @@ contains
     return
   end function put_error
 
+  function printingCharacters(str) result(str_printing)
+    ! Return a string that contains only printable characters
+    character(len=*) :: str
+    character(len=LONG_STRING) :: str_printing
+    integer :: i,length
+    length = len(str)
+    i = 1
+    do while (i <= len_trim(str) .and. length == len(str))
+       if (ichar(str(i:i)) >= 32) then
+          i = i+1
+       else
+          length = i-1
+       endif
+    enddo
+    str_printing = str(1:length)
+    return
+  end function printingCharacters
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! (PRIVATE) Validity inquiry functions
 
@@ -2715,9 +2732,10 @@ contains
     status = VGD_OK
   end function my_fstprm
 
-  logical function is_big_endian() result(bend)
+  function is_big_endian() result(bend)
     ! Determine the endianness of the machine
     character(len=4) :: str
+    logical :: bend
     select case (transfer(1094861636,str))
     case ('ABCD')
        bend = .true.
@@ -2752,7 +2770,8 @@ contains
           endif
        enddo
     else
-       str_cvt = str
+       str_cvt = '        '
+       str_cvt(1:len_trim(str)) = str
     endif
     val_out = transfer(str_cvt,val_out)
     status = VGD_OK
@@ -2768,6 +2787,7 @@ contains
     logical :: overflow
     status = VGD_ERROR; str_out = ''
     str_cvt = transfer(val,str_cvt)
+    overflow = .false.
     if (is_big_endian()) then
        cnt = 1; overflow = .false.
        do i=len(str_cvt),1,-1
@@ -2785,6 +2805,7 @@ contains
        write(STDERR,*) 'ERROR: string length to flip_transfer (',len(str_out),') is insufficient: ',len_trim(str_cvt)
        return
     endif
+    str_out = printingCharacters(str_out)
     status = VGD_OK
     return
   end function flip_transfer_char
@@ -2804,7 +2825,7 @@ contains
     integer :: i,j,error,nk
     real*8, dimension(size(sfc_field,dim=1),size(sfc_field,dim=2)) :: s_8
     real*8, dimension(size(ip1_list)) :: aa_8,bb_8
-    logical :: found,my_in_log
+    logical :: found
 
     ! Set error status
     status = VGD_ERROR
@@ -2852,7 +2873,7 @@ contains
     integer :: i,j,error,nk
     real*8, dimension(size(sfc_field,dim=1),size(sfc_field,dim=2)) :: s_8
     real*8, dimension(size(ip1_list)) :: aa_8,bb_8
-    logical :: found,my_in_log
+    logical :: found
 
     ! Set error status
     status = VGD_ERROR
@@ -2946,7 +2967,7 @@ contains
     integer :: i,j,error,nk
     real*8, dimension(size(sfc_field,dim=1),size(sfc_field,dim=2)) :: s_8
     real*8, dimension(size(ip1_list)) :: aa_8,bb_8
-    logical :: found,my_in_log
+    logical :: found
 
     ! Set error status
     status = VGD_ERROR
@@ -2994,7 +3015,7 @@ contains
     integer :: i,j,error,nk
     real*8, dimension(size(sfc_field,dim=1),size(sfc_field,dim=2)) :: s_8
     real*8, dimension(size(ip1_list)) :: aa_8,bb_8
-    logical :: found,my_in_log
+    logical :: found
 
     ! Set error status
     status = VGD_ERROR
@@ -3215,12 +3236,12 @@ contains
          bit, datyp, ip1a,ip2a,ip3a, tva, var, etik_S, grda, &
          ig1a,ig2a,ig3a,ig4a, swa,lng, dlf, ubc, ex1, ex2, ex3 )
     if (ier.lt.0) then
-       print *,'gen_legacy_desc error: fstprm on key',fstkeys(1)
+       write(STDERR,*) 'gen_legacy_desc error: fstprm on key',fstkeys(1)
        return
     else
        call convip (ip1a, lev, kind,-1, blk_S, .false.)
        if (kind.ne.1.and.kind.ne.2.and.kind.ne.5) then
-          print *,'gen_legacy_desc error: kind = ',kind,' has to be 1,2 or 5'
+          write(STDERR,*) 'gen_legacy_desc error: kind = ',kind,' has to be 1,2 or 5'
           deallocate(ip1,hyb,hybm)
           return
        endif
@@ -3234,12 +3255,12 @@ contains
             ig1a,ig2a,ig3a,ig4a, swa,lng, dlf, ubc, ex1, ex2, ex3 )
        if (ni1.ne.nia.and.nj1.ne.nja.and.nk1.ne.nka.or.&
             ier.lt.0) then
-          print *,'gen_legacy_desc error: fstprm on key',fstkeys(k),'dim mismatch'
+          write(STDERR,*) 'gen_legacy_desc error: fstprm on key',fstkeys(k),'dim mismatch'
           goto 999
        endif
        call convip (ip1a, lev, kind,-1, blk_S, .false.)
        if (kind.ne.origkind) then
-          print *,'gen_legacy_desc error: orig kind=',origkind,'kind found=',kind
+          write(STDERR,*) 'gen_legacy_desc error: orig kind=',origkind,'kind found=',kind
           goto 999
        endif
        ip1(k)=ip1a
@@ -3259,7 +3280,7 @@ contains
           allocate(work(ni,nj))
           ier = fstluk(work,pt_key,ni,nj,nk)
           if (ier.lt.0) then
-             print *,'gen_legacy_desc error: in fstluk PT'
+             write(STDERR,*) 'gen_legacy_desc error: in fstluk PT'
              deallocate(work)
              goto 999
           endif
@@ -3270,7 +3291,7 @@ contains
              allocate(work(ni,nj))
              ier = fstluk(work,e1_key,ni,nj,nk)
              if (ier.lt.0) then
-                print *,'gen_legacy_desc error: in fstluk E1'
+                write(STDERR,*) 'gen_legacy_desc error: in fstluk E1'
                 deallocate(work)
                 goto 999
              endif
@@ -3305,7 +3326,7 @@ contains
 ! hybrid (normalized) coordinate found
           ier=read_decode_hyb(iun,'HY',-1,-1,' ',-1,ptop,pref,rcoef)
           if (ier.lt.0) then
-             print *,'gen_legacy_desc error: in read_decode_hyb'
+             write(STDERR,*) 'gen_legacy_desc error: in read_decode_hyb'
              goto 999
           endif
           call vgrid_genab_1002_5001(6,1002,hyb,rcoef,ptop*100.d0,pref*100.d0,&
@@ -3354,7 +3375,7 @@ contains
        ! hybrid (un-normalized) coordinate found
        ier=read_decode_hyb(iun,'HY',-1,-1,' ',-1,ptop,pref,rcoef)
        if (ier.lt.0) then
-          print *,'gen_legacy_desc error: in read_decode_hyb'
+          write(STDERR,*) 'gen_legacy_desc error: in read_decode_hyb'
           goto 999
        endif
        call vgrid_genab_1002_5001(6,5001,hyb,rcoef,ptop*100.d0,pref*100.d0,&
@@ -3373,7 +3394,7 @@ contains
             ip1_m=ip1s)       
        goto 999
     else
-       print *,'gen_legacy_desc error: kind=5 but no HY found'
+       write(STDERR,*) 'gen_legacy_desc error: kind=5 but no HY found'
        goto 999
     endif
 
