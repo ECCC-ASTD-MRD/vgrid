@@ -1,0 +1,30 @@
+program constructor
+
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,VGD_ERROR
+  use Unit_Testing, only: ut_report
+
+  implicit none
+
+  type(vgrid_descriptor) :: d
+  integer :: fnom,fstouv
+  integer :: stat,lu=10
+
+  logical :: OK=.false.
+
+  stat=fnom(lu,"data/dm_1001_just_p0","RND",0)
+  if(stat.lt.0)then
+     print*,'ERROR with fnom'
+     call abort
+  endif
+  stat=fstouv(lu,"RND")
+  if(stat.lt.0)then
+     print*,'Error with fstouv'
+     call abort
+  endif
+  
+  stat=vgd_new(d,lu)
+  OK=stat.eq.VGD_ERROR
+
+  call ut_report(OK,'Grid_Descriptors::vgd_vintage no levels in file')
+  
+end program constructor
