@@ -101,3 +101,8 @@ cat >${dest_dir}/README <<EOF
   SVN 
 EOF
 
+#==============================================================================
+# Temporary support for old architecture names
+. s.old-arch.dot
+ln -sf ${dest_dir} ${dest_path}/${VERSION}/${EC_ARCH}
+
