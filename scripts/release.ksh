@@ -88,7 +88,7 @@ fi
 #==============================================================================
 
 make clean
-make all
+make all DEBUG_FLAGS=
 mkdir -p ${dest_dir}/mod
 ar cru ${dest_dir}/libdescrip.a *.o
 cp *.mod ${dest_dir}/mod
