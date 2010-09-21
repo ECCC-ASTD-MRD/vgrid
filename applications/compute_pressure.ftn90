@@ -1,31 +1,88 @@
+module mod_comp_pres
+   implicit none
+   private
+   public :: rpn, my_fstprm
+   integer, public, parameter :: COMP_PRES_ERROR=0,COMP_PRES_OK=1
+   type rpn
+      real, dimension(:,:), pointer :: data=>null()
+      integer ::dateo, datev, datyp, deet, dltf, extra1, extra2, extra3, ig1,&
+           ig2, ig3, ig4, ip1, ip2, ip3, iun, key, lng, nbits,&
+           ni,  nj, nk, npak, npas, swa, ubc
+      character(len=12) :: etiket
+      character(len=4)  :: nomvar
+      character(len=2)  :: typvar
+      character(len=1)  :: grtyp, ctype
+      logical :: rewrit
+   end type rpn
+   contains
+   !
+   integer function my_fstprm(fstkey,record) result(status)
+      implicit none
+      integer, intent(in) :: fstkey
+      type(rpn) :: record
+      ! 
+      ! Local variables
+      !
+      integer :: error,ni,nj,nk,kind
+      real*8 :: nhours
+      character (len=1) :: dummy_S
+      !
+      !external
+      !
+      integer, external :: fstprm
+      !
+      status = COMP_PRES_ERROR
+      !
+      error=fstprm(fstkey,record%dateo,record%deet,record%npas, &
+           record%ni,record%nj,record%nk,record%nbits,record%datyp,record%ip1,record%ip2, &
+           record%ip3,record%typvar,record%nomvar,record%etiket,record%grtyp, &
+           record%ig1,record%ig2,record%ig3,record%ig4,record%swa, &
+           record%lng,record%dltf,record%ubc,record%extra1,record%extra2, &
+           record%extra3)
+      if (error < 0) then
+         write(6,*) 'ERROR: in my_fstprm, cannot fstprm for fstkey ',fstkey
+         return
+      end if
+      nhours=record%deet*record%npas/3600.d0
+      call incdatr(record%datev,record%dateo,nhours)
+      !
+      status = COMP_PRES_OK
+      !
+   end function my_fstprm
+end module mod_comp_pres
+!========================================================================
 program compute_pressure
-  use vGrid_Descriptors, only: vgd_levels,VGD_OK
+  use vGrid_Descriptors, only: vgd_new,vgd_levels,vgd_get,vgrid_descriptor,VGD_OK
+  use mod_comp_pres, only: rpn, my_fstprm
   
   implicit none
 
-  integer, parameter :: ncle=3,lui=10,luo=11, nmax=1000
+  integer, parameter :: ncle=4,lui=10,luo=11, nmax=1000
   integer, dimension(nmax) :: liste
+  integer, dimension(:), pointer :: ip1_list,ip1_list2,ip1_list3
   integer :: stat,infon,ier,npos,i,k,exdb,exfin
-  integer :: fnom,fstouv,fstfrm,fstinf,key,fstluk,fstinl,fstprm,fstecr
-  real, dimension(:,:,:), pointer :: pres
+  integer :: fnom,fstouv,fstfrm,fstinf,key,fstluk,fstinl,fstprm,fstecr,nvars
+  real, dimension(:,:,:), pointer :: pres  
   real :: dummy
   logical :: ok
   character(len=256), dimension(ncle) :: cle,val,def
-  character(len=4), dimension(2) :: my_var=(/'TT','UU'/)
-  character(len=12), parameter :: version='v_1.0.1'
+  character(len=10) :: my_var
+  character(len=12), parameter :: version='v_1.2.0'
+  type (vgrid_descriptor) :: vgd
+  type (rpn) :: p0
 
   ! For fstprm
   integer :: ig1,ig2,ig3,ig4,dateo,deet,npas,datyp,nbits
-  integer :: ni,nj,nk,ni2,nj2,nk2,nit,njt,nkt,nkmod
+  integer :: ni,nj,nk,ni2,nj2,nk2,nit,njt,nkt,nkmod,nk3
   integer :: ip1,ip2,ip3,swa,lng,dltf,ubc,extra1,extra2,extra3,datev
   character(len=1) :: grtyp
   character(len=2) :: typvar
   character(len=4) :: nomvar
   character(len=12) :: etiket
   
-  cle=(/'s.      ','d.      ','samefile'/)
-  val=(/'undef'   ,'undef'   ,'NO   '   /)
-  def=(/'undef'   ,'undef'   ,'YES  '   /)
+  cle=(/'s.      ','d.      ','samefile','var    '/)
+  val=(/'undef   ','undef   ','NO      ','undef  '/)
+  def=(/'undef   ','undef   ','YES     ','undef  '/)
   
   !==========================================================================
   
@@ -35,16 +92,21 @@ program compute_pressure
   npos=1
   call ccard(cle,def,val,ncle,npos) 
 
-  if(val(1).eq.'undef')then
-     print*,'usage : compute_pressure -s sorce_file -d destination_file'
+  if(trim(val(1)).eq.'undef')then
+     print*,'usage : compute_pressure -s sorce_file -d destination_file -var (NOMVAR,THERMO,MOMENTUM,ALL_LEVELS)'
      stop
-   endif
-   
-   if(val(2).eq.'undef')then
-      print*,'usage : compute_pressure -s sorce_file -d destination_file'
-      stop
-   endif
-   
+  endif
+  
+  if(trim(val(2)).eq.'undef')then
+     print*,'usage : compute_pressure -s sorce_file -d destination_file -var (NOMVAR,THERMO,MOMENTUM,ALL_LEVELS)'
+     stop
+  endif
+  
+  if(trim(val(4)).eq.'undef')then
+     print*,'usage : compute_pressure -s sorce_file -d destination_file -var (NOMVAR,THERMO,MOMENTUM,ALL_LEVELS)'
+  endif
+  my_var=val(4)
+  
   stat=fnom(lui,val(1),"RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom on lui'
@@ -65,31 +127,73 @@ program compute_pressure
      print*,'Error : problem with fstouv on ',trim(val(2))
      stat=fstfrm(luo)
      call exit(1)
-  endif
+  endif  
 
-  do i=1,2
-     
-     ier = fstinl(lui,ni,nj,nk,-1,' ',-1,-1,-1,' ',my_var(i),liste,infon,nmax)
+  print*,trim(MY_VAR)
 
-     if(infon == 0 )then
-        print*,'pas de record de',my_var(i)
-        cycle
-     endif
-     
-     stat = vgd_levels(unit=lui,fstkeys=liste(1:infon),levels=pres)
-     if(stat .ne. VGD_OK )then
-        print*,'Problem with vgd_levels'
-        call exit(1)
-     endif
-     pres=pres/100.
-     do k=1,infon
-        stat=fstprm(liste(k),dateo,deet,npas,ni,nj,nk,nbits,datyp,ip1,&
-             ip2,ip3,typvar,nomvar,etiket,grtyp,ig1,ig2,ig3, &
-             ig4,swa,lng,dltf,ubc,extra1,extra2,extra3)
-        stat=fstecr(pres(:,:,k),dummy,-nbits,luo,dateo,deet,npas,ni,nj,nk, &
-             ip1,ip2,ip3,typvar,'PX',etiket,grtyp,ig1,ig2,ig3,ig4,datyp,.true.)
-     enddo
-  enddo
+  select case (trim(my_var))
+     case ( 'THERMO' , 'MOMENTUM' , 'ALL_LEVELS' )
+        stat=vgd_new(vgd,lui,'fst')
+        if(trim(my_var).eq.'THERMO')then
+           stat=vgd_get(vgd,'VIPT - level ip1 list (t)',value=ip1_list)
+        else if(trim(my_var).eq.'MOMENTUM')then
+           stat=vgd_get(vgd,'VIPM - level ip1 list (m)',value=ip1_list)
+        else if (trim(my_var).eq.'ALL_LEVELS')then
+           stat=vgd_get(vgd,'VIPT - level ip1 list (t)',value=ip1_list2)
+           stat=vgd_get(vgd,'VIPM - level ip1 list (m)',value=ip1_list3)
+           nk2=size(ip1_list2)
+           nk3=size(ip1_list3)
+           allocate(ip1_list(nk2+nk3))
+           ip1_list(1:nk2)=ip1_list2
+           ip1_list(nk2+1:nk2+nk3)=ip1_list3
+        endif
+        stat=vgd_get(vgd,'RFLD - reference field name',value=nomvar)
+        ier = fstinl(lui,ni,nj,nk,-1,' ',-1,-1,-1,' ',nomvar,liste,infon,nmax)
+        if(infon == 0 )then
+           print*,'pas de record de',nomvar
+           call exit(1)
+        endif
+        if(infon > 1 )then
+           print*,'Warning: more than one ',nomvar,' taking first one only'
+        endif
+        allocate(p0%data(ni,nj),stat=stat)
+        if(stat.ne.0)then
+           print*,'Problem in allocate p0'
+           call exit(1)
+        endif
+        ier=fstluk(p0%data,liste(1),ni,nj,nk)
+        ier=my_fstprm(liste(1),p0)
+        p0%data=p0%data*100.
+        ier=vgd_levels(vgd,sfc_field=p0%data,ip1_list=ip1_list,levels=pres)
+        pres=pres/100.
+        if(ier.ne.VGD_OK)then
+           print*,'Problem with vgd_levels on ip1_list'
+           call exit(1)
+        endif
+        do k=1,size(pres,3)
+           stat=fstecr(pres(1,1,k),dummy,-p0%nbits,luo,p0%dateo,p0%deet,p0%npas,p0%ni,p0%nj,p0%nk, &
+                ip1_list(k),p0%ip2,p0%ip3,p0%typvar,'PX',p0%etiket,p0%grtyp,p0%ig1,p0%ig2,p0%ig3,p0%ig4,p0%datyp,.true.)
+        enddo
+     case default
+        ier = fstinl(lui,ni,nj,nk,-1,' ',-1,-1,-1,' ',my_var,liste,infon,nmax)           
+        if(infon.eq.0)then
+           print*,'pas de record de',my_var
+           call exit(1)
+        endif
+        stat = vgd_levels(unit=lui,fstkeys=liste(1:infon),levels=pres)
+        if(stat .ne. VGD_OK )then
+           print*,'Problem with vgd_levels'
+           call exit(1)
+        endif
+        pres=pres/100.
+        do k=1,infon
+           stat=fstprm(liste(k),dateo,deet,npas,ni,nj,nk,nbits,datyp,ip1,&
+                ip2,ip3,typvar,nomvar,etiket,grtyp,ig1,ig2,ig3, &
+                ig4,swa,lng,dltf,ubc,extra1,extra2,extra3)
+           stat=fstecr(pres(:,:,k),dummy,-nbits,luo,dateo,deet,npas,ni,nj,nk, &
+                ip1,ip2,ip3,typvar,'PX',etiket,grtyp,ig1,ig2,ig3,ig4,datyp,.true.)
+        enddo
+     end select
 
   stat=fstfrm(lui)
   stat=fstfrm(luo)

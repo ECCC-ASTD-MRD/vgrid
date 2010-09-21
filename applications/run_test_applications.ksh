@@ -48,7 +48,7 @@ EOF
 EOF
       ./r.convert_toctoc_5002 -samefile -s ${TMPDIR}/tempo
       rm -f ${TMPDIR}/px
-      compute_pressure -s ${TMPDIR}/tempo -d ${TMPDIR}/px
+      compute_pressure -s ${TMPDIR}/tempo -d ${TMPDIR}/px -var ALL_LEVELS
       STATUS=$(fstcomp -ne -a ${TMPDIR}/px -b ${TMPDIR}/dm2007050912-00-00_001_sans_p0 | grep PX | awk '{if($7 > 5.e-4)print "NOTOK"}')
       if [ "${STATUS}" = 'NOTOK' ];then
          echo "TEST 3 FAILED"
@@ -75,7 +75,7 @@ if [ ${add_toctoc_and_compute_pressure} = oui ];then
          exit
       fi
       rm -f $TMPDIR/px
-      compute_pressure -s data/${ITEM} -d $TMPDIR/px
+      compute_pressure -s data/${ITEM} -d $TMPDIR/px -var ALL_LEVELS
       STATUS=$(fstcomp -ne -a $TMPDIR/px -b data/${ITEM} | grep PX | awk '{if($7 > 6.e-6)print "NOTOK"}')
       if [ "${STATUS}" = 'NOTOK' ];then
          echo "TEST compute_pressure with ${ITEM} FAILED"
