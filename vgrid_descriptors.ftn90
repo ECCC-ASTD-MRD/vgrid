@@ -1615,12 +1615,12 @@ contains
        error = new_read(gd,unit=unit,format='fst',ip1=-1,ip2=-1)
     endif
     if (error /= VGD_OK) then
-       write(STDERR,*) 'ERROR: cannot build grid descriptor instance for fst key ',fstkeys(i)
+       write(STDERR,*) 'ERROR: cannot build grid descriptor instance for fst key ',fstkeys(1)
        return
     endif
     error = levels_readref(gd,unit=unit,fstkeys=fstkeys,levels=levels,in_log=my_in_log)
     if (error /= VGD_OK) then
-       write(STDERR,*) 'ERROR: problem computing level information for fst key ',fstkeys(i)
+       write(STDERR,*) 'ERROR: problem computing level information for fst key ',fstkeys(1)
        return
     endif
 
@@ -3176,6 +3176,10 @@ contains
     write(STDERR,'("   Found",i10," unique ip1 of kind ",i2," among the ",i10," records in file to construct the vertical descriptor")')nb,kind,count
     
     status = gen_legacy_desc(self,F_lu,Ip1List(1:nb),KeyList(1:nb),nb)
+    if(status/=VGD_OK)then
+       write(STDERR,'("Error : problem with gen_legacy_desc")')
+       return
+    endif
 
     write(STDERR,'("   Vertical descriptor successfully reconstructed")')
 

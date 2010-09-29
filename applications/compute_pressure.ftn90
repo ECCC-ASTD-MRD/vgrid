@@ -262,7 +262,7 @@ program compute_pressure
    integer :: fnom,fstouv,fstfrm,fstinf,key,fstluk,fstinl,fstprm,fstecr,nvars
    character(len=256), dimension(ncle) :: cle,val,def
    character(len=10) :: my_var
-   character(len=12), parameter :: version='v_1.2.0'
+   character(len=12), parameter :: version='v_2.0.0'
    !
    cle=(/'s.      ','d.      ','samefile','var    '/)
    val=(/'undef   ','undef   ','NO      ','undef  '/)
