@@ -7,6 +7,7 @@ module mod_comp_pres
    public :: rpn, my_fstprm,get_pres_by_nomvar,get_pres_by_group
    !
    integer, public, parameter :: COMP_PRES_ERROR=0,COMP_PRES_OK=1
+   logical, public :: verbose_L
    !
    type rpn
       real, dimension(:,:), pointer :: data=>null()
@@ -124,7 +125,8 @@ module mod_comp_pres
    !=====================================================================
    integer function get_pres_by_group(F_lui,F_luo,F_group) result(status)
       !
-      use vGrid_Descriptors, only: vgd_new,vgd_levels,vgd_get,vgrid_descriptor,VGD_OK
+      use vGrid_Descriptors, only: vgd_new,vgd_levels,vgd_get, &
+           vgrid_descriptor,vgd_print,VGD_OK
       !
       implicit none
       !    
@@ -149,6 +151,14 @@ module mod_comp_pres
       if(ier.ne.VGD_OK)then
          print*,'Error with vgd_new for var  (group) ',F_group
          return
+      endif
+      !
+      if(verbose_L)then
+         ier=vgd_print(vgd)
+         if(ier.ne.VGD_OK)then
+            print*,'ERROR with vgd_print'
+            call exit(1)
+         endif
       endif
       !
       if(trim(F_group).eq.'THERMO')then
@@ -208,7 +218,7 @@ module mod_comp_pres
             return
          endif
          !
-         ier=fstluk(record%data,liste(1),ni,nj,nk)
+         ier=fstluk(record%data,liste(i),ni,nj,nk)
          if(ier.lt.0)then
             print*,'Error with fstluk on ',nomvar
             return
@@ -252,11 +262,12 @@ end module mod_comp_pres
 !========================================================================
 program compute_pressure
    !
-   use mod_comp_pres, only: rpn, my_fstprm,get_pres_by_nomvar,get_pres_by_group,COMP_PRES_ERROR
+   use mod_comp_pres, only: rpn, my_fstprm,get_pres_by_nomvar, &
+        get_pres_by_group,COMP_PRES_ERROR,verbose_L
    !
    implicit none
    !
-   integer, parameter :: ncle=4,lui=10,luo=11, nmax=1000
+   integer, parameter :: ncle=5,lui=10,luo=11, nmax=1000
    integer, dimension(nmax) :: liste
    integer :: stat,infon,ier,npos,i,k,exdb,exfin,ni,nj,nk,nk2,nk3
    integer :: fnom,fstouv,fstfrm,fstinf,key,fstluk,fstinl,fstprm,fstecr,nvars
@@ -264,9 +275,9 @@ program compute_pressure
    character(len=10) :: my_var
    character(len=12), parameter :: version='v_2.0.0'
    !
-   cle=(/'s.      ','d.      ','samefile','var    '/)
-   val=(/'undef   ','undef   ','NO      ','undef  '/)
-   def=(/'undef   ','undef   ','YES     ','undef  '/)
+   cle=(/'s.      ','d.      ','samefile','var    ','verbose'/)
+   val=(/'undef   ','undef   ','NO      ','undef  ','NO     '/)
+   def=(/'undef   ','undef   ','YES     ','undef  ','YES    '/)
    !
    stat=exdb('compute_pressure',version,'NON')
    !
@@ -284,6 +295,9 @@ program compute_pressure
    endif
    !
    my_var=val(4)
+   !
+   verbose_L=.false.
+   if(val(5).eq.'YES')verbose_L=.true.
    !
    stat=fnom(lui,val(1),"RND",0)
    if(stat.lt.0)then
