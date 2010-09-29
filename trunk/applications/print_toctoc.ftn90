@@ -1,0 +1,57 @@
+program print_toctoc
+   
+   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_print,VGD_ERROR
+   
+   implicit none
+   
+   type(vgrid_descriptor) :: vgd
+   integer, parameter :: lu=10,ncle=1
+   integer :: stat,npos
+   integer :: fnom,fstouv,fstfrm,exdb,exfin
+   character(len=12), parameter :: version='v_1.0.0'
+   character(len=256), dimension(ncle) :: cle,val,def
+
+   !==========================================================================
+   
+   stat=exdb('print_toctoc',version,'NON')
+   
+   !==========================================================================  
+   ! Get keys
+   cle=(/'fst.'/)
+   val=(/'undef'/)
+   def=(/'undef'/)
+   npos=1
+   call ccard(cle,def,val,ncle,npos) 
+   if(trim(val(1)).eq.'undef')then
+      print*,'Usage : print_toctoc -fst rpn_file'
+      call exit(1)
+   endif
+
+   !==========================================================================
+   
+   stat=fnom(lu,val(1),"RND",0)
+   if(stat.lt.0)then
+      print*,'ERROR with fnom on',val(1)
+      call exit(1)
+   endif
+   stat=fstouv(lu,'RND')
+   if(stat.lt.0)then
+      print*,'ERROR with fstouv on',val(1)
+      call exit(1)
+   endif
+   
+   stat = vgd_new(vgd,lu,'fst')
+   if(stat.eq.VGD_ERROR)then
+      print*,'ERROR with vgd_new on',val(1)
+      call exit(1)
+   endif
+   stat = vgd_print(vgd)
+   if(stat.eq.VGD_ERROR)then
+      print*,'ERROR with vgd_print'
+      call exit(1)
+   endif
+   
+   stat=fstfrm(lu)
+   stat=exfin('print_toctoc',version,'NON')
+   
+end program print_toctoc
