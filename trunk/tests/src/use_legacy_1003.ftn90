@@ -11,13 +11,12 @@ program constructor
   integer :: fnom,fstouv,fstfrm,fstinl,ni,nj,nk,infon,fstluk,k
   integer :: stat,lu=10
   real, dimension(:,:,:), pointer :: levels,px
-  real, parameter :: epsilon=1.0e-6
+  real, parameter :: epsilon=6.0e-6
   real :: ff
 
   logical :: OK=.true.,in_log
 
-  stat=fnom(lu,"data/dm_1002_from_model_run","RND",0)
-
+  stat=fnom(lu,"data/dm_1003_from_pgsm_lam_east_ops","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
      call abort
@@ -30,7 +29,7 @@ program constructor
 
   stat=vgd_new(d,lu)
   if(stat.eq.VGD_ERROR)stop
-  
+
   stat=vgd_print(d,6)  
   if(stat.eq.VGD_ERROR)stop
 
@@ -55,7 +54,7 @@ program constructor
      endif
   enddo
 
- stat=fstfrm(lu)
+  stat=fstfrm(lu)
 
   call ut_report(OK,'Grid_Descriptors::vgd_vintage (1002 eta)')
 

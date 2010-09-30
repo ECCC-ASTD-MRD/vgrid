@@ -16,8 +16,7 @@ program constructor
 
   logical :: OK=.true.,in_log
 
-  stat=fnom(lu,"data/dm_1002_from_model_run","RND",0)
-
+  stat=fnom(lu,"data/dm_1001_from_model_run","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
      call abort
@@ -49,14 +48,14 @@ program constructor
   do k=1,infon
      ff=abs(px(1,1,k)-levels(1,1,k)/100.)/px(1,1,k)
      if(ff.gt.epsilon)then        
-        print*,'OUPS, difference should be equal within epsilon',px(1,1,k),levels(1,1,k)/100.
+        print*,'OUPS, these should be equal within epsilon',px(1,1,k),levels(1,1,k)/100.
         print*,'But found difference of',ff
         stop
      endif
   enddo
 
- stat=fstfrm(lu)
+  stat=fstfrm(lu)
 
-  call ut_report(OK,'Grid_Descriptors::vgd_vintage (1002 eta)')
+  call ut_report(OK,'Grid_Descriptors::vgd_vintage (1001 sigma)')
 
 end program constructor
