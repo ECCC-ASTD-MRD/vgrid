@@ -3177,7 +3177,7 @@ contains
     
     status = gen_legacy_desc(self,F_lu,Ip1List(1:nb),KeyList(1:nb),nb)
     if(status/=VGD_OK)then
-       write(STDERR,'("Error : problem with gen_legacy_desc")')
+       write(STDERR,'(" Error : problem with gen_legacy_desc")')
        return
     endif
 
@@ -3208,10 +3208,11 @@ contains
     !     V.Lee-A.Plante 2010 
     !
     ! Local variables
-
-    integer   fstinf,fstprm,fstluk,fnom,read_decode_hyb,hyb_to_pres,eta_to_pres,&
+    integer, parameter :: nmax=1000
+    integer, dimension(nmax) :: liste
+    integer :: fstinl,fstinf,infon,fstprm,fstluk,fnom,read_decode_hyb,hyb_to_pres,eta_to_pres,&
          sigma_to_pres,etasef_to_pres 
-    external  fstinf,fstprm,fstluk,fnom,read_decode_hyb,hyb_to_pres,eta_to_pres,&
+    external  fstinl,fstinf,fstprm,fstluk,fnom,read_decode_hyb,hyb_to_pres,eta_to_pres,&
          sigma_to_pres,etasef_to_pres
     
     integer :: ier,nvar,error,origkind
@@ -3281,26 +3282,18 @@ contains
     
     if (kind.eq.1) then
        if (pt_key.ge.0) then
-          allocate(work(ni,nj))
-          ier = fstluk(work,pt_key,ni,nj,nk)
-          if (ier.lt.0) then
-             write(STDERR,*) 'gen_legacy_desc error: in fstluk PT'
-             deallocate(work)
+          ier=get_consistent_pt_e1(iun,ptop,'PT')
+          if(ier.eq.VGD_ERROR)then
+             write(STDERR,*) 'gen_legacy_desc error: consistency check on PT failed'
              goto 999
           endif
-          ptop = work(1,1)
-          deallocate(work)
           if (e1_key.ge.0) then
-! etasef coordinate found
-             allocate(work(ni,nj))
-             ier = fstluk(work,e1_key,ni,nj,nk)
-             if (ier.lt.0) then
-                write(STDERR,*) 'gen_legacy_desc error: in fstluk E1'
-                deallocate(work)
+             write(STDERR,*)' etasef coordinate found'
+             ier=get_consistent_pt_e1(iun,etatop,'E1')
+             if(ier.eq.VGD_ERROR)then
+                write(STDERR,*) 'gen_legacy_desc error: consistency check on E1 failed'
                 goto 999
              endif
-             etatop = work(1,1)
-             deallocate(work)
              call vgrid_genab_1004(6,hyb,etatop,ptop,a_m_8,b_m_8,error)
              if (error /= VDESC_1004_OK)goto 999
              !        ier = vgd_new(self,kind=1,version=4,nk=nlev, &
@@ -3313,7 +3306,7 @@ contains
              !                     ip1_m=ip1s)
              goto 999
           else
-             ! eta coordinate found
+             write(STDERR,*)' eta coordinate found'
              call vgrid_genab_1002_5001(6,1002,hyb,1.,ptop*100.d0,80000.d0,&
                   hybm,a_m_8,b_m_8,ip1,error)
              if (error /= VDESC_1002_5001_OK)goto 999
@@ -3327,10 +3320,10 @@ contains
              goto 999
           endif
        else if (hy_key.ge.0) then
-! hybrid (normalized) coordinate found
-          ier=read_decode_hyb(iun,'HY',-1,-1,' ',-1,ptop,pref,rcoef)
-          if (ier.lt.0) then
-             write(STDERR,*) 'gen_legacy_desc error: in read_decode_hyb'
+          write(STDERR,*)' hybrid (normalized) coordinate found'
+          ier=get_consistent_hy(iun,ptop,pref,rcoef)
+          if(ier.eq.VGD_ERROR)then
+             write(STDERR,*) 'gen_legacy_desc error: consistency check on HY failed'
              goto 999
           endif
           call vgrid_genab_1002_5001(6,1002,hyb,rcoef,ptop*100.d0,pref*100.d0,&
@@ -3347,7 +3340,7 @@ contains
                ip1_m=ip1s)          
           goto 999
        else 
-! sigma coordinate found
+          write(STDERR,*)' sigma coordinate found'
           call vgrid_genab_1001(6,hyb,hybm,a_m_8,b_m_8,ip1,error)
           if (error /= VDESC_1001_OK)goto 999
           status = vgd_new(self,kind=1,version=1, nk=nlev,&
@@ -3361,7 +3354,7 @@ contains
     endif
     
     if (kind.eq.2) then
-! pressure coordinate found
+       write(STDERR,*)' pressure coordinate found'
        call vgrid_genab_2001(6,hyb,a_m_8,b_m_8,error)
        if (error /= VDESC_2001_OK)then
           goto 999
@@ -3376,10 +3369,10 @@ contains
     endif
     
     if (kind.eq.5.and.hy_key.ge.0) then
-       ! hybrid (un-normalized) coordinate found
-       ier=read_decode_hyb(iun,'HY',-1,-1,' ',-1,ptop,pref,rcoef)
-       if (ier.lt.0) then
-          write(STDERR,*) 'gen_legacy_desc error: in read_decode_hyb'
+       write(STDERR,*)' hybrid (un-normalized) coordinate found'
+       ier=get_consistent_hy(iun,ptop,pref,rcoef)
+       if(ier.eq.VGD_ERROR)then
+          write(STDERR,*) 'gen_legacy_desc error: consistency check on HY failed'
           goto 999
        endif
        call vgrid_genab_1002_5001(6,5001,hyb,rcoef,ptop*100.d0,pref*100.d0,&
@@ -3405,5 +3398,127 @@ contains
 999 deallocate(ip1,hyb,hybm)              
 
  end function gen_legacy_desc
- 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!! (PRIVATE) !s/r consistency_hy - to check if HY in file are the same
+ !*********************************************************************
+ ! 
+ integer function get_consistent_hy(F_iun,F_ptop,F_pref,F_rcoef) result(status)
+    
+    implicit none
+
+    integer :: F_iun
+    real :: F_ptop,F_pref,F_rcoef
+
+    !Local variables
+    real :: ptop,pref,rcoef
+    type(FSTD_ext) :: record
+    integer, parameter :: nmax=1000
+    integer, dimension(nmax) :: liste
+    integer :: infon,ier,read_decode_hyb,fstinl,ni,nj,nk,k
+    external read_decode_hyb
+    
+    status=VGD_ERROR
+    
+    ier=fstinl(F_iun,ni,nj,nk,-1,' ',-1,-1,-1,' ','HY',liste,infon,nmax)
+    if (ier.lt.0) then
+       write(STDERR,*) 'In get_consistent_hy, problem with fstinl on HY'
+       return
+    endif
+    if(infon.gt.1)then
+       write(STDERR,*) '  More than one HY, checking consistency ...'
+    endif
+    do k=1,infon
+       ier=my_fstprm(liste(k),record)
+       if (ier < 0) then
+          write(STDERR,*) 'In get_consistent_hy, problem with my_fstprm on k=',k
+          return
+       endif       
+       ier=read_decode_hyb(F_iun,'HY',record%ip2,record%ip3,record%etiket,record%datev,ptop,pref,rcoef)
+       if (ier.lt.0) then
+          write(STDERR,*) 'In get_consistent_hy, problem with read_decode_hyb'
+          return
+       endif
+       if(k.eq.1)then
+          F_ptop =ptop
+          F_pref =pref
+          F_rcoef=rcoef
+       else
+          if( &
+               ptop .ne.F_ptop .or. &
+               pref .ne.F_pref .or. &
+               rcoef.ne.F_rcoef)then
+             write(STDERR,*) 'In get_consistent_hy, found inconsistant HY'
+             write(STDERR,*) 'ptop: ',ptop ,' vs ',F_ptop
+             write(STDERR,*) 'pref: ',pref ,' vs ',F_pref
+             write(STDERR,*) 'rcoef:',rcoef,' vs ',F_rcoef
+          return
+          endif
+       endif
+    enddo    
+    if(infon.gt.1)write(STDERR,*) '  All HY consistent.'
+    status=VGD_OK
+
+ end function get_consistent_hy
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!! (PRIVATE) !s/r consistency_hy - to check if HY in file are the same
+ !*********************************************************************
+ ! 
+ integer function get_consistent_pt_e1(F_iun,F_val,F_nomvar) result(status)
+    
+    implicit none
+
+    integer :: F_iun
+    real ::F_val
+    character(len=*) :: F_nomvar
+    
+    ! Local variables
+    integer, parameter :: nmax=1000
+    integer, dimension(nmax) :: liste
+    integer :: infon,ier,fstinl,fstluk,ni,nj,nk,k
+    real, dimension(:,:),allocatable :: work
+    type(FSTD_ext) :: record
+
+    status=VGD_ERROR
+    
+    ier=fstinl(F_iun,ni,nj,nk,-1,' ',-1,-1,-1,' ',F_nomvar,liste,infon,nmax)
+
+    if(infon.gt.1)then
+       write(STDERR,*) '  More than one ',F_nomvar,', checking consistency ...'
+    endif
+    allocate(work(ni,nj))
+    
+    do k=1,infon       
+       ier=my_fstprm(liste(k),record)
+       if (ier < 0) then
+          write(STDERR,*) 'In get_consistent_pt_e1, problem with my_fstprm on k=',k
+          return
+       endif
+       if(  record%ni.ne.ni.or. &
+            record%nj.ne.nj.or. &
+            record%nK.ne.nk)then
+          write(STDERR,*) 'In get_consistent_pt_e1 : inconsistent ',F_nomvar,' frid size:'
+          write(STDERR,*) 'ni : ',record%ni,' vs ',ni
+          write(STDERR,*) 'nj : ',record%nj,' vs ',nj
+          write(STDERR,*) 'nk : ',record%nk,' vs ',nk
+          goto 999
+       endif
+       ier = fstluk(work,liste(k),ni,nj,nk)
+       if (ier.lt.0) then
+          write(STDERR,*) 'In get_consistent_pt_e1 : problem in fstluk ',F_nomvar,' k=',k
+          goto 999
+       endif
+       if(k.eq.1)then
+          F_val = work(1,1)
+       else
+          if(work(1,1).ne.F_val)then
+             write(STDERR,*) 'In get_consistent_pt_e1 : inconsistent ',F_nomvar,' ',work(1,1),' vs ',F_val
+             goto 999
+          endif
+       endif
+    enddo
+    write(STDERR,*) '  All ',F_nomvar,' consistent.'
+    status=VGD_OK
+999 deallocate(work)
+ end function get_consistent_pt_e1
+
 end module vGrid_Descriptors

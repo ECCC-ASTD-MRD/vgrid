@@ -211,6 +211,22 @@ module mod_comp_pres
       !
       do i=1,infon
          !
+         ier=my_fstprm(liste(i),record)
+         if(ier.ne.COMP_PRES_OK)then
+            print*,'Error with my_fstprm on ',nomvar
+            return
+         endif
+         !
+         if(record%ni.ne.ni.or. &
+            record%nj.ne.nj.or. &
+            record%nk.ne.nk)then
+            print*,'Size of record ',nomvar,' inconsistant with previous one:'
+            print*,'ni',record%ni,'vs',ni
+            print*,'nj',record%nj,'vs',nj
+            print*,'nk',record%nk,'vd',nk
+            return
+         endif
+         !
          if(associated(record%data))deallocate(record%data)
          allocate(record%data(ni,nj),stat=ier)
          if(ier.ne.0)then
@@ -221,12 +237,6 @@ module mod_comp_pres
          ier=fstluk(record%data,liste(i),ni,nj,nk)
          if(ier.lt.0)then
             print*,'Error with fstluk on ',nomvar
-            return
-         endif
-         !
-         ier=my_fstprm(liste(i),record)
-         if(ier.ne.COMP_PRES_OK)then
-            print*,'Error with my_fstprm on ',nomvar
             return
          endif
          !
