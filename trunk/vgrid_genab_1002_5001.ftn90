@@ -116,7 +116,7 @@ contains
       endif
       !
       if (F_vcode.eq.5001) then         
-         if((F_ptop_8-F_hybuser(1)*F_pref_8)/F_ptop_8.gt.epsilon)then
+         if(F_ptop_8-F_hybuser(1)*F_pref_8.gt.epsilon)then
             write (F_unout,'("ERROR: ptop=",E25.16," is lower than first hyb level =",E25.16)')F_ptop_8,F_hybuser(1)*F_pref_8
             return
          endif

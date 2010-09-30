@@ -1,6 +1,6 @@
 #!/bin/ksh
 
-set -x
+#set -x
 
 # Destination path
 dest_path=/users/dor/armn/rmt/data/public/vgrid_descriptors
@@ -88,7 +88,7 @@ fi
 #==============================================================================
 
 make clean
-make all DEBUG_FLAGS=
+make all
 mkdir -p ${dest_dir}/mod
 ar cru ${dest_dir}/libdescrip.a *.o
 cp *.mod ${dest_dir}/mod
@@ -98,12 +98,6 @@ cat >${dest_dir}/README <<EOF
   
   Acquired with . r.ssmuse.dot ${COMPILER} 
 
-  To get code, type:
-  svn co ${dest_svn_url}/tags/release-${VERSION}
+  SVN 
 EOF
-
-#==============================================================================
-# Temporary support for old architecture names
-. s.old-arch.dot
-#ln -sf ${dest_dir} ${dest_path}/${VERSION}/${EC_ARCH}
 

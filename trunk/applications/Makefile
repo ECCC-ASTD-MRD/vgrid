@@ -1,5 +1,5 @@
 # User options
-#FCFLAGS='=-C -g'
+FCFLAGS='=-C -g'
 RCOMPILE = r.compile
 DESCRIP_PATH = ../
 RMN = rmnbeta_011

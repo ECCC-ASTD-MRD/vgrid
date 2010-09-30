@@ -1,6 +1,5 @@
 # User options
-FCFLAGS=
-DEBUG_FLAGS='=-C -g'
+FCFLAGS='=-C -g'
 RCOMPILE = r.compile
 RELEASE_SCR = ./scripts/release.ksh
 COMPILERS_AIX = xlf10 Xlf12
@@ -16,7 +15,7 @@ default: all
 # Define suffix rules
 .SUFFIXES: .ftn90 .o
 .ftn90.o:
-	$(RCOMPILE) -optf $(FCFLAGS) $(DEBUG_FLAGS) -src $<
+	$(RCOMPILE) -optf $(FCFLAGS) -src $<
 
 OBJECTS = vgrid_descriptors.o vgrid_genab_1001.o vgrid_genab_1002_5001.o vgrid_genab_1004.o vgrid_genab_2001.o vgrid_genab_5002.o 
 
