@@ -4,7 +4,7 @@ module mod_comp_pres
    !
    private
    !
-   public :: rpn, my_fstprm,get_pres_by_nomvar,get_pres_by_group
+   public :: rpn, my_fstprm,get_pres_by_group
    !
    integer, public, parameter :: COMP_PRES_ERROR=0,COMP_PRES_OK=1
    logical, public :: verbose_L
@@ -62,67 +62,6 @@ module mod_comp_pres
       !
    end function my_fstprm
    !=======================================================================
-   integer function get_pres_by_nomvar(F_lui,F_luo,F_nomvar) result(status)
-      !
-      use vGrid_Descriptors, only: vgd_levels,VGD_OK
-      !
-      implicit none
-      !
-      integer :: F_lui,F_luo
-      character(len=4) :: F_nomvar
-      !
-      ! Local variables
-      !
-      type(rpn) :: record
-      integer, parameter :: nmax=1000
-      integer, dimension(nmax) :: liste
-      integer :: ier,fstinl,infon,fstecr,ni,nj,nk,k
-      real :: dummy
-      real, dimension(:,:,:), pointer :: pres
-      !
-      status=COMP_PRES_ERROR
-      !
-      ier=fstinl(F_lui,ni,nj,nk,-1,' ',-1,-1,-1,' ',F_nomvar,liste,infon,nmax)           
-      if(ier.lt.0)then
-         print*,'Error with fstinl on ',F_nomvar
-         return
-      endif
-      if(infon.eq.0)then
-         print*,'No record ',F_nomvar,' in input file'
-         return
-      endif
-      ier=vgd_levels(unit=F_lui,fstkeys=liste(1:infon),levels=pres)
-      if(ier.ne.VGD_OK)then
-         print*,'Problem with vgd_levels on ',F_nomvar
-         call exit(1)
-      endif
-      pres=pres/100.
-      do k=1,infon
-         ier=my_fstprm(liste(k),record)
-         if(ier.eq.COMP_PRES_ERROR)then
-            print*,'Error with my_fstprm on ',F_nomvar,' k=',k
-            return
-         endif         
-         ier=fstecr(pres(:,:,k),dummy,-record%nbits,F_luo,record%dateo,record%deet,record%npas, &
-              record%ni,record%nj,record%nk,record%ip1,record%ip2,record%ip3, &
-              record%typvar,'PX',record%etiket, &
-              record%grtyp,record%ig1,record%ig2,record%ig3,record%ig4, &
-              record%datyp,.true.)
-         if(ier.lt.0)then
-            print*,'Error with fstecr ',F_nomvar,' k=',k
-            return
-         endif
-      enddo
-      !
-      deallocate(pres)
-      !
-      status=COMP_PRES_OK
-      !
-      return
-      !
-   end function get_pres_by_nomvar
-   !
-   !=====================================================================
    integer function get_pres_by_group(F_lui,F_luo,F_group) result(status)
       !
       use vGrid_Descriptors, only: vgd_new,vgd_levels,vgd_get, &
@@ -139,10 +78,10 @@ module mod_comp_pres
       type (vgrid_descriptor) :: vgd
       integer, parameter :: nmax=1000
       integer, dimension(nmax) :: liste
-      integer :: nk2,nk3,ier,fstinl,fstluk,fstecr,ni,nj,nk,infon,i,k
+      integer :: nk2,nk3,ier,fstinl,fstluk,fstecr,ni,nj,nk,infon,i,k,kind
       integer, dimension(:), pointer :: ip1_list,ip1_list2,ip1_list3
-      character(len=4) :: nomvar
-      real :: dummy
+      character(len=4) :: nomvar,dummy_S
+      real :: dummy,ppp
       real, dimension(:,:,:), pointer :: pres
       real, dimension(:,:), pointer :: work
       !
@@ -190,6 +129,29 @@ module mod_comp_pres
          allocate(ip1_list(nk2+nk3))
          ip1_list(1:nk2)=ip1_list2
          ip1_list(nk2+1:nk2+nk3)=ip1_list3
+      else
+         ier=fstinl(F_lui,ni,nj,nk,-1,' ',-1,-1,-1,' ',F_group,liste,infon,nmax)           
+         if(ier.lt.0)then
+            print*,'Error with fstinl on ',F_group
+            return
+         endif
+         if(infon.eq.0)then
+            print*,'No record ',F_group,' in input file'
+            return
+         endif
+         allocate(ip1_list(infon),stat=ier)
+         if(ier.ne.0)then
+            print*,'Problem in allocate ip1_list(infon)'
+            return
+         endif
+         do i=1,infon
+            ier=my_fstprm(liste(i),record)
+            if(ier.ne.COMP_PRES_OK)then
+               print*,'Error with my_fstprm on ',nomvar
+               return
+            endif
+            ip1_list(i)=record%ip1
+         enddo
       endif
       !
       ier=vgd_get(vgd,'RFLD - reference field name',value=nomvar)
@@ -256,7 +218,8 @@ module mod_comp_pres
          endif
          pres=pres/100.
          ! The following is to make sure PX at surface is the same as P0
-         pres(:,:,size(pres,3))=work
+         call convip(ip1_list(size(ip1_list)),ppp,kind,-1,dummy_S,.false.)
+         if(ppp.eq.1.)pres(:,:,size(pres,3))=work
          do k=1,size(pres,3)
             ier=fstecr(pres(1,1,k),dummy,-record%nbits,F_luo,record%dateo,record%deet,record%npas, &
                  record%ni,record%nj,record%nk,ip1_list(k),record%ip2,record%ip3, &
@@ -281,8 +244,8 @@ end module mod_comp_pres
 !========================================================================
 program compute_pressure
    !
-   use mod_comp_pres, only: rpn, my_fstprm,get_pres_by_nomvar, &
-        get_pres_by_group,COMP_PRES_ERROR,verbose_L
+   use mod_comp_pres, only: rpn, my_fstprm,get_pres_by_group, &
+        COMP_PRES_ERROR,verbose_L
    !
    implicit none
    !
@@ -292,7 +255,7 @@ program compute_pressure
    integer :: fnom,fstouv,fstfrm,fstinf,key,fstluk,fstinl,fstprm,fstecr,nvars
    character(len=256), dimension(ncle) :: cle,val,def
    character(len=10) :: my_var
-   character(len=12), parameter :: version='v_2.0.0'
+   character(len=12), parameter :: version='v_2.1.0'
    !
    cle=(/'s.      ','d.      ','samefile','var    ','verbose'/)
    val=(/'undef   ','undef   ','NO      ','undef  ','NO     '/)
@@ -341,42 +304,11 @@ program compute_pressure
       call exit(1)
    endif
    !
-   select case (trim(my_var))
-      !
-   case ( 'THERMO' , 'MOMENTUM' , 'ALL_LEVELS' )
-      !
-      stat=get_pres_by_group(lui,luo,my_var)      
-      if(stat.eq.COMP_PRES_ERROR)then
-         print*,'Error with get_pres_by_group for ',trim(my_var)
-         call exit(1)
-      endif
-      !
-   case ( 'undef')
-      !
-      stat=get_pres_by_nomvar(lui,luo,'TT  ')
-      if(stat.eq.COMP_PRES_ERROR)then
-         print*,'Error with get_pres_by_nomvar for TT, trying VT'
-         stat=get_pres_by_nomvar(lui,luo,'VT  ')
-         if(stat.eq.COMP_PRES_ERROR)then
-            print*,'Error with get_pres_by_nomvar for VT'
-            call exit(1)
-         endif
-      endif
-      stat=get_pres_by_nomvar(lui,luo,'UU  ')
-      if(stat.eq.COMP_PRES_ERROR)then
-         print*,'Error with get_pres_by_nomvar for UU'
-         call exit(1)
-      endif
-      !
-   case default
-      !
-      stat=get_pres_by_nomvar(lui,luo,my_var)
-      if(stat.eq.COMP_PRES_ERROR)then
-         print*,'Error with get_pres_by_nomvar for ',my_var
-         call exit(1)
-      endif
-      !
-   end select
+   stat=get_pres_by_group(lui,luo,my_var)      
+   if(stat.eq.COMP_PRES_ERROR)then
+      print*,'Error with get_pres_by_group for ',trim(my_var)
+      call exit(1)
+   endif
    !
    stat=fstfrm(lui)
    stat=fstfrm(luo)

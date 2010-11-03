@@ -56,6 +56,7 @@ EOF
       fi
    fi
 fi
+
 #===========================================================================
 #===========================================================================
 #===========================================================================
@@ -75,7 +76,7 @@ if [ ${add_toctoc_and_compute_pressure} = oui ];then
          exit
       fi
       rm -f $TMPDIR/px
-      compute_pressure -s data/${ITEM} -d $TMPDIR/px -var ALL_LEVELS
+      ./compute_pressure -s data/${ITEM} -d $TMPDIR/px -var MOMENTUM
       STATUS=$(fstcomp -ne -a $TMPDIR/px -b data/${ITEM} | grep PX | awk '{if($7 > 6.e-6)print "NOTOK"}')
       if [ "${STATUS}" = 'NOTOK' ];then
          echo "TEST compute_pressure with ${ITEM} FAILED"
