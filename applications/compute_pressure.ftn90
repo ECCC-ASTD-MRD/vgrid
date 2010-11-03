@@ -219,7 +219,7 @@ module mod_comp_pres
          pres=pres/100.
          ! The following is to make sure PX at surface is the same as P0
          call convip(ip1_list(size(ip1_list)),ppp,kind,-1,dummy_S,.false.)
-         if(ppp.eq.1.)pres(:,:,size(pres,3))=work
+         if(abs(ppp-1.) <= epsilon(ppp))pres(:,:,size(pres,3))=work
          do k=1,size(pres,3)
             ier=fstecr(pres(1,1,k),dummy,-record%nbits,F_luo,record%dateo,record%deet,record%npas, &
                  record%ni,record%nj,record%nk,ip1_list(k),record%ip2,record%ip3, &
