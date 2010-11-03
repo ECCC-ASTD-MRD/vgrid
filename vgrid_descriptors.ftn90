@@ -1822,6 +1822,7 @@ contains
     endif
 
     ! Compute levels for known vertical coordinates
+    print*,'Vcode = ',self%vcode
     select case (self%vcode)
     case (1001)
        istat = compute_pressure_1001(self,sfc_field,ip1_list,levels,my_in_log)
