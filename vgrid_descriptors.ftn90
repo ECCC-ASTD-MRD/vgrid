@@ -3,6 +3,8 @@ module vGrid_Descriptors
   implicit none
   private
 
+  ! Note : all pressure is hydrostatic
+
   ! Public methods
   public :: vgrid_descriptor                    !vertical grid descriptor structure
   public :: vgd_new                             !class constructor
@@ -11,6 +13,7 @@ module vGrid_Descriptors
   public :: vgd_print                           !dump plain-text contents of instance
   public :: vgd_write                           !write coordinates to a file
   public :: vgd_levels                          !compute physical level information
+  public :: vgd_dpidpis                         !compute pressure derivative with respesct the sfc pressure
 
   ! Public class variables
   integer, parameter, public :: VGD_LEN_NAME=8  !maximum length of a variable name in the data file
@@ -120,6 +123,10 @@ module vGrid_Descriptors
      module procedure levels_readref
      module procedure levels_withref
      module procedure levels_withref_prof
+  end interface
+
+  interface vgd_dpidpis
+     module procedure dpidpis_withref_prof
   end interface
 
   interface size_ok
@@ -1731,7 +1738,27 @@ contains
     return
   end function levels_readref
 
-  integer function levels_withref_prof(self,ip1_list,levels,sfc_field,in_log,dpidpis) result(status)
+  integer function levels_withref_prof(self,ip1_list,levels,sfc_field,in_log) result(status)
+     type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
+     integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
+     real, dimension(:), pointer :: levels                       !Physical level values
+     real, optional, intent(in) :: sfc_field                     !Surface field reference for coordinate [none]
+     logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]          
+
+     status = diag_withref_prof(self,ip1_list,levels,sfc_field,in_log)
+
+  end function levels_withref_prof
+
+  integer function dpidpis_withref_prof(self,ip1_list,dpidpis,sfc_field) result(status)
+     type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
+     integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
+     real, dimension(:), pointer :: dpidpis                      !Derivative values
+     real, optional, intent(in) :: sfc_field                     !Surface field reference for coordinate [none]
+     status = diag_withref_prof(self,ip1_list,dpidpis,sfc_field,dpidpis=.true.)
+
+  end function dpidpis_withref_prof
+
+  integer function diag_withref_prof(self,ip1_list,levels,sfc_field,in_log,dpidpis) result(status)
      ! profile wraper for levels_withref
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
@@ -1753,14 +1780,14 @@ contains
 
      allocate(sfc_field_2d(1,1),levels_3d(1,1,nk),stat=error)
      if (error /= 0) then
-        write(STDERR,*) 'ERROR: cannot allocate space for p0/levels in levels_withref_prof'
+        write(STDERR,*) 'ERROR: cannot allocate space for p0/levels in diag_withref_prof'
         return
      endif
      sfc_field_2d=sfc_field
      ! Wrap call to level calculator    
      error = levels_withref(self,sfc_field=sfc_field_2d,ip1_list=ip1_list,levels=levels_3d,in_log=in_log,dpidpis=dpidpis)    
      if (error /= 0) then
-        write(STDERR,*) 'ERROR: problem with levels_withref in levels_withref_prof'
+        write(STDERR,*) 'ERROR: problem with levels_withref in diag_withref_prof'
         return
      endif
      if (associated(levels)) then
@@ -1771,7 +1798,7 @@ contains
      endif
      allocate(levels(nk),stat=error)
      if (error /= 0) then
-        write(STDERR,*) 'ERROR: cannot allocate space for levels in levels_withref_prof'
+        write(STDERR,*) 'ERROR: cannot allocate space for levels in diag_withref_prof'
         return
      endif
      levels=levels_3d(1,1,1:nk)
@@ -1780,7 +1807,7 @@ contains
      status = VGD_OK
      return
 
-  end function levels_withref_prof
+  end function diag_withref_prof
 
   integer function levels_withref(self,ip1_list,levels,sfc_field,in_log,dpidpis) result(status)
     ! Given referent, compute physical levelling information from the vertical description
