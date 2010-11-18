@@ -1,20 +1,20 @@
 program tests
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_levels,VGD_OK
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_dpidpis,VGD_OK
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  integer :: stat,lu=0,ni,nj,fnom,fstouv,fstfrm,fclos,fstlir,fstinf,k,lutxt=69,ip1,ip2
-  integer, parameter :: i0=20,j0=10,nk=5
+  integer :: stat,lu=0,ni,nj,nk,fnom,fstouv,fstfrm,fclos,fstlir,fstinf,k,lutxt=69,ip1,ip2
+  integer, parameter :: i0=20,j0=10
   integer, dimension(:), pointer :: ip1_list
-  real, dimension(:), pointer :: pres_profil
-  real :: epsilon=0.01
+  real, dimension(:), pointer :: dpidpis_profil
+  real :: epsilon=1.e-5
   real, dimension(:,:), allocatable :: p0,px
-  real, dimension(:,:,:), pointer :: lev
-  real :: local_pres
+  real :: local_pres,w1
   type(vgrid_descriptor) :: d
   logical :: ok
-
+  real*8, dimension(:), pointer :: coef_b
+  
   stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
@@ -29,41 +29,43 @@ program tests
   read(lutxt,*) ip1,ip2
   close(lutxt)
 
-  ! Get physical levelling information
+  ! Get dpidpis
   stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
-  
+
+  stat = vgd_get(d,key='CB_T - vertical B coefficient (t)',value=coef_b)
+
+  stat = vgd_get(d,key='VIPT - level ip1 list (t)'        ,value=ip1_list)
+
   stat = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',"UU")
 
-  allocate(p0(ni,nj),ip1_list(5),px(ni,nj))
-
-  ip1_list=(/95310597,95339472,95358406,95368356,93423264/)
+  allocate(p0(ni,nj),px(ni,nj))
 
   stat = fstlir(p0,lu,ni,nj,nk,-1,'',-1,-1,-1,'','P0')
   p0 = p0*100. !mb to Pa
   
-  local_pres=p0(i0,j0)  
+  local_pres=p0(i0,j0)
 
-  stat = vgd_levels(d,sfc_field=local_pres,ip1_list=ip1_list,levels=pres_profil,dpidpis=.true.)
+  stat = vgd_dpidpis(d,sfc_field=local_pres,ip1_list=ip1_list,dpidpis=dpidpis_profil)
   if(stat.ne.VGD_OK)then
-     print*,'ERROR: problem with vgd_levels'
+     print*,'ERROR: problem with vgd_dpidpis'
      stat=fstfrm(lu)
      call abort
   endif
 
-  pres_profil=pres_profil*.01
-  print*,'size(pres_profil)',size(pres_profil)
+  print*,'size(dpidpis_profil)',size(dpidpis_profil)
 
   OK=.true.
-  do k=1,nk
+  do k=1,size(coef_b)
      stat = fstlir(px,lu,ni,nj,nk,-1,'',ip1_list(k),-1,-1,'','PX')
-     print*,px(i0,j0),pres_profil(k)
-     if(abs(pres_profil(k)-(px(i0,j0)/p0(i0,j0)))>epsilon)then
+     w1=coef_b(k)*px(i0,j0)*100./p0(i0,j0)
+     print*,w1,dpidpis_profil(k)
+     if(abs(dpidpis_profil(k)- w1)/w1>epsilon)then
         print*,'OUPS'
         OK=.false.
      endif
   enddo
 
-  call ut_report(ok,message='Grid_Descriptors::vgd_levels level calculation status')
+  call ut_report(ok,message='Grid_Descriptors::vgd_dpidpis level calculation status')
 
   stat=fstfrm(lu)
 
