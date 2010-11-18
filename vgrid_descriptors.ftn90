@@ -1448,6 +1448,7 @@ contains
     write(my_stdout,*) '  ip1=',self%ip1
     write(my_stdout,*) '  ip2=',self%ip2
     write(my_stdout,*) trim(hr)
+    write(my_stdout,*) 'Vcode=',self%vcode
 
     ! Dump vertical descriptor information
     have_descriptor: if (found_descriptor(self)) then
@@ -1730,13 +1731,15 @@ contains
     return
   end function levels_readref
 
-  integer function levels_withref_prof(self,ip1_list,levels,sfc_field,in_log) result(status)
+  integer function levels_withref_prof(self,ip1_list,levels,sfc_field,in_log,dpidpis) result(status)
      ! profile wraper for levels_withref
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
      real, dimension(:), pointer :: levels                       !Physical level values
      real, optional, intent(in) :: sfc_field                     !Surface field reference for coordinate [none]
      logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]          
+     logical, optional, intent(in) :: dpidpis                    !Compute partial derivative of hydrostatic pressure (pi) with
+                                                                 !   respect to surface hydrostatic pressure(pis)
      
      ! Local variables
      integer :: error,nk
@@ -1755,7 +1758,7 @@ contains
      endif
      sfc_field_2d=sfc_field
      ! Wrap call to level calculator    
-     error = levels_withref(self,sfc_field=sfc_field_2d,ip1_list=ip1_list,levels=levels_3d,in_log=in_log)    
+     error = levels_withref(self,sfc_field=sfc_field_2d,ip1_list=ip1_list,levels=levels_3d,in_log=in_log,dpidpis=dpidpis)    
      if (error /= 0) then
         write(STDERR,*) 'ERROR: problem with levels_withref in levels_withref_prof'
         return
@@ -1779,17 +1782,20 @@ contains
 
   end function levels_withref_prof
 
-  integer function levels_withref(self,ip1_list,levels,sfc_field,in_log) result(status)
+  integer function levels_withref(self,ip1_list,levels,sfc_field,in_log,dpidpis) result(status)
     ! Given referent, compute physical levelling information from the vertical description
     type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
     integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
     real, dimension(:,:,:), pointer :: levels                   !Physical level values
     real, dimension(:,:), optional, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
     logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]
+    logical, optional, intent(in) :: dpidpis                    !Compute partial derivative of hydrostatic pressure (pi) with
+                                                                !   respect to surface hydrostatic pressure(pis)
+
    
     ! Local variables
     integer kind,version,istat,ni,nj,nk,error
-    logical :: my_in_log
+    logical :: my_in_log, my_dpidpis
 
     ! Set error status
     status = VGD_ERROR
@@ -1797,6 +1803,8 @@ contains
     ! Set default values
     my_in_log = .false.
     if (present(in_log)) my_in_log = in_log
+    my_dpidpis = .false.
+    if (present(dpidpis)) my_dpidpis = dpidpis
     
     ! Set size of output and allocate space
     if (present(sfc_field)) then
@@ -1825,22 +1833,42 @@ contains
     print*,'Vcode = ',self%vcode
     select case (self%vcode)
     case (1001)
+       if(my_dpidpis)then
+          write(STDERR,*) 'ERROR: dpidpis not implemented for vertical coordinate 1001'
+          return 
+       endif
        istat = compute_pressure_1001(self,sfc_field,ip1_list,levels,my_in_log)
     case (1002)
+       if(my_dpidpis)then
+          write(STDERR,*) 'ERROR: dpidpis not implemented for vertical coordinate 1002'
+          return 
+       endif
        istat = compute_pressure_1002(self,sfc_field,ip1_list,levels,my_in_log)
     case (2001)
+       if(my_dpidpis)then
+          write(STDERR,*) 'ERROR: dpidpis not implemented for vertical coordinate 2001'
+          return 
+       endif
        istat = compute_pressure_2001(self,ip1_list,levels,my_in_log)
     case (1003,5001)
+       if(my_dpidpis)then
+          write(STDERR,*) 'ERROR: dpidpis not implemented for vertical coordinate 1003 or 5001'
+          return 
+       endif
        istat = compute_pressure_5001(self,sfc_field,ip1_list,levels,my_in_log)
     case (5002)
-       istat = compute_pressure_5002(self,sfc_field,ip1_list,levels,my_in_log)
+       istat = compute_pressure_5002(self,sfc_field,ip1_list,levels,my_in_log,my_dpidpis)
     case DEFAULT
        istat = get_version_info(self,kind,version)
        write(STDERR,*) 'ERROR: kind or version invalid :',kind,version
        return 
     end select
     if (istat /= VGD_OK) then
-       write(STDERR,*) 'ERROR: error computing pressure in levels_withref'
+       if(my_dpidpis)then
+          write(STDERR,*) 'ERROR: error computing dpidpis in levels_withref'
+       else
+          write(STDERR,*) 'ERROR: error computing pressure in levels_withref'
+       endif
        return
     endif
 
@@ -3004,13 +3032,15 @@ contains
     return
  end function compute_pressure_5001
 
-  integer function compute_pressure_5002(self,sfc_field,ip1_list,levels,in_log) result(status)
+  integer function compute_pressure_5002(self,sfc_field,ip1_list,levels,in_log,dpidpis) result(status)
     ! Compute pressure for all levels specified in ip1_list
     type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
     real, dimension(:,:), intent(in) :: sfc_field       !Surface field reference for coordinate
     integer, dimension(:), intent(in) :: ip1_list       !List of IP1 levels to calculate on
     real, dimension(:,:,:), pointer  :: levels          !Physical level values
     logical, intent(in) :: in_log                       !Compute level values in ln()
+    logical, intent(in) :: dpidpis                      !Compute partial derivative of hydrostatic pressure (pi) with
+                                                        !   respect to surface hydrostatic pressure(pis)
 
     ! Internal variables
     integer :: i,j,error,nk
@@ -3057,6 +3087,16 @@ contains
        levels(:,:,i) = aa_8(i) + bb_8(i)*s_8
     enddo
     if (.not.in_log) levels = exp(levels)
+    if(dpidpis)then
+       if(in_log)then
+          write(STDERR,*) 'ERROR: in compute_pressure_5002, cannot get dpidpis in log'
+          return
+       endif
+       do i=1,nk
+          levels(:,:,i) = bb_8(i)*levels(:,:,i)/sfc_field
+       enddo
+    endif
+
 
     ! Set status and return
     status = VGD_OK

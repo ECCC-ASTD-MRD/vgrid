@@ -65,7 +65,7 @@ module mod_comp_pres
    integer function get_pres_by_group(F_lui,F_luo,F_group) result(status)
       !
       use vGrid_Descriptors, only: vgd_new,vgd_levels,vgd_get, &
-           vgrid_descriptor,vgd_print,VGD_OK
+           vgrid_descriptor,vgd_print,vgd_write,VGD_OK
       !
       implicit none
       !    
@@ -180,6 +180,7 @@ module mod_comp_pres
             return
          endif
          !
+         ier=vgd_write(vgd,F_luo,'fst')
          if(record%ni.ne.ni.or. &
             record%nj.ne.nj.or. &
             record%nk.ne.nk)then
