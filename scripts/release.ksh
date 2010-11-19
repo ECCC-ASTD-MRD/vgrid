@@ -112,7 +112,7 @@ make distclean
 touch .buildstamp
 sleep 1 #make sure that the timestamp of the generated files is newer
 make all
-install --backup -t ${dest_dir}/bin/${BASE_ARCH} $(find . -newer .buildstamp -executable -type f)
+install --backup -t ${dest_dir}/bin/${BASE_ARCH} $(find . -newer .buildstamp -perm -u+x -type f -print)
 install --backup -t ${dest_dir}/include/${EC_ARCH} $(find . -name "*.mod")
 cd ${OLDPWD}
 

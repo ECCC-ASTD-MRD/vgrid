@@ -4,7 +4,7 @@ DEBUG_FLAGS='=-C -g'
 RCOMPILE = r.compile
 RELEASE_SCR = ./scripts/release.ksh
 COMPILERS_AIX = xlf10 Xlf12
-COMPILERS_LINUX = pgi6xx pgi9xx #svn_tag
+COMPILERS_LINUX = pgi9xx svn_tag
 COMPILERS_LINUX64 = pgi9xx
 VERSION = 
 
