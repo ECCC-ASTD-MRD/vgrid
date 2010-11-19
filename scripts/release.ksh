@@ -31,7 +31,7 @@ if [ ${COMPILER} = svn_tag ];then
 
    svn copy ${dest_svn_url}/trunk \
             ${dest_svn_url}/tags/release-${VERSION} \
-      -m "Tagging the VERSION release of the vcoord project"
+      -m "Tagging the ${VERSION} release of the vcoord project"
    
    if [ ${?} != 0 ];then
       echo "There is a problem in making the thag version ${dest_svn_url}/tags/release-${VERSION}"
@@ -81,7 +81,7 @@ set -e
 dest_dir=${dest_path}/${VERSION}
 mkdir -p ${dest_dir}
 cd ${dest_dir}
-s.set_dir_struct --bin --lib --include --share
+s.set_dir_struct --bin --lib --include
 cd ${OLDPWD}
 
 #==============================================================================
@@ -89,32 +89,23 @@ cd ${OLDPWD}
 
 make clean
 make all DEBUG_FLAGS=
-tmplib=.libdescrip.a
-ar cru ${tmplib} *.o
-install --backup -T ${tmplib} ${dest_dir}/lib/${EC_ARCH}/libdescrip.a
-rm -f ${tmplib}
 ar cru ${dest_dir}/lib/${EC_ARCH}/libdescrip.a *.o
-install --backup -t ${dest_dir}/include/${EC_ARCH} *.mod
-cat >${dest_dir}/share/README <<EOF
-  Release date: $(date)
-  Version ${VERSION} built on ${EC_ARCH} using ${COMPILER}
-  
-  Acquired with . r.ssmuse.dot ${COMPILER} 
-
-  To get code, type:
-  svn co ${dest_svn_url}/tags/release-${VERSION}
-EOF
+cp *.mod ${dest_dir}/include/${EC_ARCH}
 
 #==============================================================================
 # Build and install applications
-cd applications
-make distclean
-touch .buildstamp
-sleep 1 #make sure that the timestamp of the generated files is newer
-make all
-install --backup -t ${dest_dir}/bin/${BASE_ARCH} $(find . -newer .buildstamp -perm -u+x -type f -print)
-install --backup -t ${dest_dir}/include/${EC_ARCH} $(find . -name "*.mod")
-cd ${OLDPWD}
+if [[ $(find ${dest_dir}/bin/${BASE_ARCH} -type f | wc -l) -eq 0 ]] ; then
+  cd applications
+  make distclean
+  touch .buildstamp
+  sleep 1 #make sure that the timestamp of the generated files is newer
+  make all
+  for file in $(find . -newer .buildstamp -perm -u+x -type f -print); do
+    cp $file ${dest_dir}/bin/${BASE_ARCH}
+  done
+  cp *.mod ${dest_dir}/include/${EC_ARCH}
+  cd ${OLDPWD}
+fi
 
 #==============================================================================
 # Temporary support for old architecture names
