@@ -72,27 +72,30 @@ case $(uname) in
 esac
 
 set +e
-. r.ssmuse.dot ${COMPILER}
+. s.ssmuse.dot ${COMPILER} rmnlib-dev
 set -e
 
 #==============================================================================
-# Check for version already there and add code in tags
+# Create release tree
 
-dest_dir=${dest_path}/${VERSION}/${EC_ARCH}
-
-if [ -d ${dest_dir} ];then
-   echo "Looks like version already exist at ${dest_dir}, remove it or increase version number"
-   exit 1
-fi
+dest_dir=${dest_path}/${VERSION}
+mkdir -p ${dest_dir}
+cd ${dest_dir}
+s.set_dir_struct --bin --lib --include --share
+cd ${OLDPWD}
 
 #==============================================================================
+# Build and install library
 
 make clean
 make all DEBUG_FLAGS=
-mkdir -p ${dest_dir}/mod
-ar cru ${dest_dir}/libdescrip.a *.o
-cp *.mod ${dest_dir}/mod
-cat >${dest_dir}/README <<EOF
+tmplib=.libdescrip.a
+ar cru ${tmplib} *.o
+install --backup -T ${tmplib} ${dest_dir}/lib/${EC_ARCH}/libdescrip.a
+rm -f ${tmplib}
+ar cru ${dest_dir}/lib/${EC_ARCH}/libdescrip.a *.o
+install --backup -t ${dest_dir}/include/${EC_ARCH} *.mod
+cat >${dest_dir}/share/README <<EOF
   Release date: $(date)
   Version ${VERSION} built on ${EC_ARCH} using ${COMPILER}
   
@@ -103,7 +106,19 @@ cat >${dest_dir}/README <<EOF
 EOF
 
 #==============================================================================
+# Build and install applications
+cd applications
+make distclean
+touch .buildstamp
+sleep 1 #make sure that the timestamp of the generated files is newer
+make all
+install --backup -t ${dest_dir}/bin/${BASE_ARCH} $(find . -newer .buildstamp -perm -u+x -type f -print)
+install --backup -t ${dest_dir}/include/${EC_ARCH} $(find . -name "*.mod")
+cd ${OLDPWD}
+
+#==============================================================================
 # Temporary support for old architecture names
+
 . s.old-arch.dot
 #ln -sf ${dest_dir} ${dest_path}/${VERSION}/${EC_ARCH}
 
