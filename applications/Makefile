@@ -17,13 +17,13 @@ OBJECTS = $(DESCRIP_PATH)vgrid_descriptors.o $(DESCRIP_PATH)vgrid_genab_5002.o $
 all: compute_pressure convert_toctoc_5002 add_toctoc print_toctoc
 
 convert_toctoc_5002: convert_toctoc_5002.ftn90 $(OBJECTS)
-	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90  -o r.$@ -librmn $(RMN)
+	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90  -o $@ -librmn $(RMN)
 
 print_toctoc: print_toctoc.ftn90 $(OBJECTS)
-	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90 -o r.$@ -librmn $(RMN)
+	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90 -o $@ -librmn $(RMN)
 
 add_toctoc: add_toctoc.ftn90 $(OBJECTS)
-	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90 -o r.$@ -librmn $(RMN)
+	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90 -o $@ -librmn $(RMN)
 
 compute_pressure: compute_pressure.ftn90 $(OBJECTS)
 	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90 -o $@ -librmn $(RMN)
@@ -40,5 +40,5 @@ clean:
 	rm -f *.f90 *.o *.mod test_output.fst
 
 distclean: clean
-	rm -f compute_pressure print_toctoc convert_toctoc_5002
+	rm -f print_toctoc add_toctoc compute_pressure print_toctoc convert_toctoc_5002 
 
