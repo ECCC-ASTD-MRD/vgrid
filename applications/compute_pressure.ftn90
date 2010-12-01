@@ -258,9 +258,9 @@ program compute_pressure
    character(len=10) :: my_var
    character(len=12), parameter :: version='v_2.1.0'
    !
-   cle=(/'s.      ','d.      ','samefile','var    ','verbose'/)
-   val=(/'undef   ','undef   ','NO      ','undef  ','NO     '/)
-   def=(/'undef   ','undef   ','YES     ','undef  ','YES    '/)
+   cle=(/'s.      ','d.      ','samefile','var     ','verbose '/)
+   val=(/'undef   ','undef   ','NO      ','undef   ','NO      '/)
+   def=(/'undef   ','undef   ','YES     ','undef   ','YES     '/)
    !
    stat=exdb('compute_pressure',version,'NON')
    !
