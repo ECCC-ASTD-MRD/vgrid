@@ -245,15 +245,7 @@ contains
                      write(STDERR,*) 'ERROR: problem with my_fstprm in new_read'
                      self%vcode = -1
                      return
-                  endif
-                  ! The following was making the package from LAM where toc from DYN and PHY are in the dame file.
-                  ! These toc are the same but do not have the same IPs due to the different horizontal grids.
-                  !if(var%ip1 /= self%ip1 .or. var%ip2 /= self%ip2 .or. &
-                  !     var%ni  /= ni     .or. var%nj  /= nj     .or.  var%nk  /= nk )then
-                  !   write(STDERR,*) 'ERROR: found different vertical descriptors after wildcard (-1) search'
-                  !   self%vcode = -1
-                  !   return
-                  !endif                  
+                  endif              
                   istat=fstluk(l_table,keyList(i),nii,njj,nkk)
                   if(istat < 0)then
                      write(STDERR,*) 'ERROR: problem with fstluk on l_table i=',i
