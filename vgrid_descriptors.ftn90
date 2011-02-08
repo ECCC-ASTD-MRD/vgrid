@@ -1877,7 +1877,6 @@ contains
     endif
 
     ! Compute levels for known vertical coordinates
-    print*,'Vcode = ',self%vcode
     select case (self%vcode)
     case (1001)
        if(my_dpidpis)then
