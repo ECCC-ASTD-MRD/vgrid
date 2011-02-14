@@ -486,34 +486,6 @@ contains
             missingInput = .true.
          endif
       endif      
-      if (is_valid(self,a_m_8_valid)) then
-         if(present(a_m_8))then
-            if (associated(self%a_m_8)) deallocate(self%a_m_8)
-            allocate(self%a_m_8(size(a_m_8)),stat=error)
-            if(error < 0)then
-               write(STDERR,*) 'ERROR: problem allocating a_m_8 in new_build_vert'
-               return
-            endif
-            self%a_m_8 = a_m_8
-         else
-            write(STDERR,*) 'ERROR: a_m_8 is a required constructor entry'
-            missingInput = .true.
-         endif
-      endif
-      if (is_valid(self,b_m_8_valid)) then
-         if(present(b_m_8))then
-            if (associated(self%b_m_8)) deallocate(self%b_m_8)
-            allocate(self%b_m_8(size(b_m_8)),stat=error)
-            if(error < 0)then
-               write(STDERR,*) 'ERROR: problem allocating b_m_8 in new_build_vert'
-               return
-            endif
-            self%b_m_8 = b_m_8
-         else
-            write(STDERR,*) 'ERROR: b_m_8 is a required constructor entry'
-            missingInput = .true.
-         endif
-      endif
       if (missingInput) return
 
       ! Fill table with version-specific encoder
@@ -557,7 +529,7 @@ contains
       real*8, optional, intent(in) :: ptop_8            !Top-level pressure (Pa)
       real*8, optional, intent(in) :: pref_8            !Reference-level pressure (Pa)
       integer, optional, intent(in) :: ip1,ip2          !IP1,2 values for FST file record [0,0]
-      integer, intent(in), optional :: stdout_unit      !Unit number for verbose output [STDERR]
+      integer, optional, intent(in) :: stdout_unit      !Unit number for verbose output [STDERR]
 
       ! Internal variables
       integer :: myip1,myip2,mystdout_unit,error
@@ -695,7 +667,7 @@ contains
       status = VGD_OK
       return
    end function new_gen
-
+ 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Get methods
 
@@ -1745,8 +1717,22 @@ contains
      real, optional, intent(in) :: sfc_field                     !Surface field reference for coordinate [none]
      logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]          
 
-     status = diag_withref_prof(self,ip1_list,levels,sfc_field,in_log)
+     ! Local variables
+     real :: my_sfc_field
+     logical :: my_in_log
 
+     ! Set return value
+     status = VGD_ERROR
+
+     ! Set default values
+     my_sfc_field = VGD_MISSING
+     if (present(sfc_field)) my_sfc_field = sfc_field
+     my_in_log = .false.
+     if (present(in_log)) my_in_log = in_log
+
+     ! Wrap call to level calculation
+     status = diag_withref_prof(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log)
+     return
   end function levels_withref_prof
 
   integer function dpidpis_withref_prof(self,ip1_list,dpidpis,sfc_field) result(status)
@@ -1754,8 +1740,20 @@ contains
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
      real, dimension(:), pointer :: dpidpis                      !Derivative values
      real, optional, intent(in) :: sfc_field                     !Surface field reference for coordinate [none]
-     status = diag_withref_prof(self,ip1_list,dpidpis,sfc_field,dpidpis=.true.)
 
+     ! Local variables
+     real :: my_sfc_field
+
+     ! Set return value
+     status = VGD_ERROR
+
+     ! Set default values
+     my_sfc_field = VGD_MISSING
+     if (present(sfc_field)) my_sfc_field = sfc_field
+
+     ! Wrap call to level calculation
+     status = diag_withref_prof(self,ip1_list,dpidpis,sfc_field=my_sfc_field,dpidpis=.true.)
+     return
   end function dpidpis_withref_prof
 
   integer function diag_withref_prof(self,ip1_list,levels,sfc_field,in_log,dpidpis) result(status)
@@ -1765,15 +1763,25 @@ contains
      real, optional, intent(in) :: sfc_field                     !Surface field reference for coordinate [none]
      logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]          
      logical, optional, intent(in) :: dpidpis                    !Compute partial derivative of hydrostatic pressure (pi) with
-                                                                 !   respect to surface hydrostatic pressure(pis)
+                                                                 !   respect to surface hydrostatic pressure(pis) [.false.]
      
      ! Local variables
      integer :: error,nk
+     real :: my_sfc_field
      real, dimension(:,:), pointer :: sfc_field_2d
      real, dimension(:,:,:), pointer :: levels_3d
-     
+     logical :: my_in_log,my_dpidpis
+
      ! Set error status
      status = VGD_ERROR
+
+     ! Set default values
+     my_sfc_field = VGD_MISSING
+     if (present(sfc_field)) my_sfc_field = sfc_field
+     my_in_log = .false.
+     if (present(in_log)) my_in_log = in_log
+     my_dpidpis = .false.
+     if (present(dpidpis)) my_dpidpis = dpidpis
 
      nk=size(ip1_list)
 
@@ -1782,9 +1790,9 @@ contains
         write(STDERR,*) 'ERROR: cannot allocate space for p0/levels in diag_withref_prof'
         return
      endif
-     sfc_field_2d=sfc_field
+     sfc_field_2d=my_sfc_field
      ! Wrap call to level calculator    
-     error = diag_withref(self,sfc_field=sfc_field_2d,ip1_list=ip1_list,levels=levels_3d,in_log=in_log,dpidpis=dpidpis)    
+     error = diag_withref(self,sfc_field=sfc_field_2d,ip1_list=ip1_list,levels=levels_3d,in_log=my_in_log,dpidpis=my_dpidpis)    
      if (error /= 0) then
         write(STDERR,*) 'ERROR: problem with diag_withref in diag_withref_prof'
         return
@@ -1809,26 +1817,80 @@ contains
   end function diag_withref_prof
 
   integer function levels_withref(self,ip1_list,levels,sfc_field,in_log) result(status)
-    ! Given referent, compute physical levelling information from the vertical description
-    type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
-    integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
-    real, dimension(:,:,:), pointer :: levels                   !Physical level values
-    real, dimension(:,:), optional, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
-    logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]
+     ! Given referent, compute physical levelling information from the vertical description
+     type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
+     integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
+     real, dimension(:,:,:), pointer :: levels                   !Physical level values
+     real, dimension(:,:), optional, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
+     logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]
 
-    status=diag_withref(self,ip1_list,levels,sfc_field,in_log)
+     ! Local variables
+     integer :: error,ni,nj
+     real, dimension(:,:), allocatable :: my_sfc_field
+     logical :: my_in_log
 
- end function levels_withref
+     ! Set return value
+     status = VGD_ERROR
 
- integer function dpidpis_withref(self,ip1_list,dpidpis,sfc_field) result(status)
-    ! Given referent, compute physical levelling information from the vertical description
-    type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
-    integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
-    real, dimension(:,:,:), pointer :: dpidpis                  !pressure derivative with respect to sfc pressure
-    real, dimension(:,:), optional, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
-    status=diag_withref(self,ip1_list,dpidpis,sfc_field,dpidpis=.true.)
+     ! Set default values
+     if (present(sfc_field)) then
+        ni = size(sfc_field,dim=1); nj = size(sfc_field,dim=2)
+     else
+        ni = 1; nj = 1
+     endif
+     allocate(my_sfc_field(ni,nj),stat=error)
+     if (error /= 0) then
+        write(STDERR,*) 'ERROR: cannot allocate space for sfc_field in levels_withref'
+        return
+     endif
+     if (present(sfc_field)) then
+        my_sfc_field = sfc_field
+     else
+        my_sfc_field = VGD_MISSING
+     endif
+     my_in_log = .false.
+     if (present(in_log)) my_in_log = in_log
 
- end function dpidpis_withref
+     ! Wrap call to level calculator
+     status=diag_withref(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log)
+     return
+  end function levels_withref
+
+  integer function dpidpis_withref(self,ip1_list,dpidpis,sfc_field) result(status)
+     ! Given referent, compute physical levelling information from the vertical description
+     type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
+     integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
+     real, dimension(:,:,:), pointer :: dpidpis                  !pressure derivative with respect to sfc pressure
+     real, dimension(:,:), optional, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
+
+     ! Local variables 
+     integer :: error,ni,nj
+     real, dimension(:,:), allocatable :: my_sfc_field
+
+     ! Set return value
+     status = VGD_ERROR
+
+     ! Set default values
+     if (present(sfc_field)) then
+        ni = size(sfc_field,dim=1); nj = size(sfc_field,dim=2)
+     else
+        ni = 1; nj = 1
+     endif
+     allocate(my_sfc_field(ni,nj),stat=error)
+     if (error /= 0) then
+        write(STDERR,*) 'ERROR: cannot allocate space for sfc_field in levels_withref'
+        return
+     endif
+     if (present(sfc_field)) then
+        my_sfc_field = sfc_field
+     else
+        my_sfc_field = VGD_MISSING
+     endif
+
+     ! Wrap call to level calculator
+     status=diag_withref(self,ip1_list,dpidpis,sfc_field=my_sfc_field,dpidpis=.true.)
+     return
+  end function dpidpis_withref
 
  integer function diag_withref(self,ip1_list,levels,sfc_field,in_log,dpidpis) result(status)
     ! Given referent, compute physical levelling information from the vertical description
@@ -1838,7 +1900,7 @@ contains
     real, dimension(:,:), optional, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
     logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]
     logical, optional, intent(in) :: dpidpis                    !Compute partial derivative of hydrostatic pressure (pi) with
-                                                                !   respect to surface hydrostatic pressure(pis)
+                                                                !   respect to surface hydrostatic pressure(pis) [.false.]
    
     ! Local variables
     integer kind,version,istat,ni,nj,nk,error
