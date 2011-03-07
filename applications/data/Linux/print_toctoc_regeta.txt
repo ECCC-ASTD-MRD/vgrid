@@ -1,0 +1,1 @@
+./run_test_applications.ksh: line 102: ./print_toctoc: cannot execute binary file
