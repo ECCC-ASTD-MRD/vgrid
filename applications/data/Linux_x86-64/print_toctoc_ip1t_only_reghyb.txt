@@ -1,0 +1,10 @@
+WARNING: cannot find !! with the following: ip1=        -1,ip2=        -1
+Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)
+   Found        80 unique ip1 of kind  5 among the        163 records in file to construct the vertical descriptor
+  hybrid (un-normalized) coordinate found
+   More than one HY, checking consistency ...
+   All HY consistent.
+   Vertical descriptor successfully reconstructed
+ WARNING: attempt to retrieve invalid key VIPT - level ip1 list (t) returns VGD_MISSING
+ NOTE: Recomputing ptop in order to make it consistant with hyb top
+ ERROR with vgd_get onVIPT
