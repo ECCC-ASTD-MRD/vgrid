@@ -1,8 +1,10 @@
-convert_toctoc_5002=oui
+convert_toctoc_5002=non
 
-add_toctoc_and_compute_pressure=oui
+add_toctoc_and_compute_pressure=non
 
-#set -x
+print_toctoc=oui
+
+set -x
 
 #===========================================================================
 #===========================================================================
@@ -87,6 +89,43 @@ if [ ${add_toctoc_and_compute_pressure} = oui ];then
 
    done
 
+fi
+#===========================================================================
+#===========================================================================
+#===========================================================================
+if [ ${print_toctoc} = oui ];then
+   for ITEM in east.eta glbeta glbhyb regeta reghyb
+   do
+      ./print_toctoc -fst data/${ITEM} -no_box > to_erase.txt 2>&1
+      FILE=data/print_toctoc_${ITEM}.txt
+      diff to_erase.txt ${FILE}
+      if [ $? != 0 ];then
+         echo "ERROR 1: ./print_toctoc on data/${ITEM} do not mach with ${FILE}"
+	 echo "faire : xxdiff  to_erase.txt ${FILE}"
+	 exit
+      fi
+
+exit
+
+      ./print_toctoc -fst data/${ITEM} -ip1m_only > to_erase.txt 2>&1
+      FILE=data/print_toctoc_ip1m_only_${ITEM}.txt
+      diff to_erase.txt ${FILE}
+      if [ $? != 0 ];then
+         echo "ERROR 2: ./print_toctoc -ip1m_only on data/${ITEM} do not mach with ${FILE}"
+         echo "faire : xxdiff  to_erase.txt ${FILE}"
+         exit
+      fi
+      ./print_toctoc -fst data/${ITEM} -ip1t_only > to_erase.txt 2>&1
+      FILE=data/print_toctoc_ip1t_only_${ITEM}.txt
+      diff to_erase.txt ${FILE}
+      if [ $? != 1 ];then
+         echo "ERROR 3: ./print_toctoc -ip1t_only on data/${ITEM} do not mach with ${FILE}"
+         echo "faire : xxdiff  to_erase.txt ${FILE}"
+         #exit
+      fi
+      
+   done
+   rm -f to_erase.txt
 fi
 #===========================================================================
 #===========================================================================
