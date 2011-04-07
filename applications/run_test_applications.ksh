@@ -94,6 +94,8 @@ fi
 #===========================================================================
 #===========================================================================
 if [ ${print_toctoc} = oui ];then
+    
+
    for ITEM in east.eta glbeta glbhyb regeta reghyb
    do
       ./print_toctoc -fst data/${ITEM} -no_box > to_erase.txt 2>&1
@@ -106,7 +108,7 @@ if [ ${print_toctoc} = oui ];then
 	 exit
       fi
       ./print_toctoc -fst data/${ITEM} -ip1m_only > to_erase.txt 2>&1
-      FILE=data/print_toctoc_ip1m_only_${ITEM}.txt
+      FILE=data/${BASE_ARCH}/print_toctoc_ip1m_only_${ITEM}.txt
       #cp to_erase.txt ${FILE}
       diff -b to_erase.txt ${FILE}
       if [ $? != 0 ];then
@@ -115,7 +117,7 @@ if [ ${print_toctoc} = oui ];then
          exit
       fi
       ./print_toctoc -fst data/${ITEM} -ip1t_only > to_erase.txt 2>&1
-      FILE=data/print_toctoc_ip1t_only_${ITEM}.txt
+      FILE=data/${BASE_ARCH}/print_toctoc_ip1t_only_${ITEM}.txt
       #cp to_erase.txt ${FILE}
       diff -b to_erase.txt ${FILE}
       if [ $? != 0 ];then
