@@ -1,7 +1,7 @@
 program add_toctoc
    use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_write,vgd_print,VGD_ERROR
    implicit none
-   integer, parameter :: ncle=3,lui=10,nmax=1000
+   integer, parameter :: ncle=4,lui=10,nmax=1000
    integer, dimension(nmax) :: liste
    integer, dimension(2*nmax) :: key_to_erase
    integer :: npos,istat,fnom,fstouv,fstfrm,infon,fstprm,fstinl,fstluk,fstinf,fstecr,fsteff,ind_to_erase
@@ -17,7 +17,7 @@ program add_toctoc
 
    ! For fstprm
    integer :: ig1,ig2,ig3,ig4,dateo,deet,npas,datyp,nbits
-   integer :: ni,nj,nk,ni2,nj2,nk2,nit,njt,nkt,nkmod
+   integer :: ni,nj,nk,ni2,nj2,nk2,nit,njt,nkt,nkmod,kind
    integer :: ip1,ip2,ip3,swa,lng,dltf,ubc,extra1,extra2,extra3,datev
    character(len=1) :: grtyp
    character(len=2) :: typvar
@@ -26,9 +26,9 @@ program add_toctoc
 
    type(vgrid_descriptor) :: vgd
    
-   cle=(/'s.      ','d.      ','samefile'/)
-   val=(/'undef   ','undef   ','NO      '/)
-   def=(/'undef   ','undef   ','YES     '/)
+   cle=(/'s.      ','d.      ','kind    ','samefile'/)
+   val=(/'undef   ','undef   ','undef   ','NO      '/)
+   def=(/'undef   ','undef   ','undef   ','YES     '/)
 
    ind_to_erase=0
 
@@ -53,7 +53,13 @@ program add_toctoc
       stop
    endif
    
-   samefile_L=val(3).eq.'YES'
+   kind=-1
+   if(val(3).ne.'undef')then
+      read(val(3),*)kind
+      print*,'Note : only adding level descriptor for kind',kind
+   endif  
+
+   samefile_L=val(4).eq.'YES'
 
    !==========================================================================
    ! Open files
@@ -101,7 +107,7 @@ program add_toctoc
       endif 
    endif
 
-   istat=vgd_new(vgd,lui)
+   istat=vgd_new(vgd,lui,kind=kind)
    if(istat.eq.VGD_ERROR)then
       print*,'Error with vgd_new'
       call exit(1)

@@ -94,7 +94,6 @@ fi
 #===========================================================================
 #===========================================================================
 if [ ${print_toctoc} = oui ];then
-    
 
    for ITEM in east.eta glbeta glbhyb regeta reghyb
    do
@@ -124,7 +123,7 @@ if [ ${print_toctoc} = oui ];then
          echo "ERROR 3: ./print_toctoc -ip1t_only on data/${ITEM} do not mach with ${FILE}"
          echo "faire : xxdiff  to_erase.txt ${FILE}"
          exit
-      fi      
+      fi
    done
    rm -f to_erase.txt
 fi
