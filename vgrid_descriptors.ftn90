@@ -158,15 +158,16 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Class constructor
 
-   integer function new_read(self,unit,format,ip1,ip2) result(status)
+   integer function new_read(self,unit,format,ip1,ip2,kind) result(status)
       ! Coordinate constructor - read from a file and initialize instance
       type(vgrid_descriptor), intent(out) :: self !Vertical descriptor instance
       integer, intent(in) :: unit                 !File unit to read descriptor information from
       character(len=*), optional, intent(in) :: format !File format ('fst' or 'bin') default is 'fst'
       integer,optional :: ip1,ip2                 !ip1,2 values of the desired descriptors
+      integer,optional, intent(in) :: kind        ! Level kind requested by user.
 
       ! Internal variables
-      integer :: istat,key,error,kind,version,count,i,myip1,myip2
+      integer :: istat,key,error,lkind,user_kind,version,count,i,myip1,myip2
       integer :: fstinf,fstinl,fstluk,fstprm,ni,nj,nk,swa,lng,ubc,dltf,extra1,extra2,extra3
       integer :: nii,njj,nkk
       integer, dimension(MAX_DESC_REC) :: keyList
@@ -176,6 +177,11 @@ contains
 
       ! Set error status
       status = VGD_ERROR
+
+      user_kind=-1
+      if(present(kind))then
+         user_kind=kind
+      endif
 
       ! Set default values
       myformat='FST'
@@ -203,7 +209,7 @@ contains
          if(key < 0)then
             write(STDERR,'("WARNING: cannot find '//trim(self%rec%nomvar)//' with the following: ip1=",i10,",ip2=",i10)')myip1,myip2
             write(STDERR,'("Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)")')
-            istat=vgd_legacy(self,unit)
+            istat=vgd_legacy(self,unit,user_kind)
             if(istat.eq.VGD_ERROR)then
                self%vcode = -1
                return
@@ -323,11 +329,18 @@ contains
             return
          endif
       case DEFAULT
-         istat = get_version_info(self,kind,version)
-         write(STDERR,*) 'ERROR: invalid kind or version:',kind,version
+         istat = get_version_info(self,lkind,version)
+         write(STDERR,*) 'ERROR: invalid kind or version:',lkind,version
          return
       end select
-
+      !
+      if(user_kind /= -1)then
+         istat = get_version_info(self,lkind,version)
+         if(lkind /= user_kind)then
+            write(STDERR,*) 'ERROR: cannot find requested kind=',user_kind,' in file'
+            return
+         endif
+      endif
       ! Set status and return
       if (found_descriptor(self)) status = VGD_OK
       return
@@ -3223,7 +3236,7 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! (PRIVATE) Construct vertical structure from legacy encoding (PT,HY...)
  
- integer function vgd_legacy(self,F_lu) result(status)
+ integer function vgd_legacy(self,F_lu,F_kind) result(status)
     ! Construct vertical structure from legacy encoding (PT,HY...)
     
     implicit none
@@ -3231,16 +3244,24 @@ contains
     ! Arguments
     type(vgrid_descriptor), intent(out) :: self !Vertical descriptor instance    
     integer, intent(in)    :: F_lu  ! fst lu containing records
+    integer, optional, intent(in) :: F_kind ! ip1 kind set (all by default)
     
     ! Local variables
     integer, dimension(MAX_DESC_REC) :: KeyList,Ip1List
     real,    dimension(MAX_DESC_REC) :: PresList
-    integer :: fstinl,count,error,ni,nj,nk,i,j,k,m,kind,nip1,nb,itmp,imin
+    integer :: fstinl,count,error,ni,nj,nk,i,j,k,m,nip1,nb,itmp,imin
+    integer :: kind,user_kind,valid_kind
     integer, parameter :: nb_kind=100
     integer, dimension(0:nb_kind) :: num_in_kind
 
     real :: x1
     type(FSTD_ext) :: var
+
+    user_kind=-1
+    if(present(F_kind))then
+       user_kind=F_kind
+       write(STDERR,*) 'Looking for kind=',user_kind
+    endif
 
     num_in_kind=0
 
@@ -3264,12 +3285,14 @@ contains
        if(var%nomvar == 'PT')cycle
        if(var%nomvar == 'HY')cycle
        if(kind==2.and.PresList(i)==0.)cycle
+       if(user_kind /= -1 .and. kind /= user_kind)cycle
        if(kind==1.or.kind==2.or.kind==5)then
           num_in_kind(kind)=num_in_kind(kind)+1
           nip1=nip1+1
           Ip1List(nip1)=var%ip1
           KeyList(nip1)=keyList(i)
           PresList(nip1)=PresList(i)
+          valid_kind=kind
        endif
     enddo
 
@@ -3331,7 +3354,7 @@ contains
        write(STDERR,*) 'No record of type pressure/sigma/hyb in file'
        return
     endif
-    write(STDERR,'("   Found",i10," unique ip1 of kind ",i2," among the ",i10," records in file to construct the vertical descriptor")')nb,kind,count
+    write(STDERR,'("   Found",i10," unique ip1 of kind ",i2," among the ",i10," records in file to construct the vertical descriptor")')nb,valid_kind,count
     
     status = gen_legacy_desc(self,F_lu,Ip1List(1:nb),KeyList(1:nb),nb)
     if(status/=VGD_OK)then
@@ -3560,7 +3583,7 @@ contains
 !!! (PRIVATE) !s/r consistency_hy - to check if HY in file are the same
  !*********************************************************************
  ! 
- integer function get_consistent_hy(F_iun,F_ptop,F_pref,F_rcoef) result(status)
+  integer function get_consistent_hy(F_iun,F_ptop,F_pref,F_rcoef) result(status)
     
     implicit none
 
@@ -3572,7 +3595,7 @@ contains
     type(FSTD_ext) :: record
     integer, parameter :: nmax=1000
     integer, dimension(nmax) :: liste
-    integer :: infon,ier,read_decode_hyb,fstinl,ni,nj,nk,k
+    integer :: infon,ier,read_decode_hyb,fstinl,ni,nj,nk,k,ip1
     external read_decode_hyb
     
     status=VGD_ERROR
@@ -3600,15 +3623,18 @@ contains
           F_ptop =ptop
           F_pref =pref
           F_rcoef=rcoef
+          ip1=record%ip1
        else
-          if( &
+          if( &               
                ptop .ne.F_ptop .or. &
                pref .ne.F_pref .or. &
-               rcoef.ne.F_rcoef)then
+               rcoef.ne.F_rcoef.or. &
+               record%ip1.ne.ip1)then
              write(STDERR,*) 'In get_consistent_hy, found inconsistant HY'
-             write(STDERR,*) 'ptop: ',ptop ,' vs ',F_ptop
-             write(STDERR,*) 'pref: ',pref ,' vs ',F_pref
-             write(STDERR,*) 'rcoef:',rcoef,' vs ',F_rcoef
+             write(STDERR,*) 'ptop: ',ptop      ,' vs ',F_ptop
+             write(STDERR,*) 'pref: ',pref      ,' vs ',F_pref
+             write(STDERR,*) 'rcoef:',rcoef     ,' vs ',F_rcoef
+             write(STDERR,*) 'ip1:  ',record%ip1,' vs ',ip1
           return
           endif
        endif
