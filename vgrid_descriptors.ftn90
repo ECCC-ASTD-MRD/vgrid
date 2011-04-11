@@ -1568,6 +1568,9 @@ contains
     logical, optional, intent(in) :: in_log             !Compute levels in ln() [.false.]
 
     ! Local variables
+    real :: lev
+    integer :: ip1,kind
+    character(len=1) :: blk_S
     integer :: error,ig1,ig2,ig3,i
     character(len=LONG_STRING) :: grtyp
     logical :: construct,multiple_grids,my_in_log
@@ -1594,6 +1597,7 @@ contains
           ig2 = var%ig2
           ig3 = var%ig3
           grtyp = var%grtyp
+          ip1 = var%ip1
        endif
        if (var%ig1 /= ig1 .or. var%ig2 /= ig2 .or. var%ig3 /= ig3 .or. trim(var%grtyp) /= trim(grtyp)) then
           write(STDERR,*) 'ERROR: multiple grids defined in fstkeys vector'
@@ -1601,11 +1605,12 @@ contains
        endif
     enddo grids
 
+    call convip (ip1, lev, kind,-1, blk_S, .false.)
     ! Create grid descriptor instance and call level calculator
     if (any(MATCH_GRTYP == grtyp)) then
-       error = new_read(gd,unit=unit,format='fst',ip1=ig1,ip2=ig2)
+       error = new_read(gd,unit=unit,format='fst',ip1=ig1,ip2=ig2,kind=kind)
     else
-       error = new_read(gd,unit=unit,format='fst',ip1=-1,ip2=-1)
+       error = new_read(gd,unit=unit,format='fst',ip1=-1,ip2=-1,kind=kind)
     endif
     if (error /= VGD_OK) then
        write(STDERR,*) 'ERROR: cannot build grid descriptor instance for fst key ',fstkeys(1)
