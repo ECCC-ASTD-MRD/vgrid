@@ -4,6 +4,7 @@ DEBUG_FLAGS='=-C -g'
 RCOMPILE = r.compile
 RELEASE_SCR = ./scripts/release.ksh
 COMPILERS_AIX = Xlf12 xlf10
+COMPILERS_AIXPPC7 = Xlf13
 COMPILERS_LINUX = pgi9xx
 COMPILERS_LINUX64 = pgi9xx svn_tag
 VERSION = 
@@ -36,6 +37,11 @@ release:
         fi; \
 	if [ ${BASE_ARCH} = "AIX" ] ; then \
 	  for comp in $(COMPILERS_AIX) ; do \
+            $(RELEASE_SCR) $$comp $(VERSION); \
+          done; \
+        fi; \
+	if [ ${BASE_ARCH} = "AIX-powerpc7" ] ; then \
+	  for comp in $(COMPILERS_AIXPPC7) ; do \
             $(RELEASE_SCR) $$comp $(VERSION); \
           done; \
         fi; \
