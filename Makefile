@@ -3,7 +3,7 @@ FCFLAGS=
 DEBUG_FLAGS='=-C -g'
 RCOMPILE = r.compile
 RELEASE_SCR = ./scripts/release.ksh
-COMPILERS_AIX = Xlf12 xlf10
+COMPILERS_AIX = Xlf12
 COMPILERS_AIXPPC7 = Xlf13
 COMPILERS_LINUX = pgi9xx
 COMPILERS_LINUX64 = pgi9xx svn_tag

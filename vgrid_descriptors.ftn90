@@ -530,7 +530,7 @@ contains
       return
    end function new_build_vert
 
-   integer function new_gen(self,kind,version,hyb,rcoef1,rcoef2,ptop_8,pref_8,ip1,ip2,stdout_unit) result(status)
+   integer function new_gen(self,kind,version,hyb,rcoef1,rcoef2,ptop_8,pref_8,ip1,ip2,tbatub_L,stdout_unit) result(status)
       use vdescript_1001
       use vdescript_1002_5001
       use vdescript_5002
@@ -542,6 +542,7 @@ contains
       real*8, optional, intent(in) :: ptop_8            !Top-level pressure (Pa)
       real*8, optional, intent(in) :: pref_8            !Reference-level pressure (Pa)
       integer, optional, intent(in) :: ip1,ip2          !IP1,2 values for FST file record [0,0]
+      logical, optional, intent(in) :: tbatub_L         !
       integer, optional, intent(in) :: stdout_unit      !Unit number for verbose output [STDERR]
 
       ! Internal variables
@@ -549,7 +550,7 @@ contains
       integer, dimension(:), pointer :: ip1_m,ip1_t
       real, dimension(:), pointer :: hybm,hybt
       real*8, dimension(:), pointer :: a_m_8,b_m_8,a_t_8,b_t_8
-      logical :: gen_ok,errorInput=.false.
+      logical :: gen_ok,errorInput=.false.,mytbatub_L
 
       ! Set error status
       status = VGD_ERROR
@@ -561,6 +562,8 @@ contains
       if (present(ip2)) myip2 = ip2
       mystdout_unit = STDERR
       if (present(stdout_unit)) mystdout_unit = stdout_unit
+      mytbatub_L=.false.
+      if (present(tbatub_L))mytbatub_L=tbatub_L
 
       error = VGD_ERROR
       ! Check for required inputs
@@ -655,7 +658,7 @@ contains
          if (error /= VGD_OK) return
       case (5002)
          call vgrid_genab_5002(mystdout_unit,hyb,(/rcoef1,rcoef2/),ptop_8,pref_8, &
-              hybm,hybt,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,error)
+              hybm,hybt,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,mytbatub_L,error)
          if (error /= VDESC_5002_OK) return
          error = vgd_new(self,kind,version,size(hyb), &
               ip1=myip1,           &

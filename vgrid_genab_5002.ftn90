@@ -55,7 +55,7 @@ contains
    !     ----------------------------------------------------------
    
    subroutine vgrid_genab_5002 (F_unout,F_hybuser,F_rcoef,F_ptop_8,F_pref_8, &
-        F_hybm,F_hybt,F_am_8,F_bm_8,F_at_8,F_bt_8,F_ip1_m,F_ip1_t,F_err)
+        F_hybm,F_hybt,F_am_8,F_bm_8,F_at_8,F_bt_8,F_ip1_m,F_ip1_t,F_tbatub_L,F_err)
       
     implicit none
     !      
@@ -70,6 +70,7 @@ contains
     real*8, dimension(:), pointer :: F_am_8, F_bm_8       ! model As and Bs on momentum levels
     real*8, dimension(:), pointer :: F_at_8, F_bt_8       ! model As and Bs on thermodynamic levels
     integer, dimension(:), pointer :: F_ip1_m,F_ip1_t     ! ip1 values for momentum and thermodynamic levels
+    logical, intent(in) :: F_tbatub_L
 
     ! Local variables
     integer :: k, status, nk
@@ -203,9 +204,15 @@ contains
        F_hybt(k) = sqrt(F_hybm(k)*F_hybm(k-1))
     enddo
     F_hybt(NK+1) = sqrt(F_hybm(NK))
-    
+
     F_hybt(NK+2) = 1.0
     F_hybm(NK+1) = 1.0
+    
+    if(F_tbatub_L)then
+        F_bt_8(Nk+1) = F_bm_8(Nk)
+        F_at_8(Nk+1) = F_am_8(Nk)
+        F_hybt(NK+1) = F_hybm(NK)
+    endif
     
     F_err = VDESC_5002_OK
  
