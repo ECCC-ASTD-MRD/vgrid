@@ -3596,11 +3596,11 @@ contains
     real :: F_ptop,F_pref,F_rcoef
 
     !Local variables
-    real :: ptop,pref,rcoef
+    real :: ptop,pref,rcoef,pres1,pres2
     type(FSTD_ext) :: record
     integer, parameter :: nmax=1000
     integer, dimension(nmax) :: liste
-    integer :: infon,ier,read_decode_hyb,fstinl,ni,nj,nk,k,ip1
+    integer :: infon,ier,read_decode_hyb,fstinl,ni,nj,nk,k,ip1,kind
     external read_decode_hyb
     
     status=VGD_ERROR
@@ -3633,14 +3633,20 @@ contains
           if( &               
                ptop .ne.F_ptop .or. &
                pref .ne.F_pref .or. &
-               rcoef.ne.F_rcoef.or. &
-               record%ip1.ne.ip1)then
+               rcoef.ne.F_rcoef)then
              write(STDERR,*) 'In get_consistent_hy, found inconsistant HY'
              write(STDERR,*) 'ptop: ',ptop      ,' vs ',F_ptop
              write(STDERR,*) 'pref: ',pref      ,' vs ',F_pref
              write(STDERR,*) 'rcoef:',rcoef     ,' vs ',F_rcoef
-             write(STDERR,*) 'ip1:  ',record%ip1,' vs ',ip1
           return
+          endif
+          if(record%ip1.ne.ip1)then
+             call convip(       ip1,pres1,kind,-1,'',.false.)
+             call convip(record%ip1,pres2,kind,-1,'',.false.)
+             if(abs(pres1-pres2).gt.epsilon(pres1))then
+                write(STDERR,*) 'ip1:  ',record%ip1,' vs ',ip1             
+                return
+             endif
           endif
        endif
     enddo    

@@ -6,5 +6,4 @@ Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)
    More than one HY, checking consistency ...
    All HY consistent.
    Vertical descriptor successfully reconstructed
- WARNING: attempt to retrieve invalid key VIPT - level ip1 list (t) returns VGD_MISSING
- ERROR with vgd_get onVIPT
+ Option -nml not implemented for kind=1 (sigma/eta) levels

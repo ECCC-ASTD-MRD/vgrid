@@ -9,6 +9,13 @@ print_toctoc=oui
 #===========================================================================
 #===========================================================================
 #===========================================================================
+
+rm -f data_tests
+ln -s ../tests/data_$(uname -s) data_tests
+
+#===========================================================================
+#===========================================================================
+#===========================================================================
 if [ ${convert_toctoc_5002} = oui ];then
    rm -f ${TMPDIR}/dm2007050912-00-00_001_sans_p0
    editfst -s data/dm2007050912-00-00_001 -d ${TMPDIR}/dm2007050912-00-00_001_sans_p0 <<EOF
@@ -125,6 +132,20 @@ if [ ${print_toctoc} = oui ];then
          exit
       fi
    done
+
+   for ITEM in 2001_from_model_run dm_1001_from_model_run dm_5001_from_model_run dm_5002_from_model_run
+   do
+      ./print_toctoc -fst data_tests/${ITEM} -nml > to_erase.txt 2>&1
+      FILE=data/${BASE_ARCH}/print_toctoc_nml_${ITEM}.txt
+      diff to_erase.txt ${FILE}
+      if [ $? != 0 ];then
+         echo "ERROR 4: ./print_toctoc option -nml on data/${ITEM} do not mach with ${FILE}"
+	 echo "faire : xxdiff  to_erase.txt ${FILE}"
+	 exit
+      fi
+
+   done
+
    rm -f to_erase.txt
 fi
 #===========================================================================
