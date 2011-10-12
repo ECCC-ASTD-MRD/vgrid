@@ -4,9 +4,9 @@ DEBUG_FLAGS='=-C -g'
 RCOMPILE = r.compile
 RELEASE_SCR = ./scripts/release.ksh
 COMPILERS_AIX = Xlf12 xlf10
-COMPILERS_AIXPPC7 = Xlf13
-COMPILERS_LINUX = pgi9xx
-COMPILERS_LINUX64 = pgi9xx svn_tag
+COMPILERS_AIX-powerpc7 = Xlf13
+COMPILERS_Linux = pgi9xx
+COMPILERS_Linux_x86-64 = pgi9xx svn_tag
 VERSION = 
 
 # Set default target
@@ -35,23 +35,6 @@ release:
 	  echo "VERSION= is a mandatory argument"; \
           exit 1 ; \
         fi; \
-	if [ ${BASE_ARCH} = "AIX" ] ; then \
-	  for comp in $(COMPILERS_AIX) ; do \
-            $(RELEASE_SCR) $$comp $(VERSION); \
-          done; \
-        fi; \
-	if [ ${BASE_ARCH} = "AIX-powerpc7" ] ; then \
-	  for comp in $(COMPILERS_AIXPPC7) ; do \
-            $(RELEASE_SCR) $$comp $(VERSION); \
-          done; \
-        fi; \
-	if [ ${BASE_ARCH} = "Linux" ] ; then \
-	  for comp in $(COMPILERS_LINUX) ; do \
-            $(RELEASE_SCR) $$comp $(VERSION); \
-          done; \
-        fi
-	if [ ${BASE_ARCH} = "Linux_x86-64" ] ; then \
-	  for comp in $(COMPILERS_LINUX64) ; do \
-            $(RELEASE_SCR) $$comp $(VERSION); \
-          done; \
-        fi
+	for comp in \$(COMPILERS_$(BASE_ARCH)) ; do \
+	  $(RELEASE_SCR) $$comp $(VERSION); \
+        done

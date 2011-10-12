@@ -2,7 +2,7 @@
 #FCFLAGS='=-C -g'
 RCOMPILE = r.compile
 DESCRIP_PATH = ../
-RMN = rmn_011
+RMN = rmn_012
 
 # Override incorrect implicits
 %.o : %.mod
