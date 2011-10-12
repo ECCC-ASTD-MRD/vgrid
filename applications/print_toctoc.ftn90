@@ -41,7 +41,7 @@ contains
             print*,hybm(k),','
          enddo
          stat=vgd_get(F_vgd,'RC_1 - first R-coef value',rcoef1)
-         print*,'rcoef=',rcoef1,','
+         print*,'Grd_rcoef=',rcoef1,','
       elseif(vers.eq.2)then
          do k=1,size(hybm)-1
             print*,hybm(k),','

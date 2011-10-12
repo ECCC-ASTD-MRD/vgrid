@@ -1,8 +1,10 @@
 WARNING: cannot find !! with the following: ip1=        -1,ip2=        -1
 Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)
  Looking for kind=           -1
-   Found        80 unique ip1 of kind  5 among the        324 records in file to construct the vertical descriptor
+   Found        80 unique ip1 of kind  5 among the        163 records in file to construct the vertical descriptor
   hybrid (un-normalized) coordinate found
+   More than one HY, checking consistency ...
+   All HY consistent.
    Vertical descriptor successfully reconstructed
  NOTE: Recomputing ptop in order to make it consistant with hyb top
  &gem_cfs
@@ -87,5 +89,5 @@ Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)
    0.9850000     ,
    0.9950000     ,
     1.000000     ,
- Grd_rcoef=    1.600000     ,
+ rcoef=    1.600000     ,
  /
