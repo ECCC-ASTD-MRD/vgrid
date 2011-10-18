@@ -1,7 +1,7 @@
 # User options
 FCFLAGS='=-C -g'
 RCOMPILE = r.compile
-DESCRIP_PATH = ../
+DESCRIP_PATH = ../lib
 DATA_ARCH=`uname -s`
 
 # Override incorrect implicits
@@ -12,18 +12,17 @@ DATA_ARCH=`uname -s`
 .ftn90.o:
 	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -src $<
 
-OBJECTS = $(DESCRIP_PATH)grid_descriptors.o unit_testing.o
+OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o unit_testing.o
 
-unit_testing.o: unit_testing.ftn90
+unit_testing.o: unit_testing.ftn90 $(DESCRIP_PATH)/vgrid_descriptors.o
 
 alltests:
 	make tests DATA_ARCH=Linux; \
         make tests DATA_ARCH=AIX
 
 
-$(DESCRIP_PATH)grid_descriptors.o: $(DESCRIP_PATH)grid_descriptors.ftn90
-	echo "STOP: $(DESCRIP_PATH)grid_descriptors has been updated ... recompilation needed in $(DESCRIP_PATH)"; \
-	exit
+$(DESCRIP_PATH)/vgrid_descriptors.o: $(DESCRIP_PATH)/vgrid_descriptors.ftn90
+	(cd $(DESCRIP_PATH) && $(MAKE) $(MAKEFLAGS) vgrid_descriptors.o)
 
 tests:
 	rm -f data/* 2>/dev/null; \
@@ -35,3 +34,4 @@ tests:
 clean:
 	rm -f *.f90 *.o *.mod
 
+distclean: clean
