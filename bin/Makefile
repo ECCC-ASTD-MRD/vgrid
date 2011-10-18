@@ -32,12 +32,10 @@ compute_pressure: compute_pressure.ftn90 $(OBJECTS)
 	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90 -o $@ -librmn $(RMN)
 
 $(DESCRIP_PATH)/vgrid_descriptors.o: $(DESCRIP_PATH)/vgrid_descriptors.ftn90
-	echo "STOP: $(DESCRIP_PATH)/vgrid_descriptors has been updated ... recompilation needed in $(DESCRIP_PATH)"; \
-	exit
+	(cd $(DESCRIP_PATH) && $(MAKE) $(MAKEFLAGS) vgrid_descriptors.o)
 
 $(DESCRIP_PATH)/vgrid_genab.o: $(DESCRIP_PATH)/vgrid_genab.ftn90
-	echo "STOP: $(DESCRIP_PATH)/vgrid_genab.o has been updated ... recompilation needed in $(DESCRIP_PATH)"; \
-	exit
+	(cd $(DESCRIP_PATH) && $(MAKE) $(MAKEFLAGS) vgrid_genab.o)
 
 clean:
 	rm -f *.f90 *.o *.mod test_output.fst
