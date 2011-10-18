@@ -1,0 +1,43 @@
+mycleanpath() {
+	 __newpath=''
+	 __pattern=$1
+	 __version=$2	 
+	 __oldpath="$(echo $3 | tr ':' ' ')"
+	 __myssmrootdir=/home/ordenv/ssm-domains
+	 for item in ${__oldpath}; do
+		  if [[ x$(echo $item | grep ${__pattern} | grep ${__myssmrootdir} | grep -v ${__version} 2>/dev/null) == x ]] ; then
+				__newpath=${__newpath}:$item
+		  #else
+		  #		echo "rm $item" 1>&2
+		  fi
+	 done
+	 echo ${__newpath#*:}
+}
+
+mycleanpath0() {
+	 __pattern=$1
+	 __version=$2
+	 [[ -n $PATH ]] && PATH=$(mycleanpath ${__pattern} ${__version} $PATH)
+	 #[[ -n $MANPATH ]] && MANPATH=$(mycleanpath ${__pattern} ${__version} $MANPATH):
+	 [[ -n $LD_LIBRARY_PATH ]] && LD_LIBRARY_PATH=$(mycleanpath ${__pattern} ${__version} $LD_LIBRARY_PATH)
+	 #[[ -n $PYTHONPATH ]] && PYTHONPATH=$(mycleanpath ${__pattern} ${__version} $PYTHONPATH)
+	 #[[ -n $TCL_LIBRARY ]] && TCL_LIBRARY=$(mycleanpath ${__pattern} ${__version} $TCL_LIBRARY)
+	 [[ -n $LIBPATH ]] && LIBPATH=$(mycleanpath ${__pattern} ${__version} $LIBPATH)
+
+	 EC_LD_LIBRARY_PATH="$(echo $EC_LD_LIBRARY_PATH | tr ' ' ':')"
+	 [[ -n $EC_LD_LIBRARY_PATH ]] && EC_LD_LIBRARY_PATH=$(mycleanpath ${__pattern} ${__version} $EC_LD_LIBRARY_PATH)
+	 EC_LD_LIBRARY_PATH="$(echo $EC_LD_LIBRARY_PATH | tr ':' ' ')"
+
+	 EC_INCLUDE_PATH="$(echo $EC_INCLUDE_PATH | tr ' ' ':')"
+	 [[ -n $EC_INCLUDE_PATH ]] && EC_INCLUDE_PATH=$(mycleanpath ${__pattern} ${__version} $EC_INCLUDE_PATH)
+	 EC_INCLUDE_PATH="$(echo $EC_INCLUDE_PATH | tr ':' ' ')"
+	 return 0
+}
+
+vname=$(echo ${__swname} | tr "[:lower:]" "[:upper:]")_VERSION
+if [[ -n "$(eval echo \$$vname)" && x$(eval echo \$$vname) != x${__version} ]] ; then
+	 mycleanpath0 ${__swname} ${__version} || true
+fi
+
+export ${vname}=${__version}
+unset __version
