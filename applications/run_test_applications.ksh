@@ -1,8 +1,8 @@
-convert_toctoc_5002=oui
+convert_toctoc_5002=non
 
 add_toctoc_and_compute_pressure=oui
 
-print_toctoc=oui
+print_toctoc=non
 
 #set -e
 
@@ -135,7 +135,7 @@ if [ ${print_toctoc} = oui ];then
       fi
    done
 
-   for ITEM in 2001_from_model_run dm_1001_from_model_run dm_5001_from_model_run dm_5002_from_model_run
+   for ITEM in 2001_from_model_run dm_1001_from_model_run dm_5001_from_model_run dm_5002_from_model_run dm_5003_from_model_run
    do
       ./print_toctoc -fst data_tests/${ITEM} -nml > to_erase.txt 2>&1
       FILE=data/$(uname -s)/print_toctoc_nml_${ITEM}.txt

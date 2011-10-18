@@ -55,7 +55,7 @@ contains
    !     ----------------------------------------------------------
    
    subroutine vgrid_genab_5002 (F_unout,F_hybuser,F_rcoef,F_ptop_8,F_pref_8, &
-        F_hybm,F_hybt,F_am_8,F_bm_8,F_at_8,F_bt_8,F_ip1_m,F_ip1_t,F_err)
+        F_hybm,F_hybt,F_am_8,F_bm_8,F_at_8,F_bt_8,F_ip1_m,F_ip1_t,F_err,lastTatU_L)
       
     implicit none
     !      
@@ -70,16 +70,21 @@ contains
     real*8, dimension(:), pointer :: F_am_8, F_bm_8       ! model As and Bs on momentum levels
     real*8, dimension(:), pointer :: F_at_8, F_bt_8       ! model As and Bs on thermodynamic levels
     integer, dimension(:), pointer :: F_ip1_m,F_ip1_t     ! ip1 values for momentum and thermodynamic levels
+    logical, optional :: lastTatU_L                       ! Put last thermodynamic level at last momentum level
 
     ! Local variables
     integer :: k, status, nk
     logical :: wronghyb
     real    :: rcoef
     real*8  :: pr1, ztop_8, zsrf_8, eta_8, zeta_8
+    logical :: my_lastTatU_L
     !     __________________________________________________________________
 
     F_err = VDESC_5002_ERROR
     stdout = F_unout
+
+    my_lastTatU_L=.false.
+    if(present(lastTatU_L))my_lastTatU_L=lastTatU_L
 
     ! Set size of the problem and check for full inputs
     nk = size(F_hybuser)
@@ -207,6 +212,12 @@ contains
     F_hybt(NK+2) = 1.0
     F_hybm(NK+1) = 1.0
     
+    if(my_lastTatU_L)then
+       F_at_8(Nk+1) =  F_am_8(Nk)
+       F_bt_8(Nk+1) =  F_bm_8(Nk)
+       F_hybt(Nk+1) =  F_hybm(Nk)
+    endif    
+
     F_err = VDESC_5002_OK
  
     ! Compute ip1 values

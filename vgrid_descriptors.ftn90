@@ -31,17 +31,17 @@ module vGrid_Descriptors
   character(len=1), dimension(3), parameter :: MATCH_GRTYP=(/'X','Y','Z'/) !grid types with ip1,2 to ig1,2 mapping
 
   ! Validity table
-  integer, dimension(4), parameter :: ptop_8_valid=(/1002,1003,5001,5002/)
-  integer, dimension(3), parameter :: pref_8_valid=(/1003,5001,5002/)
-  integer, dimension(3), parameter :: rcoef1_valid=(/1003,5001,5002/)
-  integer, dimension(1), parameter :: rcoef2_valid=(/5002/)
-  integer, dimension(6), parameter :: a_m_8_valid=(/1001,1002,1003,2001,5001,5002/)
-  integer, dimension(6), parameter :: b_m_8_valid=(/1001,1002,1003,2001,5001,5002/)
-  integer, dimension(1), parameter :: a_t_8_valid=(/5002/)
-  integer, dimension(1), parameter :: b_t_8_valid=(/5002/)
-  integer, dimension(6), parameter :: ip1_m_valid=(/1001,1002,1003,2001,5001,5002/)
-  integer, dimension(1), parameter :: ip1_t_valid=(/5002/)
-  integer, dimension(5), parameter :: ref_name_valid=(/1001,1002,1003,5001,5002/)
+  integer, dimension(5), parameter :: ptop_8_valid=            (/1002,1003,5001,5002,5003/)
+  integer, dimension(4), parameter :: pref_8_valid=                 (/1003,5001,5002,5003/)
+  integer, dimension(4), parameter :: rcoef1_valid=                 (/1003,5001,5002,5003/)
+  integer, dimension(2), parameter :: rcoef2_valid=                           (/5002,5003/)
+  integer, dimension(7), parameter :: a_m_8_valid=   (/1001,1002,1003,2001,5001,5002,5003/)
+  integer, dimension(7), parameter :: b_m_8_valid=   (/1001,1002,1003,2001,5001,5002,5003/)
+  integer, dimension(2), parameter :: a_t_8_valid=                            (/5002,5003/)
+  integer, dimension(2), parameter :: b_t_8_valid=                            (/5002,5003/)
+  integer, dimension(7), parameter :: ip1_m_valid=   (/1001,1002,1003,2001,5001,5002,5003/)
+  integer, dimension(2), parameter :: ip1_t_valid=                            (/5002,5003/)
+  integer, dimension(6), parameter :: ref_name_valid=(/1001,1002,1003,5001,5002,5003/)
 
   ! FST file record structure
   type FSTD
@@ -324,7 +324,7 @@ contains
             write(STDERR,*) 'ERROR: problem with fstluk on '//trim(self%rec%nomvar)
             return
          endif
-      case (5002)
+      case (5002,5003)
          istat=decode_vert_5002(self)
          if(istat < 0)then
             write(STDERR,*) 'ERROR: problem with fstluk on '//trim(self%rec%nomvar)
@@ -515,7 +515,7 @@ contains
          error = encode_vert_2001(self)
       case (5001)
          error = encode_vert_5001(self,nk)
-      case (5002)
+      case (5002,5003)
          error = encode_vert_5002(self,nk)
       case DEFAULT
          write(STDERR,*) 'ERROR: unsupported kind and version : ',kind,version,' (vcode) ',self%vcode
@@ -658,6 +658,24 @@ contains
       case (5002)
          call vgrid_genab_5002(mystdout_unit,hyb,(/rcoef1,rcoef2/),ptop_8,pref_8, &
               hybm,hybt,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,error)
+         if (error /= VDESC_5002_OK) return
+         error = vgd_new(self,kind,version,size(hyb), &
+              ip1=myip1,           &
+              ip2=myip2,           &
+              ptop_8=ptop_8,       &
+              pref_8=pref_8,       &
+              rcoef1=rcoef1,       &
+              rcoef2=rcoef2,       &
+              a_m_8=a_m_8,         &
+              b_m_8=b_m_8,         &
+              a_t_8=a_t_8,         &
+              b_t_8=b_t_8,         &
+              ip1_m=ip1_m,         &
+              ip1_t=ip1_t)
+         if (error /= VGD_OK) return
+      case (5003)
+         call vgrid_genab_5002(mystdout_unit,hyb,(/rcoef1,rcoef2/),ptop_8,pref_8, &
+              hybm,hybt,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,error,lastTatU_L=.true.)
          if (error /= VDESC_5002_OK) return
          error = vgd_new(self,kind,version,size(hyb), &
               ip1=myip1,           &
@@ -1474,7 +1492,7 @@ contains
           nk=size(self%ip1_m)
           write(my_stdout,*)'  Number of hybrid levels',nk
           write(my_stdout,*)'  Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100'
-       case (5002)
+       case (5002,5003)
           nk=size(self%ip1_m)
           write(my_stdout,*)'  Number of hybrid levels (momentum levels)',nk-1
           write(my_stdout,*)'  Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref)'
@@ -2088,7 +2106,7 @@ contains
        istat = compute_pressure_2001_8(self,ip1_list,levels,my_in_log)
     case (1003,5001)
        istat = compute_pressure_5001_8(self,sfc_field,ip1_list,levels,my_in_log,my_dpidpis)
-    case (5002)
+    case (5002,5003)
        istat = compute_pressure_5002_8(self,sfc_field,ip1_list,levels,my_in_log,my_dpidpis)
     case DEFAULT
        istat = get_version_info(self,kind,version)

@@ -49,7 +49,19 @@ contains
          stat=vgd_get(F_vgd,'PTOP - top level pressure',ptop_8)
          stat=vgd_get(F_vgd,'RC_1 - first R-coef value',rcoef1)
          stat=vgd_get(F_vgd,'RC_2 - second R-coef value',rcoef2)
-         print*,'Grd_rcoef=',rcoef1,',',rcoef2,',   Cstv_ptop_8=',ptop_8,','
+         print*,'Grd_rcoef=',rcoef1,',',rcoef2
+         print*,'Cstv_ptop_8=',ptop_8,','
+         print*,'Schm_LastTatU = 0 ,'
+      elseif(vers.eq.3)then
+         do k=1,size(hybm)-1
+            print*,hybm(k),','
+         enddo         
+         stat=vgd_get(F_vgd,'PTOP - top level pressure',ptop_8)
+         stat=vgd_get(F_vgd,'RC_1 - first R-coef value',rcoef1)
+         stat=vgd_get(F_vgd,'RC_2 - second R-coef value',rcoef2)
+         print*,'Grd_rcoef=',rcoef1,',',rcoef2
+         print*,'Cstv_ptop_8=',ptop_8,','
+         print*,'Schm_LastTatU = 1 ,'
       else
          print*,'Option -nml not supported for version',vers
          return
