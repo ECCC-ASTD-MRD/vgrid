@@ -1,7 +1,7 @@
 # User options
 #FCFLAGS='=-C -g'
 RCOMPILE = r.compile
-DESCRIP_PATH = ../
+DESCRIP_PATH = ../lib
 RMN = rmn_012
 
 # Override incorrect implicits
@@ -12,7 +12,7 @@ RMN = rmn_012
 .ftn90.o:
 	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -src $<
 
-OBJECTS = $(DESCRIP_PATH)vgrid_descriptors.o $(DESCRIP_PATH)vgrid_genab_5002.o $(DESCRIP_PATH)vgrid_genab_1002_5001.o $(DESCRIP_PATH)vgrid_genab_1001.o  $(DESCRIP_PATH)vgrid_genab_2001.o $(DESCRIP_PATH)vgrid_genab_1004.o 
+OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/vgrid_genab_5002.o $(DESCRIP_PATH)/vgrid_genab_1002_5001.o $(DESCRIP_PATH)/vgrid_genab_1001.o  $(DESCRIP_PATH)/vgrid_genab_2001.o $(DESCRIP_PATH)/vgrid_genab_1004.o 
 
 # Set default target
 default: all
@@ -31,12 +31,12 @@ add_toctoc: add_toctoc.ftn90 $(OBJECTS)
 compute_pressure: compute_pressure.ftn90 $(OBJECTS)
 	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90 -o $@ -librmn $(RMN)
 
-$(DESCRIP_PATH)vgrid_descriptors.o: $(DESCRIP_PATH)vgrid_descriptors.ftn90
-	echo "STOP: $(DESCRIP_PATH)vgrid_descriptors has been updated ... recompilation needed in $(DESCRIP_PATH)"; \
+$(DESCRIP_PATH)/vgrid_descriptors.o: $(DESCRIP_PATH)/vgrid_descriptors.ftn90
+	echo "STOP: $(DESCRIP_PATH)/vgrid_descriptors has been updated ... recompilation needed in $(DESCRIP_PATH)"; \
 	exit
 
-$(DESCRIP_PATH)vgrid_genab.o: $(DESCRIP_PATH)vgrid_genab.ftn90
-	echo "STOP: $(DESCRIP_PATH)vgrid_genab.o has been updated ... recompilation needed in $(DESCRIP_PATH)"; \
+$(DESCRIP_PATH)/vgrid_genab.o: $(DESCRIP_PATH)/vgrid_genab.ftn90
+	echo "STOP: $(DESCRIP_PATH)/vgrid_genab.o has been updated ... recompilation needed in $(DESCRIP_PATH)"; \
 	exit
 
 clean:
