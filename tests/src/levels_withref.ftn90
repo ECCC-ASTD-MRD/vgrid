@@ -20,7 +20,9 @@ program level_withref_5001
   ier=chek_levels_withref('data/dm_5002_from_model_run','data/dm_5002_ips.txt')
   if(ier==VGD_ERROR)stat=VGD_ERROR
   
-
+  ier=chek_levels_withref('data/dm_5003_from_model_run','data/dm_5003_ips.txt')
+  if(ier==VGD_ERROR)stat=VGD_ERROR
+  
   call ut_report(stat,'Grid_Descriptors, vgd_new')
 
 end program level_withref_5001
@@ -47,6 +49,7 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
    real*8, dimension(:,:,:), pointer :: pres_8
    real, dimension(:,:), pointer :: ff
    real*8, dimension(:,:), pointer :: ff_8
+   real :: epsilon=5.0e-6
    integer, dimension(:), pointer :: ip1s
    logical :: ok
    ! Variable for fstprm, sorry...
@@ -58,7 +61,6 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
    character(len=2)  :: typvar
    character(len=1)  :: grtyp, ctype
    logical :: rewrit
-   real :: hyb
    
    status=VGD_ERROR   
 
@@ -71,7 +73,7 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
    endif
    ier=fstouv(lu,'RND')
    if(ier.le.0)then
-      print*,'No record in RPN file ',trim(F_fst)
+      print*,'No record in RPN file ',trim(F_fst),ier
       return
    endif
    open(unit=lutxt,file=F_ips,status='OLD')
@@ -133,7 +135,7 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
       endif
       do j=1,nj
          do i=1,ni
-            if(abs((ff(i,j)-pres(i,j,k))/ff(i,j))>1.0e-6)then
+            if(abs((ff(i,j)-pres(i,j,k))/ff(i,j))>epsilon)then
                print*,'32 bits: Difference in pressure is too large at'
                print*,'i,j,k,ff(i,j),pres(i,j,k)',i,j,k,ff(i,j),pres(i,j,k)
                return
@@ -166,7 +168,7 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
       endif
       do j=1,nj
          do i=1,ni
-            if(abs((ff(i,j)-pres_8(i,j,k))/ff(i,j))>1.0e-6)then
+            if(abs((ff(i,j)-pres_8(i,j,k))/ff(i,j))>epsilon)then
                print*,'64 bits: Difference in pressure is too large at'
                print*,'i,j,k,ff(i,j),pres_8(i,j,k)',i,j,k,ff(i,j),pres_8(i,j,k)
                return
