@@ -7,7 +7,7 @@ COMPILERS_Linux_x86-64 = pgi9xx svn_tag
 VERSION = 
 
 # Override incorrect implicits
-SUBDIRS = lib bin tests
+SUBDIRS = lib bin examples tests
 
 all:
 	for dir in $(SUBDIRS) ; do\
