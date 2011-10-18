@@ -1,5 +1,5 @@
  program calculate_levels
-   use Grid_Descriptors, only: gd_levels,GD_OK
+   use vGrid_Descriptors, only: vgd_levels,VGD_OK
    implicit none
    !
    ! Variable declarations
@@ -16,8 +16,8 @@
    status = fstinl(iun,ni,nj,nk,-1,' ',-1,-1,-1,' ','TT',keys,count,size(keys))
    !
    ! Calculate level information for this field
-   status = gd_levels(unit=iun,fstkeys=keys(1:count),levels=lev)
-   if (status /= GD_OK) write(0,*) 'WARNING - error during level calculation'
+   status = vgd_levels(unit=iun,fstkeys=keys(1:count),levels=lev)
+   if (status /= VGD_OK) write(0,*) 'WARNING - error during level calculation'
    !
    ! Generate a bit of output
    print*, 'shape of returned lev: ',shape(lev)
