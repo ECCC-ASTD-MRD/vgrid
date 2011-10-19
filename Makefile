@@ -6,7 +6,7 @@ SUBDIRS = lib bin examples tests
 
 all:
 	for dir in $(SUBDIRS) ; do\
-	  (cd $$dir && $(MAKE) $(MAKEFLAGS)) RMN=$(RMN);\
+	  (cd $$dir && $(MAKE) $(MAKEFLAGS) RMN=$(RMN)) ;\
 	done;
 
 clean:
