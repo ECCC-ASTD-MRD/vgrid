@@ -35,3 +35,4 @@ clean:
 	rm -f *.f90 *.o *.mod
 
 distclean: clean
+	rm -f data/*
