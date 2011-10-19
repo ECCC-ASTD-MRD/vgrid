@@ -1,8 +1,8 @@
-convert_toctoc_5002=non
+convert_toctoc_5002=oui
 
 add_toctoc_and_compute_pressure=oui
 
-print_toctoc=non
+print_toctoc=oui
 
 #set -e
 
@@ -133,19 +133,6 @@ if [ ${print_toctoc} = oui ];then
          echo "faire : xxdiff  to_erase.txt ${FILE}"
          exit
       fi
-   done
-
-   for ITEM in 2001_from_model_run dm_1001_from_model_run dm_5001_from_model_run dm_5002_from_model_run dm_5003_from_model_run
-   do
-      ./print_toctoc -fst data_tests/${ITEM} -nml > to_erase.txt 2>&1
-      FILE=data/$(uname -s)/print_toctoc_nml_${ITEM}.txt
-      diff to_erase.txt ${FILE}
-      if [ $? != 0 ];then
-         echo "ERROR 4: ./print_toctoc option -nml on data/${ITEM} do not mach with ${FILE}"
-	 echo "faire : xxdiff  to_erase.txt ${FILE}"
-	 exit
-      fi
-
    done
 
    rm -f to_erase.txt
