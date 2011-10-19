@@ -24,7 +24,6 @@ lib: all
 	ar cru libdescrip.a $(OBJECTS)
 
 clean:
-	rm -f *.f90 *.o *.mod
+	rm -f *.f90 *.o *.mod lib*.a
 
 distclean: clean
-	rm -f lib*.a
