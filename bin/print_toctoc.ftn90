@@ -83,7 +83,7 @@ program print_toctoc
    implicit none
    !
    type(vgrid_descriptor) :: vgd
-   integer, parameter :: lu=10,ncle=6
+   integer, parameter :: lu=10,ncle=5
    integer :: stat,npos,i,noptions
    integer :: fnom,fstouv,fstfrm,exdb,exfin,kind
    integer, dimension(:), pointer :: ip1s
@@ -94,9 +94,9 @@ program print_toctoc
    !==========================================================================
    !
    ! Get keys
-   cle=(/'fst.     ','ip1m_only','ip1t_only','kind     ','no_box   ','nml      '/)
-   val=(/'undef    ','no       ','no       ','undef    ','no       ','no       '/)
-   def=(/'undef    ','yes      ','yes      ','undef    ','yes      ','yes      '/)
+   cle=(/'fst.     ','ip1m_only','ip1t_only','kind     ','no_box   '/)
+   val=(/'undef    ','no       ','no       ','undef    ','no       '/)
+   def=(/'undef    ','yes      ','yes      ','undef    ','yes      '/)
    npos=1
    call ccard(cle,def,val,ncle,npos) 
    !
