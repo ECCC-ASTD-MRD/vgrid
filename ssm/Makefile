@@ -11,11 +11,11 @@ ssm: profile.sh
         chmod a+x pre-publish;
 	cp pre-publish profile.sh $(SSMPACKAGE)/.ssm.d;
 	mkdir -p $(SSMPACKAGE)/src/base $(SSMPACKAGE)/src/bin $(SSMPACKAGE)/src/examples; \
-	cp ../lib/*.ftn* $(SSMPACKAGE)/src/base; \
-	cp ../bin/*.ftn* $(SSMPACKAGE)/src/bin; \
-	cp ../examples/*.ftn* $(SSMPACKAGE)/src/examples; \
+	find ../lib -name "*.ftn90" -exec cp {}  $(SSMPACKAGE)/src/base \; ; \
+	find ../bin -name "*.ftn90" -exec cp {} $(SSMPACKAGE)/src/bin \; ; \
+	find ../examples -name "*.ftn90" -exec cp {} $(SSMPACKAGE)/src/examples \; ; \
 	s.set_dir_struct --bin --lib --include --dest=$(SSMPACKAGE); \
-	find ../bin -perm -a+x -type f \( ! -iname "*.ksh" \) -exec cp {} $(SSMPACKAGE)/bin/$(BASE_ARCH) \; ; \
+	find ../bin -perm -a+x -type f \( ! -name "*.ksh*" \) -exec cp {} $(SSMPACKAGE)/bin/$(BASE_ARCH) \; ; \
 	find ../lib -name "*.mod" -type f -exec cp {} $(SSMPACKAGE)/include/$(EC_ARCH) \; ; \
 	find ../lib -name "lib*.a" -exec cp {} $(SSMPACKAGE)/lib/$(EC_ARCH) \; ; \
 	echo "Package: ${SWNAME}" > $(SSMPACKAGE)/.ssm.d/control; \
