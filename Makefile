@@ -1,17 +1,12 @@
 # User options
-RELEASE_SCR = ./scripts/release.ksh
-COMPILERS_AIX = Xlf12 xlf10
-COMPILERS_AIX-powerpc7 = Xlf13
-COMPILERS_Linux = pgi9xx
-COMPILERS_Linux_x86-64 = pgi9xx svn_tag
-VERSION = 
+RMN = rmn_012
 
 # Override incorrect implicits
 SUBDIRS = lib bin examples tests
 
 all:
 	for dir in $(SUBDIRS) ; do\
-	  (cd $$dir && $(MAKE) $(MAKEFLAGS)) ;\
+	  (cd $$dir && $(MAKE) $(MAKEFLAGS)) RMN=$(RMN);\
 	done;
 
 clean:
