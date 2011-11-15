@@ -548,9 +548,9 @@ contains
 
       ! Internal variables
       integer :: myip1,myip2,mystdout_unit,error
-      integer, dimension(:), pointer :: ip1_m,ip1_t
-      real, dimension(:), pointer :: hybm,hybt
-      real*8, dimension(:), pointer :: a_m_8,b_m_8,a_t_8,b_t_8
+      integer, dimension(:), pointer :: ip1_m=>null(),ip1_t=>null()
+      real, dimension(:), pointer :: hybm=>null(),hybt=>null()
+      real*8, dimension(:), pointer :: a_m_8=>null(),b_m_8=>null(),a_t_8=>null(),b_t_8=>null()
       logical :: gen_ok,errorInput=.false.
 
       ! Set error status
@@ -1659,7 +1659,7 @@ contains
     integer :: fstinf,ni,nj,nk,sfc_key,istat,error,fstluk,i
     integer, dimension(size(fstkeys)) :: ip1_list
     type(FSTD_ext) prmk,prm_p0,prm_check
-    real, dimension(:,:), pointer :: p0
+    real, dimension(:,:), pointer :: p0=>null()
     logical :: my_in_log
 
     ! Set error status
@@ -1758,7 +1758,7 @@ contains
 
      ! Local variables
      real*8 :: my_sfc_field_8
-     real*8, dimension(:), pointer :: levels_8
+     real*8, dimension(:), pointer :: levels_8=>null()
      integer :: error
      logical :: my_in_log
 
@@ -1818,7 +1818,7 @@ contains
 
      ! Local variables
      real*8 :: my_sfc_field_8
-     real*8, dimension(:), pointer :: dpidpis_8
+     real*8, dimension(:), pointer :: dpidpis_8=>null()
      integer :: error
 
      ! Set return value
@@ -1853,8 +1853,8 @@ contains
      ! Local variables
      integer :: error,nk
      real*8 :: my_sfc_field
-     real*8, dimension(:,:), pointer :: sfc_field_2d
-     real*8, dimension(:,:,:), pointer :: levels_3d
+     real*8, dimension(:,:), pointer :: sfc_field_2d=>null()
+     real*8, dimension(:,:,:), pointer :: levels_3d=>null()
      logical :: my_in_log,my_dpidpis
 
      ! Set error status
@@ -1911,7 +1911,7 @@ contains
 
      ! Local variables
      integer :: error,ni,nj
-     real*8, dimension(:,:,:), pointer :: levels_8
+     real*8, dimension(:,:,:), pointer :: levels_8=>null()
      real*8, dimension(:,:), allocatable :: my_sfc_field
      logical :: my_in_log
 
@@ -2001,8 +2001,8 @@ contains
 
      ! Local variables 
      integer :: error,ni,nj
-     real*8, dimension(:,:), pointer :: my_sfc_field_8
-     real*8, dimension(:,:,:), pointer :: dpidpis_8
+     real*8, dimension(:,:), pointer :: my_sfc_field_8=>null()
+     real*8, dimension(:,:,:), pointer :: dpidpis_8=>null()
 
      ! Set return value
      status = VGD_ERROR
