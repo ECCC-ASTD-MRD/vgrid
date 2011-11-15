@@ -1,80 +1,3 @@
-Module Mod_print_toctoc
-   private
-   public print_nml
-contains
-   integer function print_nml(F_vgd) result(status)
-      use vGrid_Descriptors, only: vgrid_descriptor,vgd_get,VGD_ERROR,VGD_OK
-      type(vgrid_descriptor) :: F_vgd
-      ! Local variables
-      integer :: stat,k,mykind,vers
-      real :: rcoef1,rcoef2
-      real, dimension(:), pointer :: hybm
-      real*8 :: ptop_8
-      status=VGD_ERROR
-      stat=vgd_get(F_vgd,'KIND - vertical coordinate ip1 kind',mykind)
-      if(mykind.eq.1)then
-         print*,'Option -nml not implemented for kind=1 (sigma/eta) levels'
-         return
-      endif
-      if(mykind.eq.2)then
-         print*,'Option -nml cannot be use with pressure levels'
-         return
-      endif
-      if(mykind.ne.5)then
-         print*,'Option -nml not supported for kind',mykind
-         return
-      endif
-      stat=vgd_get(F_vgd,'VERS - vertical coordinate version',vers)
-      if(stat.eq.VGD_ERROR)then
-         print*,'ERROR with vgd_get on ','KIND'
-         return
-      endif
-      stat=vgd_get(F_vgd,'VCDM - vertical coordinate (m)',hybm)
-      if(stat.eq.VGD_ERROR)then
-         print*,'ERROR with vgd_get on ','VCDM'
-         return
-      endif
-      print*,'&gem_cfs'
-      print*,'hyb='
-      if(vers.eq.1)then
-         do k=1,size(hybm)
-            print*,hybm(k),','
-         enddo
-         stat=vgd_get(F_vgd,'RC_1 - first R-coef value',rcoef1)
-         print*,'Grd_rcoef=',rcoef1,','
-      elseif(vers.eq.2)then
-         do k=1,size(hybm)-1
-            print*,hybm(k),','
-         enddo         
-         stat=vgd_get(F_vgd,'PTOP - top level pressure',ptop_8)
-         stat=vgd_get(F_vgd,'RC_1 - first R-coef value',rcoef1)
-         stat=vgd_get(F_vgd,'RC_2 - second R-coef value',rcoef2)
-         print*,'Grd_rcoef=',rcoef1,',',rcoef2
-         print*,'Cstv_ptop_8=',ptop_8,','
-         print*,'Schm_LastTatU = 0 ,'
-      elseif(vers.eq.3)then
-         do k=1,size(hybm)-1
-            print*,hybm(k),','
-         enddo         
-         stat=vgd_get(F_vgd,'PTOP - top level pressure',ptop_8)
-         stat=vgd_get(F_vgd,'RC_1 - first R-coef value',rcoef1)
-         stat=vgd_get(F_vgd,'RC_2 - second R-coef value',rcoef2)
-         print*,'Grd_rcoef=',rcoef1,',',rcoef2
-         print*,'Cstv_ptop_8=',ptop_8,','
-         print*,'Schm_LastTatU = 1 ,'
-      else
-         print*,'Option -nml not supported for version',vers
-         return
-      endif
-
-      print*,'/'
-      status=VGD_OK
-   end function print_nml
-end Module Mod_print_toctoc
-!====================================================================================
-!====================================================================================
-!====================================================================================
-!====================================================================================
 program print_toctoc
    !
    use Mod_print_toctoc, only: print_nml
@@ -83,28 +6,28 @@ program print_toctoc
    implicit none
    !
    type(vgrid_descriptor) :: vgd
-   integer, parameter :: lu=10,ncle=5
+   integer, parameter :: lu=10,ncle=6
    integer :: stat,npos,i,noptions
-   integer :: fnom,fstouv,fstfrm,exdb,exfin,kind
+   integer :: fnom,fstouv,fstfrm,exdb,exfin,kind,lu_out
    integer, dimension(:), pointer :: ip1s
    character(len=12), parameter :: version='v_1.1.0'
    character(len=256), dimension(ncle) :: cle,val,def
-   logical :: ip1m_only_L, ip1t_only_L, box_L,nml_L
+   logical :: ip1m_only_L, ip1t_only_L, box_L
    !
    !==========================================================================
    !
    ! Get keys
-   cle=(/'fst.     ','ip1m_only','ip1t_only','kind     ','no_box   '/)
-   val=(/'undef    ','no       ','no       ','undef    ','no       '/)
-   def=(/'undef    ','yes      ','yes      ','undef    ','yes      '/)
-   npos=1
+   cle=(/'fst.     ','ip1m_only','ip1t_only','kind     ','no_box   ','out.     '/)
+   val=(/'undef    ','no       ','no       ','undef    ','no       ','undef    '/)
+   def=(/'undef    ','yes      ','yes      ','undef    ','yes      ','undef    '/)
+   npos=-111
    call ccard(cle,def,val,ncle,npos) 
    !
    noptions=0
    ip1m_only_L=.false.
    ip1t_only_L=.false.
    box_L=.true.
-   nml_L=.false.
+   lu_out=6
    if(val(5).eq.'YES')box_L=.false.
    !
    if(trim(val(1)).eq.'undef')then
@@ -130,15 +53,14 @@ program print_toctoc
       print*,'Note : printing only level information for kind',kind
    endif
    !
-   if(trim(val(6)).eq.'YES')then
-      noptions=noptions+1
-      nml_L=.true.
-      box_L=.false.
-   endif
-   !
    if(noptions.gt.1)then
       print*,'Only one of the following options can be set:'
       print*,'-ip1m_only -ip1t_only -nml'
+   endif
+   !
+   if(trim(val(6)).ne.'undef')then
+      lu_out=10
+      open(unit=lu_out,file=trim(val(6)),status='unknown')
    endif
    !
    if(box_L)stat=exdb('print_toctoc',version,'NON')
@@ -168,7 +90,7 @@ program print_toctoc
          call exit(1)
       endif
       do i=1,size(ip1s)
-         print*,ip1s(i)
+         write(lu_out,'(i10)')ip1s(i)
       enddo
    elseif(ip1t_only_L)then
       stat=vgd_get(vgd,'VIPT - level ip1 list (t)',ip1s)
@@ -177,10 +99,8 @@ program print_toctoc
          call exit(1)
       endif
       do i=1,size(ip1s)
-         print*,ip1s(i)
+         write(lu_out,'(i10)')ip1s(i)
       enddo
-   elseif(nml_L)then
-      stat=print_nml(vgd)
    else
       stat = vgd_print(vgd)
       if(stat.eq.VGD_ERROR)then
@@ -191,5 +111,6 @@ program print_toctoc
    endif
    !
    stat=fstfrm(lu)
+   close(lu_out)
    !
 end program print_toctoc
