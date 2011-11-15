@@ -264,7 +264,7 @@ program compute_pressure
    !
    stat=exdb('compute_pressure',version,'NON')
    !
-   npos=1
+   npos=-111
    call ccard(cle,def,val,ncle,npos) 
    !
    if(trim(val(1)).eq.'undef')then

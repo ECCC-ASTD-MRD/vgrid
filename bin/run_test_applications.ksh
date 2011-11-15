@@ -1,6 +1,6 @@
-convert_toctoc_5002=oui
+convert_toctoc_5002=non
 
-add_toctoc_and_compute_pressure=oui
+add_toctoc_and_compute_pressure=non
 
 print_toctoc=oui
 
@@ -106,6 +106,7 @@ if [ ${print_toctoc} = oui ];then
 
    for ITEM in east.eta glbeta glbhyb regeta reghyb
    do
+
       ./print_toctoc -fst data/${ITEM} -no_box > to_erase.txt 2>&1
       FILE=data/$(uname -s)/print_toctoc_${ITEM}.txt
       #cp to_erase.txt ${FILE}
@@ -115,6 +116,7 @@ if [ ${print_toctoc} = oui ];then
 	 echo "faire : xxdiff  to_erase.txt ${FILE}"
 	 exit
       fi
+
       ./print_toctoc -fst data/${ITEM} -ip1m_only > to_erase.txt 2>&1
       FILE=data/$(uname -s)/print_toctoc_ip1m_only_${ITEM}.txt
       #cp to_erase.txt ${FILE}
@@ -124,6 +126,7 @@ if [ ${print_toctoc} = oui ];then
          echo "faire : xxdiff  to_erase.txt ${FILE}"
          exit
       fi
+
       ./print_toctoc -fst data/${ITEM} -ip1t_only > to_erase.txt 2>&1
       FILE=data/$(uname -s)/print_toctoc_ip1t_only_${ITEM}.txt
       #cp to_erase.txt ${FILE}
@@ -133,6 +136,17 @@ if [ ${print_toctoc} = oui ];then
          echo "faire : xxdiff  to_erase.txt ${FILE}"
          exit
       fi
+
+      ./print_toctoc -fst data/${ITEM} -ip1m_only -out output_file.txt > to_erase.txt 2>&1
+      FILE=data/$(uname -s)/print_toctoc_ip1m_only_out_${ITEM}.txt
+      #cp output_file.txt ${FILE}
+      diff output_file.txt ${FILE}
+      if [ $? != 0 ];then
+         echo "ERROR 4.2: ./print_toctoc on data/${ITEM} do not mach with ${FILE}"
+	 echo "faire : xxdiff  output_file.txt ${FILE}"
+	 exit
+      fi
+
    done
 
    rm -f to_erase.txt
