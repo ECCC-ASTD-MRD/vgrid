@@ -1,0 +1,50 @@
+program tests
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_dpidpis,VGD_OK
+
+  implicit none
+
+  integer :: stat,lu=0,ni,nj,nk,fnom,fstouv,fstfrm,fclos
+  integer, dimension(:), pointer :: ip1_list
+  real, dimension(:), pointer :: dpidpis_profil
+  real :: sfc_field
+  type(vgrid_descriptor) :: vgd
+  
+  stat=fnom(lu,"/users/dor/afsg/apm/vcoord/trunk/tests/data/dm_5002_from_model_run","RND",0)
+  if(stat.lt.0)then
+     print*,'ERROR with fnom'
+     call abort
+  endif
+  stat=fstouv(lu,'RND')
+  if(stat.lt.0)then
+     print*,'No record in RPN file'
+     call abort
+  endif
+
+  ! Get vertical structure object
+  stat = vgd_new(vgd,unit=lu,format="fst")
+  if(stat.ne.VGD_OK)then
+     print*,'ERROR: problem with vgd_new'
+     call abort
+  endif
+
+  ! Get thermo ip1
+  stat = vgd_get(vgd,key='VIPT - level ip1 list (t)'        ,value=ip1_list)
+  if(stat.ne.VGD_OK)then
+     print*,'ERROR: problem with vgd_get on VIPT'
+     call abort
+  endif
+
+  ! Get dpidpis
+  ! sfc_field is the surface pressure in Pa
+  sfc_field=100000.
+  stat = vgd_dpidpis(vgd,sfc_field=sfc_field,ip1_list=ip1_list,dpidpis=dpidpis_profil)
+  if(stat.ne.VGD_OK)then
+     print*,'ERROR: problem with vgd_dpidpis'
+     call abort
+  endif
+
+  print*,dpidpis_profil
+
+  stat=fstfrm(lu)
+
+end program tests
