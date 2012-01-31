@@ -1,0 +1,10 @@
+. s.ssmuse.dot rmnlib-dev
+case ${BASE_ARCH} in
+   Linux_x86-64)COMP=pgi9xx;;
+          Linux)COMP=pgi9xx;;
+            AIX)COMP=xlf13;;
+   AIX-powerpc7)COMP=xlf13;;\
+              *)echo "ERROR ADD COMPILER FOR ${BASE_ARCH}"
+                exit 1;;
+esac
+. s.ssmuse.dot ${COMP}

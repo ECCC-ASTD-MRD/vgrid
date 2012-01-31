@@ -1,0 +1,4 @@
+vgd_new:
+--------
+For file with eta and hyb mixed vgd_new will abort since HY records are different even if
+user uses optional argument kind=1 or kind=2
