@@ -7,41 +7,113 @@ program constructor
 
   type(vgrid_descriptor) :: d
   integer, parameter :: nk=27
-  integer :: stat,k,i
-  integer, dimension(:), pointer :: vipm
-  real :: epsilon=1.e-6
-  real, dimension(:), pointer :: sigma
-  real*8, dimension(:), pointer :: b_m_8,a_m_8
+  integer :: stat,k,i,nl_m=-1,nl_t=-1
+  integer, dimension(:), pointer :: vipm,vipt,work_i
+  real :: my_epsilon=1.e-6
+  real, dimension(:), pointer :: sigma,vcdm,vcdt,work
+  real*8, dimension(:), pointer :: b_m_8,a_m_8,b_t_8,a_t_8,work_8
   logical :: OK=.true.
+  logical, parameter :: write_control_L=.false.
   character (len=1) :: dumc_S
-  
+  character (len=256) :: file
+
   allocate(sigma(nk))
   sigma=(/0.011000, 0.027000, 0.051000, 0.075000, 0.101000, 0.127000, 0.155000, 0.185000, 0.219000, 0.258000, 0.302000, 0.351000, 0.405000, 0.460000, 0.516000, 0.574000, 0.631000, 0.688000, 0.744000, 0.796000, 0.842000, 0.884000, 0.922000, 0.955000, 0.980000, 0.993000, 1.000000/)
 
   stat = vgd_new(d,kind=1,version=1,hyb=sigma)
-  stat = vgd_get(d,key='CB_M - vertical B coefficient',value=b_m_8)
-  stat = vgd_get(d,key='CA_M - vertical A coefficient',value=a_m_8)
-  stat = vgd_get(d,key='VIPM - level ip1 list (m)'    ,value=vipm)
+  stat = vgd_get(d,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8)
+  stat = vgd_get(d,key='CA_T - vertical A coefficient (t)'   ,value=a_t_8)
+  stat = vgd_get(d,key='CB_M - vertical B coefficient (m)'   ,value=b_m_8)
+  stat = vgd_get(d,key='CB_T - vertical B coefficient (t)'   ,value=b_t_8)
+  stat = vgd_get(d,key='VIPM - level ip1 list (m)'           ,value=vipm)
+  stat = vgd_get(d,key='VIPT - level ip1 list (t)'           ,value=vipt)
+  stat = vgd_get(d,key='VCDM - vertical coordinate (m)'      ,value=vcdm)
+  stat = vgd_get(d,key='VCDT - vertical coordinate (t)'      ,value=vcdt)
+  stat = vgd_get(d,key='NL_M - Number of vertical levels (m)',value=nl_m)
+  stat = vgd_get(d,key='NL_T - Number of vertical levels (t)',value=nl_t)
 
+  file='data_Linux/data_constructor_gen_1001.txt'
+  if(write_control_L)then
+     open(unit=10,file=file)
+     write(10,*)b_m_8
+     write(10,*)vipm
+     write(10,*)vcdm
+     close(10)
+  endif
+  
+  if(nl_m.ne.size(b_m_8))then
+     OK=.false.
+     print*,'Problem with NL_M 1001 should be',size(b_m_8),' got',nl_m
+  endif
+  if(nl_t.ne.size(b_m_8))then
+     OK=.false.
+     print*,'Problem with NL_T 1001 should be',size(b_m_8),' got',nl_t
+  endif
+
+  ! Check A
+  if(any(a_m_8.ne.0.d0))then
+     OK=.false.
+     print*,'Probleme avec A M, doit egaler 0.0d :',a_m_8
+  endif
+  if(any(a_t_8.ne.0.d0))then
+     OK=.false.
+     print*,'Probleme avec A T, doit egaler 0.0d :',a_t_8
+  endif
+  
+  ! Check B
+  open(unit=10,file=file,ACTION='READ')
+  allocate(work_8(size(a_m_8)))
+  print*,'Reading B'
+  read(10,*)work_8
   do k=1,nk
-     if(abs(b_m_8(k)-sigma(k))/sigma(k)>epsilon)then
+     if(abs(work_8(k)-b_m_8(k))/b_m_8(k)>10.*epsilon(b_m_8(k)))then
         OK=.false.
-        print*,'Probleme avec B 1001',b_m_8(k),' vs ',sigma(k)
+        print*,'Probleme avec B, pas dans les limites tollerees'
+        print*,work_8(k),'vs',b_m_8(k)
      endif
   enddo
+  if(any(b_m_8.ne.b_t_8))then
+     OK=.false.
+     print*,'Probleme avec B T, dot egaler B M :'
+     print*,b_t_8
+     print*,b_m_8
+  endif
+
+  ! Check IP
+  allocate(work_i(size(vipm)))
+  print*,'Reading IP'
+  read(10,*)work_i
   do k=1,nk
-     if(a_m_8(1).ne.0.d0)then
+     if(work_i(k).ne.vipm(k))then
         OK=.false.
-        print*,'Probleme avec A 1001, should be 0 got',a_m_8(k)
+        print*,'Probleme avec IP :'
+        print*,work_i(k),'vs',vipm(k)
      endif
   enddo
+  if(any(vipm.ne.vipt))then
+     OK=.false.
+     print*,'Probleme avec ip1 A , doit egaler ip1 M :'
+     print*,vipt
+     print*,vipm
+  endif
+
+  ! Check vcdm
+  allocate(work(size(vcdm)))
+  print*,'Reading VCDM'
+  read(10,*)work
   do k=1,nk
-     call convip(i,sigma(k),1   ,2,dumc_S,.false.)
-     if(i.ne.vipm(k))then
+     if(abs(work(k)-vcdm(k))/vcdm(k)>10.*epsilon(vcdm(k)))then
         OK=.false.
-        print*,'Probleme avec ip1 1001, should be',i,'got',vipm(k)
+        print*,'Probleme avec vcdm, pas dans les limites tollerees'
+        print*,work(k),'vs',vcdm(k)
      endif
-  enddo
+  enddo  
+  if(any(vcdm.ne.vcdt))then
+     OK=.false.
+     print*,'Probleme avec VCDT, doit egaler VCDM'
+     print*,vcdt
+     print*,vcdm
+  endif
 
   call ut_report(OK,'Grid_Descriptors::vgd_new vertical generate initializer (1001) value')
 

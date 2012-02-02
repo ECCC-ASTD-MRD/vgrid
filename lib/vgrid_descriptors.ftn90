@@ -30,18 +30,23 @@ module vGrid_Descriptors
   integer, parameter :: MAX_DESC_REC=10000      !maximum number of descriptor records in a single file
   character(len=1), dimension(3), parameter :: MATCH_GRTYP=(/'X','Y','Z'/) !grid types with ip1,2 to ig1,2 mapping
 
-  ! Validity table
-  integer, dimension(5), parameter :: ptop_8_valid=            (/1002,1003,5001,5002,5003/)
-  integer, dimension(4), parameter :: pref_8_valid=                 (/1003,5001,5002,5003/)
-  integer, dimension(4), parameter :: rcoef1_valid=                 (/1003,5001,5002,5003/)
-  integer, dimension(2), parameter :: rcoef2_valid=                           (/5002,5003/)
-  integer, dimension(7), parameter :: a_m_8_valid=   (/1001,1002,1003,2001,5001,5002,5003/)
-  integer, dimension(7), parameter :: b_m_8_valid=   (/1001,1002,1003,2001,5001,5002,5003/)
-  integer, dimension(2), parameter :: a_t_8_valid=                            (/5002,5003/)
-  integer, dimension(2), parameter :: b_t_8_valid=                            (/5002,5003/)
-  integer, dimension(7), parameter :: ip1_m_valid=   (/1001,1002,1003,2001,5001,5002,5003/)
-  integer, dimension(2), parameter :: ip1_t_valid=                            (/5002,5003/)
-  integer, dimension(6), parameter :: ref_name_valid=(/1001,1002,1003,5001,5002,5003/)
+  ! Validity table for self
+  integer, dimension(5), parameter :: ptop_8_valid=             (/1002,1003,5001,5002,5003/)
+  integer, dimension(4), parameter :: pref_8_valid=                  (/1003,5001,5002,5003/)
+  integer, dimension(4), parameter :: rcoef1_valid=                  (/1003,5001,5002,5003/)
+  integer, dimension(2), parameter :: rcoef2_valid=                            (/5002,5003/)
+  integer, dimension(7), parameter :: a_m_8_valid=    (/1001,1002,1003,2001,5001,5002,5003/)
+  integer, dimension(7), parameter :: b_m_8_valid=    (/1001,1002,1003,2001,5001,5002,5003/)
+  integer, dimension(2), parameter :: a_t_8_valid=                             (/5002,5003/)
+  integer, dimension(6), parameter :: a_t_8_valid_get=(/1001,1002,     2001,5001,5002,5003/)
+  integer, dimension(2), parameter :: b_t_8_valid=                             (/5002,5003/)
+  integer, dimension(6), parameter :: b_t_8_valid_get=(/1001,1002,     2001,5001,5002,5003/)
+  integer, dimension(7), parameter :: ip1_m_valid=    (/1001,1002,1003,2001,5001,5002,5003/)
+  integer, dimension(2), parameter :: ip1_t_valid=                             (/5002,5003/)
+  integer, dimension(6), parameter :: ip1_t_valid_get=(/1001,1002,     2001,5001,5002,5003/)
+  integer, dimension(6), parameter :: ref_name_valid= (/1001,1002,1003     ,5001,5002,5003/)
+  integer, dimension(7), parameter :: nl_m_valid=     (/1001,1002,1003,2001,5001,5002,5003/)
+  integer, dimension(7), parameter :: nl_t_valid=     (/1001,1002,1003,2001,5001,5002,5003/)
 
   ! FST file record structure
   type FSTD
@@ -745,8 +750,8 @@ contains
     integer, intent(out) :: value                       !Retrieved value
     
     ! Local variables
-    integer :: error
-
+    integer :: istat
+    integer, dimension(:), pointer :: vip
     ! Set error status
     status = VGD_ERROR
 
@@ -773,6 +778,20 @@ contains
        value = self%kind
     case ('VERS')
        value = self%version
+    case ('NL_M')
+       istat=vgd_get(self,key='VIPM - level ip1 list (m)',value=vip)
+       if(istat /= VGD_OK)then
+          deallocate(vip)
+          return
+       endif
+       value=size(vip)
+    case ('NL_T')
+       istat=vgd_get(self,key='VIPT - level ip1 list (m)',value=vip)
+       if(istat /= VGD_OK)then
+          deallocate(vip)
+          return
+       endif
+       value=size(vip)
     case DEFAULT
        write(STDERR,*) 'ERROR: invalid key '//trim(key)//' given to gd_get (int)'
        return
@@ -819,10 +838,16 @@ contains
           return
        endif
     case ('VIPT')
-       if (is_valid(self,ip1_t_valid)) then
-          istat = get_allocate(key,value,size(self%ip1_t))
-          if (istat /= 0) return
-          value = self%ip1_t
+       if (is_valid(self,ip1_t_valid_get)) then
+          if (is_valid(self,ip1_t_valid)) then
+             istat = get_allocate(key,value,size(self%ip1_t))
+             if (istat /= 0) return
+             value = self%ip1_t
+          else
+             istat = get_allocate(key,value,size(self%ip1_m))
+             if (istat /= 0) return
+             value = self%ip1_m
+          endif
        else
           error = int(get_error(key))
           return
@@ -880,6 +905,7 @@ contains
 
     ! Internal variables
     integer :: k,istat,error
+    integer, dimension(:), pointer :: vipt
 
     ! Set error status
     status = VGD_ERROR
@@ -903,12 +929,16 @@ contains
           return
        endif
     case ('VCDT')
-       if (is_valid(self,ip1_t_valid)) then
-          istat = get_allocate(key,value,size(self%ip1_t))
-          if (istat /= 0) return
+       if (is_valid(self,ip1_t_valid_get)) then
+          istat=vgd_get(self,key='VIPT - level ip1 list (t)',value=vipt)
+          if (istat /= VGD_OK)then
+             deallocate(vipt)
+             return
+          endif
+          istat = get_allocate(key,value,size(self%ip1_m))
           call convip(k,value(1),self%kind,0,'',.false.)
-          do k=1,size(value)
-             call convip(self%ip1_t(k),value(k),self%kind,-1,'',.false.)
+          do k=1,size(vipt)
+             call convip(vipt(k),value(k),self%kind,-1,'',.false.)
           enddo
        else
           error = int(get_error(key))
@@ -1018,19 +1048,31 @@ contains
           return
        endif
     case ('CA_T')
-       if (is_valid(self,a_t_8_valid)) then
-          istat = get_allocate(key,value,size(self%a_t_8))
-          if (istat /= 0) return
-          value = self%a_t_8
+       if (is_valid(self,a_t_8_valid_get)) then
+          if(is_valid(self,a_t_8_valid)) then
+             istat = get_allocate(key,value,size(self%a_t_8))
+             if (istat /= 0) return
+             value = self%a_t_8
+          else
+             istat = get_allocate(key,value,size(self%a_m_8))
+             if (istat /= 0) return
+             value = self%a_m_8
+          endif
        else
           error = int(get_error(key))
           return
        endif
     case ('CB_T')
-       if (is_valid(self,b_t_8_valid)) then
-          istat = get_allocate(key,value,size(self%b_t_8))
-          if (istat /= 0) return
-          value = self%b_t_8
+       if (is_valid(self,b_t_8_valid_get)) then
+          if (is_valid(self,b_t_8_valid)) then
+             istat = get_allocate(key,value,size(self%b_t_8))
+             if (istat /= 0) return
+             value = self%b_t_8
+          else
+             istat = get_allocate(key,value,size(self%b_m_8))
+             if (istat /= 0) return
+             value = self%b_m_8
+          endif
        else
           error = int(get_error(key))
           return
