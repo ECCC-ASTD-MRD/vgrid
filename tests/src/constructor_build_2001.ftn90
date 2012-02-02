@@ -1,23 +1,72 @@
 program constructor
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,VGD_ERROR
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_print,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
 
   type(vgrid_descriptor) :: d
-  integer :: stat,i
+  integer :: stat,i,nl_m,nl_t
   integer, dimension(:), allocatable :: ip1s
+  integer, dimension(:), pointer :: vipm,vipt
   real(kind=8), dimension(4) :: pres=(/1000.,925.,850.,700./),b=(/0.,0.,0.,0./)
   real*8, dimension(:,:,:), pointer :: tbl
+  real*8, dimension(:), pointer :: a_m,a_t,b_m,b_t
+  real, dimension(:), pointer :: vcdm,vcdt
+  real :: my_real
+  logical :: OK
+  character(len=1) :: dum_S
 
   ! Construct a new set of 3D coordinate descriptors
   pres = pres*100. !convert mb to Pa
   allocate(ip1s(size(pres)))
   do i=1,size(ip1s)
-     call convip(ip1s(i),pres(i),2,2,'',.false.)
+     my_real=pres(i)/100.
+     call convip(ip1s(i),my_real,2,2,dum_S,.false.)
   enddo
+
   stat = vgd_new(d,kind=2,version=1,nk=size(pres),ip1_m=ip1s,a_m_8=pres,b_m_8=b)
   stat = vgd_get(d,key='VTBL - vertical coordinate table',value=tbl)
-  call ut_report(abs(tbl(2,2,1)-pres(1)) < epsilon(pres),'Grid_Descriptors::vgd_new vertical build initializer (2001) value')
+  OK=abs(tbl(2,2,1)-pres(1)) < epsilon(pres)
+  
+  stat = vgd_get(d,'CA_M - vertical A coefficient (m)',value=a_m)
+  stat = vgd_get(d,'CA_T - vertical A coefficient (t)',value=a_t)
+  if(any(a_m.ne.a_t))then
+     print*,'Problem with CA_T, not equal to CA_M for vcode 2001'
+     OK=.false.
+  endif
+
+  stat = vgd_get(d,'CB_M - vertical B coefficient (m)',value=b_m)
+  stat = vgd_get(d,'CB_T - vertical B coefficient (t)',value=b_t)
+  if(any(b_m.ne.b_t))then
+     print*,'Problem with CB_T, not equal to CB_M for vcode 2001'
+     OK=.false.
+  endif
+
+  stat = vgd_get(d,'VCDM - vertical coordinate (m)',value=vcdm)
+  stat = vgd_get(d,'VCDT - vertical coordinate (t)',value=vcdt)
+  if(any(vcdm.ne.vcdt))then
+     print*,'Problem with VCDT , not equal to VCDT for vcode 2001'
+     OK=.false.
+  endif
+
+  stat = vgd_get(d,'VIPM - level ip1 list (m)',value=vipm)
+  stat = vgd_get(d,'VIPT - level ip1 list (t)',value=vipt)
+  if(any(vipm.ne.vipt))then
+     print*,'Problem with VIPT, not equal to VIPM for vcode 2001'
+     OK=.false.
+  endif
+
+  stat = vgd_get(d,key='NL_M - Number of vertical levels (m)',value=nl_m)
+  stat = vgd_get(d,key='NL_T - Number of vertical levels (t)',value=nl_t)
+  if(nl_m.ne.size(a_m))then
+     OK=.false.
+     print*,'Problem with NL_M for vcode 2001 should be',size(a_m),' got',nl_m     
+  endif
+  if(nl_t.ne.size(a_t))then
+     OK=.false.
+     print*,'Problem with NL_T for vcode 2001 should be',size(a_t),' got',nl_t     
+  endif
+
+  call ut_report(OK,'Grid_Descriptors::vgd_new vertical build initializer (2001) value')
 
 end program constructor
