@@ -1,6 +1,6 @@
-convert_toctoc_5002=non
+convert_toctoc_5002=oui
 
-add_toctoc_and_compute_pressure=non
+add_toctoc_and_compute_pressure=oui
 
 print_toctoc=oui
 
