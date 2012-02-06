@@ -541,6 +541,7 @@ contains
       use vdescript_1001
       use vdescript_1002_5001
       use vdescript_5002
+      use vdescript_2001
       ! Coordinate constructor - build vertical descriptor from hybrid coordinate entries
       type(vgrid_descriptor), intent(out) :: self       !Vertical descriptor instance    
       integer, intent(in) :: kind,version               !Kind,version to create
@@ -642,6 +643,18 @@ contains
               ptop_8=ptop_8,       &
               a_m_8=a_m_8,         &
               b_m_8=b_m_8,         &
+              ip1_m=ip1_m)
+         if (error /= VGD_OK) return
+      case(2001)
+         call vgrid_genab_2001(6,hyb,a_m_8,b_m_8,error,ip1=ip1_m)
+         if (error /= VDESC_2001_OK)then
+            return
+         endif
+         error = vgd_new(self,kind,version,size(hyb), &
+              ip1=myip1,         &
+              ip2=myip2,         &
+              a_m_8=a_m_8,       &
+              b_m_8=b_m_8,       &
               ip1_m=ip1_m)
          if (error /= VGD_OK) return
       case (5001)
