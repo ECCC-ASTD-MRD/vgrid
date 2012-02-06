@@ -110,7 +110,7 @@ integer function test_5002(F_d,F_file,F_write_control_L) result(istat)
   print*,'Reading A M'
   read(10,*)work_8
   do k=1,nk
-     if(abs(work_8(k)-a_m_8(k))/a_m_8(k)>10.*epsilon(a_m_8(k)))then
+     if(abs(work_8(k)-a_m_8(k))/a_m_8(k)>10.*epsilon(1.))then
         istat=VGD_ERROR
         print*,'Probleme avec A M, pas dans les limites tollerees'
         print*,work_8(k),'vs',a_m_8(k)
@@ -119,7 +119,7 @@ integer function test_5002(F_d,F_file,F_write_control_L) result(istat)
   print*,'Reading A T'
   read(10,*)work_8
   do k=1,nk
-     if(abs(work_8(k)-a_t_8(k))/a_t_8(k)>10.*epsilon(a_t_8(k)))then
+     if(abs(work_8(k)-a_t_8(k))/a_t_8(k)>10.*epsilon(1.))then
         istat=VGD_ERROR
         print*,'Probleme avec A T, pas dans les limites tollerees'
         print*,work_8(k),'vs',a_t_8(k)
