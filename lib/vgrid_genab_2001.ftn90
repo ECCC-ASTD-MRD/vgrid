@@ -33,7 +33,7 @@ module vdescript_2001
 
 contains
 
-   subroutine vgrid_genab_2001 (F_unout,F_pres,F_a_8,F_b_8,F_err)
+   subroutine vgrid_genab_2001 (F_unout,F_pres,F_a_8,F_b_8,F_err,ip1)
 
       !    Using pres coordinate generate A=0 and B=convip(...,F_pres,...)
       
@@ -44,6 +44,7 @@ contains
       integer, intent(in) :: F_unout             ! stdout fortran unit for messaging
       real, dimension(:), intent(in) :: F_pres    ! user specification for vertical layering eta
       real*8, dimension(:), pointer :: F_a_8, F_b_8 ! model As and Bs
+      integer, dimension(:), pointer, optional :: ip1 ! ip1 value
       
       ! Local variables
       integer :: k,i, status, nk
@@ -87,10 +88,19 @@ contains
       !
       do k=1,nk
          F_b_8(k)=0.0
-         F_a_8(k)=F_pres(k)
+         F_a_8(k)=F_pres(k)*100.d0
       end do
       !
+      if(present(ip1))then
+         status = reallocate(ip1,1,nk)
+         if (status /= VDESC_2001_OK) return
+         do k=1,nk
+            call convip(ip1(k),F_pres(k),2,2,dumc_S,.false.)
+         enddo
+      endif
+      !
       F_err = VDESC_2001_OK
+      !
       return
 
 1000  format (/' ===> WRONG SPECIFICATION OF PRESSURE VERTICAL LEVELS:'/&
