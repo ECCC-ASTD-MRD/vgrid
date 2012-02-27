@@ -8,8 +8,8 @@ include config/config.mk
 ssm: profile.sh
 	echo "Creating SSM package $(SSMPACKAGE)..."
 	ssmprep --basePath $(shell pwd)/$(SSMPACKAGE) -p $(SSMPACKAGE) --editorPath /bin/echo; \
-        chmod a+x pre-publish;
-	cp pre-publish profile.sh $(SSMPACKAGE)/.ssm.d;
+        chmod a+x post-install;
+	cp post-install profile.sh $(SSMPACKAGE)/.ssm.d;
 	mkdir -p $(SSMPACKAGE)/src/base $(SSMPACKAGE)/src/bin $(SSMPACKAGE)/src/examples; \
 	find ../lib -name "*.ftn90" -exec cp {}  $(SSMPACKAGE)/src/base \; ; \
 	find ../bin -name "*.ftn90" -exec cp {} $(SSMPACKAGE)/src/bin \; ; \
