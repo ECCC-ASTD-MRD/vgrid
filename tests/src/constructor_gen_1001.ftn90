@@ -32,7 +32,7 @@ program constructor
   stat = vgd_get(d,key='NL_M - Number of vertical levels (m)',value=nl_m)
   stat = vgd_get(d,key='NL_T - Number of vertical levels (t)',value=nl_t)
 
-  file='data_Linux/data_constructor_gen_1001.txt'
+  file='data/data_constructor_gen_1001.txt'
   if(write_control_L)then
      open(unit=10,file=file)
      write(10,*)b_m_8
