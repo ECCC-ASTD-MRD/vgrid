@@ -45,7 +45,7 @@ program constructor
   print*,'===== 1002 Test on complete level set ===='
   stat = vgd_new(d,kind=1,version=2,hyb=hyb_N,ptop_8=ptop_N)
 
-  file='data_Linux/data_constructor_gen_1002.txt'
+  file='data/data_constructor_gen_1002.txt'
   stat = test_1002_5001(d,file,write_control_L)
   if(stat.eq.VGD_ERROR)OK=.false.
 
@@ -94,7 +94,7 @@ program constructor
      print*,ptop,' should equal ',w1
   endif
 
-  file='data_Linux/data_constructor_gen_1005.txt'
+  file='data/data_constructor_gen_5001.txt'
   stat = test_1002_5001(d,file,write_control_L)
   if(stat.eq.VGD_ERROR)OK=.false.
 

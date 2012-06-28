@@ -10,7 +10,8 @@ program constructor
   type(vgrid_descriptor) :: d
   integer :: stat,nl_m,nl_t
   real :: epsilon=1.e-6
-  real, dimension(57) :: hyb=(/0.0134575, 0.0203980, 0.0333528, 0.0472815, 0.0605295, 0.0720790, &
+  real, dimension(57) :: hyb= &
+     (/0.0134575, 0.0203980, 0.0333528, 0.0472815, 0.0605295, 0.0720790, &
        0.0815451, 0.0889716, 0.0946203, 0.0990605, 0.1033873, 0.1081924, &
        0.1135445, 0.1195212, 0.1262188, 0.1337473, 0.1422414, 0.1518590, &
        0.1627942, 0.1752782, 0.1895965, 0.2058610, 0.2229843, 0.2409671, &
@@ -31,17 +32,17 @@ program constructor
   ! Construct a new set of vertical coordinate descriptors 5002
   stat = vgd_new(d,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
 
-  file='data_Linux/data_constructor_gen_5002.txt'
+  file='data/data_constructor_gen_5002.txt'
   stat = test_5002(d,file,write_control_L)
   if(stat.eq.VGD_ERROR)OK=.false.
 
   ! Construct a new set of vertical coordinate descriptors 5003
   stat = vgd_new(d,kind=5,version=3,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
 
-  file='data_Linux/data_constructor_gen_5003.txt'
+  file='data/data_constructor_gen_5003.txt'
   stat = test_5002(d,file,write_control_L)
   if(stat.eq.VGD_ERROR)OK=.false.
-  
+
   call ut_report(OK,'Grid_Descriptors::vgd_new vertical generate initializer (5002) value')
 end program constructor
 !==============================================================================
@@ -110,19 +111,22 @@ integer function test_5002(F_d,F_file,F_write_control_L) result(istat)
   print*,'Reading A M'
   read(10,*)work_8
   do k=1,nk
-     if(abs(work_8(k)-a_m_8(k))/a_m_8(k)>10.*epsilon(1.))then
+     if(abs(work_8(k)-a_m_8(k))/a_m_8(k)>10.*epsilon(a_m_8(k)))then
         istat=VGD_ERROR
         print*,'Probleme avec A M, pas dans les limites tollerees'
-        print*,work_8(k),'vs',a_m_8(k)
+        print*,work_8(k),'vs'
+        print*,a_m_8(k)
      endif
   enddo
+
   print*,'Reading A T'
   read(10,*)work_8
   do k=1,nk
      if(abs(work_8(k)-a_t_8(k))/a_t_8(k)>10.*epsilon(1.))then
         istat=VGD_ERROR
         print*,'Probleme avec A T, pas dans les limites tollerees'
-        print*,work_8(k),'vs',a_t_8(k)
+        print*,work_8(k),'vs'
+        print*,a_t_8(k)
      endif
   enddo
  
@@ -133,7 +137,8 @@ integer function test_5002(F_d,F_file,F_write_control_L) result(istat)
      if(abs(work_8(k)-b_m_8(k))/b_m_8(k)>10.*epsilon(1.))then
         istat=VGD_ERROR
         print*,'Probleme avec B M, pas dans les limites tollerees'
-        print*,work_8(k),'vs',b_m_8(k)
+        print*,work_8(k),'vs'
+        print*,b_m_8(k)
      endif
   enddo
   print*,'Reading B T'
@@ -142,7 +147,8 @@ integer function test_5002(F_d,F_file,F_write_control_L) result(istat)
      if(abs(work_8(k)-b_t_8(k))/b_t_8(k)>10.*epsilon(1.))then
         istat=VGD_ERROR
         print*,'Probleme avec B T, pas dans les limites tollerees'
-        print*,work_8(k),'vs',b_t_8(k)
+        print*,work_8(k),'vs'
+        print*,b_t_8(k)
      endif
   enddo
 
@@ -154,7 +160,8 @@ integer function test_5002(F_d,F_file,F_write_control_L) result(istat)
      if(work_i(k).ne.vipm(k))then
         istat=VGD_ERROR
         print*,'Probleme avec IP:'
-        print*,work_i(k),'vs',vipm(k)
+        print*,work_i(k),'vs'
+        print*,vipm(k)
      endif
   enddo
   print*,'Reading IP T'
@@ -163,7 +170,8 @@ integer function test_5002(F_d,F_file,F_write_control_L) result(istat)
      if(work_i(k).ne.vipt(k))then
         istat=VGD_ERROR
         print*,'Probleme avec IP:'
-        print*,work_i(k),'vs',vipt(k)
+        print*,work_i(k),'vs'
+        print*,vipt(k)
      endif
   enddo
 
@@ -175,7 +183,8 @@ integer function test_5002(F_d,F_file,F_write_control_L) result(istat)
      if(abs(work(k)-vcdm(k))/vcdm(k)>10.*epsilon(vcdm(k)))then
         istat=VGD_ERROR
         print*,'Probleme avec vcdm, pas dans les limites tollerees'
-        print*,work(k),'vs',vcdm(k)
+        print*,work(k),'vs'
+        print*,vcdm(k)
      endif
   enddo  
   print*,'Reading VCDT'
@@ -184,7 +193,8 @@ integer function test_5002(F_d,F_file,F_write_control_L) result(istat)
      if(abs(work(k)-vcdt(k))/vcdt(k)>10.*epsilon(vcdt(k)))then
         istat=VGD_ERROR
         print*,'Probleme avec vcdt, pas dans les limites tollerees'
-        print*,work(k),'vs',vcdt(k)
+        print*,work(k),'vs'
+        print*,vcdt(k)
      endif
   enddo  
 

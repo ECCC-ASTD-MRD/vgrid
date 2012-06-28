@@ -56,6 +56,9 @@ contains
    
    subroutine vgrid_genab_5002 (F_unout,F_hybuser,F_rcoef,F_ptop_8,F_pref_8, &
         F_hybm,F_hybt,F_am_8,F_bm_8,F_at_8,F_bt_8,F_ip1_m,F_ip1_t,F_err,lastTatU_L)
+
+    ! Modifs 
+    ! Andre Plante June 2012 : force real*8 in compuation of log(F_hybuser(k)*1.d0) in
       
     implicit none
     !      
@@ -174,7 +177,7 @@ contains
     !
     pr1 = 1.0d0/(zsrf_8 - ztop_8)
     do k = 1, Nk
-       zeta_8  = zsrf_8+log(F_hybuser(k))
+       zeta_8  = zsrf_8+log(F_hybuser(k)*1.d0)
        eta_8  = (zeta_8- ztop_8)*pr1
        rcoef   = F_rcoef(2)-(F_rcoef(2)-F_rcoef(1))*eta_8
        F_bm_8(k) = eta_8 ** rcoef

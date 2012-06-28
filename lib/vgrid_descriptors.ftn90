@@ -3390,20 +3390,29 @@ contains
           enddo
        endif
        if (.not.found) then
-          write(STDERR,*) 'ERROR: cannot find ip1 ',ip1_list(i),' in compute_pressure_5002'
+          write(STDERR,*) 'ERROR: cannot find ip1 ',ip1_list(i),' in compute_pressure_5002_8'
           return
        endif
     enddo
 
     ! Compute pressure
-    s_8 = log(dble(sfc_field)/self%pref_8)
+    !s_8 = log(dble(sfc_field)/self%pref_8)
+    ! Andre Plante dble(sfc_field) not needed since sfc_field already real*8
+    s_8 = log(sfc_field/self%pref_8)
     do i=1,nk
        levels(:,:,i) = aa_8(i) + bb_8(i)*s_8
     enddo
-    if (.not.in_log) levels = exp(levels)
+    if (.not.in_log)then
+       levels = exp(levels)
+       ! Force surface pressure to be equal to sfc_field
+       ! Needed by assimilation section.
+       do i=1,nk
+          if(bb_8(i).eq.1.)levels(:,:,i)=sfc_field
+       enddo       
+    endif
     if(dpidpis)then
        if(in_log)then
-          write(STDERR,*) 'ERROR: in compute_pressure_5002, cannot get dpidpis in log'
+          write(STDERR,*) 'ERROR: in compute_pressure_5002_8, cannot get dpidpis in log'
           return
        endif
        do i=1,nk
