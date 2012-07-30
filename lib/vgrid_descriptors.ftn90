@@ -2138,7 +2138,6 @@ contains
        write(STDERR,*) 'ERROR: cannot allocate space for levels in diag_withref_8'
        return
     endif
-
     ! Compute levels for known vertical coordinates
     select case (self%vcode)
     case (1001)
@@ -2608,7 +2607,7 @@ contains
      type(vgrid_descriptor), intent(inout) :: self  !Vertical descriptor instance
      
      ! Local variables
-     integer :: skip,nj,nk,k,ind,error
+     integer :: skip,nj,nk,k,ind,error,istat
 
      ! Set error status
      status = VGD_ERROR
@@ -2629,11 +2628,23 @@ contains
 
      ! Allocate and assign level data
      if (associated(self%ip1_m)) deallocate(self%ip1_m)
-     allocate(self%ip1_m(nk))
+     allocate(self%ip1_m(nk),stat=istat)
+     if (istat /= 0) then
+        write(STDERR,*) 'ERROR: unable to allocate self%ip1_m(nk) in decode_vert_1001'
+        return
+     endif
      if (associated(self%a_m_8)) deallocate(self%a_m_8)
-     allocate(self%a_m_8(nk))
+     allocate(self%a_m_8(nk),stat=istat)
+     if (istat /= 0) then
+        write(STDERR,*) 'ERROR: unable to allocate self%a_m_8 in decode_vert_1001'
+        return
+     endif
      if (associated(self%b_m_8)) deallocate(self%b_m_8)
-     allocate(self%b_m_8(nk))     
+     allocate(self%b_m_8(nk),stat=istat)
+     if (istat /= 0) then
+        write(STDERR,*) 'ERROR: unable to allocate self%b_m_8(nk) in decode_vert_1001'
+        return
+     endif     
 
      do k=1,nk
         ind=k+skip
@@ -2651,7 +2662,7 @@ contains
      type(vgrid_descriptor), intent(inout) :: self  !Vertical descriptor instance
      
      ! Local variables
-     integer :: skip,nj,nk,k,ind,error
+     integer :: skip,nj,nk,k,ind,error,istat
 
      ! Set error status
      status = VGD_ERROR
@@ -2673,11 +2684,23 @@ contains
 
      ! Allocate and assign level data
      if (associated(self%ip1_m)) deallocate(self%ip1_m)
-     allocate(self%ip1_m(nk))
+     allocate(self%ip1_m(nk),stat=istat)
+     if (istat /= 0) then
+        write(STDERR,*) 'ERROR: unable to allocate self%ip1_m(nk) in decode_vert_1002'
+        return
+     endif
      if (associated(self%a_m_8)) deallocate(self%a_m_8)
-     allocate(self%a_m_8(nk))
+     allocate(self%a_m_8(nk),stat=istat)
+     if (istat /= 0) then
+        write(STDERR,*) 'ERROR: unable to allocate self%a_m_8(nk) in decode_vert_1002'
+        return
+     endif
      if (associated(self%b_m_8)) deallocate(self%b_m_8)
-     allocate(self%b_m_8(nk))     
+     allocate(self%b_m_8(nk),stat=istat)
+     if (istat /= 0) then
+        write(STDERR,*) 'ERROR: unable to allocate self%b_m_8(nk) in decode_vert_1002'
+        return
+     endif     
 
      do k=1,nk
         ind=k+skip
@@ -2695,7 +2718,7 @@ contains
     type(vgrid_descriptor), intent(inout) :: self  !Vertical descriptor instance
 
     ! Local variables
-    integer :: skip,nj,nk,k,ind
+    integer :: skip,nj,nk,k,ind,istat
     
     ! Set error status
     status = VGD_ERROR
@@ -2709,11 +2732,23 @@ contains
 
     ! Allocate and assign pressure level data
     if (associated(self%ip1_m)) deallocate(self%ip1_m)
-    allocate(self%ip1_m(nk))
+    allocate(self%ip1_m(nk),stat=istat)
+    if (istat /= 0) then
+       write(STDERR,*) 'ERROR: unable to allocate self%ip1_m(nk) in decode_vert_2001'
+       return
+    endif
     if (associated(self%a_m_8)) deallocate(self%a_m_8)
-    allocate(self%a_m_8(nk))
+    allocate(self%a_m_8(nk),stat=istat)
+    if (istat /= 0) then
+       write(STDERR,*) 'ERROR: unable to allocate self%a_m_8(nk) in decode_vert_2001'
+       return
+    endif
     if (associated(self%b_m_8)) deallocate(self%b_m_8)
-    allocate(self%b_m_8(nk))
+    allocate(self%b_m_8(nk),stat=istat)
+    if (istat /= 0) then
+       write(STDERR,*) 'ERROR: unable to allocate self%b_m_8(nk) in decode_vert_2001'
+       return
+    endif
 
     do k=1,nk
        ind=k+skip
@@ -2731,7 +2766,7 @@ contains
      type(vgrid_descriptor), intent(inout) :: self  !Vertical descriptor instance
      
      ! Local variables
-     integer :: skip,nj,nk,k,ind,error
+     integer :: skip,nj,nk,k,ind,error,istat
 
      ! Set error status
      status = VGD_ERROR
@@ -2757,11 +2792,23 @@ contains
 
      ! Allocate and assign level data
      if (associated(self%ip1_m)) deallocate(self%ip1_m)
-     allocate(self%ip1_m(nk))
+     allocate(self%ip1_m(nk),stat=istat)
+     if (istat /= 0) then
+        write(STDERR,*) 'ERROR: unable to allocate self%ip1_m(nk) in decode_vert_5001'
+        return
+     endif
      if (associated(self%a_m_8)) deallocate(self%a_m_8)
-     allocate(self%a_m_8(nk))
+     allocate(self%a_m_8(nk),stat=istat)
+     if (istat /= 0) then
+        write(STDERR,*) 'ERROR: unable to allocate self%a_m_8(nk) in decode_vert_5001'
+        return
+     endif
      if (associated(self%b_m_8)) deallocate(self%b_m_8)
-     allocate(self%b_m_8(nk))     
+     allocate(self%b_m_8(nk),stat=istat)
+     if (istat /= 0) then
+        write(STDERR,*) 'ERROR: unable to allocate self%b_m_8(nk) in decode_vert_5001'
+        return
+     endif
 
      do k=1,nk
         ind=k+skip
@@ -2779,7 +2826,7 @@ contains
      type(vgrid_descriptor), intent(inout) :: self  !Vertical descriptor instance
      
      ! Local variables
-     integer :: skip,nj,nk,k,ind,error
+     integer :: skip,nj,nk,k,ind,error,istat
 
      ! Set error status
      status = VGD_ERROR
@@ -2807,11 +2854,23 @@ contains
 
      ! Allocate and assign momentum level data
      if (associated(self%ip1_m)) deallocate(self%ip1_m)
-     allocate(self%ip1_m(nk+1))
+     allocate(self%ip1_m(nk+1),stat=istat)
+     if (istat /= 0) then
+        write(STDERR,*) 'ERROR: unable to allocate self%ip1_m(nk+1) in decode_vert_5002'
+        return
+     endif
      if (associated(self%a_m_8)) deallocate(self%a_m_8)
-     allocate(self%a_m_8(nk+1))
+     allocate(self%a_m_8(nk+1),stat=istat)
+     if (istat /= 0) then
+        write(STDERR,*) 'ERROR: unable to allocate self%a_m_8(nk+1) in decode_vert_5002'
+        return
+     endif
      if (associated(self%b_m_8)) deallocate(self%b_m_8)
-     allocate(self%b_m_8(nk+1))     
+     allocate(self%b_m_8(nk+1),stat=istat)
+     if (istat /= 0) then
+        write(STDERR,*) 'ERROR: unable to allocate self%b_m_8(nk+1) in decode_vert_5002'
+        return
+     endif
 
      do k=1,nk+1
         ind=k+skip
@@ -2822,11 +2881,23 @@ contains
 
      ! Allocate and assign thermodynamic level data
      if (associated(self%ip1_t)) deallocate(self%ip1_t)
-     allocate(self%ip1_t(nk+2))
+     allocate(self%ip1_t(nk+2),stat=istat)
+     if (istat /= 0) then
+        write(STDERR,*) 'ERROR: unable to allocate self%ip1_t(nk+2) in decode_vert_5002'
+        return
+     endif
      if (associated(self%a_t_8)) deallocate(self%a_t_8)
-     allocate(self%a_t_8(nk+2))
+     allocate(self%a_t_8(nk+2),stat=istat)
+     if (istat /= 0) then
+        write(STDERR,*) 'ERROR: unable to allocate self%a_t_8(nk+2) in decode_vert_5002'
+        return
+     endif
      if (associated(self%b_t_8)) deallocate(self%b_t_8)
-     allocate(self%b_t_8(nk+2))     
+     allocate(self%b_t_8(nk+2),stat=istat)
+     if (istat /= 0) then
+        write(STDERR,*) 'ERROR: unable to allocate self%b_t_8(nk+2) in decode_vert_5002'
+        return
+     endif
 
      do k=1,nk+2
         ind=k+skip+nk+1
@@ -3420,7 +3491,6 @@ contains
        enddo
     endif
 
-
     ! Set status and return
     status = VGD_OK
     return
@@ -3589,7 +3659,7 @@ contains
     external  fstinl,fstinf,fstprm,fstluk,fnom,read_decode_hyb,hyb_to_pres,eta_to_pres,&
          sigma_to_pres,etasef_to_pres
     
-    integer :: ier,nvar,error,origkind
+    integer :: ier,nvar,error,origkind,istat
     integer,dimension(:),pointer :: ip1
     real :: x1
     real,dimension(:),pointer :: hyb,hybm
@@ -3609,8 +3679,12 @@ contains
     
     status=VGD_ERROR
     
-    allocate(ip1(nlev),hyb(nlev),hybm(nlev))
-
+    allocate(ip1(nlev),hyb(nlev),hybm(nlev),stat=istat)
+    if (istat /= 0) then
+       write(STDERR,*) 'ERROR: unable to allocate ip1,hyb,hybm, in gen_legacy_desc'
+       return
+    endif
+    
     ier = fstprm (fstkeys(1), dateo, deet, ipas, nia, nja, nka, &
          bit, datyp, ip1a,ip2a,ip3a, tva, var, etik_S, grda, &
          ig1a,ig2a,ig3a,ig4a, swa,lng, dlf, ubc, ex1, ex2, ex3 )
@@ -3857,7 +3931,7 @@ contains
     ! Local variables
     integer, parameter :: nmax=1000
     integer, dimension(nmax) :: liste
-    integer :: infon,ier,fstinl,fstluk,ni,nj,nk,k
+    integer :: infon,ier,fstinl,fstluk,ni,nj,nk,k,istat
     real, dimension(:,:),allocatable :: work
     type(FSTD_ext) :: record
 
@@ -3868,7 +3942,11 @@ contains
     if(infon.gt.1)then
        write(STDERR,*) '  More than one ',F_nomvar,', checking consistency ...'
     endif
-    allocate(work(ni,nj))
+    allocate(work(ni,nj),stat=istat)
+    if (istat /= 0) then
+       write(STDERR,*) 'ERROR: unable to allocate work(ni,nj) in get_consistent_pt_e1'
+       return
+    endif
     
     do k=1,infon       
        ier=my_fstprm(liste(k),record)

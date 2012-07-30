@@ -78,10 +78,10 @@ module mod_comp_pres
       type (vgrid_descriptor) :: vgd
       integer, parameter :: nmax=1000
       integer, dimension(nmax) :: liste
-      integer :: nk2,nk3,ier,fstinl,fstluk,fstecr,ni,nj,nk,infon,i,k,kind
-      integer, dimension(:), pointer :: ip1_list,ip1_list2,ip1_list3
+      integer :: nk2,nk3,ier,fstinl,fstluk,fstecr,ni,nj,nk,infon,i,j,k,kind
+      integer, dimension(:), pointer :: ip1_list,ip1_list2,ip1_list3,ip1_single
       character(len=4) :: nomvar,dummy_S
-      real :: dummy,ppp
+      real :: dummy
       real, dimension(:,:,:), pointer :: pres
       real, dimension(:,:), pointer :: work
       !
@@ -100,6 +100,8 @@ module mod_comp_pres
             call exit(1)
          endif
       endif
+      !
+      allocate(ip1_single(1))
       !
       if(trim(F_group).eq.'THERMO')then
          ier=vgd_get(vgd,'VIPT - level ip1 list (t)',value=ip1_list)
@@ -212,18 +214,18 @@ module mod_comp_pres
          !
          work=record%data
          record%data=record%data*100.
-         ier=vgd_levels(vgd,sfc_field=record%data,ip1_list=ip1_list,levels=pres)
-         if(ier.ne.VGD_OK)then
-            print*,'Error with vgd_levels for var (group) ',F_group
-            return
-         endif
-         pres=pres/100.
-         ! The following is to make sure PX at surface is the same as P0
-         call convip(ip1_list(size(ip1_list)),ppp,kind,-1,dummy_S,.false.)
-         if(abs(ppp-1.) <= epsilon(ppp))pres(:,:,size(pres,3))=work
-         do k=1,size(pres,3)
-            ier=fstecr(pres(1,1,k),dummy,-record%nbits,F_luo,record%dateo,record%deet,record%npas, &
-                 record%ni,record%nj,record%nk,ip1_list(k),record%ip2,record%ip3, &
+         ! Loop on ip1_list was added since memory allocation for the cube was too large with
+         ! some global grids.
+         do j=1,size(ip1_list)
+            ip1_single=ip1_list(j)
+            ier=vgd_levels(vgd,sfc_field=record%data,ip1_list=ip1_single,levels=pres)            
+            if(ier.ne.VGD_OK)then
+               print*,'Error with vgd_levels for var (group) ',F_group
+               return
+            endif
+            pres=pres/100.
+            ier=fstecr(pres,dummy,-record%nbits,F_luo,record%dateo,record%deet,record%npas, &
+                 record%ni,record%nj,record%nk,ip1_single,record%ip2,record%ip3, &
                  record%typvar,'PX',record%etiket,record%grtyp, &
                  record%ig1,record%ig2,record%ig3,record%ig4,record%datyp,.true.)
             if(ier.lt.0)then
@@ -256,7 +258,7 @@ program compute_pressure
    integer :: fnom,fstouv,fstfrm,fstinf,key,fstluk,fstinl,fstprm,fstecr,nvars
    character(len=256), dimension(ncle) :: cle,val,def
    character(len=10) :: my_var
-   character(len=12), parameter :: version='v_2.1.0'
+   character(len=12), parameter :: version='v_2.2.0'
    !
    cle=(/'s.      ','d.      ','samefile','var     ','verbose '/)
    val=(/'undef   ','undef   ','NO      ','undef   ','NO      '/)
