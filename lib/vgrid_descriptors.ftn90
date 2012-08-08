@@ -14,7 +14,7 @@ module vGrid_Descriptors
   public :: vgd_write                           !write coordinates to a file
   public :: vgd_levels                          !compute physical level information
   public :: vgd_dpidpis                         !compute pressure derivative with respesct the sfc pressure
-  public :: operator(==)
+  public :: operator(==)                        !overload equivalence operator
 
   ! Public class variables
   integer, parameter, public :: VGD_LEN_NAME=8  !maximum length of a variable name in the data file
