@@ -48,13 +48,13 @@ program print_toctoc
    kind=-1
    if(trim(val(4)).ne.'undef')then
       read(val(4),*)kind
-      noptions=noptions+1
       print*,'Note : printing only level information for kind',kind
    endif
    !
    if(noptions.gt.1)then
       print*,'Only one of the following options can be set:'
       print*,'-ip1m_only -ip1t_only -nml'
+      call exit(1)
    endif
    !
    if(trim(val(6)).ne.'undef')then

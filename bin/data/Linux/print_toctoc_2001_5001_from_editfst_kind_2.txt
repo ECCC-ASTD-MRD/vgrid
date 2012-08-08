@@ -1,0 +1,24 @@
+ Note : printing only level information for kind            2
+WARNING: cannot find !! with the following: ip1=        -1,ip2=        -1
+WARNING: Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)
+ Looking for kind=            2
+   Found         7 unique ip1 of kind  2 among the         92 records in file to construct the vertical descriptor
+  pressure coordinate found
+   Vertical descriptor successfully reconstructed
+ -- Vertical Grid Descriptor Information --
+   ip1=        53151 
+   ip2=        26578 
+ -------------------------------------------------------
+ Vcode=         2001
+   Descriptor Nomvar: !!
+   level kind = 2, level version =   1
+   Number of pressure levels            7 
+   Equation to compute hydrostatic pressure (P): P = A
+   Momentum levels ip1, A, B:
+     42043040    1000.000000000000         0.000000000000000
+     40994464    10000.00000000000         0.000000000000000
+     41144464    25000.00000000000         0.000000000000000
+     41394464    50000.00000000000         0.000000000000000
+     41594464    70000.00000000000         0.000000000000000
+     41744464    85000.00000000000         0.000000000000000
+     39945888    100000.0000000000         0.000000000000000

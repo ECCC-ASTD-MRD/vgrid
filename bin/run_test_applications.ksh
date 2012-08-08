@@ -104,56 +104,88 @@ fi
 #===========================================================================
 if [ ${print_toctoc} = oui ];then
 
-   for ITEM in east.eta glbeta glbhyb regeta reghyb
+    DEBUG=non
+
+   for ITEM in 2001_5001_from_editfst dm_1001_from_model_run dm_1002_from_model_run dm_1003_from_pgsm_lam_east_ops 2001_from_model_run dm_5001_from_model_run dm_5001_from_model_run dm_5001_from_model_run
    do
-
-      ./print_toctoc -fst data/${ITEM} -no_box > to_erase.txt 2>&1
-      FILE=data/$(uname -s)/print_toctoc_${ITEM}.txt
-      #cp to_erase.txt ${FILE}
-      diff to_erase.txt ${FILE}
-      if [ $? != 0 ];then
-         echo "ERROR 1: ./print_toctoc on data/${ITEM} do not mach with ${FILE}"
-	 echo "faire : xxdiff  to_erase.txt ${FILE}"
-	 exit
+     
+      kinds='=-1'
+      if [ ${ITEM} = 2001_5001_from_editfst ];then
+         kinds='2 5'
       fi
+      
+      for kind in ${kinds}
+      do
 
-      ./print_toctoc -fst data/${ITEM} -ip1m_only > to_erase.txt 2>&1
-      FILE=data/$(uname -s)/print_toctoc_ip1m_only_${ITEM}.txt
-      #cp to_erase.txt ${FILE}
-      diff -b to_erase.txt ${FILE}
-      if [ $? != 0 ];then
-         echo "ERROR 2: ./print_toctoc -ip1m_only on data/${ITEM} do not mach with ${FILE}"
-         echo "faire : xxdiff  to_erase.txt ${FILE}"
-         exit
-      fi
+	 lable=_kind_${kind}
+         if [ ${kind} = =-1 ];then
+            lable=""
+         fi
 
-      ./print_toctoc -fst data/${ITEM} -ip1t_only > to_erase.txt 2>&1
-      FILE=data/$(uname -s)/print_toctoc_ip1t_only_${ITEM}.txt
-      #cp to_erase.txt ${FILE}
-      diff -b to_erase.txt ${FILE}
-      if [ $? != 0 ];then
-         echo "ERROR 3: ./print_toctoc -ip1t_only on data/${ITEM} do not mach with ${FILE}"
-         echo "faire : xxdiff  to_erase.txt ${FILE}"
-         exit
-      fi
+         ./print_toctoc -fst data_tests/${ITEM} -no_box -kind ${kind} > to_erase.txt 2>&1
+         FILE=data/$(uname -s)/print_toctoc_${ITEM}${lable}.txt
+         #cp  to_erase.txt ${FILE}
+         diff to_erase.txt ${FILE}
+         if [ $? != 0 ];then
+            echo "ERROR 1: ./print_toctoc on data/${ITEM} do not mach with ${FILE}"
+	    echo "faire : xxdiff  to_erase.txt ${FILE}"
+	    if [ ${DEBUG} = oui ];then
+		xxdiff  to_erase.txt ${FILE}
+	    else
+		exit
+	    fi
+         fi
 
-      ./print_toctoc -fst data/${ITEM} -ip1m_only -out output_file.txt > to_erase.txt 2>&1
-      FILE=data/$(uname -s)/print_toctoc_ip1m_only_out_${ITEM}.txt
-      #cp output_file.txt ${FILE}
-      diff output_file.txt ${FILE}
-      if [ $? != 0 ];then
-         echo "ERROR 4.2: ./print_toctoc on data/${ITEM} do not mach with ${FILE}"
-	 echo "faire : xxdiff  output_file.txt ${FILE}"
-	 exit
-      fi
+         ./print_toctoc -fst data_tests/${ITEM} -ip1m_only -kind ${kind} > to_erase.txt 2>&1
+         FILE=data/$(uname -s)/print_toctoc_ip1m_only_${ITEM}${lable}.txt
+         #cp to_erase.txt ${FILE}
+         diff -b to_erase.txt ${FILE}
+         if [ $? != 0 ];then
+            echo "ERROR 2: ./print_toctoc -ip1m_only on data_tests/${ITEM} do not mach with ${FILE}"
+            echo "faire : xxdiff  to_erase.txt ${FILE}"
+	    if [ ${DEBUG} = oui ];then
+		xxdiff  to_erase.txt ${FILE}
+	    else
+		exit
+	    fi
+         fi
+
+         ./print_toctoc -fst data_tests/${ITEM} -ip1t_only -kind ${kind} > to_erase.txt 2>&1
+         FILE=data/$(uname -s)/print_toctoc_ip1t_only_${ITEM}${lable}.txt
+         #cp to_erase.txt ${FILE}
+         diff -b to_erase.txt ${FILE}
+         if [ $? != 0 ];then
+            echo "ERROR 3: ./print_toctoc -ip1t_only on data_tests/${ITEM} do not mach with ${FILE}"
+            echo "faire : xxdiff  to_erase.txt ${FILE}"
+	    if [ ${DEBUG} = oui ];then
+		xxdiff  to_erase.txt ${FILE}
+	    else
+		exit
+	    fi
+         fi
+
+         ./print_toctoc -fst data_tests/${ITEM} -ip1m_only -out output_file.txt -kind ${kind} > to_erase.txt 2>&1
+         FILE=data/$(uname -s)/print_toctoc_ip1m_only_out_${ITEM}${lable}.txt
+         #cp output_file.txt ${FILE}
+         diff output_file.txt ${FILE}
+         if [ $? != 0 ];then
+            echo "ERROR 4.2: ./print_toctoc on data_tests/${ITEM} do not mach with ${FILE}"
+	    echo "faire : xxdiff  output_file.txt ${FILE}"
+	    if [ ${DEBUG} = oui ];then
+		xxdiff  to_erase.txt ${FILE}
+	    else
+		exit
+	    fi
+         fi
+
+      done
 
    done
 
-   rm -f to_erase.txt
+   #rm -f to_erase.txt
 fi
 #===========================================================================
 #===========================================================================
 #===========================================================================
 
 echo "TEST(S) OK"
-
