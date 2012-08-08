@@ -73,7 +73,7 @@ module vGrid_Descriptors
      integer :: ip1=0,ip2=0                             !ip1,2 values given to the 3D descriptor
      integer :: unit                                    !file unit associated with this 3D descriptor
      logical :: match_ipig                              !do ip/ig matching for records
-     character(len=VGD_LEN_NAME) :: ref_name            !reference field name
+     character(len=VGD_LEN_NAME) :: ref_name='None'     !reference field name
      integer, dimension(:), pointer :: ip1_m=>null()    !ip1 values for momentum levels
      integer, dimension(:), pointer :: ip1_t=>null()    !ip1 values for thermodynamic levels
      real(kind=8), dimension(:), pointer :: a_m_8=>null()!A-coefficients for momentum levels
@@ -81,8 +81,8 @@ module vGrid_Descriptors
      real(kind=8), dimension(:), pointer :: a_t_8=>null()!A-coefficients for thermodynamic levels
      real(kind=8), dimension(:), pointer :: b_t_8=>null()!B-coefficients for thermodynamic levels
      real(kind=8), dimension(:,:,:), pointer :: table=>null()!complete grid descriptor record
-     real*8 :: ptop_8,pref_8                            !Top level and reference pressures (Pa)
-     real :: rcoef1,rcoef2                              !Rectification coefficients
+     real*8 :: ptop_8=dble(VGD_MISSING),pref_8=dble(VGD_MISSING)!Top level and reference pressures (Pa)
+     real :: rcoef1=VGD_MISSING,rcoef2=VGD_MISSING      !Rectification coefficients
      type(FSTD) :: rec                                  !FST file record structure for descriptor
      integer :: vcode,kind,version                      !Vertical coordinate codes
   end type vgrid_descriptor
