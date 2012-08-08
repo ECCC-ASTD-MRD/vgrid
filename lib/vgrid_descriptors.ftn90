@@ -16,15 +16,11 @@ module vGrid_Descriptors
   public :: vgd_dpidpis                         !compute pressure derivative with respesct the sfc pressure
   public :: operator(==)                        !overload equivalence operator
 
-  ! Public class variables
-  integer, parameter, public :: VGD_LEN_NAME=8  !maximum length of a variable name in the data file
-  integer, parameter, public :: VGD_OK=0        !method return value on success
-  integer, parameter, public :: VGD_ERROR=-1    !method return value on error
-  real, parameter, public :: VGD_MISSING=-9999. !missing value returned for invalid entries
+  ! Public class constants
+  include "vgrid.hf"
 
   ! Private class variables
   integer, parameter :: STDERR=0                !STDERR output unit
-  integer, parameter :: LONG_STRING=1024        !number of characters in a long string
   character(len=VGD_LEN_NAME) :: ZNAME='!!'     !name of the vertical coodinate
   integer, parameter :: MAX_VKIND=100           !maximum number of 'kind' (used in error check)
   integer, parameter :: KEY_LENGTH=4            !length of key string considered for get/put operations
@@ -142,33 +138,9 @@ module vGrid_Descriptors
      module procedure dpidpis_withref_prof
   end interface
 
-  interface size_ok
-     module procedure size_ok_i1d
-     module procedure size_ok_r81d
-     module procedure size_ok_r83d
-  end interface
-
   interface set_vcode
      module procedure set_vcode_d
      module procedure set_vcode_i
-  end interface
-
-  interface get_allocate
-     module procedure get_allocate_i1d
-     module procedure get_allocate_r1d
-     module procedure get_allocate_r81d
-     module procedure get_allocate_r83d
-  end interface
-
-  interface flip_transfer
-     module procedure flip_transfer_r8
-     module procedure flip_transfer_char
-  end interface
-
-  interface same_vec
-     module procedure same_vec_i
-     module procedure same_vec_r8
-     module procedure same_vec_r83d
   end interface
 
 contains
@@ -179,6 +151,7 @@ contains
 !!! Class constructor
 
    integer function new_read(self,unit,format,ip1,ip2,kind) result(status)
+      use utils, only: up
       ! Coordinate constructor - read from a file and initialize instance
       type(vgrid_descriptor), intent(out) :: self !Vertical descriptor instance
       integer, intent(in) :: unit                 !File unit to read descriptor information from
@@ -817,6 +790,7 @@ contains
 !!! Get methods
 
   integer function get_logical(self,key,value) result(status)
+    use utils, only: up
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
     character(len=*), intent(in) :: key                 !Descriptor key to retrieve
@@ -853,6 +827,7 @@ contains
  end function get_logical
 
   integer function get_int(self,key,value) result(status)
+    use utils, only: up
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
     character(len=*), intent(in) :: key                 !Descriptor key to retrieve
@@ -914,6 +889,7 @@ contains
   end function get_int
 
   integer function get_int_1d(self,key,value) result(status)
+    use utils, only: get_allocate,up,get_error
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
     character(len=*), intent(in) :: key                 !Descriptor key to retrieve
@@ -977,6 +953,7 @@ contains
   end function get_int_1d
 
   integer function get_real(self,key,value) result(status)
+    use utils, only: up,get_error
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self   !Vertical descriptor instance
     character(len=*), intent(in) :: key          !Descriptor key to retrieve
@@ -1015,6 +992,7 @@ contains
   end function get_real
 
   integer function get_real_1d(self,key,value) result(status)
+    use utils, only: get_allocate,up,get_error
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to retrieve
@@ -1082,6 +1060,7 @@ contains
   end function get_real_1d
 
   integer function get_real8(self,key,value) result(status)
+    use utils, only: up,get_error
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to retrieve
@@ -1134,6 +1113,7 @@ contains
   end function get_real8
 
   integer function get_real8_1d(self,key,value) result(status)
+    use utils, only: get_allocate,up,get_error
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to retrieve
@@ -1229,6 +1209,7 @@ contains
   end function get_real8_1d
 
   integer function get_real8_3d(self,key,value) result(status)
+    use utils, only: get_allocate,up
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to retrieve
@@ -1262,6 +1243,7 @@ contains
   end function get_real8_3d
 
   integer function get_char(self,key,value) result(status)
+    use utils, only: up,get_error,printingCharacters
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to retrieve
@@ -1302,6 +1284,7 @@ contains
 !!! Put methods
 
   integer function put_int(self,key,value) result(status)
+    use utils, only: up
     ! Set the value of the requested instance variable
     type(vgrid_descriptor), intent(inout) :: self !Vertical descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to set
@@ -1343,6 +1326,7 @@ contains
   end function put_int
 
   integer function put_int_1d(self,key,value) result(status)
+    use utils, only: size_ok,up,put_error
     ! Set the value of the requested instance variable
     type(vgrid_descriptor), intent(inout) :: self       !Vertical descriptor instance
     character(len=*), intent(in) :: key                 !Descriptor key to set
@@ -1391,6 +1375,7 @@ contains
   end function put_int_1d
 
   integer function put_real_1d(self,key,value) result(status)
+    use utils, only: up
     ! Set the value of the requested instance variable
     type(vgrid_descriptor), intent(inout) :: self!Descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to set
@@ -1435,6 +1420,7 @@ contains
   end function put_real_1d
 
   integer function put_real8(self,key,value) result(status)
+    use utils, only: up,put_error
     ! Set the value of the requested instance variable
     type(vgrid_descriptor), intent(inout) :: self!Descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to set
@@ -1476,6 +1462,7 @@ contains
   end function put_real8
 
   integer function put_real8_1d(self,key,value) result(status)
+    use utils, only: size_ok,up,put_error
     ! Set the value of the requested instance variable
     type(vgrid_descriptor), intent(inout) :: self!Descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to set
@@ -1556,6 +1543,7 @@ contains
   end function put_real8_1d
 
   integer function put_real8_3d(self,key,value) result(status)
+    use utils, only: size_ok, up
     ! Set the value of the requested instance variable
     type(vgrid_descriptor), intent(inout) :: self!Descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to set
@@ -1594,6 +1582,7 @@ contains
   end function put_real8_3d
 
   integer function put_char(self,key,value) result(status)
+    use utils, only: up,put_error
     ! Set the value of the requested instance variable
     type(vgrid_descriptor), intent(inout) :: self!Descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to set
@@ -1747,6 +1736,7 @@ contains
 !!! Write descriptors
   
   integer function write_desc(self,unit,format) result(status)     
+    use utils, only: up
     ! Write descriptors to the requested file
     type(vgrid_descriptor), intent(in) :: self       !Vertical descriptor instance
     integer, intent(in) :: unit                      !File unit to write to
@@ -1816,7 +1806,7 @@ contains
     integer :: ip1,kind
     character(len=1) :: blk_S
     integer :: error,ig1,ig2,ig3,i
-    character(len=LONG_STRING) :: grtyp
+    character(len=1) :: grtyp
     logical :: construct,multiple_grids,my_in_log
     type(vgrid_descriptor) :: gd
     type(FSTD_ext) :: var
@@ -2392,6 +2382,7 @@ contains
 !!! Test vgrid_descriptor type for equality
 
  logical function test_equality(vgd1,vgd2) result(equal)
+   use utils, only: same_vec
    ! Determine whether a given pair of vgrid_descriptor structures are identical
    type(vgrid_descriptor), intent(in) :: vgd1,vgd2      !vertical grid descriptors to compare
 
@@ -2425,150 +2416,10 @@ contains
  end function test_equality
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!! (PRIVATE) Compare a pair of vector pointers
-  
-  logical function same_vec_i(vec1,vec2) result(equal)
-    ! Check for equality between a pair of pointer vectors
-    integer, dimension(:), pointer :: vec1,vec2          !Pointer vectors to compare
-    integer :: i
-    equal = .false.
-    if (associated(vec1)) then
-       if (associated(vec2)) then
-          if (size(vec1) == size(vec2)) then
-             do i=1,size(vec1)
-                if (vec1(i) /= vec2(i)) return
-             enddo
-          endif
-       else
-          return
-       endif
-    else
-       if (associated(vec2)) return
-    endif
-    equal = .true.
-    return
-  end function same_vec_i
- 
-  logical function same_vec_r8(vec1,vec2) result(equal)
-    ! Check for equality between a pair of pointer vectors
-    real(kind=8), dimension(:), pointer :: vec1,vec2     !Pointer vectors to compare
-    integer :: i
-    equal = .false.
-    if (associated(vec1)) then
-       if (associated(vec2)) then
-          if (size(vec1) == size(vec2)) then
-             do i=1,size(vec1)
-                if (vec1(i) /= vec2(i)) return
-             enddo
-          endif
-       else
-          return
-       endif
-    else
-       if (associated(vec2)) return
-    endif
-    equal = .true.
-    return
-  end function same_vec_r8
-
-  logical function same_vec_r83d(vec1,vec2) result(equal)
-    ! Check for equality between a pair of pointer vectors
-    real(kind=8), dimension(:,:,:), pointer :: vec1,vec2 !Pointer vectors to compare
-    integer :: i,j,k
-    equal = .false.
-    if (associated(vec1)) then
-       if (associated(vec2)) then
-          if (size(vec1) == size(vec2)) then
-             do k=1,size(vec1,dim=3)
-                do j=1,size(vec1,dim=2)
-                   do i=1,size(vec1,dim=1)
-                      if (vec1(i,j,k) /= vec2(i,j,k)) return
-                   enddo
-                enddo
-             enddo
-          endif
-       else
-          return
-       endif
-    else
-       if (associated(vec2)) return
-    endif
-    equal = .true.
-    return
-  end function same_vec_r83d
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!! (PRIVATE) Convert string to upper-case
-
-  function up (string) result(upper_string)
-    ! Convert a string to all upper-case
-    character(len=*), intent(in) :: string      !Input string to upper-case
-    character(len=LONG_STRING) :: upper_string  !Upper-cased result
-    integer :: i
-    if (len_trim(string) > len(upper_string)) then
-       write(for_msg,*) 'Long string truncated in up() ',trim(string)
-       call vgrid_msg(MSG_WARNING,for_msg)
-    endif
-    upper_string = string
-    do i = 1,len_trim(string)
-       if (string(i:i) >= 'a' .and. string(i:i) <= 'z') then
-          upper_string(i:i) = achar(iachar(string(i:i)) - 32)
-       endif
-    enddo
-    return
-  end function up
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!! (PRIVATE) Check array sizes
-
-  logical function size_ok_i1d(p1,p2) result(ok)
-    ! Check size matching for 3d real8 arrays
-    integer, dimension(:), pointer :: p1        !Input pointer 1
-    integer, dimension(:), pointer :: p2        !Input pointer 2
-    ok = .false.
-    if (.not.associated(p1) .or. .not.associated(p2)) then
-       write(for_msg,*) 'ERROR: unallocated pointer to check in size_ok'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
-       return
-    endif
-    if (size(p1,dim=1) == size(p2,dim=1)) ok = .true.
-    return
-  end function size_ok_i1d
-
-  logical function size_ok_r81d(p1,p2) result(ok)
-    ! Check size matching for 3d real8 arrays
-    real(kind=8), dimension(:), pointer :: p1   !Input pointer 1
-    real(kind=8), dimension(:), pointer :: p2   !Input pointer 2
-    ok = .false.
-    if (.not.associated(p1) .or. .not.associated(p2)) then
-       write(for_msg,*) 'ERROR: unallocated pointer to check in size_ok'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
-       return
-    endif
-    if (size(p1,dim=1) == size(p2,dim=1)) ok = .true.
-    return
-  end function size_ok_r81d
-
-  logical function size_ok_r83d(p1,p2) result(ok)
-    ! Check size matching for 3d real8 arrays
-    real(kind=8), dimension(:,:,:), pointer :: p1 !Input pointer 1
-    real(kind=8), dimension(:,:,:), pointer :: p2 !Input pointer 2
-    ok = .false.
-    if (.not.associated(p1) .or. .not.associated(p2)) then
-       write(for_msg,*) 'ERROR: unallocated pointer to check in size_ok'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
-       return
-    endif
-    if ( size(p1,dim=1) == size(p2,dim=1) .and. &
-         size(p1,dim=2) == size(p2,dim=2) .and. &
-         size(p1,dim=3) == size(p2,dim=3)) ok = .true.
-    return
-  end function size_ok_r83d
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! (PRIVATE) Encoding functions
 
   integer function encode_vert_1001(self,nk) result(status)
+     use utils, only: flip_transfer
      type(vgrid_descriptor), intent(inout) :: self      !Vertical descriptor instance
      integer, intent(in) :: nk                          !Number of levels
 
@@ -2642,6 +2493,7 @@ contains
   end function encode_vert_1001
 
   integer function encode_vert_1002(self,nk) result(status)
+     use utils, only: flip_transfer
      type(vgrid_descriptor), intent(inout) :: self      !Vertical descriptor instance
      integer, intent(in) :: nk                          !Number of levels
 
@@ -2765,6 +2617,7 @@ contains
    end function encode_vert_2001
 
   integer function encode_vert_5001(self,nk) result(status)
+     use utils, only: flip_transfer
      type(vgrid_descriptor), intent(inout) :: self      !Vertical descriptor instance
      integer, intent(in) :: nk                          !Number of levels
 
@@ -2848,6 +2701,7 @@ contains
   end function encode_vert_5001
 
   Integer function encode_vert_5002(self,nk) result(status)
+     use utils, only: flip_transfer
      type(vgrid_descriptor), intent(inout) :: self      !Vertical descriptor instance
      integer, intent(in) :: nk                          !Number of levels
 
@@ -2955,6 +2809,7 @@ contains
 !!! (PRIVATE) Decoding functions
 
   integer function decode_vert_1001(self) result(status)
+     use utils, only: flip_transfer
      type(vgrid_descriptor), intent(inout) :: self  !Vertical descriptor instance
      
      ! Local variables
@@ -3014,6 +2869,7 @@ contains
   end function decode_vert_1001
 
   integer function decode_vert_1002(self) result(status)
+     use utils, only: flip_transfer
      type(vgrid_descriptor), intent(inout) :: self  !Vertical descriptor instance
      
      ! Local variables
@@ -3125,6 +2981,7 @@ contains
   end function decode_vert_2001
        
   integer function decode_vert_5001(self) result(status)
+     use utils, only: flip_transfer
      type(vgrid_descriptor), intent(inout) :: self  !Vertical descriptor instance
      
      ! Local variables
@@ -3189,6 +3046,7 @@ contains
   end function decode_vert_5001
 
   integer function decode_vert_5002(self) result(status)
+     use utils, only: flip_transfer
      type(vgrid_descriptor), intent(inout) :: self  !Vertical descriptor instance
      
      ! Local variables
@@ -3374,98 +3232,6 @@ contains
   end function found_descriptor
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!! (PRIVATE) Get/Put support functions
-  
-  real function get_error(key) result(value)
-    ! Write error message and return a missing value     
-    character(len=*), intent(in) :: key
-    write(for_msg,*) 'Attempt to retrieve invalid key '//trim(key)//' returns VGD_MISSING'
-    call vgrid_msg(MSG_CRITICAL,for_msg)
-    value = dble(VGD_MISSING)
-    return
-  end function get_error
-
-  integer function get_allocate_i1d(key,value,len) result(istat)
-    ! Allocate space for the result value and report error
-    character(len=*), intent(in) :: key
-    integer, dimension(:), pointer :: value
-    integer, intent(in) :: len
-    allocate(value(len),stat=istat)
-    if (istat /= 0) then
-       write(for_msg,*) 'ERROR: unable to allocate space for '//trim(key)//' request'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
-    endif
-  end function get_allocate_i1d
-  
-  integer function get_allocate_r1d(key,value,len) result(istat)
-    ! Allocate space for the result value and report error
-    character(len=*), intent(in) :: key
-    real, dimension(:), pointer :: value
-    integer, intent(in) :: len
-    allocate(value(len),stat=istat)
-    if (istat /= 0) then
-       write(for_msg,*) 'ERROR: unable to allocate space for '//trim(key)//' request'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
-    endif
-  end function get_allocate_r1d
-
-  integer function get_allocate_r81d(key,value,len) result(istat)
-    ! Allocate space for the result value and report error
-    character(len=*), intent(in) :: key
-    real*8, dimension(:), pointer :: value
-    integer, intent(in) :: len
-    allocate(value(len),stat=istat)
-    if (istat /= 0) then
-       write(for_msg,*) 'ERROR: unable to allocate space for '//trim(key)//' request'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
-    endif
-  end function get_allocate_r81d
-
-    integer function get_allocate_r83d(key,value,len) result(istat)
-    ! Allocate space for the result value and report error (len is result of 'shape()')
-    character(len=*), intent(in) :: key
-    real*8, dimension(:,:,:), pointer :: value
-    integer, dimension(:), intent(in) :: len
-    if (size(len) < 3) then
-       write(for_msg,*) 'ERROR: wrong array shape specified for '//trim(key)
-       call vgrid_msg(MSG_CRITICAL,for_msg)
-       istat = -1
-       return
-    endif
-    allocate(value(len(1),len(2),len(3)),stat=istat)
-    if (istat /= 0) then
-       write(for_msg,*) 'ERROR: unable to allocate space for '//trim(key)//' request'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
-    endif
-  end function get_allocate_r83d
-
-  integer function put_error(key) result(error)
-    character(len=*), intent(in) :: key
-    write(for_msg,*) 'WARNING: attempt to set useless value for '//trim(key)
-    call vgrid_msg(MSG_CRITICAL,for_msg)
-    error = VGD_ERROR
-    return
-  end function put_error
-
-  function printingCharacters(str) result(str_printing)
-    ! Return a string that contains only printable characters
-    character(len=*) :: str
-    character(len=LONG_STRING) :: str_printing
-    integer :: i,length
-    length = len(str)
-    i = 1
-    do while (i <= len_trim(str) .and. length == len(str))
-       if (ichar(str(i:i)) >= 32) then
-          i = i+1
-       else
-          length = i-1
-       endif
-    enddo
-    str_printing = str(1:length)
-    return
-  end function printingCharacters
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! (PRIVATE) Validity inquiry functions
 
   logical function is_valid(self,element_valid) result(valid)
@@ -3520,87 +3286,6 @@ contains
     call incdatr(record%datev,record%dateo,nhours)
     status = VGD_OK
   end function my_fstprm
-
-  function is_big_endian() result(bend)
-    ! Determine the endianness of the machine
-    character(len=4) :: str
-    logical :: bend
-    select case (transfer(1094861636,str))
-    case ('ABCD')
-       bend = .true.
-    case ('DCBA')
-       bend = .false.
-    case DEFAULT
-       write(for_msg,*) 'WARNING: unable to determine bit ordering in is_big_endian'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
-       bend = .false.
-    end select
-    return
-  end function is_big_endian
-
-  integer function flip_transfer_r8(str,val_out) result(status)
-    ! Convert string to a little-endian 8-byte real
-    character(len=*), intent(in) :: str                 !string to convert
-    real*8, intent(out) :: val_out                      !8-byte real for output
-    integer :: i,cnt
-    character(len=8) :: str_cvt
-    status = VGD_ERROR; val_out = 0.d0
-    if (len_trim(str) > len(str_cvt)) then
-       write(for_msg,*) 'ERROR: string length to flip_transfer (',len_trim(str),') exceeds limit: ',len(str)
-       call vgrid_msg(MSG_CRITICAL,for_msg)
-       return
-    endif
-    if (is_big_endian()) then
-       cnt = 1
-       do i=len(str_cvt),1,-1
-          if (cnt <= len_trim(str)) then
-             str_cvt(i:i) = str(cnt:cnt)
-             cnt = cnt+1
-          else
-             str_cvt(i:i) = ' '
-          endif
-       enddo
-    else
-       str_cvt = '        '
-       str_cvt(1:len_trim(str)) = str
-    endif
-    val_out = transfer(str_cvt,val_out)
-    status = VGD_OK
-    return
-  end function flip_transfer_r8
-
-  integer function flip_transfer_char(val,str_out) result(status)
-    ! Convert a little-endian 8-byte real to a string
-    real*8, intent(in) :: val                           !8-byte real to convert
-    character(len=*), intent(out) :: str_out            !string for output
-    integer :: i,cnt
-    character(len=8) :: str_cvt
-    logical :: overflow
-    status = VGD_ERROR; str_out = ''
-    str_cvt = transfer(val,str_cvt)
-    overflow = .false.
-    if (is_big_endian()) then
-       cnt = 1; overflow = .false.
-       do i=len(str_cvt),1,-1
-          if (cnt <= len(str_out)) then
-             str_out(cnt:cnt) = str_cvt(i:i)
-             cnt = cnt+1
-          else
-             if (ichar(str_cvt(i:i)) > 32) overflow = .true.
-          endif
-       enddo
-    else
-       str_out = str_cvt
-    endif
-    if (overflow) then
-       write(for_msg,*) 'ERROR: string length to flip_transfer (',len(str_out),') is insufficient: ',len_trim(str_cvt)
-       call vgrid_msg(MSG_CRITICAL,for_msg)
-       return
-    endif
-    str_out = printingCharacters(str_out)
-    status = VGD_OK
-    return
-  end function flip_transfer_char
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! (PRIVATE) Pressure computation functions
