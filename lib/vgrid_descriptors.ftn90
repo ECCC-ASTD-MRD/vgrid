@@ -14,6 +14,7 @@ module vGrid_Descriptors
   public :: vgd_write                           !write coordinates to a file
   public :: vgd_levels                          !compute physical level information
   public :: vgd_dpidpis                         !compute pressure derivative with respesct the sfc pressure
+  public :: operator(==)
 
   ! Public class variables
   integer, parameter, public :: VGD_LEN_NAME=8  !maximum length of a variable name in the data file
@@ -132,6 +133,10 @@ module vGrid_Descriptors
      module procedure levels_withref_prof_8
   end interface
 
+  interface operator (==)
+     module procedure test_equality
+  end interface
+
   interface vgd_dpidpis
      module procedure dpidpis_withref
      module procedure dpidpis_withref_prof
@@ -158,6 +163,12 @@ module vGrid_Descriptors
   interface flip_transfer
      module procedure flip_transfer_r8
      module procedure flip_transfer_char
+  end interface
+
+  interface same_vec
+     module procedure same_vec_i
+     module procedure same_vec_r8
+     module procedure same_vec_r83d
   end interface
 
 contains
@@ -2180,6 +2191,115 @@ contains
     status = VGD_OK
     return
  end function diag_withref_8
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!! Test vgrid_descriptor type for equality
+
+ logical function test_equality(vgd1,vgd2) result(equal)
+   ! Determine whether a given pair of vgrid_descriptor structures are identical
+   type(vgrid_descriptor), intent(in) :: vgd1,vgd2      !vertical grid descriptors to compare
+
+   ! Local variables
+
+   ! Assume that structures are not identical
+   equal = .false.
+
+   ! Check each element of the structure (except FST attributes) for equality
+   if (vgd1%vcode /= vgd2%vcode) return
+   if (vgd1%kind /= vgd2%kind) return
+   if (vgd1%version /= vgd2%version) return
+   if (vgd1%ref_name /= vgd2%ref_name) return
+   if (vgd1%ptop_8 /= vgd2%ptop_8) return
+   if (vgd1%pref_8 /= vgd2%pref_8) return
+   if (vgd1%rcoef1 /= vgd2%rcoef1) return
+   if (vgd1%rcoef2 /= vgd2%rcoef2) return
+
+   ! Check pointer associations and values
+   if (.not.same_vec(vgd1%ip1_m,vgd2%ip1_m)) return
+   if (.not.same_vec(vgd1%ip1_t,vgd2%ip1_t)) return
+   if (.not.same_vec(vgd1%a_m_8,vgd2%a_m_8)) return
+   if (.not.same_vec(vgd1%b_m_8,vgd2%b_m_8)) return
+   if (.not.same_vec(vgd1%a_t_8,vgd2%a_t_8)) return
+   if (.not.same_vec(vgd1%b_t_8,vgd2%b_t_8)) return
+   if (.not.same_vec(vgd1%table,vgd2%table)) return
+
+   ! The full structure is equivalent
+   equal = .true.
+   return
+ end function test_equality
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!! (PRIVATE) Compare a pair of vector pointers
+  
+  logical function same_vec_i(vec1,vec2) result(equal)
+    ! Check for equality between a pair of pointer vectors
+    integer, dimension(:), pointer :: vec1,vec2          !Pointer vectors to compare
+    integer :: i
+    equal = .false.
+    if (associated(vec1)) then
+       if (associated(vec2)) then
+          if (size(vec1) == size(vec2)) then
+             do i=1,size(vec1)
+                if (vec1(i) /= vec2(i)) return
+             enddo
+          endif
+       else
+          return
+       endif
+    else
+       if (associated(vec2)) return
+    endif
+    equal = .true.
+    return
+  end function same_vec_i
+ 
+  logical function same_vec_r8(vec1,vec2) result(equal)
+    ! Check for equality between a pair of pointer vectors
+    real(kind=8), dimension(:), pointer :: vec1,vec2     !Pointer vectors to compare
+    integer :: i
+    equal = .false.
+    if (associated(vec1)) then
+       if (associated(vec2)) then
+          if (size(vec1) == size(vec2)) then
+             do i=1,size(vec1)
+                if (vec1(i) /= vec2(i)) return
+             enddo
+          endif
+       else
+          return
+       endif
+    else
+       if (associated(vec2)) return
+    endif
+    equal = .true.
+    return
+  end function same_vec_r8
+
+  logical function same_vec_r83d(vec1,vec2) result(equal)
+    ! Check for equality between a pair of pointer vectors
+    real(kind=8), dimension(:,:,:), pointer :: vec1,vec2 !Pointer vectors to compare
+    integer :: i,j,k
+    equal = .false.
+    if (associated(vec1)) then
+       if (associated(vec2)) then
+          if (size(vec1) == size(vec2)) then
+             do k=1,size(vec1,dim=3)
+                do j=1,size(vec1,dim=2)
+                   do i=1,size(vec1,dim=1)
+                      if (vec1(i,j,k) /= vec2(i,j,k)) return
+                   enddo
+                enddo
+             enddo
+          endif
+       else
+          return
+       endif
+    else
+       if (associated(vec2)) return
+    endif
+    equal = .true.
+    return
+  end function same_vec_r83d
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! (PRIVATE) Convert string to upper-case
