@@ -1,0 +1,34 @@
+ Note : printing only level information for kind           -1
+WARNING: cannot find !! with the following: ip1=        -1,ip2=        -1
+WARNING: Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)
+ Looking for kind=           -1
+   Found        27 unique ip1 of kind  1 among the        111 records in file to construct the vertical descriptor
+  sigma coordinate found
+   Vertical descriptor successfully reconstructed
+      2110
+      2270
+      2510
+      2750
+      3010
+      3270
+      3550
+      3850
+      4190
+      4580
+      5020
+      5510
+      6050
+      6600
+      7160
+      7740
+      8310
+      8880
+      9440
+      9960
+     10420
+     10840
+     11220
+     11550
+     11800
+     11930
+     12000

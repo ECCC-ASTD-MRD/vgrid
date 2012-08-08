@@ -1,0 +1,14 @@
+ Note : printing only level information for kind            2
+WARNING: cannot find !! with the following: ip1=        -1,ip2=        -1
+WARNING: Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)
+ Looking for kind=            2
+   Found         7 unique ip1 of kind  2 among the         92 records in file to construct the vertical descriptor
+  pressure coordinate found
+   Vertical descriptor successfully reconstructed
+  42043040
+  40994464
+  41144464
+  41394464
+  41594464
+  41744464
+  39945888

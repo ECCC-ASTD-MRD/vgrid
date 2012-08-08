@@ -12,7 +12,7 @@ RMN=rmn_013
 .ftn90.o:
 	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -src $<
 
-OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/vgrid_genab_5002.o $(DESCRIP_PATH)/vgrid_genab_1002_5001.o $(DESCRIP_PATH)/vgrid_genab_1001.o  $(DESCRIP_PATH)/vgrid_genab_2001.o $(DESCRIP_PATH)/vgrid_genab_1004.o 
+OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/vgrid_genab_5002.o $(DESCRIP_PATH)/vgrid_genab_1002_5001.o $(DESCRIP_PATH)/vgrid_genab_1001.o  $(DESCRIP_PATH)/vgrid_genab_2001.o $(DESCRIP_PATH)/vgrid_genab_1004.o $(DESCRIP_PATH)/vgrid_msg.o
 
 # Set default target
 default: all
@@ -32,10 +32,22 @@ compute_pressure: compute_pressure.ftn90 $(OBJECTS)
 	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90 -o $@ -librmn $(RMN)
 
 $(DESCRIP_PATH)/vgrid_descriptors.o: $(DESCRIP_PATH)/vgrid_descriptors.ftn90
-	(cd $(DESCRIP_PATH) && $(MAKE) $(MAKEFLAGS) vgrid_descriptors.o)
+	(cd $(DESCRIP_PATH) && $(MAKE) vgrid_descriptors.o)
 
-$(DESCRIP_PATH)/vgrid_genab.o: $(DESCRIP_PATH)/vgrid_genab.ftn90
-	(cd $(DESCRIP_PATH) && $(MAKE) $(MAKEFLAGS) vgrid_genab.o)
+$(DESCRIP_PATH)/vgrid_genab_5002.o: $(DESCRIP_PATH)/vgrid_genab_5002.ftn90
+	(cd $(DESCRIP_PATH) && $(MAKE) vgrid_genab_5002.o)
+
+$(DESCRIP_PATH)/vgrid_genab_1002_5001.o: $(DESCRIP_PATH)/vgrid_genab_1002_5001.ftn90
+	(cd $(DESCRIP_PATH) && $(MAKE) vgrid_genab_1002_5001.o)
+
+$(DESCRIP_PATH)/vgrid_genab_1001.o: $(DESCRIP_PATH)/vgrid_genab_1001.ftn90
+	(cd $(DESCRIP_PATH) && $(MAKE) vgrid_genab_1001.o)
+
+$(DESCRIP_PATH)/vgrid_genab_1004.o: $(DESCRIP_PATH)/vgrid_genab_1004.ftn90
+	(cd $(DESCRIP_PATH) && $(MAKE) vgrid_genab_1004.o)
+
+$(DESCRIP_PATH)/vgrid_msg.o: $(DESCRIP_PATH)/vgrid_msg.ftn90
+	(cd $(DESCRIP_PATH) && $(MAKE) vgrid_msg.o)
 
 clean:
 	rm -f *.f90 *.o *.mod test_output.fst
