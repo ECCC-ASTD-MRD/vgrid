@@ -47,8 +47,6 @@ module vGrid_Descriptors
   integer, dimension(2), parameter :: ip1_t_valid=                             (/5002,5003/)
   integer, dimension(6), parameter :: ip1_t_valid_get=(/1001,1002,     2001,5001,5002,5003/)
   integer, dimension(6), parameter :: ref_name_valid= (/1001,1002,1003     ,5001,5002,5003/)
-  integer, dimension(7), parameter :: nl_m_valid=     (/1001,1002,1003,2001,5001,5002,5003/)
-  integer, dimension(7), parameter :: nl_t_valid=     (/1001,1002,1003,2001,5001,5002,5003/)
 
   ! FST file record structure
   type FSTD
@@ -91,6 +89,7 @@ module vGrid_Descriptors
 
   interface vgd_new
      module procedure new_read
+     module procedure new_from_table
      module procedure new_build_vert
      module procedure new_gen
   end interface
@@ -188,7 +187,7 @@ contains
       integer,optional, intent(in) :: kind        ! Level kind requested by user.
 
       ! Internal variables
-      integer :: istat,key,error,lkind,user_kind,version,count,i,myip1,myip2
+      integer :: istat,key,error,lkind,mykind,version,count,i,myip1,myip2
       integer :: fstinf,fstinl,fstluk,fstprm,ni,nj,nk,swa,lng,ubc,dltf,extra1,extra2,extra3
       integer :: nii,njj,nkk
       integer, dimension(MAX_DESC_REC) :: keyList
@@ -199,11 +198,6 @@ contains
       ! Set error status
       status = VGD_ERROR
 
-      user_kind=-1
-      if(present(kind))then
-         user_kind=kind
-      endif
-
       ! Set default values
       myformat='FST'
       if (present(format)) myformat = format
@@ -211,6 +205,8 @@ contains
       if (present(ip1)) myip1 = ip1
       myip2 = -1
       if (present(ip2)) myip2 = ip2
+      mykind=-1
+      if(present(kind)) mykind = kind
 
       ! Set instance variables
       self%unit = unit
@@ -232,7 +228,7 @@ contains
             call vgrid_msg(MSG_WARNING,for_msg)
             write(for_msg,'("Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)")')
             call vgrid_msg(MSG_WARNING,for_msg)
-            istat=vgd_legacy(self,unit,user_kind)
+            istat=vgd_legacy(self,unit,mykind)
             if(istat.eq.VGD_ERROR)then
                self%vcode = -1
                return
@@ -287,7 +283,7 @@ contains
                      return
                   endif
                   if(nii.ne.ni.or.njj.ne.nj.or.nkk.ne.nk)then
-                     write(for_msg,*) 'ERROR: found different entries in vertical descriptors after wildcard (-1) search'
+                     write(for_msg,*) 'ERROR: found different entry dimensions in vertical descriptors after wildcard (-1) search'
                      call vgrid_msg(MSG_CRITICAL,for_msg)
                      return
                   endif
@@ -332,58 +328,96 @@ contains
          return
       end select
 
-      ! Set internal vcode (if all above was successful)
-      error = set_vcode(self)
-      select case (self%vcode)
-      case (1001)
-         istat=decode_vert_1001(self)
-         if(istat < 0)then
-            write(for_msg,*) 'ERROR: problem with fstluk on '//trim(self%rec%nomvar)
-            call vgrid_msg(MSG_CRITICAL,for_msg)
-            return
-         endif
-      case (1002)
-         istat=decode_vert_1002(self)
-         if(istat < 0)then
-            write(for_msg,*) 'ERROR: problem with fstluk on '//trim(self%rec%nomvar)
-            call vgrid_msg(MSG_CRITICAL,for_msg)
-            return
-         endif
-      case (2001)
-         istat=decode_vert_2001(self)
-      case (1003,5001)
-         istat=decode_vert_5001(self)
-         if(istat < 0)then
-            write(for_msg,*) 'ERROR: problem with fstluk on '//trim(self%rec%nomvar)
-            call vgrid_msg(MSG_CRITICAL,for_msg)
-            return
-         endif
-      case (5002,5003)
-         istat=decode_vert_5002(self)
-         if(istat < 0)then
-            write(for_msg,*) 'ERROR: problem with fstluk on '//trim(self%rec%nomvar)
-            call vgrid_msg(MSG_CRITICAL,for_msg)
-            return
-         endif
-      case DEFAULT
-         istat = get_version_info(self,lkind,version)
-         write(for_msg,*) 'ERROR: invalid kind or version:',lkind,version
+      ! Fill structure from input table
+      error = vgd_new(self,self%table)
+      if (error /= VGD_OK) then
+         write(for_msg,*) 'ERROR: unable to construct from table'
          call vgrid_msg(MSG_CRITICAL,for_msg)
-         return
-      end select
-      !
-      if(user_kind /= -1)then
+      endif
+
+      ! Check that the requested kind matches the record kind
+      if (present(kind)) then
          istat = get_version_info(self,lkind,version)
-         if(lkind /= user_kind)then
-            write(for_msg,*) 'ERROR: cannot find requested kind=',user_kind,' in file'
+         if (lkind /= mykind) then
+            write(for_msg,*) 'ERROR: cannot find requested kind=',mykind,' in file'
             call vgrid_msg(MSG_CRITICAL,for_msg)
             return
          endif
       endif
+
       ! Set status and return
       if (found_descriptor(self)) status = VGD_OK
       return
    end function new_read
+
+   integer function new_from_table(self,table) result(status)
+     ! Coordinate constructor - build vertical descriptor from table input
+     ! Set internal vcode (if all above was successful)
+     type(vgrid_descriptor), intent(inout) :: self      !Vertical descriptor instance    
+     real(kind=8), dimension(:,:,:), pointer :: table   !Raw table of vgrid records
+
+     ! Local variables
+     integer :: error,istat,kind,version
+     real(kind=8), dimension(size(table,dim=1),size(table,dim=2),size(table,dim=3)) :: ltable
+
+     ! Set error status
+     status = VGD_ERROR
+
+     ! Initializations
+     ltable = table
+     if (associated(self%table)) deallocate(self%table)
+     allocate(self%table(size(table,dim=1),size(table,dim=2),size(table,dim=3)),stat=istat)
+     if (istat /= 0) then
+        write(for_msg,*) 'ERROR: unable to allocate self%table'
+        call vgrid_msg(MSG_CRITICAL,for_msg)
+        return
+     endif
+     self%table = ltable
+
+     ! Fill remainder of structure
+     error = set_vcode(self)
+     select case (self%vcode)
+     case (1001)
+        istat=decode_vert_1001(self)
+        if(istat < 0)then
+           write(for_msg,*) 'ERROR: problem with decoding table for vcode 1001'
+           call vgrid_msg(MSG_CRITICAL,for_msg)
+           return
+        endif
+     case (1002)
+        istat=decode_vert_1002(self)
+        if(istat < 0)then
+           write(for_msg,*) 'ERROR: problem with decoding table with vcode 1002'
+           call vgrid_msg(MSG_CRITICAL,for_msg)
+           return
+        endif
+     case (2001)
+        istat=decode_vert_2001(self)
+     case (1003,5001)
+        istat=decode_vert_5001(self)
+        if(istat < 0)then
+           write(for_msg,*) 'ERROR: problem with decoding table with vcode 1003 or 5001'
+           call vgrid_msg(MSG_CRITICAL,for_msg)
+           return
+        endif
+     case (5002,5003)
+        istat=decode_vert_5002(self)
+        if(istat < 0)then
+           write(for_msg,*) 'ERROR: problem with decoding table with vcode 5002 or 5003'
+           call vgrid_msg(MSG_CRITICAL,for_msg)
+           return
+        endif
+     case DEFAULT
+        istat = get_version_info(self,kind,version)
+        write(for_msg,*) 'ERROR: invalid kind or version:',kind,version
+        call vgrid_msg(MSG_CRITICAL,for_msg)
+        return
+     end select
+
+     ! Set status and return
+     status = VGD_OK
+     return
+   end function new_from_table
 
    integer function new_build_vert(self,kind,version,nk,ip1,ip2, &
         ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8, &
