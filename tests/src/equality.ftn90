@@ -1,6 +1,6 @@
 program constructor
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,operator(==)
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,operator(==),VGD_OK,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
@@ -29,9 +29,9 @@ program constructor
   stat = vgd_new(vgrid,unit=lu,format="fst",ip1=ip1,ip2=ip2)
   vgrid_rebuilt = vgrid
   if (vgrid == vgrid_rebuilt) then
-     stat = 0
+     stat = VGD_OK
   else
-     stat = -1
+     stat = VGD_ERROR
   endif
   call ut_report(stat,'Grid_Descriptors, equality')
 
