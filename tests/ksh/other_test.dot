@@ -1,0 +1,14 @@
+TEST=ksh/${test}.dot
+
+echo
+echo "   This test has a shell test component: ${TEST}"
+
+if [ ! -f ${TEST} ];then
+   echo "   test ${TEST} should exist and does not"
+   result_o=' notok'
+else
+
+   . ${TEST}
+
+fi
+

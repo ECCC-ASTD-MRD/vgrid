@@ -195,9 +195,9 @@ contains
          key=fstinf(unit,ni,nj,nk,-1,' ',myip1,myip2,-1,' ',self%rec%nomvar)
          if(key < 0)then
             write(for_msg,'("cannot find '//trim(self%rec%nomvar)//' with the following: ip1=",i10,",ip2=",i10)')myip1,myip2
-            call vgrid_msg(MSG_WARNING,for_msg)
+            call msg(MSG_WARNING,VGD_PRFX//for_msg)
             write(for_msg,'("Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)")')
-            call vgrid_msg(MSG_WARNING,for_msg)
+            call msg(MSG_WARNING,VGD_PRFX//for_msg)
             istat=vgd_legacy(self,unit,mykind)
             if(istat.eq.VGD_ERROR)then
                self%vcode = -1
@@ -207,13 +207,13 @@ contains
             allocate(self%table(ni,nj,nk),stat=istat)
             if (istat /= 0) then
                write(for_msg,*) 'unable to allocate self%table'
-               call vgrid_msg(MSG_CRITICAL,for_msg)
+               call msg(MSG_ERROR,VGD_PRFX//for_msg)
                return
             endif
             istat=fstluk(self%table,key,ni,nj,nk)
             if(istat < 0)then
                write(for_msg,*) 'problem with fstluk on '//trim(self%rec%nomvar)
-               call vgrid_msg(MSG_CRITICAL,for_msg)
+               call msg(MSG_ERROR,VGD_PRFX//for_msg)
                return
             endif
             ! Sorry, I have to use fstprm!
@@ -227,7 +227,7 @@ contains
             error = fstinl(unit,ni,nj,nk,-1,' ',myip1,myip2,-1,' ',self%rec%nomvar,keyList,count,size(keyList))
             if (error < 0) then
                write(for_msg,*) 'problem retrieving '//trim(self%rec%nomvar)//' keys for ip1,ip2: ',myip1,myip2
-               call vgrid_msg(MSG_CRITICAL,for_msg)
+               call msg(MSG_ERROR,VGD_PRFX//for_msg)
                self%vcode = -1
                return
             endif
@@ -235,31 +235,31 @@ contains
                allocate(l_table(ni,nj,nk),stat=istat)
                if (istat /= 0) then
                   write(for_msg,*) 'unable to allocate l_table'
-                  call vgrid_msg(MSG_CRITICAL,for_msg)
+                  call msg(MSG_ERROR,VGD_PRFX//for_msg)
                   return
                endif
                do i=2,count
                   error=my_fstprm(keyList(i),var)
                   if (error < 0) then
                      write(for_msg,*) 'problem with my_fstprm in new_read'
-                     call vgrid_msg(MSG_CRITICAL,for_msg)
+                     call msg(MSG_ERROR,VGD_PRFX//for_msg)
                      self%vcode = -1
                      return
                   endif              
                   istat=fstluk(l_table,keyList(i),nii,njj,nkk)
                   if(istat < 0)then
                      write(for_msg,*) 'problem with fstluk on l_table i=',i
-                     call vgrid_msg(MSG_CRITICAL,for_msg)
+                     call msg(MSG_ERROR,VGD_PRFX//for_msg)
                      return
                   endif
                   if(nii.ne.ni.or.njj.ne.nj.or.nkk.ne.nk)then
                      write(for_msg,*) 'found different entry dimensions in vertical descriptors after wildcard (-1) search'
-                     call vgrid_msg(MSG_CRITICAL,for_msg)
+                     call msg(MSG_ERROR,VGD_PRFX//for_msg)
                      return
                   endif
                   if(any(l_table /= self%table))then
                      write(for_msg,*) 'found different entries in vertical descriptors after wildcard (-1) search'
-                     call vgrid_msg(MSG_CRITICAL,for_msg)
+                     call msg(MSG_ERROR,VGD_PRFX//for_msg)
                      return
                   endif
                enddo
@@ -273,7 +273,7 @@ contains
          allocate(self%table(ni,nj,nk),stat=istat)
          if (istat /= 0) then
             write(for_msg,*) 'unable to allocate self%table'
-            call vgrid_msg(MSG_CRITICAL,for_msg)
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
             return
          endif
          read(unit) self%table
@@ -294,7 +294,7 @@ contains
          ! Warn user on invalid input format specification
       case DEFAULT
          write(for_msg,*) 'invalid constructor format request ',trim(myformat)
-         call vgrid_msg(MSG_CRITICAL,for_msg)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
          return
       end select
 
@@ -302,7 +302,7 @@ contains
       error = vgd_new(self,self%table)
       if (error /= VGD_OK) then
          write(for_msg,*) 'unable to construct from table'
-         call vgrid_msg(MSG_CRITICAL,for_msg)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
       endif
 
       ! Check that the requested kind matches the record kind
@@ -310,7 +310,7 @@ contains
          istat = get_version_info(self,lkind,version)
          if (lkind /= mykind .and. mykind /= -1) then
             write(for_msg,*) 'cannot find requested kind=',mykind,' in file'
-            call vgrid_msg(MSG_CRITICAL,for_msg)
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
             return
          endif
       endif
@@ -339,7 +339,7 @@ contains
      allocate(self%table(size(table,dim=1),size(table,dim=2),size(table,dim=3)),stat=istat)
      if (istat /= 0) then
         write(for_msg,*) 'unable to allocate self%table'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      self%table = ltable
@@ -351,14 +351,14 @@ contains
         istat=decode_vert_1001(self)
         if(istat < 0)then
            write(for_msg,*) 'problem with decoding table for vcode 1001'
-           call vgrid_msg(MSG_CRITICAL,for_msg)
+           call msg(MSG_ERROR,VGD_PRFX//for_msg)
            return
         endif
      case (1002)
         istat=decode_vert_1002(self)
         if(istat < 0)then
            write(for_msg,*) 'problem with decoding table with vcode 1002'
-           call vgrid_msg(MSG_CRITICAL,for_msg)
+           call msg(MSG_ERROR,VGD_PRFX//for_msg)
            return
         endif
      case (2001)
@@ -367,20 +367,20 @@ contains
         istat=decode_vert_5001(self)
         if(istat < 0)then
            write(for_msg,*) 'problem with decoding table with vcode 1003 or 5001'
-           call vgrid_msg(MSG_CRITICAL,for_msg)
+           call msg(MSG_ERROR,VGD_PRFX//for_msg)
            return
         endif
      case (5002,5003)
         istat=decode_vert_5002(self)
         if(istat < 0)then
            write(for_msg,*) 'problem with decoding table with vcode 5002 or 5003'
-           call vgrid_msg(MSG_CRITICAL,for_msg)
+           call msg(MSG_ERROR,VGD_PRFX//for_msg)
            return
         endif
      case DEFAULT
         istat = get_version_info(self,kind,version)
         write(for_msg,*) 'invalid kind or version:',kind,version
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      end select
 
@@ -431,7 +431,7 @@ contains
             self%ptop_8 = ptop_8
          else
             write(for_msg,*) 'ptop_8 is a required constructor entry'
-            call vgrid_msg(MSG_CRITICAL,for_msg)
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
             missingInput = .true.
          endif
       endif
@@ -440,7 +440,7 @@ contains
             self%pref_8 = pref_8
          else
             write(for_msg,*) 'pref_8 is a required constructor entry'
-            call vgrid_msg(MSG_CRITICAL,for_msg)
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
             missingInput = .true.
          endif
       endif
@@ -449,7 +449,7 @@ contains
             self%rcoef1 = rcoef1
          else
             write(for_msg,*) 'rcoef1 is a required constructor entry'
-            call vgrid_msg(MSG_CRITICAL,for_msg)
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
             missingInput = .true.
          endif
       endif     
@@ -458,7 +458,7 @@ contains
             self%rcoef2 = rcoef2
          else
             write(for_msg,*) 'rcoef2 is a required constructor entry'
-            call vgrid_msg(MSG_CRITICAL,for_msg)
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
             missingInput = .true.
          endif
       endif
@@ -468,13 +468,13 @@ contains
             allocate(self%a_m_8(size(a_m_8)),stat=error)
             if(error < 0)then
                write(for_msg,*) 'problem allocating a_m_8 in new_build_vert'
-               call vgrid_msg(MSG_CRITICAL,for_msg)
+               call msg(MSG_ERROR,VGD_PRFX//for_msg)
                return
             endif
             self%a_m_8 = a_m_8
          else
             write(for_msg,*) 'a_m_8 is a required constructor entry'
-            call vgrid_msg(MSG_CRITICAL,for_msg)
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
             missingInput = .true.
          endif
       endif
@@ -484,13 +484,13 @@ contains
             allocate(self%b_m_8(size(b_m_8)),stat=error)
             if(error < 0)then
                write(for_msg,*) 'problem allocating b_m_8 in new_build_vert'
-               call vgrid_msg(MSG_CRITICAL,for_msg)
+               call msg(MSG_ERROR,VGD_PRFX//for_msg)
                return
             endif
             self%b_m_8 = b_m_8
          else
             write(for_msg,*) 'b_m_8 is a required constructor entry'
-            call vgrid_msg(MSG_CRITICAL,for_msg)
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
             missingInput = .true.
          endif
       endif
@@ -500,13 +500,13 @@ contains
             allocate(self%a_t_8(size(a_t_8)),stat=error)
             if(error < 0)then
                write(for_msg,*) 'problem allocating a_t_8 in new_build_vert'
-               call vgrid_msg(MSG_CRITICAL,for_msg)
+               call msg(MSG_ERROR,VGD_PRFX//for_msg)
                return
             endif
             self%a_t_8 = a_t_8
          else
             write(for_msg,*) 'a_t_8 is a required constructor entry'
-            call vgrid_msg(MSG_CRITICAL,for_msg)
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
             missingInput = .true.
          endif
       endif
@@ -516,13 +516,13 @@ contains
             allocate(self%b_t_8(size(b_t_8)),stat=error)
             if(error < 0)then
                write(for_msg,*) 'problem allocating b_t_8 in new_build_vert'
-               call vgrid_msg(MSG_CRITICAL,for_msg)
+               call msg(MSG_ERROR,VGD_PRFX//for_msg)
                return
             endif
             self%b_t_8 = b_t_8
          else
             write(for_msg,*) 'b_t_8 is a required constructor entry'
-            call vgrid_msg(MSG_CRITICAL,for_msg)
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
             missingInput = .true.
          endif
       endif
@@ -532,13 +532,13 @@ contains
             allocate(self%ip1_m(size(ip1_m)),stat=error)
             if(error < 0)then
                write(for_msg,*) 'problem allocating ip1_m in new_build_vert'
-               call vgrid_msg(MSG_CRITICAL,for_msg)
+               call msg(MSG_ERROR,VGD_PRFX//for_msg)
                return
             endif
             self%ip1_m = ip1_m
          else
             write(for_msg,*) 'ip1_m is a required constructor entry'
-            call vgrid_msg(MSG_CRITICAL,for_msg)
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
             missingInput = .true.
          endif
       endif      
@@ -548,13 +548,13 @@ contains
             allocate(self%ip1_t(size(ip1_t)),stat=error)
             if(error < 0)then
                write(for_msg,*) 'problem allocating ip1_t in new_build_vert'
-               call vgrid_msg(MSG_CRITICAL,for_msg)
+               call msg(MSG_ERROR,VGD_PRFX//for_msg)
                return
             endif
             self%ip1_t = ip1_t
          else
             write(for_msg,*) 'ip1_t is a required constructor entry'
-            call vgrid_msg(MSG_CRITICAL,for_msg)
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
             missingInput = .true.
          endif
       endif      
@@ -576,14 +576,14 @@ contains
          error = encode_vert_5002(self,nk)
       case DEFAULT
          write(for_msg,*) 'unsupported kind and version : ',kind,version,' (vcode) ',self%vcode
-         call vgrid_msg(MSG_CRITICAL,for_msg)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
          return
       end select
       if (error /= VGD_OK) then
          write(for_msg,'(i4)') self%vcode
-         call vgrid_msg(MSG_CRITICAL,for_msg)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
          write(for_msg,*) 'problem with encode_vert_'//trim(cvcode)
-         call vgrid_msg(MSG_CRITICAL,for_msg)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
          return
       endif
 
@@ -633,49 +633,49 @@ contains
       if(is_valid(self,ptop_8_valid)) then
          if(.not.present(ptop_8))then
             write(for_msg,*) 'ptop_8 is a required constructor entry'
-            call vgrid_msg(MSG_CRITICAL,for_msg)
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
             errorInput = .true.
          endif
       endif
       if(is_valid(self,pref_8_valid)) then
          if(.not.present(pref_8))then
             write(for_msg,*) 'pref_8 is a required constructor entry'
-            call vgrid_msg(MSG_CRITICAL,for_msg)
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
             errorInput = .true.
          endif
       endif
       if(is_valid(self,rcoef1_valid)) then
          if(.not.present(rcoef1))then
             write(for_msg,*) 'rcoef1 is a required constructor entry'
-            call vgrid_msg(MSG_CRITICAL,for_msg)
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
             errorInput = .true.
          endif
       endif
       if(is_valid(self,rcoef2_valid)) then
          if(.not.present(rcoef2))then
             write(for_msg,*) 'rcoef2 is a required constructor entry'
-            call vgrid_msg(MSG_CRITICAL,for_msg)
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
             errorInput = .true.
          endif
       endif
       if(present(ptop_8).and.(.not.is_valid(self,ptop_8_valid)))then
          write(for_msg,*) 'ptop_8 is not a required constructor entry'
-         call vgrid_msg(MSG_CRITICAL,for_msg)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
          errorInput = .true.
       endif
       if(present(pref_8).and.(.not.is_valid(self,pref_8_valid)))then
          write(for_msg,*) 'pref_8 is not a required constructor entry'
-         call vgrid_msg(MSG_CRITICAL,for_msg)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
          errorInput = .true.
       endif
       if(present(rcoef1).and.(.not.is_valid(self,rcoef1_valid)))then
          write(for_msg,*) 'rcoef1 is not a required constructor entry'
-         call vgrid_msg(MSG_CRITICAL,for_msg)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
          errorInput = .true.
       endif
       if(present(rcoef2).and.(.not.is_valid(self,rcoef2_valid)))then
          write(for_msg,*) 'rcoef2 is not a required constructor entry'
-         call vgrid_msg(MSG_CRITICAL,for_msg)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
          errorInput = .true.
       endif
       if (errorInput) return
@@ -774,7 +774,7 @@ contains
          if (error /= VGD_OK) return
       case DEFAULT
          write(for_msg,*)'unsuported IP1 kind = ',kind,', AND/OR version = ',version
-         call vgrid_msg(MSG_CRITICAL,for_msg)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
          return
       end select
       
@@ -786,18 +786,25 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Get methods
 
-  integer function get_logical(self,key,value) result(status)
+  integer function get_logical(self,key,value,quiet) result(status)
     use utils, only: up
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
     character(len=*), intent(in) :: key                 !Descriptor key to retrieve
     logical, intent(out) :: value                       !Retrieved value
+    logical, optional, intent(in) :: quiet              !Do not print massages    
     
     ! Local variables
-    integer :: error
+    integer :: error,level_msg
+    logical :: my_quiet
 
     ! Set error status
     status = VGD_ERROR
+
+    level_msg=MSG_ERROR
+    my_quiet=.false.
+    if (present(quiet)) my_quiet = quiet
+    if(my_quiet)level_msg=MSG_QUIET
 
     ! Map key name to derived-type element
     select case (up(key(1:KEY_LENGTH)))
@@ -809,12 +816,12 @@ contains
           value=.true.
        case DEFAULT
           write(for_msg,*) 'unsupported vcode for LOGP: ',self%vcode
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(level_msg,VGD_PRFX//for_msg)
           return
        end select
     case DEFAULT
-       write(for_msg,*) 'invalid key '//trim(key)//' given to gd_get (int)'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       write(for_msg,*) 'invalid key '//trim(key)//' given to gd_get (logical)'
+       call msg(level_msg,VGD_PRFX//for_msg)
        return
     end select
 
@@ -823,19 +830,26 @@ contains
     return
  end function get_logical
 
-  integer function get_int(self,key,value) result(status)
+  integer function get_int(self,key,value,quiet) result(status)
     use utils, only: up
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
     character(len=*), intent(in) :: key                 !Descriptor key to retrieve
     integer, intent(out) :: value                       !Retrieved value
-    
+    logical, optional, intent(in) :: quiet              !Do not print massages
+
     ! Local variables
-    integer :: istat
+    integer :: istat,level_msg
     integer, dimension(:), pointer :: vip
+    logical :: my_quiet
 
     ! Set error status
     status = VGD_ERROR
+
+    level_msg=MSG_ERROR
+    my_quiet=.false.
+    if (present(quiet)) my_quiet = quiet
+    if(my_quiet)level_msg=MSG_QUIET
 
     ! Map key name to derived-type element
 
@@ -876,7 +890,7 @@ contains
        value=size(vip)
     case DEFAULT
        write(for_msg,*) 'invalid key '//trim(key)//' given to gd_get (int)'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(level_msg,VGD_PRFX//for_msg)
        return
     end select
 
@@ -885,18 +899,26 @@ contains
     return
   end function get_int
 
-  integer function get_int_1d(self,key,value) result(status)
+  integer function get_int_1d(self,key,value,quiet) result(status)
     use utils, only: get_allocate,up,get_error
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
     character(len=*), intent(in) :: key                 !Descriptor key to retrieve
     integer, dimension(:), pointer :: value             !Retrieved value
+    logical, optional, intent(in) :: quiet              !Do not print massages
 
     ! Internal variables
     integer :: istat,error
+    integer :: level_msg
+    logical :: my_quiet
 
     ! Set error status
     status = VGD_ERROR
+
+    level_msg=MSG_ERROR
+    my_quiet=.false.
+    if (present(quiet)) my_quiet = quiet
+    if(my_quiet)level_msg=MSG_QUIET
 
     ! Garbage collection
     if (associated(value)) deallocate(value)
@@ -907,11 +929,11 @@ contains
     case ('VIP1')
        if (is_valid(self,ip1_m_valid)) then
           write(for_msg,*) 'depricated key '//trim(key)//', use VIPM instead'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(level_msg,VGD_PRFX//for_msg)
           return
        else
           write(for_msg,*) 'invalid key '//trim(key)//' given to gd_get (int 1D)'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(level_msg,VGD_PRFX//for_msg)
           return
        endif
     case ('VIPM')
@@ -940,7 +962,7 @@ contains
        endif
     case DEFAULT
        write(for_msg,*) 'invalid key '//trim(key)//' given to gd_get (int 1D)'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(level_msg,VGD_PRFX//for_msg)
        return
     end select
 
@@ -949,17 +971,25 @@ contains
     return
   end function get_int_1d
 
-  integer function get_real(self,key,value) result(status)
+  integer function get_real(self,key,value,quiet) result(status)
     use utils, only: up,get_error
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self   !Vertical descriptor instance
     character(len=*), intent(in) :: key          !Descriptor key to retrieve
     real, intent(out) :: value                   !Retrieved value
+    logical, optional, intent(in) :: quiet       !Do not print massages
 
     ! Internal variables
+    integer :: level_msg
+    logical :: my_quiet
 
     ! Set error status
     status = VGD_ERROR
+
+    level_msg=MSG_ERROR
+    my_quiet=.false.
+    if (present(quiet)) my_quiet = quiet
+    if(my_quiet)level_msg=MSG_QUIET
 
     ! Map key name to derived-type element
     select case (up(key(1:KEY_LENGTH)))
@@ -979,7 +1009,7 @@ contains
        endif
     case DEFAULT
        write(for_msg,*) 'invalid key '//trim(key)//' given to gd_get (real)'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(level_msg,VGD_PRFX//for_msg)
        return
     end select
 
@@ -988,19 +1018,26 @@ contains
     return
   end function get_real
 
-  integer function get_real_1d(self,key,value) result(status)
+  integer function get_real_1d(self,key,value,quiet) result(status)
     use utils, only: get_allocate,up,get_error
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to retrieve
     real, dimension(:), pointer :: value        !Retrieved value
+    logical, optional, intent(in) :: quiet      !Do not print massages
 
     ! Internal variables
-    integer :: k,istat,error
+    integer :: k,istat,error,level_msg
     integer, dimension(:), pointer :: vipt
+    logical :: my_quiet
 
     ! Set error status
     status = VGD_ERROR
+
+    level_msg=MSG_ERROR
+    my_quiet=.false.
+    if (present(quiet)) my_quiet = quiet
+    if(my_quiet)level_msg=MSG_QUIET
 
     ! Garbage collection
     if (associated(value)) deallocate(value)
@@ -1039,15 +1076,15 @@ contains
     case ('VCRD')
        if (is_valid(self,ip1_m_valid)) then
           write(for_msg,*) 'depricated key '//trim(key)//', use VCDM instead'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(level_msg,VGD_PRFX//for_msg)
           return
        else
           error = int(get_error(key))
           return
        endif
     case DEFAULT
-       write(for_msg,*) 'invalid key '//trim(key)//' given to gd_get (real8 1D)'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       write(for_msg,*) 'invalid key '//trim(key)//' given to gd_get (real 1D)'
+       call msg(level_msg,VGD_PRFX//for_msg)
        return
     end select
 
@@ -1056,17 +1093,25 @@ contains
     return
   end function get_real_1d
 
-  integer function get_real8(self,key,value) result(status)
+  integer function get_real8(self,key,value,quiet) result(status)
     use utils, only: up,get_error
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to retrieve
     real(kind=8), intent(out) :: value          !Retrieved value
+    logical, optional, intent(in) :: quiet      !Do not print massages
 
     ! Internal Variables
+    integer :: istat,level_msg
+    logical :: my_quiet
 
     ! Set error status
     status = VGD_ERROR
+
+    level_msg=MSG_ERROR
+    my_quiet=.false.
+    if (present(quiet)) my_quiet = quiet
+    if(my_quiet)level_msg=MSG_QUIET
 
     ! Map key name to derived-type element
     select case (up(key(1:KEY_LENGTH)))
@@ -1100,7 +1145,7 @@ contains
        endif
     case DEFAULT
        write(for_msg,*) 'invalid key '//trim(key)//' given to gd_get (real8)'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(level_msg,VGD_PRFX//for_msg)
        return
     end select
 
@@ -1109,18 +1154,25 @@ contains
     return
   end function get_real8
 
-  integer function get_real8_1d(self,key,value) result(status)
+  integer function get_real8_1d(self,key,value,quiet) result(status)
     use utils, only: get_allocate,up,get_error
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to retrieve
     real(kind=8), dimension(:), pointer :: value !Retrieved value
+    logical, optional, intent(in) :: quiet      !Do not print massages
 
     ! Internal variables
-    integer :: istat,error
+    integer :: istat,error,level_msg
+    logical :: my_quiet
 
     ! Set error status
     status = VGD_ERROR
+
+    level_msg=MSG_ERROR
+    my_quiet=.false.
+    if (present(quiet)) my_quiet = quiet
+    if(my_quiet)level_msg=MSG_QUIET
 
     ! Garbage collection
     if (associated(value)) deallocate(value)
@@ -1196,7 +1248,7 @@ contains
        endif
     case DEFAULT
        write(for_msg,*) 'invalid key '//trim(key)//' given to gd_get (real8 1D)'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(level_msg,VGD_PRFX//for_msg)
        return
     end select
 
@@ -1205,18 +1257,25 @@ contains
     return
   end function get_real8_1d
 
-  integer function get_real8_3d(self,key,value) result(status)
+  integer function get_real8_3d(self,key,value,quiet) result(status)
     use utils, only: get_allocate,up
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to retrieve
     real(kind=8), dimension(:,:,:), pointer :: value !Retrieved value
+    logical, optional, intent(in) :: quiet      !Do not print massages
 
     ! Internal variables
-    integer :: istat
+    integer :: istat,level_msg
+    logical :: my_quiet
 
     ! Set error status
     status = VGD_ERROR
+
+    level_msg=MSG_ERROR
+    my_quiet=.false.
+    if (present(quiet)) my_quiet = quiet
+    if(my_quiet)level_msg=MSG_QUIET
 
     ! Garbage collection
     if (associated(value)) deallocate(value)
@@ -1230,7 +1289,7 @@ contains
        value = self%table
     case DEFAULT
        write(for_msg,*) 'invalid key '//trim(key)//' given to gd_get (real8 3D)'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(level_msg,VGD_PRFX//for_msg)
        return
     end select
 
@@ -1239,18 +1298,25 @@ contains
     return
   end function get_real8_3d
 
-  integer function get_char(self,key,value) result(status)
+  integer function get_char(self,key,value,quiet) result(status)
     use utils, only: up,get_error,printingCharacters
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to retrieve
     character(len=*), intent(out) :: value      !Retrieved value
+    logical, optional, intent(in) :: quiet      !Do not print massages
     
     ! Local variables
-    integer :: error
+    integer :: error,level_msg
+    logical :: my_quiet
 
     ! Set error status
     status = VGD_ERROR
+
+    level_msg=MSG_ERROR
+    my_quiet=.false.
+    if (present(quiet)) my_quiet = quiet
+    if(my_quiet)level_msg=MSG_QUIET
 
     ! Map key name to derived-type element
     select case (up(key(1:KEY_LENGTH)))
@@ -1263,12 +1329,12 @@ contains
           value = printingCharacters(self%ref_name)
        else
           write(for_msg,'(i8)') get_error(key)
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(level_msg,VGD_PRFX//for_msg)
           return
        endif
     case DEFAULT
        write(for_msg,*) 'invalid key '//trim(key)//' given to gd_get (char)'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(level_msg,VGD_PRFX//for_msg)
        return
     end select
 
@@ -1313,7 +1379,7 @@ contains
        self%rec%ip3 = value
     case DEFAULT
        write(for_msg,*) 'invalid key '//trim(key)//' given to gd_put (int)'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     end select
 
@@ -1338,7 +1404,7 @@ contains
     ! Check for valid value
     if (.not.associated(value)) then
        write(for_msg,*) 'unallocated value sent to gd_put for '//trim(key)
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
 
@@ -1347,7 +1413,7 @@ contains
     case ('VIPM')
        if (.not.size_ok(self%ip1_m,value)) then
           write(for_msg,*) 'value does not match '//trim(key)//' size in gd_put'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
        self%ip1_m = value
@@ -1355,14 +1421,14 @@ contains
     case ('VIPT')
        if (.not.size_ok(self%ip1_t,value)) then
           write(for_msg,*) 'value does not match '//trim(key)//' size in gd_put'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
        self%ip1_t = value
        if (.not.is_valid(self,ip1_t_valid)) status = put_error(key)
     case DEFAULT
        write(for_msg,*) 'invalid key '//trim(key)//' given to gd_put (real8 1D)'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     end select
 
@@ -1387,7 +1453,7 @@ contains
     ! Check for valid value
     if (.not.associated(value)) then
        write(for_msg,*) 'unallocated value sent to gd_put for '//trim(key)
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
 
@@ -1395,19 +1461,19 @@ contains
     select case (up(key(1:KEY_LENGTH)))
     case ('VCDM')
        write(for_msg,*) trim(key)//' cannot be set - modify VIPM instead'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     case ('VCDT')
        write(for_msg,*) trim(key)//' cannot be set - modify VIPT instead'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     case ('VCRD')
        write(for_msg,*) trim(key)//' cannot be set - modify VIPM instead'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     case DEFAULT
        write(for_msg,*) 'invalid key '//trim(key)//' given to gd_put (real8 1D)'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     end select
 
@@ -1446,7 +1512,7 @@ contains
        if (.not.is_valid(self,rcoef2_valid)) error = put_error(key)
     case DEFAULT
        write(for_msg,*) 'invalid key '//trim(key)//' given to gd_put (real8)'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     end select
 
@@ -1474,7 +1540,7 @@ contains
     ! Check for valid value
     if (.not.associated(value)) then
        write(for_msg,*) 'unallocated value sent to gd_put for '//trim(key)
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
 
@@ -1483,7 +1549,7 @@ contains
     case ('CA_M')
        if (.not.size_ok(self%a_m_8,value)) then
           write(for_msg,*) 'value does not match '//trim(key)//' size in gd_put'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
        self%a_m_8 = value
@@ -1491,7 +1557,7 @@ contains
     case ('CB_M')
        if (.not.size_ok(self%b_m_8,value)) then
           write(for_msg,*) 'value does not match '//trim(key)//' size in gd_put'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
        self%b_m_8 = value
@@ -1499,7 +1565,7 @@ contains
     case ('CA_T')
        if (.not.size_ok(self%a_t_8,value)) then
           write(for_msg,*) 'value does not match '//trim(key)//' size in gd_put'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
        self%a_t_8 = value
@@ -1507,7 +1573,7 @@ contains
     case ('CB_T')
        if (.not.size_ok(self%b_t_8,value)) then
           write(for_msg,*) 'value does not match '//trim(key)//' size in gd_put'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
        self%b_t_8 = value
@@ -1515,7 +1581,7 @@ contains
     case ('COFA')
        if (.not.size_ok(self%a_m_8,value)) then
           write(for_msg,*) 'value does not match '//trim(key)//' size in gd_put'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
        self%a_m_8 = value
@@ -1523,14 +1589,14 @@ contains
     case ('COFB')
        if (.not.size_ok(self%b_m_8,value)) then
           write(for_msg,*) 'value does not match '//trim(key)//' size in gd_put'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
        self%b_m_8 = value
        if (.not.is_valid(self,b_m_8_valid)) status = put_error(key)
     case DEFAULT
        write(for_msg,*) 'invalid key '//trim(key)//' given to gd_put (real8 1D)'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     end select
 
@@ -1554,7 +1620,7 @@ contains
     ! Check for valid value
     if (.not.associated(value)) then
        write(for_msg,*) 'unallocated value sent to gd_put for'//trim(key)
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
 
@@ -1563,13 +1629,13 @@ contains
     case ('VTBL')
        if (.not.size_ok(self%table,value)) then
           write(for_msg,*) 'value does not match table size in gd_put'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
        self%table = value
     case DEFAULT
        write(for_msg,*) 'invalid key '//trim(key)//' given to gd_put (real8 3D)'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     end select
 
@@ -1602,7 +1668,7 @@ contains
        if (.not.is_valid(self,ref_name_valid)) error = put_error(key)
     case DEFAULT
        write(for_msg,*) 'invalid key '//trim(key)//' given to gd_put (char)'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     end select
 
@@ -1640,88 +1706,88 @@ contains
                      '\n   ip2=',self%ip2,&
                      '\n ',trim(hr),&
                      '\n Vcode=',self%vcode
-    call vgrid_msg(MSG_IMPORTANT,trim(for_msg))
+    call msg(MSG_VERBATIM,trim(for_msg))
 
     ! Dump vertical descriptor information
     have_descriptor: if (found_descriptor(self)) then
        write(for_msg,*)'  Descriptor Nomvar: ',trim(self%rec%nomvar)
-       call vgrid_msg(MSG_IMPORTANT,trim(for_msg))      
+       call msg(MSG_VERBATIM,trim(for_msg))      
        write(for_msg,'(a,i2,a,i3)')'   level kind =',self%kind,', level version = ',self%version
-       call vgrid_msg(MSG_IMPORTANT,trim(for_msg))
+       call msg(MSG_VERBATIM,trim(for_msg))
        if (is_valid(self,ptop_8_valid))then
           write(for_msg,*)'  ptop=',self%ptop_8,'Pa'
-          call vgrid_msg(MSG_IMPORTANT,trim(for_msg))
+          call msg(MSG_VERBATIM,trim(for_msg))
        endif
        if (is_valid(self,pref_8_valid))then
           write(for_msg,*)'  pref=',self%pref_8,'Pa'
-          call vgrid_msg(MSG_IMPORTANT,trim(for_msg))
+          call msg(MSG_VERBATIM,trim(for_msg))
        endif
        if (is_valid(self,rcoef1_valid))then
           write(for_msg,*)'  rcoef1=',self%rcoef1
-          call vgrid_msg(MSG_IMPORTANT,trim(for_msg))
+          call msg(MSG_VERBATIM,trim(for_msg))
        endif
        if (is_valid(self,rcoef2_valid))then
           write(for_msg,*)'  rcoef2=',self%rcoef2
-          call vgrid_msg(MSG_IMPORTANT,trim(for_msg))
+          call msg(MSG_VERBATIM,trim(for_msg))
        endif
        if (is_valid(self,ref_name_valid))then
           write(for_msg,*)'  Surface field nomvar ',self%ref_name
-          call vgrid_msg(MSG_IMPORTANT,trim(for_msg))
+          call msg(MSG_VERBATIM,trim(for_msg))
        endif
        select case (self%vcode)
        case (1001)
           nk=size(self%ip1_m)
           write(for_msg,*)'  Number of sigma levels',nk,&
                         '\n   Equation to compute hydrostatic pressure (pi): pi = B * P0*100'
-          call vgrid_msg(MSG_IMPORTANT,trim(for_msg))
+          call msg(MSG_VERBATIM,trim(for_msg))
        case (1002)
           nk=size(self%ip1_m)
           write(for_msg,*)'  Number of eta levels',nk,&
                         '\n   Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100'
-          call vgrid_msg(MSG_IMPORTANT,trim(for_msg))    
+          call msg(MSG_VERBATIM,trim(for_msg))    
        case (1003)
           nk=size(self%ip1_m)
           write(for_msg,*)'  Number of hybrid normalized levels',nk,&
                         '\n   Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100'
-          call vgrid_msg(MSG_IMPORTANT,trim(for_msg))
+          call msg(MSG_VERBATIM,trim(for_msg))
        case (2001)
           nk=size(self%ip1_m)
           write(for_msg,*)'  Number of pressure levels',nk,&
                         '\n   Equation to compute hydrostatic pressure (P): P = A'
-          call vgrid_msg(MSG_IMPORTANT,trim(for_msg))
+          call msg(MSG_VERBATIM,trim(for_msg))
        case (5001)
           nk=size(self%ip1_m)
           write(for_msg,*)'  Number of hybrid levels',nk,&
                         '\n   Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100'
-          call vgrid_msg(MSG_IMPORTANT,trim(for_msg))
+          call msg(MSG_VERBATIM,trim(for_msg))
        case (5002,5003)
           nk=size(self%ip1_m)
           write(for_msg,*)'  Number of hybrid levels (momentum levels)',nk-1,&
                         '\n   Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref)'
-          call vgrid_msg(MSG_IMPORTANT,trim(for_msg))
+          call msg(MSG_VERBATIM,trim(for_msg))
        end select
        
        if (is_valid(self,ip1_m_valid))then
           nk=size(self%ip1_m)
           write(for_msg,*)'  Momentum levels ip1, A, B:'
-          call vgrid_msg(MSG_IMPORTANT,trim(for_msg))
+          call msg(MSG_VERBATIM,trim(for_msg))
           do k=1,nk
              write(for_msg,*)self%ip1_m(k),self%a_m_8(k),self%b_m_8(k)
-             call vgrid_msg(MSG_IMPORTANT,trim(for_msg))
+             call msg(MSG_VERBATIM,trim(for_msg))
           enddo
        endif
        if (is_valid(self,ip1_t_valid))then
           nk=size(self%ip1_t)
           write(for_msg,*)'  Thermodynamic levels ip1, A, B:'
-          call vgrid_msg(MSG_IMPORTANT,trim(for_msg))
+          call msg(MSG_VERBATIM,trim(for_msg))
           do k=1,nk
              write(for_msg,*)self%ip1_t(k),self%a_t_8(k),self%b_t_8(k)
-             call vgrid_msg(MSG_IMPORTANT,trim(for_msg))
+             call msg(MSG_VERBATIM,trim(for_msg))
           enddo
        endif
     else
        write(for_msg,*) '* No Vertical Grid Descriptor Information Found'
-       call vgrid_msg(MSG_IMPORTANT,trim(for_msg))
+       call msg(MSG_VERBATIM,trim(for_msg))
     endif have_descriptor
 
     ! Set status and return
@@ -1768,7 +1834,7 @@ contains
          self%rec%ig1,self%rec%ig2,self%rec%ig3,self%rec%ig4,5,.true.)
     if(error < 0)then
        write(for_msg,*) 'problem with fstecr in write_desc'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
 
@@ -1780,7 +1846,7 @@ contains
     ! Warn user for unknown format
     case DEFAULT
        write(for_msg,*) 'No write done for unknown format ',trim(myformat)
-       call vgrid_msg(MSG_WARNING,for_msg)
+       call msg(MSG_WARNING,VGD_PRFX//for_msg)
     end select
 
     ! Set status and return
@@ -1822,7 +1888,7 @@ contains
        error = my_fstprm(fstkeys(i),var)
        if (error /= VGD_OK) then
           write(for_msg,*) 'return from fstprm wrapper for fst key ',fstkeys(i)
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
        if (i==1) then
@@ -1834,7 +1900,7 @@ contains
        endif
        if (var%ig1 /= ig1 .or. var%ig2 /= ig2 .or. var%ig3 /= ig3 .or. trim(var%grtyp) /= trim(grtyp)) then
           write(for_msg,*) 'multiple grids defined in fstkeys vector'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
     enddo grids
@@ -1848,13 +1914,13 @@ contains
     endif
     if (error /= VGD_OK) then
        write(for_msg,*) 'cannot build grid descriptor instance for fst key ',fstkeys(1)
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
     error = levels_readref(gd,unit=unit,fstkeys=fstkeys,levels=levels,in_log=my_in_log)
     if (error /= VGD_OK) then
        write(for_msg,*) 'problem computing level information for fst key ',fstkeys(1)
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
 
@@ -1888,32 +1954,32 @@ contains
     ! Check input keys
     if(size(fstkeys)<1)then
        write(for_msg,*) 'fstkeys vector passed to vgd_levels is null'                             
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return                                                                
     endif
     istat=my_fstprm(fstkeys(1),prmk)
     if(istat < 0)then
        write(for_msg,*) 'problem with my_fstprm in levels_readref'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
     endif
     check_times: do i=1,size(fstkeys)
        istat=my_fstprm(fstkeys(i),prm_check)
        ip1_list(i) = prm_check%ip1
        if (prm_check%datev /= prmk%datev) then
           write(for_msg,*) 'multiple valid times given in fstkeys vector'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
        if (prm_check%ig1 /= prmk%ig1 .or. prm_check%ig2 /= prmk%ig2) then
           write(for_msg,*) 'multiple grids given in fstkeys vector'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
     enddo check_times
     if (self%match_ipig) then
        if (prmk%ig1 /= self%ip1 .or. prmk%ig2 /= self%ip2) then
           write(for_msg,*) 'fstkeys do not correspond to the correct grid descriptor'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
     endif
@@ -1923,34 +1989,34 @@ contains
        sfc_key = fstinf(unit,ni,nj,nk,prmk%datev,prmk%etiket,-1,prmk%ip2,prmk%ip3,' ',self%ref_name)
        if(sfc_key < 0)then
           write(for_msg,*) 'cannot find ',self%ref_name,' for :'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           write(for_msg,*) 'datev=',prmk%datev,' etiket=',prmk%etiket,' ip2=',prmk%ip2,' ip3=',prmk%ip3
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return   
        endif
        istat=my_fstprm(sfc_key,prm_p0)
        if(prm_p0%ni.ne.prmk%ni.or.prm_p0%nj.ne.prmk%nj)then
           write(for_msg,*) 'horizontal grid mismatch for '//trim(self%ref_name),ni,nj,' vs',prmk%ni,prmk%nj
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
        if (self%match_ipig) then
           if (prm_p0%ig1 /= self%ip1 .or. prm_p0%ig2 /= self%ip2) then
              write(for_msg,*) 'sfc_field ig1-2 do not correspond to the correct grid descriptor'
-             call vgrid_msg(MSG_CRITICAL,for_msg)
+             call msg(MSG_ERROR,VGD_PRFX//for_msg)
              return
           endif
        endif
        allocate(p0(ni,nj),stat=error)
        if (error /= 0) then
           write(for_msg,*) 'cannot allocate space for p0 in levels_readref'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
        error = fstluk(p0,sfc_key,ni,nj,nk)
        if(error < 0 )then
           write(for_msg,*) 'problem with fstluk '//trim(self%ref_name)//' in levels_readref'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
        if (trim(self%ref_name) == 'P0') p0 = p0*100. !convert mb to Pa
@@ -1958,7 +2024,7 @@ contains
        allocate(p0(1,1),stat=error)
        if (error /= 0) then
           write(for_msg,*) 'cannot allocate space for p0 in levels_readref'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
        p0 = VGD_MISSING
@@ -1969,7 +2035,7 @@ contains
     deallocate(p0)
     if (error /= VGD_OK) then
        write(for_msg,*) 'got error return from levels_withref in levels_readref'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
 
@@ -2007,7 +2073,7 @@ contains
      allocate(levels(size(levels_8,dim=1)),stat=error)
      if (error /= 0) then
         write(for_msg,*) 'cannot allocate space for levels in levels_withref_prof'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      levels=levels_8
@@ -2064,7 +2130,7 @@ contains
      allocate(dpidpis(size(dpidpis_8,dim=1)),stat=error)
      if (error /= 0) then
         write(for_msg,*) 'cannot allocate space for dpidpis in dpidpis_withref_prof'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      dpidpis=dpidpis_8
@@ -2104,7 +2170,7 @@ contains
      allocate(sfc_field_2d(1,1),levels_3d(1,1,nk),stat=error)
      if (error /= 0) then
         write(for_msg,*) 'cannot allocate space for p0/levels in diag_withref_prof_8'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      sfc_field_2d=my_sfc_field
@@ -2112,20 +2178,20 @@ contains
      error = diag_withref_8(self,sfc_field=sfc_field_2d,ip1_list=ip1_list,levels=levels_3d,in_log=my_in_log,dpidpis=my_dpidpis)    
      if (error /= 0) then
         write(for_msg,*) 'problem with diag_withref in diag_withref_prof_8'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      if (associated(levels)) then
         if (size(levels) /= nk) then
            write(for_msg,*) 'Levels array size error - will be reallocated'
-           call vgrid_msg(MSG_WARNING,for_msg)
+           call msg(MSG_WARNING,VGD_PRFX//for_msg)
         endif
         deallocate(levels)
      endif
      allocate(levels(nk),stat=error)
      if (error /= 0) then
         write(for_msg,*) 'cannot allocate space for levels in diag_withref_prof_8'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      levels=levels_3d(1,1,1:nk)
@@ -2162,7 +2228,7 @@ contains
      allocate(my_sfc_field(ni,nj),stat=error)
      if (error /= 0) then
         write(for_msg,*) 'cannot allocate space for my_sfc_field in levels_withref'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      if (present(sfc_field)) then
@@ -2180,7 +2246,7 @@ contains
      allocate(levels(size(levels_8,dim=1),size(levels_8,dim=2),size(levels_8,dim=3)),stat=error)
      if (error /= 0) then
         write(for_msg,*) 'cannot allocate space for levels in levels_withref'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      levels=levels_8
@@ -2213,7 +2279,7 @@ contains
      allocate(my_sfc_field(ni,nj),stat=error)
      if (error /= 0) then
         write(for_msg,*) 'cannot allocate space for sfc_field in levels_withref'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      if (present(sfc_field)) then
@@ -2254,7 +2320,7 @@ contains
      allocate(my_sfc_field_8(ni,nj),stat=error)
      if (error /= 0) then
         write(for_msg,*) 'cannot allocate space for sfc_field in levels_withref'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      if (present(sfc_field)) then
@@ -2270,7 +2336,7 @@ contains
      allocate(dpidpis(size(dpidpis_8,dim=1),size(dpidpis_8,dim=2),size(dpidpis_8,dim=3)),stat=error)
      if (error /= 0) then
         write(for_msg,*) 'cannot allocate space for dpidpis in dpidpis_withref'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      dpidpis=dpidpis_8
@@ -2307,7 +2373,7 @@ contains
     else
       if (is_valid(self,ref_name_valid)) then
          write(for_msg,*) 'reference field must be provided to diag_withref_8'
-         call vgrid_msg(MSG_CRITICAL,for_msg)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
          return
       else
          ni = 1; nj = 1; nk = size(ip1_list)
@@ -2316,14 +2382,14 @@ contains
     if (associated(levels)) then
        if (size(levels,dim=1) /= ni .or. size(levels,dim=2) /= nj .or. size(levels,dim=3) /= nk) then
           write(for_msg,*) 'Levels array size error - will be reallocated'
-          call vgrid_msg(MSG_WARNING,for_msg)
+          call msg(MSG_WARNING,VGD_PRFX//for_msg)
        endif
        deallocate(levels)
     endif
     allocate(levels(ni,nj,nk),stat=error)
     if (error /= 0) then
        write(for_msg,*) 'cannot allocate space for levels in diag_withref_8'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
     ! Compute levels for known vertical coordinates
@@ -2331,21 +2397,21 @@ contains
     case (1001)
        if(my_dpidpis)then
           write(for_msg,*) 'dpidpis not implemented for vertical coordinate 1001'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return 
        endif
        istat = compute_pressure_1001_8(self,sfc_field,ip1_list,levels,my_in_log)
     case (1002)
        if(my_dpidpis)then
           write(for_msg,*) 'dpidpis not implemented for vertical coordinate 1002'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return 
        endif
        istat = compute_pressure_1002_8(self,sfc_field,ip1_list,levels,my_in_log)
     case (2001)
        if(my_dpidpis)then
           write(for_msg,*) 'dpidpis not implemented for vertical coordinate 2001'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return 
        endif
        istat = compute_pressure_2001_8(self,ip1_list,levels,my_in_log)
@@ -2356,16 +2422,16 @@ contains
     case DEFAULT
        istat = get_version_info(self,kind,version)
        write(for_msg,*) 'kind or version invalid :',kind,version
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return 
     end select
     if (istat /= VGD_OK) then
        if(my_dpidpis)then
           write(for_msg,*) 'error computing dpidpis in diag_withref_8'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
        else
           write(for_msg,*) 'error computing pressure in diag_withref_8'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
        endif
        return
     endif
@@ -2433,7 +2499,7 @@ contains
      allocate(self%table(3,nk+skip,1),stat=error)
      if(error < 0)then
         write(for_msg,*) 'cannot allocate self%table in encode_vert_1001'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
 
@@ -2444,7 +2510,7 @@ contains
           ig4=0)
      if (error /= VGD_OK) then
         write(for_msg,*) 'cannot initialize fstd record entries'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      end if
      self%ref_name="P0"
@@ -2453,25 +2519,25 @@ contains
      nn=size(self%ip1_m)
      if(nn.ne.nk)then
         write(for_msg,*) 'wrong size for ip1_m, is ',nn,'should be ',nk
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      nn=size(self%a_m_8)
      if(nn.ne.nk)then
         write(for_msg,*) 'wrong size for a_m_8, is ',nn,'should be ',nk
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      nn=size(self%b_m_8)
      if(nn.ne.nk)then
         write(for_msg,*) 'wrong size for b_m_8, is ',nn,'should be ',nk
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      error = flip_transfer(self%ref_name,for_char_8)
      if (error /= VGD_OK) then
         write(for_msg,*) 'flip_transfer function returned an error code from encode ',error
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
 
@@ -2507,7 +2573,7 @@ contains
      allocate(self%table(3,nk+skip,1),stat=error)
      if(error < 0)then
         write(for_msg,*) 'cannot allocate self%table in encode_vert_1002'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
 
@@ -2518,7 +2584,7 @@ contains
           ig4=0)
      if (error /= VGD_OK) then
         write(for_msg,*) 'cannot initialize fstd record entries'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      end if
      self%ref_name="P0"
@@ -2527,25 +2593,25 @@ contains
      nn=size(self%ip1_m)
      if(nn.ne.nk)then
         write(for_msg,*) 'wrong size for ip1_m, is ',nn,'should be ',nk
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      nn=size(self%a_m_8)
      if(nn.ne.nk)then
         write(for_msg,*) 'wrong size for a_m_8, is ',nn,'should be ',nk
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      nn=size(self%b_m_8)
      if(nn.ne.nk)then
         write(for_msg,*) 'wrong size for b_m_8, is ',nn,'should be ',nk
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      error = flip_transfer(self%ref_name,for_char_8)
      if (error /= VGD_OK) then
         write(for_msg,*) 'flip_transfer function returned an error code from encode ',error
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
 
@@ -2579,7 +2645,7 @@ contains
      allocate(self%table(3,nk+skip,1),stat=error)
      if(error < 0)then
         write(for_msg,*) 'cannot allocate self%table in encode_vert_2001'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
 
@@ -2587,7 +2653,7 @@ contains
      error = fstd_init(self,etiket='PRESSURE',ig2=0,ig3=0,ig4=0)
      if (error /= VGD_OK) then
         write(for_msg,*) 'cannot initialize fstd record entries'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      end if
 
@@ -2595,7 +2661,7 @@ contains
      nn=size(self%a_m_8)
      if(nn.ne.nk)then
         write(for_msg,*) 'wrong size for a_m_8, is ',nn,'should be ',nk
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      
@@ -2631,7 +2697,7 @@ contains
      allocate(self%table(3,nk+skip,1),stat=error)
      if(error < 0)then
         write(for_msg,*) 'cannot allocate self%table in encode_vert_5001'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
 
@@ -2650,7 +2716,7 @@ contains
      end select
      if (error /= VGD_OK) then
         write(for_msg,*) 'cannot initialize fstd record entries'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      end if
 
@@ -2660,25 +2726,25 @@ contains
      nn=size(self%ip1_m)
      if(nn.ne.nk)then
         write(for_msg,*) 'wrong size for ip1_m, is ',nn,'should be ',nk
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      nn=size(self%a_m_8)
      if(nn.ne.nk)then
         write(for_msg,*) 'wrong size for a_m_8, is ',nn,'should be ',nk
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      nn=size(self%b_m_8)
      if(nn.ne.nk)then
         write(for_msg,*) 'wrong size for b_m_8, is ',nn,'should be ',nk
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      error = flip_transfer(self%ref_name,for_char_8)
      if (error /= VGD_OK) then
         write(for_msg,*) 'flip_transfer function returned an error code from encode ',error
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
 
@@ -2716,7 +2782,7 @@ contains
      allocate(self%table(3,(2*nk+3)+skip,1),stat=error)
      if(error < 0)then
         write(for_msg,*) 'cannot allocate self%table in encode_vert_5002'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
 
@@ -2727,7 +2793,7 @@ contains
           ig4=nint(self%rcoef2*100.))
      if (error /= VGD_OK) then
         write(for_msg,*) 'cannot initialize fstd record entries'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      end if
      self%ref_name="P0"
@@ -2736,48 +2802,48 @@ contains
      nn=size(self%ip1_m)
      if(nn.ne.nk+1)then
         write(for_msg,*) 'wrong size for ip1_m, is ',nn,'should be ',nk+1
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      nn=size(self%a_m_8)
      if(nn.ne.nk+1)then
         write(for_msg,*) 'wrong size for a_m_8, is ',nn,'should be ',nk+1
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      nn=size(self%b_m_8)
      if(nn.ne.nk+1)then
         write(for_msg,*) 'wrong size for b_m_8, is ',nn,'should be ',nk+1
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      nn=size(self%ip1_t)
      if(nn.ne.nk+2)then
         write(for_msg,*) 'wrong size for ip1_t, is ',nn,'should be ',nk+2
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      nn=size(self%a_t_8)
      if(nn.ne.nk+2)then
         write(for_msg,*) 'wrong size for a_t_8, is ',nn,'should be ',nk+2
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      nn=size(self%b_t_8)
      if(nn.ne.nk+2)then
         write(for_msg,*) 'wrong size for b_t_8, is ',nn,'should be ',nk+2
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      if (len_trim(self%ref_name) > len(ref_name)) then
         write(for_msg,*) 'reference field name '//trim(self%ref_name)//' longer than limit: ',len(ref_name)
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      error = flip_transfer(self%ref_name,for_char_8)
      if (error /= VGD_OK) then
         write(for_msg,*) 'flip_transfer function returned error code from encode ',error
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
 
@@ -2824,7 +2890,7 @@ contains
      error = flip_transfer(self%table(1,2,1),self%ref_name)
      if (error /= VGD_OK) then
         write(for_msg,*) 'flip_transfer function returned an error code from decode ',error
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      nj=size(self%table,dim=2)
@@ -2835,21 +2901,21 @@ contains
      allocate(self%ip1_m(nk),stat=istat)
      if (istat /= 0) then
         write(for_msg,*) 'unable to allocate self%ip1_m(nk) in decode_vert_1001'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      if (associated(self%a_m_8)) deallocate(self%a_m_8)
      allocate(self%a_m_8(nk),stat=istat)
      if (istat /= 0) then
         write(for_msg,*) 'unable to allocate self%a_m_8 in decode_vert_1001'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      if (associated(self%b_m_8)) deallocate(self%b_m_8)
      allocate(self%b_m_8(nk),stat=istat)
      if (istat /= 0) then
         write(for_msg,*) 'unable to allocate self%b_m_8(nk) in decode_vert_1001'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif     
 
@@ -2885,7 +2951,7 @@ contains
      error = flip_transfer(self%table(2,2,1),self%ref_name)
      if (error /= VGD_OK) then
         write(for_msg,*) 'flip_transfer function returned an error code from decode ',error
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      nj=size(self%table,dim=2)
@@ -2896,21 +2962,21 @@ contains
      allocate(self%ip1_m(nk),stat=istat)
      if (istat /= 0) then
         write(for_msg,*) 'unable to allocate self%ip1_m(nk) in decode_vert_1002'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      if (associated(self%a_m_8)) deallocate(self%a_m_8)
      allocate(self%a_m_8(nk),stat=istat)
      if (istat /= 0) then
         write(for_msg,*) 'unable to allocate self%a_m_8(nk) in decode_vert_1002'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      if (associated(self%b_m_8)) deallocate(self%b_m_8)
      allocate(self%b_m_8(nk),stat=istat)
      if (istat /= 0) then
         write(for_msg,*) 'unable to allocate self%b_m_8(nk) in decode_vert_1002'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif     
 
@@ -2947,21 +3013,21 @@ contains
     allocate(self%ip1_m(nk),stat=istat)
     if (istat /= 0) then
        write(for_msg,*) 'unable to allocate self%ip1_m(nk) in decode_vert_2001'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
     if (associated(self%a_m_8)) deallocate(self%a_m_8)
     allocate(self%a_m_8(nk),stat=istat)
     if (istat /= 0) then
        write(for_msg,*) 'unable to allocate self%a_m_8(nk) in decode_vert_2001'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
     if (associated(self%b_m_8)) deallocate(self%b_m_8)
     allocate(self%b_m_8(nk),stat=istat)
     if (istat /= 0) then
        write(for_msg,*) 'unable to allocate self%b_m_8(nk) in decode_vert_2001'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
 
@@ -3001,7 +3067,7 @@ contains
      error = flip_transfer(self%table(1,3,1),self%ref_name)
      if (error /= VGD_OK) then
         write(for_msg,*) 'flip_transfer function returned an error code from decode ',error
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      nj=size(self%table,dim=2)
@@ -3012,21 +3078,21 @@ contains
      allocate(self%ip1_m(nk),stat=istat)
      if (istat /= 0) then
         write(for_msg,*) 'unable to allocate self%ip1_m(nk) in decode_vert_5001'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      if (associated(self%a_m_8)) deallocate(self%a_m_8)
      allocate(self%a_m_8(nk),stat=istat)
      if (istat /= 0) then
         write(for_msg,*) 'unable to allocate self%a_m_8(nk) in decode_vert_5001'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      if (associated(self%b_m_8)) deallocate(self%b_m_8)
      allocate(self%b_m_8(nk),stat=istat)
      if (istat /= 0) then
         write(for_msg,*) 'unable to allocate self%b_m_8(nk) in decode_vert_5001'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
 
@@ -3067,7 +3133,7 @@ contains
      error = flip_transfer(self%table(2,3,1),self%ref_name)
      if (error /= VGD_OK) then
         write(for_msg,*) 'flip_transfer function returned an error code from decode ',error
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      nj=size(self%table,dim=2)
@@ -3079,21 +3145,21 @@ contains
      allocate(self%ip1_m(nk+1),stat=istat)
      if (istat /= 0) then
         write(for_msg,*) 'unable to allocate self%ip1_m(nk+1) in decode_vert_5002'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      if (associated(self%a_m_8)) deallocate(self%a_m_8)
      allocate(self%a_m_8(nk+1),stat=istat)
      if (istat /= 0) then
         write(for_msg,*) 'unable to allocate self%a_m_8(nk+1) in decode_vert_5002'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      if (associated(self%b_m_8)) deallocate(self%b_m_8)
      allocate(self%b_m_8(nk+1),stat=istat)
      if (istat /= 0) then
         write(for_msg,*) 'unable to allocate self%b_m_8(nk+1) in decode_vert_5002'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
 
@@ -3109,21 +3175,21 @@ contains
      allocate(self%ip1_t(nk+2),stat=istat)
      if (istat /= 0) then
         write(for_msg,*) 'unable to allocate self%ip1_t(nk+2) in decode_vert_5002'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      if (associated(self%a_t_8)) deallocate(self%a_t_8)
      allocate(self%a_t_8(nk+2),stat=istat)
      if (istat /= 0) then
         write(for_msg,*) 'unable to allocate self%a_t_8(nk+2) in decode_vert_5002'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      if (associated(self%b_t_8)) deallocate(self%b_t_8)
      allocate(self%b_t_8(nk+2),stat=istat)
      if (istat /= 0) then
         write(for_msg,*) 'unable to allocate self%b_t_8(nk+2) in decode_vert_5002'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
 
@@ -3153,7 +3219,7 @@ contains
      status = VGD_ERROR
      if (.not.associated(self%table)) then
         write(for_msg,*) 'set_vcode called before constructor'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
 
@@ -3161,7 +3227,7 @@ contains
      status = get_version_info(self,kind,version)
      if (status /= VGD_OK) then
         write(for_msg,*) 'cannot decode table to read kind and version: ',kind,version
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      status = set_vcode(self,kind,version)
@@ -3182,7 +3248,7 @@ contains
      ! Check for valid entries (version is limited by the mangling equation)
      if (kind > MAX_VKIND .or. kind < 0 .or. version > 999 .or. version < 0) then
         write(for_msg,*) 'invalid kind or version: ',kind,version
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
 
@@ -3222,7 +3288,7 @@ contains
         found = .true.
      else
         write(for_msg,*) 'WARNING: uninitialized descriptor given to found_descriptor()'
-        call vgrid_msg(MSG_CRITICAL,for_msg)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      return
@@ -3318,7 +3384,7 @@ contains
        enddo
        if (.not.found) then
           write(for_msg,*) 'cannot find ip1 ',ip1_list(i),' in compute_pressure_1001'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
     enddo
@@ -3366,7 +3432,7 @@ contains
        enddo
        if (.not.found) then
           write(for_msg,*) 'cannot find ip1 ',ip1_list(i),' in compute_pressure_1002'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
     enddo
@@ -3412,7 +3478,7 @@ contains
        enddo
        if (.not.found) then
           write(for_msg,*) 'cannot find ip1 ',ip1_list(i),' in compute_pressure_2001'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
     enddo
@@ -3462,7 +3528,7 @@ contains
        enddo
        if (.not.found) then
           write(for_msg,*) 'cannot find ip1 ',ip1_list(i),' in compute_pressure_5001'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
     enddo
@@ -3470,7 +3536,7 @@ contains
     if(dpidpis)then
        if(in_log)then
           write(for_msg,*) 'option in_log not allowed with dpidpis'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
        do i=1,nk
@@ -3536,7 +3602,7 @@ contains
        endif
        if (.not.found) then
           write(for_msg,*) 'cannot find ip1 ',ip1_list(i),' in compute_pressure_5002_8'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
     enddo
@@ -3559,7 +3625,7 @@ contains
     if(dpidpis)then
        if(in_log)then
           write(for_msg,*) 'in compute_pressure_5002_8, cannot get dpidpis in log'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
        do i=1,nk
@@ -3600,7 +3666,7 @@ contains
     if(present(F_kind))then
        user_kind=F_kind
        write(for_msg,*) 'Looking for kind=',user_kind
-       call vgrid_msg(MSG_INFO,for_msg)
+       call msg(MSG_INFO,VGD_PRFX//for_msg)
     endif
 
     num_in_kind=0
@@ -3609,7 +3675,7 @@ contains
     error = fstinl(F_lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',' ',keyList,count,size(keyList))
     if (error < 0) then
        write(for_msg,*) 'problem fstinl in vgd_legacy'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
     nip1=0
@@ -3617,7 +3683,7 @@ contains
        error = my_fstprm(keyList(i),var)
        if (error /= VGD_OK) then
           write(for_msg,*) 'in vgd_legacy, error return from fstprm wrapper for fst key ',keyList(i)
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
        call convip(var%ip1,PresList(i),kind,-1,'',.false.)
@@ -3640,11 +3706,11 @@ contains
 
     if(maxval(num_in_kind) /= nip1)then       
        write(for_msg,*) 'more than one pressure/sigma/hyb coordinate in file'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        do i=0,nb_kind
           if(num_in_kind(i) > 0)then
              write(for_msg,'("There are",i10," records of kind ",i3)')num_in_kind(i),i
-             call vgrid_msg(MSG_INFO,for_msg)
+             call msg(MSG_INFO,VGD_PRFX//for_msg)
           endif
        enddo
        return
@@ -3698,21 +3764,21 @@ contains
 
     if(nb==0)then
        write(for_msg,*) 'No record of type pressure/sigma/hyb in file'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
     write(for_msg,'("   Found",i10," unique ip1 of kind ",i2," among the ",i10," records in file to construct the vertical descriptor")')nb,valid_kind,count
-    call vgrid_msg(MSG_INFO,for_msg)
+    call msg(MSG_INFO,VGD_PRFX//for_msg)
     
     status = gen_legacy_desc(self,F_lu,Ip1List(1:nb),KeyList(1:nb),nb)
     if(status/=VGD_OK)then
        write(for_msg,'(" Error : problem with gen_legacy_desc")')
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
 
     write(for_msg,'("   Vertical descriptor successfully reconstructed")')
-    call vgrid_msg(MSG_IMPORTANT,for_msg)
+    call msg(MSG_INFO,VGD_PRFX//for_msg)
 
  end function vgd_legacy
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -3769,7 +3835,7 @@ contains
     allocate(ip1(nlev),hyb(nlev),hybm(nlev),stat=istat)
     if (istat /= 0) then
        write(for_msg,*) 'unable to allocate ip1,hyb,hybm, in gen_legacy_desc'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
     
@@ -3778,13 +3844,13 @@ contains
          ig1a,ig2a,ig3a,ig4a, swa,lng, dlf, ubc, ex1, ex2, ex3 )
     if (ier.lt.0) then
        write(for_msg,*) 'gen_legacy_desc error: fstprm on key',fstkeys(1)
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     else
        call convip (ip1a, lev, kind,-1, blk_S, .false.)
        if (kind.ne.1.and.kind.ne.2.and.kind.ne.5) then
           write(for_msg,*) 'gen_legacy_desc error: kind = ',kind,' has to be 1,2 or 5'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           deallocate(ip1,hyb,hybm)
           return
        endif
@@ -3799,13 +3865,13 @@ contains
        if (ni1.ne.nia.and.nj1.ne.nja.and.nk1.ne.nka.or.&
             ier.lt.0) then
           write(for_msg,*) 'gen_legacy_desc error: fstprm on key',fstkeys(k),'dim mismatch'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           goto 999
        endif
        call convip (ip1a, lev, kind,-1, blk_S, .false.)
        if (kind.ne.origkind) then
           write(for_msg,*) 'gen_legacy_desc error: orig kind=',origkind,'kind found=',kind
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           goto 999
        endif
        ip1(k)=ip1a
@@ -3825,16 +3891,16 @@ contains
           ier=get_consistent_pt_e1(iun,ptop,'PT')
           if(ier.eq.VGD_ERROR)then
              write(for_msg,*) 'gen_legacy_desc error: consistency check on PT failed'
-             call vgrid_msg(MSG_CRITICAL,for_msg)
+             call msg(MSG_ERROR,VGD_PRFX//for_msg)
              goto 999
           endif
           if (e1_key.ge.0) then
              write(for_msg,*)' etasef coordinate found'
-             call vgrid_msg(MSG_IMPORTANT,for_msg)
+             call msg(MSG_INFO,VGD_PRFX//for_msg)
              ier=get_consistent_pt_e1(iun,etatop,'E1')
              if(ier.eq.VGD_ERROR)then
                 write(for_msg,*) 'gen_legacy_desc error: consistency check on E1 failed'
-                call vgrid_msg(MSG_CRITICAL,for_msg)
+                call msg(MSG_ERROR,VGD_PRFX//for_msg)
                 goto 999
              endif
              call vgrid_genab_1004(hyb,etatop,ptop,a_m_8,b_m_8,error)
@@ -3850,7 +3916,7 @@ contains
              goto 999
           else
              write(for_msg,*)' eta coordinate found'
-             call vgrid_msg(MSG_IMPORTANT,for_msg)
+             call msg(MSG_INFO,VGD_PRFX//for_msg)
              call vgrid_genab_1002_5001(1002,hyb,1.,ptop*100.d0,80000.d0,&
                   hybm,a_m_8,b_m_8,ip1,error)
              if (error /= VGD_OK)goto 999
@@ -3865,11 +3931,11 @@ contains
           endif
        else if (hy_key.ge.0) then
           write(for_msg,*)' hybrid (normalized) coordinate found'
-          call vgrid_msg(MSG_IMPORTANT,for_msg)
+          call msg(MSG_INFO,VGD_PRFX//for_msg)
           ier=get_consistent_hy(iun,ptop,pref,rcoef)
           if(ier.eq.VGD_ERROR)then
              write(for_msg,*) 'gen_legacy_desc error: consistency check on HY failed'
-             call vgrid_msg(MSG_CRITICAL,for_msg)
+             call msg(MSG_ERROR,VGD_PRFX//for_msg)
              goto 999
           endif
           call vgrid_genab_1002_5001(1002,hyb,rcoef,ptop*100.d0,pref*100.d0,&
@@ -3887,7 +3953,7 @@ contains
           goto 999
        else 
           write(for_msg,*)' sigma coordinate found'
-          call vgrid_msg(MSG_IMPORTANT,for_msg)
+          call msg(MSG_INFO,VGD_PRFX//for_msg)
           call vgrid_genab_1001(hyb,hybm,a_m_8,b_m_8,ip1,error)
           if (error /= VGD_OK)goto 999
           status = vgd_new(self,kind=1,version=1, nk=nlev,&
@@ -3902,7 +3968,7 @@ contains
     
     if (kind.eq.2) then
        write(for_msg,*)' pressure coordinate found'
-       call vgrid_msg(MSG_IMPORTANT,for_msg)
+       call msg(MSG_INFO,VGD_PRFX//for_msg)
        call vgrid_genab_2001(hyb,a_m_8,b_m_8,error)
        if (error /= VGD_OK)then
           goto 999
@@ -3918,11 +3984,11 @@ contains
     
     if (kind.eq.5.and.hy_key.ge.0) then
        write(for_msg,*)' hybrid (un-normalized) coordinate found'
-       call vgrid_msg(MSG_IMPORTANT,for_msg)
+       call msg(MSG_INFO,VGD_PRFX//for_msg)
        ier=get_consistent_hy(iun,ptop,pref,rcoef)
        if(ier.eq.VGD_ERROR)then
           write(for_msg,*) 'gen_legacy_desc error: consistency check on HY failed'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           goto 999
        endif
        call vgrid_genab_1002_5001(5001,hyb,rcoef,ptop*100.d0,pref*100.d0,&
@@ -3942,7 +4008,7 @@ contains
        goto 999
     else
        write(for_msg,*) 'gen_legacy_desc error: kind=5 but no HY found'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        goto 999
     endif
 
@@ -3973,24 +4039,24 @@ contains
     ier=fstinl(F_iun,ni,nj,nk,-1,' ',-1,-1,-1,' ','HY',liste,infon,nmax)
     if (ier.lt.0) then
        write(for_msg,*) 'In get_consistent_hy, problem with fstinl on HY'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
     if(infon.gt.1)then
        write(for_msg,*) '  More than one HY, checking consistency ...'
-       call vgrid_msg(MSG_WARNING,for_msg)
+       call msg(MSG_WARNING,VGD_PRFX//for_msg)
     endif
     do k=1,infon
        ier=my_fstprm(liste(k),record)
        if (ier < 0) then
           write(for_msg,*) 'In get_consistent_hy, problem with my_fstprm on k=',k
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif       
        ier=read_decode_hyb(F_iun,'HY',record%ip2,record%ip3,record%etiket,record%datev,ptop,pref,rcoef)
        if (ier.lt.0) then
           write(for_msg,*) 'In get_consistent_hy, problem with read_decode_hyb'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
        if(k.eq.1)then
@@ -4004,13 +4070,13 @@ contains
                pref .ne.F_pref .or. &
                rcoef.ne.F_rcoef)then
              write(for_msg,*) 'In get_consistent_hy, found inconsistant HY'
-             call vgrid_msg(MSG_CRITICAL,for_msg)
+             call msg(MSG_ERROR,VGD_PRFX//for_msg)
              write(for_msg,*) 'ptop: ',ptop      ,' vs ',F_ptop
-             call vgrid_msg(MSG_CRITICAL,for_msg)
+             call msg(MSG_ERROR,VGD_PRFX//for_msg)
              write(for_msg,*) 'pref: ',pref      ,' vs ',F_pref
-             call vgrid_msg(MSG_CRITICAL,for_msg)
+             call msg(MSG_ERROR,VGD_PRFX//for_msg)
              write(for_msg,*) 'rcoef:',rcoef     ,' vs ',F_rcoef
-             call vgrid_msg(MSG_CRITICAL,for_msg)
+             call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
           endif
           if(record%ip1.ne.ip1)then
@@ -4018,7 +4084,7 @@ contains
              call convip(record%ip1,pres2,kind,-1,'',.false.)
              if(abs(pres1-pres2).gt.epsilon(pres1))then
                 write(for_msg,*) 'ip1:  ',record%ip1,' vs ',ip1             
-                call vgrid_msg(MSG_CRITICAL,for_msg)
+                call msg(MSG_ERROR,VGD_PRFX//for_msg)
                 return
              endif
           endif
@@ -4026,7 +4092,7 @@ contains
     enddo    
     if(infon.gt.1)then
        write(for_msg,*) '  All HY consistent.'
-       call vgrid_msg(MSG_IMPORTANT,for_msg)
+       call msg(MSG_INFO,VGD_PRFX//for_msg)
     endif
     status=VGD_OK
 
@@ -4056,12 +4122,12 @@ contains
 
     if(infon.gt.1)then
        write(for_msg,*) '  More than one ',F_nomvar,', checking consistency ...'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
     endif
     allocate(work(ni,nj),stat=istat)
     if (istat /= 0) then
        write(for_msg,*) 'unable to allocate work(ni,nj) in get_consistent_pt_e1'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
     
@@ -4069,26 +4135,26 @@ contains
        ier=my_fstprm(liste(k),record)
        if (ier < 0) then
           write(for_msg,*) 'In get_consistent_pt_e1, problem with my_fstprm on k=',k
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
        if(  record%ni.ne.ni.or. &
             record%nj.ne.nj.or. &
             record%nK.ne.nk)then
           write(for_msg,*) 'In get_consistent_pt_e1 : inconsistent ',F_nomvar,' frid size:'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           write(for_msg,*) 'ni : ',record%ni,' vs ',ni
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           write(for_msg,*) 'nj : ',record%nj,' vs ',nj
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           write(for_msg,*) 'nk : ',record%nk,' vs ',nk
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           goto 999
        endif
        ier = fstluk(work,liste(k),ni,nj,nk)
        if (ier.lt.0) then
           write(for_msg,*) 'In get_consistent_pt_e1 : problem in fstluk ',F_nomvar,' k=',k
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           goto 999
        endif
        if(k.eq.1)then
@@ -4096,13 +4162,13 @@ contains
        else
           if(work(1,1).ne.F_val)then
              write(for_msg,*) 'In get_consistent_pt_e1 : inconsistent ',F_nomvar,' ',work(1,1),' vs ',F_val
-             call vgrid_msg(MSG_CRITICAL,for_msg)
+             call msg(MSG_ERROR,VGD_PRFX//for_msg)
              goto 999
           endif
        endif
     enddo
     write(for_msg,*) '  All ',F_nomvar,' consistent.'
-    call vgrid_msg(MSG_IMPORTANT,for_msg)
+    call msg(MSG_INFO,VGD_PRFX//for_msg)
     status=VGD_OK
 999 deallocate(work)
  end function get_consistent_pt_e1

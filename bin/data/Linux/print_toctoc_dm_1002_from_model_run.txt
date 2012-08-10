@@ -1,12 +1,12 @@
  Note : printing only level information for kind           -1
-WARNING: cannot find !! with the following: ip1=        -1,ip2=        -1
-WARNING: Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)
- Looking for kind=           -1
-   Found        28 unique ip1 of kind  1 among the        117 records in file to construct the vertical descriptor
+WARNING: (vgd) cannot find !! with the following: ip1=        -1,ip2=        -1
+WARNING: (vgd) Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)
+(vgd)  Looking for kind=           -1
+(vgd)    Found        28 unique ip1 of kind  1 among the        117 records in file to construct the vertical descriptor
 Read(10) PT   P  K4H9ST1A        41    20     1  338994800           0      0     0      900        0  E32  Z  2009  1000     0     0
-   All PT consistent.
-  eta coordinate found
-   Vertical descriptor successfully reconstructed
+(vgd)    All PT consistent.
+(vgd)   eta coordinate found
+(vgd)    Vertical descriptor successfully reconstructed
  -- Vertical Grid Descriptor Information --
    ip1=         2009 
    ip2=         1000 

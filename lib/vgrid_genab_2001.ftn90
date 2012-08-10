@@ -65,7 +65,7 @@ contains
       if(F_pres(1).eq.0.d0)then
          wrongsig = .true.
          write(for_msg,1000)
-         call vgrid_msg(MSG_CRITICAL,for_msg)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
       endif
       do k=2, nk
          if (F_pres(k).le.F_pres(k-1))monotone = .false.
@@ -73,14 +73,14 @@ contains
       if(.not.monotone)then
          wrongsig = .true.
          write(for_msg,1003)
-         call vgrid_msg(MSG_CRITICAL,for_msg)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
       endif
       if (wrongsig) then
          write(for_msg,1002)
-         call vgrid_msg(MSG_CRITICAL,for_msg)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
          do k=1, nk
             write(for_msg,*) F_pres(k),k
-            call vgrid_msg(MSG_CRITICAL,for_msg)               
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)               
          end do
          return
       endif
@@ -127,14 +127,14 @@ contains
        deallocate(v,stat=check)
        if (check /= 0) then
           write(for_msg,*) 'in deallocate() from vdescript_2001::reallocate()'
-          call vgrid_msg(MSG_CRITICAL,for_msg)          
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)          
           return
        endif
     endif
     allocate(v(low:high),stat=check)
     if (check /= 0) then
        write(for_msg,*) 'in allocate() from vdescript_2001::reallocate()'
-       call vgrid_msg(MSG_CRITICAL,for_msg)  
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)  
        return
     endif
     status = VGD_OK
@@ -156,14 +156,14 @@ contains
        deallocate(v,stat=check)
        if (check /= 0) then
           write(for_msg,*) 'in deallocate() from vgrid_genab_2001:reallocate()'
-          call vgrid_msg(MSG_CRITICAL,for_msg) 
+          call msg(MSG_ERROR,VGD_PRFX//for_msg) 
           return
        endif
     endif
     allocate(v(low:high),stat=check)
     if (check /= 0) then
        write(for_msg,*) 'in allocate() from vgrid_genab_2001::reallocate()'
-       call vgrid_msg(MSG_CRITICAL,for_msg)        
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)        
        return
     endif
     status = VGD_OK
@@ -187,14 +187,14 @@ contains
        deallocate(v,stat=check)
        if (check /= 0) then
           write(for_msg,*) 'Error in deallocate() from vdescript_2001::reallocate()'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
     endif
     allocate(v(low:high),stat=check)
     if (check /= 0) then
        write(for_msg,*) 'Error in allocate() from vdescript_2001::reallocate()'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
     status = VGD_OK

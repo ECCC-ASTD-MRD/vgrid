@@ -89,7 +89,7 @@ contains
     nk = size(F_hybuser)
     if (size(F_rcoef) /= 2) then
        write(for_msg,*) 'Size of F_rcoef should be 2 in vdescript_5002::vgrid_genab_5002()... is ',size(F_rcoef)
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
 
@@ -113,13 +113,13 @@ contains
 
     if (  Nk.lt.1 )  then
        write(for_msg,9100)
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
     
     if (F_ptop_8.le.0.d0) then
        write(for_msg,9400)
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
     !     
@@ -132,7 +132,7 @@ contains
     !
     if (F_hybuser(NK).ge.1..or.F_hybuser(1).le.F_hybm(0))then
        write(for_msg,9550) F_hybm(0)
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
     !     
@@ -145,12 +145,12 @@ contains
     
     if (wronghyb) then
        write(for_msg,9250)
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        write(for_msg,*)'MOMENTUM LEVELS'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        do k=1, NK
           write(for_msg,*) F_hybuser(k),k
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
        end do
        return            
     endif
@@ -259,14 +259,14 @@ contains
        deallocate(v,stat=check)
        if (check /= 0) then
           write(for_msg,*) 'in deallocate() from vdescript_5002::reallocate()'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
     endif
     allocate(v(low:high),stat=check)
     if (check /= 0) then
        write(for_msg,*) 'in allocate() from vdescript_5002::reallocate()'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
     status = VGD_OK
@@ -288,14 +288,14 @@ contains
        deallocate(v,stat=check)
        if (check /= 0) then
           write(for_msg,*) 'in deallocate() from vgrid_genab_5002::reallocate()'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
     endif
     allocate(v(low:high),stat=check)
     if (check /= 0) then
        write(for_msg,*) 'in allocate() from vgrid_genab_5002::reallocate()'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
     status = VGD_OK
@@ -319,14 +319,14 @@ contains
        deallocate(v,stat=check)
        if (check /= 0) then
           write(for_msg,*) 'in deallocate() from vdescript_5002::reallocate()'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
     endif
     allocate(v(low:high),stat=check)
     if (check /= 0) then
        write(for_msg,*) 'in allocate() from vdescript_5002::reallocate()'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
     status = VGD_OK
