@@ -12,9 +12,9 @@ DATA_ARCH=`uname -s`
 .ftn90.o:
 	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -src $<
 
-OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o unit_testing.o
+OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/utils.o unit_testing.o
 
-unit_testing.o: unit_testing.ftn90 $(DESCRIP_PATH)/vgrid_descriptors.o
+unit_testing.o: unit_testing.ftn90 $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/utils.o
 
 alltests:
 	make tests DATA_ARCH=Linux; \
@@ -23,6 +23,9 @@ alltests:
 
 $(DESCRIP_PATH)/vgrid_descriptors.o: $(DESCRIP_PATH)/vgrid_descriptors.ftn90
 	(cd $(DESCRIP_PATH) && $(MAKE) $(MAKEFLAGS) vgrid_descriptors.o)
+
+$(DESCRIP_PATH)/utils.o: $(DESCRIP_PATH)/utils.ftn90
+	(cd $(DESCRIP_PATH) && $(MAKE) $(MAKEFLAGS) utils.o)
 
 tests:
 	rm -f data/* 2>/dev/null; \

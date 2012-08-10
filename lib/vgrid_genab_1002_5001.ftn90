@@ -19,9 +19,7 @@ module vdescript_1002_5001
   private
 
   ! Define class variables
-  integer, parameter, public :: VDESC_1002_5001_ERROR=-1
-  integer, parameter, public :: VDESC_1002_5001_OK=0
-  integer, private :: stdout
+#include "vgrid.hf"
 
   ! Define and publicize interfaces
   public :: vgrid_genab_1002_5001
@@ -33,7 +31,7 @@ module vdescript_1002_5001
 
 contains   
 
-   subroutine vgrid_genab_1002_5001 (F_unout,F_vcode,F_hybuser,F_rcoef, &
+   subroutine vgrid_genab_1002_5001 (F_vcode,F_hybuser,F_rcoef, &
         F_ptop_8,F_pref_8,F_hyb,F_a_8,F_b_8,F_ip1,F_err)
 
       !    Using Laprise & Girard, generates de A and B of the hybrid coordinate
@@ -46,7 +44,6 @@ contains
       !      
       ! Arguments
       integer, intent(out) :: F_err
-      integer, intent(in) :: F_unout                        ! stdout fortran unit for messaging
       integer, intent(in) :: F_vcode                        ! v code 1002 or 5001
       real, dimension(:), intent(in) :: F_hybuser           ! user specification for vertical layering hyb
       real, intent(in) :: F_rcoef                           ! user specification for rcoef
@@ -69,21 +66,20 @@ contains
 
       !     __________________________________________________________________
       
-      F_err = VDESC_1002_5001_ERROR
-      stdout = F_unout
+      F_err = VGD_ERROR
 
       ! Set size of the problem
       nk = size(F_hybuser)
       
       ! Check and allocate as required
       status = reallocate(F_hyb,1,nk)
-      if (status /= VDESC_1002_5001_OK) return
+      if (status /= VGD_OK) return
       status = reallocate(F_hyb_fst,1,nk)
-      if (status /= VDESC_1002_5001_OK) return
+      if (status /= VGD_OK) return
       status = reallocate(F_a_8,1,nk)
-      if (status /= VDESC_1002_5001_OK) return
+      if (status /= VGD_OK) return
       status = reallocate(F_b_8,1,nk)
-      if (status /= VDESC_1002_5001_OK) return
+      if (status /= VGD_OK) return
       status = reallocate(F_ip1,1,nk)
       
       !
@@ -91,33 +87,37 @@ contains
       !
       if(F_hybuser(nk).ne.1.d0)then
          wronghyb = .true.
-         if(F_unout.gt.0)write(F_unout,9202)
+         write(for_msg,9202)
+         call vgrid_msg(MSG_CRITICAL,for_msg)
       endif
       do k=2, nk
          if (F_hybuser(k).le.F_hybuser(k-1))monotone = .false.
       end do
       if(.not.monotone)then
          wronghyb = .true.
-         if(F_unout.gt.0)write(F_unout,9203)
+         write(for_msg,9203)
+         call vgrid_msg(MSG_CRITICAL,for_msg)
       endif
       if (wronghyb) then
-         if (F_unout.gt.0) then
-            write(F_unout,9204)
-            do k=1, nk
-               write (F_unout,*) F_hybuser(k),k
-            end do
-         endif
+         write(for_msg,9204)
+         call vgrid_msg(MSG_CRITICAL,for_msg)
+         do k=1, nk
+            write(for_msg,*) F_hybuser(k),k
+            call vgrid_msg(MSG_CRITICAL,for_msg)
+         end do
          return
       endif
       !
       if(F_ptop_8.le.0.d0)then
-         write (F_unout,'("ERROR: ptop=",f20.16," must be greater than zero")')F_ptop_8
+         write(for_msg,'("ptop=",f20.16," must be greater than zero")')F_ptop_8
+         call vgrid_msg(MSG_CRITICAL,for_msg)
          return
       endif
       !
       if (F_vcode.eq.5001) then         
          if((F_ptop_8-F_hybuser(1)*F_pref_8)/F_ptop_8.gt.epsilon)then
-            write (F_unout,'("ERROR: ptop=",E25.16," is lower than first hyb level =",E25.16)')F_ptop_8,F_hybuser(1)*F_pref_8
+            write(for_msg,'("ptop=",E25.16," is lower than first hyb level =",E25.16)')F_ptop_8,F_hybuser(1)*F_pref_8
+            call vgrid_msg(MSG_CRITICAL,for_msg)
             return
          endif
          ! Find out if first level is at top
@@ -157,7 +157,8 @@ contains
             call convip(i,hybtop,kind,-1,dumc_S,.false.)
          endif
       else
-         write(F_unout,'("Wrong vcode, must be 1002 or 5001")')
+         write(for_msg,'("Wrong vcode, must be 1002 or 5001")')
+         call vgrid_msg(MSG_CRITICAL,for_msg)
          return
       endif
       !
@@ -170,7 +171,7 @@ contains
          !print*,F_a_8(k),F_b_8(k)
       enddo
 
-      F_err = VDESC_1002_5001_OK
+      F_err = VGD_OK
       return
 
 9202  format (/' ===> WRONG SPECIFICATION OF HYB VERTICAL LEVELS:'/&
@@ -193,20 +194,22 @@ contains
     integer :: check
 
     ! Deallocate and re-allocate with the correct size
-    status = VDESC_1002_5001_ERROR
+    status = VGD_ERROR
     if (associated(v)) then
        deallocate(v,stat=check)
        if (check /= 0) then
-          write(stdout,*) 'Error in deallocate() from vdescript_1002_5001::reallocate()'
+          write(for_msg,*) 'in deallocate() from vdescript_1002_5001::reallocate()'
+          call vgrid_msg(MSG_CRITICAL,for_msg)
           return
        endif
     endif
     allocate(v(low:high),stat=check)
     if (check /= 0) then
-       write(stdout,*) 'Error in allocate() from vdescript_1002_5001::reallocate()'
+       write(for_msg,*) 'in allocate() from vdescript_1002_5001::reallocate()'
+       call vgrid_msg(MSG_CRITICAL,for_msg)
        return
     endif
-    status = VDESC_1002_5001_OK
+    status = VGD_OK
     return
   end function PRIV_reallocate4
 
@@ -220,20 +223,22 @@ contains
     integer :: check
 
     ! Deallocate and re-allocate with the correct size
-    status = VDESC_1002_5001_ERROR
+    status = VGD_ERROR
     if (associated(v)) then
        deallocate(v,stat=check)
        if (check /= 0) then
-          write(stdout,*) 'Error in deallocate() from vgrid_genab_1002_5001:reallocate()'
+          write(for_msg,*) 'in deallocate() from vgrid_genab_1002_5001:reallocate()'
+          call vgrid_msg(MSG_CRITICAL,for_msg)
           return
        endif
     endif
     allocate(v(low:high),stat=check)
     if (check /= 0) then
-       write(stdout,*) 'Error in allocate() from vgrid_genab_1002_5001::reallocate()'
+       write(for_msg,*) 'in allocate() from vgrid_genab_1002_5001::reallocate()'
+       call vgrid_msg(MSG_CRITICAL,for_msg)
        return
     endif
-    status = VDESC_1002_5001_OK
+    status = VGD_OK
     return
   end function PRIV_reallocate8
 
@@ -249,20 +254,22 @@ contains
     integer :: check
 
     ! Deallocate and re-allocate with the correct size
-    status = VDESC_1002_5001_ERROR
+    status = VGD_ERROR
     if (associated(v)) then
        deallocate(v,stat=check)
        if (check /= 0) then
-          write(stdout,*) 'Error in deallocate() from vdescript_1002_5001::reallocate()'
+          write(for_msg,*) 'in deallocate() from vdescript_1002_5001::reallocate()'
+          call vgrid_msg(MSG_CRITICAL,for_msg)
           return
        endif
     endif
     allocate(v(low:high),stat=check)
     if (check /= 0) then
-       write(stdout,*) 'Error in allocate() from vdescript_1002_5001::reallocate()'
+       write(for_msg,*) 'in allocate() from vdescript_1002_5001::reallocate()'
+       call vgrid_msg(MSG_CRITICAL,for_msg)
        return
     endif
-    status = VDESC_1002_5001_OK
+    status = VGD_OK
     return
   end function PRIV_reallocateI
 

@@ -19,9 +19,7 @@ module vdescript_5002
   private
 
   ! Define class variables
-  integer, parameter, public :: VDESC_5002_ERROR=-1
-  integer, parameter, public :: VDESC_5002_OK=0
-  integer, private :: stdout
+#include "vgrid.hf"
 
   ! Define and publicize interfaces
   public :: vgrid_genab_5002
@@ -54,7 +52,7 @@ contains
    !    |                                                          |
    !     ----------------------------------------------------------
    
-   subroutine vgrid_genab_5002 (F_unout,F_hybuser,F_rcoef,F_ptop_8,F_pref_8, &
+   subroutine vgrid_genab_5002 (F_hybuser,F_rcoef,F_ptop_8,F_pref_8, &
         F_hybm,F_hybt,F_am_8,F_bm_8,F_at_8,F_bt_8,F_ip1_m,F_ip1_t,F_err,lastTatU_L)
 
     ! Modifs 
@@ -64,7 +62,6 @@ contains
     !      
     ! Arguments
     integer, intent(out) :: F_err
-    integer, intent(in) :: F_unout                        ! stdout fortran unit for messaging
     real, dimension(:), intent(in) :: F_hybuser           ! user specification for vertical layering hyb
     real, dimension(:), intent(in) :: F_rcoef             ! user specification for rcoef
     real*8 , intent(in) :: F_ptop_8, F_pref_8             ! user specification for lid and reference pressures
@@ -83,8 +80,7 @@ contains
     logical :: my_lastTatU_L
     !     __________________________________________________________________
 
-    F_err = VDESC_5002_ERROR
-    stdout = F_unout
+    F_err = VGD_ERROR
 
     my_lastTatU_L=.false.
     if(present(lastTatU_L))my_lastTatU_L=lastTatU_L
@@ -92,35 +88,38 @@ contains
     ! Set size of the problem and check for full inputs
     nk = size(F_hybuser)
     if (size(F_rcoef) /= 2) then
-       write(stdout,*) 'Size of F_rcoef should be 2 in vdescript_5002::vgrid_genab_5002()... is ',size(F_rcoef)
+       write(for_msg,*) 'Size of F_rcoef should be 2 in vdescript_5002::vgrid_genab_5002()... is ',size(F_rcoef)
+       call vgrid_msg(MSG_CRITICAL,for_msg)
        return
     endif
 
     ! Check and allocate as required
     status = reallocate(F_hybm,0,nk+1)
-    if (status /= VDESC_5002_OK) return
+    if (status /= VGD_OK) return
     status = reallocate(F_hybt,0,nk+2)
-    if (status /= VDESC_5002_OK) return
+    if (status /= VGD_OK) return
     status = reallocate(F_am_8,1,nk+1)
-    if (status /= VDESC_5002_OK) return
+    if (status /= VGD_OK) return
     status = reallocate(F_bm_8,1,nk+1)
-    if (status /= VDESC_5002_OK) return
+    if (status /= VGD_OK) return
     status = reallocate(F_at_8,1,nk+2)
-    if (status /= VDESC_5002_OK) return
+    if (status /= VGD_OK) return
     status = reallocate(F_bt_8,1,nk+2)
-    if (status /= VDESC_5002_OK) return
+    if (status /= VGD_OK) return
     status = reallocate(F_ip1_m,1,nk+1)
-    if (status /= VDESC_5002_OK) return
+    if (status /= VGD_OK) return
     status = reallocate(F_ip1_t,1,nk+2)
-    if (status /= VDESC_5002_OK) return
+    if (status /= VGD_OK) return
 
     if (  Nk.lt.1 )  then
-       if (stdout.ge.0) write (stdout,9100)
+       write(for_msg,9100)
+       call vgrid_msg(MSG_CRITICAL,for_msg)
        return
     endif
     
     if (F_ptop_8.le.0.d0) then
-       if (stdout.ge.0) write(stdout,9400)
+       write(for_msg,9400)
+       call vgrid_msg(MSG_CRITICAL,for_msg)
        return
     endif
     !     
@@ -132,7 +131,8 @@ contains
     !     Check range
     !
     if (F_hybuser(NK).ge.1..or.F_hybuser(1).le.F_hybm(0))then
-       if (stdout.ge.0) write(stdout,9550) F_hybm(0)
+       write(for_msg,9550) F_hybm(0)
+       call vgrid_msg(MSG_CRITICAL,for_msg)
        return
     endif
     !     
@@ -144,13 +144,14 @@ contains
     enddo
     
     if (wronghyb) then
-       if (stdout.ge.0) then
-          write(stdout,9250)
-          write(stdout,*)'MOMENTUM LEVELS'
-          do k=1, NK
-             write (stdout,*) F_hybuser(k),k
-          end do
-       endif
+       write(for_msg,9250)
+       call vgrid_msg(MSG_CRITICAL,for_msg)
+       write(for_msg,*)'MOMENTUM LEVELS'
+       call vgrid_msg(MSG_CRITICAL,for_msg)
+       do k=1, NK
+          write(for_msg,*) F_hybuser(k),k
+          call vgrid_msg(MSG_CRITICAL,for_msg)
+       end do
        return            
     endif
     !
@@ -221,7 +222,7 @@ contains
        F_hybt(Nk+1) =  F_hybm(Nk)
     endif    
 
-    F_err = VDESC_5002_OK
+    F_err = VGD_OK
  
     ! Compute ip1 values
     do k=1,nk+1
@@ -230,13 +231,13 @@ contains
     enddo
     call convip(F_ip1_t(nk+2),F_hybt(nk+2),5,2,'',.false.)
     
-9100 format (/'ERROR: Insufficient number of vertical levels in variable hyb'/)
+9100 format (/'Insufficient number of vertical levels in variable hyb'/)
 9250 format (/' ===> WRONG SPECIFICATION OF HYB VERTICAL LEVELS:'/ &
          '      LEVELS MUST BE MONOTONICALLY INCREASING'/     &
          '      FROM HYB(1) ---- ERROR ----'//                &
          '      Current choice:')
-9400 format (/,'ERROR: Cstv_ptop_8 must be > 0',/)
-9550 format (/,'ERROR: hyb must be < 1.0 and > ',es10.4,/)
+9400 format (/,'Cstv_ptop_8 must be > 0',/)
+9550 format (/,'hyb must be < 1.0 and > ',es10.4,/)
     !     __________________________________________________________________
     return
  end subroutine vgrid_genab_5002
@@ -253,20 +254,22 @@ contains
     integer :: check
 
     ! Deallocate and re-allocate with the correct size
-    status = VDESC_5002_ERROR
+    status = VGD_ERROR
     if (associated(v)) then
        deallocate(v,stat=check)
        if (check /= 0) then
-          write(stdout,*) 'Error in deallocate() from vdescript_5002::reallocate()'
+          write(for_msg,*) 'in deallocate() from vdescript_5002::reallocate()'
+          call vgrid_msg(MSG_CRITICAL,for_msg)
           return
        endif
     endif
     allocate(v(low:high),stat=check)
     if (check /= 0) then
-       write(stdout,*) 'Error in allocate() from vdescript_5002::reallocate()'
+       write(for_msg,*) 'in allocate() from vdescript_5002::reallocate()'
+       call vgrid_msg(MSG_CRITICAL,for_msg)
        return
     endif
-    status = VDESC_5002_OK
+    status = VGD_OK
     return
   end function PRIV_reallocate4
 
@@ -280,20 +283,22 @@ contains
     integer :: check
 
     ! Deallocate and re-allocate with the correct size
-    status = VDESC_5002_ERROR
+    status = VGD_ERROR
     if (associated(v)) then
        deallocate(v,stat=check)
        if (check /= 0) then
-          write(stdout,*) 'Error in deallocate() from vgrid_genab_5002::reallocate()'
+          write(for_msg,*) 'in deallocate() from vgrid_genab_5002::reallocate()'
+          call vgrid_msg(MSG_CRITICAL,for_msg)
           return
        endif
     endif
     allocate(v(low:high),stat=check)
     if (check /= 0) then
-       write(stdout,*) 'Error in allocate() from vgrid_genab_5002::reallocate()'
+       write(for_msg,*) 'in allocate() from vgrid_genab_5002::reallocate()'
+       call vgrid_msg(MSG_CRITICAL,for_msg)
        return
     endif
-    status = VDESC_5002_OK
+    status = VGD_OK
     return
   end function PRIV_reallocate8
 
@@ -309,20 +314,22 @@ contains
     integer :: check
 
     ! Deallocate and re-allocate with the correct size
-    status = VDESC_5002_ERROR
+    status = VGD_ERROR
     if (associated(v)) then
        deallocate(v,stat=check)
        if (check /= 0) then
-          write(stdout,*) 'Error in deallocate() from vdescript_5002::reallocate()'
+          write(for_msg,*) 'in deallocate() from vdescript_5002::reallocate()'
+          call vgrid_msg(MSG_CRITICAL,for_msg)
           return
        endif
     endif
     allocate(v(low:high),stat=check)
     if (check /= 0) then
-       write(stdout,*) 'Error in allocate() from vdescript_5002::reallocate()'
+       write(for_msg,*) 'in allocate() from vdescript_5002::reallocate()'
+       call vgrid_msg(MSG_CRITICAL,for_msg)
        return
     endif
-    status = VDESC_5002_OK
+    status = VGD_OK
     return
   end function PRIV_reallocateI
 

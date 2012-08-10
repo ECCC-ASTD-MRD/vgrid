@@ -13,7 +13,7 @@ module utils
   public :: printingCharacters                  !printable character strings
 
   ! Public vgrid_descriptor constants
-  include "vgrid.hf"
+#include "vgrid.hf"
 
   ! Private constants
   integer, parameter :: LONG_STRING=1024        !number of characters in a long string
@@ -47,8 +47,6 @@ module utils
 
 contains
 
-#include "vgrid_msg.h"
-
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Check array sizes
 
@@ -58,7 +56,7 @@ contains
     integer, dimension(:), pointer :: p2        !Input pointer 2
     ok = .false.
     if (.not.associated(p1) .or. .not.associated(p2)) then
-       write(for_msg,*) 'ERROR: unallocated pointer to check in size_ok'
+       write(for_msg,*) 'unallocated pointer to check in size_ok'
        call vgrid_msg(MSG_CRITICAL,for_msg)
        return
     endif
@@ -72,7 +70,7 @@ contains
     real(kind=8), dimension(:), pointer :: p2   !Input pointer 2
     ok = .false.
     if (.not.associated(p1) .or. .not.associated(p2)) then
-       write(for_msg,*) 'ERROR: unallocated pointer to check in size_ok'
+       write(for_msg,*) 'unallocated pointer to check in size_ok'
        call vgrid_msg(MSG_CRITICAL,for_msg)
        return
     endif
@@ -86,7 +84,7 @@ contains
     real(kind=8), dimension(:,:,:), pointer :: p2 !Input pointer 2
     ok = .false.
     if (.not.associated(p1) .or. .not.associated(p2)) then
-       write(for_msg,*) 'ERROR: unallocated pointer to check in size_ok'
+       write(for_msg,*) 'unallocated pointer to check in size_ok'
        call vgrid_msg(MSG_CRITICAL,for_msg)
        return
     endif
@@ -106,7 +104,7 @@ contains
     integer, intent(in) :: len
     allocate(value(len),stat=istat)
     if (istat /= 0) then
-       write(for_msg,*) 'ERROR: unable to allocate space for '//trim(key)//' request'
+       write(for_msg,*) 'unable to allocate space for '//trim(key)//' request'
        call vgrid_msg(MSG_CRITICAL,for_msg)
     endif
   end function get_allocate_i1d
@@ -118,7 +116,7 @@ contains
     integer, intent(in) :: len
     allocate(value(len),stat=istat)
     if (istat /= 0) then
-       write(for_msg,*) 'ERROR: unable to allocate space for '//trim(key)//' request'
+       write(for_msg,*) 'unable to allocate space for '//trim(key)//' request'
        call vgrid_msg(MSG_CRITICAL,for_msg)
     endif
   end function get_allocate_r1d
@@ -130,7 +128,7 @@ contains
     integer, intent(in) :: len
     allocate(value(len),stat=istat)
     if (istat /= 0) then
-       write(for_msg,*) 'ERROR: unable to allocate space for '//trim(key)//' request'
+       write(for_msg,*) 'unable to allocate space for '//trim(key)//' request'
        call vgrid_msg(MSG_CRITICAL,for_msg)
     endif
   end function get_allocate_r81d
@@ -141,14 +139,14 @@ contains
     real*8, dimension(:,:,:), pointer :: value
     integer, dimension(:), intent(in) :: len
     if (size(len) < 3) then
-       write(for_msg,*) 'ERROR: wrong array shape specified for '//trim(key)
+       write(for_msg,*) 'wrong array shape specified for '//trim(key)
        call vgrid_msg(MSG_CRITICAL,for_msg)
        istat = -1
        return
     endif
     allocate(value(len(1),len(2),len(3)),stat=istat)
     if (istat /= 0) then
-       write(for_msg,*) 'ERROR: unable to allocate space for '//trim(key)//' request'
+       write(for_msg,*) 'unable to allocate space for '//trim(key)//' request'
        call vgrid_msg(MSG_CRITICAL,for_msg)
     endif
   end function get_allocate_r83d
@@ -181,7 +179,7 @@ contains
     character(len=8) :: str_cvt
     status = VGD_ERROR; val_out = 0.d0
     if (len_trim(str) > len(str_cvt)) then
-       write(for_msg,*) 'ERROR: string length to flip_transfer (',len_trim(str),') exceeds limit: ',len(str)
+       write(for_msg,*) 'string length to flip_transfer (',len_trim(str),') exceeds limit: ',len(str)
        call vgrid_msg(MSG_CRITICAL,for_msg)
        return
     endif
@@ -228,7 +226,7 @@ contains
        str_out = str_cvt
     endif
     if (overflow) then
-       write(for_msg,*) 'ERROR: string length to flip_transfer (',len(str_out),') is insufficient: ',len_trim(str_cvt)
+       write(for_msg,*) 'string length to flip_transfer (',len(str_out),') is insufficient: ',len_trim(str_cvt)
        call vgrid_msg(MSG_CRITICAL,for_msg)
        return
     endif

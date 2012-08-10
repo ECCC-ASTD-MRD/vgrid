@@ -1,0 +1,6 @@
+case ${BASE_ARCH} in
+         AIX-powerpc7) . s.ssmuse.dot Xlf13;;
+   Linux|Linux_x86-64) . s.ssmuse.dot pgi9xx;;
+esac
+
+. s.ssmuse.dot rmnlib-dev
