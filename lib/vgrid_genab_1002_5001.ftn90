@@ -88,7 +88,7 @@ contains
       if(F_hybuser(nk).ne.1.d0)then
          wronghyb = .true.
          write(for_msg,9202)
-         call vgrid_msg(MSG_CRITICAL,for_msg)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
       endif
       do k=2, nk
          if (F_hybuser(k).le.F_hybuser(k-1))monotone = .false.
@@ -96,28 +96,28 @@ contains
       if(.not.monotone)then
          wronghyb = .true.
          write(for_msg,9203)
-         call vgrid_msg(MSG_CRITICAL,for_msg)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
       endif
       if (wronghyb) then
          write(for_msg,9204)
-         call vgrid_msg(MSG_CRITICAL,for_msg)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
          do k=1, nk
             write(for_msg,*) F_hybuser(k),k
-            call vgrid_msg(MSG_CRITICAL,for_msg)
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
          end do
          return
       endif
       !
       if(F_ptop_8.le.0.d0)then
          write(for_msg,'("ptop=",f20.16," must be greater than zero")')F_ptop_8
-         call vgrid_msg(MSG_CRITICAL,for_msg)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
          return
       endif
       !
       if (F_vcode.eq.5001) then         
          if((F_ptop_8-F_hybuser(1)*F_pref_8)/F_ptop_8.gt.epsilon)then
             write(for_msg,'("ptop=",E25.16," is lower than first hyb level =",E25.16)')F_ptop_8,F_hybuser(1)*F_pref_8
-            call vgrid_msg(MSG_CRITICAL,for_msg)
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
             return
          endif
          ! Find out if first level is at top
@@ -158,7 +158,7 @@ contains
          endif
       else
          write(for_msg,'("Wrong vcode, must be 1002 or 5001")')
-         call vgrid_msg(MSG_CRITICAL,for_msg)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
          return
       endif
       !
@@ -199,14 +199,14 @@ contains
        deallocate(v,stat=check)
        if (check /= 0) then
           write(for_msg,*) 'in deallocate() from vdescript_1002_5001::reallocate()'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
     endif
     allocate(v(low:high),stat=check)
     if (check /= 0) then
        write(for_msg,*) 'in allocate() from vdescript_1002_5001::reallocate()'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
     status = VGD_OK
@@ -228,14 +228,14 @@ contains
        deallocate(v,stat=check)
        if (check /= 0) then
           write(for_msg,*) 'in deallocate() from vgrid_genab_1002_5001:reallocate()'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
     endif
     allocate(v(low:high),stat=check)
     if (check /= 0) then
        write(for_msg,*) 'in allocate() from vgrid_genab_1002_5001::reallocate()'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
     status = VGD_OK
@@ -259,14 +259,14 @@ contains
        deallocate(v,stat=check)
        if (check /= 0) then
           write(for_msg,*) 'in deallocate() from vdescript_1002_5001::reallocate()'
-          call vgrid_msg(MSG_CRITICAL,for_msg)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
     endif
     allocate(v(low:high),stat=check)
     if (check /= 0) then
        write(for_msg,*) 'in allocate() from vdescript_1002_5001::reallocate()'
-       call vgrid_msg(MSG_CRITICAL,for_msg)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
     status = VGD_OK

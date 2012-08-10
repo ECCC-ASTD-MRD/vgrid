@@ -1,0 +1,4 @@
+if ! diff ${test}.out > /dev/null 2>&1 data_$(uname -s)/TXT/${test}.out ;then
+   result_o=' notok'
+   echo "   These files should be the same: ${test}.out data_$(uname -s)/TXT/${test}.out"
+fi
