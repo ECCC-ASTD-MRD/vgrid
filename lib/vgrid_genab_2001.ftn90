@@ -19,10 +19,7 @@ module vdescript_2001
   private
 
   ! Define class variables
-  integer, parameter, public :: VDESC_2001_ERROR=-1
-  integer, parameter, public :: VDESC_2001_OK=0
-  integer, private :: stdout
-
+      
   ! Define and publicize interfaces
   public :: vgrid_genab_2001
   interface reallocate
@@ -31,21 +28,22 @@ module vdescript_2001
      module procedure PRIV_reallocateI
   end interface
 
+#include "vgrid.hf"
+
 contains
-
-   subroutine vgrid_genab_2001 (F_unout,F_pres,F_a_8,F_b_8,F_err,ip1)
-
+   
+   subroutine vgrid_genab_2001 (F_pres,F_a_8,F_b_8,F_err,ip1)
+      
       !    Using pres coordinate generate A=0 and B=convip(...,F_pres,...)
       
       implicit none
       !      
       ! Arguments
       integer, intent(out) :: F_err
-      integer, intent(in) :: F_unout             ! stdout fortran unit for messaging
       real, dimension(:), intent(in) :: F_pres    ! user specification for vertical layering eta
       real*8, dimension(:), pointer :: F_a_8, F_b_8 ! model As and Bs
       integer, dimension(:), pointer, optional :: ip1 ! ip1 value
-      
+
       ! Local variables
       integer :: k,i, status, nk
       logical :: monotone=.true.,wrongsig=.false.
@@ -53,36 +51,37 @@ contains
 
       !     __________________________________________________________________
       
-      F_err = VDESC_2001_ERROR
-      stdout = F_unout
+      F_err = VGD_ERROR
 
       ! Set size of the problem
       nk = size(F_pres)
       
       ! Check and allocate as required
       status = reallocate(F_a_8,1,nk)
-      if (status /= VDESC_2001_OK) return
+      if (status /= VGD_OK) return
       status = reallocate(F_b_8,1,nk)
-      if (status /= VDESC_2001_OK) return
+      if (status /= VGD_OK) return
       !
       if(F_pres(1).eq.0.d0)then
          wrongsig = .true.
-         if(F_unout.gt.0)write(F_unout,1000)
+         write(for_msg,1000)
+         call vgrid_msg(MSG_CRITICAL,for_msg)
       endif
       do k=2, nk
          if (F_pres(k).le.F_pres(k-1))monotone = .false.
       end do
       if(.not.monotone)then
          wrongsig = .true.
-         if(F_unout.gt.0)write(F_unout,1003)
+         write(for_msg,1003)
+         call vgrid_msg(MSG_CRITICAL,for_msg)
       endif
       if (wrongsig) then
-         if (F_unout.gt.0) then
-            write(F_unout,1002)
-            do k=1, nk
-               write (F_unout,*) F_pres(k),k
-            end do
-         endif
+         write(for_msg,1002)
+         call vgrid_msg(MSG_CRITICAL,for_msg)
+         do k=1, nk
+            write(for_msg,*) F_pres(k),k
+            call vgrid_msg(MSG_CRITICAL,for_msg)               
+         end do
          return
       endif
       !
@@ -93,13 +92,13 @@ contains
       !
       if(present(ip1))then
          status = reallocate(ip1,1,nk)
-         if (status /= VDESC_2001_OK) return
+         if (status /= VGD_OK) return
          do k=1,nk
             call convip(ip1(k),F_pres(k),2,2,dumc_S,.false.)
          enddo
       endif
       !
-      F_err = VDESC_2001_OK
+      F_err = VGD_OK
       !
       return
 
@@ -123,20 +122,22 @@ contains
     integer :: check
 
     ! Deallocate and re-allocate with the correct size
-    status = VDESC_2001_ERROR
+    status = VGD_ERROR
     if (associated(v)) then
        deallocate(v,stat=check)
        if (check /= 0) then
-          write(stdout,*) 'Error in deallocate() from vdescript_2001::reallocate()'
+          write(for_msg,*) 'in deallocate() from vdescript_2001::reallocate()'
+          call vgrid_msg(MSG_CRITICAL,for_msg)          
           return
        endif
     endif
     allocate(v(low:high),stat=check)
     if (check /= 0) then
-       write(stdout,*) 'Error in allocate() from vdescript_2001::reallocate()'
+       write(for_msg,*) 'in allocate() from vdescript_2001::reallocate()'
+       call vgrid_msg(MSG_CRITICAL,for_msg)  
        return
     endif
-    status = VDESC_2001_OK
+    status = VGD_OK
     return
   end function PRIV_reallocate4
 
@@ -150,20 +151,22 @@ contains
     integer :: check
 
     ! Deallocate and re-allocate with the correct size
-    status = VDESC_2001_ERROR
+    status = VGD_ERROR
     if (associated(v)) then
        deallocate(v,stat=check)
        if (check /= 0) then
-          write(stdout,*) 'Error in deallocate() from vgrid_genab_2001:reallocate()'
+          write(for_msg,*) 'in deallocate() from vgrid_genab_2001:reallocate()'
+          call vgrid_msg(MSG_CRITICAL,for_msg) 
           return
        endif
     endif
     allocate(v(low:high),stat=check)
     if (check /= 0) then
-       write(stdout,*) 'Error in allocate() from vgrid_genab_2001::reallocate()'
+       write(for_msg,*) 'in allocate() from vgrid_genab_2001::reallocate()'
+       call vgrid_msg(MSG_CRITICAL,for_msg)        
        return
     endif
-    status = VDESC_2001_OK
+    status = VGD_OK
     return
   end function PRIV_reallocate8
 
@@ -179,20 +182,22 @@ contains
     integer :: check
 
     ! Deallocate and re-allocate with the correct size
-    status = VDESC_2001_ERROR
+    status = VGD_ERROR
     if (associated(v)) then
        deallocate(v,stat=check)
        if (check /= 0) then
-          write(stdout,*) 'Error in deallocate() from vdescript_2001::reallocate()'
+          write(for_msg,*) 'Error in deallocate() from vdescript_2001::reallocate()'
+          call vgrid_msg(MSG_CRITICAL,for_msg)
           return
        endif
     endif
     allocate(v(low:high),stat=check)
     if (check /= 0) then
-       write(stdout,*) 'Error in allocate() from vdescript_2001::reallocate()'
+       write(for_msg,*) 'Error in allocate() from vdescript_2001::reallocate()'
+       call vgrid_msg(MSG_CRITICAL,for_msg)
        return
     endif
-    status = VDESC_2001_OK
+    status = VGD_OK
     return
   end function PRIV_reallocateI
 

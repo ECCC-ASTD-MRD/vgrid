@@ -12,7 +12,7 @@ RMN=rmn_013
 .ftn90.o:
 	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -src $<
 
-OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/vgrid_genab_5002.o $(DESCRIP_PATH)/vgrid_genab_1002_5001.o $(DESCRIP_PATH)/vgrid_genab_1001.o  $(DESCRIP_PATH)/vgrid_genab_2001.o $(DESCRIP_PATH)/vgrid_genab_1004.o $(DESCRIP_PATH)/vgrid_msg.o
+OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/vgrid_genab_5002.o $(DESCRIP_PATH)/vgrid_genab_1002_5001.o $(DESCRIP_PATH)/vgrid_genab_1001.o  $(DESCRIP_PATH)/vgrid_genab_2001.o $(DESCRIP_PATH)/vgrid_genab_1004.o $(DESCRIP_PATH)/vgrid_msg.o $(DESCRIP_PATH)/utils.o
 
 # Set default target
 default: all
@@ -48,6 +48,9 @@ $(DESCRIP_PATH)/vgrid_genab_1004.o: $(DESCRIP_PATH)/vgrid_genab_1004.ftn90
 
 $(DESCRIP_PATH)/vgrid_msg.o: $(DESCRIP_PATH)/vgrid_msg.ftn90
 	(cd $(DESCRIP_PATH) && $(MAKE) vgrid_msg.o)
+
+$(DESCRIP_PATH)/utils.o: $(DESCRIP_PATH)/utils.ftn90
+	(cd $(DESCRIP_PATH) && $(MAKE) utils.o)
 
 clean:
 	rm -f *.f90 *.o *.mod test_output.fst

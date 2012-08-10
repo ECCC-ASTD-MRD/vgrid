@@ -11,7 +11,7 @@ DESCRIP_PATH = ../lib
 .ftn90.o:
 	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -src $<
 
-OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/vgrid_genab_5002.o $(DESCRIP_PATH)/vgrid_genab_1002_5001.o $(DESCRIP_PATH)/vgrid_genab_1001.o $(DESCRIP_PATH)/vgrid_genab_1004.o $(DESCRIP_PATH)/vgrid_genab_2001.o $(DESCRIP_PATH)/vgrid_msg.o unit_testing.o 
+OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/vgrid_genab_5002.o $(DESCRIP_PATH)/vgrid_genab_1002_5001.o $(DESCRIP_PATH)/vgrid_genab_1001.o $(DESCRIP_PATH)/vgrid_genab_1004.o $(DESCRIP_PATH)/vgrid_genab_2001.o $(DESCRIP_PATH)/vgrid_msg.o $(DESCRIP_PATH)/utils.o unit_testing.o
 
 UNIT_TEST: UNIT_TEST.ftn90 $(OBJECTS)
 	$(RCOMPILE) -librmn rmn_012 -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src UNIT_TEST.ftn90 -o UNIT_TEST
@@ -35,6 +35,9 @@ $(DESCRIP_PATH)/vgrid_genab_1004.o: $(DESCRIP_PATH)/vgrid_genab_1004.ftn90
 
 $(DESCRIP_PATH)/vgrid_msg.o: $(DESCRIP_PATH)/vgrid_msg.ftn90
 	(cd $(DESCRIP_PATH) && $(MAKE) vgrid_msg.o)
+
+$(DESCRIP_PATH)/utils.o: $(DESCRIP_PATH)/utils.ftn90
+	(cd $(DESCRIP_PATH) && $(MAKE) utils.o)
 
 clean:
 	rm -f *.f90 *.o *.mod
