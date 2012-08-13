@@ -50,7 +50,7 @@ $(DESCRIP_PATH)/utils.o: $(DESCRIP_PATH)/utils.ftn90
 	(cd $(DESCRIP_PATH) && $(MAKE) utils.o)
 
 clean:
-	rm -f *.f90 *.o *.mod test_output.fst
+	rm -f *.f90 *.o *.mod test_output.fst utput_file.txt bin/data_tests
 
 distclean: clean
 	rm -f print_toctoc add_toctoc compute_pressure print_toctoc convert_toctoc_5002 
