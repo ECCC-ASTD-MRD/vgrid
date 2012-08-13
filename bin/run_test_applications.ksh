@@ -1,6 +1,6 @@
-convert_toctoc_5002=oui
+convert_toctoc_5002=non
 
-add_toctoc_and_compute_pressure=oui
+add_toctoc_and_compute_pressure=non
 
 print_toctoc=oui
 
@@ -110,7 +110,7 @@ if [ ${print_toctoc} = oui ];then
    do
      
       kinds='=-1'
-      if [ ${ITEM} = 2001_5001_from_editfst ];then
+      if [ ${ITEM} = dm_2001_5001_from_editfst ];then
          kinds='2 5'
       fi
       
