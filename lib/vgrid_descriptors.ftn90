@@ -1064,7 +1064,7 @@ contains
              deallocate(vipt)
              return
           endif
-          istat = get_allocate(key,value,size(self%ip1_m))
+          istat = get_allocate(key,value,size(self%ip1_t))
           call convip(k,value(1),self%kind,0,'',.false.)
           do k=1,size(vipt)
              call convip(vipt(k),value(k),self%kind,-1,'',.false.)
