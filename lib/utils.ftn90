@@ -20,7 +20,6 @@ module utils
   integer, parameter :: LONG_STRING=1024        !number of characters in a long string
 
   ! Private variables
-  character(len=LONG_STRING) :: for_msg         !string to write output messages     
 
   interface size_ok
      module procedure size_ok_i1d
