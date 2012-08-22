@@ -1059,12 +1059,16 @@ contains
        endif
     case ('VCDT')
        if (is_valid(self,ip1_t_valid_get)) then
-          istat=vgd_get(self,key='VIPT - level ip1 list (t)',value=vipt)
+          if (is_valid(self,ip1_t_valid)) then
+             istat=vgd_get(self,key='VIPT - level ip1 list (t)',value=vipt)
+          else
+             istat=vgd_get(self,key='VIPM - level ip1 list (m)',value=vipt)
+          endif
           if (istat /= VGD_OK)then
              deallocate(vipt)
              return
           endif
-          istat = get_allocate(key,value,size(self%ip1_t))
+          istat = get_allocate(key,value,size(vipt))
           call convip(k,value(1),self%kind,0,'',.false.)
           do k=1,size(vipt)
              call convip(vipt(k),value(k),self%kind,-1,'',.false.)
