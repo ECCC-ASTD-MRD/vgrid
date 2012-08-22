@@ -13,7 +13,7 @@ ssm: profile.sh
 	mkdir -p $(SSMPACKAGE)/src/base $(SSMPACKAGE)/src/bin $(SSMPACKAGE)/src/examples; \
 	find ../lib -name "*.ftn90" -exec cp {}  $(SSMPACKAGE)/src/base \; ; \
 	find ../bin -name "*.ftn90" -exec cp {} $(SSMPACKAGE)/src/bin \; ; \
-g	find ../examples -name "*.ftn90" -exec cp {} $(SSMPACKAGE)/src/examples \; ; \
+	find ../examples -name "*.ftn90" -exec cp {} $(SSMPACKAGE)/src/examples \; ; \
 	s.set_dir_struct --bin --lib --include --dest=$(SSMPACKAGE); \
 	find ../bin -perm -a+x -type f \( ! -name "*.ksh*" \) -exec cp {} $(SSMPACKAGE)/bin/$(BASE_ARCH) \; ; \
 	find ../lib -name "*.mod" -type f -exec cp {} $(SSMPACKAGE)/include/$(EC_ARCH) \; ; \
