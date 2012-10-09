@@ -12,6 +12,7 @@ ssm: profile.sh
 	cp post-install profile.sh $(SSMPACKAGE)/.ssm.d;
 	mkdir -p $(SSMPACKAGE)/src/base $(SSMPACKAGE)/src/bin $(SSMPACKAGE)/src/examples; \
 	find ../lib -name "*.ftn90" -exec cp {}  $(SSMPACKAGE)/src/base \; ; \
+	find ../lib -name "*.hf" -exec cp {}  $(SSMPACKAGE)/src/base \; ; \
 	find ../bin -name "*.ftn90" -exec cp {} $(SSMPACKAGE)/src/bin \; ; \
 	find ../examples -name "*.ftn90" -exec cp {} $(SSMPACKAGE)/src/examples \; ; \
 	s.set_dir_struct --bin --lib --include --dest=$(SSMPACKAGE); \
