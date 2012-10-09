@@ -8,6 +8,7 @@ module vGrid_Descriptors
   ! Public methods
   public :: vgrid_descriptor                    !vertical grid descriptor structure
   public :: vgd_new                             !class constructor
+  public :: vgd_free                            !class destructor
   public :: vgd_get                             !get instance variable value
   public :: vgd_put                             !set instance variable value
   public :: vgd_print                           !dump plain-text contents of instance
@@ -65,6 +66,7 @@ module vGrid_Descriptors
   ! Combined coordinate structure
   type vgrid_descriptor
      private
+     logical :: initialized=.false.                     !initialization status of the structure
      integer :: ip1=0,ip2=0                             !ip1,2 values given to the 3D descriptor
      integer :: unit                                    !file unit associated with this 3D descriptor
      logical :: match_ipig                              !do ip/ig matching for records
@@ -87,6 +89,10 @@ module vGrid_Descriptors
      module procedure new_from_table
      module procedure new_build_vert
      module procedure new_gen
+  end interface
+
+  interface vgd_free
+     module procedure garbage_collection
   end interface
 
   interface vgd_get
@@ -336,7 +342,7 @@ contains
      ! Initializations
      ltable = table
      if (associated(self%table)) deallocate(self%table)
-     allocate(self%table(size(table,dim=1),size(table,dim=2),size(table,dim=3)),stat=istat)
+     allocate(self%table(size(ltable,dim=1),size(ltable,dim=2),size(ltable,dim=3)),stat=istat)
      if (istat /= 0) then
         write(for_msg,*) 'unable to allocate self%table'
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
@@ -783,6 +789,18 @@ contains
       return
    end function new_gen
  
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!! Class destructor
+
+   integer function garbage_collection(self) result(status)
+     ! Free all memory associated with with structure and uninitialize it
+     type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
+
+     ! Set error status
+     status = VGD_ERROR
+
+   end function garbage_collection
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Get methods
 
