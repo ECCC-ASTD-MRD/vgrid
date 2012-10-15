@@ -3593,7 +3593,9 @@ contains
     integer :: i,j,error,nk
     real*8, dimension(size(sfc_field,dim=1),size(sfc_field,dim=2)) :: s_8
     real*8, dimension(size(ip1_list)) :: aa_8,bb_8
+    real :: pppp
     logical :: found
+    character(len=1)  :: dummy_S
 
     ! Set error status
     status = VGD_ERROR
@@ -3641,7 +3643,8 @@ contains
        ! Force surface pressure to be equal to sfc_field
        ! Needed by assimilation section.
        do i=1,nk
-          if(bb_8(i).eq.1.)levels(:,:,i)=sfc_field
+          call convip(ip1_list(i),pppp,self%kind,-1,dummy_S,.false.)
+          if(abs(pppp-1.).lt.epsilon(pppp))levels(:,:,i)=sfc_field         
        enddo       
     endif
     if(dpidpis)then
