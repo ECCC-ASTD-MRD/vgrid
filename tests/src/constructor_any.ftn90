@@ -11,6 +11,9 @@ program constructor
   integer :: fnom,fstouv,fstfrm,fclos
   logical :: ok
 
+	print*, 'top'
+	call flush(6)
+
   stat=fnom(lu,"data/dm_5002_from_model_run-interp","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
@@ -32,6 +35,7 @@ program constructor
   close(lutxt)
 
   ! Construct a new set of 3D coordinate descriptors
+	print*, 'to call new'
   stat = vgd_new(d,unit=lu,format="fst",ip1=-1,ip2=-1)
   stat = vgd_write(d,unit=lu2,format="fst")
   stat = vgd_new(d2,unit=lu2,format="fst",ip1=ip1,ip2=ip2)
