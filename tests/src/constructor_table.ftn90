@@ -1,16 +1,54 @@
+module mod_constructor_table
+  type FSTD_ext
+     integer :: ig1,ig2,ig3,ig4,dateo,deet,npas,datyp,nbits,ni,nj,nk
+     integer :: ip1,ip2,ip3,swa,lng,dltf,ubc,extra1,extra2,extra3,datev
+     character(len=1) :: grtyp
+     character(len=2) :: typvar
+     character(len=4) :: nomvar
+     character(len=12) :: etiket
+  end type FSTD_ext
+contains
+   integer function my_fstprm(fstkey,record) result(status)
+      ! Use fstprm function to get information about the record
+      integer, intent(in) :: fstkey               !Key from FST file record
+      type(FSTD_ext) :: record                    !Record information
+      integer :: error,ni,nj,nk
+      integer, external :: fstprm,fstinf
+      real*8 :: nhours
+      status = -1
+      error=fstprm(fstkey,record%dateo,record%deet,record%npas, &
+           record%ni,record%nj,record%nk,record%nbits,record%datyp,record%ip1,record%ip2, &
+           record%ip3,record%typvar,record%nomvar,record%etiket,record%grtyp, &
+           record%ig1,record%ig2,record%ig3,record%ig4,record%swa, &
+           record%lng,record%dltf,record%ubc,record%extra1,record%extra2, &
+           record%extra3)
+      if (error < 0) then
+         write(6,*) 'cannot fstprm for fstkey ',fstkey
+         return
+      end if
+      nhours=record%deet*record%npas/3600.d0
+      call incdatr(record%datev,record%dateo,nhours)
+      status = 0
+   end function my_fstprm
+end module mod_constructor_table
+!================================================================================================
 program constructor
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,operator(==)
+  use mod_constructor_table, only:FSTD_ext,my_fstprm
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,operator(==),vgd_write
   use Unit_Testing, only: ut_report
 
   implicit none
 
   type(vgrid_descriptor) :: vgrid,vgrid_rebuilt
-  integer :: lu=0,lutxt=69
-  integer :: stat,ip1,ip2
-  integer :: fnom,fstouv,fstfrm
-  logical :: ok
+  integer, parameter :: nmax = 1000
+  integer, dimension(nmax) :: liste
+  integer :: lu=0,lu2=0,lutxt=69
+  integer :: stat,ip1,ip2,infon,i,ni,nj,nk,key
+  integer :: fnom,fstouv,fstfrm,fstinl,fsteff,fstinf
+  logical :: ok  
   real(kind=8), dimension(:,:,:), pointer :: table
+  type(FSTD_ext) :: prm_orig,prm_rebuilt
 
   stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
   if(stat.lt.0)then
@@ -27,16 +65,67 @@ program constructor
   close(lutxt)
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = vgd_new(vgrid,unit=lu,format="fst",ip1=ip1,ip2=ip2)
-  stat = vgd_get(vgrid,'VTBL',table)
-  stat = vgd_new(vgrid_rebuilt,table)
+  stat=0  
+  stat = min(stat,vgd_new(vgrid,unit=lu,format="fst",ip1=ip1,ip2=ip2))
+  stat = min(stat,vgd_get(vgrid,'VTBL',table))
+  stat = min(stat,vgd_new(vgrid_rebuilt,table))
   if (vgrid_rebuilt == vgrid) then
-     stat = 0
+     ! Ok do noting
   else
+     print*,'ERROR: rebuilding table'
      stat = -1
   endif
+
+  ! Write table in fst and check it fst parameters
+  stat=fnom(lu2,"data/WORK/trash","RND",0)
+  if(stat.lt.0)then
+     print*,'ERROR with fnom 2'
+     call abort
+  endif
+  stat=fstouv(lu2,'RND')
+  ! Remove all possible records
+  stat = fstinl(lu2,ni,nj,nk,-1,' ',-1,-1,-1,' ',' ',liste,infon,nmax)
+  do i=1,infon
+     stat = fsteff(liste(i))
+  enddo
+
+  if (vgd_write(vgrid_rebuilt,lu2,'fst') /= 0) then
+     print*, 'ERROR with vgd_write'
+     call abort
+  endif
+
+  ! Get parameters of original !!
+  key = fstinf(lu ,ni,nj,nk,-1,' ',-1,-1,-1,' ','!!')
+  stat = my_fstprm(key,prm_orig)
+  if(stat.lt.0)then
+     print*,'ERROR with my_fstprm 1'
+     call abort
+  endif
+  
+  ! !! is alone in its file, read it
+  key = fstinf(lu2,ni,nj,nk,-1,' ',-1,-1,-1,' ',' ')
+  stat = my_fstprm(key,prm_rebuilt)
+  if(stat.lt.0)then
+     print*,'ERROR with my_fstprm 2'
+     call abort
+  endif
+
+  if(trim(prm_rebuilt%nomvar).ne.trim(prm_orig%nomvar))then
+     print*,'nomvar do not match, expected ',trim(prm_orig%nomvar),' got ',trim(prm_rebuilt%nomvar)
+     stat = -1
+  endif
+  if(trim(prm_rebuilt%etiket).ne.trim(prm_orig%etiket))then
+     print*,'Etiket do not match, expected ',trim(prm_orig%etiket),' got ',trim(prm_rebuilt%etiket)
+     stat = -1
+  endif
+  if(prm_rebuilt%datyp.ne.prm_orig%datyp)then
+     print*,'datyp do not match, expected ',prm_orig%datyp,' got ',prm_rebuilt%datyp
+     stat = -1
+  endif
+
   call ut_report(stat,'Grid_Descriptors, rebuild from table')
 
   stat=fstfrm(lu)
+  stat=fstfrm(lu2)
 
 end program constructor

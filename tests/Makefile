@@ -30,6 +30,8 @@ $(DESCRIP_PATH)/utils.o: $(DESCRIP_PATH)/utils.ftn90
 tests:
 	rm -f data/* 2>/dev/null; \
 	cd data ; \
+	rm -rf WORK ; \
+	mkdir -p WORK ; \
         ln -s ../data_$(DATA_ARCH)/* . ; \
 	cd .. ; \
 	run_tests.ksh $(ONLY)
