@@ -47,13 +47,14 @@ module vGrid_Descriptors
 
   ! FST file record structure
   type FSTD
+     sequence
      private
      integer :: ip3,ig1,ig2,ig3,ig4,dateo,deet,npas,datyp,nbits
+     logical :: initialized=.false.
      character(len=1) :: grtyp
      character(len=2) :: typvar
      character(len=KEY_LENGTH) :: nomvar
      character(len=ETIK_LENGTH) :: etiket
-     logical :: initialized=.false.
   end type FSTD
   type FSTD_ext
      private
@@ -67,23 +68,24 @@ module vGrid_Descriptors
 
   ! Combined coordinate structure
   type vgrid_descriptor
+     sequence
      private
-     logical :: initialized=.false.                     !initialization status of the structure
-     integer :: ip1=0,ip2=0                             !ip1,2 values given to the 3D descriptor
-     integer :: unit                                    !file unit associated with this 3D descriptor
-     logical :: match_ipig                              !do ip/ig matching for records
-     character(len=VGD_LEN_NAME) :: ref_name='None'     !reference field name
-     integer, dimension(:), pointer :: ip1_m=>null()    !ip1 values for momentum levels
-     integer, dimension(:), pointer :: ip1_t=>null()    !ip1 values for thermodynamic levels
+     real*8 :: ptop_8=dble(VGD_MISSING),pref_8=dble(VGD_MISSING)!Top level and reference pressures (Pa)
+     real(kind=8), dimension(:,:,:), pointer :: table=>null()!complete grid descriptor record
      real(kind=8), dimension(:), pointer :: a_m_8=>null()!A-coefficients for momentum levels
      real(kind=8), dimension(:), pointer :: b_m_8=>null()!B-coefficients for momentum levels
      real(kind=8), dimension(:), pointer :: a_t_8=>null()!A-coefficients for thermodynamic levels
      real(kind=8), dimension(:), pointer :: b_t_8=>null()!B-coefficients for thermodynamic levels
-     real(kind=8), dimension(:,:,:), pointer :: table=>null()!complete grid descriptor record
-     real*8 :: ptop_8=dble(VGD_MISSING),pref_8=dble(VGD_MISSING)!Top level and reference pressures (Pa)
      real :: rcoef1=VGD_MISSING,rcoef2=VGD_MISSING      !Rectification coefficients
-     type(FSTD) :: rec                                  !FST file record structure for descriptor
+     logical :: initialized=.false.                     !initialization status of the structure
+     logical :: match_ipig                              !do ip/ig matching for records
+     integer :: ip1=0,ip2=0                             !ip1,2 values given to the 3D descriptor
+     integer :: unit                                    !file unit associated with this 3D descriptor
      integer :: vcode,kind,version                      !Vertical coordinate codes
+     integer, dimension(:), pointer :: ip1_m=>null()    !ip1 values for momentum levels
+     integer, dimension(:), pointer :: ip1_t=>null()    !ip1 values for thermodynamic levels
+     character(len=VGD_LEN_NAME) :: ref_name='None'     !reference field name
+     type(FSTD) :: rec                                  !FST file record structure for descriptor
   end type vgrid_descriptor
 
   interface vgd_new
@@ -634,10 +636,12 @@ contains
 
       ! Internal variables
       integer :: myip1,myip2,mystdout_unit,error
-      integer, dimension(:), pointer :: ip1_m=>null(),ip1_t=>null()
-      real, dimension(:), pointer :: hybm=>null(),hybt=>null()
-      real*8, dimension(:), pointer :: a_m_8=>null(),b_m_8=>null(),a_t_8=>null(),b_t_8=>null()
+      integer, dimension(:), pointer :: ip1_m,ip1_t
+      real, dimension(:), pointer :: hybm,hybt
+      real*8, dimension(:), pointer :: a_m_8,b_m_8,a_t_8,b_t_8
       logical :: gen_ok,errorInput=.false.
+
+      nullify(ip1_m,ip1_t,hybm,hybt,a_m_8,b_m_8,a_t_8,b_t_8)
 
       ! Set error status
       status = VGD_ERROR
@@ -1982,8 +1986,10 @@ contains
     integer :: fstinf,ni,nj,nk,sfc_key,istat,error,fstluk,i
     integer, dimension(size(fstkeys)) :: ip1_list
     type(FSTD_ext) prmk,prm_p0,prm_check
-    real, dimension(:,:), pointer :: p0=>null()
+    real, dimension(:,:), pointer :: p0
     logical :: my_in_log
+
+    nullify(p0)
 
     ! Set error status
     status = VGD_ERROR
@@ -2094,9 +2100,11 @@ contains
 
      ! Local variables
      real*8 :: my_sfc_field_8
-     real*8, dimension(:), pointer :: levels_8=>null()
+     real*8, dimension(:), pointer :: levels_8
      integer :: error
      logical :: my_in_log
+
+     nullify(levels_8)
 
      ! Set return value
      status = VGD_ERROR
@@ -2155,8 +2163,10 @@ contains
 
      ! Local variables
      real*8 :: my_sfc_field_8
-     real*8, dimension(:), pointer :: dpidpis_8=>null()
+     real*8, dimension(:), pointer :: dpidpis_8
      integer :: error
+
+     nullify(dpidpis_8)
 
      ! Set return value
      status = VGD_ERROR
@@ -2191,9 +2201,11 @@ contains
      ! Local variables
      integer :: error,nk
      real*8 :: my_sfc_field
-     real*8, dimension(:,:), pointer :: sfc_field_2d=>null()
-     real*8, dimension(:,:,:), pointer :: levels_3d=>null()
+     real*8, dimension(:,:), pointer :: sfc_field_2d
+     real*8, dimension(:,:,:), pointer :: levels_3d
      logical :: my_in_log,my_dpidpis
+
+     !nullify(sfc_field_2d,levels_3d)
 
      ! Set error status
      status = VGD_ERROR
@@ -2253,9 +2265,11 @@ contains
 
      ! Local variables
      integer :: error,ni,nj
-     real*8, dimension(:,:,:), pointer :: levels_8=>null()
+     real*8, dimension(:,:,:), pointer :: levels_8
      real*8, dimension(:,:), allocatable :: my_sfc_field
      logical :: my_in_log
+
+     nullify(levels_8)
 
      ! Set return value
      status = VGD_ERROR
@@ -2346,8 +2360,10 @@ contains
 
      ! Local variables 
      integer :: error,ni,nj
-     real*8, dimension(:,:), pointer :: my_sfc_field_8=>null()
-     real*8, dimension(:,:,:), pointer :: dpidpis_8=>null()
+     real*8, dimension(:,:), pointer :: my_sfc_field_8
+     real*8, dimension(:,:,:), pointer :: dpidpis_8
+
+     nullify(my_sfc_field_8,dpidpis_8)
 
      ! Set return value
      status = VGD_ERROR
@@ -3856,9 +3872,11 @@ contains
     character(len=1) :: tva, grda, blk_S
     character(len=KEY_LENGTH) :: var
     character(len=ETIK_LENGTH) :: etik_S
-    real(kind=8), dimension(:), pointer :: a_m_8=>null()!A-coefficients for momentum levels
-    real(kind=8), dimension(:), pointer :: b_m_8=>null()!B-coefficients for momentum levels
+    real(kind=8), dimension(:), pointer :: a_m_8!A-coefficients for momentum levels
+    real(kind=8), dimension(:), pointer :: b_m_8!B-coefficients for momentum levels
     
+    nullify(a_m_8,b_m_8)
+
     status=VGD_ERROR
     
     allocate(ip1(nlev),hyb(nlev),hybm(nlev),stat=istat)
