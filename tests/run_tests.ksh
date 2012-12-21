@@ -51,10 +51,10 @@ passed=0
 failed=0
 for test in ${tests[*]} ; do
   if echo ${test} | grep -q OMP ;then
-    export OPM_NUM_THREADS=4
-    MESSAGE=" whith OPM_NUM_THREADS=${OPM_NUM_THREADS} "
+    export OMP_NUM_THREADS=4
+    MESSAGE=" with OMP_NUM_THREADS=${OMP_NUM_THREADS} "
   else
-    export OPM_NUM_THREADS=1
+    export OMP_NUM_THREADS=1
     MESSAGE=''
   fi      
   printf "Testing ${test} ${MESSAGE}..."

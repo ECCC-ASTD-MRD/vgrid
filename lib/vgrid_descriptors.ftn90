@@ -2177,7 +2177,9 @@ contains
      
      ! Wrap call to level calculation
      status = diag_withref_prof_8(self,ip1_list,dpidpis_8,sfc_field=my_sfc_field_8,dpidpis=.true.)
+     print*,'ANDRE a1'
      if (associated(dpidpis))deallocate(dpidpis)
+     print*,'ANDRE a1.1'
      allocate(dpidpis(size(dpidpis_8,dim=1)),stat=error)
      if (error /= 0) then
         write(for_msg,*) 'cannot allocate space for dpidpis in dpidpis_withref_prof'
@@ -2185,7 +2187,9 @@ contains
         return
      endif
      dpidpis=dpidpis_8
+     print*,'ANDRE a2'
      deallocate(dpidpis_8)
+     print*,'ANDRE afin'
      return
   end function dpidpis_withref_prof
 
@@ -2239,7 +2243,9 @@ contains
            write(for_msg,*) 'Levels array size error - will be reallocated'
            call msg(MSG_WARNING,VGD_PRFX//for_msg)
         endif
+        print*,'ANDRE b1'
         deallocate(levels)
+        print*,'ANDRE b2'
      endif
      allocate(levels(nk),stat=error)
      if (error /= 0) then
@@ -2248,7 +2254,9 @@ contains
         return
      endif
      levels=levels_3d(1,1,1:nk)
+     print*,'ANDRE b3'
      deallocate(sfc_field_2d,levels_3d)
+     print*,'ANDRE bfin'
      ! Set status and return
      status = VGD_OK
      return
