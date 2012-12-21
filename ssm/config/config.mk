@@ -1,6 +1,6 @@
 # this file contains common config that is sourced by all makefiles
 WHO_I_AM=$(shell whoami)
-VERSION=3.6.2
+VERSION=3.8.0
 MACHINE=$(shell uname -s)
 ARCH=$(MACHINE)
 SWNAME=vgriddescriptors
