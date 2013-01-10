@@ -59,9 +59,7 @@ program tests
   endif  
 !$omp do
   do i=1,ni*nj
-  !do i=1,ni*nj
-     print*,'i=',i
-     !allocate(dpidpis_profil(1))
+     !print*,'i=',i
      nullify(dpidpis_profil)
      stat = vgd_dpidpis(d,sfc_field=p00(i),ip1_list=ip1_list,dpidpis=dpidpis_profil)         
      if(stat.ne.VGD_OK)then
