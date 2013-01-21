@@ -27,12 +27,9 @@ program tests
      print*,'No record in RPN file'
      call abort
   endif
-  open(unit=lutxt,file='data/dm_5002_ips.txt',status='OLD')
-  read(lutxt,*) ip1,ip2
-  close(lutxt)
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = vgd_new(vgd,unit=lu,format="fst",ip1=ip1,ip2=ip2)
+  stat = vgd_new(vgd,unit=lu,format="fst")
   call flush(6)
 
   ! Get information about the coordinate

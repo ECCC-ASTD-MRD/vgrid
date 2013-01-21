@@ -1,5 +1,5 @@
 program tests
-  use vGrid_Descriptors, only: vgd_levels
+  use vGrid_Descriptors, only: vgd_levels,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
@@ -23,6 +23,10 @@ program tests
   ! Get physical levelling information
   fstkey = fstinf(lu,ni,nj,nk,-1,'',93423264,-1,-1,'','TT')
   stat = vgd_levels(unit=lu,fstkeys=(/fstkey/),levels=lev)
+  if(stat==VGD_ERROR)then
+     print*,'Problem with vgd_levels'
+     call abort
+  endif
   allocate(px(ni,nj))
   stat = fstlir(px,lu,ni,nj,nk,-1,'',93423264,-1,-1,'','PX')
   stat = fstlir(px,lu,ni,nj,nk,-1,'',-1,-1,-1,'','P0')

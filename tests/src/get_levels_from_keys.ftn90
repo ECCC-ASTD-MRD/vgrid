@@ -34,12 +34,9 @@ program get_levels_from_keys
      print*,'No record in RPN file'
      call abort
   endif
-  open(unit=lutxt,file='data/dm_5002_ips.txt',status='OLD')
-  read(lutxt,*) ip1,ip2
-  close(lutxt)
 
   ! Get vertical grid descriptor
-  stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
+  stat = vgd_new(d,unit=lu,format="fst")
   if(stat < 0 )then
      print*,'Problem getting vertical grid descriptor'
      stop
@@ -53,6 +50,11 @@ program get_levels_from_keys
   endif
 
   stat = vgd_levels(d,unit=lu,fstkeys=liste(1:infon),levels=pres)
+  if(stat < 0 )then
+     print*,'Problem with vgd_levels'
+     stop
+  endif
+  
   pres=pres/100.
 
   allocate(ff(ni,nj))
