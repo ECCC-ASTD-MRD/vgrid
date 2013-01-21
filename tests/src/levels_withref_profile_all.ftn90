@@ -8,13 +8,13 @@ program levels_withref_profile_all
 
   stat=VGD_OK
   
-  ier=chek_levels_withref('data/dm_1001_from_model_run','data/dm_1001_ips.txt')
+  ier=chek_levels_withref('data/dm_1001_from_model_run','')
   if(ier==VGD_ERROR)stat=VGD_ERROR
 
-  ier=chek_levels_withref('data/dm_1002_from_model_run','data/dm_1002_ips.txt')
+  ier=chek_levels_withref('data/dm_1002_from_model_run','')
   if(ier==VGD_ERROR)stat=VGD_ERROR
 
-  ier=chek_levels_withref('data/dm_5001_from_model_run','data/dm_5001_ips.txt')
+  ier=chek_levels_withref('data/dm_5001_from_model_run','')
   if(ier==VGD_ERROR)stat=VGD_ERROR
 
   ier=chek_levels_withref('data/dm_5002_from_model_run','data/dm_5002_ips.txt')
@@ -77,10 +77,14 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
       print*,'No record in RPN file ',trim(F_fst),ier
       return
    endif
-   open(unit=lutxt,file=F_ips,status='OLD')
-   read(lutxt,*) ip1,ip2
-   close(lutxt)
-   
+   if(trim(F_ips).eq.'')then
+      ip1=-1; ip2=-1     
+   else
+      open(unit=lutxt,file=F_ips,status='OLD')
+      read(lutxt,*) ip1,ip2
+      close(lutxt)
+   endif
+
    ! Get vertical grid descriptor
    ier = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
    if(ier == VGD_ERROR )then

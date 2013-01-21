@@ -4,10 +4,12 @@ program tests
 
   implicit none
 
-  integer :: stat,lu=0,ni,nj,nk,fnom,fstouv,fstfrm,fclos,fstlir,fstinf,k,lutxt=69,ip1,ip2
+  integer :: stat,lu=0,ni,nj,nk,fnom,fstouv,fstfrm,fclos,fstlir,fstinf,k
+  integer, parameter :: i0=1,j0=1
   integer, dimension(:), pointer :: ip1_list
-  real, dimension(:), pointer :: dpidpis_prof
-  real :: eps=1.e-6,p0
+  real, dimension(:,:,:), pointer :: dpidpis_cube
+  real :: eps=1.e-6
+  real, dimension(:,:), allocatable :: p0
   real :: w1
   type(vgrid_descriptor) :: d
   logical :: ok
@@ -23,36 +25,40 @@ program tests
      print*,'No record in RPN file'
      call abort
   endif
-  open(unit=lutxt,file='data/dm_5001_ips.txt',status='OLD')
-  read(lutxt,*) ip1,ip2
-  close(lutxt)
 
   ! Get dpidpis
-  stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
+  stat = vgd_new(d,unit=lu,format="fst")
+  if(stat/=VGD_OK)then
+     print*,'ERROR with vgd_new'
+     call exit(1)
+  endif  
+
   stat = vgd_get(d,key='CB_M - vertical B coefficient (m)',value=coef_b)
   stat = vgd_get(d,key='VIPM - level ip1 list (m)'        ,value=ip1_list)
 
-  stat = vgd_dpidpis(d,sfc_field=p0,ip1_list=ip1_list,dpidpis=dpidpis_prof)
+  allocate(p0(1,1))
+
+  stat = vgd_dpidpis(d,sfc_field=p0,ip1_list=ip1_list,dpidpis=dpidpis_cube)
   if(stat.ne.VGD_OK)then
      print*,'ERROR: problem with vgd_dpidpis'
      stat=fstfrm(lu)
      call abort
   endif
 
-  print*,'size(dpidpis_prof)',size(dpidpis_prof)
+  print*,'size(dpidpis_cube)',size(dpidpis_cube)
 
   OK=.true.
   do k=1,size(coef_b)
-     print*,coef_b(k),dpidpis_prof(k)
+     print*,coef_b(k),dpidpis_cube(i0,j0,k)
      if(coef_b(k).le.epsilon(coef_b(k)))then
-        if(abs(coef_b(k)-dpidpis_prof(k))>epsilon(coef_b(k)))then
-           print*,'OUPS 1'
+        if(abs(coef_b(k)-dpidpis_cube(i0,j0,k))>epsilon(coef_b(k)))then
+           print*,'OUPS'
            OK=.false.
            exit
         endif
      else
-        if(abs(dpidpis_prof(k)- coef_b(k))/coef_b(k)>eps)then
-           print*,'OUPS 2'
+        if(abs(dpidpis_cube(i0,j0,k)- coef_b(k))/coef_b(k)>eps)then
+           print*,'OUPS'
            OK=.false.
            exit
         endif

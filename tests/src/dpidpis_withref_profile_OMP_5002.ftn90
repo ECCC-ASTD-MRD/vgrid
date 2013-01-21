@@ -4,7 +4,7 @@ program tests
 
   implicit none
 
-  integer :: stat,lu=0,ni,nj,nk,fnom,fstouv,fstfrm,fclos,fstlir,fstinf,k,lutxt=69,ip1,ip2
+  integer :: stat,lu=0,ni,nj,nk,nkk,fnom,fstouv,fstfrm,fclos,fstlir,fstinf,k,lutxt=69,ip1,ip2
   integer, parameter :: i0=20,j0=10
   integer, dimension(:), pointer :: ip1_list
   integer :: i,j,tid,ii,jj,icor
@@ -45,8 +45,8 @@ program tests
   nk=size(ip1_list)
   allocate(p0(ni,nj),p00(ni*nj),px(ni,nj),dpidpis_3d_from_prof(ni,nj,nk))
 
-  stat = fstlir(p0,lu,ni,nj,nk,-1,'',-1,-1,-1,'','P0')
-  stat = fstlir(p00,lu,ni,nj,nk,-1,'',-1,-1,-1,'','P0')
+  stat = fstlir(p0,lu,ni,nj,nkk,-1,'',-1,-1,-1,'','P0')
+  stat = fstlir(p00,lu,ni,nj,nkk,-1,'',-1,-1,-1,'','P0')
   p0  = p0*100. !mb to Pa
   p00 = p00*100. !mb to Pa
   
@@ -101,7 +101,7 @@ do k=1,nk
 enddo
 
   do k=1,size(coef_b)
-     stat = fstlir(px,lu,ni,nj,nk,-1,'',ip1_list(k),-1,-1,'','PX')
+     stat = fstlir(px,lu,ni,nj,nkk,-1,'',ip1_list(k),-1,-1,'','PX')
 
      PRINT*,'andre k,i0,j0=',k,i0,j0
 
