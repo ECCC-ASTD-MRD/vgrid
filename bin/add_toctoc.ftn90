@@ -85,7 +85,7 @@ program add_toctoc
    !
    istat=fstinl(lui,ni,nj,nk,-1,' ',-1,-1,-1,' ','!!',liste,infon,nmax)
    if(infon.gt.0)then
-      print*,'Record !! already there , noting to do'
+      print*,'Record !! already there, noting to do'
       goto 999
    endif
    !
