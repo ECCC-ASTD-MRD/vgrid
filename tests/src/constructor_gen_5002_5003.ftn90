@@ -62,7 +62,7 @@ integer function test_5002(F_d,F_file,F_write_control_L) result(istat)
    real, dimension(:), pointer :: vcdm,vcdt,work
    real*8, dimension(:), pointer :: b_m_8,a_m_8,b_t_8,a_t_8,work_8
    integer, dimension(:), pointer :: vipm,vipt,work_i
-   integer :: nl_m,nl_t,k,nk,stat,kind,vers,vcode
+   integer :: nl_m,nl_t,k,nk,stat,kind,vers,vcode,ip1,my_ip1
 
    istat=VGD_OK
 
@@ -78,7 +78,7 @@ integer function test_5002(F_d,F_file,F_write_control_L) result(istat)
    stat = vgd_get(F_d,key='VCDT - vertical coordinate (t)'      ,value=vcdt)
    stat = vgd_get(F_d,key='NL_M - Number of vertical levels (m)',value=nl_m)
    stat = vgd_get(F_d,key='NL_T - Number of vertical levels (t)',value=nl_t)
-   
+   stat = vgd_get(F_d,key='IP_1 - record ip1'                   ,value=ip1)
    print*,'TESTING ',kind*1000+vers
 
    if(F_write_control_L)then
@@ -91,6 +91,7 @@ integer function test_5002(F_d,F_file,F_write_control_L) result(istat)
      write(10,*)vipt
      write(10,*)vcdm
      write(10,*)vcdt
+     write(10,*)ip1
      close(10)
   endif
  
@@ -152,7 +153,7 @@ integer function test_5002(F_d,F_file,F_write_control_L) result(istat)
      endif
   enddo
 
-  ! Check IP
+  ! Check IPs
   allocate(work_i(size(vipm)))
   print*,'Reading IP M'
   read(10,*)work_i
@@ -197,5 +198,11 @@ integer function test_5002(F_d,F_file,F_write_control_L) result(istat)
         print*,vcdt(k)
      endif
   enddo  
+
+  print*,'Reading VCDT'
+  read(10,*)my_ip1
+  if(my_ip1.eq.ip1)then
+     print*,'Probleme avec ip1, expected ',ip1,' got',my_ip1     
+  endif
 
 end function test_5002
