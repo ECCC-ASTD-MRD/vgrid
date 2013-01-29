@@ -5,12 +5,23 @@ program tests
   implicit none
 
   type(vgrid_descriptor) :: d
-  integer :: stat,fstkey
+  integer :: stat,fnom,fstouv,lu=10
   real, dimension(:,:,:), allocatable :: lev
   character(len=VGD_LEN_NAME) :: vname
 
+  stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
+  if(stat.lt.0)then
+     print*,'ERROR with fnom'
+     call abort
+  endif
+  stat=fstouv(lu,'RND')
+  if(stat.lt.0)then
+     print*,'No record in RPN file'
+     call abort
+  endif
+
   ! Construct a new set of 3D coordinate descriptors
-  stat = vgd_new(d,unit=10,format='fst',ip1=100,ip2=200)
+  stat = vgd_new(d,lu,format='fst')
 
   ! Change an element of the structure
   stat = vgd_put(d,key='NAME - vertical coordinate name',value='VCRD')
