@@ -1,38 +1,145 @@
+module mod_constructor_table
+  type FSTD_ext
+     integer :: ig1,ig2,ig3,ig4,dateo,deet,npas,datyp,nbits,ni,nj,nk
+     integer :: ip1,ip2,ip3,swa,lng,dltf,ubc,extra1,extra2,extra3,datev
+     character(len=1) :: grtyp
+     character(len=2) :: typvar
+     character(len=4) :: nomvar
+     character(len=12) :: etiket
+  end type FSTD_ext
+contains
+   integer function my_fstprm(fstkey,record) result(status)
+      ! Use fstprm function to get information about the record
+      integer, intent(in) :: fstkey               !Key from FST file record
+      type(FSTD_ext) :: record                    !Record information
+      integer :: error,ni,nj,nk
+      integer, external :: fstprm,fstinf
+      real*8 :: nhours
+      status = -1
+      error=fstprm(fstkey,record%dateo,record%deet,record%npas, &
+           record%ni,record%nj,record%nk,record%nbits,record%datyp,record%ip1,record%ip2, &
+           record%ip3,record%typvar,record%nomvar,record%etiket,record%grtyp, &
+           record%ig1,record%ig2,record%ig3,record%ig4,record%swa, &
+           record%lng,record%dltf,record%ubc,record%extra1,record%extra2, &
+           record%extra3)
+      if (error < 0) then
+         write(6,*) 'cannot fstprm for fstkey ',fstkey
+         return
+      end if
+      nhours=record%deet*record%npas/3600.d0
+      call incdatr(record%datev,record%dateo,nhours)
+      status = 0
+   end function my_fstprm
+end module mod_constructor_table
+!================================================================================================
 program tests
   use vGrid_Descriptors, only: vgd_levels,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  integer :: stat,lu=0,ni,nj,nk,fnom,fstouv,fstfrm,fclos,fstkey,fstlir,fstinf
-  real :: epsilon=0.01
+  integer :: stat,lu=10,do_it,fstfrm,fclos,i,ier
+  logical :: ok=.true.
+  integer, parameter :: nfiles=6
+  character(len=200), dimension(nfiles) :: files=(/&
+       "data/dm_1001_from_model_run",&
+       "data/dm_1002_from_model_run",&
+       "data/dm_5001_from_model_run",&
+       "data/dm_5002_from_model_run",&
+       "data/dm_5002_from_model_run",&
+       "data/dm_5003_from_model_run"&
+       /)
+  
+  do i=1,nfiles
+     stat = do_it(lu,files(i))
+     ier=fstfrm(lu)
+     ier=fclos(lu)
+     if(stat==VGD_ERROR)then
+        ok=.false.
+        exit
+     endif
+  enddo
+
+  call ut_report(ok,message='Grid_Descriptors::vgd_levels level calculation status')
+
+end program tests
+!=========================================================================
+!=========================================================================
+!=========================================================================
+integer function do_it(lu,file) result(status)
+
+  use vGrid_Descriptors, only: vgd_levels,VGD_ERROR,VGD_OK
+  use mod_constructor_table, only: FSTD_ext,my_fstprm 
+
+  implicit none
+
+  integer :: lu
+  character(len=*) :: file
+
+  !Local variables
+
+  type(FSTD_ext) :: prm
+  integer, parameter :: nmax=1000
+  integer, dimension(nmax) :: liste
+  integer :: ni,nj,nk,fnom,fstouv,fstfrm,fclos,fstkey,fstlir,fstinf,ier,kind,fstinl,infon
+  real :: epsilon=0.01,pres
   real, dimension(:,:), allocatable :: px
   real, dimension(:,:,:), pointer :: lev
+  character(len=1) :: string
 
-  stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
-  if(stat.lt.0)then
-     print*,'ERROR with fnom'
-     call abort
+  status=VGD_ERROR
+
+  print*,'===================================================='
+  print*,trim(file)
+
+  ier=fnom(lu,file,"RND+R/O",0)
+  if(ier.lt.0)then
+     print*,'ERROR with fnom on file ',file
+     return
   endif
-  stat=fstouv(lu,'RND')
-  if(stat.lt.0)then
-     print*,'No record in RPN file'
-     call abort
+  ier=fstouv(lu,'RND')
+  if(ier.lt.0)then
+     print*,'No record in RPN file ',file
+     return
   endif
 
   ! Get physical levelling information
-  fstkey = fstinf(lu,ni,nj,nk,-1,'',93423264,-1,-1,'','TT')
-  stat = vgd_levels(unit=lu,fstkeys=(/fstkey/),levels=lev)
-  if(stat==VGD_ERROR)then
+  ier = fstinl(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ' ,'TT',liste,infon,nmax)
+  if(infon.le.0)then
+     print*,'ERROR cannot find any TT in input file ',file
+     return
+  endif    
+  ! treat middle level record
+  ier=my_fstprm(liste(infon/2),prm)
+  call convip(prm%ip1,pres,kind,-1,string,.false.)
+  print*,'Treating TT at ip1=',prm%ip1,' ->',pres
+
+  fstkey = fstinf(lu,ni,nj,nk,-1,'',prm%ip1,-1,-1,'','TT')
+  if(fstkey.le.0)then
+     print*,'ERROR cannot find any TT in input file ',file
+     return
+  endif
+  ier = vgd_levels(unit=lu,fstkeys=(/fstkey/),levels=lev)
+  if(ier==VGD_ERROR)then
      print*,'Problem with vgd_levels'
-     call abort
+     return
   endif
   allocate(px(ni,nj))
-  stat = fstlir(px,lu,ni,nj,nk,-1,'',93423264,-1,-1,'','PX')
-  stat = fstlir(px,lu,ni,nj,nk,-1,'',-1,-1,-1,'','P0')
-  call ut_report(abs(lev(10,10,1)/100.-px(10,10))<epsilon,message='Grid_Descriptors::vgd_levels level calculation status')
+  ier = fstlir(px,lu,ni,nj,nk,-1,'',prm%ip1,-1,-1,'','PX')
+  if(ier.lt.0)then
+     print*,'ERROR with fstlir on PX for ip1,file ',prm%ip1,file
+     return
+  endif  
 
-  stat=fstfrm(lu)
-  stat=fclos(lu)
+  if(abs(lev(10,10,1)/100.-px(10,10))>epsilon)then
+     print*,'ERROR difference in pressure to high',lev(10,10,1)/100.,' VS',px(10,10)
+     return
+  else
+     print*,'Difference in pressure are OK',lev(10,10,1)/100.,' VS',px(10,10)
+  endif
 
-end program tests
+  deallocate(px,lev)
+
+  status=VGD_OK
+
+end function do_it

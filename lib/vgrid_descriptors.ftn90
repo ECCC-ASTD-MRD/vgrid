@@ -2098,12 +2098,11 @@ contains
     real :: lev
     integer :: ip1,kind
     character(len=1) :: blk_S
-    integer :: error,ig1,ig2,ig3,i
+    integer :: error,ig1,ig2,ig3,ig4,i
     character(len=1) :: grtyp
     logical :: construct,multiple_grids,my_in_log
     type(vgrid_descriptor) :: gd
     type(FSTD_ext) :: var
-
 
     ! Set error status
     status = VGD_ERROR
@@ -2125,6 +2124,7 @@ contains
           ig1 = var%ig1
           ig2 = var%ig2
           ig3 = var%ig3
+          ig4 = var%ig4
           grtyp = var%grtyp
           ip1 = var%ip1
        endif
@@ -2138,7 +2138,13 @@ contains
     call convip (ip1, lev, kind,-1, blk_S, .false.)
     ! Create grid descriptor instance and call level calculator
     if (any(MATCH_GRTYP == grtyp)) then
-       error = new_read(gd,unit=unit,format='fst',ip1=ig1,ip2=ig2,kind=kind)
+       error = new_read(gd,unit=unit,format='fst',ip1=ig4,        kind=kind)
+       if(error==VGD_ERROR)then          
+          error = new_read(gd,unit=unit,format='fst',ip1=ig1,ip2=ig2,kind=kind)
+          if(error==VGD_ERROR)then
+             error = new_read(gd,unit=unit,format='fst',                kind=kind)
+          endif
+       endif
     else
        error = new_read(gd,unit=unit,format='fst',ip1=-1,ip2=-1,kind=kind)
     endif

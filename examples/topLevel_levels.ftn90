@@ -11,7 +11,7 @@
    integer, external :: fstinl,fnom,fstouv,fstfrm,fclos
    !
    ! Open file and get FST key for field of interest (in this case TT)
-   status = fnom(iun,'../tests/data/Linux_pgi611/dm_5002_from_model_run','STD',0)
+   status = fnom(iun,'../tests/data_Linux/dm_5002_from_model_run_ig4_ip1_link','STD',0)
    status = fstouv(iun,'RND')
    status = fstinl(iun,ni,nj,nk,-1,' ',-1,-1,-1,' ','TT',keys,count,size(keys))
    !

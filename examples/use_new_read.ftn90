@@ -1,0 +1,21 @@
+program use_new_read
+   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_print,VGD_OK
+
+   implicit none
+   
+   integer :: status,fnom,fstouv,iun=10
+   type(vgrid_descriptor) :: vgd
+
+   status = fnom(iun,'../tests/data_Linux/dm_5002_from_model_run','RND+R/O',0)
+   status = fstouv(iun,'RND')
+
+   status = vgd_new(vgd,iun,'fst')
+   
+   if (status /= VGD_OK)then
+      print*,'ERROR'
+      call exit(1)
+   endif
+
+   status = vgd_print(vgd,6)
+
+end program use_new_read
