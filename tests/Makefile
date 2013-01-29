@@ -37,7 +37,7 @@ tests:
 	run_tests.ksh $(ONLY)
 
 clean:
-	rm -f *.f90 *.o *.mod
+	rm -f *.f90 *.o *.mod *.out
 
 distclean: clean
 	rm -f data/*

@@ -1,5 +1,5 @@
 program tests
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,VGD_LEN_NAME,VGD_ERROR,VGD_OK
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_putopt,VGD_LEN_NAME,VGD_ERROR,VGD_OK
   use utils, only: same_vec
   use Unit_Testing, only: ut_report
   implicit none
@@ -27,6 +27,9 @@ program tests
      print*,'No record in RPN file'
      call abort
   endif
+
+  !
+  stat = vgd_putopt('ALLOW_RESHAPE',.true.)
 
   ! Construct a new set of 3D coordinate descriptors
   stat = vgd_new(vgd,unit=lu,format="fst")
@@ -98,7 +101,7 @@ program tests
   call flush(6)  
   
   !===================================
-  ! Tests get methot on value returned
+  ! Tests get method on value returned
  
   ! int
   stat = vgd_get(vgd,'KIND',my_int)
@@ -115,7 +118,7 @@ program tests
   if(stat==VGD_ERROR)ok=.false.
   stat = vgd_get(vgd,'VIPM',my_int2_1d,quiet=.false.)
   if(stat==VGD_ERROR)ok=.false.
-  if(.not.same_vec(my_int_1d,my_int2_1d))call message(ok,'Test1 on get_int_1d failed')
+  if(.not.same_vec(my_int_1d,my_int2_1d))call message(ok,'Test1 on get_int_1d failed')  
   stat = vgd_get(vgd,'VIPM',my_int2_1d,quiet=.true.)
   if(stat==VGD_ERROR)ok=.false.
   if(.not.same_vec(my_int_1d,my_int2_1d))call message(ok,'Test2 on get_int_1d failed')
@@ -204,6 +207,6 @@ subroutine message(F_ok,F_message)
 
    F_ok=.false.
 
-   print*,F_message
+   print*,F_message;flush(6)
 
 end subroutine message

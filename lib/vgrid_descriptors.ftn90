@@ -1,5 +1,8 @@
 module vGrid_Descriptors
 
+  ! Autors : Ron MacTaggart-Cowan and Andre Plante
+  ! Contributors : Cecilien Charette
+
   implicit none
   private
 
@@ -11,6 +14,8 @@ module vGrid_Descriptors
   public :: vgd_free                            !class destructor
   public :: vgd_get                             !get instance variable value
   public :: vgd_put                             !set instance variable value
+  public :: vgd_getopt                          !get class variable value
+  public :: vgd_putopt                          !set class variable value
   public :: vgd_print                           !dump plain-text contents of instance
   public :: vgd_write                           !write coordinates to a file
   public :: vgd_levels                          !compute physical level information
@@ -28,6 +33,7 @@ module vGrid_Descriptors
   integer, parameter :: ETIK_LENGTH=12          !length of standard file etikets
   integer, parameter :: MAX_DESC_REC=10000      !maximum number of descriptor records in a single file
   character(len=1), dimension(3), parameter :: MATCH_GRTYP=(/'X','Y','Z'/) !grid types with ip1,2 to ig1,2 mapping
+  logical :: ALLOW_RESHAPE=.false.              ! Allow reshape of class pointer members
 
   ! Validity table for self
   integer, dimension(5), parameter :: ptop_8_valid=             (/1002,1003,5001,5002,5003/)
@@ -50,7 +56,7 @@ module vGrid_Descriptors
      sequence
      private
      integer :: ip1,ip2,ip3,ig1,ig2,ig3,ig4,dateo,deet,npas,datyp,nbits
-     logical :: initialized
+     logical :: initialized=.false.
      character(len=1) :: grtyp
      character(len=2) :: typvar
      character(len=KEY_LENGTH) :: nomvar
@@ -70,21 +76,23 @@ module vGrid_Descriptors
   type vgrid_descriptor
      sequence
      private
-     real*8 :: ptop_8,pref_8                          !Top level and reference pressures (Pa)
-     real(kind=8), dimension(:,:,:), pointer :: table !complete grid descriptor record
-     real(kind=8), dimension(:), pointer :: a_m_8     !A-coefficients for momentum levels
-     real(kind=8), dimension(:), pointer :: b_m_8     !B-coefficients for momentum levels
-     real(kind=8), dimension(:), pointer :: a_t_8     !A-coefficients for thermodynamic levels
-     real(kind=8), dimension(:), pointer :: b_t_8     !B-coefficients for thermodynamic levels
-     real :: rcoef1,rcoef2                            !Rectification coefficients
-     logical :: initialized                           !initialization status of the structure
-     logical :: match_ipig                            !do ip/ig matching for records
-     integer :: unit                                  !file unit associated with this 3D descriptor
-     integer :: vcode,kind,version                    !Vertical coordinate codes
-     integer, dimension(:), pointer :: ip1_m          !ip1 values for momentum levels
-     integer, dimension(:), pointer :: ip1_t          !ip1 values for thermodynamic levels
-     character(len=VGD_LEN_NAME) :: ref_name          !reference field name
-     type(FSTD) :: rec                                !FST file record structure for descriptor
+     real*8 :: ptop_8=dble(VGD_MISSING),pref_8=dble(VGD_MISSING)!Top level and reference pressures (Pa)
+     real(kind=8), dimension(:,:,:), pointer :: table=>null()!complete grid descriptor record
+     real(kind=8), dimension(:), pointer :: a_m_8=>null()!A-coefficients for momentum levels
+     real(kind=8), dimension(:), pointer :: b_m_8=>null()!B-coefficients for momentum levels
+     real(kind=8), dimension(:), pointer :: a_t_8=>null()!A-coefficients for thermodynamic levels
+     real(kind=8), dimension(:), pointer :: b_t_8=>null()!B-coefficients for thermodynamic levels
+     integer, dimension(:), pointer :: ip1_m=>null()    !ip1 values for momentum levels
+     integer, dimension(:), pointer :: ip1_t=>null()    !ip1 values for thermodynamic levels
+     real :: rcoef1=VGD_MISSING,rcoef2=VGD_MISSING      !Rectification coefficients
+     logical :: initialized=.false.                     !initialization status of the structure
+     logical :: match_ipig                              !do ip/ig matching for records
+     logical :: valid=.false.                           !Validity of structure
+     integer :: ip1=0,ip2=0                             !ip1,2 values given to the 3D descriptor
+     integer :: unit                                    !file unit associated with this 3D descriptor
+     integer :: vcode,kind,version                      !Vertical coordinate codes
+     character(len=VGD_LEN_NAME) :: ref_name='None'     !reference field name
+     type(FSTD) :: rec                                  !FST file record structure for descriptor
   end type vgrid_descriptor
 
   interface vgd_new
@@ -120,6 +128,14 @@ module vGrid_Descriptors
      module procedure put_char
   end interface
 
+  interface vgd_getopt
+     module procedure getopt_logical
+  end interface
+
+  interface vgd_putopt
+     module procedure putopt_logical
+  end interface
+  
   interface vgd_print
      module procedure print_desc
   end interface
@@ -159,7 +175,7 @@ contains
    integer function new_read(self,unit,format,ip1,ip2,kind) result(status)
       use utils, only: up
       ! Coordinate constructor - read from a file and initialize instance
-      type(vgrid_descriptor), intent(out) :: self !Vertical descriptor instance
+      type(vgrid_descriptor), intent(inout) :: self !Vertical descriptor instance
       integer, intent(in) :: unit                 !File unit to read descriptor information from
       character(len=*), optional, intent(in) :: format !File format ('fst' or 'bin') default is 'fst'
       integer,optional :: ip1,ip2                 !ip1,2 values of the desired descriptors
@@ -174,6 +190,7 @@ contains
       real*8, dimension(:,:,:), allocatable :: l_table
       character(len=100) :: myformat
 
+      self%valid=.false.
       ! Set error status
       status = VGD_ERROR
 
@@ -335,6 +352,7 @@ contains
          endif
       endif
 
+      self%valid=.true.
       ! Set status and return
       if (found_descriptor(self)) status = VGD_OK
       return
@@ -350,6 +368,7 @@ contains
      integer :: error,istat,kind,version
      real(kind=8), dimension(size(table,dim=1),size(table,dim=2),size(table,dim=3)) :: ltable
 
+     self%valid=.false.
      ! Set error status
      status = VGD_ERROR
 
@@ -411,7 +430,8 @@ contains
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
-
+     
+     self%valid=.true.
      ! Set status and return
      status = VGD_OK
      return
@@ -421,7 +441,7 @@ contains
         ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8, &
         ip1_m,ip1_t) result(status)
       ! Coordinate constructor - build vertical descriptor from arguments
-      type(vgrid_descriptor), intent(out) :: self       !Vertical descriptor instance    
+      type(vgrid_descriptor) :: self                    !Vertical descriptor instance    
       integer, intent(in) :: kind,version               !Kind,version to create
       integer, intent(in) :: nk                         !Number of levels
       integer, optional, intent(in) :: ip1,ip2          !IP1,2 values for FST file record [0,0]
@@ -437,6 +457,7 @@ contains
       character(len=4) :: cvcode
       logical :: missingInput
 
+      self%valid=.false.
       ! Set error status
       status = VGD_ERROR
 
@@ -550,7 +571,7 @@ contains
          endif
       endif
       if(is_valid(self,ip1_m_valid)) then
-         if(present(ip1_m))then
+         if(present(ip1_m))then            
             if (associated(self%ip1_m)) deallocate(self%ip1_m)
             allocate(self%ip1_m(size(ip1_m)),stat=error)
             if(error < 0)then
@@ -624,6 +645,7 @@ contains
          if(ip2 > -1)self%rec%ip2 = ip2
       endif
 
+      self%valid=.true.
       ! Set status and return
       status = VGD_OK
       return
@@ -635,7 +657,7 @@ contains
       use vdescript_2001,      only: vgrid_genab_2001
       use vdescript_5002,      only: vgrid_genab_5002
       ! Coordinate constructor - build vertical descriptor from hybrid coordinate entries
-      type(vgrid_descriptor), intent(out) :: self       !Vertical descriptor instance    
+      type(vgrid_descriptor),intent(inout) :: self      !Vertical descriptor instance    
       integer, intent(in) :: kind,version               !Kind,version to create
       real, dimension(:),intent(in) :: hyb              !List of hybrid levels
       real, optional, intent(in) :: rcoef1,rcoef2       !R-coefficient values for rectification
@@ -653,6 +675,7 @@ contains
 
       nullify(ip1_m,ip1_t,hybm,hybt,a_m_8,b_m_8,a_t_8,b_t_8)
 
+      self%valid=.false.
       ! Set error status
       status = VGD_ERROR
 
@@ -816,7 +839,16 @@ contains
          call msg(MSG_ERROR,VGD_PRFX//for_msg)
          return
       end select
-      
+      if(associated(ip1_m))deallocate(ip1_m)
+      if(associated(ip1_t))deallocate(ip1_t)
+      if(associated(hybm))deallocate(hybm)
+      if(associated(hybt))deallocate(hybt)
+      if(associated(a_m_8))deallocate(a_m_8)
+      if(associated(b_m_8))deallocate(b_m_8)
+      if(associated(a_t_8))deallocate(a_t_8)
+      if(associated(b_t_8))deallocate(b_t_8)
+
+      self%valid=.true.
       ! Set status and return
       status = VGD_OK
       return
@@ -827,11 +859,21 @@ contains
 
    integer function garbage_collection(self) result(status)
      ! Free all memory associated with with structure and uninitialize it
-     type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
-
+     type(vgrid_descriptor), intent(inout) :: self          !Vertical descriptor instance
+     status=VGD_ERROR
+     self%valid=.false.
+     if(associated(self%table))deallocate(self%table)
+     if(associated(self%a_m_8))then
+        deallocate(self%a_m_8)
+     endif
+     if(associated(self%b_m_8))deallocate(self%b_m_8)
+     if(associated(self%a_t_8))deallocate(self%a_t_8)
+     if(associated(self%b_t_8))deallocate(self%b_t_8)
+     if(associated(self%ip1_m))deallocate(self%ip1_m)
+     if(associated(self%ip1_t))deallocate(self%ip1_t)
+     self%initialized=.false.
      ! Set error status
-     status = VGD_ERROR
-
+     status = VGD_OK
    end function garbage_collection
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -898,6 +940,11 @@ contains
     status = VGD_ERROR
 
     level_msg=MSG_ERROR
+    if(.not.self%valid)then
+       write(for_msg,*) 'vgrid structure is not valid in get_int'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+       return
+    endif
     my_quiet=.false.
     if (present(quiet)) my_quiet = quiet
     if(my_quiet)level_msg=MSG_QUIET
@@ -967,13 +1014,14 @@ contains
     status = VGD_ERROR
 
     level_msg=MSG_ERROR
+    if(.not.self%valid)then
+       write(for_msg,*) 'vgrid structure is not valid in get_int_1d'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+       return
+    endif
     my_quiet=.false.
     if (present(quiet)) my_quiet = quiet
     if(my_quiet)level_msg=MSG_QUIET
-
-    ! Garbage collection
-    if (associated(value)) deallocate(value)
-    nullify(value)
 
     ! Map key name to derived-type element
     select case (up(key(1:KEY_LENGTH)))
@@ -989,7 +1037,7 @@ contains
        endif
     case ('VIPM')
        if (is_valid(self,ip1_m_valid)) then
-          istat = get_allocate(key,value,size(self%ip1_m))
+          istat = get_allocate(key,value,size(self%ip1_m),ALLOW_RESHAPE,'(VIPM in get_int_1d)')
           if (istat /= 0) return
           value = self%ip1_m
        else
@@ -999,11 +1047,11 @@ contains
     case ('VIPT')
        if (is_valid(self,ip1_t_valid_get)) then
           if (is_valid(self,ip1_t_valid)) then
-             istat = get_allocate(key,value,size(self%ip1_t))
+             istat = get_allocate(key,value,size(self%ip1_t),ALLOW_RESHAPE,'(VIPT in get_int_1d)')
              if (istat /= 0) return
              value = self%ip1_t
           else
-             istat = get_allocate(key,value,size(self%ip1_m))
+             istat = get_allocate(key,value,size(self%ip1_m),ALLOW_RESHAPE,'(VIPT in get_int_1d)')
              if (istat /= 0) return
              value = self%ip1_m
           endif
@@ -1038,6 +1086,11 @@ contains
     status = VGD_ERROR
 
     level_msg=MSG_ERROR
+    if(.not.self%valid)then
+       write(for_msg,*) 'vgrid structure is not valid in get_real'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+       return
+    endif
     my_quiet=.false.
     if (present(quiet)) my_quiet = quiet
     if(my_quiet)level_msg=MSG_QUIET
@@ -1086,19 +1139,20 @@ contains
     status = VGD_ERROR
 
     level_msg=MSG_ERROR
+    if(.not.self%valid)then
+       write(for_msg,*) 'vgrid structure is not valid in get_real_1d'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+       return
+    endif
     my_quiet=.false.
     if (present(quiet)) my_quiet = quiet
     if(my_quiet)level_msg=MSG_QUIET
 
-    ! Garbage collection
-    if (associated(value)) deallocate(value)
-    nullify(value)
-    
     ! Map key name to derived-type element
     select case (up(key(1:KEY_LENGTH)))
     case ('VCDM')
        if (is_valid(self,ip1_m_valid)) then
-          istat = get_allocate(key,value,size(self%ip1_m))
+          istat = get_allocate(key,value,size(self%ip1_m),ALLOW_RESHAPE,'(VCDM in get_real_1d)')
           if (istat /= 0) return
           call convip(k,value(1),self%kind,0,'',.false.)
           do k=1,size(value)
@@ -1119,7 +1173,7 @@ contains
              deallocate(vipt)
              return
           endif
-          istat = get_allocate(key,value,size(vipt))
+          istat = get_allocate(key,value,size(vipt),ALLOW_RESHAPE,'(VCDT in get_real_1d)')
           call convip(k,value(1),self%kind,0,'',.false.)
           do k=1,size(vipt)
              call convip(vipt(k),value(k),self%kind,-1,'',.false.)
@@ -1164,6 +1218,11 @@ contains
     status = VGD_ERROR
 
     level_msg=MSG_ERROR
+    if(.not.self%valid)then
+       write(for_msg,*) 'vgrid structure is not valid in get_real8'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+       return
+    endif
     my_quiet=.false.
     if (present(quiet)) my_quiet = quiet
     if(my_quiet)level_msg=MSG_QUIET
@@ -1225,19 +1284,20 @@ contains
     status = VGD_ERROR
 
     level_msg=MSG_ERROR
+    if(.not.self%valid)then
+       write(for_msg,*) 'vgrid structure is not valid in get_real8_1d'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+       return
+    endif
     my_quiet=.false.
     if (present(quiet)) my_quiet = quiet
     if(my_quiet)level_msg=MSG_QUIET
-
-    ! Garbage collection
-    if (associated(value)) deallocate(value)
-    nullify(value)
 
     ! Map key name to derived-type element
     select case (up(key(1:KEY_LENGTH)))
     case ('CA_M')
        if (is_valid(self,a_m_8_valid)) then
-          istat = get_allocate(key,value,size(self%a_m_8))
+          istat = get_allocate(key,value,size(self%a_m_8),ALLOW_RESHAPE,'(CA_M in get_real8_1d)')
           if (istat /= 0) return
           value = self%a_m_8
        else
@@ -1246,7 +1306,7 @@ contains
        endif
     case ('CB_M')
        if (is_valid(self,b_m_8_valid)) then
-          istat = get_allocate(key,value,size(self%b_m_8))
+          istat = get_allocate(key,value,size(self%b_m_8),ALLOW_RESHAPE,'(CB_M in get_real8_1d)')
           if (istat /= 0) return
           value = self%b_m_8
        else
@@ -1256,11 +1316,11 @@ contains
     case ('CA_T')
        if (is_valid(self,a_t_8_valid_get)) then
           if(is_valid(self,a_t_8_valid)) then
-             istat = get_allocate(key,value,size(self%a_t_8))
+             istat = get_allocate(key,value,size(self%a_t_8),ALLOW_RESHAPE,'(CA_T in get_real8_1d)')
              if (istat /= 0) return
              value = self%a_t_8
           else
-             istat = get_allocate(key,value,size(self%a_m_8))
+             istat = get_allocate(key,value,size(self%a_m_8),ALLOW_RESHAPE,'(CA_T (m) in get_real8_1d)')
              if (istat /= 0) return
              value = self%a_m_8
           endif
@@ -1271,11 +1331,11 @@ contains
     case ('CB_T')
        if (is_valid(self,b_t_8_valid_get)) then
           if (is_valid(self,b_t_8_valid)) then
-             istat = get_allocate(key,value,size(self%b_t_8))
+             istat = get_allocate(key,value,size(self%b_t_8),ALLOW_RESHAPE,'(CB_T in get_real8_1d)')
              if (istat /= 0) return
              value = self%b_t_8
           else
-             istat = get_allocate(key,value,size(self%b_m_8))
+             istat = get_allocate(key,value,size(self%b_m_8),ALLOW_RESHAPE,'(CB_T (m) in get_real8_1d)')
              if (istat /= 0) return
              value = self%b_m_8
           endif
@@ -1285,7 +1345,7 @@ contains
        endif
     case ('COFA')
        if (is_valid(self,a_m_8_valid)) then
-          istat = get_allocate(key,value,size(self%a_m_8))
+          istat = get_allocate(key,value,size(self%a_m_8),ALLOW_RESHAPE,'(COFA in get_real8_1d)')
           if (istat /= 0) return
           value = self%a_m_8
        else
@@ -1294,7 +1354,7 @@ contains
        endif
     case ('COFB')
        if (is_valid(self,b_m_8_valid)) then
-          istat = get_allocate(key,value,size(self%b_m_8))
+          istat = get_allocate(key,value,size(self%b_m_8),ALLOW_RESHAPE,'(COFB in get_real8_1d)')
           if (istat /= 0) return
           value = self%b_m_8
        else
@@ -1328,18 +1388,19 @@ contains
     status = VGD_ERROR
 
     level_msg=MSG_ERROR
+    if(.not.self%valid)then
+       write(for_msg,*) 'vgrid structure is not valid in get_real8_3d'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+       return
+    endif
     my_quiet=.false.
     if (present(quiet)) my_quiet = quiet
     if(my_quiet)level_msg=MSG_QUIET
 
-    ! Garbage collection
-    if (associated(value)) deallocate(value)
-    nullify(value)
-
     ! Map key name to derived-type element
     select case (up(key(1:KEY_LENGTH)))
     case ('VTBL')
-       istat = get_allocate(key,value,shape(self%table))
+       istat = get_allocate(key,value,shape(self%table),ALLOW_RESHAPE,'(VTBL) in get_real8_3d)')
        if (istat /= 0) return
        value = self%table
     case DEFAULT
@@ -1369,6 +1430,11 @@ contains
     status = VGD_ERROR
 
     level_msg=MSG_ERROR
+    if(.not.self%valid)then
+       write(for_msg,*) 'vgrid structure is not valid in get_char'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+       return
+    endif
     my_quiet=.false.
     if (present(quiet)) my_quiet = quiet
     if(my_quiet)level_msg=MSG_QUIET
@@ -1397,7 +1463,37 @@ contains
     status = VGD_OK
     return
   end function get_char
+  
+  integer function getopt_logical(key,value,quiet) result(status)
+     character(len=*), intent(in) :: key           !Descriptor key to retrieve
+     logical, intent(out) :: value                    !Retrieved value
+     logical, intent(in), optional :: quiet        !Do not generate messages
 
+     ! Local variables
+     integer :: error,level_msg
+     logical :: my_quiet
+     
+    ! Set error status
+     status=VGD_ERROR
+
+     level_msg=MSG_ERROR
+     my_quiet=.false.
+     if (present(quiet)) my_quiet = quiet
+     if(my_quiet)level_msg=MSG_QUIET
+     
+     select case(trim(key))
+     case ('ALLOW_RESHAPE')
+        value=ALLOW_RESHAPE
+     case DEFAULT
+        write(for_msg,*) 'invalid key in call to getopt_logical: ',trim(key)
+        call msg(level_msg,VGD_PRFX//for_msg)
+        return
+     end select
+     ! Set status and return
+     status = VGD_OK
+     return
+  end function getopt_logical
+     
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Put methods
 
@@ -1413,7 +1509,13 @@ contains
 
     ! Set error status
     status = VGD_ERROR
-
+    
+    if(.not.self%valid)then
+       write(for_msg,*) 'vgrid structure is not valid in put_int'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+       return
+    endif    
+    
     ! Map key name to derived-type element
     select case (up(key(1:KEY_LENGTH)))
     case ('DATE')
@@ -1455,6 +1557,12 @@ contains
     
     ! Set error status
     status = VGD_ERROR
+
+    if(.not.self%valid)then
+       write(for_msg,*) 'vgrid structure is not valid in put_int_1d'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+       return
+    endif    
 
     ! Check for valid value
     if (.not.associated(value)) then
@@ -1505,6 +1613,12 @@ contains
     ! Set error status
     status = VGD_ERROR
 
+    if(.not.self%valid)then
+       write(for_msg,*) 'vgrid structure is not valid in put_real_1d'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+       return
+    endif    
+
     ! Check for valid value
     if (.not.associated(value)) then
        write(for_msg,*) 'unallocated value sent to gd_put for '//trim(key)
@@ -1550,6 +1664,12 @@ contains
     ! Set error status
     status = VGD_ERROR
 
+    if(.not.self%valid)then
+       write(for_msg,*) 'vgrid structure is not valid in put_real8'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+       return
+    endif    
+
     ! Map key name to derived-type element
     error = VGD_OK
     select case (up(key(1:KEY_LENGTH)))
@@ -1591,6 +1711,12 @@ contains
     
     ! Set error status
     status = VGD_ERROR
+
+    if(.not.self%valid)then
+       write(for_msg,*) 'vgrid structure is not valid in put_real8_1d'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+       return
+    endif    
 
     ! Check for valid value
     if (.not.associated(value)) then
@@ -1672,6 +1798,12 @@ contains
     ! Set error status
     status = VGD_ERROR
 
+    if(.not.self%valid)then
+       write(for_msg,*) 'vgrid structure is not valid in put_real8_3d'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+       return
+    endif    
+
     ! Check for valid value
     if (.not.associated(value)) then
        write(for_msg,*) 'unallocated value sent to gd_put for'//trim(key)
@@ -1712,6 +1844,12 @@ contains
     ! Set error status
     status = VGD_ERROR
 
+    if(.not.self%valid)then
+       write(for_msg,*) 'vgrid structure is not valid in put_char'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+       return
+    endif    
+
     ! Map key name to derived-type element
     select case (up(key(1:KEY_LENGTH)))
     case ('ETIK')
@@ -1732,6 +1870,29 @@ contains
     return
   end function put_char
 
+  integer function putopt_logical(key,value) result(status)
+     character(len=*), intent(in) :: key           !Descriptor key to retrieve
+     logical, intent(in) :: value                    !Retrieved value
+
+     ! Local variables
+     
+    ! Set error status
+     status=VGD_ERROR
+
+     select case(trim(key))
+     case ('ALLOW_RESHAPE')
+        ALLOW_RESHAPE=value
+     case DEFAULT
+        write(for_msg,*) 'invalid key in call to putopt_logical: ',trim(key)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     end select
+     ! Set status and return
+     status = VGD_OK
+     return
+  end function putopt_logical
+
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Dump contents
 
@@ -1747,6 +1908,12 @@ contains
 
     ! Set error status
     status = VGD_ERROR
+
+    if(.not.self%valid)then
+       write(for_msg,*) 'vgrid structure is not valid in print_desc'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+       return
+    endif
 
     ! Set default values
     my_stdout = 6
@@ -1867,6 +2034,12 @@ contains
 
     ! Set error status
     status = VGD_ERROR
+
+    if(.not.self%valid)then
+       write(for_msg,*) 'vgrid structure is not valid in write_desc'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+       return
+    endif
 
     ! Set default values                                                                                  
     myformat='FST'                                                                                        
@@ -2006,6 +2179,12 @@ contains
     ! Set error status
     status = VGD_ERROR
 
+    if(.not.self%valid)then
+       write(for_msg,*) 'vgrid structure is not valid in levels_readref'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+       return
+    endif
+
     ! Set default values
     my_in_log = .false.
     if (present(in_log)) my_in_log=in_log
@@ -2112,6 +2291,7 @@ contains
   end function levels_readref
 
   integer function levels_withref_prof(self,ip1_list,levels,sfc_field,in_log) result(status)
+     use utils, only: get_allocate
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
      real, dimension(:), pointer :: levels                       !Physical level values
@@ -2121,13 +2301,19 @@ contains
      ! Local variables
      real*8 :: my_sfc_field_8
      real*8, dimension(:), pointer :: levels_8
-     integer :: error
+     integer :: error,stat
      logical :: my_in_log
 
      nullify(levels_8)
 
      ! Set return value
      status = VGD_ERROR
+
+     if(.not.self%valid)then
+        write(for_msg,*) 'vgrid structure is not valid in levels_withref_prof'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+        return
+     endif
 
      ! Set default values
      my_sfc_field_8 = VGD_MISSING
@@ -2136,17 +2322,16 @@ contains
      if (present(in_log)) my_in_log = in_log
 
      ! Wrap call to level calculation
-     status = diag_withref_prof_8(self,ip1_list,levels_8,sfc_field=my_sfc_field_8,in_log=my_in_log)
+     stat = diag_withref_prof_8(self,ip1_list,levels_8,sfc_field=my_sfc_field_8,in_log=my_in_log)
+     if(stat==VGD_ERROR)return
      ! Write results back to 32 bits
-     if (associated(levels))deallocate(levels)
-     allocate(levels(size(levels_8,dim=1)),stat=error)
+     error = get_allocate('levels',levels,size(levels_8),ALLOW_RESHAPE,'(in levels_withref_prof)')
      if (error /= 0) then
-        write(for_msg,*) 'cannot allocate space for levels in levels_withref_prof'
-        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      levels=levels_8
      deallocate(levels_8)
+     status=VGD_OK
      return
   end function levels_withref_prof
 
@@ -2164,6 +2349,12 @@ contains
      ! Set return value
      status = VGD_ERROR
 
+     if(.not.self%valid)then
+        write(for_msg,*) 'vgrid structure is not valid in levels_withref_prof_8'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+        return
+     endif
+
      ! Set default values
      my_sfc_field = VGD_MISSING
      if (present(sfc_field)) my_sfc_field = sfc_field
@@ -2176,6 +2367,7 @@ contains
   end function levels_withref_prof_8
 
   integer function dpidpis_withref_prof(self,ip1_list,dpidpis,sfc_field) result(status)
+     use utils, only: get_allocate,up,get_error
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
      real, dimension(:), pointer :: dpidpis                      !Derivative values
@@ -2184,32 +2376,36 @@ contains
      ! Local variables
      real*8 :: my_sfc_field_8
      real*8, dimension(:), pointer :: dpidpis_8
-     integer :: error
+     integer :: error,stat
 
      nullify(dpidpis_8)
 
      ! Set return value
      status = VGD_ERROR
 
+     if(.not.self%valid)then
+        write(for_msg,*) 'vgrid structure is not valid in dpidpis_withref_prof'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+        return
+     endif
+
      ! Set default values
      my_sfc_field_8 = VGD_MISSING
      if (present(sfc_field)) my_sfc_field_8 = sfc_field
      
      ! Wrap call to level calculation
-     status = diag_withref_prof_8(self,ip1_list,dpidpis_8,sfc_field=my_sfc_field_8,dpidpis=.true.)
-     if (associated(dpidpis))deallocate(dpidpis)
-     allocate(dpidpis(size(dpidpis_8,dim=1)),stat=error)
-     if (error /= 0) then
-        write(for_msg,*) 'cannot allocate space for dpidpis in dpidpis_withref_prof'
-        call msg(MSG_ERROR,VGD_PRFX//for_msg)
-        return
-     endif
+     stat = diag_withref_prof_8(self,ip1_list,dpidpis_8,sfc_field=my_sfc_field_8,dpidpis=.true.)
+     if(stat==VGD_ERROR)return
+     error = get_allocate('dpidpis',dpidpis,size(dpidpis_8),ALLOW_RESHAPE,'(in dpidpis_withref_prof)')
+     if (error /= 0) return
      dpidpis=dpidpis_8
      deallocate(dpidpis_8)
+     status=VGD_OK
      return
   end function dpidpis_withref_prof
 
   integer function diag_withref_prof_8(self,ip1_list,levels,sfc_field,in_log,dpidpis) result(status)
+     use utils, only: get_allocate
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
      real*8, dimension(:), pointer :: levels                       !Physical level values
@@ -2225,10 +2421,14 @@ contains
      real*8, dimension(:,:,:), pointer :: levels_3d
      logical :: my_in_log,my_dpidpis
 
-     !nullify(sfc_field_2d,levels_3d)
-
      ! Set error status
      status = VGD_ERROR
+
+     if(.not.self%valid)then
+        write(for_msg,*) 'vgrid structure is not valid in diag_withref_prof_8'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+        return
+     endif
 
      ! Set default values
      my_sfc_field = VGD_MISSING
@@ -2254,19 +2454,8 @@ contains
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
-     if (associated(levels)) then
-        if (size(levels) /= nk) then
-           write(for_msg,*) 'Levels array size error - will be reallocated'
-           call msg(MSG_WARNING,VGD_PRFX//for_msg)
-        endif
-        deallocate(levels)
-     endif
-     allocate(levels(nk),stat=error)
-     if (error /= 0) then
-        write(for_msg,*) 'cannot allocate space for levels in diag_withref_prof_8'
-        call msg(MSG_ERROR,VGD_PRFX//for_msg)
-        return
-     endif
+     error = get_allocate('levels',levels,nk,ALLOW_RESHAPE,'(in diag_withref_prof_8)')
+     if(error/=0)return
      levels=levels_3d(1,1,1:nk)
      deallocate(sfc_field_2d,levels_3d)
      ! Set status and return
@@ -2276,6 +2465,7 @@ contains
   end function diag_withref_prof_8
 
   integer function levels_withref(self,ip1_list,levels,sfc_field,in_log) result(status)
+     use utils, only: get_allocate
      ! Given referent, compute physical levelling information from the vertical description
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
@@ -2284,7 +2474,7 @@ contains
      logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]
 
      ! Local variables
-     integer :: error,ni,nj
+     integer :: error,ni,nj,stat
      real*8, dimension(:,:,:), pointer :: levels_8
      real*8, dimension(:,:), allocatable :: my_sfc_field
      logical :: my_in_log
@@ -2293,6 +2483,12 @@ contains
 
      ! Set return value
      status = VGD_ERROR
+
+     if(.not.self%valid)then
+        write(for_msg,*) 'vgrid structure is not valid in levels_withref'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+        return
+     endif
 
      ! Set default values
      if (present(sfc_field)) then
@@ -2315,17 +2511,16 @@ contains
      if (present(in_log)) my_in_log = in_log
 
      ! Wrap call to level calculator at 64 bits
-     status=diag_withref_8(self,ip1_list,levels_8,sfc_field=my_sfc_field,in_log=my_in_log)
+     stat=diag_withref_8(self,ip1_list,levels_8,sfc_field=my_sfc_field,in_log=my_in_log)
+     if(stat==VGD_ERROR)return
      ! Write results back to 32 bits
-     if (associated(levels))deallocate(levels)
-     allocate(levels(size(levels_8,dim=1),size(levels_8,dim=2),size(levels_8,dim=3)),stat=error)
+     error = get_allocate('levels',levels,shape(levels_8),ALLOW_RESHAPE,'(in levels_withref)')
      if (error /= 0) then
-        write(for_msg,*) 'cannot allocate space for levels in levels_withref'
-        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      levels=levels_8
      deallocate(my_sfc_field,levels_8)
+     status=VGD_OK
      return
   end function levels_withref
 
@@ -2344,6 +2539,12 @@ contains
 
      ! Set return value
      status = VGD_ERROR
+
+     if(.not.self%valid)then
+        write(for_msg,*) 'vgrid structure is not valid in levels_withref_8'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+        return
+     endif
 
      ! Set default values
      if (present(sfc_field)) then
@@ -2372,6 +2573,7 @@ contains
   end function levels_withref_8
 
   integer function dpidpis_withref(self,ip1_list,dpidpis,sfc_field) result(status)
+     use utils, only: get_allocate
      ! Given referent, compute physical levelling information from the vertical description
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
@@ -2379,7 +2581,7 @@ contains
      real, dimension(:,:), optional, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
 
      ! Local variables 
-     integer :: error,ni,nj
+     integer :: error,ni,nj,stat
      real*8, dimension(:,:), pointer :: my_sfc_field_8
      real*8, dimension(:,:,:), pointer :: dpidpis_8
 
@@ -2387,6 +2589,12 @@ contains
 
      ! Set return value
      status = VGD_ERROR
+
+     if(.not.self%valid)then
+        write(for_msg,*) 'vgrid structure is not valid in dpidpis_withref'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+        return
+     endif
 
      ! Set default values
      if (present(sfc_field)) then
@@ -2405,19 +2613,17 @@ contains
      else
         my_sfc_field_8 = VGD_MISSING
      endif
-
      ! Wrap call to level calculator
-     status=diag_withref_8(self,ip1_list,dpidpis_8,sfc_field=my_sfc_field_8,dpidpis=.true.)
+     stat=diag_withref_8(self,ip1_list,dpidpis_8,sfc_field=my_sfc_field_8,dpidpis=.true.)
+     if(stat==VGD_ERROR)return
      ! Write results back to 32 bits
-     if (associated(dpidpis))deallocate(dpidpis)
-     allocate(dpidpis(size(dpidpis_8,dim=1),size(dpidpis_8,dim=2),size(dpidpis_8,dim=3)),stat=error)
+     error = get_allocate('dpidpis',dpidpis,shape(dpidpis_8),ALLOW_RESHAPE,'(in dpidpis_withref)')
      if (error /= 0) then
-        write(for_msg,*) 'cannot allocate space for dpidpis in dpidpis_withref'
-        call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      dpidpis=dpidpis_8
      deallocate(my_sfc_field_8,dpidpis_8)
+     status=VGD_OK
      return
   end function dpidpis_withref
 
@@ -2437,6 +2643,12 @@ contains
 
     ! Set error status
     status = VGD_ERROR
+
+     if(.not.self%valid)then
+        write(for_msg,*) 'vgrid structure is not valid in diag_withref_8'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+        return
+     endif
 
     ! Set default values
     my_in_log = .false.
@@ -3241,6 +3453,13 @@ contains
      
      ! Set error status and check initialization
      status = VGD_ERROR
+
+     if(.not.self%valid)then
+        write(for_msg,*) 'vgrid structure is not valid in set_vcode_d'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+        return
+     endif
+
      if (.not.associated(self%table)) then
         write(for_msg,*) 'set_vcode called before constructor'
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
@@ -3268,6 +3487,12 @@ contains
 
      ! Set error status
      status = VGD_ERROR
+
+     if(.not.self%valid)then
+        write(for_msg,*) 'vgrid structure is not valid in set_vcode_i'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+        return
+     endif
 
      ! Check for valid entries (version is limited by the mangling equation)
      if (kind > MAX_VKIND .or. kind < 0 .or. version > 999 .or. version < 0) then
@@ -3714,11 +3939,9 @@ contains
  
  integer function vgd_legacy(self,F_lu,F_kind) result(status)
     ! Construct vertical structure from legacy encoding (PT,HY...)
-    
-    implicit none
     !      
     ! Arguments
-    type(vgrid_descriptor), intent(out) :: self !Vertical descriptor instance    
+    type(vgrid_descriptor), intent(inout) :: self !Vertical descriptor instance    
     integer, intent(in)    :: F_lu  ! fst lu containing records
     integer, optional, intent(in) :: F_kind ! ip1 kind set (all by default)
     
@@ -3863,10 +4086,8 @@ contains
     use vdescript_1004,      only: vgrid_genab_1004
     use vdescript_2001,      only: vgrid_genab_2001
     !
-    implicit none
-    !
     ! Arguments
-    type(vgrid_descriptor), intent(out) :: self !Vertical descriptor
+    type(vgrid_descriptor), intent(inout) :: self !Vertical descriptor
     integer, intent(in)    :: iun               ! unit containing records
     integer, dimension(:), intent(in):: ip1s    ! list of ips
     integer, dimension(:), intent(in):: fstkeys ! list of fstkeys (matching ip1s)
@@ -4093,9 +4314,6 @@ contains
  !*********************************************************************
  ! 
   integer function get_consistent_hy(F_iun,F_ptop,F_pref,F_rcoef) result(status)
-    
-    implicit none
-
     integer :: F_iun
     real :: F_ptop,F_pref,F_rcoef
 
@@ -4108,7 +4326,7 @@ contains
     external read_decode_hyb
     
     status=VGD_ERROR
-    
+
     ier=fstinl(F_iun,ni,nj,nk,-1,' ',-1,-1,-1,' ','HY',liste,infon,nmax)
     if (ier.lt.0) then
        write(for_msg,*) 'In get_consistent_hy, problem with fstinl on HY'
@@ -4176,8 +4394,6 @@ contains
  ! 
  integer function get_consistent_pt_e1(F_iun,F_val,F_nomvar) result(status)
     
-    implicit none
-
     integer :: F_iun
     real ::F_val
     character(len=*) :: F_nomvar
@@ -4190,7 +4406,7 @@ contains
     type(FSTD_ext) :: record
 
     status=VGD_ERROR
-    
+
     ier=fstinl(F_iun,ni,nj,nk,-1,' ',-1,-1,-1,' ',F_nomvar,liste,infon,nmax)
 
     if(infon.gt.1)then
@@ -4245,5 +4461,5 @@ contains
     status=VGD_OK
 999 deallocate(work)
  end function get_consistent_pt_e1
-
+ 
 end module vGrid_Descriptors

@@ -1,5 +1,5 @@
 program tests
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_levels
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_levels,vgd_putopt
   use Unit_Testing, only: ut_report
 
   implicit none
@@ -14,6 +14,8 @@ program tests
   real :: local_pres
   type(vgrid_descriptor) :: d
   logical :: ok
+
+  stat=vgd_putopt('ALLOW_RESHAPE',.true.)
 
   stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
   if(stat.lt.0)then
