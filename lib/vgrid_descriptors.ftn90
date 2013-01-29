@@ -3454,12 +3454,6 @@ contains
      ! Set error status and check initialization
      status = VGD_ERROR
 
-     if(.not.self%valid)then
-        write(for_msg,*) 'vgrid structure is not valid in set_vcode_d'
-        call msg(MSG_ERROR,VGD_PRFX//for_msg)       
-        return
-     endif
-
      if (.not.associated(self%table)) then
         write(for_msg,*) 'set_vcode called before constructor'
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
@@ -3487,12 +3481,6 @@ contains
 
      ! Set error status
      status = VGD_ERROR
-
-     if(.not.self%valid)then
-        write(for_msg,*) 'vgrid structure is not valid in set_vcode_i'
-        call msg(MSG_ERROR,VGD_PRFX//for_msg)       
-        return
-     endif
 
      ! Check for valid entries (version is limited by the mangling equation)
      if (kind > MAX_VKIND .or. kind < 0 .or. version > 999 .or. version < 0) then
