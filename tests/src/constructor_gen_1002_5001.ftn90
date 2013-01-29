@@ -1,6 +1,6 @@
 program constructor
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,VGD_ERROR
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_putopt,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
@@ -32,6 +32,8 @@ program constructor
   integer :: test_1002_5001
   logical, parameter :: write_control_L=.false.
   character (len=256) :: file
+
+  stat = vgd_putopt('ALLOW_RESHAPE',.true.)
 
   !
   ! Testing 1002

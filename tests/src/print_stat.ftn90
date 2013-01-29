@@ -6,9 +6,21 @@ program tests
 
   type(vgrid_descriptor) :: d
   integer :: stat
+  integer :: fnom,fstouv,lu=10
+
+  stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
+  if(stat.lt.0)then
+     print*,'ERROR with fnom'
+     call exit(1)
+  endif
+  stat=fstouv(lu,'RND')
+  if(stat.lt.0)then
+     print*,'No record in RPN file'
+     call exit(1)
+  endif
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = vgd_new(d,unit=10,format='fst',ip1=100,ip2=200)
+  stat = vgd_new(d,unit=10,format='fst')
 
   ! Print information about the instance
   stat = vgd_print(d)
