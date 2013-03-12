@@ -1,6 +1,6 @@
-convert_toctoc_5002=oui
+convert_toctoc_5002=non
 
-add_toctoc_and_compute_pressure=oui
+add_toctoc_and_compute_pressure=non
 
 print_toctoc=oui
 
@@ -88,6 +88,8 @@ if [ ${add_toctoc_and_compute_pressure} = oui ];then
       fi
       rm -f $TMPDIR/px
       ./compute_pressure -s data/${ITEM} -d $TMPDIR/px -var MOMENTUM
+      !fstcomp -ne -a $TMPDIR/px -b data/${ITEM} | grep PX
+      !xrec -imflds $TMPDIR/px  data/${ITEM}
       STATUS=$(fstcomp -ne -a $TMPDIR/px -b data/${ITEM} | grep PX | awk '{if($7 > 6.e-6)print "NOTOK"}')
       if [ "${STATUS}" = 'NOTOK' ];then
          echo "TEST compute_pressure with ${ITEM} FAILED"
