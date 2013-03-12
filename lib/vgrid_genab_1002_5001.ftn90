@@ -150,9 +150,11 @@ contains
          end do
          if(F_hybuser(1).eq.0)then
             ! Complete set
+            complet_L=.true.
             hybtop=F_hyb(1)
          else
             ! Incomplete set
+            complet_L=.false.
             hybtop=F_ptop_8/F_pref_8
             call convip(i,hybtop,1   , 1,dumc_S,.false.)
             call convip(i,hybtop,kind,-1,dumc_S,.false.)
