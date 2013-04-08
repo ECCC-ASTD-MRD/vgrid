@@ -2098,7 +2098,7 @@ contains
     real :: lev
     integer :: ip1,kind
     character(len=1) :: blk_S
-    integer :: error,ig1,ig2,ig3,ig4,i
+    integer :: error,ig1,ig2,ig3,i
     character(len=1) :: grtyp
     logical :: construct,multiple_grids,my_in_log
     type(vgrid_descriptor) :: gd
@@ -2124,7 +2124,6 @@ contains
           ig1 = var%ig1
           ig2 = var%ig2
           ig3 = var%ig3
-          ig4 = var%ig4
           grtyp = var%grtyp
           ip1 = var%ip1
        endif
@@ -2138,12 +2137,9 @@ contains
     call convip (ip1, lev, kind,-1, blk_S, .false.)
     ! Create grid descriptor instance and call level calculator
     if (any(MATCH_GRTYP == grtyp)) then
-       error = new_read(gd,unit=unit,format='fst',ip1=ig4,        kind=kind)
-       if(error==VGD_ERROR)then          
-          error = new_read(gd,unit=unit,format='fst',ip1=ig1,ip2=ig2,kind=kind)
-          if(error==VGD_ERROR)then
-             error = new_read(gd,unit=unit,format='fst',                kind=kind)
-          endif
+       error = new_read(gd,unit=unit,format='fst',ip1=ig1,ip2=ig2,kind=kind)
+       if(error==VGD_ERROR)then
+          error = new_read(gd,unit=unit,format='fst',                kind=kind)
        endif
     else
        error = new_read(gd,unit=unit,format='fst',ip1=-1,ip2=-1,kind=kind)
@@ -2223,18 +2219,13 @@ contains
        endif
     enddo check_times
     if (self%match_ipig) then
-       if (prmk%ig4 /= self%rec%ip1) then                    
-          if(  prmk%ig1 == self%rec%ip1 .and. &
-               prmk%ig2 == self%rec%ip2)then
-             write(for_msg,*) 'ig4 -> ip1 link not found but legacy (ig1,ig2) -> (ip1,ip2) link detected, using grid descriptor'
-             call msg(MSG_WARNING,VGD_PRFX//for_msg)  
-             ! Relaxing sefl ipig match
-             relax_ipig_match_L=.true.
-          else
-             write(for_msg,*) 'fstkeys do not correspond to the correct grid descriptor, got ig4 = ',prmk%ig4,' expected ip1 =',self%rec%ip1
-             call msg(MSG_ERROR,VGD_PRFX//for_msg)
-             return
-          endif
+       if (prmk%ig1 /= self%rec%ip1 .or. prmk%ig2 /= self%rec%ip2) then
+          write(for_msg,*) 'fstkeys do not correspond to the correct grid descriptor'
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          write(for_msg,'("   expecting (ip1,ip2)->(",i8,",",i8,"), got (ig1,ig2)->(",i8,",",i8,")")')&
+          prmk%ig1,prmk%ig2,self%rec%ip1,self%rec%ip2
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return
        endif
     endif
 
@@ -2254,10 +2245,13 @@ contains
           call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
-       if (self%match_ipig.and..not.relax_ipig_match_L) then
-          if (prm_p0%ig4 /= self%rec%ip1) then
-             write(for_msg,*) 'sfc_field ig4 does not correspond to the correct grid descriptor'
+       if (self%match_ipig) then
+          if (prm_p0%ig1 /= self%rec%ip1 .or. prm_p0%ig2 /= self%rec%ip2) then
+             write(for_msg,*) 'sfc_field ig1 ig2 do not correspond to the correct grid descriptor'
              call msg(MSG_ERROR,VGD_PRFX//for_msg)
+             write(for_msg,'("   expecting (ip1,ip2)->(",i8,",",i8,"), got (ig1,ig2)->(",i8,",",i8,")")')&
+                  self%rec%ip1,self%rec%ip2,prm_p0%ig1,prm_p0%ig2
+             call msg(MSG_ERROR,VGD_PRFX//for_msg)                            
              return
           endif
        endif
@@ -3558,7 +3552,7 @@ contains
     ! Initialize common elements of the fstd record
     type(vgrid_descriptor), intent(inout) :: self !Vertical descriptor instance
     ! Local variables
-    integer :: ig2,ig3,ig4,error,crc,cnt,f_crc32
+    integer :: ig2,ig3,ig4,error
     character(len=ETIK_LENGTH) :: etiket
     status = VGD_ERROR
     if (self%rec%initialized) then
@@ -3607,11 +3601,6 @@ contains
     self%rec%ig2=ig2
     self%rec%ig3=ig3
     self%rec%ig4=ig4
-    !
-    cnt=size(self%table,1)*size(self%table,2)*size(self%table,3)*8
-    crc=f_crc32(0.,self%table,cnt)
-    self%rec%ip1=ibits(crc,0,16)
-    !
     self%rec%initialized=.true.
     status = VGD_OK
   end function fstd_init
