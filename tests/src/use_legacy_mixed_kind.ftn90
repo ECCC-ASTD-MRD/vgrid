@@ -1,5 +1,8 @@
 program constructor
 
+   ! Object : try to construct the descriptor but there are many different vertical structures
+   !          in the link file, this should produce an error.
+
   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,VGD_ERROR
   use Unit_Testing, only: ut_report
 

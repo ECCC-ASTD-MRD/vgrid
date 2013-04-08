@@ -1,5 +1,8 @@
 program constructor
 
+  ! Objetc: The constructor vgd_new shoul produce an error since there 
+  ! are more than one !! matching
+
   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,VGD_ERROR,VGD_OK
   use Unit_Testing, only: ut_report
 
@@ -24,8 +27,6 @@ program constructor
      call abort
   endif
   
-  ! The following must produce an error since there are more than one !! matching
-  ! Construct a new set of 3D coordinate descriptors
   stat = vgd_new(d,unit=lu,format="fst",ip1=-1,ip2=-1)
 
   call ut_report(stat==VGD_ERROR,'Grid_Descriptors, vgd_new, vgd_get CA')
