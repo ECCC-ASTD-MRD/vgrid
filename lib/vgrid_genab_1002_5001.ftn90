@@ -136,9 +136,10 @@ contains
             F_ip1(k)=i
          end do
          if(complet_L)then
-            print*,'NOTE: Recomputing ptop in order to make it consistant with hyb top'
-            F_ptop_8=F_hyb(1)*F_pref_8
-            hybtop=F_hyb(1)
+            hybtop=F_ptop_8/F_pref_8
+!            print*,'NOTE: Recomputing ptop in order to make it consistant with hyb top'
+!            F_ptop_8=F_hyb(1)*F_pref_8
+!            hybtop=F_hyb(1)
          endif
       else if(F_vcode.eq.1002) then
          do k=1,nk
@@ -149,9 +150,11 @@ contains
          end do
          if(F_hybuser(1).eq.0)then
             ! Complete set
+            complet_L=.true.
             hybtop=F_hyb(1)
          else
             ! Incomplete set
+            complet_L=.false.
             hybtop=F_ptop_8/F_pref_8
             call convip(i,hybtop,1   , 1,dumc_S,.false.)
             call convip(i,hybtop,kind,-1,dumc_S,.false.)
@@ -170,7 +173,11 @@ contains
          F_a_8(k)=F_pref_8*(F_hyb(k)-F_b_8(k))
          !print*,F_a_8(k),F_b_8(k)
       enddo
-
+      if(complet_L)then
+         F_b_8(1)=0d0
+         F_a_8(1)=F_ptop_8
+      endif
+      !
       F_err = VGD_OK
       return
 
