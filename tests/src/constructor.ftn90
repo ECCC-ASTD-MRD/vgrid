@@ -1,5 +1,7 @@
 program constructor
 
+  ! Object: construct vgrid_descriptor
+
   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new
   use Unit_Testing, only: ut_report
 

@@ -44,19 +44,19 @@ program constructor
   integer, parameter :: nmax = 1000
   integer, dimension(nmax) :: liste
   integer :: lu=0,lu2=0,lutxt=69
-  integer :: stat,ip1,ip2,infon,i,ni,nj,nk,key
+  integer :: ier,stat,ip1,ip2,infon,i,ni,nj,nk,key
   integer :: fnom,fstouv,fstfrm,fstinl,fsteff,fstinf
   logical :: ok  
   real(kind=8), dimension(:,:,:), pointer :: table
   type(FSTD_ext) :: prm_orig,prm_rebuilt
 
-  stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
-  if(stat.lt.0)then
+  ier=fnom(lu,"data/dm_5002_from_model_run","RND",0)
+  if(ier.lt.0)then
      print*,'ERROR with fnom'
      call abort
   endif
-  stat=fstouv(lu,'RND')
-  if(stat.le.0)then
+  ier=fstouv(lu,'RND')
+  if(ier.le.0)then
      print*,'No record in RPN file'
      call abort
   endif
@@ -68,7 +68,7 @@ program constructor
   stat=0  
   stat = min(stat,vgd_new(vgrid,unit=lu,format="fst",ip1=ip1,ip2=ip2))
   stat = min(stat,vgd_get(vgrid,'VTBL',table))
-  stat = min(stat,vgd_new(vgrid_rebuilt,table))
+  stat = min(stat,vgd_new(vgrid_rebuilt,table))  
   if (vgrid_rebuilt == vgrid) then
      ! Ok do noting
   else
@@ -77,16 +77,16 @@ program constructor
   endif
 
   ! Write table in fst and check it fst parameters
-  stat=fnom(lu2,"data/WORK/trash","RND",0)
-  if(stat.lt.0)then
+  ier=fnom(lu2,"data/WORK/trash","RND",0)
+  if(ier.lt.0)then
      print*,'ERROR with fnom 2'
      call abort
   endif
-  stat=fstouv(lu2,'RND')
+  ier=fstouv(lu2,'RND')
   ! Remove all possible records
-  stat = fstinl(lu2,ni,nj,nk,-1,' ',-1,-1,-1,' ',' ',liste,infon,nmax)
+  ier = fstinl(lu2,ni,nj,nk,-1,' ',-1,-1,-1,' ',' ',liste,infon,nmax)
   do i=1,infon
-     stat = fsteff(liste(i))
+     ier = fsteff(liste(i))
   enddo
 
   if (vgd_write(vgrid_rebuilt,lu2,'fst') /= 0) then
@@ -96,16 +96,16 @@ program constructor
 
   ! Get parameters of original !!
   key = fstinf(lu ,ni,nj,nk,-1,' ',-1,-1,-1,' ','!!')
-  stat = my_fstprm(key,prm_orig)
-  if(stat.lt.0)then
+  ier = my_fstprm(key,prm_orig)
+  if(ier.lt.0)then
      print*,'ERROR with my_fstprm 1'
      call abort
   endif
   
   ! !! is alone in its file, read it
   key = fstinf(lu2,ni,nj,nk,-1,' ',-1,-1,-1,' ',' ')
-  stat = my_fstprm(key,prm_rebuilt)
-  if(stat.lt.0)then
+  ier = my_fstprm(key,prm_rebuilt)
+  if(ier.lt.0)then
      print*,'ERROR with my_fstprm 2'
      call abort
   endif
