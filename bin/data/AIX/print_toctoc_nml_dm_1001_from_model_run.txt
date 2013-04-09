@@ -1,7 +1,0 @@
-WARNING: cannot find !! with the following: ip1=        -1,ip2=        -1
-Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)
- Looking for kind= -1
-   Found        27 unique ip1 of kind  1 among the        111 records in file to construct the vertical descriptor
-  sigma coordinate found
-   Vertical descriptor successfully reconstructed
- Option -nml not implemented for kind=1 (sigma/eta) levels
