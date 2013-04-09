@@ -124,7 +124,7 @@ if [ ${print_toctoc} = oui ];then
 
          ./print_toctoc -fst data_tests/${ITEM} -no_box -kind ${kind} > to_erase.txt 2>&1
          FILE=data/$(uname -s)/print_toctoc_${ITEM}${lable}.txt
-         #cp  to_erase.txt ${FILE}
+         cp  to_erase.txt ${FILE}
          diff to_erase.txt ${FILE}
          if [ $? != 0 ];then
             echo "ERROR 1: ./print_toctoc on data/${ITEM} do not mach with ${FILE}"
@@ -138,7 +138,7 @@ if [ ${print_toctoc} = oui ];then
 
          ./print_toctoc -fst data_tests/${ITEM} -ip1m_only -kind ${kind} > to_erase.txt 2>&1
          FILE=data/$(uname -s)/print_toctoc_ip1m_only_${ITEM}${lable}.txt
-         #cp to_erase.txt ${FILE}
+         cp to_erase.txt ${FILE}
          diff -b to_erase.txt ${FILE}
          if [ $? != 0 ];then
             echo "ERROR 2: ./print_toctoc -ip1m_only on data_tests/${ITEM} do not mach with ${FILE}"
@@ -152,7 +152,7 @@ if [ ${print_toctoc} = oui ];then
 
          ./print_toctoc -fst data_tests/${ITEM} -ip1t_only -kind ${kind} > to_erase.txt 2>&1
          FILE=data/$(uname -s)/print_toctoc_ip1t_only_${ITEM}${lable}.txt
-         #cp to_erase.txt ${FILE}
+         cp to_erase.txt ${FILE}
          diff -b to_erase.txt ${FILE}
          if [ $? != 0 ];then
             echo "ERROR 3: ./print_toctoc -ip1t_only on data_tests/${ITEM} do not mach with ${FILE}"
@@ -166,7 +166,7 @@ if [ ${print_toctoc} = oui ];then
 
          ./print_toctoc -fst data_tests/${ITEM} -ip1m_only -out output_file.txt -kind ${kind} > to_erase.txt 2>&1
          FILE=data/$(uname -s)/print_toctoc_ip1m_only_out_${ITEM}${lable}.txt
-         #cp output_file.txt ${FILE}
+         cp output_file.txt ${FILE}
          diff output_file.txt ${FILE}
          if [ $? != 0 ];then
             echo "ERROR 4.2: ./print_toctoc on data_tests/${ITEM} do not mach with ${FILE}"
