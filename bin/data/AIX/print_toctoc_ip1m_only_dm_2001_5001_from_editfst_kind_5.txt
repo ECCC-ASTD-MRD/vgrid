@@ -4,6 +4,7 @@ WARNING: (vgd) Trying to construct vgrid descriptor from legacy encoding (PT,HY 
 (vgd)  Looking for kind= 5
 (vgd)    Found        80 unique ip1 of kind  5 among the         92 records in file to construct the vertical descriptor
 (vgd)   hybrid (un-normalized) coordinate found
+ NOTE: Recomputing ptop in order to make it consistant with hyb top
 (vgd)    Vertical descriptor successfully reconstructed
   97642568
   97738568

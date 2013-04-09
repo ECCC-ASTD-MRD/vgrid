@@ -21,7 +21,7 @@ WARNING: (vgd)    More than one HY, checking consistency ...
    Number of hybrid normalized levels           58 
    Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100
    Momentum levels ip1, A, B:
-         2000    1000.000000000000         0.000000000000000
+         2000    1000.000014901161         0.000000000000000
          2102    1753.698415122926        6.5126857953146100E-004
          2233    2645.329162478447        2.4421336129307747E-003
          2374    3538.033366203308        5.2070841193199158E-003
