@@ -638,7 +638,7 @@ contains
          call msg(MSG_ERROR,VGD_PRFX//for_msg)
          return
       endif
-      self%rec%ip2=0
+      self%rec%ip1=0
       if (present(ip1))then
          if(ip1 > -1)self%rec%ip1 = ip1
       endif
