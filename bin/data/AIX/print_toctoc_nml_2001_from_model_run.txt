@@ -1,0 +1,7 @@
+WARNING: cannot find !! with the following: ip1=        -1,ip2=        -1
+Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)
+ Looking for kind= -1
+   Found         7 unique ip1 of kind  2 among the          9 records in file to construct the vertical descriptor
+  pressure coordinate found
+   Vertical descriptor successfully reconstructed
+ Option -nml cannot be use with pressure levels
