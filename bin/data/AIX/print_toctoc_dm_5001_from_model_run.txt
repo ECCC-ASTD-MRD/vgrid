@@ -4,6 +4,7 @@ WARNING: (vgd) Trying to construct vgrid descriptor from legacy encoding (PT,HY 
 (vgd)  Looking for kind= -1
 (vgd)    Found        80 unique ip1 of kind  5 among the        324 records in file to construct the vertical descriptor
 (vgd)   hybrid (un-normalized) coordinate found
+ NOTE: Recomputing ptop in order to make it consistant with hyb top
 (vgd)    Vertical descriptor successfully reconstructed
  -- Vertical Grid Descriptor Information --
    ip1= 2009 
@@ -19,7 +20,7 @@ WARNING: (vgd) Trying to construct vgrid descriptor from legacy encoding (PT,HY 
    Number of hybrid levels 80 
    Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100
    Momentum levels ip1, A, B:
- 97642568 10.0000001490116119 0.000000000000000000E+00
+ 97642568 10.0000004749745131 0.000000000000000000E+00
  97738568 17.6501587679922523 0.373010180965138716E-06
  97899568 30.4157651862624334 0.180293352514127037E-05
  98152568 50.3681939153466374 0.539758002560120076E-05
