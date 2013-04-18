@@ -5,20 +5,20 @@ program print_toctoc
    implicit none
    !
    type(vgrid_descriptor) :: vgd
-   integer, parameter :: lu=10,ncle=6
+   integer, parameter :: lu=10,ncle=7
    integer :: stat,npos,i,noptions
    integer :: fnom,fstouv,fstfrm,exdb,exfin,kind,lu_out
    integer, dimension(:), pointer :: ip1s
-   character(len=12), parameter :: version='v_1.1.0'
+   character(len=12), parameter :: version='v_1.2.0'
    character(len=256), dimension(ncle) :: cle,val,def
-   logical :: ip1m_only_L, ip1t_only_L, box_L
+   logical :: ip1m_only_L, ip1t_only_L, box_L, convip_L
    !
    !==========================================================================
    !
    ! Get keys
-   cle=(/'fst.     ','ip1m_only','ip1t_only','kind     ','no_box   ','out.     '/)
-   val=(/'undef    ','no       ','no       ','undef    ','no       ','undef    '/)
-   def=(/'undef    ','yes      ','yes      ','undef    ','yes      ','undef    '/)
+   cle=(/'fst.     ','ip1m_only','ip1t_only','kind     ','no_box   ','out.     ','convip   '/)
+   val=(/'undef    ','no       ','no       ','undef    ','no       ','undef    ','no       '/)
+   def=(/'undef    ','yes      ','yes      ','undef    ','yes      ','undef    ','yes      '/)
    npos=-111
    call ccard(cle,def,val,ncle,npos) 
    !
@@ -31,7 +31,13 @@ program print_toctoc
    !
    if(trim(val(1)).eq.'undef')then
       stat=exdb('print_toctoc',version,'NON')
-      print*,'Usage : print_toctoc -fst rpn_file'
+      print*,'Usage   : print_toctoc -fst rpn_file'
+      print*,'Options : -ip1m_only get -> ip1 list on momentum levels only'
+      print*,'          -ip1T_only get -> ip1 list on thermo   levels only'
+      print*,'          -kind kind     -> print !! for level kind=kind only' 
+      print*,'          -no_box        -> do not print top and bottum boxes'
+      print*,'          -out file_out  -> print in file file_out (works only with options -ip1m_only or -ip1T_only)'
+      print*,'          -convip        -> also print real value (p) associated to ip1'
       call exit(1)
    endif
    !
@@ -60,6 +66,10 @@ program print_toctoc
    if(trim(val(6)).ne.'undef')then
       lu_out=10
       open(unit=lu_out,file=trim(val(6)),status='unknown')
+   endif
+   convip_L=.false.
+   if(trim(val(7)).eq.'YES')then
+      convip_L=.true.
    endif
    !
    if(box_L)stat=exdb('print_toctoc',version,'NON')
@@ -101,7 +111,7 @@ program print_toctoc
          write(lu_out,'(i10)')ip1s(i)
       enddo
    else
-      stat = vgd_print(vgd)
+      stat = vgd_print(vgd,6,convip_L)
       if(stat.eq.VGD_ERROR)then
          print*,'ERROR with vgd_print'
          call exit(1)

@@ -981,6 +981,7 @@ contains
           return
        endif
        value=size(vip)
+       deallocate(vip)
     case ('NL_T')
        istat=vgd_get(self,key='VIPT - level ip1 list (m)',value=vip)
        if(istat /= VGD_OK)then
@@ -988,6 +989,7 @@ contains
           return
        endif
        value=size(vip)
+       deallocate(vip)
     case DEFAULT
        write(for_msg,*) 'invalid key '//trim(key)//' given to gd_get (int)'
        call msg(level_msg,VGD_PRFX//for_msg)
@@ -1898,15 +1900,20 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Dump contents
 
-  integer function print_desc(self,stdout) result(status)
+  integer function print_desc(self,stdout,convip_L) result(status)
     ! Dump plain text grid descriptor information to the requested file unit
     type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
     integer, intent(in), optional :: stdout     !Output unit to write to [6]
+    logical, intent(in), optional :: convip_L
 
     ! Internal variables
     integer :: my_stdout,stat,nk,k
     character(len=64) :: hr
     character(len=VGD_LEN_NAME) :: name
+    logical :: my_convip_L
+    real :: pres
+    character(len=1) :: null_S
+    character(len=10) :: kind_S
 
     ! Set error status
     status = VGD_ERROR
@@ -1916,6 +1923,9 @@ contains
        call msg(MSG_ERROR,VGD_PRFX//for_msg)       
        return
     endif
+
+    my_convip_L=.false.
+    if(present(convip_L))my_convip_L=convip_L
 
     ! Set default values
     my_stdout = 6
@@ -1990,24 +2000,48 @@ contains
                         '\n   Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref)'
           call msg(MSG_VERBATIM,trim(for_msg))
        end select
-       
-       if (is_valid(self,ip1_m_valid))then
-          nk=size(self%ip1_m)
-          write(for_msg,*)'  Momentum levels ip1, A, B:'
-          call msg(MSG_VERBATIM,trim(for_msg))
-          do k=1,nk
-             write(for_msg,*)self%ip1_m(k),self%a_m_8(k),self%b_m_8(k)
+              
+       if(my_convip_L)then
+          if (is_valid(self,ip1_m_valid))then
+             nk=size(self%ip1_m)
+             write(for_msg,*)'  Momentum levels ip1, p, A, B:'
              call msg(MSG_VERBATIM,trim(for_msg))
-          enddo
-       endif
-       if (is_valid(self,ip1_t_valid))then
-          nk=size(self%ip1_t)
-          write(for_msg,*)'  Thermodynamic levels ip1, A, B:'
-          call msg(MSG_VERBATIM,trim(for_msg))
-          do k=1,nk
-             write(for_msg,*)self%ip1_t(k),self%a_t_8(k),self%b_t_8(k)
+             null_S=''
+             do k=1,nk                
+                call convip(self%ip1_m(k),pres,self%kind,-1,null_S,.false.)
+                write(for_msg,*)self%ip1_m(k),pres,self%a_m_8(k),self%b_m_8(k)
+                call msg(MSG_VERBATIM,trim(for_msg))
+             enddo
+          endif
+          if (is_valid(self,ip1_t_valid))then
+             nk=size(self%ip1_t)
+             write(for_msg,*)'  Thermodynamic levels ip1, p, A, B:'
              call msg(MSG_VERBATIM,trim(for_msg))
-          enddo
+             do k=1,nk
+                call convip(self%ip1_t(k),pres,self%kind,-1,null_S,.false.)
+                write(for_msg,*)self%ip1_t(k),pres,self%a_t_8(k),self%b_t_8(k)
+                call msg(MSG_VERBATIM,trim(for_msg))
+             enddo
+          endif
+       else
+          if (is_valid(self,ip1_m_valid))then
+             nk=size(self%ip1_m)
+             write(for_msg,*)'  Momentum levels ip1, A, B:'
+             call msg(MSG_VERBATIM,trim(for_msg))
+             do k=1,nk
+                write(for_msg,*)self%ip1_m(k),self%a_m_8(k),self%b_m_8(k)
+                call msg(MSG_VERBATIM,trim(for_msg))
+             enddo
+          endif
+          if (is_valid(self,ip1_t_valid))then
+             nk=size(self%ip1_t)
+             write(for_msg,*)'  Thermodynamic levels ip1, A, B:'
+             call msg(MSG_VERBATIM,trim(for_msg))
+             do k=1,nk
+                write(for_msg,*)self%ip1_t(k),self%a_t_8(k),self%b_t_8(k)
+                call msg(MSG_VERBATIM,trim(for_msg))
+             enddo
+          endif
        endif
     else
        write(for_msg,*) '* No Vertical Grid Descriptor Information Found'
