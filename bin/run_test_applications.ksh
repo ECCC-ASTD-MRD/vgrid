@@ -136,6 +136,20 @@ if [ ${print_toctoc} = oui ];then
 	    fi
          fi
 
+         ./print_toctoc -fst data_tests/${ITEM} -no_box -kind ${kind} -convip > to_erase.txt 2>&1
+         FILE=data/$(uname -s)/print_toctoc_convip_${ITEM}${lable}.txt
+         #cp  to_erase.txt ${FILE}
+         diff to_erase.txt ${FILE}
+         if [ $? != 0 ];then
+            echo "ERROR 1: ./print_toctoc on data/${ITEM} do not mach with ${FILE}"
+	    echo "faire : xxdiff  to_erase.txt ${FILE}"
+	    if [ ${DEBUG} = oui ];then
+		xxdiff  to_erase.txt ${FILE}
+	    else
+		exit
+	    fi
+         fi
+
          ./print_toctoc -fst data_tests/${ITEM} -ip1m_only -kind ${kind} > to_erase.txt 2>&1
          FILE=data/$(uname -s)/print_toctoc_ip1m_only_${ITEM}${lable}.txt
          #cp to_erase.txt ${FILE}
