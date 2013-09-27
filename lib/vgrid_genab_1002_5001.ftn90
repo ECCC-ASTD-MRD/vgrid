@@ -50,7 +50,6 @@ contains
       real*8 :: F_ptop_8                                    ! user specification for lid pressures
       real*8, intent(in) :: F_pref_8                        ! user specification for lid and reference pressures
       real, dimension(:), pointer :: F_hyb                  ! model hyb values (cannot be normalides)
-      real, dimension(:), pointer :: F_hyb_fst              ! standard file hyb values (can be normalised)
       real*8, dimension(:), pointer :: F_a_8, F_b_8         ! model As and Bs
       integer, dimension(:), pointer :: F_ip1               ! ip1 values
       
@@ -73,8 +72,6 @@ contains
       
       ! Check and allocate as required
       status = reallocate(F_hyb,1,nk)
-      if (status /= VGD_OK) return
-      status = reallocate(F_hyb_fst,1,nk)
       if (status /= VGD_OK) return
       status = reallocate(F_a_8,1,nk)
       if (status /= VGD_OK) return

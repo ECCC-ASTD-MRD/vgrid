@@ -120,7 +120,7 @@ contains
               deallocate(value)
               alloc_lev_L=.true.
            else
-              write(for_msg,*) '1D pointer already allocated with a different lenght, will not reallocate '//trim(msg_S)
+              write(for_msg,*) '1D pointer already allocated with a different length, will not reallocate '//trim(msg_S)
               call msg(MSG_ERROR,VGD_PRFX//for_msg)
               return
            endif
@@ -158,7 +158,7 @@ contains
              deallocate(value)
              alloc_lev_L=.true.
           else
-             write(for_msg,*) '1D pointer already allocated with a different lenght, will not reallocate '//trim(msg_S)
+             write(for_msg,*) '1D pointer already allocated with a different length, will not reallocate '//trim(msg_S)
              call msg(MSG_ERROR,VGD_PRFX//for_msg)
              return
           endif
@@ -196,7 +196,7 @@ contains
              deallocate(value)
              alloc_lev_L=.true.
           else
-             write(for_msg,*) '1D pointer already allocated with a different lenght, will not reallocate '//trim(msg_S)
+             write(for_msg,*) '1D pointer already allocated with a different length, will not reallocate '//trim(msg_S)
              call msg(MSG_ERROR,VGD_PRFX//for_msg)
              return
           endif
@@ -241,7 +241,7 @@ contains
              deallocate(value)
              alloc_lev_L=.true.
           else
-             write(for_msg,*) '3D pointer already allocated with a different lenght, will not reallocate '//trim(msg_S)
+             write(for_msg,*) '3D pointer already allocated with a different length, will not reallocate '//trim(msg_S)
              call msg(MSG_ERROR,VGD_PRFX//for_msg)
              return
           endif
@@ -286,7 +286,7 @@ contains
              deallocate(value)
              alloc_lev_L=.true.
           else
-             write(for_msg,*) '3D pointer already allocated with a different lenght, will not reallocate '//trim(msg_S)
+             write(for_msg,*) '3D pointer already allocated with a different length, will not reallocate '//trim(msg_S)
              call msg(MSG_ERROR,VGD_PRFX//for_msg)
              return
           endif

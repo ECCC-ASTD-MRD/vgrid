@@ -35,5 +35,5 @@ ERROR: (vgd)  invalid key UNDEFINED KEY given to gd_get (logical)
 ERROR: (vgd)  invalid key UNDEFINED KEY given to gd_get (logical)
  Error with get_logical detected and message printed above
  Error with get_logical detected but message not printed above
-Read(999) !!   X  STG_CP_GEMV4     3    60     1  000000000       41148      0     0        0        0  E64  X  5002  6500   100   100
-Read(999) !!   X  STG_CP_GEMV4     3    60     1  000000000       41148      0     0        0        0  E64  X  5002  6500   100   100
+Read(999) !!   X  STG_CP_GEMV4     3    60     1  000000000       41148       0     0        0        0  E 64  X  5002  6500   100   100
+Read(999) !!   X  STG_CP_GEMV4     3    60     1  000000000       41148       0     0        0        0  E 64  X  5002  6500   100   100
