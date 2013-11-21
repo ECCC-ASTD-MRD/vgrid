@@ -183,10 +183,19 @@ integer function test_1002_5001(F_d,F_file,F_write_control_L) result(istat)
   print*,'Reading A'
   read(10,*)work_8
   do k=1,nk
-     if(abs(work_8(k)-a_m_8(k))/a_m_8(k)>10.*epsilon(a_m_8(k)))then
-        istat=VGD_ERROR
-        print*,'Probleme avec A, pas dans les limites tollerees'
-        print*,work_8(k),'vs',a_m_8(k)
+     
+     if(a_m_8(k).eq.0.)then
+        if(abs(work_8(k)-a_m_8(k))>10.*epsilon(a_m_8(k)))then
+           istat=VGD_ERROR
+           print*,'Probleme avec A, pas dans les limites tollerees'
+           print*,work_8(k),'vs',a_m_8(k)
+        endif
+     else
+        if(abs(work_8(k)-a_m_8(k))/a_m_8(k)>10.*epsilon(a_m_8(k)))then
+           istat=VGD_ERROR
+           print*,'Probleme avec A, pas dans les limites tollerees'
+           print*,work_8(k),'vs',a_m_8(k)
+        endif
      endif
   enddo
   if(any(a_m_8.ne.a_t_8))then
@@ -200,10 +209,18 @@ integer function test_1002_5001(F_d,F_file,F_write_control_L) result(istat)
   print*,'Reading B'
   read(10,*)work_8
   do k=1,nk
-     if(abs(work_8(k)-b_m_8(k))/b_m_8(k)>10.*epsilon(1.))then
-        istat=VGD_ERROR
-        print*,'Probleme avec B, pas dans les limites tollerees'
-        print*,work_8(k),'vs',b_m_8(k)
+     if(b_m_8(k).eq.0.)then
+         if(abs(work_8(k)-b_m_8(k))>10.*epsilon(1.))then
+           istat=VGD_ERROR
+           print*,'Probleme avec B, pas dans les limites tollerees'
+           print*,work_8(k),'vs',b_m_8(k)
+        endif
+     else
+        if(abs(work_8(k)-b_m_8(k))/b_m_8(k)>10.*epsilon(1.))then
+           istat=VGD_ERROR
+           print*,'Probleme avec B, pas dans les limites tollerees'
+           print*,work_8(k),'vs',b_m_8(k)
+        endif
      endif
   enddo
   if(any(b_m_8.ne.b_t_8))then
@@ -236,10 +253,18 @@ integer function test_1002_5001(F_d,F_file,F_write_control_L) result(istat)
   print*,'Reading VCDM'
   read(10,*)work
   do k=1,nk
-     if(abs(work(k)-vcdm(k))/vcdm(k)>10.*epsilon(vcdm(k)))then
-        istat=VGD_ERROR
-        print*,'Probleme avec vcdm, pas dans les limites tollerees'
-        print*,work(k),'vs',vcdm(k)
+     if(vcdm(k).eq.0.)then
+        if(abs(work(k)-vcdm(k))>10.*epsilon(vcdm(k)))then
+           istat=VGD_ERROR
+           print*,'Probleme avec vcdm, pas dans les limites tollerees'
+           print*,work(k),'vs',vcdm(k)
+        endif
+     else
+        if(abs(work(k)-vcdm(k))/vcdm(k)>10.*epsilon(vcdm(k)))then
+           istat=VGD_ERROR
+           print*,'Probleme avec vcdm, pas dans les limites tollerees'
+           print*,work(k),'vs',vcdm(k)
+        endif
      endif
   enddo  
   if(any(vcdm.ne.vcdt))then

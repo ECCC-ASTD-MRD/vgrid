@@ -44,16 +44,16 @@ contains
    !    |                                                          |
    !    |                A = Z                                     |
    !    |                                                          |
-   !    |                B = (Z - Ztop)/(Zsrf-Ztop)**R             |
+   !    |                Lambda = (Z - Zu)/(Zsrf-Zu)               |
    !    |                                                          |
-   !    |                Z = A(Z) + B(Z) * Zsrf                    |
+   !    |                R = Rmax-(Rmax-Rmin)*Lambda               |
    !    |                                                          |
-   !    |                R = Rmax-(Rmax-Rmin)*(Z-Ztop)/(Zsrf-Ztop) |
+   !    |                B = Lambda**R                             |
    !    |                                                          |
    !     ----------------------------------------------------------
    
    subroutine vgrid_genab_5002 (F_hybuser,F_rcoef,F_ptop_8,F_pref_8, &
-        F_hybm,F_hybt,F_am_8,F_bm_8,F_at_8,F_bt_8,F_ip1_m,F_ip1_t,F_err,lastTatU_L)
+        F_am_8,F_bm_8,F_at_8,F_bt_8,F_ip1_m,F_ip1_t,F_err,lastTatU_L,notop_L)
 
     ! Modifs 
     ! Andre Plante June 2012 : force real*8 in compuation of log(F_hybuser(k)*1.d0) in
@@ -64,26 +64,34 @@ contains
     integer, intent(out) :: F_err
     real, dimension(:), intent(in) :: F_hybuser           ! user specification for vertical layering hyb
     real, dimension(:), intent(in) :: F_rcoef             ! user specification for rcoef
-    real*8 , intent(in) :: F_ptop_8, F_pref_8             ! user specification for lid and reference pressures
+    real*8 :: F_ptop_8                                    ! user specification for top pressure
+    real*8 , intent(in) :: F_pref_8                       ! user specification for reference pressure
 
-    real, dimension(:), pointer :: F_hybm, F_hybt         ! model hyb values
     real*8, dimension(:), pointer :: F_am_8, F_bm_8       ! model As and Bs on momentum levels
     real*8, dimension(:), pointer :: F_at_8, F_bt_8       ! model As and Bs on thermodynamic levels
     integer, dimension(:), pointer :: F_ip1_m,F_ip1_t     ! ip1 values for momentum and thermodynamic levels
     logical, optional :: lastTatU_L                       ! Put last thermodynamic level at last momentum level
+    logical, optional :: notop_L                          ! Do put the top thermodynamic level in output vector
 
     ! Local variables
-    integer :: k, status, nk
+    integer :: k, status, nk, k_plus
     logical :: wronghyb
     real    :: rcoef
-    real*8  :: pr1, ztop_8, zsrf_8, eta_8, zeta_8
-    logical :: my_lastTatU_L
+    real*8  :: pr1, ztop_8, zsrf_8, lamba_8,zeta_8, zetau_8,zeta2_8
+    logical :: my_lastTatU_L, my_notop_L
+    real, dimension(:), pointer :: hybm, hybt             ! model hyb values
+    real*8, dimension(:), pointer :: at_8, bt_8
+    integer, dimension(:), pointer :: ip1_t
     !     __________________________________________________________________
 
     F_err = VGD_ERROR
 
     my_lastTatU_L=.false.
     if(present(lastTatU_L))my_lastTatU_L=lastTatU_L
+    my_notop_L=.false.
+    if(present(notop_L))my_notop_L=notop_L
+    k_plus=1
+    if(my_notop_L)k_plus=0
 
     ! Set size of the problem and check for full inputs
     nk = size(F_hybuser)
@@ -94,21 +102,29 @@ contains
     endif
 
     ! Check and allocate as required
-    status = reallocate(F_hybm,0,nk+1)
-    if (status /= VGD_OK) return
-    status = reallocate(F_hybt,0,nk+2)
-    if (status /= VGD_OK) return
     status = reallocate(F_am_8,1,nk+1)
     if (status /= VGD_OK) return
     status = reallocate(F_bm_8,1,nk+1)
     if (status /= VGD_OK) return
-    status = reallocate(F_at_8,1,nk+2)
+    status = reallocate(F_at_8,1,nk+1+k_plus)
     if (status /= VGD_OK) return
-    status = reallocate(F_bt_8,1,nk+2)
+    status = reallocate(F_bt_8,1,nk+1+k_plus)
     if (status /= VGD_OK) return
     status = reallocate(F_ip1_m,1,nk+1)
     if (status /= VGD_OK) return
-    status = reallocate(F_ip1_t,1,nk+2)
+    status = reallocate(F_ip1_t,1,nk+1+k_plus)
+    if (status /= VGD_OK) return
+
+    ! Allocate working thermo arrays
+    status = reallocate(hybm,0,nk+1)
+    if (status /= VGD_OK) return
+    status = reallocate(hybt,0,nk+2)
+    if (status /= VGD_OK) return
+    status = reallocate(at_8,1,nk+2)
+    if (status /= VGD_OK) return
+    status = reallocate(bt_8,1,nk+2)
+    if (status /= VGD_OK) return
+    status = reallocate(ip1_t,1,nk+2)
     if (status /= VGD_OK) return
 
     if (  Nk.lt.1 )  then
@@ -117,21 +133,36 @@ contains
        return
     endif
     
-    if (F_ptop_8.le.0.d0) then
+    zsrf_8  = log(F_pref_8)
+    if ( nint(F_ptop_8).eq.-2.or.&
+         nint(F_ptop_8).eq.-1) then
+       ! Auto compute ptop and make B(1) = 0
+       zetau_8 = zsrf_8+log(F_hybuser(1)*1.d0)
+       zeta2_8 = zsrf_8+log(F_hybuser(2)*1.d0)
+       ztop_8=0.5d0*(3.d0*zetau_8-zeta2_8)
+       F_ptop_8=exp(ztop_8)
+       if(nint(F_ptop_8).eq.-1) then
+          ! Compute B(1) from ztop
+          zetau_8 = ztop_8
+       endif
+    else if (F_ptop_8.le.0.d0)then
        write(for_msg,9400)
        call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
+    else
+       ! Compute B(1) from user's ztop
+       ztop_8  = log(F_ptop_8)
+       zetau_8 = ztop_8
     endif
     !     
     !     Checking vertical layering
     !
-    F_hybm(0) = F_ptop_8 / F_pref_8
-    F_hybt(0) = F_hybm(0)
+    hybm(0) = F_ptop_8 / F_pref_8
     !
     !     Check range
     !
-    if (F_hybuser(NK).ge.1..or.F_hybuser(1).le.F_hybm(0))then
-       write(for_msg,9550) F_hybm(0)
+    if (F_hybuser(NK).ge.1..or.F_hybuser(1).le.hybm(0))then
+       write(for_msg,9550) hybm(0)
        call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
@@ -155,33 +186,14 @@ contains
        return            
     endif
     !
-    ztop_8  = log(F_ptop_8)
-    zsrf_8  = log(F_pref_8)
-    !
-    !     ------------------------------------------------------------
-    !    |                                                            |
-    !    |   Set A and B for momentum and thermodynamic levels        |
-    !    |                                                            |
-    !    |   according to the formulae:                               |
-    !    |                                                            |
-    !    |                Z = Zsrf + log(hyb)                         |
-    !    |                                                            |
-    !    |                B = (Z - Ztop)/(Zsrf-Ztop)**R               |
-    !    |                                                            |
-    !    |                A = Z                                       |
-    !    |                                                            |
-    !    |                R = Rmax-(Rmax-Rmin)*(Z - Ztop)/(Zsrf-Ztop) |
-    !    |                                                            |
-    !     ------------------------------------------------------------
-    !
     !     Momentum levels
     !
-    pr1 = 1.0d0/(zsrf_8 - ztop_8)
+    pr1 = 1.0d0/(zsrf_8 - zetau_8)
     do k = 1, Nk
        zeta_8  = zsrf_8+log(F_hybuser(k)*1.d0)
-       eta_8  = (zeta_8- ztop_8)*pr1
-       rcoef   = F_rcoef(2)-(F_rcoef(2)-F_rcoef(1))*eta_8
-       F_bm_8(k) = eta_8 ** rcoef
+       lamba_8  = (zeta_8- zetau_8)*pr1
+       rcoef   = F_rcoef(2)-(F_rcoef(2)-F_rcoef(1))*lamba_8
+       F_bm_8(k) = lamba_8 ** rcoef
        F_am_8(k) = zeta_8
     enddo
     
@@ -193,44 +205,56 @@ contains
     !     Thermodynamic levels
     
     do k = 2, Nk
-       F_bt_8(k)    = 0.5d0*(F_bm_8(k)   +F_bm_8(k-1)) 
-       F_at_8(k)    = 0.5d0*(F_am_8(k)   +F_am_8(k-1)) 
+       bt_8(k)    = 0.5d0*(F_bm_8(k)   +F_bm_8(k-1)) 
+       at_8(k)    = 0.5d0*(F_am_8(k)   +F_am_8(k-1)) 
     enddo
     
     !     Special thermo levels for vert int.
-    F_bt_8(1)     = 0.5d0*(F_bm_8(1) + 0.d0)
-    F_bt_8(Nk+1)  = 0.5d0*(F_bm_8(Nk) + 1.d0)
-    F_bt_8(Nk+2)  = 1.d0
-    F_at_8(1)     = 0.5d0*(F_am_8( 1) + ztop_8)
-    F_at_8(Nk+1)  = 0.5d0*(F_am_8(Nk) + zsrf_8)
-    F_at_8(Nk+2)  = zsrf_8
+    bt_8(1)     = 0.5d0*(F_bm_8(1) + 0.d0)
+    bt_8(Nk+1)  = 0.5d0*(F_bm_8(Nk) + 1.d0)
+    bt_8(Nk+2)  = 1.d0
+    at_8(1)     = 0.5d0*(F_am_8( 1) + ztop_8)
+    at_8(Nk+1)  = 0.5d0*(F_am_8(Nk) + zsrf_8)
+    at_8(Nk+2)  = zsrf_8
     
-    F_hybm(1:NK) = F_hybuser(1:NK)
+    hybm(1:NK) = F_hybuser(1:NK)
     
-    F_hybt(1) = sqrt(F_hybm(0)*F_hybm(1))
+    hybt(1) = sqrt(hybm(0)*hybm(1))
     do k = 2, NK
-       F_hybt(k) = sqrt(F_hybm(k)*F_hybm(k-1))
+       hybt(k) = sqrt(hybm(k)*hybm(k-1))
     enddo
-    F_hybt(NK+1) = sqrt(F_hybm(NK))
+    hybt(NK+1) = sqrt(hybm(NK))
     
-    F_hybt(NK+2) = 1.0
-    F_hybm(NK+1) = 1.0
+    hybt(NK+2) = 1.0
+    hybm(NK+1) = 1.0
     
     if(my_lastTatU_L)then
-       F_at_8(Nk+1) =  F_am_8(Nk)
-       F_bt_8(Nk+1) =  F_bm_8(Nk)
-       F_hybt(Nk+1) =  F_hybm(Nk)
+       at_8(Nk+1) =  F_am_8(Nk)
+       bt_8(Nk+1) =  F_bm_8(Nk)
+       hybt(Nk+1)   =  hybm(Nk)
     endif    
 
     F_err = VGD_OK
  
     ! Compute ip1 values
     do k=1,nk+1
-       call convip(F_ip1_m(k),F_hybm(k),5,2,'',.false.)
-       call convip(F_ip1_t(k),F_hybt(k),5,2,'',.false.)
+       call convip(F_ip1_m(k),hybm(k),5,2,'',.false.)
+       call convip(ip1_t(k),hybt(k),5,2,'',.false.)
     enddo
-    call convip(F_ip1_t(nk+2),F_hybt(nk+2),5,2,'',.false.)
-    
+    call convip(ip1_t(nk+2),hybt(nk+2),5,2,'',.false.)
+
+    if(my_notop_L)then
+       F_at_8=at_8(2:nk+2)
+       F_bt_8=bt_8(2:nk+2)
+       F_ip1_t=ip1_t(2:nk+2)
+    else
+       F_at_8=at_8
+       F_bt_8=bt_8
+       F_ip1_t=ip1_t
+    endif
+
+    deallocate(hybm,hybt,at_8,bt_8,ip1_t)
+
 9100 format (/'Insufficient number of vertical levels in variable hyb'/)
 9250 format (/' ===> WRONG SPECIFICATION OF HYB VERTICAL LEVELS:'/ &
          '      LEVELS MUST BE MONOTONICALLY INCREASING'/     &

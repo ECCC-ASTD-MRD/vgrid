@@ -36,20 +36,20 @@ module vGrid_Descriptors
   logical :: ALLOW_RESHAPE=.false.              ! Allow reshape of class pointer members
 
   ! Validity table for self
-  integer, dimension(5), parameter :: ptop_8_valid=             (/1002,1003,5001,5002,5003/)
-  integer, dimension(4), parameter :: pref_8_valid=                  (/1003,5001,5002,5003/)
-  integer, dimension(4), parameter :: rcoef1_valid=                  (/1003,5001,5002,5003/)
-  integer, dimension(2), parameter :: rcoef2_valid=                            (/5002,5003/)
-  integer, dimension(7), parameter :: a_m_8_valid=    (/1001,1002,1003,2001,5001,5002,5003/)
-  integer, dimension(7), parameter :: b_m_8_valid=    (/1001,1002,1003,2001,5001,5002,5003/)
-  integer, dimension(2), parameter :: a_t_8_valid=                             (/5002,5003/)
-  integer, dimension(6), parameter :: a_t_8_valid_get=(/1001,1002,     2001,5001,5002,5003/)
-  integer, dimension(2), parameter :: b_t_8_valid=                             (/5002,5003/)
-  integer, dimension(6), parameter :: b_t_8_valid_get=(/1001,1002,     2001,5001,5002,5003/)
-  integer, dimension(7), parameter :: ip1_m_valid=    (/1001,1002,1003,2001,5001,5002,5003/)
-  integer, dimension(2), parameter :: ip1_t_valid=                             (/5002,5003/)
-  integer, dimension(6), parameter :: ip1_t_valid_get=(/1001,1002,     2001,5001,5002,5003/)
-  integer, dimension(6), parameter :: ref_name_valid= (/1001,1002,1003     ,5001,5002,5003/)
+  integer, dimension(6), parameter :: ptop_8_valid=             (/1002,1003,5001,5002,5003,5004/)
+  integer, dimension(5), parameter :: pref_8_valid=                  (/1003,5001,5002,5003,5004/)
+  integer, dimension(5), parameter :: rcoef1_valid=                  (/1003,5001,5002,5003,5004/)
+  integer, dimension(3), parameter :: rcoef2_valid=                            (/5002,5003,5004/)
+  integer, dimension(8), parameter :: a_m_8_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004/)
+  integer, dimension(8), parameter :: b_m_8_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004/)
+  integer, dimension(3), parameter :: a_t_8_valid=                             (/5002,5003,5004/)
+  integer, dimension(7), parameter :: a_t_8_valid_get=(/1001,1002,     2001,5001,5002,5003,5004/)
+  integer, dimension(3), parameter :: b_t_8_valid=                             (/5002,5003,5004/)
+  integer, dimension(7), parameter :: b_t_8_valid_get=(/1001,1002,     2001,5001,5002,5003,5004/)
+  integer, dimension(8), parameter :: ip1_m_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004/)
+  integer, dimension(3), parameter :: ip1_t_valid=                             (/5002,5003,5004/)
+  integer, dimension(7), parameter :: ip1_t_valid_get=(/1001,1002,     2001,5001,5002,5003,5004/)
+  integer, dimension(7), parameter :: ref_name_valid= (/1001,1002,1003     ,5001,5002,5003,5004/)
 
   ! FST file record structure
   type FSTD
@@ -409,7 +409,7 @@ contains
            call msg(MSG_ERROR,VGD_PRFX//for_msg)
            return
         endif
-     case (5002,5003)
+     case (5002,5003,5004)
         istat=decode_vert_5002(self)
         if(istat < 0)then
            write(for_msg,*) 'problem with decoding table with vcode 5002 or 5003'
@@ -418,7 +418,7 @@ contains
         endif
      case DEFAULT
         istat = get_version_info(self,kind,version)
-        write(for_msg,*) 'invalid kind or version:',kind,version
+        write(for_msg,*) 'invalid kind or version in new_from_table:',kind,version
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      end select
@@ -454,8 +454,8 @@ contains
 
       ! Local variables
       integer :: error,nn,ig1,ig2,ig3,ig4,k
-      character(len=4) :: cvcode
       logical :: missingInput
+      character(len=10) :: cvcode
 
       self%valid=.false.
       ! Set error status
@@ -607,16 +607,22 @@ contains
       ! Fill table with version-specific encoder
       select case (self%vcode)
       case (1001)
+         cvcode="1001"
          error = encode_vert_1001(self,nk)
       case (1002)
-         error = encode_vert_1002(self,nk)
+         cvcode="1002"                
+         error = encode_vert_1002(self,nk)         
       case (1003)
+         cvcode="1003"
          error = encode_vert_5001(self,nk)
       case (2001)
+         cvcode="2001"
          error = encode_vert_2001(self)
       case (5001)
+         cvcode="5001"
          error = encode_vert_5001(self,nk)
-      case (5002,5003)
+      case (5002,5003,5004)
+         cvcode="5002"
          error = encode_vert_5002(self,nk)
       case DEFAULT
          write(for_msg,*) 'unsupported kind and version : ',kind,version,' (vcode) ',self%vcode
@@ -817,10 +823,8 @@ contains
          if (error /= VGD_OK) return
       case (5002)
          call vgrid_genab_5002(hyb,(/rcoef1,rcoef2/),ptop_8,pref_8, &
-              hybm,hybt,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,error)
+              a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,error)
          if (error /= VGD_OK)then
-            if(associated(hybm))deallocate(hybm)
-            if(associated(hybt))deallocate(hybt)
             if(associated(a_m_8))deallocate(a_m_8)
             if(associated(b_m_8))deallocate(b_m_8)
             if(associated(a_t_8))deallocate(a_t_8)
@@ -845,10 +849,34 @@ contains
          if (error /= VGD_OK) return
       case (5003)
          call vgrid_genab_5002(hyb,(/rcoef1,rcoef2/),ptop_8,pref_8, &
-              hybm,hybt,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,error,lastTatU_L=.true.)
+              a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,error,lastTatU_L=.true.)
          if (error /= VGD_OK)then
-            if(associated(hybm))deallocate(hybm)
-            if(associated(hybt))deallocate(hybt)
+            if(associated(a_m_8))deallocate(a_m_8)
+            if(associated(b_m_8))deallocate(b_m_8)
+            if(associated(a_t_8))deallocate(a_t_8)
+            if(associated(b_t_8))deallocate(b_t_8)
+            if(associated(ip1_m))deallocate(ip1_m)
+            if(associated(ip1_t))deallocate(ip1_t)
+            return
+         endif
+         error = new_build_vert(self,kind,version,size(hyb), &
+              ip1=myip1,           &
+              ip2=myip2,           &
+              ptop_8=ptop_8,       &
+              pref_8=pref_8,       &
+              rcoef1=rcoef1,       &
+              rcoef2=rcoef2,       &
+              a_m_8=a_m_8,         &
+              b_m_8=b_m_8,         &
+              a_t_8=a_t_8,         &
+              b_t_8=b_t_8,         &
+              ip1_m=ip1_m,         &
+              ip1_t=ip1_t)
+         if (error /= VGD_OK) return
+      case (5004)
+         call vgrid_genab_5002(hyb,(/rcoef1,rcoef2/),ptop_8,pref_8, &
+              a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,error,notop_L=.true.)
+         if (error /= VGD_OK)then
             if(associated(a_m_8))deallocate(a_m_8)
             if(associated(b_m_8))deallocate(b_m_8)
             if(associated(a_t_8))deallocate(a_t_8)
@@ -2037,6 +2065,11 @@ contains
           write(for_msg,*)'  Number of hybrid levels (momentum levels)',nk-1,&
                         '\n   Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref)'
           call msg(MSG_VERBATIM,trim(for_msg))
+       case (5004)
+          nk=size(self%ip1_m)
+          write(for_msg,*)'  Number of hybrid levels (momentum/thermo levels)',nk-1,&
+                        '\n   Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref)'
+          call msg(MSG_VERBATIM,trim(for_msg))
        end select
               
        if(my_convip_L)then
@@ -2129,6 +2162,7 @@ contains
 
     ! Write to an RPN Standard file
     case ('FST')
+
     error=fstecr(self%table,dummy,-self%rec%nbits,unit, &
          self%rec%dateo,self%rec%deet,self%rec%npas, &
          ni,nj,nk,self%rec%ip1,self%rec%ip2,self%rec%ip3, &
@@ -2142,6 +2176,7 @@ contains
 
     ! Write to a Fortran binary file
     case ('BIN')
+       
        write(unit) ni,nj,nk
        write(unit) self%table
 
@@ -2221,6 +2256,7 @@ contains
        call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
+
     error = levels_readref(gd,unit=unit,fstkeys=fstkeys,levels=levels,in_log=my_in_log)
     if (error /= VGD_OK) then
        write(for_msg,*) 'problem computing level information for fst key ',fstkeys(1)
@@ -2230,6 +2266,7 @@ contains
 
     ! Set status and return
     status = VGD_OK
+
     return
   end function levels_toplevel
 
@@ -2807,11 +2844,11 @@ contains
        istat = compute_pressure_2001_8(self,ip1_list,levels,my_in_log)
     case (1003,5001)
        istat = compute_pressure_5001_8(self,sfc_field,ip1_list,levels,my_in_log,my_dpidpis)
-    case (5002,5003)
+    case (5002,5003,5004)
        istat = compute_pressure_5002_8(self,sfc_field,ip1_list,levels,my_in_log,my_dpidpis)
     case DEFAULT
        istat = get_version_info(self,kind,version)
-       write(for_msg,*) 'kind or version invalid :',kind,version
+       write(for_msg,*) 'kind or version invalid in diag_withref_8:',kind,version
        call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return 
     end select
@@ -3115,7 +3152,7 @@ contains
      integer, intent(in) :: nk                          !Number of levels
 
      ! Local variables
-     integer :: nn,error,k,ind
+     integer :: nn,error,k,ind,k_plus
      integer, parameter :: skip=3
      real*8 :: for_char_8
      character(len=8) :: ref_name
@@ -3123,9 +3160,13 @@ contains
      ! Set error status
      status = VGD_ERROR
 
+     k_plus=1
+     ! Test if version == 4 -> notop
+     if(self%version==4)k_plus=0
+
      ! Allocate table space
      if (associated(self%table)) deallocate(self%table)         
-     allocate(self%table(3,(2*nk+3)+skip,1),stat=error)
+     allocate(self%table(3,(2*nk+2+k_plus)+skip,1),stat=error)
      if(error < 0)then
         write(for_msg,*) 'cannot allocate self%table in encode_vert_5002'
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
@@ -3155,20 +3196,20 @@ contains
         return
      endif
      nn=size(self%ip1_t)
-     if(nn.ne.nk+2)then
-        write(for_msg,*) 'wrong size for ip1_t, is ',nn,'should be ',nk+2
+     if(nn.ne.nk+1+k_plus)then
+        write(for_msg,*) 'wrong size for ip1_t, is ',nn,'should be ',nk+1+k_plus
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      nn=size(self%a_t_8)
-     if(nn.ne.nk+2)then
-        write(for_msg,*) 'wrong size for a_t_8, is ',nn,'should be ',nk+2
+     if(nn.ne.nk+1+k_plus)then
+        write(for_msg,*) 'wrong size for a_t_8, is ',nn,'should be ',nk+1+k_plus
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      nn=size(self%b_t_8)
-     if(nn.ne.nk+2)then
-        write(for_msg,*) 'wrong size for b_t_8, is ',nn,'should be ',nk+2
+     if(nn.ne.nk+1+k_plus)then
+        write(for_msg,*) 'wrong size for b_t_8, is ',nn,'should be ',nk+1+k_plus
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
@@ -3196,11 +3237,11 @@ contains
      enddo     
 
      ! Fill thermodynamic level data
-     do k=1,nk+2
+     do k=1,nk+1+k_plus
         ind=k+skip+nk+1
         self%table(1:3,ind,1)=(/dble(self%ip1_t(k)),self%a_t_8(k),self%b_t_8(k)/)
      enddo
-
+     
      ! Set status and return
      status = VGD_OK
   end function encode_vert_5002
@@ -3221,7 +3262,7 @@ contains
      ! Read header line 1
      self%kind     = nint(self%table(1,1,1))
      self%version  = nint(self%table(2,1,1))
-     skip             = nint(self%table(3,1,1))
+     skip          = nint(self%table(3,1,1))
      
      ! Read header line 2
      error = flip_transfer(self%table(1,2,1),self%ref_name)
@@ -3281,7 +3322,7 @@ contains
      ! Read header line 1
      self%kind     = nint(self%table(1,1,1))
      self%version  = nint(self%table(2,1,1))
-     skip             = nint(self%table(3,1,1))
+     skip          = nint(self%table(3,1,1))
      
      ! Read header line 2
      self%ptop_8   = self%table(1,2,1)
@@ -3341,7 +3382,7 @@ contains
     ! Read header line 1
     self%kind     = nint(self%table(1,1,1))
     self%version  = nint(self%table(2,1,1))
-    skip             = nint(self%table(3,1,1))
+    skip          = nint(self%table(3,1,1))
 
     nk = size(self%table,dim=2) - skip
 
@@ -3393,7 +3434,7 @@ contains
      ! Read header line 1
      self%kind     = nint(self%table(1,1,1))
      self%version  = nint(self%table(2,1,1))
-     skip             = nint(self%table(3,1,1))
+     skip          = nint(self%table(3,1,1))
      
      ! Read header line 2
      self%ptop_8   = self%table(1,2,1)
@@ -3450,7 +3491,7 @@ contains
      type(vgrid_descriptor), intent(inout) :: self  !Vertical descriptor instance
      
      ! Local variables
-     integer :: skip,nj,nk,k,ind,error,istat
+     integer :: skip,nj,nk,k,ind,error,istat,k_plus
 
      ! Set error status
      status = VGD_ERROR
@@ -3458,8 +3499,10 @@ contains
      ! Read header line 1
      self%kind     = nint(self%table(1,1,1))
      self%version  = nint(self%table(2,1,1))
-     skip             = nint(self%table(3,1,1))
-     
+     skip          = nint(self%table(3,1,1))
+     k_plus=1
+     if(self%version==4)k_plus=0
+
      ! Read header line 2
      self%ptop_8   = self%table(1,2,1)
      self%pref_8   = self%table(2,2,1)
@@ -3475,7 +3518,7 @@ contains
      endif
      nj=size(self%table,dim=2)
 
-     nk=(nj-3-skip)/2
+     nk=(nj-2-k_plus-skip)/2
 
      ! Allocate and assign momentum level data
      if (associated(self%ip1_m)) deallocate(self%ip1_m)
@@ -3509,28 +3552,28 @@ contains
 
      ! Allocate and assign thermodynamic level data
      if (associated(self%ip1_t)) deallocate(self%ip1_t)
-     allocate(self%ip1_t(nk+2),stat=istat)
+     allocate(self%ip1_t(nk+1+k_plus),stat=istat)
      if (istat /= 0) then
-        write(for_msg,*) 'unable to allocate self%ip1_t(nk+2) in decode_vert_5002'
+        write(for_msg,*) 'unable to allocate self%ip1_t in decode_vert_5002'
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      if (associated(self%a_t_8)) deallocate(self%a_t_8)
-     allocate(self%a_t_8(nk+2),stat=istat)
+     allocate(self%a_t_8(nk+1+k_plus),stat=istat)
      if (istat /= 0) then
-        write(for_msg,*) 'unable to allocate self%a_t_8(nk+2) in decode_vert_5002'
+        write(for_msg,*) 'unable to allocate self%a_t_8 in decode_vert_5002'
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      if (associated(self%b_t_8)) deallocate(self%b_t_8)
-     allocate(self%b_t_8(nk+2),stat=istat)
+     allocate(self%b_t_8(nk+1+k_plus),stat=istat)
      if (istat /= 0) then
-        write(for_msg,*) 'unable to allocate self%b_t_8(nk+2) in decode_vert_5002'
+        write(for_msg,*) 'unable to allocate self%b_t_8 in decode_vert_5002'
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
 
-     do k=1,nk+2
+     do k=1,nk+1+k_plus
         ind=k+skip+nk+1
         self%ip1_t(k) = nint(self%table(1,ind,1))
         self%a_t_8(k) =      self%table(2,ind,1)
@@ -3585,7 +3628,7 @@ contains
 
      ! Check for valid entries (version is limited by the mangling equation)
      if (kind > MAX_VKIND .or. kind < 0 .or. version > 999 .or. version < 0) then
-        write(for_msg,*) 'invalid kind or version: ',kind,version
+        write(for_msg,*) 'invalid kind or version in set_vcode_d: ',kind,version
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
@@ -3676,13 +3719,13 @@ contains
        etiket='HYB_GEMV3'
        ig2=nint(self%ptop_8*10.d0)
        ig3=nint(self%rcoef1*100.)
-    case (5002,5003)
+    case (5002,5003,5004)
        etiket='STG_CP_GEMV4'
        ig2=nint(self%ptop_8*10.d0)
        ig3=nint(self%rcoef1*100.)
        ig4=nint(self%rcoef2*100.)
     case DEFAULT
-       write(for_msg,*) 'invalid kind or version:',self%kind,self%version
+       write(for_msg,*) 'invalid kind or version in fstd_init:',self%kind,self%version
        call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     end select
