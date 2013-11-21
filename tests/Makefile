@@ -28,7 +28,7 @@ $(DESCRIP_PATH)/utils.o: $(DESCRIP_PATH)/utils.ftn90
 	(cd $(DESCRIP_PATH) && $(MAKE) $(MAKEFLAGS) utils.o)
 
 tests:
-	rm -f data/* 2>/dev/null; \
+	rm -rf data/* 2>/dev/null; \
 	cd data ; \
 	rm -rf WORK ; \
 	mkdir -p WORK ; \

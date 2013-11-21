@@ -28,18 +28,30 @@ program constructor
   integer :: test_5002
   logical, parameter :: write_control_L=.false.
   character (len=256) :: file
-  
+
   ! Construct a new set of vertical coordinate descriptors 5002
   stat = vgd_new(d,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
-
   file='data/data_constructor_gen_5002.txt'
   stat = test_5002(d,file,write_control_L)
   if(stat.eq.VGD_ERROR)OK=.false.
 
   ! Construct a new set of vertical coordinate descriptors 5003
   stat = vgd_new(d,kind=5,version=3,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
-
   file='data/data_constructor_gen_5003.txt'
+  stat = test_5002(d,file,write_control_L)
+  if(stat.eq.VGD_ERROR)OK=.false.
+
+  ! Construct a new set of vertical coordinate descriptors 5004
+  ! 
+  stat = vgd_new(d,kind=5,version=4,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-1.d0,pref_8=pref)
+  file='data/data_constructor_gen_5004.txt'
+  stat = test_5002(d,file,write_control_L)
+  if(stat.eq.VGD_ERROR)OK=.false.
+
+  ! Construct a new set of vertical coordinate descriptors 5004 with flat Momentum(1) level B(1)=0.
+  ! 
+  stat = vgd_new(d,kind=5,version=4,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-2.d0,pref_8=pref)
+  file='data/data_constructor_gen_5004_B_0.txt'
   stat = test_5002(d,file,write_control_L)
   if(stat.eq.VGD_ERROR)OK=.false.
 
@@ -135,11 +147,17 @@ integer function test_5002(F_d,F_file,F_write_control_L) result(istat)
   print*,'Reading B M'
   read(10,*)work_8
   do k=1,nk
-     if(abs(work_8(k)-b_m_8(k))/b_m_8(k)>10.*epsilon(1.))then
-        istat=VGD_ERROR
-        print*,'Probleme avec B M, pas dans les limites tollerees'
-        print*,work_8(k),'vs'
-        print*,b_m_8(k)
+     if(b_m_8(k).eq.0.)then
+        if(work_8(k).eq.0.)then
+           print*,'Probleme avec B M, pas egal a zero'
+        endif
+     else
+        if(abs(work_8(k)-b_m_8(k))/b_m_8(k)>10.*epsilon(1.))then
+           istat=VGD_ERROR
+           print*,'Probleme avec B M, pas dans les limites tollerees'
+           print*,work_8(k),'vs'
+           print*,b_m_8(k)
+        endif
      endif
   enddo
   print*,'Reading B T'

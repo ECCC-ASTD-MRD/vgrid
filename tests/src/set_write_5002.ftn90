@@ -25,7 +25,7 @@ program constructor
 
   allocate(ip1_m(nk+1),a_m_8(nk+1),b_m_8(nk+1),ip1_t(nk+2),a_t_8(nk+2),b_t_8(nk+2))
 
-  ! This was obtaines from the lisying of a model run
+  ! This was obtaines from the litying of a model run
 !0:  prgenab Ver_a_8%m(k),Ver_b_8%m(k),k=1,G_nk+1
 !0:             1    9.210340386877345        9.6040478224904788E-003
 !0:             2    10.59663474799723        0.4828198537713364     

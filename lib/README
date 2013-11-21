@@ -12,5 +12,3 @@ To add a new vertical coordinate type:
 10- Add a level calculator (e.g. compute_pressure_5002)
 11- Add a branch for your new vcoord in the printer (print_desc)
 
-
-
