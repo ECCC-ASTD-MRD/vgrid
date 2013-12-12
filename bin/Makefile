@@ -1,8 +1,8 @@
 # User options
 #FCFLAGS='=-C -g'
-RCOMPILE = s.compile
+#RCOMPILE = r.compile
 DESCRIP_PATH = ../lib
-RMN=rmn_014_rc2
+#RMN=rmn_014_rc2
 
 # Override incorrect implicits
 %.o : %.mod
