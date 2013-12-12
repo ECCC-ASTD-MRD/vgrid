@@ -80,6 +80,8 @@ integer function test_it(F_file_from_model_run,F_file_with_ips) result(status)
    
    status=VGD_ERROR
    
+   nullify(table)
+
    ier=fnom(lu,trim(F_file_from_model_run),"RND",0)
    if(ier.lt.0)then
       print*,'ERROR with fnom'

@@ -17,6 +17,8 @@ program tests
   character(len=VGD_LEN_NAME) :: my_char, my_char2
   logical :: my_logical, ok=.true.,my_logical2
 
+  nullify(my_int_1d,my_int2_1d,my_real_1d,my_real2_1d,my_real8_1d,my_real82_1d,my_real8_3d,my_real82_3d)
+
   stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'

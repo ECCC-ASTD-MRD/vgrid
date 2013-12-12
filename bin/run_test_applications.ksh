@@ -1,6 +1,6 @@
-convert_toctoc_5002=oui
+convert_toctoc_5002=non
 
-add_toctoc_and_compute_pressure=oui
+add_toctoc_and_compute_pressure=non
 
 print_toctoc=oui
 
@@ -106,9 +106,9 @@ if [ ${print_toctoc} = oui ];then
 
     DEBUG=non
 
-   #for ITEM in dm_2001_5001_from_editfst dm_1001_from_model_run dm_1002_from_model_run dm_1003_from_pgsm_lam_east_ops 2001_from_model_run dm_5001_from_model_run dm_5001_from_model_run dm_5001_from_model_run
+   for ITEM in dm_2001_5001_from_editfst dm_1001_from_model_run dm_1002_from_model_run dm_1003_from_pgsm_lam_east_ops 2001_from_model_run dm_5001_from_model_run dm_5001_from_model_run dm_5001_from_model_run
 
-   for ITEM in dm_5004_from_model_run
+   #for ITEM in dm_5004_from_model_run
 
    do
      

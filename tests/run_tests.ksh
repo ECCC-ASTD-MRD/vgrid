@@ -73,7 +73,7 @@ for test in ${tests[*]} ; do
   else
      failed=$((failed + 1))
      if [ "${result}" != ' ok' ];then
-        printf "${result} (see ${test}.out for details)\n"
+        printf "${result} (see ${test}.out for details)\n"	
      else
         printf "   Shell script test failled, see reason above"
      fi
@@ -84,7 +84,7 @@ rm -f fort.* test.bin
 total=$((passed + failed))
 if [[ ${failed} > 0 ]] ; then
   printf " * Failed ${failed}/${total} Tests\n"
-  exit
+  exit 1
 else
   printf " * All Tests Succeeded\n"
   rm -f Makefile.test

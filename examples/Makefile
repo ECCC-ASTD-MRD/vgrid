@@ -2,7 +2,7 @@
 FCFLAGS='=-C -g'
 RCOMPILE = r.compile
 DESCRIP_PATH = ../lib
-RMN=rmn_013
+RMN=rmn_014_rc2
 DIST=use_new_read use_new_gen topLevel_levels lowLevel_levels use_dpidpis
 
 # Override incorrect implicits

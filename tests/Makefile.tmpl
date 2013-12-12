@@ -1,8 +1,8 @@
 # User options
 FCFLAGS='=-C -g'
-RCOMPILE = r.compile
+RCOMPILE = s.compile
 DESCRIP_PATH = ../lib
-RMN=rmnbeta_014
+RMN=rmn_014_rc2
 
 # Override incorrect implicits
 %.o : %.mod
@@ -11,12 +11,12 @@ RMN=rmnbeta_014
 .SUFFIXES: .ftn90 .o
 .ftn90.o:
 	echo $(DESCRIP_PATH)
-	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -src $<
+	$(RCOMPILE) -libpath $(LIBRARY_PATH) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -src $<
 
 OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/vgrid_genab_5002.o $(DESCRIP_PATH)/vgrid_genab_1002_5001.o $(DESCRIP_PATH)/vgrid_genab_1001.o $(DESCRIP_PATH)/vgrid_genab_1004.o $(DESCRIP_PATH)/vgrid_genab_2001.o $(DESCRIP_PATH)/utils.o unit_testing.o
 
 UNIT_TEST: UNIT_TEST.ftn90 $(OBJECTS)
-	$(RCOMPILE) $(OPENMP) -librmn $(RMN) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src UNIT_TEST.ftn90 -o UNIT_TEST  -libappl modelutils_base
+	$(RCOMPILE) $(OPENMP) -librmn $(RMN) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) $(INCLUDE_PATH) -obj $(OBJECTS) -src UNIT_TEST.ftn90 -o UNIT_TEST  -libappl modelutils_base
 
 unit_testing.o: unit_testing.ftn90
 

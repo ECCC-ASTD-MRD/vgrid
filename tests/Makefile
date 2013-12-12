@@ -1,6 +1,6 @@
 # User options
 FCFLAGS='=-C -g'
-RCOMPILE = r.compile
+RCOMPILE = s.compile
 DESCRIP_PATH = ../lib
 DATA_ARCH=`uname -s`
 
@@ -10,7 +10,7 @@ DATA_ARCH=`uname -s`
 # Define suffix rules
 .SUFFIXES: .ftn90 .o
 .ftn90.o:
-	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -src $<
+	$(RCOMPILE) -libpath $(LIBRARY_PATH) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -src $<
 
 OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/utils.o unit_testing.o
 

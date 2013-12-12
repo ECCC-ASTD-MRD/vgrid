@@ -7,14 +7,16 @@ program constructor
 
   type(vgrid_descriptor) :: d
   integer, parameter :: lu=10,nk=3
-  integer :: stat,ip1,k,ni,nj,nk
+  integer :: stat,ip1,k,ni,nj,nkk
   integer, external :: fnom,fstouv,fstfrm,fstinf
   logical :: ok
   real :: pp
-  real*8, dimension(:),allocatable :: a_m_8,b_m_8
-  real*8, dimension(:),allocatable :: a_t_8, b_t_8
-  integer, dimension(:),allocatable :: ip1_m,ip1_t
+  real*8, dimension(:),pointer :: a_m_8,b_m_8
+  real*8, dimension(:),pointer :: a_t_8, b_t_8
+  integer, dimension(:),pointer :: ip1_m,ip1_t
   character(len=10) :: blk_S
+
+  nullify(a_m_8,b_m_8,a_t_8, b_t_8,ip1_m,ip1_t)
 
   stat=fnom(lu,"data/dm_5002","RND",0)
   if(stat.lt.0)then
@@ -86,7 +88,7 @@ program constructor
   stat = vgd_write(d,lu,format='fst')
 
   ! Ensure that the correct ip2 value was written
-  stat = fstinf(lu,ni,nj,nk,-1,'',-1,801,-1,'','!!')
+  stat = fstinf(lu,ni,nj,nkk,-1,'',-1,801,-1,'','!!')
   call ut_report(stat >= 0,'Grid_Descriptors, vgd_new, vgd_put, vgd_write')
   stat=fstfrm(lu)
 

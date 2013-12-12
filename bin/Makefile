@@ -1,8 +1,8 @@
 # User options
 #FCFLAGS='=-C -g'
-RCOMPILE = r.compile
+RCOMPILE = s.compile
 DESCRIP_PATH = ../lib
-RMN=rmn_013
+RMN=rmn_014_rc2
 
 # Override incorrect implicits
 %.o : %.mod
@@ -10,7 +10,7 @@ RMN=rmn_013
 # Define suffix rules
 .SUFFIXES: .ftn90 .o
 .ftn90.o:
-	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -src $<
+	$(RCOMPILE) -libpath $(LIBRARY_PATH) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -src $<
 
 OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/vgrid_genab_5002.o $(DESCRIP_PATH)/vgrid_genab_1002_5001.o $(DESCRIP_PATH)/vgrid_genab_1001.o  $(DESCRIP_PATH)/vgrid_genab_2001.o $(DESCRIP_PATH)/vgrid_genab_1004.o $(DESCRIP_PATH)/utils.o
 

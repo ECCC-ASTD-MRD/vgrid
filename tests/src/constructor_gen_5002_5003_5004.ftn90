@@ -26,7 +26,7 @@ program constructor
   real*8 :: ptop=805d0,pref=100000d0
   logical :: OK=.true.
   integer :: test_5002
-  logical, parameter :: write_control_L=.false.
+  logical, parameter :: write_control_L=.true.
   character (len=256) :: file
 
   ! Construct a new set of vertical coordinate descriptors 5002
@@ -42,18 +42,20 @@ program constructor
   if(stat.eq.VGD_ERROR)OK=.false.
 
   ! Construct a new set of vertical coordinate descriptors 5004
-  ! 
-  stat = vgd_new(d,kind=5,version=4,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-1.d0,pref_8=pref)
+  !
+  stat = vgd_new(d,kind=5,version=4,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-1.d0,pref_8=pref,ptop_out_8=ptop)
   file='data/data_constructor_gen_5004.txt'
   stat = test_5002(d,file,write_control_L)
   if(stat.eq.VGD_ERROR)OK=.false.
+  print*,'ptop',ptop
 
   ! Construct a new set of vertical coordinate descriptors 5004 with flat Momentum(1) level B(1)=0.
   ! 
-  stat = vgd_new(d,kind=5,version=4,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-2.d0,pref_8=pref)
+  stat = vgd_new(d,kind=5,version=4,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-2.d0,pref_8=pref,ptop_out_8=ptop)
   file='data/data_constructor_gen_5004_B_0.txt'
   stat = test_5002(d,file,write_control_L)
   if(stat.eq.VGD_ERROR)OK=.false.
+  print*,'ptop',ptop
 
   call ut_report(OK,'Grid_Descriptors::vgd_new vertical generate initializer (5002) value')
 end program constructor
@@ -77,6 +79,8 @@ integer function test_5002(F_d,F_file,F_write_control_L) result(istat)
    integer :: nl_m,nl_t,k,nk,stat,kind,vers,vcode,ip1,my_ip1
 
    istat=VGD_OK
+
+   nullify(vcdm,vcdt,work,b_m_8,a_m_8,b_t_8,a_t_8,work_8,vipm,vipt,work_i)
 
    stat = vgd_get(F_d,key='KIND - vertical coordinate ip1 kind' ,value=kind)
    stat = vgd_get(F_d,key='VERS - vertical coordinate version'  ,value=vers)   
@@ -123,8 +127,11 @@ integer function test_5002(F_d,F_file,F_write_control_L) result(istat)
   allocate(work_8(size(a_m_8)))
   print*,'Reading A M'
   read(10,*)work_8
+
+  print*,'ANDRE epsilon(a_m_8(1))',epsilon(a_m_8(1))
+
   do k=1,nk
-     if(abs(work_8(k)-a_m_8(k))/a_m_8(k)>10.*epsilon(a_m_8(k)))then
+     if(abs(work_8(k)-a_m_8(k))/a_m_8(k)>100.*epsilon(a_m_8(k)))then
         istat=VGD_ERROR
         print*,'Probleme avec A M, pas dans les limites tollerees'
         print*,work_8(k),'vs'
@@ -135,7 +142,7 @@ integer function test_5002(F_d,F_file,F_write_control_L) result(istat)
   print*,'Reading A T'
   read(10,*)work_8
   do k=1,nk
-     if(abs(work_8(k)-a_t_8(k))/a_t_8(k)>10.*epsilon(1.))then
+     if(abs(work_8(k)-a_t_8(k))/a_t_8(k)>100.*epsilon(1.))then
         istat=VGD_ERROR
         print*,'Probleme avec A T, pas dans les limites tollerees'
         print*,work_8(k),'vs'
@@ -148,11 +155,11 @@ integer function test_5002(F_d,F_file,F_write_control_L) result(istat)
   read(10,*)work_8
   do k=1,nk
      if(b_m_8(k).eq.0.)then
-        if(work_8(k).eq.0.)then
+        if(work_8(k).ne.0.)then
            print*,'Probleme avec B M, pas egal a zero'
         endif
      else
-        if(abs(work_8(k)-b_m_8(k))/b_m_8(k)>10.*epsilon(1.))then
+        if(abs(work_8(k)-b_m_8(k))/b_m_8(k)>100.*epsilon(1.))then
            istat=VGD_ERROR
            print*,'Probleme avec B M, pas dans les limites tollerees'
            print*,work_8(k),'vs'
@@ -163,7 +170,7 @@ integer function test_5002(F_d,F_file,F_write_control_L) result(istat)
   print*,'Reading B T'
   read(10,*)work_8
   do k=1,nk
-     if(abs(work_8(k)-b_t_8(k))/b_t_8(k)>10.*epsilon(1.))then
+     if(abs(work_8(k)-b_t_8(k))/b_t_8(k)>100.*epsilon(1.))then
         istat=VGD_ERROR
         print*,'Probleme avec B T, pas dans les limites tollerees'
         print*,work_8(k),'vs'
@@ -199,7 +206,7 @@ integer function test_5002(F_d,F_file,F_write_control_L) result(istat)
   print*,'Reading VCDM'
   read(10,*)work
   do k=1,nk
-     if(abs(work(k)-vcdm(k))/vcdm(k)>10.*epsilon(vcdm(k)))then
+     if(abs(work(k)-vcdm(k))/vcdm(k)>100.*epsilon(vcdm(k)))then
         istat=VGD_ERROR
         print*,'Probleme avec vcdm, pas dans les limites tollerees'
         print*,work(k),'vs'
@@ -209,7 +216,7 @@ integer function test_5002(F_d,F_file,F_write_control_L) result(istat)
   print*,'Reading VCDT'
   read(10,*)work
   do k=1,nk
-     if(abs(work(k)-vcdt(k))/vcdt(k)>10.*epsilon(vcdt(k)))then
+     if(abs(work(k)-vcdt(k))/vcdt(k)>100.*epsilon(vcdt(k)))then
         istat=VGD_ERROR
         print*,'Probleme avec vcdt, pas dans les limites tollerees'
         print*,work(k),'vs'
@@ -222,5 +229,7 @@ integer function test_5002(F_d,F_file,F_write_control_L) result(istat)
   if(my_ip1.eq.ip1)then
      print*,'Probleme avec ip1, expected ',ip1,' got',my_ip1     
   endif
+
+  deallocate(vcdm,vcdt,work,b_m_8,a_m_8,b_t_8,a_t_8,work_8,vipm,vipt,work_i)
 
 end function test_5002
