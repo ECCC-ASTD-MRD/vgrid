@@ -1,6 +1,6 @@
 # User options
 FCFLAGS='=-C -g'
-RCOMPILE = s.compile
+#RCOMPILE = r.compile
 DESCRIP_PATH = ../lib
 DATA_ARCH=`uname -s`
 

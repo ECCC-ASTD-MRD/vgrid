@@ -11,5 +11,7 @@ export LIBRARY_PATH="/users/dor/armn/sch/Data/ords/modelutils_base/1.3.0+/lib/${
 . ssmuse-sh -d hpcs/201311/00-test/base -d hpcs/201311/00-test/intel13sp1
 . ssmuse-sh -d /ssm/net/rpn/libs/201309/01
 
+export RMN=rmn_014_rc2
+export RCOMPILE=s.compile
 
 

@@ -1,7 +1,7 @@
 # User options
 FCFLAGS=
-DEBUG_FLAGS='=-C -g'
-RCOMPILE = s.compile
+#DEBUG_FLAGS='=-C -g'
+#RCOMPILE = r.compile
 
 # Set default target
 default: lib
