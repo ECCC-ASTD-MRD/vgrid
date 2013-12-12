@@ -33,6 +33,8 @@ program constructor
   logical, parameter :: write_control_L=.false.
   character (len=256) :: file
 
+  nullify(b_m_8,a_m_8)
+
   stat = vgd_putopt('ALLOW_RESHAPE',.true.)
 
   !
