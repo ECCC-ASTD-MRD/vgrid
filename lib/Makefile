@@ -1,7 +1,7 @@
 # User options
 FCFLAGS=
-#DEBUG_FLAGS='=-C -g'
-RCOMPILE = r.compile
+DEBUG_FLAGS='=-C -g'
+RCOMPILE = s.compile
 
 # Set default target
 default: lib
@@ -12,7 +12,7 @@ default: lib
 # Define suffix rules
 .SUFFIXES: .ftn90 .o
 .ftn90.o:
-	$(RCOMPILE) -optf $(FCFLAGS) $(DEBUG_FLAGS) -src $<
+	$(RCOMPILE) -includes $(INCLUDE_PATH) -optf $(FCFLAGS) $(DEBUG_FLAGS) -src $<
 
 OBJECTS = vgrid_descriptors.o vgrid_genab_1001.o vgrid_genab_1002_5001.o vgrid_genab_1004.o vgrid_genab_2001.o vgrid_genab_5002.o utils.o
 

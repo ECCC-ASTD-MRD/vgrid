@@ -87,6 +87,7 @@ program constructor
   !
   print*,''
   print*,'===== Test complete level set ===='
+
   ptop=hyb(1)*pref
   w1=ptop
   stat = vgd_new(d,kind=5,version=1,hyb=hyb,rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
@@ -95,17 +96,16 @@ program constructor
      print*,'Probleme avec ptop 5001'
      print*,ptop,' should equal ',w1
   endif
-
   file='data/data_constructor_gen_5001.txt'
   stat = test_1002_5001(d,file,write_control_L)
   if(stat.eq.VGD_ERROR)OK=.false.
-
   print*,''
   print*,'===== Test incomplete level set ===='
   stat = vgd_new(d,kind=5,version=1,hyb=hyb(10:28),rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
   stat = vgd_get(d,key='CB_M - vertical B coefficient',value=b_m_8)
   stat = vgd_get(d,key='CA_M - vertical A coefficient',value=a_m_8)
   w1=8.8046513497829437E-002
+
   if(.not.(abs(b_m_8(1)-w1)/w1<my_epsilon))then
      OK=.false.
      print*,'Probleme avec B 5001'
@@ -141,6 +141,8 @@ integer function test_1002_5001(F_d,F_file,F_write_control_L) result(istat)
    integer :: nl_m,nl_t,k,nk,stat,kind,vers,vcode
 
    istat=VGD_OK
+
+   nullify(vcdm,vcdt,work,b_m_8,a_m_8,b_t_8,a_t_8,work_8,vipm,vipt,work_i)
 
    stat = vgd_get(F_d,key='KIND - vertical coordinate ip1 kind' ,value=kind)
    stat = vgd_get(F_d,key='VERS - vertical coordinate version'  ,value=vers)   

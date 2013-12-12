@@ -87,6 +87,8 @@ module mod_comp_pres
       !
       status=COMP_PRES_ERROR
       !
+      nullify(ip1_list,ip1_list2,ip1_list3,ip1_single,pres,work)
+      !
       ier=vgd_new(vgd,F_lui,'fst')
       if(ier.ne.VGD_OK)then
          print*,'Error with vgd_new for var  (group) ',F_group
@@ -234,7 +236,13 @@ module mod_comp_pres
             endif
          enddo
          !
-         deallocate(record%data,work)
+         deallocate(record%data,work,ip1_single)
+         if(associated(ip1_list) )deallocate(ip1_list)
+         if(associated(ip1_list2))deallocate(ip1_list2)
+         if(associated(ip1_list3))deallocate(ip1_list3)
+         if(associated(pres )    )deallocate(pres)
+         if(associated(work)     )deallocate(work)
+         
          !
       enddo
       !

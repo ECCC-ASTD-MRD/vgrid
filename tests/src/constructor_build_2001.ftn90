@@ -11,7 +11,7 @@ program constructor
   real(kind=8), dimension(4) :: pres=(/700.,850.,925.,1000./),b=(/0.,0.,0.,0./)
   real*8, dimension(:,:,:), pointer :: tbl
   real*8, dimension(:), pointer :: a_m_8,a_t_8,b_m_8,b_t_8,work_8
-  real, dimension(:), pointer :: vcdm,vcdt,hyb,work
+  real, dimension(:), pointer :: hyb
   real :: my_real
   logical :: OK
   character(len=1) :: dum_S
@@ -67,6 +67,7 @@ integer function test_2001(F_d,F_file,F_write_control_L) result(istat)
    !
    istat=VGD_ERROR
    !
+   nullify(vcdm,vcdt,work,b_m_8,a_m_8,b_t_8,a_t_8,work_8,vipm,vipt,work_i)
    stat = vgd_get(F_d,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8)
    stat = vgd_get(F_d,key='CA_T - vertical A coefficient (t)'   ,value=a_t_8)
    stat = vgd_get(F_d,key='CB_M - vertical B coefficient (m)'   ,value=b_m_8)

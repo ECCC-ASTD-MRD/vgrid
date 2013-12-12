@@ -53,7 +53,7 @@ contains
    !     ----------------------------------------------------------
    
    subroutine vgrid_genab_5002 (F_hybuser,F_rcoef,F_ptop_8,F_pref_8, &
-        F_am_8,F_bm_8,F_at_8,F_bt_8,F_ip1_m,F_ip1_t,F_err,lastTatU_L,notop_L)
+        F_am_8,F_bm_8,F_at_8,F_bt_8,F_ip1_m,F_ip1_t,F_err,lastTatU_L,notop_L,ptop_out_8)
 
     ! Modifs 
     ! Andre Plante June 2012 : force real*8 in compuation of log(F_hybuser(k)*1.d0) in
@@ -64,7 +64,8 @@ contains
     integer, intent(out) :: F_err
     real, dimension(:), intent(in) :: F_hybuser           ! user specification for vertical layering hyb
     real, dimension(:), intent(in) :: F_rcoef             ! user specification for rcoef
-    real*8 :: F_ptop_8                                    ! user specification for top pressure
+    real*8 , intent(in) :: F_ptop_8                       ! user specification for top pressure
+    real*8 , optional, intent(out):: ptop_out_8            ! computed ptop if F_ptop_8 < 0
     real*8 , intent(in) :: F_pref_8                       ! user specification for reference pressure
 
     real*8, dimension(:), pointer :: F_am_8, F_bm_8       ! model As and Bs on momentum levels
@@ -77,7 +78,7 @@ contains
     integer :: k, status, nk, k_plus
     logical :: wronghyb
     real    :: rcoef
-    real*8  :: pr1, ztop_8, zsrf_8, lamba_8,zeta_8, zetau_8,zeta2_8
+    real*8  :: pr1, ztop_8, zsrf_8, lamba_8,zeta_8, zetau_8,zeta2_8, l_ptop_8
     logical :: my_lastTatU_L, my_notop_L
     real, dimension(:), pointer :: hybm, hybt             ! model hyb values
     real*8, dimension(:), pointer :: at_8, bt_8
@@ -85,6 +86,8 @@ contains
     !     __________________________________________________________________
 
     F_err = VGD_ERROR
+
+    nullify(hybm,hybt,at_8,bt_8,ip1_t)
 
     my_lastTatU_L=.false.
     if(present(lastTatU_L))my_lastTatU_L=lastTatU_L
@@ -140,9 +143,9 @@ contains
        zetau_8 = zsrf_8+log(F_hybuser(1)*1.d0)
        zeta2_8 = zsrf_8+log(F_hybuser(2)*1.d0)
        ztop_8=0.5d0*(3.d0*zetau_8-zeta2_8)
-       F_ptop_8=exp(ztop_8)
+       l_ptop_8=exp(ztop_8)
        if(nint(F_ptop_8).eq.-1) then
-          ! Compute B(1) from ztop
+          ! Compute B(1) from ztop, B(1) != 0
           zetau_8 = ztop_8
        endif
     else if (F_ptop_8.le.0.d0)then
@@ -151,13 +154,14 @@ contains
        return
     else
        ! Compute B(1) from user's ztop
+       l_ptop_8=F_ptop_8
        ztop_8  = log(F_ptop_8)
        zetau_8 = ztop_8
     endif
     !     
     !     Checking vertical layering
     !
-    hybm(0) = F_ptop_8 / F_pref_8
+    hybm(0) = l_ptop_8 / F_pref_8
     !
     !     Check range
     !
@@ -252,6 +256,8 @@ contains
        F_bt_8=bt_8
        F_ip1_t=ip1_t
     endif
+
+    if(present(ptop_out_8))ptop_out_8=l_ptop_8
 
     deallocate(hybm,hybt,at_8,bt_8,ip1_t)
 

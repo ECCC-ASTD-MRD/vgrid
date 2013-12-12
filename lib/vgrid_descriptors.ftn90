@@ -36,6 +36,7 @@ module vGrid_Descriptors
   logical :: ALLOW_RESHAPE=.false.              ! Allow reshape of class pointer members
 
   ! Validity table for self
+  integer, dimension(1), parameter :: ptop_out_8_valid=                                  (/5004/)
   integer, dimension(6), parameter :: ptop_8_valid=             (/1002,1003,5001,5002,5003,5004/)
   integer, dimension(5), parameter :: pref_8_valid=                  (/1003,5001,5002,5003,5004/)
   integer, dimension(5), parameter :: rcoef1_valid=                  (/1003,5001,5002,5003,5004/)
@@ -659,7 +660,7 @@ contains
       return
    end function new_build_vert
 
-   integer function new_gen(self,kind,version,hyb,rcoef1,rcoef2,ptop_8,pref_8,ip1,ip2,stdout_unit) result(status)
+   integer function new_gen(self,kind,version,hyb,rcoef1,rcoef2,ptop_8,pref_8,ptop_out_8,ip1,ip2,stdout_unit) result(status)
       use vdescript_1001,      only: vgrid_genab_1001
       use vdescript_1002_5001, only: vgrid_genab_1002_5001
       use vdescript_2001,      only: vgrid_genab_2001
@@ -669,7 +670,8 @@ contains
       integer, intent(in) :: kind,version               !Kind,version to create
       real, dimension(:),intent(in) :: hyb              !List of hybrid levels
       real, optional, intent(in) :: rcoef1,rcoef2       !R-coefficient values for rectification
-      real*8, optional, intent(in) :: ptop_8            !Top-level pressure (Pa)
+      real*8, optional, intent(in) :: ptop_8            !Top-level pressure (Pa) inout
+      real*8, optional, intent(out):: ptop_out_8        !Top-level pressure (Pa) output if ptop_8 < 0
       real*8, optional, intent(in) :: pref_8            !Reference-level pressure (Pa)
       integer, optional, intent(in) :: ip1,ip2          !IP1,2 values for FST file record [0,0]
       integer, optional, intent(in) :: stdout_unit      !Unit number for verbose output [STDERR]
@@ -707,6 +709,13 @@ contains
             errorInput = .true.
          endif
       endif
+      if(is_valid(self,ptop_out_8_valid)) then
+         if(.not.present(ptop_out_8))then
+            write(for_msg,*) 'ptop_out_8 is a required constructor entry'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            errorInput = .true.
+         endif
+      endif
       if(is_valid(self,pref_8_valid)) then
          if(.not.present(pref_8))then
             write(for_msg,*) 'pref_8 is a required constructor entry'
@@ -730,6 +739,11 @@ contains
       endif
       if(present(ptop_8).and.(.not.is_valid(self,ptop_8_valid)))then
          write(for_msg,*) 'ptop_8 is not a required constructor entry'
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         errorInput = .true.
+      endif
+      if(present(ptop_out_8).and.(.not.is_valid(self,ptop_out_8_valid)))then
+         write(for_msg,*) 'ptop_out_8 is not a required constructor entry'
          call msg(MSG_ERROR,VGD_PRFX//for_msg)
          errorInput = .true.
       endif
@@ -873,9 +887,9 @@ contains
               ip1_m=ip1_m,         &
               ip1_t=ip1_t)
          if (error /= VGD_OK) return
-      case (5004)
+      case (5004)  
          call vgrid_genab_5002(hyb,(/rcoef1,rcoef2/),ptop_8,pref_8, &
-              a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,error,notop_L=.true.)
+              a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,error,notop_L=.true.,ptop_out_8=ptop_out_8)
          if (error /= VGD_OK)then
             if(associated(a_m_8))deallocate(a_m_8)
             if(associated(b_m_8))deallocate(b_m_8)
@@ -888,7 +902,7 @@ contains
          error = new_build_vert(self,kind,version,size(hyb), &
               ip1=myip1,           &
               ip2=myip2,           &
-              ptop_8=ptop_8,       &
+              ptop_8=ptop_out_8,   &
               pref_8=pref_8,       &
               rcoef1=rcoef1,       &
               rcoef2=rcoef2,       &

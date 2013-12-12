@@ -1,5 +1,5 @@
 # User options
-RMN = rmn_013
+RMN = rmn_014_rc2
 
 # Override incorrect implicits
 SUBDIRS = lib bin examples tests
