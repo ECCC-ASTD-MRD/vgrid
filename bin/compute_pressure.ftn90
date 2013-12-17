@@ -258,7 +258,7 @@ program compute_pressure
    integer :: fnom,fstouv,fstfrm,fstinf,key,fstluk,fstinl,fstprm,fstecr,nvars
    character(len=256), dimension(ncle) :: cle,val,def
    character(len=10) :: my_var
-   character(len=12), parameter :: version='v_2.2.0'
+   character(len=12), parameter :: version='v_2.2.1'
    !
    cle=(/'s.      ','d.      ','samefile','var     ','verbose '/)
    val=(/'undef   ','undef   ','NO      ','undef   ','NO      '/)
@@ -284,7 +284,7 @@ program compute_pressure
    verbose_L=.false.
    if(val(5).eq.'YES')verbose_L=.true.
    !
-   stat=fnom(lui,val(1),"RND",0)
+   stat=fnom(lui,val(1),"RND+R/O",0)
    if(stat.lt.0)then
       print*,'ERROR with fnom on lui'
       call exit(1)

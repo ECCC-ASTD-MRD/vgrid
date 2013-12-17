@@ -57,7 +57,11 @@ program convert_toctoc_5002
 
    !==========================================================================
    ! Open files
-   istat=fnom(lui,val(1),'RND',0)
+   if(samefile_L)then
+      istat=fnom(lui,val(1),'RND',0)
+   else
+      istat=fnom(lui,val(1),'RND+R/O',0)
+   endif
    if(istat.lt.0)then
       print*,'ERROR with fnom on file ',trim(val(1))
       call exit(1)
