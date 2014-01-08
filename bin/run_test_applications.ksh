@@ -108,7 +108,7 @@ if [ ${print_toctoc} = oui ];then
 
     XXDIFF='xxdiff --ignore-all-space'
     #DIFF='diff --ignore-all-space'
-    DIFF='diff'
+    DIFF='diff -b'
 
    for ITEM in dm_2001_5001_from_editfst dm_1001_from_model_run dm_1002_from_model_run dm_1003_from_pgsm_lam_east_ops 2001_from_model_run dm_5001_from_model_run dm_5001_from_model_run dm_5001_from_model_run
 
