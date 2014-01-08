@@ -8,8 +8,8 @@ WARNING: (vgd)    More than one HY, checking consistency ...
 (vgd)    All HY consistent.
 (vgd)    Vertical descriptor successfully reconstructed
  -- Vertical Grid Descriptor Information --
-   ip1=          150 
-   ip2=          200 
+   ip1=          150
+   ip2=          200
  -------------------------------------------------------
  Vcode=         1003
    Descriptor Nomvar: !!
@@ -18,7 +18,7 @@ WARNING: (vgd)    More than one HY, checking consistency ...
    pref=    80000.00000000000      Pa
    rcoef1=    1.600000
    Surface field nomvar P0
-   Number of hybrid normalized levels           58 
+   Number of hybrid normalized levels           58
    Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100
    Momentum levels ip1, p, A, B:
          2000    0.000000        1000.000000000000         0.000000000000000

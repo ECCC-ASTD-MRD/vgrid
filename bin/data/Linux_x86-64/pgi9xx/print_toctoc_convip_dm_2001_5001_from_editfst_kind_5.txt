@@ -6,8 +6,8 @@ WARNING: (vgd) Trying to construct vgrid descriptor from legacy encoding (PT,HY 
 (vgd)   hybrid (un-normalized) coordinate found
 (vgd)    Vertical descriptor successfully reconstructed
  -- Vertical Grid Descriptor Information --
-   ip1=         2009 
-   ip2=         1000 
+   ip1=         2009
+   ip2=         1000
  -------------------------------------------------------
  Vcode=         5001
    Descriptor Nomvar: !!
@@ -16,7 +16,7 @@ WARNING: (vgd) Trying to construct vgrid descriptor from legacy encoding (PT,HY 
    pref=    80000.00000000000      Pa
    rcoef1=    1.600000
    Surface field nomvar P0
-   Number of hybrid levels           80 
+   Number of hybrid levels           80
    Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100
    Momentum levels ip1, p, A, B:
      97642568   1.2500001E-04    10.00000014901161         0.000000000000000

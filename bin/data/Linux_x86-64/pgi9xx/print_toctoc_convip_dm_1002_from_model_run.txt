@@ -8,15 +8,15 @@ Read(10) PT   P  K4H9ST1A        41    20     1  338994800           0       0  
 (vgd)   eta coordinate found
 (vgd)    Vertical descriptor successfully reconstructed
  -- Vertical Grid Descriptor Information --
-   ip1=         2009 
-   ip2=         1000 
+   ip1=         2009
+   ip2=         1000
  -------------------------------------------------------
  Vcode=         1002
    Descriptor Nomvar: !!
    level kind = 1, level version =   2
    ptop=    1000.000000000000      Pa
    Surface field nomvar P0
-   Number of eta levels           28 
+   Number of eta levels           28
    Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100
    Momentum levels ip1, p, A, B:
          2000    0.000000        1000.000000000000         0.000000000000000

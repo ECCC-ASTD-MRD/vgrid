@@ -6,13 +6,13 @@ WARNING: (vgd) Trying to construct vgrid descriptor from legacy encoding (PT,HY 
 (vgd)   pressure coordinate found
 (vgd)    Vertical descriptor successfully reconstructed
  -- Vertical Grid Descriptor Information --
-   ip1=        53151 
-   ip2=        26578 
+   ip1=        53151
+   ip2=        26578
  -------------------------------------------------------
  Vcode=         2001
    Descriptor Nomvar: !!
    level kind = 2, level version =   1
-   Number of pressure levels            7 
+   Number of pressure levels            7
    Equation to compute hydrostatic pressure (P): P = A
    Momentum levels ip1, A, B:
      42043040    1000.000000000000         0.000000000000000
