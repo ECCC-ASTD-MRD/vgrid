@@ -14,13 +14,15 @@ program print_toctoc
    logical :: ip1m_only_L, ip1t_only_L, box_L, convip_L
    !
    !==========================================================================
-   !
+   !   
    ! Get keys
    cle=(/'fst.     ','ip1m_only','ip1t_only','kind     ','no_box   ','out.     ','convip   '/)
    val=(/'undef    ','no       ','no       ','undef    ','no       ','undef    ','no       '/)
    def=(/'undef    ','yes      ','yes      ','undef    ','yes      ','undef    ','yes      '/)
    npos=-111
    call ccard(cle,def,val,ncle,npos) 
+   !
+   nullify(ip1s)
    !
    noptions=0
    ip1m_only_L=.false.
@@ -101,7 +103,7 @@ program print_toctoc
       do i=1,size(ip1s)
          write(lu_out,'(i10)')ip1s(i)
       enddo
-   elseif(ip1t_only_L)then
+   elseif(ip1t_only_L)then      
       stat=vgd_get(vgd,'VIPT - level ip1 list (t)',ip1s)
       if(stat.eq.VGD_ERROR)then
          print*,'ERROR with vgd_get on','VIPT'
