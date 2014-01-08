@@ -2015,11 +2015,15 @@ contains
     hr = '-------------------------------------------------------'
 
     ! Dump general descriptor information
-    write(for_msg,*) '-- Vertical Grid Descriptor Information --',&
-                     '\n   ip1=',self%rec%ip1,&
-                     '\n   ip2=',self%rec%ip2,&
-                     '\n ',trim(hr),&
-                     '\n Vcode=',self%vcode
+    write(for_msg,*) '-- Vertical Grid Descriptor Information --'
+    call msg(MSG_VERBATIM,trim(for_msg))
+    write(for_msg,*) '  ip1=',self%rec%ip1
+    call msg(MSG_VERBATIM,trim(for_msg))
+    write(for_msg,*) '  ip2=',self%rec%ip2
+    call msg(MSG_VERBATIM,trim(for_msg))
+    write(for_msg,*) '',trim(hr)
+    call msg(MSG_VERBATIM,trim(for_msg))
+    write(for_msg,*) 'Vcode=',self%vcode
     call msg(MSG_VERBATIM,trim(for_msg))
 
     ! Dump vertical descriptor information
@@ -2051,38 +2055,45 @@ contains
        select case (self%vcode)
        case (1001)
           nk=size(self%ip1_m)
-          write(for_msg,*)'  Number of sigma levels',nk,&
-                        '\n   Equation to compute hydrostatic pressure (pi): pi = B * P0*100'
+          write(for_msg,*)'  Number of sigma levels',nk
+          call msg(MSG_VERBATIM,trim(for_msg))
+          write(for_msg,*)'  Equation to compute hydrostatic pressure (pi): pi = B * P0*100'
           call msg(MSG_VERBATIM,trim(for_msg))
        case (1002)
           nk=size(self%ip1_m)
-          write(for_msg,*)'  Number of eta levels',nk,&
-                        '\n   Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100'
+          write(for_msg,*)'  Number of eta levels',nk
+          call msg(MSG_VERBATIM,trim(for_msg))
+          write(for_msg,*)'  Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100'
           call msg(MSG_VERBATIM,trim(for_msg))    
        case (1003)
           nk=size(self%ip1_m)
-          write(for_msg,*)'  Number of hybrid normalized levels',nk,&
-                        '\n   Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100'
+          write(for_msg,*)'  Number of hybrid normalized levels',nk
+          call msg(MSG_VERBATIM,trim(for_msg))
+          write(for_msg,*)'  Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100'
           call msg(MSG_VERBATIM,trim(for_msg))
        case (2001)
           nk=size(self%ip1_m)
-          write(for_msg,*)'  Number of pressure levels',nk,&
-                        '\n   Equation to compute hydrostatic pressure (P): P = A'
+          write(for_msg,*)'  Number of pressure levels',nk
+          call msg(MSG_VERBATIM,trim(for_msg))
+          write(for_msg,*)'  Equation to compute hydrostatic pressure (P): P = A'
           call msg(MSG_VERBATIM,trim(for_msg))
        case (5001)
           nk=size(self%ip1_m)
-          write(for_msg,*)'  Number of hybrid levels',nk,&
-                        '\n   Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100'
+          write(for_msg,*)'  Number of hybrid levels',nk
+          call msg(MSG_VERBATIM,trim(for_msg))
+          write(for_msg,*)'  Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100'
           call msg(MSG_VERBATIM,trim(for_msg))
        case (5002,5003)
           nk=size(self%ip1_m)
-          write(for_msg,*)'  Number of hybrid levels (momentum levels)',nk-1,&
-                        '\n   Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref)'
+          write(for_msg,*)'  Number of hybrid levels (momentum levels)',nk-1
+          call msg(MSG_VERBATIM,trim(for_msg))
+          write(for_msg,*)'  Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref)'
           call msg(MSG_VERBATIM,trim(for_msg))
        case (5004)
           nk=size(self%ip1_m)
-          write(for_msg,*)'  Number of hybrid levels (momentum/thermo levels)',nk-1,&
-                        '\n   Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref)'
+          write(for_msg,*)'  Number of hybrid levels (momentum/thermo levels)',nk-1
+          call msg(MSG_VERBATIM,trim(for_msg))
+          write(for_msg,*)'  Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref)'
           call msg(MSG_VERBATIM,trim(for_msg))
        end select
               
