@@ -13,7 +13,7 @@ program add_toctoc
    real :: dummy
    real*8 :: nhours
    logical :: samefile_L
-   character(len=12), parameter :: version='v_1.0.0'
+   character(len=12), parameter :: version='v_1.0.1'
 
    ! For fstprm
    integer :: ig1,ig2,ig3,ig4,dateo,deet,npas,datyp,nbits
@@ -63,7 +63,11 @@ program add_toctoc
 
    !==========================================================================
    ! Open files
-   istat=fnom(lui,val(1),'RND',0)
+   if(samefile_L)then
+      istat=fnom(lui,val(1),'RND',0)
+   else
+      istat=fnom(lui,val(1),'RND+R/O',0)
+   endif
    if(istat.lt.0)then
       print*,'ERROR with fnom on file ',trim(val(1))
       call exit(1)

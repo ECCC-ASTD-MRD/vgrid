@@ -836,7 +836,7 @@ contains
               ip1_m=ip1_m)
          if (error /= VGD_OK) return
       case (5002)
-         call vgrid_genab_5002(hyb,(/rcoef1,rcoef2/),ptop_8,pref_8, &
+         call vgrid_genab_5002(version,hyb,(/rcoef1,rcoef2/),ptop_8,pref_8, &
               a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,error)
          if (error /= VGD_OK)then
             if(associated(a_m_8))deallocate(a_m_8)
@@ -862,7 +862,7 @@ contains
               ip1_t=ip1_t)
          if (error /= VGD_OK) return
       case (5003)
-         call vgrid_genab_5002(hyb,(/rcoef1,rcoef2/),ptop_8,pref_8, &
+         call vgrid_genab_5002(version,hyb,(/rcoef1,rcoef2/),ptop_8,pref_8, &
               a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,error,lastTatU_L=.true.)
          if (error /= VGD_OK)then
             if(associated(a_m_8))deallocate(a_m_8)
@@ -888,7 +888,7 @@ contains
               ip1_t=ip1_t)
          if (error /= VGD_OK) return
       case (5004)  
-         call vgrid_genab_5002(hyb,(/rcoef1,rcoef2/),ptop_8,pref_8, &
+         call vgrid_genab_5002(version,hyb,(/rcoef1,rcoef2/),ptop_8,pref_8, &
               a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,error,notop_L=.true.,ptop_out_8=ptop_out_8)
          if (error /= VGD_OK)then
             if(associated(a_m_8))deallocate(a_m_8)
