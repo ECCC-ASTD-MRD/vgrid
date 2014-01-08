@@ -9,7 +9,7 @@ program print_toctoc
    integer :: stat,npos,i,noptions
    integer :: fnom,fstouv,fstfrm,exdb,exfin,kind,lu_out
    integer, dimension(:), pointer :: ip1s
-   character(len=12), parameter :: version='v_1.2.0'
+   character(len=12), parameter :: version='v_1.2.1'
    character(len=256), dimension(ncle) :: cle,val,def
    logical :: ip1m_only_L, ip1t_only_L, box_L, convip_L
    !
@@ -76,7 +76,7 @@ program print_toctoc
    !
    !==========================================================================
    !
-   stat=fnom(lu,val(1),"RND",0)
+   stat=fnom(lu,val(1),"RND+R/O",0)
    if(stat.lt.0)then
       print*,'ERROR with fnom on',val(1)
       call exit(1)

@@ -52,7 +52,7 @@ contains
    !    |                                                          |
    !     ----------------------------------------------------------
    
-   subroutine vgrid_genab_5002 (F_hybuser,F_rcoef,F_ptop_8,F_pref_8, &
+   subroutine vgrid_genab_5002 (F_version,F_hybuser,F_rcoef,F_ptop_8,F_pref_8, &
         F_am_8,F_bm_8,F_at_8,F_bt_8,F_ip1_m,F_ip1_t,F_err,lastTatU_L,notop_L,ptop_out_8)
 
     ! Modifs 
@@ -62,6 +62,7 @@ contains
     !      
     ! Arguments
     integer, intent(out) :: F_err
+    integer, intent(in) :: F_version                      ! vgrid version (2,3,4)
     real, dimension(:), intent(in) :: F_hybuser           ! user specification for vertical layering hyb
     real, dimension(:), intent(in) :: F_rcoef             ! user specification for rcoef
     real*8 , intent(in) :: F_ptop_8                       ! user specification for top pressure
@@ -83,11 +84,25 @@ contains
     real, dimension(:), pointer :: hybm, hybt             ! model hyb values
     real*8, dimension(:), pointer :: at_8, bt_8
     integer, dimension(:), pointer :: ip1_t
+    character(len=100) :: func_name
     !     __________________________________________________________________
 
-    F_err = VGD_ERROR
+    func_name='vgrid_genab_5002'
 
+    F_err = VGD_ERROR
+    
     nullify(hybm,hybt,at_8,bt_8,ip1_t)
+
+    if(F_version.lt.2.or.F_version.gt.4)then
+       write(for_msg,*) 'In '//trim(func_name)//' : wrong version ->',F_version
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return
+    endif
+    if(F_ptop_8.lt.0.and.F_version.ne.4)then
+       write(for_msg,*)'In '//trim(func_name)//' F_ptop_8 must by > 0.0 got ',F_ptop_8
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return
+    endif
 
     my_lastTatU_L=.false.
     if(present(lastTatU_L))my_lastTatU_L=lastTatU_L
@@ -99,7 +114,7 @@ contains
     ! Set size of the problem and check for full inputs
     nk = size(F_hybuser)
     if (size(F_rcoef) /= 2) then
-       write(for_msg,*) 'Size of F_rcoef should be 2 in vdescript_5002::vgrid_genab_5002()... is ',size(F_rcoef)
+       write(for_msg,*) 'In '//trim(func_name)//' Size of F_rcoef should be 2, it is ',size(F_rcoef)
        call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
@@ -130,12 +145,6 @@ contains
     status = reallocate(ip1_t,1,nk+2)
     if (status /= VGD_OK) return
 
-    if (  Nk.lt.1 )  then
-       write(for_msg,9100)
-       call msg(MSG_ERROR,VGD_PRFX//for_msg)
-       return
-    endif
-    
     zsrf_8  = log(F_pref_8)
     if ( nint(F_ptop_8).eq.-2.or.&
          nint(F_ptop_8).eq.-1) then
@@ -149,7 +158,7 @@ contains
           zetau_8 = ztop_8
        endif
     else if (F_ptop_8.le.0.d0)then
-       write(for_msg,9400)
+       write(for_msg,*)'In '//trim(func_name)//' F_ptop_8 must be > 0, got ',F_ptop_8
        call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     else
@@ -166,7 +175,7 @@ contains
     !     Check range
     !
     if (F_hybuser(NK).ge.1..or.F_hybuser(1).le.hybm(0))then
-       write(for_msg,9550) hybm(0)
+       write(for_msg,'("hyb must be < 1.0 and > ",es10.4)') hybm(0)
        call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
@@ -179,7 +188,10 @@ contains
     enddo
     
     if (wronghyb) then
-       write(for_msg,9250)
+       write(for_msg,*)'WRONG SPECIFICATION OF HYB VERTICAL LEVELS'
+       write(for_msg,*)'LEVELS MUST BE MONOTONICALLY INCREASING'
+       write(for_msg,*)'      FROM HYB(1) ---- ERROR ----'
+       write(for_msg,*)'      Current choice:'
        call msg(MSG_ERROR,VGD_PRFX//for_msg)
        write(for_msg,*)'MOMENTUM LEVELS'
        call msg(MSG_ERROR,VGD_PRFX//for_msg)
@@ -238,8 +250,6 @@ contains
        hybt(Nk+1)   =  hybm(Nk)
     endif    
 
-    F_err = VGD_OK
- 
     ! Compute ip1 values
     do k=1,nk+1
        call convip(F_ip1_m(k),hybm(k),5,2,'',.false.)
@@ -261,13 +271,7 @@ contains
 
     deallocate(hybm,hybt,at_8,bt_8,ip1_t)
 
-9100 format (/'Insufficient number of vertical levels in variable hyb'/)
-9250 format (/' ===> WRONG SPECIFICATION OF HYB VERTICAL LEVELS:'/ &
-         '      LEVELS MUST BE MONOTONICALLY INCREASING'/     &
-         '      FROM HYB(1) ---- ERROR ----'//                &
-         '      Current choice:')
-9400 format (/,'Cstv_ptop_8 must be > 0',/)
-9550 format (/,'hyb must be < 1.0 and > ',es10.4,/)
+    F_err = VGD_OK 
     !     __________________________________________________________________
     return
  end subroutine vgrid_genab_5002
