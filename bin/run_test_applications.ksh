@@ -1,8 +1,8 @@
 convert_toctoc_5002=non
 
-add_toctoc_and_compute_pressure=non
+add_toctoc_and_compute_pressure=oui
 
-print_toctoc=oui
+print_toctoc=non
 
 #set -e
 
