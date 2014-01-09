@@ -6,14 +6,14 @@ WARNING: (vgd) Trying to construct vgrid descriptor from legacy encoding (PT,HY 
 (vgd)   sigma coordinate found
 (vgd)    Vertical descriptor successfully reconstructed
  -- Vertical Grid Descriptor Information --
-   ip1= 2009 
-   ip2= 1000 
+   ip1= 2009
+   ip2= 1000
  -------------------------------------------------------
  Vcode= 1001
    Descriptor Nomvar: !!
    level kind = 1, level version =   1
    Surface field nomvar P0
-   Number of sigma levels 27 
+   Number of sigma levels 27
    Equation to compute hydrostatic pressure (pi): pi = B * P0*100
    Momentum levels ip1, A, B:
  2110 0.000000000000000000E+00 0.109999999403953552E-01
