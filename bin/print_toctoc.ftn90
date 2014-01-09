@@ -22,6 +22,8 @@ program print_toctoc
    npos=-111
    call ccard(cle,def,val,ncle,npos) 
    !
+   nullify(ip1s)
+   !
    noptions=0
    ip1m_only_L=.false.
    ip1t_only_L=.false.
