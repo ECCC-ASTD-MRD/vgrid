@@ -1,8 +1,10 @@
-convert_toctoc_5002=non
+convert_toctoc_5002=oui
 
-add_toctoc_and_compute_pressure=non
+add_toctoc_and_compute_pressure=oui
 
 print_toctoc=oui
+
+ignore_spaces_in_diff=oui
 
 #set -e
 
@@ -106,6 +108,21 @@ if [ ${print_toctoc} = oui ];then
 
     DEBUG=non
 
+    if [ ${ignore_spaces_in_diff} = oui ];then
+	XXDIFF='xxdiff --ignore-all-space'
+	if [ ${BASE_ARCH} = Linux_x86-64 ];then
+           DIFF='diff --ignore-all-space'
+        elif [ ${BASE_ARCH} = AIX-powerpc7 ];then
+           DIFF='diff -b'
+        else
+           echo "Please add support to BASE_ARCH=${BASE_ARCH}"
+           exit 1
+        fi
+    else
+	XXDIFF=xxdiff
+	DIFF=diff
+    fi
+
    for ITEM in dm_2001_5001_from_editfst dm_1001_from_model_run dm_1002_from_model_run dm_1003_from_pgsm_lam_east_ops 2001_from_model_run dm_5001_from_model_run dm_5001_from_model_run dm_5001_from_model_run
 
    #for ITEM in dm_5004_from_model_run
@@ -126,70 +143,70 @@ if [ ${print_toctoc} = oui ];then
          fi
 
          ./print_toctoc -fst data_tests/${ITEM} -no_box -kind ${kind} > to_erase.txt 2>&1
-         FILE=data/$(uname -s)/print_toctoc_${ITEM}${lable}.txt
+         FILE=data/${EC_ARCH}/print_toctoc_${ITEM}${lable}.txt
          #cp  to_erase.txt ${FILE}
-         diff to_erase.txt ${FILE}
+         ${DIFF} to_erase.txt ${FILE}
          if [ $? != 0 ];then
             echo "ERROR 1: ./print_toctoc on data/${ITEM} do not mach with ${FILE}"
-	    echo "faire : xxdiff  to_erase.txt ${FILE}"
+	    echo "faire : ${XXDIFF}  to_erase.txt ${FILE}"
 	    if [ ${DEBUG} = oui ];then
-		xxdiff  to_erase.txt ${FILE}
+		${XXDIFF}  to_erase.txt ${FILE}
 	    else
 		exit
 	    fi
          fi
 
          ./print_toctoc -fst data_tests/${ITEM} -no_box -kind ${kind} -convip > to_erase.txt 2>&1
-         FILE=data/$(uname -s)/print_toctoc_convip_${ITEM}${lable}.txt
+         FILE=data/${EC_ARCH}/print_toctoc_convip_${ITEM}${lable}.txt
          #cp  to_erase.txt ${FILE}
-         diff to_erase.txt ${FILE}
+         ${DIFF} to_erase.txt ${FILE}
          if [ $? != 0 ];then
             echo "ERROR 1: ./print_toctoc on data/${ITEM} do not mach with ${FILE}"
-	    echo "faire : xxdiff  to_erase.txt ${FILE}"
+	    echo "faire : ${XXDIFF}  to_erase.txt ${FILE}"
 	    if [ ${DEBUG} = oui ];then
-		xxdiff  to_erase.txt ${FILE}
+		${XXDIFF}  to_erase.txt ${FILE}
 	    else
 		exit
 	    fi
          fi
 
          ./print_toctoc -fst data_tests/${ITEM} -ip1m_only -kind ${kind} > to_erase.txt 2>&1
-         FILE=data/$(uname -s)/print_toctoc_ip1m_only_${ITEM}${lable}.txt
+         FILE=data/${EC_ARCH}/print_toctoc_ip1m_only_${ITEM}${lable}.txt
          #cp to_erase.txt ${FILE}
-         diff -b to_erase.txt ${FILE}
+         ${DIFF} -b to_erase.txt ${FILE}
          if [ $? != 0 ];then
             echo "ERROR 2: ./print_toctoc -ip1m_only on data_tests/${ITEM} do not mach with ${FILE}"
-            echo "faire : xxdiff  to_erase.txt ${FILE}"
+            echo "faire : ${XXDIFF}  to_erase.txt ${FILE}"
 	    if [ ${DEBUG} = oui ];then
-		xxdiff  to_erase.txt ${FILE}
+		${XXDIFF}  to_erase.txt ${FILE}
 	    else
 		exit
 	    fi
          fi
 
          ./print_toctoc -fst data_tests/${ITEM} -ip1t_only -kind ${kind} > to_erase.txt 2>&1
-         FILE=data/$(uname -s)/print_toctoc_ip1t_only_${ITEM}${lable}.txt
+         FILE=data/${EC_ARCH}/print_toctoc_ip1t_only_${ITEM}${lable}.txt
          #cp to_erase.txt ${FILE}
-         diff -b to_erase.txt ${FILE}
+         ${DIFF} -b to_erase.txt ${FILE}
          if [ $? != 0 ];then
             echo "ERROR 3: ./print_toctoc -ip1t_only on data_tests/${ITEM} do not mach with ${FILE}"
-            echo "faire : xxdiff  to_erase.txt ${FILE}"
+            echo "faire : ${XXDIFF}  to_erase.txt ${FILE}"
 	    if [ ${DEBUG} = oui ];then
-		xxdiff  to_erase.txt ${FILE}
+		${XXDIFF}  to_erase.txt ${FILE}
 	    else
 		exit
 	    fi
          fi
 
          ./print_toctoc -fst data_tests/${ITEM} -ip1m_only -out output_file.txt -kind ${kind} > to_erase.txt 2>&1
-         FILE=data/$(uname -s)/print_toctoc_ip1m_only_out_${ITEM}${lable}.txt
+         FILE=data/${EC_ARCH}/print_toctoc_ip1m_only_out_${ITEM}${lable}.txt
          #cp output_file.txt ${FILE}
-         diff output_file.txt ${FILE}
+         ${DIFF} output_file.txt ${FILE}
          if [ $? != 0 ];then
             echo "ERROR 4.2: ./print_toctoc on data_tests/${ITEM} do not mach with ${FILE}"
-	    echo "faire : xxdiff  output_file.txt ${FILE}"
+	    echo "faire : ${XXDIFF}  output_file.txt ${FILE}"
 	    if [ ${DEBUG} = oui ];then
-		xxdiff  to_erase.txt ${FILE}
+		${XXDIFF}  to_erase.txt ${FILE}
 	    else
 		exit
 	    fi
