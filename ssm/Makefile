@@ -15,6 +15,9 @@ ssm: profile.sh
 	mkdir -p $(SSMPACKAGE)/include/$(EC_ARCH); \
 	mkdir -p $(SSMPACKAGE)/bin/$(EC_ARCH); \
 	find ../bin -perm -a+x -type f \( ! -name "*.ksh*" \) -exec cp {} $(SSMPACKAGE)/bin/$(EC_ARCH) \; ; \
+	cd $(SSMPACKAGE)/bin/$(BASE_ARCH); \
+	ln -s $(COMP_ARCH)/* .; \
+	cd -; \
 	find ../lib -name "*.mod" -type f -exec cp {} $(SSMPACKAGE)/include/$(EC_ARCH) \; ; \
 	find ../lib -name "lib*.a" -exec cp {} $(SSMPACKAGE)/lib/$(EC_ARCH) \; ; \
 	echo "Package: ${SWNAME}" > $(SSMPACKAGE)/.ssm.d/control; \

@@ -4,6 +4,8 @@ add_toctoc_and_compute_pressure=oui
 
 print_toctoc=oui
 
+ignore_spaces_in_diff=non
+
 #set -e
 
 #set -x
@@ -106,12 +108,20 @@ if [ ${print_toctoc} = oui ];then
 
     DEBUG=non
 
-    XXDIFF='xxdiff --ignore-all-space'
-    # Pour Linux
-    #DIFF='diff --ignore-all-space'
-    # Pour AIX
-    #DIFF='diff -b'
-    DIFF=diff
+    if [ ${ignore_spaces_in_diff} = oui ];then
+	XXDIFF='xxdiff --ignore-all-space'
+	if [ ${BASE_ARCH} = Linux_x86-64 ];then
+           DIFF='diff --ignore-all-space'
+        elif [ ${BASE_ARCH} = AIX-powerpc7 ];then
+           DIFF='diff -b'
+        else
+           echo "Please add support to BASE_ARCH=${BASE_ARCH}"
+           exit 1
+        fi
+    else
+	XXDIFF=xxdiff
+	DIFF=diff
+    fi
 
    for ITEM in dm_2001_5001_from_editfst dm_1001_from_model_run dm_1002_from_model_run dm_1003_from_pgsm_lam_east_ops 2001_from_model_run dm_5001_from_model_run dm_5001_from_model_run dm_5001_from_model_run
 
@@ -138,7 +148,7 @@ if [ ${print_toctoc} = oui ];then
          ${DIFF} to_erase.txt ${FILE}
          if [ $? != 0 ];then
             echo "ERROR 1: ./print_toctoc on data/${ITEM} do not mach with ${FILE}"
-	    echo "faire : xxdiff  to_erase.txt ${FILE}"
+	    echo "faire : ${XXDIFF}  to_erase.txt ${FILE}"
 	    if [ ${DEBUG} = oui ];then
 		${XXDIFF}  to_erase.txt ${FILE}
 	    else
@@ -152,7 +162,7 @@ if [ ${print_toctoc} = oui ];then
          ${DIFF} to_erase.txt ${FILE}
          if [ $? != 0 ];then
             echo "ERROR 1: ./print_toctoc on data/${ITEM} do not mach with ${FILE}"
-	    echo "faire : xxdiff  to_erase.txt ${FILE}"
+	    echo "faire : ${XXDIFF}  to_erase.txt ${FILE}"
 	    if [ ${DEBUG} = oui ];then
 		${XXDIFF}  to_erase.txt ${FILE}
 	    else
@@ -166,7 +176,7 @@ if [ ${print_toctoc} = oui ];then
          ${DIFF} -b to_erase.txt ${FILE}
          if [ $? != 0 ];then
             echo "ERROR 2: ./print_toctoc -ip1m_only on data_tests/${ITEM} do not mach with ${FILE}"
-            echo "faire : xxdiff  to_erase.txt ${FILE}"
+            echo "faire : ${XXDIFF}  to_erase.txt ${FILE}"
 	    if [ ${DEBUG} = oui ];then
 		${XXDIFF}  to_erase.txt ${FILE}
 	    else
@@ -180,7 +190,7 @@ if [ ${print_toctoc} = oui ];then
          ${DIFF} -b to_erase.txt ${FILE}
          if [ $? != 0 ];then
             echo "ERROR 3: ./print_toctoc -ip1t_only on data_tests/${ITEM} do not mach with ${FILE}"
-            echo "faire : xxdiff  to_erase.txt ${FILE}"
+            echo "faire : ${XXDIFF}  to_erase.txt ${FILE}"
 	    if [ ${DEBUG} = oui ];then
 		${XXDIFF}  to_erase.txt ${FILE}
 	    else
@@ -194,7 +204,7 @@ if [ ${print_toctoc} = oui ];then
          ${DIFF} output_file.txt ${FILE}
          if [ $? != 0 ];then
             echo "ERROR 4.2: ./print_toctoc on data_tests/${ITEM} do not mach with ${FILE}"
-	    echo "faire : xxdiff  output_file.txt ${FILE}"
+	    echo "faire : ${XXDIFF}  output_file.txt ${FILE}"
 	    if [ ${DEBUG} = oui ];then
 		${XXDIFF}  to_erase.txt ${FILE}
 	    else
