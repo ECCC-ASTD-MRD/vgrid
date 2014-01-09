@@ -4,7 +4,7 @@ add_toctoc_and_compute_pressure=oui
 
 print_toctoc=oui
 
-ignore_spaces_in_diff=oui
+ignore_spaces_in_diff=non
 
 #set -e
 
