@@ -1,5 +1,5 @@
 # this file contains common config that is sourced by all makefiles
-CURRENT_VERSION=4.4.0-rc1
+CURRENT_VERSION=4.5.0-a1
 ARCH=all
 SWNAME=vgriddescriptors
 SWDESCRIP='Vertical grid descriptors package'

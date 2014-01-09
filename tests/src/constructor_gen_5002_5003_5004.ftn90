@@ -65,20 +65,20 @@ program constructor
   ! Construct a new set of vertical coordinate descriptors 5002
   stat = vgd_new(d,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
   file='data/data_constructor_gen_5002.txt'
-  stat = test_5002(d,file,write_control_L)
+  stat = test_5002(d,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
 
   ! Construct a new set of vertical coordinate descriptors 5003
   stat = vgd_new(d,kind=5,version=3,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
   file='data/data_constructor_gen_5003.txt'
-  stat = test_5002(d,file,write_control_L)
+  stat = test_5002(d,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
 
   ! Construct a new set of vertical coordinate descriptors 5004
   !
   stat = vgd_new(d,kind=5,version=4,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-1.d0,pref_8=pref,ptop_out_8=ptop)
   file='data/data_constructor_gen_5004.txt'
-  stat = test_5002(d,file,write_control_L)
+  stat = test_5002(d,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
   print*,'ptop',ptop
   
@@ -86,7 +86,7 @@ program constructor
   ! 
   stat = vgd_new(d,kind=5,version=4,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-2.d0,pref_8=pref,ptop_out_8=ptop)
   file='data/data_constructor_gen_5004_B_0.txt'
-  stat = test_5002(d,file,write_control_L)
+  stat = test_5002(d,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
   print*,'ptop',ptop
 
@@ -95,7 +95,7 @@ end program constructor
 !==============================================================================
 !===============================================================================
 !===============================================================================
-integer function test_5002(F_d,F_file,F_write_control_L) result(istat)
+integer function test_5002(F_d,F_file,F_write_control_L,F_stat) result(istat)
    !
    use vGrid_Descriptors, only: vgrid_descriptor,vgd_get,VGD_ERROR,VGD_OK
    implicit none
@@ -103,6 +103,7 @@ integer function test_5002(F_d,F_file,F_write_control_L) result(istat)
    type (vgrid_descriptor) :: F_d
    logical :: F_write_control_L
    character (len=256) :: F_file
+   integer :: F_stat
    !
    ! Local variable
    !
@@ -112,6 +113,14 @@ integer function test_5002(F_d,F_file,F_write_control_L) result(istat)
    integer :: nl_m,nl_t,k,nk,stat,kind,vers,vcode,ip1,my_ip1
 
    istat=VGD_OK
+
+   call flush(6)
+
+   if(F_stat.eq.VGD_ERROR)then
+      print*,'In test_5002: test not performed, since previous command failed'
+      istat=VGD_ERROR
+      return
+   endif
 
    nullify(vcdm,vcdt,work,b_m_8,a_m_8,b_t_8,a_t_8,work_8,vipm,vipt,work_i)
 
