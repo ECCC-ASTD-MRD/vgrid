@@ -2,7 +2,9 @@
 FCFLAGS='=-C -g'
 #RCOMPILE = r.compile
 DESCRIP_PATH = ../lib
+# Use the setup* dot files in ../ to set the following variables 
 #RMN=rmn_014_rc2
+#MODELUTILS
 
 # Override incorrect implicits
 %.o : %.mod
@@ -11,12 +13,12 @@ DESCRIP_PATH = ../lib
 .SUFFIXES: .ftn90 .o
 .ftn90.o:
 	echo $(DESCRIP_PATH)
-	$(RCOMPILE) -libpath $(LIBRARY_PATH) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -src $<
+	$(RCOMPILE) -libpath $(MY_LIBPATH) $(LIBRARY_PATH) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -src $<
 
-OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/vgrid_genab_5002.o $(DESCRIP_PATH)/vgrid_genab_1002_5001.o $(DESCRIP_PATH)/vgrid_genab_1001.o $(DESCRIP_PATH)/vgrid_genab_1004.o $(DESCRIP_PATH)/vgrid_genab_2001.o $(DESCRIP_PATH)/utils.o unit_testing.o
+OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/vgrid_genab_5002.o $(DESCRIP_PATH)/vgrid_genab_1002_5001.o $(DESCRIP_PATH)/vgrid_genab_1001.o $(DESCRIP_PATH)/vgrid_genab_1004.o $(DESCRIP_PATH)/vgrid_genab_2001.o $(DESCRIP_PATH)/utils.o $(DESCRIP_PATH)/msg.o unit_testing.o
 
 UNIT_TEST: UNIT_TEST.ftn90 $(OBJECTS)
-	$(RCOMPILE) $(OPENMP) -librmn $(RMN) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) $(INCLUDE_PATH) -obj $(OBJECTS) -src UNIT_TEST.ftn90 -o UNIT_TEST  -libappl modelutils_base
+	$(RCOMPILE) $(OPENMP) -librmn $(RMN) -optf $(FCFLAGS) -includes $(MY_INCLUDE_PATH) $(DESCRIP_PATH) $(INCLUDE_PATH) -obj $(OBJECTS) -src UNIT_TEST.ftn90 -o UNIT_TEST  -libpath $(MY_LIBPATH) $(LIBRARY_PATH) -libappl $(MODELUTILS)
 
 unit_testing.o: unit_testing.ftn90
 

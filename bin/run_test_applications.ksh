@@ -1,10 +1,10 @@
-convert_toctoc_5002=oui
+convert_toctoc_5002=non
 
-add_toctoc_and_compute_pressure=oui
+add_toctoc_and_compute_pressure=non
 
 print_toctoc=oui
 
-ignore_spaces_in_diff=non
+ignore_spaces_in_diff=oui
 
 #set -e
 
@@ -104,6 +104,7 @@ fi
 #===========================================================================
 #===========================================================================
 #===========================================================================
+
 if [ ${print_toctoc} = oui ];then
 
     DEBUG=non

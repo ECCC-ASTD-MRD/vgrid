@@ -10,3 +10,5 @@ esac
 . s.ssmuse.dot rmnlib-dev
 
 . s.ssmuse.dot ENV/d/x/modelutils/modelutils_1.1.0-a8
+
+export MODELUTILS='modelutils_base'

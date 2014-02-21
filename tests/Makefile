@@ -1,6 +1,5 @@
 # User options
 FCFLAGS='=-C -g'
-#RCOMPILE = r.compile
 DESCRIP_PATH = ../lib
 DATA_ARCH=`uname -s`
 
@@ -10,7 +9,7 @@ DATA_ARCH=`uname -s`
 # Define suffix rules
 .SUFFIXES: .ftn90 .o
 .ftn90.o:
-	$(RCOMPILE) -libpath $(LIBRARY_PATH) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -src $<
+	$(RCOMPILE) -libpath $(MY_LIBPATH) $(LIBRARY_PATH) -optf $(FCFLAGS) -includes $(MY_INCLUDE_PATH) $(DESCRIP_PATH) -src $<
 
 OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/utils.o unit_testing.o
 
@@ -34,7 +33,7 @@ tests:
 	mkdir -p WORK ; \
         ln -s ../data_$(DATA_ARCH)/* . ; \
 	cd .. ; \
-	run_tests.ksh $(ONLY)
+	./run_tests.ksh $(ONLY)
 
 clean:
 	rm -f *.f90 *.o *.mod *.out
