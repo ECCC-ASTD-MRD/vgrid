@@ -1,0 +1,11 @@
+ Note : printing only level information for kind           -1
+WARNING: (vgd) cannot find !! with the following: ip1=        -1,ip2=        -1
+WARNING: (vgd) Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)
+(vgd)  Looking for kind=           -1
+(vgd)    Found        58 unique ip1 of kind  1 among the        119 records in file to construct the vertical descriptor
+(vgd)   hybrid (normalized) coordinate found
+WARNING: (vgd)    More than one HY, checking consistency ...
+(vgd)    All HY consistent.
+(vgd)    Vertical descriptor successfully reconstructed
+CRITICAL ERROR:  Attempt to retrieve invalid key VIPT - level ip1 list (t) returns VGD_MISSING
+ ERROR with vgd_get onVIPT
