@@ -1,0 +1,16 @@
+. ssmuse-sh -d hpcs/201402/00-test/base -d hpcs/201402/00-test/pgi1401 
+. ssmuse-sh -d rpn/env/00-test
+
+export RMN=rmn_014
+
+export RCOMPILE=s.compile
+
+. s.ssmuse.dot rmnlib-dev
+
+#. s.ssmuse.dot ENV/d/x/modelutils/modelutils_1.1.0-a8
+# J'ai mis msg.ftn90 et msg.h dans lib
+# Il faut enleve cela des lib dans le Makefile
+
+export MODELUTILS=''
+
+
