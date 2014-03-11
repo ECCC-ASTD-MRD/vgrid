@@ -63,7 +63,7 @@ for test in ${tests[*]} ; do
     MESSAGE=''
   fi      
   printf "Testing ${test} ${MESSAGE}..."
-  ${test} >${test}.out 2>&1
+  ./${test} >${test}.out 2>&1
   result=`cat ${report_file}`
   Other_Tests
   if [[ ${result} == ' ok' && ${result_o} == ' ok' ]] ; then

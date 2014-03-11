@@ -8,8 +8,8 @@ program tests
   integer, parameter :: i0=1,j0=1
   integer, dimension(:), pointer :: ip1_list
   real, dimension(:,:,:), pointer :: dpidpis_cube
+  real*8, dimension(:,:,:), pointer :: dpidpis_cube_8
   real :: eps=1.e-6
-  real, dimension(:,:), allocatable :: p0
   real :: w1
   type(vgrid_descriptor) :: d
   logical :: ok
@@ -38,9 +38,10 @@ program tests
   stat = vgd_get(d,key='CB_M - vertical B coefficient (m)',value=coef_b)
   stat = vgd_get(d,key='VIPM - level ip1 list (m)'        ,value=ip1_list)
 
-  allocate(p0(1,1))
+  !===============
+  ! real interface
 
-  stat = vgd_dpidpis(d,sfc_field=p0,ip1_list=ip1_list,dpidpis=dpidpis_cube)
+  stat = vgd_dpidpis(d,ip1_list=ip1_list,dpidpis=dpidpis_cube)
   if(stat.ne.VGD_OK)then
      print*,'ERROR: problem with vgd_dpidpis'
      stat=fstfrm(lu)
@@ -54,13 +55,43 @@ program tests
      print*,coef_b(k),dpidpis_cube(i0,j0,k)
      if(coef_b(k).le.epsilon(coef_b(k)))then
         if(abs(coef_b(k)-dpidpis_cube(i0,j0,k))>epsilon(coef_b(k)))then
-           print*,'OUPS'
+           print*,'ERROR 1 dpidpis_cube do not validate '
            OK=.false.
            exit
         endif
      else
         if(abs(dpidpis_cube(i0,j0,k)- coef_b(k))/coef_b(k)>eps)then
-           print*,'OUPS'
+           print*,'ERROR 2 dpidpis_cube do not validate '
+           OK=.false.
+           exit
+        endif
+     endif
+  enddo
+
+  !=================
+  ! real*8 interface
+
+  stat = vgd_dpidpis(d,ip1_list=ip1_list,dpidpis=dpidpis_cube_8)
+  if(stat.ne.VGD_OK)then
+     print*,'ERROR: problem with vgd_dpidpis real*8'
+     stat=fstfrm(lu)
+     call abort
+  endif
+
+  print*,'size(dpidpis_cube_8)',size(dpidpis_cube_8)
+
+  OK=.true.
+  do k=1,size(coef_b)
+     print*,coef_b(k),dpidpis_cube_8(i0,j0,k)
+     if(coef_b(k).le.epsilon(coef_b(k)))then
+        if(abs(coef_b(k)-dpidpis_cube_8(i0,j0,k))>epsilon(coef_b(k)))then
+           print*,'ERROR 3 dpidpis_cube_8 do not validate'
+           OK=.false.
+           exit
+        endif
+     else
+        if(abs(dpidpis_cube(i0,j0,k)- coef_b(k))/coef_b(k)>eps)then
+           print*,'ERROR 4 dpidpis_cube_8 do not validate'
            OK=.false.
            exit
         endif
