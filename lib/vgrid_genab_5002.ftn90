@@ -93,6 +93,12 @@ contains
     
     nullify(hybm,hybt,at_8,bt_8,ip1_t)
 
+    if(F_version.eq.4)then
+       write(for_msg,*) 'In '//trim(func_name)//' : version not supported ->',F_version
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return
+    endif
+
     if(F_version.lt.2.or.F_version.gt.4)then
        write(for_msg,*) 'In '//trim(func_name)//' : wrong version ->',F_version
        call msg(MSG_ERROR,VGD_PRFX//for_msg)

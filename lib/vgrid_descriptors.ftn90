@@ -3271,6 +3271,12 @@ contains
      ! Set error status
      status = VGD_ERROR
 
+     if(self%version==4)then
+        write(for_msg,*) 'in encode_vert_5002, unsupported version -> ',self%version
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
+
      k_plus=1
      ! Test if version == 4 -> notop
      if(self%version==4)k_plus=0
@@ -3610,6 +3616,11 @@ contains
      ! Read header line 1
      self%kind     = nint(self%table(1,1,1))
      self%version  = nint(self%table(2,1,1))
+     if(self%version==4)then
+        write(for_msg,*) 'in decode_vert_5002, unsupported version -> ',self%version
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
      skip          = nint(self%table(3,1,1))
      k_plus=1
      if(self%version==4)k_plus=0
@@ -4108,6 +4119,12 @@ contains
 
     ! Set error status
     status = VGD_ERROR
+
+    if(self%version==4)then
+       write(for_msg,*) 'in compute_pressure_5002_8, version not supported -> ',self%version
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return
+    endif
 
     ! Set size of output
     nk = size(ip1_list)
