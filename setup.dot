@@ -1,5 +1,5 @@
-#LINUX_COMP=intel13sp1
-LINUX_COMP=pgi1301
+LINUX_COMP=intel13sp1
+#LINUX_COMP=pgi1301
 
 
 if [ ${BASE_ARCH} = AIX-powerpc7 ];then
@@ -7,8 +7,8 @@ if [ ${BASE_ARCH} = AIX-powerpc7 ];then
    . ssmuse-sh \
       -d hpcs/13b/04/base\
       -d hpcs/ext/xlf_13.1.0.10\
-      -d rpn/libs/201309/01
-   export RMN=rmn_014_rc2
+      -d rpn/libs/3.0
+   export RMN=rmn_014
 
 else
 
