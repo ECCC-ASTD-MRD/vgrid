@@ -1,19 +1,35 @@
-case ${BASE_ARCH} in
-   AIX-powerpc7) . ssmuse-sh \
-                    -d hpcs/13b/04/base\
-                    -d hpcs/ext/xlf_13.1.0.10\
-                    -d rpn/libs/201309/01
-		 export RMN=rmn_014_rc2
-                 :;;
+#LINUX_COMP=intel13sp1
+LINUX_COMP=pgi1301
 
-   Linux_x86-64). ssmuse-sh \
+
+if [ ${BASE_ARCH} = AIX-powerpc7 ];then
+
+   . ssmuse-sh \
+      -d hpcs/13b/04/base\
+      -d hpcs/ext/xlf_13.1.0.10\
+      -d rpn/libs/201309/01
+   export RMN=rmn_014_rc2
+
+else
+
+   case ${LINUX_COMP} in
+      intel13sp1). ssmuse-sh \
                     -d hpcs/201402/00-test/base\
                     -d hpcs/201402/00-test/intel13sp1\
                     -d rpn/env/00-test
                  export RMN=rmn_014
 		 :;;
-              *) echo "ERROR please get a compiler for ${BASE_ARCH}";;
-esac
+         pgi1301). ssmuse-sh \
+	            -d hpcs/201402/00-test/base\
+                    -d hpcs/13b/04/pgi1301\
+                    -d rpn/libs/2.0b
+                 export RMN=rmn_013
+		 :;;
+              *) echo "Add compiler ${LINUX_COMP} in case ";;
+   esac
+
+fi
+
 echo
 
 export PLATFORM=$(ssm platforms | awk '{print $1}')

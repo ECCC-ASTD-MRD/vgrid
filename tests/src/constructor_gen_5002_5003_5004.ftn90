@@ -54,9 +54,9 @@ program constructor
   stat = vgd_new(d,kind=5,version=2,hyb=hyb_wrong2,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
   stat = vgd_new(d,kind=5,version=2,hyb=hyb_wrong3,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
   print*,'The following error on on missing ptop_out_8 option is normal'
-  call flush(6)
-  stat = vgd_new(d,kind=5,version=4,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-1.d0,pref_8=pref)
-  call flush(6)
+  !call flush(6)
+  !stat = vgd_new(d,kind=5,version=4,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-1.d0,pref_8=pref)
+  !call flush(6)
   print*,'================== EXPECTED ERROR SECTION ENDS  ================='
   print*,'================== EXPECTED ERROR SECTION ENDS  ================='
   print*,'================== EXPECTED ERROR SECTION ENDS  ================='
@@ -76,19 +76,19 @@ program constructor
 
   ! Construct a new set of vertical coordinate descriptors 5004
   !
-  stat = vgd_new(d,kind=5,version=4,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-1.d0,pref_8=pref,ptop_out_8=ptop)
-  file='data/data_constructor_gen_5004.txt'
-  stat = test_5002(d,file,write_control_L,stat)
-  if(stat.eq.VGD_ERROR)OK=.false.
-  print*,'ptop',ptop
+  !stat = vgd_new(d,kind=5,version=4,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-1.d0,pref_8=pref,ptop_out_8=ptop)
+  !file='data/data_constructor_gen_5004.txt'
+  !stat = test_5002(d,file,write_control_L,stat)
+  !if(stat.eq.VGD_ERROR)OK=.false.
+  !print*,'ptop',ptop
   
   ! Construct a new set of vertical coordinate descriptors 5004 with flat Momentum(1) level B(1)=0.
   ! 
-  stat = vgd_new(d,kind=5,version=4,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-2.d0,pref_8=pref,ptop_out_8=ptop)
-  file='data/data_constructor_gen_5004_B_0.txt'
-  stat = test_5002(d,file,write_control_L,stat)
-  if(stat.eq.VGD_ERROR)OK=.false.
-  print*,'ptop',ptop
+  !stat = vgd_new(d,kind=5,version=4,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-2.d0,pref_8=pref,ptop_out_8=ptop)
+  !file='data/data_constructor_gen_5004_B_0.txt'
+  !stat = test_5002(d,file,write_control_L,stat)
+  !if(stat.eq.VGD_ERROR)OK=.false.
+  !print*,'ptop',ptop
 
   call ut_report(OK,'Grid_Descriptors::vgd_new vertical generate initializer (5002) value')
 end program constructor
