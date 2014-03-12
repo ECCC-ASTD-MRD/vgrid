@@ -1,5 +1,5 @@
 # User options
-FCFLAGS='=-C -g'
+#FCFLAGS='=-C -g'
 DESCRIP_PATH = ../lib
 
 # Override incorrect implicits
