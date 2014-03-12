@@ -1,9 +1,10 @@
-#!/usr/bin/env ksh
+#!/bin/bash
 domainHome=$1
 packageHome=$2
 profileDirPath=${packageHome}/etc/profile.d
 packageName=${packageHome##*/}
 profilePath=${profileDirPath}/${packageName}.sh
+loginPath=${profileDirPath}/${packageName}.csh
 mkdir -p ${profileDirPath}
 Platform=`uname -s` ; [[ $Platform = Linux ]] && Platform=${Platform}-`uname -m`
 cp ${packageHome}/.ssm.d/profile.sh ${profilePath}

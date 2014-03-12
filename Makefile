@@ -3,7 +3,7 @@
 #RMN = rmn_014_rc2
 
 # Override incorrect implicits
-SUBDIRS = lib bin examples tests
+SUBDIRS = lib examples tests
 
 all:
 	for dir in $(SUBDIRS) ; do\

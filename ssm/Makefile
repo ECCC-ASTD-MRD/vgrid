@@ -11,17 +11,14 @@ ssm: profile.sh
 	chmod a+x post-install; \
 	cp post-install $(SSMPACKAGE)/.ssm.d; \
 	cp profile.sh $(SSMPACKAGE)/.ssm.d; \
-	mkdir -p $(SSMPACKAGE)/lib/$(EC_ARCH); \
-	mkdir -p $(SSMPACKAGE)/include/$(EC_ARCH); \
-	mkdir -p $(SSMPACKAGE)/bin/$(EC_ARCH); \
-	find ../bin -perm -a+x -type f \( ! -name "*.ksh*" \) -exec cp {} $(SSMPACKAGE)/bin/$(EC_ARCH) \; ; \
-	cd $(SSMPACKAGE)/bin/$(BASE_ARCH); \
-	ln -s $(COMP_ARCH)/* .; \
-	cd -; \
-	find ../lib -name "*.mod" -type f -exec cp {} $(SSMPACKAGE)/include/$(EC_ARCH) \; ; \
-	find ../lib -name "lib*.a" -exec cp {} $(SSMPACKAGE)/lib/$(EC_ARCH) \; ; \
+	mkdir -p $(SSMPACKAGE)/lib; \
+	mkdir -p $(SSMPACKAGE)/include; \
+	echo   "*          VGRID - Release: ${VERSION} ${EC_ARCH} $$(date)" > $(SSMPACKAGE)/include/vgrid_version.cdk
+	echo   "********************************************************************************************" >> $(SSMPACKAGE)/include/vgrid_version.cdk
+	find ../lib -name "*.mod" -type f -exec cp {} $(SSMPACKAGE)/include \; ; \
+	find ../lib -name "lib*.a" -exec cp {} $(SSMPACKAGE)/lib \; ; \
 	echo "Package: ${SWNAME}" > $(SSMPACKAGE)/.ssm.d/control; \
-	echo "Version: ${CURRENT_VERSION}" >> $(SSMPACKAGE)/.ssm.d/control; \
+	echo "Version: ${SSM_VERSION}" >> $(SSMPACKAGE)/.ssm.d/control; \
 	echo "Platform: all" >> $(SSMPACKAGE)/.ssm.d/control; \
 	echo "Maintainer: $(shell whoami)" >> $(SSMPACKAGE)/.ssm.d/control; \
 	echo "BuildInfo:" >> $(SSMPACKAGE)/.ssm.d/control; \
@@ -29,7 +26,7 @@ ssm: profile.sh
 	tar cvf - $(SSMPACKAGE) | gzip -> $(SSMPACKAGE).ssm
 
 profile.sh: profile
-	echo "__version=${CURRENT_VERSION}" >$@ ;\
+	echo "__version=${SSM_VERSION}" >$@ ;\
 	echo "__swname=${SWNAME}" >>$@ ;\
 	cat profile >>$@
 

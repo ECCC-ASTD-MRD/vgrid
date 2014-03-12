@@ -1,0 +1,22 @@
+case ${BASE_ARCH} in
+   AIX-powerpc7) . ssmuse-sh \
+                    -d hpcs/13b/04/base\
+                    -d hpcs/ext/xlf_13.1.0.10\
+                    -d rpn/libs/201309/01
+		 export RMN=rmn_014_rc2
+                 :;;
+
+   Linux_x86-64). ssmuse-sh \
+                    -d hpcs/201402/00-test/base\
+                    -d hpcs/201402/00-test/intel13sp1\
+                    -d rpn/env/00-test
+                 export RMN=rmn_014
+		 :;;
+              *) echo "ERROR please get a compiler for ${BASE_ARCH}";;
+esac
+echo
+
+export PLATFORM=$(ssm platforms | awk '{print $1}')
+
+export RCOMPILE=s.compile
+
