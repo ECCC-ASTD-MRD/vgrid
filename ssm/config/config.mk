@@ -2,7 +2,7 @@
 # Warning : no underscore '_' in CURRENT_VERSION string
 VERSION=5.0.0
 SSM_VERSION=$(VERSION)-$(COMP_ARCH)
-SWNAME=vgrid
+SWNAME=vgriddescriptors
 SWDESCRIP='Vertical grid descriptors package'
 
 SSMPACKAGE=$(SWNAME)_$(SSM_VERSION)_${PLATFORM}
