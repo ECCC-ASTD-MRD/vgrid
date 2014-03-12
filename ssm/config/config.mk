@@ -1,11 +1,8 @@
 # this file contains common config that is sourced by all makefiles
-CURRENT_VERSION=4.5.0-a1
-ARCH=all
-SWNAME=vgriddescriptors
+# Warning : no underscore '_' in CURRENT_VERSION string
+VERSION=6.0.0
+SSM_VERSION=$(VERSION)-$(COMP_ARCH)
+SWNAME=vgrid
 SWDESCRIP='Vertical grid descriptors package'
 
-# platform specific definition
-#SSMPACKAGE=$(SWNAME)_$(CURRENT_VERSION)_${BASE_ARCH}
-SSMPACKAGE=$(SWNAME)_$(CURRENT_VERSION)_multi
-
-
+SSMPACKAGE=$(SWNAME)_$(SSM_VERSION)_${PLATFORM}
