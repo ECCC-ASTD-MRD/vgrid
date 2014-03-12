@@ -10,16 +10,22 @@ program tests
   integer :: i,j,tid,ii,jj,icor
   integer, external :: omp_get_thread_num,omp_get_num_threads
   real, dimension(:), pointer :: dpidpis_profil
-  real, dimension(:,:,:), pointer :: dpidpis_3d=>null(),dpidpis_3d_from_prof=>null()
+  real*8, dimension(:), pointer :: dpidpis_profil_8
+  real, dimension(:,:,:), pointer :: dpidpis_3d,dpidpis_3d_from_prof
+  real*8, dimension(:,:,:), pointer :: dpidpis_3d_8,dpidpis_3d_from_prof_8
   real :: epsilon=1.e-5
-  real, dimension(:,:), allocatable :: p0,px
-  real, dimension(:), allocatable :: p00
+  real, dimension(:,:), pointer :: p0,px
+  real*8, dimension(:,:), pointer ::  p0_8
+  real, dimension(:), pointer :: p00
+  real*8, dimension(:), pointer :: p00_8
   real :: local_pres,w1
   type(vgrid_descriptor) :: d
   logical :: ok
   real*8, dimension(:), pointer :: coef_b
   
-  stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
+  nullify(ip1_list,dpidpis_3d,dpidpis_3d_from_prof,dpidpis_3d_from_prof_8,p0,px,p0_8,p00,p00_8,coef_b)
+
+  stat=fnom(lu,"data/dm_5002_from_model_run","RND+R/O",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
      call abort
@@ -43,16 +49,19 @@ program tests
   stat = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',"UU")
 
   nk=size(ip1_list)
-  allocate(p0(ni,nj),p00(ni*nj),px(ni,nj),dpidpis_3d_from_prof(ni,nj,nk))
+  allocate(p0(ni,nj),p00(ni*nj),p00_8(ni*nj),p0_8(ni,nj),px(ni,nj),dpidpis_3d_from_prof(ni,nj,nk),dpidpis_3d_from_prof_8(ni,nj,nk))
 
   stat = fstlir(p0,lu,ni,nj,nkk,-1,'',-1,-1,-1,'','P0')
   stat = fstlir(p00,lu,ni,nj,nkk,-1,'',-1,-1,-1,'','P0')
   p0  = p0*100. !mb to Pa
+  p0_8=p0
   p00 = p00*100. !mb to Pa
-  
-  stat = vgd_dpidpis(d,sfc_field=p0,ip1_list=ip1_list,dpidpis=dpidpis_3d)  
+  p00_8=p00
 
-!$omp parallel private(tid,dpidpis_profil,stat,ii,jj,k)
+  stat = vgd_dpidpis(d,sfc_field=p0  ,ip1_list=ip1_list,dpidpis=dpidpis_3d)  
+  stat = vgd_dpidpis(d,sfc_field=p0_8,ip1_list=ip1_list,dpidpis=dpidpis_3d_8)  
+
+!$omp parallel private(tid,dpidpis_profil,dpidpis_profil_8,stat,ii,jj,k)
   tid=omp_get_thread_num()
   if (tid .eq. 0) then
      print*,'number of threads=',omp_get_num_threads()
@@ -63,7 +72,14 @@ program tests
      nullify(dpidpis_profil)
      stat = vgd_dpidpis(d,sfc_field=p00(i),ip1_list=ip1_list,dpidpis=dpidpis_profil)         
      if(stat.ne.VGD_OK)then
-        print*,'ERROR: problem with vgd_dpidpis'
+        print*,'ERROR: problem with vgd_dpidpis profil for i=',i
+        stat=fstfrm(lu)
+        call abort
+     endif
+     nullify(dpidpis_profil_8)
+     stat = vgd_dpidpis(d,sfc_field=p00_8(i),ip1_list=ip1_list,dpidpis=dpidpis_profil_8)         
+     if(stat.ne.VGD_OK)then
+        print*,'ERROR: problem with vgd_dpidpis profil real*8 for i=',i
         stat=fstfrm(lu)
         call abort
      endif
@@ -72,16 +88,26 @@ program tests
      jj=(i-ii)/ni+1
      !print*,'ii,jj=',ii,jj
      do k=1,nk
-        dpidpis_3d_from_prof(ii,jj,k)=dpidpis_profil(k)
+        dpidpis_3d_from_prof  (ii,jj,k)=dpidpis_profil  (k)
+        dpidpis_3d_from_prof_8(ii,jj,k)=dpidpis_profil_8(k)
      enddo
-     deallocate(dpidpis_profil)
+     deallocate(dpidpis_profil,dpidpis_profil_8)
   enddo
 !$omp enddo
 !$omp end parallel
 
+if(associated(dpidpis_profil))deallocate(dpidpis_profil)
 stat = vgd_dpidpis(d,sfc_field=p0(i0,j0),ip1_list=ip1_list,dpidpis=dpidpis_profil)
 if(stat.ne.VGD_OK)then
    print*,'ERROR: problem with vgd_dpidpis'
+   stat=fstfrm(lu)
+   call abort
+endif
+
+if(associated(dpidpis_profil_8))deallocate(dpidpis_profil_8)
+stat = vgd_dpidpis(d,sfc_field=p0_8(i0,j0),ip1_list=ip1_list,dpidpis=dpidpis_profil_8)
+if(stat.ne.VGD_OK)then
+   print*,'ERROR: problem with vgd_dpidpis real*8'
    stat=fstfrm(lu)
    call abort
 endif
@@ -96,6 +122,12 @@ do k=1,nk
             OK=.false.
             exit
          endif
+         if(dpidpis_3d_from_prof_8(i,j,k).ne.dpidpis_3d_8(i,j,k))then
+            print*,'Problem : OpenMP do not reproduce result for reak*8'
+            print*,'problem in i,k,j',i,k,j,dpidpis_3d_from_prof_8(i,j,k),dpidpis_3d_8(i,j,k)
+            OK=.false.
+            exit
+         endif         
       enddo
    enddo
 enddo
