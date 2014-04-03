@@ -1,16 +1,19 @@
 #LINUX_COMP=intel13sp1
-LINUX_COMP=pgi1301
-
+#LINUX_COMP=pgi1301
+#LINUX_COMP=pgi1401
+LINUX_COMP=pgi9xx
 
 if [ ${BASE_ARCH} = AIX-powerpc7 ];then
 
    . ssmuse-sh \
       -d hpcs/13b/04/base\
       -d hpcs/ext/xlf_13.1.0.10\
-      -d rpn/libs/201309/01
-   export RMN=rmn_014_rc2
+      -d rpn/libs/3.0
+   export RMN=rmn_014
 
 else
+
+   r.use make as gmake
 
    case ${LINUX_COMP} in
       intel13sp1). ssmuse-sh \
@@ -24,6 +27,23 @@ else
                     -d hpcs/13b/04/pgi1301\
                     -d rpn/libs/2.0b
                  export RMN=rmn_013
+		 :;;
+         pgi1401). ssmuse-sh \
+	            -d hpcs/201402/00/base\
+                    -d hpcs/201402/00/pgi1401\
+                    -d rpn/env/00-test
+                 export RMN=rmn_014
+		 :;;
+         pgi9xx) if [ ${PLATFORM} = 'ubuntu-12.04-amd64-64' ];then
+	            echo "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR"
+                    echo "No rmnlib for this combination"
+                 else
+                    . ssmuse-sh -d hpcs/13b/03/base
+                    . s.ssmuse.dot pgi9xx
+                    . s.ssmuse.dot devtools
+                    . ssmuse-sh -d rpn/libs/4.0
+                    export RMN=rmn_014
+                 fi
 		 :;;
               *) echo "Add compiler ${LINUX_COMP} in case ";;
    esac
