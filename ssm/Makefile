@@ -13,8 +13,8 @@ ssm: profile.sh
 	cp profile.sh $(SSMPACKAGE)/.ssm.d; \
 	mkdir -p $(SSMPACKAGE)/lib; \
 	mkdir -p $(SSMPACKAGE)/include; \
-	echo   "*          VGRID - Release: ${VERSION} ${EC_ARCH} $$(date)" > $(SSMPACKAGE)/include/vgrid_version.cdk
-	echo   "********************************************************************************************" >> $(SSMPACKAGE)/include/vgrid_version.cdk
+	echo   "print*,'*          VGRID - Release: ${VERSION} ${EC_ARCH} $$(date)'" > $(SSMPACKAGE)/include/vgrid_version.cdk
+	echo   "print*,'********************************************************************************************'" >> $(SSMPACKAGE)/include/vgrid_version.cdk
 	find ../lib -name "*.mod" -type f -exec cp {} $(SSMPACKAGE)/include \; ; \
 	find ../lib -name "lib*.a" -exec cp {} $(SSMPACKAGE)/lib \; ; \
 	echo "Package: ${SWNAME}" > $(SSMPACKAGE)/.ssm.d/control; \
