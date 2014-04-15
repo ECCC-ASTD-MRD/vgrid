@@ -21,7 +21,11 @@ all: $(OBJECTS)
 vgrid_descriptors.o: vgrid_descriptors.ftn90 vgrid_genab_1001.o vgrid_genab_1002_5001.o vgrid_genab_1004.o vgrid_genab_2001.o vgrid_genab_5002.o utils.o
 
 lib: all
-	ar cru libdescrip.a lib/$(OBJECTS)
+	ar cru libdescrip.a $(OBJECTS)
+
+install: lib
+	mkdir -p lib; \
+	mv libdescrip.a lib; \
 
 clean:
 	rm -f *.f90 *.o *.mod lib*.a
