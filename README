@@ -1,0 +1,14 @@
+To add a new vertical coordinate type:
+
+1- Design the new table (on paper)
+2- Modify the validity tables to include your new vcoord (e.g. ptop_8_valid)
+3- Add elements to the structure (type grid_descriptor) if necessary
+4- Add a branch to your new vcoord in the build constructor (new_build_vert)
+5- Write the encoder for your new vcoord (e.g. encode_vert_5002)
+6- Add get/put entries if the structure has been modified (step 3 above)
+7- Generate a file that contains your new coordinate record
+8- Add a branch to your new vcoord in the read constructor (new_read)
+9- Write a decoder for your new vcoord (e.g. decode_vert_5002)
+10- Add a level calculator (e.g. compute_pressure_5002)
+11- Add a branch for your new vcoord in the printer (print_desc)
+

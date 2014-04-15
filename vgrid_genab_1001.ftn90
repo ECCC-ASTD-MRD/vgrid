@@ -1,0 +1,202 @@
+!-------------------------------------- LICENCE BEGIN ------------------------------------
+!Environment Canada - Atmospheric Science and Technology License/Disclaimer, 
+!                     version 3; Last Modified: May 7, 2008.
+!This is free but copyrighted software; you can use/redistribute/modify it under the terms 
+!of the Environment Canada - Atmospheric Science and Technology License/Disclaimer 
+!version 3 or (at your option) any later version that should be found at: 
+!http://collaboration.cmc.ec.gc.ca/science/rpn.comm/license.html 
+!
+!This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+!without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+!See the above mentioned License/Disclaimer for more details.
+!You should have received a copy of the License/Disclaimer along with this software; 
+!if not, you can write to: EC-RPN COMM Group, 2121 TransCanada, suite 500, Dorval (Quebec), 
+!CANADA, H9P 1J3; or send e-mail to service.rpn@ec.gc.ca
+!-------------------------------------- LICENCE END --------------------------------------
+module vdescript_1001
+
+  implicit none
+  private
+
+  ! Define class variables
+#include "vgrid.hf"
+
+  ! Define and publicize interfaces
+  public :: vgrid_genab_1001
+  interface reallocate
+     module procedure PRIV_reallocate4
+     module procedure PRIV_reallocate8
+     module procedure PRIV_reallocateI
+  end interface
+
+contains
+
+   subroutine vgrid_genab_1001 (F_siguser,F_sig,F_a_8,F_b_8,F_ip1,F_err)
+
+      !    Using sigma coordinate generate A=0 and B=convip(...,F_siguser,...)
+      
+      implicit none
+      !      
+      ! Arguments
+      integer, intent(out) :: F_err
+      real, dimension(:), intent(in) :: F_siguser           ! user specification for vertical layering sigma
+      real, dimension(:), pointer :: F_sig                  ! model sigma values (cannot be normalides)
+      real*8, dimension(:), pointer :: F_a_8, F_b_8         ! model As and Bs
+      integer, dimension(:), pointer :: F_ip1               ! ip1 values
+      
+      ! Local variables
+      integer :: k,i, status, nk, kind
+      logical :: monotone=.true.,wrongsig=.false.
+      character*16 dumc_S
+
+      !     __________________________________________________________________
+      
+      F_err = VGD_ERROR
+
+      ! Set size of the problem
+      nk = size(F_siguser)
+      
+      ! Check and allocate as required
+      status = reallocate(F_sig,1,nk)
+      if (status /= VGD_OK) return
+      status = reallocate(F_a_8,1,nk)
+      if (status /= VGD_OK) return
+      status = reallocate(F_b_8,1,nk)
+      if (status /= VGD_OK) return
+      status = reallocate(F_ip1,1,nk)      
+      !
+      if(F_siguser(nk).ne.1.d0)then
+         wrongsig = .true.
+         write(for_msg,1000)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
+      endif
+      do k=2, nk
+         if (F_siguser(k).le.F_siguser(k-1))monotone = .false.
+      end do
+      if(.not.monotone)then
+         wrongsig = .true.
+         write(for_msg,1001)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
+      endif
+      if (wrongsig) then
+         write(for_msg,1002)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         do k=1, nk
+            write(for_msg,*) F_siguser(k),k
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         end do
+         return
+      endif
+      !
+      do k=1,nk
+         call convip(i,F_siguser (k),1   , 2,dumc_S,.false.)
+         call convip(i,F_sig(k)     ,kind,-1,dumc_S,.false.)         
+         F_b_8(k)=F_sig(k)
+         F_ip1(k)=i
+      end do
+      F_a_8=0.d0
+      !
+      F_err = VGD_OK
+      return
+
+1000  format (/' ===> WRONG SPECIFICATION OF SIGMA VERTICAL LEVELS:'/&
+           '      SIGMA(NK) MUST BE 1.0')
+      
+1001  format (/' ===> WRONG SPECIFICATION OF SIGMA VERTICAL LEVELS:'/&
+           '      LEVELS MUST BE MONOTONICALLY INCREASING')
+1002  format (/'      Current choice:')
+
+   end subroutine vgrid_genab_1001
+   
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ function PRIV_reallocate4(v,low,high) result(status)
+    ! Allocate space for outputs
+    real, dimension(:), pointer :: v            !vector to allocate
+    integer, intent(in) :: low,high             !bounds for vector
+    integer :: status                           !return status of function
+    
+    ! Internal variables
+    integer :: check
+
+    ! Deallocate and re-allocate with the correct size
+    status = VGD_ERROR
+    if (associated(v)) then
+       deallocate(v,stat=check)
+       if (check /= 0) then
+          write(for_msg,*) 'Error in deallocate() from vdescript_1001::reallocate()'
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return
+       endif
+    endif
+    allocate(v(low:high),stat=check)
+    if (check /= 0) then
+       write(for_msg,*) 'Error in allocate() from vdescript_1001::reallocate()'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return
+    endif
+    status = VGD_OK
+    return
+  end function PRIV_reallocate4
+
+  function PRIV_reallocate8(v,low,high) result(status)
+    ! Allocate space for outputs
+    real*8, dimension(:), pointer :: v          !vector to allocate
+    integer, intent(in) :: low,high             !bounds for vector
+    integer :: status                           !return status of function
+    
+    ! Internal variables
+    integer :: check
+
+    ! Deallocate and re-allocate with the correct size
+    status = VGD_ERROR
+    if (associated(v)) then
+       deallocate(v,stat=check)
+       if (check /= 0) then
+          write(for_msg,*) 'Error in deallocate() from vgrid_genab_1001:reallocate()'
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return
+       endif
+    endif
+    allocate(v(low:high),stat=check)
+    if (check /= 0) then
+       write(for_msg,*) 'Error in allocate() from vgrid_genab_1001::reallocate()'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return
+    endif
+    status = VGD_OK
+    return
+  end function PRIV_reallocate8
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  function PRIV_reallocateI(v,low,high) result(status)
+    ! Allocate space for outputs
+    integer, dimension(:), pointer :: v         !vector to allocate
+    integer, intent(in) :: low,high             !bounds for vector
+    integer :: status                           !return status of function
+    
+    ! Internal variables
+    integer :: check
+
+    ! Deallocate and re-allocate with the correct size
+    status = VGD_ERROR
+    if (associated(v)) then
+       deallocate(v,stat=check)
+       if (check /= 0) then
+          write(for_msg,*) 'Error in deallocate() from vdescript_1001::reallocate()'
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return
+       endif
+    endif
+    allocate(v(low:high),stat=check)
+    if (check /= 0) then
+       write(for_msg,*) 'Error in allocate() from vdescript_1001::reallocate()'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return
+    endif
+    status = VGD_OK
+    return
+  end function PRIV_reallocateI
+
+end module vdescript_1001
+

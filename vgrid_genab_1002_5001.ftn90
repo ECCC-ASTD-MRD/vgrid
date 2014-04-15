@@ -1,0 +1,281 @@
+!-------------------------------------- LICENCE BEGIN ------------------------------------
+!Environment Canada - Atmospheric Science and Technology License/Disclaimer, 
+!                     version 3; Last Modified: May 7, 2008.
+!This is free but copyrighted software; you can use/redistribute/modify it under the terms 
+!of the Environment Canada - Atmospheric Science and Technology License/Disclaimer 
+!version 3 or (at your option) any later version that should be found at: 
+!http://collaboration.cmc.ec.gc.ca/science/rpn.comm/license.html 
+!
+!This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+!without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+!See the above mentioned License/Disclaimer for more details.
+!You should have received a copy of the License/Disclaimer along with this software; 
+!if not, you can write to: EC-RPN COMM Group, 2121 TransCanada, suite 500, Dorval (Quebec), 
+!CANADA, H9P 1J3; or send e-mail to service.rpn@ec.gc.ca
+!-------------------------------------- LICENCE END --------------------------------------
+module vdescript_1002_5001
+
+  implicit none
+  private
+
+  ! Define class variables
+#include "vgrid.hf"
+
+  ! Define and publicize interfaces
+  public :: vgrid_genab_1002_5001
+  interface reallocate
+     module procedure PRIV_reallocate4
+     module procedure PRIV_reallocate8
+     module procedure PRIV_reallocateI
+  end interface
+
+contains   
+
+   subroutine vgrid_genab_1002_5001 (F_vcode,F_hybuser,F_rcoef, &
+        F_ptop_8,F_pref_8,F_hyb,F_a_8,F_b_8,F_ip1,F_err)
+
+      !    Using Laprise & Girard, generates de A and B of the hybrid coordinate
+      !    see: Laprise & Girard, 1990, J. of Climate, eq. 5.1
+      !    Based on subroutine genab, genab2 also includes the evaluation of the 
+      !    analytical derivative of psurf*B with respect to Z which is not
+      !    part of this function
+      
+      implicit none
+      !      
+      ! Arguments
+      integer, intent(out) :: F_err
+      integer, intent(in) :: F_vcode                        ! v code 1002 or 5001
+      real, dimension(:), intent(in) :: F_hybuser           ! user specification for vertical layering hyb
+      real, intent(in) :: F_rcoef                           ! user specification for rcoef
+      real*8 :: F_ptop_8                                    ! user specification for lid pressures
+      real*8, intent(in) :: F_pref_8                        ! user specification for lid and reference pressures
+      real, dimension(:), pointer :: F_hyb                  ! model hyb values (cannot be normalides)
+      real*8, dimension(:), pointer :: F_a_8, F_b_8         ! model As and Bs
+      integer, dimension(:), pointer :: F_ip1               ! ip1 values
+      
+      ! Local variables
+      integer :: k,i, status, nk, kind
+      logical :: monotone=.true.,wronghyb=.false.,cptop_L=.true.
+      real    :: rcoef,pres,pr1,hybtop
+      real*8  :: ztop_8, zsrf_8, eta_8, zeta_8
+      real, parameter :: epsilon=1.0e-6
+      Logical :: complet_L
+
+      character*16 dumc_S
+
+      !     __________________________________________________________________
+      
+      F_err = VGD_ERROR
+
+      ! Set size of the problem
+      nk = size(F_hybuser)
+      
+      ! Check and allocate as required
+      status = reallocate(F_hyb,1,nk)
+      if (status /= VGD_OK) return
+      status = reallocate(F_a_8,1,nk)
+      if (status /= VGD_OK) return
+      status = reallocate(F_b_8,1,nk)
+      if (status /= VGD_OK) return
+      status = reallocate(F_ip1,1,nk)
+      
+      !
+      ! Code from gemdm_config.ftn
+      !
+      if(F_hybuser(nk).ne.1.d0)then
+         wronghyb = .true.
+         write(for_msg,9202)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
+      endif
+      do k=2, nk
+         if (F_hybuser(k).le.F_hybuser(k-1))monotone = .false.
+      end do
+      if(.not.monotone)then
+         wronghyb = .true.
+         write(for_msg,9203)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
+      endif
+      if (wronghyb) then
+         write(for_msg,9204)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         do k=1, nk
+            write(for_msg,*) F_hybuser(k),k
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         end do
+         return
+      endif
+      !
+      if(F_ptop_8.le.0.d0)then
+         write(for_msg,'("ptop=",f20.16," must be greater than zero")')F_ptop_8
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         return
+      endif
+      !
+      if (F_vcode.eq.5001) then         
+         if((F_ptop_8-F_hybuser(1)*F_pref_8)/F_ptop_8.gt.epsilon)then
+            write(for_msg,'("ptop=",E25.16," is lower than first hyb level =",E25.16)')F_ptop_8,F_hybuser(1)*F_pref_8
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            return
+         endif
+         ! Find out if first level is at top
+         if(abs(F_hybuser(1)-F_ptop_8/F_pref_8).lt.epsilon)then
+            complet_L=.true.
+         else
+            print*,'NOTE: First hyb level is not at model top'
+            complet_L=.false.
+            hybtop=F_ptop_8/F_pref_8
+            call convip(i,hybtop,5   , 2,dumc_S,.false.)
+            call convip(i,hybtop,kind,-1,dumc_S,.false.)
+         endif
+         do k=1,nk
+            call convip(i,F_hybuser(k),5   , 2,dumc_S,.false.)
+            call convip(i,F_hyb(k),kind,-1,dumc_S,.false.)
+            F_ip1(k)=i
+         end do
+         if(complet_L)then
+            hybtop=F_ptop_8/F_pref_8
+!            print*,'NOTE: Recomputing ptop in order to make it consistant with hyb top'
+!            F_ptop_8=F_hyb(1)*F_pref_8
+!            hybtop=F_hyb(1)
+         endif
+      else if(F_vcode.eq.1002) then
+         do k=1,nk
+            call convip(i,F_hybuser(k),1   , 1,dumc_S,.false.)
+            call convip(i,pres        ,kind,-1,dumc_S,.false.)
+            F_ip1(k)=i
+            F_hyb(k)=pres+(1.-pres)*F_ptop_8/F_pref_8
+         end do
+         if(F_hybuser(1).eq.0)then
+            ! Complete set
+            complet_L=.true.
+            hybtop=F_hyb(1)
+         else
+            ! Incomplete set
+            complet_L=.false.
+            hybtop=F_ptop_8/F_pref_8
+            call convip(i,hybtop,1   , 1,dumc_S,.false.)
+            call convip(i,hybtop,kind,-1,dumc_S,.false.)
+         endif
+      else
+         write(for_msg,'("Wrong vcode, must be 1002 or 5001")')
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         return
+      endif
+      !
+      ! Code from genab2
+      !
+      pr1=1./(1.-hybtop)
+      do k=1,nk
+         F_b_8(k)=((F_hyb(k)-hybtop)*pr1)**F_rcoef
+         F_a_8(k)=F_pref_8*(F_hyb(k)-F_b_8(k))
+         !print*,F_a_8(k),F_b_8(k)
+      enddo
+      if(complet_L)then
+         F_b_8(1)=0d0
+         F_a_8(1)=F_ptop_8
+      endif
+      !
+      F_err = VGD_OK
+      return
+
+9202  format (/' ===> WRONG SPECIFICATION OF HYB VERTICAL LEVELS:'/&
+               '      HYB(NK) MUST BE 1.0')
+      
+9203  format (/' ===> WRONG SPECIFICATION OF HYB VERTICAL LEVELS:'/&
+               '      LEVELS MUST BE MONOTONICALLY INCREASING')
+9204  format (/'      Current choice:')
+
+    end subroutine vgrid_genab_1002_5001
+   
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ function PRIV_reallocate4(v,low,high) result(status)
+    ! Allocate space for outputs
+    real, dimension(:), pointer :: v            !vector to allocate
+    integer, intent(in) :: low,high             !bounds for vector
+    integer :: status                           !return status of function
+    
+    ! Internal variables
+    integer :: check
+
+    ! Deallocate and re-allocate with the correct size
+    status = VGD_ERROR
+    if (associated(v)) then
+       deallocate(v,stat=check)
+       if (check /= 0) then
+          write(for_msg,*) 'in deallocate() from vdescript_1002_5001::reallocate()'
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return
+       endif
+    endif
+    allocate(v(low:high),stat=check)
+    if (check /= 0) then
+       write(for_msg,*) 'in allocate() from vdescript_1002_5001::reallocate()'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return
+    endif
+    status = VGD_OK
+    return
+  end function PRIV_reallocate4
+
+  function PRIV_reallocate8(v,low,high) result(status)
+    ! Allocate space for outputs
+    real*8, dimension(:), pointer :: v          !vector to allocate
+    integer, intent(in) :: low,high             !bounds for vector
+    integer :: status                           !return status of function
+    
+    ! Internal variables
+    integer :: check
+
+    ! Deallocate and re-allocate with the correct size
+    status = VGD_ERROR
+    if (associated(v)) then
+       deallocate(v,stat=check)
+       if (check /= 0) then
+          write(for_msg,*) 'in deallocate() from vgrid_genab_1002_5001:reallocate()'
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return
+       endif
+    endif
+    allocate(v(low:high),stat=check)
+    if (check /= 0) then
+       write(for_msg,*) 'in allocate() from vgrid_genab_1002_5001::reallocate()'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return
+    endif
+    status = VGD_OK
+    return
+  end function PRIV_reallocate8
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  function PRIV_reallocateI(v,low,high) result(status)
+    ! Allocate space for outputs
+    integer, dimension(:), pointer :: v         !vector to allocate
+    integer, intent(in) :: low,high             !bounds for vector
+    integer :: status                           !return status of function
+    
+    ! Internal variables
+    integer :: check
+
+    ! Deallocate and re-allocate with the correct size
+    status = VGD_ERROR
+    if (associated(v)) then
+       deallocate(v,stat=check)
+       if (check /= 0) then
+          write(for_msg,*) 'in deallocate() from vdescript_1002_5001::reallocate()'
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return
+       endif
+    endif
+    allocate(v(low:high),stat=check)
+    if (check /= 0) then
+       write(for_msg,*) 'in allocate() from vdescript_1002_5001::reallocate()'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return
+    endif
+    status = VGD_OK
+    return
+  end function PRIV_reallocateI
+
+end module vdescript_1002_5001
+
