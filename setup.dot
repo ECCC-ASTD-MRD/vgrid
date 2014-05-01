@@ -34,7 +34,7 @@ else
                     -d rpn/env/00-test
                  export RMN=rmn_014
 		 :;;
-         pgi9xx) if [ ${PLATFORM} = 'ubuntu-12.04-amd64-64' ];then
+         pgi9xx) if [ ${ORDENV_PLAT} = 'ubuntu-12.04-amd64-64' ];then
 	            echo "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR"
                     echo "No rmnlib for this combination"
                  else
