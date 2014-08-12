@@ -1,7 +1,9 @@
+
+#LINUX_COMP=intel13sp1u2
 #LINUX_COMP=intel13sp1
 #LINUX_COMP=pgi1301
 #LINUX_COMP=pgi1401
-LINUX_COMP=pgi9xx
+#LINUX_COMP=pgi9xx
 
 if [ ${BASE_ARCH} = AIX-powerpc7 ];then
 
@@ -16,6 +18,12 @@ else
    r.use make as gmake
 
    case ${LINUX_COMP} in
+      intel13sp1u2). ssmuse-sh \
+                    -d hpcs/201402/01/base\
+                    -d hpcs/201402/01/intel13sp1u2\
+                    -d rpn/libs/4.1-alpha
+                 export RMN=rmnbeta_015
+		 :;;
       intel13sp1). ssmuse-sh \
                     -d hpcs/201402/00-test/base\
                     -d hpcs/201402/00-test/intel13sp1\
