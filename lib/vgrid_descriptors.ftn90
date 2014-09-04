@@ -160,7 +160,9 @@ module vGrid_Descriptors
 
   interface vgd_dpidpis
      module procedure dpidpis_withref
+     module procedure dpidpis_withref_8
      module procedure dpidpis_withref_prof
+     module procedure dpidpis_withref_prof_8
   end interface
 
   interface set_vcode
@@ -2553,6 +2555,37 @@ contains
      return
   end function dpidpis_withref_prof
 
+  integer function dpidpis_withref_prof_8(self,ip1_list,dpidpis,sfc_field) result(status)
+     use utils, only: get_allocate,up,get_error
+     type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
+     integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
+     real*8, dimension(:), pointer :: dpidpis                      !Derivative values
+     real*8, optional, intent(in) :: sfc_field                     !Surface field reference for coordinate [none]
+
+     ! Local variables
+     real*8 :: my_sfc_field_8
+     integer :: error,stat
+
+     ! Set return value
+     status = VGD_ERROR
+     if(.not.self%valid)then
+        write(for_msg,*) 'vgrid structure is not valid in dpidpis_withref_prof_8'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+        return
+     endif
+     ! Set default values
+     my_sfc_field_8 = VGD_MISSING
+     if (present(sfc_field)) my_sfc_field_8 = sfc_field
+     ! Wrap call to level calculation
+     stat = diag_withref_prof_8(self,ip1_list,dpidpis,sfc_field=my_sfc_field_8,dpidpis=.true.)
+     if(stat==VGD_ERROR)then
+        write(for_msg,*) 'ERROR with diag_withref_prof_8 in dpidpis_withref_prof_8'
+        return
+     endif
+     status = VGD_OK
+     return
+  end function dpidpis_withref_prof_8
+
   integer function diag_withref_prof_8(self,ip1_list,levels,sfc_field,in_log,dpidpis) result(status)
      use utils, only: get_allocate
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
@@ -2763,7 +2796,7 @@ contains
      allocate(my_sfc_field_8(ni,nj),stat=error)
      if (error /= 0) then
         nullify(my_sfc_field_8)
-        write(for_msg,*) 'cannot allocate space for sfc_field in levels_withref'
+        write(for_msg,*) 'cannot allocate space for sfc_field in dpidpis_withref'
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
@@ -2789,6 +2822,58 @@ contains
      status=VGD_OK
      return
   end function dpidpis_withref
+
+  integer function dpidpis_withref_8(self,ip1_list,dpidpis,sfc_field) result(status)
+     use utils, only: get_allocate
+     ! Given referent, compute physical levelling information from the vertical description
+     type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
+     integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
+     real*8, dimension(:,:,:), pointer :: dpidpis                !pressure derivative with respect to sfc pressure
+     real*8, dimension(:,:), optional, intent(in) :: sfc_field   !Surface field reference for coordinate [none]
+
+     ! Local variables 
+     integer :: ni,nj,error,stat
+     real*8, dimension(:,:), pointer :: my_sfc_field_8
+
+     nullify(my_sfc_field_8)
+
+     ! Set return value
+     status = VGD_ERROR
+
+     if(.not.self%valid)then
+        write(for_msg,*) 'vgrid structure is not valid in dpidpis_withref_8'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+        return
+     endif
+
+     ! Set default values
+     if (present(sfc_field)) then
+        ni = size(sfc_field,dim=1); nj = size(sfc_field,dim=2)
+     else
+        ni = 1; nj = 1
+     endif
+     allocate(my_sfc_field_8(ni,nj),stat=error)
+     if (error /= 0) then
+        nullify(my_sfc_field_8)
+        write(for_msg,*) 'cannot allocate space for sfc_field in dpidpis_withref_8'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
+     if (present(sfc_field)) then
+        my_sfc_field_8 = sfc_field
+     else
+        my_sfc_field_8 = VGD_MISSING
+     endif
+     ! Wrap call to level calculator
+     stat=diag_withref_8(self,ip1_list,dpidpis,sfc_field=my_sfc_field_8,dpidpis=.true.)
+     if(stat==VGD_ERROR)then
+        deallocate(my_sfc_field_8)
+        return
+     endif
+     deallocate(my_sfc_field_8)
+     status=VGD_OK
+     return
+  end function dpidpis_withref_8
 
  integer function diag_withref_8(self,ip1_list,levels,sfc_field,in_log,dpidpis) result(status)
     ! Given referent, compute physical levelling information from the vertical description
