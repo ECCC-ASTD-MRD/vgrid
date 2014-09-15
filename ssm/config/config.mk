@@ -1,8 +1,6 @@
 # this file contains common config that is sourced by all makefiles
 # Warning : no underscore '_' in CURRENT_VERSION string
-VERSION=5.0.3
-SSM_VERSION=$(VERSION)-$(COMP_ARCH)
-SWNAME=vgriddescriptors
+SSM_VERSION=$(BH_PACKAGE_VERSION)-$(COMP_ARCH)
 SWDESCRIP='Vertical grid descriptors package'
+SSMPACKAGE=$(BH_PACKAGE_NAMES)_$(SSM_VERSION)_$(BH_PACKAGE_PLATFORM)
 
-SSMPACKAGE=$(SWNAME)_$(SSM_VERSION)_${PLATFORM}

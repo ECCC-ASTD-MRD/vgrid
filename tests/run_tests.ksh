@@ -32,13 +32,13 @@ for test in ${tests[*]} ; do
   ln -sf src/${test}.ftn90 .
   perl -p -e "s/UNIT_TEST/${test}/g" ${template} >Makefile.test
   echo "Compiling ${test}" >>${compile_log} 2>&1
-  gmake -f Makefile.test ${test} OPENMP=${OPENMP} >>${compile_log} 2>&1
+  ${BH_MAKE} -f Makefile.test ${test} OPENMP=${OPENMP} >>${compile_log} 2>&1
   if [ ! $? -eq 0 ] ; then
-    printf "\n ERROR compiling test ${test} ... aborting (try 'gmake -f Makefile.test ${test}' for details)\n"
-    exit
+    printf "\n ERROR compiling test ${test} ... aborting (try '${BH_MAKE} -f Makefile.test ${test}' for details)\n"
+    exit 1
   fi
   rm -f ${test}.ftn90
-  gmake -f Makefile.test clean >/dev/null 2>&1
+  ${BH_MAKE} -f Makefile.test clean >/dev/null 2>&1
   printf " ok\n"
 done
 printf " * All Builds Succeeded\n"
