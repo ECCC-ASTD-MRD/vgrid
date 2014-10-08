@@ -1,16 +1,17 @@
 program constructor
-  use Vgrid_Descriptors, only: Vgrid_descriptor,Vgd_new,Vgd_get,Vgd_print,VGD_OK
+  use Vgrid_Descriptors, only: Vgrid_descriptor,Vgd_free,Vgd_new,Vgd_get,Vgd_print,VGD_OK
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  type(vgrid_descriptor) :: d,d2
   integer, parameter :: lu=10
   integer :: stat
   integer :: fnom,fstouv,fstfrm,fclos
   logical :: ok,logp_L
 
-  ! 1002
+  print*,'======================================================'
+  print*,'Vcode 1002'
   stat=fnom(lu,"data/dm_1002_from_model_run_plus_toc","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
@@ -22,14 +23,14 @@ program constructor
      call abort
   endif
 
-  ! Construct a new set of 3D coordinate descriptors
   stat = vgd_new(d,unit=lu,format="fst",ip1=-1,ip2=-1)
+
   if(stat.ne.VGD_OK)then
      print*,'ERROR: problem with vgd_new'
      stat=fstfrm(lu)
      call abort
   endif
-  stat = vgd_print(d)
+  !stat = vgd_print(d)
   stat = vgd_get(d,key='LOGP',value=logp_L)
   ok=.not.logp_L
   print*,'1002 is in log',logp_L    
@@ -37,7 +38,8 @@ program constructor
   stat=fstfrm(lu)  
   stat=fclos(lu)
 
-  ! 5001
+  print*,'======================================================'
+  print*,'Vcode 5001'
   stat=fnom(lu,"data/dm_5001_from_model_run_plus_toc","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
@@ -50,13 +52,19 @@ program constructor
   endif
 
   ! Construct a new set of 3D coordinate descriptors
+  stat = vgd_free(d)
+  if(stat.ne.VGD_OK)then
+     print*,'ERROR: problem with vgd_free'
+     stat=fstfrm(lu)
+     call abort
+  endif
   stat = vgd_new(d,unit=lu,format="fst",ip1=-1,ip2=-1)
   if(stat.ne.VGD_OK)then
      print*,'ERROR: problem with vgd_new'
      stat=fstfrm(lu)
      call abort
   endif
-  stat = vgd_print(d)
+  !stat = vgd_print(d)
   stat = vgd_get(d,key='LOGP',value=logp_L)
   ok=.not.logp_L
   print*,'5001 is in log',logp_L    
@@ -64,7 +72,8 @@ program constructor
   stat=fstfrm(lu)  
   stat=fclos(lu)
 
-  ! 5002
+  print*,'======================================================'
+  print*,' 5002'
   stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
@@ -77,21 +86,27 @@ program constructor
   endif
 
   ! Construct a new set of 3D coordinate descriptors
+  stat = vgd_free(d)
+  if(stat.ne.VGD_OK)then
+     print*,'ERROR: problem with vgd_free'
+     stat=fstfrm(lu)
+     call abort
+  endif
   stat = vgd_new(d,unit=lu,format="fst",ip1=-1,ip2=-1)
   if(stat.ne.VGD_OK)then
      print*,'ERROR: problem with vgd_new'
      stat=fstfrm(lu)
      call abort
   endif
-  stat = vgd_print(d)
+  !stat = vgd_print(d)
 
   stat = vgd_get(d,key='LOGP',value=logp_L)
   ok=logp_L
   print*,'5002 is in log',logp_L
+ 
+  stat=fstfrm(lu)  
+  stat=fclos(lu)
 
   call ut_report(ok,'Grid_Descriptors, vgd_get, LOGP 5002')  
-
-  stat=fstfrm(lu)
-  
 
 end program constructor

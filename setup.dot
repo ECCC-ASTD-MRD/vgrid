@@ -1,6 +1,6 @@
 
-#LINUX_COMP=intel13sp1u2
-LINUX_COMP=pgi1401
+LINUX_COMP=intel13sp1u2
+#LINUX_COMP=pgi1401
 
 if [ ${BASE_ARCH} = AIX-powerpc7 ];then
 
@@ -35,3 +35,4 @@ fi
 echo
 export PLATFORM=$(ssm platforms | awk '{print $1}')
 export RCOMPILE=s.compile
+export BH_MAKE=gmake

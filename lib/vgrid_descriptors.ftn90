@@ -58,8 +58,9 @@ module vGrid_Descriptors
      private
      integer :: ip1,ip2,ip3,ig1,ig2,ig3,ig4,dateo,deet,npas,datyp,nbits
      logical :: initialized=.false.
-     character(len=1) :: grtyp
-     character(len=2) :: typvar
+     ! intel compiler needs minimum character lenght to be 4 in order to make correct alignment.
+     character(len=4) :: grtyp
+     character(len=4) :: typvar
      character(len=KEY_LENGTH) :: nomvar
      character(len=ETIK_LENGTH) :: etiket
   end type FSTD
@@ -68,8 +69,8 @@ module vGrid_Descriptors
      private
      integer :: ig1,ig2,ig3,ig4,dateo,deet,npas,datyp,nbits,ni,nj,nk
      integer :: ip1,ip2,ip3,swa,lng,dltf,ubc,extra1,extra2,extra3,datev
-     character(len=1) :: grtyp
-     character(len=2) :: typvar
+     character(len=4) :: grtyp
+     character(len=4) :: typvar
      character(len=KEY_LENGTH) :: nomvar
      character(len=ETIK_LENGTH) :: etiket
   end type FSTD_ext
@@ -176,7 +177,7 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Class constructor
 
-   integer function new_read(self,unit,format,ip1,ip2,kind) result(status)
+   integer function new_read(self,unit,format,ip1,ip2,kind,version) result(status)
       use utils, only: up
       ! Coordinate constructor - read from a file and initialize instance
       type(vgrid_descriptor), intent(inout) :: self !Vertical descriptor instance
@@ -184,20 +185,29 @@ contains
       character(len=*), optional, intent(in) :: format !File format ('fst' or 'bin') default is 'fst'
       integer,optional :: ip1,ip2                 !ip1,2 values of the desired descriptors
       integer,optional, intent(in) :: kind        ! Level kind requested by user.
+      integer,optional, intent(in) :: version     ! Level version requested by user.
 
       ! Internal variables
-      integer :: istat,key,error,lkind,mykind,version,count,i,myip1,myip2
+      integer :: istat,error,lkind,mykind,myversion,lversion,count,i,myip1,myip2
       integer :: fstinf,fstinl,fstluk,fstprm,ni,nj,nk,swa,lng,ubc,dltf,extra1,extra2,extra3
       integer :: nii,njj,nkk
       integer, dimension(MAX_DESC_REC) :: keyList
       type(FSTD_ext) :: var
-      real*8, dimension(:,:,:), allocatable :: l_table
+      real*8, dimension(:,:,:), pointer :: l_table
       character(len=100) :: myformat
+      logical :: toc_found_L
 
-      self%valid=.false.
       ! Set error status
       status = VGD_ERROR
 
+      nullify(l_table)
+
+      if (vgd_free(self).eq.VGD_ERROR)then
+         write(for_msg,*) 'Error with vgd_free in vgd_new (new_read)'
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         Return
+      endif
+      
       ! Set default values
       myformat='FST'
       if (present(format)) myformat = format
@@ -207,6 +217,16 @@ contains
       if (present(ip2)) myip2 = ip2
       mykind=-1
       if(present(kind)) mykind = kind
+      myversion=-1
+      if(present(version))then
+         myversion=version
+         if(mykind.eq.-1.and.myversion.ne.-1)then
+            write(for_msg,*) 'vgd_new option kind must be used with option version'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            self%vcode = -1
+            return
+         endif
+      endif
 
       ! Set instance variables
       self%unit = unit
@@ -219,10 +239,16 @@ contains
       ! Construct vertical descriptor
       select case (trim(up(myformat)))
 
-         ! RPN Standard file input
+      ! RPN Standard file input
       case ('FST')
-         key=fstinf(unit,ni,nj,nk,-1,' ',myip1,myip2,-1,' ',ZNAME)
-         if(key < 0)then
+         error = fstinl(unit,ni,nj,nk,-1,' ',myip1,myip2,-1,' ',ZNAME,keyList,count,size(keyList))
+         if (error < 0) then
+            write(for_msg,*) 'problem in vgd_new (new_read) with fstinl on nomvar !!'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            self%vcode = -1
+            return
+         endif
+         TEST_COUNT: if(count == 0)then
             write(for_msg,'("cannot find '//trim(ZNAME)//' with the following: ip1=",i10,",ip2=",i10)')myip1,myip2
             call msg(MSG_WARNING,VGD_PRFX//for_msg)
             if(self%match_ipig)then
@@ -238,83 +264,108 @@ contains
             endif
             error = fstd_init(self)
             if (error < 0) then
-               write(for_msg,*) 'problem creating record information'
+               write(for_msg,*) 'problem in vgd_new (new_read) creating record information'
                call msg(MSG_ERROR,VGD_PRFX//for_msg)
                return
             endif
          else
-            allocate(self%table(ni,nj,nk),stat=istat)
-            if (istat /= 0) then
-               write(for_msg,*) 'unable to allocate self%table'
-               call msg(MSG_ERROR,VGD_PRFX//for_msg)
-               return
-            endif
-            istat=fstluk(self%table,key,ni,nj,nk)
-            if(istat < 0)then
-               write(for_msg,*) 'problem with fstluk on '//trim(ZNAME)
-               call msg(MSG_ERROR,VGD_PRFX//for_msg)
-               return
-            endif
-            error = fstd_init(self)
-            if (error < 0) then
-               write(for_msg,*) 'problem creating record information'
-               call msg(MSG_ERROR,VGD_PRFX//for_msg)
-               return
-            endif
-            ! Sorry, I have to use fstprm!
-            istat=fstprm(key, self%rec%dateo, self%rec%deet, self%rec%npas, &
-                 ni, nj, nk, self%rec%nbits, self%rec%datyp, self%rec%ip1, self%rec%ip2, self%rec%ip3, &
-                 self%rec%typvar,self%rec%nomvar, self%rec%etiket, self%rec%grtyp,&
-                 self%rec%ig1, self%rec%ig2, self%rec%ig3, self%rec%ig4, &
-                 swa,lng,dltf,ubc,extra1,extra2,extra3)         
-
-            no_check: if(.not.(present(ip1).or.present(ip2)).or.&
-                 myip1==-1.and.myip1==-1)then
-               ! Check for multiple (different) descriptors unless user provided ip(s)
-            error = fstinl(unit,ni,nj,nk,-1,' ',myip1,myip2,-1,' ',ZNAME,keyList,count,size(keyList))
-            if (error < 0) then
-               write(for_msg,*) 'problem retrieving '//trim(ZNAME)//' keys for ip1,ip2: ',myip1,myip2
-               call msg(MSG_ERROR,VGD_PRFX//for_msg)
-               self%vcode = -1
-               return
-            endif
-            if(count>1)then
-               do i=2,count
-                  error=my_fstprm(keyList(i),var)
-                  if (error < 0) then
-                     write(for_msg,*) 'problem with my_fstprm in new_read'
-                     call msg(MSG_ERROR,VGD_PRFX//for_msg)
-                     self%vcode = -1
-                     return
-                  endif             
-                  allocate(l_table(var%ni,var%nj,var%nk),stat=istat)
+            ! Loop on all !! found
+            toc_found_L=.false.
+            LOOP_ON_TOCS: do i=1,count
+               error=my_fstprm(keyList(i),var)
+               if (error < 0) then
+                  write(for_msg,*) 'problem in vgd_new (new_read) with my_fstprm on key ',keyList(i)
+                  call msg(MSG_ERROR,VGD_PRFX//for_msg)
+                  self%vcode = -1
+                  return
+               endif
+               if(mykind.ne.-1.and.myversion.ne.-1)then
+                  if(var%ig1.ne.mykind*1000+myversion)cycle
+               else
+                  if(mykind.ne.-1)then
+                     ! Get kind from fst vcode (ig1)
+                     if(nint(float(var%ig1)/1000.).ne.mykind)cycle
+                  endif
+                  if(myversion.ne.-1)then
+                     ! Get version from fst vcode (ig1)
+                     if(var%ig1-nint(float(var%ig1)/1000.)*1000 .ne.myversion)cycle
+                  endif
+               endif
+               ! If we reaches this stage then the toc satisfy the selection criteria but
+               ! it may not be the only one.
+               FOUND_TOC: if(.not.toc_found_L)then
+                  toc_found_L=.true.
+                  ni=var%ni;nj=var%nj;nk=var%nk
+                  allocate(self%table(ni,nj,nk),stat=istat)
                   if (istat /= 0) then
-                     write(for_msg,*) 'unable to allocate l_table'
+                     write(for_msg,*) 'in vgd_new (new_read) unable to allocate Vgrid descriptor table'
                      call msg(MSG_ERROR,VGD_PRFX//for_msg)
                      return
                   endif
-                  istat=fstluk(l_table,keyList(i),nii,njj,nkk)
+                  istat=fstluk(self%table,keyList(i),ni,nj,nk)
                   if(istat < 0)then
-                     write(for_msg,*) 'problem with fstluk on l_table i=',i
+                     write(for_msg,*) 'in vgd_new (new_read) problem with fstluk on '//trim(ZNAME)
                      call msg(MSG_ERROR,VGD_PRFX//for_msg)
+                     deallocate(self%table)
                      return
                   endif
-                  if(nii.ne.ni.or.njj.ne.nj.or.nkk.ne.nk)then
-                     write(for_msg,*) 'found different entry dimensions in vertical descriptors after wildcard (-1) search'
+                  error = fstd_init(self)
+                  if (error < 0) then
+                     write(for_msg,*) 'in vgd_new (new_read) problem creating record information'
                      call msg(MSG_ERROR,VGD_PRFX//for_msg)
+                     deallocate(self%table)
                      return
                   endif
-                  if(any(l_table /= self%table))then
-                     write(for_msg,*) 'found different entries in vertical descriptors after wildcard (-1) search'
+                  ! Sorry, I have to use fstprm!
+                  istat=fstprm(keyList(i), self%rec%dateo, self%rec%deet, self%rec%npas, &
+                       ni, nj, nk, self%rec%nbits, self%rec%datyp, self%rec%ip1, self%rec%ip2, self%rec%ip3, &
+                       self%rec%typvar,self%rec%nomvar, self%rec%etiket, self%rec%grtyp,&
+                       self%rec%ig1, self%rec%ig2, self%rec%ig3, self%rec%ig4, &
+                       swa,lng,dltf,ubc,extra1,extra2,extra3)
+                  if(istat<0)then
+                     write(for_msg,*) 'in vgd_new (new_read) problem with fstprm on key',keyList(i)
                      call msg(MSG_ERROR,VGD_PRFX//for_msg)
+                     deallocate(self%table)
                      return
                   endif
+                  cycle
+               end if FOUND_TOC
+               ! If we get at this point this means that there are more than one toc satisfying the selection criteria.
+               ! We load then all to check if they are the same. If not, we return with an error message.
+               if(var%ig1.ne.self%vcode)then
+                   write(for_msg,*) 'found vertical descriptors with different vcode (ig1) ',var%ig1,' vs ',self%vcode
+                  call msg(MSG_ERROR,VGD_PRFX//for_msg)
+                  return
+               endif
+               allocate(l_table(var%ni,var%nj,var%nk),stat=istat)
+               if (istat /= 0) then
+                  write(for_msg,*) 'problem in vgd_new (new_read) unable to allocate l_table'
+                  call msg(MSG_ERROR,VGD_PRFX//for_msg)
+                  return
+               endif
+               istat=fstluk(l_table,keyList(i),nii,njj,nkk)
+               if(istat < 0)then
+                  write(for_msg,*) 'problem in vgd_new (new_read) problem with fstluk on l_table i=',i
+                  call msg(MSG_ERROR,VGD_PRFX//for_msg)
                   deallocate(l_table)
-               enddo
-            endif
-            endif no_check
-         endif
-
+                  return
+               endif
+               if(nii.ne.ni.or.njj.ne.nj.or.nkk.ne.nk)then
+                  write(for_msg,*) 'found different entry dimensions in vertical descriptors after search on ip1, ip2, kind, version -> ',myip1,myip2,mykind,myversion
+                  call msg(MSG_ERROR,VGD_PRFX//for_msg)
+                  deallocate(l_table)
+                  return
+               endif
+               if(any(l_table /= self%table))then
+                  write(for_msg,*) 'found different entries in vertical descriptors after search on ip1, ip2, kind, version -> ',myip1,myip2,mykind,myversion
+                  call msg(MSG_ERROR,VGD_PRFX//for_msg)
+                  deallocate(l_table)
+                  return
+               endif
+               deallocate(l_table)                              
+            enddo LOOP_ON_TOCS
+         endif TEST_COUNT
+         
          ! Fortran binary file input (must already be in the correct position)
       case ('BIN')
          read(unit) ni,nj,nk
@@ -346,13 +397,20 @@ contains
          call msg(MSG_ERROR,VGD_PRFX//for_msg)
       endif
 
-      ! Check that the requested kind matches the record kind
+      ! Check that the requested kind/version matches the record kind/version
       if (present(kind)) then
-         istat = get_version_info(self,lkind,version)
+         istat = get_version_info(self,lkind,lversion)
          if (lkind /= mykind .and. mykind /= -1) then
             write(for_msg,*) 'cannot find requested kind=',mykind,' in file'
             call msg(MSG_ERROR,VGD_PRFX//for_msg)
             return
+         endif
+         if (present(version)) then
+            if (lversion /= myversion .and. myversion /= -1) then
+               write(for_msg,*) 'cannot find requested kind and version=',mykind,myversion,' in file'
+               call msg(MSG_ERROR,VGD_PRFX//for_msg)
+               return
+            endif
          endif
       endif
 
@@ -378,6 +436,7 @@ contains
 
      ! Initializations
      ltable = table
+     
      if (associated(self%table)) deallocate(self%table)
      allocate(self%table(size(ltable,dim=1),size(ltable,dim=2),size(ltable,dim=3)),stat=istat)
      if (istat /= 0) then
@@ -943,17 +1002,27 @@ contains
      ! Free all memory associated with with structure and uninitialize it
      type(vgrid_descriptor), intent(inout) :: self          !Vertical descriptor instance
      status=VGD_ERROR
-     self%valid=.false.
+     self%ptop_8=dble(VGD_MISSING)
+     self%pref_8=dble(VGD_MISSING)
      if(associated(self%table))deallocate(self%table)
-     if(associated(self%a_m_8))then
-        deallocate(self%a_m_8)
-     endif
+     if(associated(self%a_m_8))deallocate(self%a_m_8)
      if(associated(self%b_m_8))deallocate(self%b_m_8)
      if(associated(self%a_t_8))deallocate(self%a_t_8)
      if(associated(self%b_t_8))deallocate(self%b_t_8)
      if(associated(self%ip1_m))deallocate(self%ip1_m)
      if(associated(self%ip1_t))deallocate(self%ip1_t)
+     self%rcoef1=VGD_MISSING
+     self%rcoef2=VGD_MISSING
      self%initialized=.false.
+     self%valid=.false.
+     self%ip1=0
+     self%ip2=0
+     self%vcode=-1
+     self%kind=-1
+     self%version=-1
+     self%ref_name='None'
+     !
+     self%rec%initialized=.false.
      ! Set error status
      status = VGD_OK
    end function garbage_collection
@@ -2259,10 +2328,10 @@ contains
           ig1 = var%ig1
           ig2 = var%ig2
           ig3 = var%ig3
-          grtyp = var%grtyp
+          grtyp = var%grtyp(1:1)
           ip1 = var%ip1
        endif
-       if (var%ig1 /= ig1 .or. var%ig2 /= ig2 .or. var%ig3 /= ig3 .or. trim(var%grtyp) /= trim(grtyp)) then
+       if (var%ig1 /= ig1 .or. var%ig2 /= ig2 .or. var%ig3 /= ig3 .or. trim(var%grtyp(1:1)) /= trim(grtyp)) then
           write(for_msg,*) 'multiple grids defined in fstkeys vector'
           call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
@@ -3873,6 +3942,7 @@ contains
     ! Use fstprm function to get information about the record
     integer, intent(in) :: fstkey               !Key from FST file record
     type(FSTD_ext) :: record                    !Record information
+    ! Local variables
     integer :: error,ni,nj,nk
     integer, external :: fstprm,fstinf
     real*8 :: nhours
@@ -3888,6 +3958,8 @@ contains
        return
     end if
     nhours=record%deet*record%npas/3600.d0
+    ! Note incdatr prints the following when dateo is zero :
+    !    label 1,idate2:           0
     call incdatr(record%datev,record%dateo,nhours)
     status = VGD_OK
   end function my_fstprm
