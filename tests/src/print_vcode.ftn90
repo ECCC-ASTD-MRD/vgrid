@@ -1,0 +1,32 @@
+program print_vcode
+   
+   use vGrid_Descriptors, only:vgd_print,VGD_ERROR
+   use Unit_Testing, only: ut_report   
+
+   implicit none
+   
+   logical :: ok=.true.
+
+   ! Print all known Vcode
+   if(vgd_print(-1).eq.VGD_ERROR)ok=.false.
+
+   ! print specific Vcode
+   if(vgd_print(1001).eq.VGD_ERROR)ok=.false.
+
+   if(vgd_print(1002).eq.VGD_ERROR)ok=.false.
+
+   if(vgd_print(1003).eq.VGD_ERROR)ok=.false.
+
+   if(vgd_print(2001).eq.VGD_ERROR)ok=.false.
+
+   if(vgd_print(5001).eq.VGD_ERROR)ok=.false.
+
+   if(vgd_print(5002).eq.VGD_ERROR)ok=.false.
+
+   if(vgd_print(5003).eq.VGD_ERROR)ok=.false.
+
+   if(vgd_print(5004).eq.VGD_ERROR)ok=.false.
+
+   call ut_report(ok,'print_vcode')
+
+end program print_vcode
