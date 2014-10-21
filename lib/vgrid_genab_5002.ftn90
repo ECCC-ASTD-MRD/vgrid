@@ -93,12 +93,6 @@ contains
     
     nullify(hybm,hybt,at_8,bt_8,ip1_t)
 
-    if(F_version.eq.4)then
-       write(for_msg,*) 'In '//trim(func_name)//' : version not supported ->',F_version
-       call msg(MSG_ERROR,VGD_PRFX//for_msg)
-       return
-    endif
-
     if(F_version.lt.2.or.F_version.gt.4)then
        write(for_msg,*) 'In '//trim(func_name)//' : wrong version ->',F_version
        call msg(MSG_ERROR,VGD_PRFX//for_msg)
@@ -181,7 +175,7 @@ contains
     !     Check range
     !
     if (F_hybuser(NK).ge.1..or.F_hybuser(1).le.hybm(0))then
-       write(for_msg,'("hyb must be < 1.0 and > ",es10.4)') hybm(0)
+       write(for_msg,'("hyb must be < 1.0 and > ",es15.4)') hybm(0)
        call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
