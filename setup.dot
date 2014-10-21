@@ -1,6 +1,6 @@
 
-LINUX_COMP=intel13sp1u2
-#LINUX_COMP=pgi1401
+#LINUX_COMP=intel13sp1u2
+LINUX_COMP=pgi1401
 
 if [ ${BASE_ARCH} = AIX-powerpc7 ];then
 
@@ -12,7 +12,7 @@ if [ ${BASE_ARCH} = AIX-powerpc7 ];then
 
 else
 
-   r.use make as gmake
+   s.use make as gmake
 
    case ${LINUX_COMP} in
       intel13sp1u2). ssmuse-sh \

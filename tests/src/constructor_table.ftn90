@@ -44,11 +44,19 @@ program constructor
    do i=1,nversion
       
       print*,"============="//vcode_S(i)//"=============="
+
+print*,'ANDRE 1'
+
       stat=test_it("data/dm_"//vcode_S(i)//"_from_model_run","data/dm_"//vcode_S(i)//"_ips.txt")
+
+print*,'ANDRE 2'
+
       if(stat.ne.VGD_OK)then
          OK=.false.
          print*,'ERROR with ',vcode_S(i)
       endif
+
+print*,'ANDRE 3'
 
    enddo
 

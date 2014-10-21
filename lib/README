@@ -10,5 +10,5 @@ To add a new vertical coordinate type:
 8- Add a branch to your new vcoord in the read constructor (new_read)
 9- Write a decoder for your new vcoord (e.g. decode_vert_5002)
 10- Add a level calculator (e.g. compute_pressure_5002)
-11- Add a branch for your new vcoord in the printer (print_desc)
+11- Add a branch for your new vcoord in the printer (print_desc and print_vcode_description)
 
