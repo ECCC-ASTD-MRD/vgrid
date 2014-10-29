@@ -1,6 +1,6 @@
 # User options
 FCFLAGS=
-#DEBUG_FLAGS='=-C -g'
+DEBUG_FLAGS='=-C -g'
 #RCOMPILE = r.compile
 
 # Set default target
@@ -10,7 +10,7 @@ default: lib
 %.o : %.mod
 
 # Define suffix rules
-.SUFFIXES: .ftn90 .o
+.SUFFIXES: .f .ftn90 .o
 .ftn90.o:
 	$(RCOMPILE) -includes . $(MY_INCLUDE_PATH) $(INCLUDE_PATH) -optf $(FCFLAGS) $(DEBUG_FLAGS) -src $<
 

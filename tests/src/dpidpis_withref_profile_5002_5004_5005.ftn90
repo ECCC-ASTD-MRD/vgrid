@@ -5,9 +5,9 @@ program tests
 
    implicit none
 
-   integer, parameter :: nfile=2
+   integer, parameter :: nfile=3
    integer :: stat,lu=0,fnom,fstouv,fstfrm,fclos,lutxt=69,ip1,ip2,test_it,i
-   character(len=4), dimension(nfile) :: vcode_S=(/"5002","5004"/)   
+   character(len=4), dimension(nfile) :: vcode_S=(/"5002","5004","5005"/)   
    logical :: ok=.true.
       
    do i=1,nfile
@@ -52,14 +52,14 @@ integer function test_it(F_lu,F_ip1,F_ip2) result(stat)
    integer :: F_lu, F_ip1, F_ip2
    
    ! Local variables
-   integer :: ni,nj,nk,fstlir,fstinf,k
+   integer :: ni,nj,nk,fstlir,fstinf,k,kind
    integer, parameter :: i0=20,j0=10
    integer, dimension(:), pointer :: ip1_list
    real, dimension(:), pointer :: dpidpis_profil
    real*8, dimension(:), pointer :: dpidpis_profil_8
    real :: epsilon=1.e-5
    real, dimension(:,:), allocatable :: p0,px
-   real :: local_pres,w1
+   real :: local_pres,w1,pres
    real*8 :: local_pres_8
    type(vgrid_descriptor) :: d
    real*8, dimension(:), pointer :: coef_b   
@@ -102,6 +102,8 @@ integer function test_it(F_lu,F_ip1,F_ip2) result(stat)
    print*,'size(dpidpis_profil)',size(dpidpis_profil)
    
    do k=1,size(coef_b)
+      call convip(ip1_list(k),pres,kind,-1,"",.false.)
+      if(kind.ne.5)cycle
       stat = fstlir(px,F_lu,ni,nj,nk,-1,'',ip1_list(k),-1,-1,'','PX')
       w1=coef_b(k)*px(i0,j0)*100./p0(i0,j0)
       print*,w1,dpidpis_profil(k)
@@ -123,6 +125,8 @@ integer function test_it(F_lu,F_ip1,F_ip2) result(stat)
    print*,'size(dpidpis_profil_8)',size(dpidpis_profil_8)
    
    do k=1,size(coef_b)
+      call convip(ip1_list(k),pres,kind,-1,"",.false.)
+      if(kind.ne.5)cycle
       stat = fstlir(px,F_lu,ni,nj,nk,-1,'',ip1_list(k),-1,-1,'','PX')
       w1=coef_b(k)*px(i0,j0)*100./p0(i0,j0)
       print*,w1,dpidpis_profil_8(k)

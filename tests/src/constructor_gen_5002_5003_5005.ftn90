@@ -32,7 +32,7 @@ program constructor
   real*8 :: ptop=805d0,pref=100000d0
   logical :: OK=.true.
   integer :: test_5002
-  logical, parameter :: write_control_L=.true.
+  logical, parameter :: write_control_L=.false.
   character (len=256) :: file
 
   !Use wrong top pressure
@@ -89,7 +89,15 @@ program constructor
   stat = test_5002(d,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
   print*,'ptop',ptop
-
+ 
+  ! Construct a new set of vertical coordinate descriptors 5005
+  !
+  stat = vgd_new(d,kind=5,version=5,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop)
+  file='data/data_constructor_gen_5005.txt'
+  stat = test_5002(d,file,write_control_L,stat)
+  if(stat.eq.VGD_ERROR)OK=.false.
+  print*,'ptop',ptop
+ 
   call ut_report(OK,'Grid_Descriptors::vgd_new vertical generate initializer (5002) value')
 end program constructor
 !==============================================================================
@@ -152,7 +160,7 @@ integer function test_5002(F_d,F_file,F_write_control_L,F_stat) result(istat)
      write(10,*)ip1
      close(10)
   endif
- 
+
   if(nl_m.ne.size(b_m_8))then
      print*,'wrong size with NL_M, got',nl_m,' should be ',size(b_m_8)
      istat=VGD_ERROR
@@ -246,21 +254,40 @@ integer function test_5002(F_d,F_file,F_write_control_L,F_stat) result(istat)
   print*,'Reading VCDM'
   read(10,*)work
   do k=1,nk
-     if(abs(work(k)-vcdm(k))/vcdm(k)>100.*epsilon(vcdm(k)))then
-        istat=VGD_ERROR
-        print*,'Probleme avec vcdm, pas dans les limites tollerees'
-        print*,work(k),'vs'
-        print*,vcdm(k)
+     if(vcdm(k).eq.0.)then
+        if(abs(work(k)-vcdm(k))>100.*epsilon(vcdm(k)))then
+           istat=VGD_ERROR
+           print*,'Probleme avec vcdm, pas dans les limites tollerees'
+           print*,work(k),'vs'
+           print*,vcdm(k)
+        endif
+     else
+        if(abs(work(k)-vcdm(k))/vcdm(k)>100.*epsilon(vcdm(k)))then
+           istat=VGD_ERROR
+           print*,'Probleme avec vcdm, pas dans les limites tollerees'
+           print*,work(k),'vs'
+           print*,vcdm(k)
+        endif
      endif
-  enddo  
+  enddo
+
   print*,'Reading VCDT'
   read(10,*)work
   do k=1,nk
-     if(abs(work(k)-vcdt(k))/vcdt(k)>100.*epsilon(vcdt(k)))then
-        istat=VGD_ERROR
-        print*,'Probleme avec vcdt, pas dans les limites tollerees'
-        print*,work(k),'vs'
-        print*,vcdt(k)
+     if(vcdt(k).eq.0.)then
+        if(abs(work(k)-vcdt(k))>100.*epsilon(vcdt(k)))then
+           istat=VGD_ERROR
+           print*,'Probleme avec vcdm, pas dans les limites tollerees'
+           print*,work(k),'vs'
+           print*,vcdt(k)
+        endif
+     else
+        if(abs(work(k)-vcdt(k))/vcdt(k)>100.*epsilon(vcdt(k)))then
+           istat=VGD_ERROR
+           print*,'Probleme avec vcdt, pas dans les limites tollerees'
+           print*,work(k),'vs'
+           print*,vcdt(k)
+        endif
      endif
   enddo  
 

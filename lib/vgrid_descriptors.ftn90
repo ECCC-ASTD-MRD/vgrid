@@ -36,21 +36,23 @@ module vGrid_Descriptors
   logical :: ALLOW_RESHAPE=.false.              ! Allow reshape of class pointer members
 
   ! Validity table for self
-  integer, dimension(1), parameter :: ptop_out_8_valid=                                  (/5004/)
+  integer, dimension(2), parameter :: ptop_out_8_valid=                                  (/5004,5005/)
   integer, dimension(6), parameter :: ptop_8_valid=             (/1002,1003,5001,5002,5003,5004/)
-  integer, dimension(5), parameter :: pref_8_valid=                  (/1003,5001,5002,5003,5004/)
-  integer, dimension(5), parameter :: rcoef1_valid=                  (/1003,5001,5002,5003,5004/)
-  integer, dimension(3), parameter :: rcoef2_valid=                            (/5002,5003,5004/)
-  integer, dimension(8), parameter :: a_m_8_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004/)
-  integer, dimension(8), parameter :: b_m_8_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004/)
-  integer, dimension(3), parameter :: a_t_8_valid=                             (/5002,5003,5004/)
-  integer, dimension(7), parameter :: a_t_8_valid_get=(/1001,1002,     2001,5001,5002,5003,5004/)
-  integer, dimension(3), parameter :: b_t_8_valid=                             (/5002,5003,5004/)
-  integer, dimension(7), parameter :: b_t_8_valid_get=(/1001,1002,     2001,5001,5002,5003,5004/)
-  integer, dimension(8), parameter :: ip1_m_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004/)
-  integer, dimension(3), parameter :: ip1_t_valid=                             (/5002,5003,5004/)
-  integer, dimension(7), parameter :: ip1_t_valid_get=(/1001,1002,     2001,5001,5002,5003,5004/)
-  integer, dimension(7), parameter :: ref_name_valid= (/1001,1002,1003     ,5001,5002,5003,5004/)
+  integer, dimension(6), parameter :: pref_8_valid=                  (/1003,5001,5002,5003,5004,5005/)
+  integer, dimension(6), parameter :: rcoef1_valid=                  (/1003,5001,5002,5003,5004,5005/)
+  integer, dimension(4), parameter :: rcoef2_valid=                            (/5002,5003,5004,5005/)
+  integer, dimension(9), parameter :: a_m_8_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004,5005/)
+  integer, dimension(9), parameter :: b_m_8_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004,5005/)
+  integer, dimension(4), parameter :: a_t_8_valid=                             (/5002,5003,5004,5005/)
+  integer, dimension(8), parameter :: a_t_8_valid_get=(/1001,1002,     2001,5001,5002,5003,5004,5005/)
+  integer, dimension(4), parameter :: b_t_8_valid=                             (/5002,5003,5004,5005/)
+  integer, dimension(8), parameter :: b_t_8_valid_get=(/1001,1002,     2001,5001,5002,5003,5004,5005/)
+  integer, dimension(9), parameter :: ip1_m_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004,5005/)
+  integer, dimension(4), parameter :: ip1_t_valid=                             (/5002,5003,5004,5005/)
+  integer, dimension(8), parameter :: ip1_t_valid_get=(/1001,1002,     2001,5001,5002,5003,5004,5005/)
+  integer, dimension(8), parameter :: ref_name_valid= (/1001,1002,1003     ,5001,5002,5003,5004,5005/)
+  integer, dimension(1), parameter :: dhm_valid=                                              (/5005/)
+  integer, dimension(1), parameter :: dht_valid=                                              (/5005/)
 
   ! FST file record structure
   type FSTD
@@ -85,6 +87,8 @@ module vGrid_Descriptors
      real(kind=8), dimension(:), pointer :: b_m_8=>null()!B-coefficients for momentum levels
      real(kind=8), dimension(:), pointer :: a_t_8=>null()!A-coefficients for thermodynamic levels
      real(kind=8), dimension(:), pointer :: b_t_8=>null()!B-coefficients for thermodynamic levels
+     real :: dhm                                        ! Diag level Height (m) for Momentum variables UU,VV
+     real :: dht                                        ! Diag level Height (m) for Thermo variables TT,HU, etc
      integer, dimension(:), pointer :: ip1_m=>null()    !ip1 values for momentum levels
      integer, dimension(:), pointer :: ip1_t=>null()    !ip1 values for thermodynamic levels
      real :: rcoef1=VGD_MISSING,rcoef2=VGD_MISSING      !Rectification coefficients
@@ -177,6 +181,55 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Class constructor
+
+      subroutine igapg(grtyp,pg1,pg2,pg3,pg4,ig1,ig2,ig3,ig4)
+      implicit none
+      character *1 grtyp
+      character *(*) pg1,pg2,pg3,pg4
+      integer ig1,ig2,ig3,ig4
+!
+      real xg1,xg2,xg3,xg4
+      external cigaxg
+!
+      if ((grtyp .eq. 'Y') .or. (grtyp .eq. 'Z')&
+         .or. (grtyp .eq. '!')) then
+         write(pg1,'(i6)') ig1
+         write(pg2,'(i6)') ig2
+         write(pg3,'(i7)') ig3
+         write(pg4,'(i7)') ig4
+         return
+      else if ((grtyp .eq. 'A') .or. (grtyp .eq. 'B') .or.&
+              (grtyp .eq. 'G') .or. (grtyp .eq. 'N') .or.&
+              (grtyp .eq. 'S') .or. (grtyp .eq. 'E')) then
+         call cigaxg(grtyp,xg1,xg2,xg3,xg4,ig1,ig2,ig3,ig4)
+      else
+         write(pg1,'(i6)') ig1
+         write(pg2,'(i6)') ig2
+         write(pg3,'(i7)') ig3
+         write(pg4,'(i7)') ig4
+         return
+      endif
+      if ((grtyp .eq. 'N') .or. (grtyp .eq. 'S')) then
+         write(pg1,'(f6.1)') xg1
+         write(pg2,'(f6.1)') xg2
+         write(pg3,'(f5.1,a2)') (xg3/1000.), 'Km'
+         write(pg4,'(f7.3)') xg4
+      else if ((grtyp .eq. 'A') .or. (grtyp .eq. 'B') .or.&
+              (grtyp .eq. 'G')) then
+         write(pg1,'(i6)') int(xg1)
+         write(pg2,'(i6)') int(xg2)
+         write(pg3,'(i7)') int(xg3)
+         write(pg4,'(i7)') int(xg4)
+      else
+         write(pg1,'(f6.2)') xg1
+         write(pg2,'(f6.2)') xg2
+         write(pg3,'(f7.3)') xg3
+         write(pg4,'(f7.3)') xg4
+      endif
+      return
+   end subroutine igapg
+
+
 
    integer function new_read(self,unit,format,ip1,ip2,kind,version) result(status)
       use utils, only: up
@@ -478,10 +531,10 @@ contains
            call msg(MSG_ERROR,VGD_PRFX//for_msg)
            return
         endif
-     case (5002,5003,5004)
+     case (5002,5003,5004,5005)
         istat=decode_vert_5002(self)
         if(istat < 0)then
-           write(for_msg,*) 'problem decoding table with vcode 5002,5003 or 5004'
+           write(for_msg,*) 'problem decoding table with vcode 5002,5003,5004 or 5005'
            call msg(MSG_ERROR,VGD_PRFX//for_msg)
            return
         endif
@@ -670,7 +723,8 @@ contains
             call msg(MSG_ERROR,VGD_PRFX//for_msg)
             missingInput = .true.
          endif
-      endif      
+      endif 
+       
       if (missingInput) return      
 
       ! Fill table with version-specific encoder
@@ -690,7 +744,7 @@ contains
       case (5001)
          cvcode="5001"
          error = encode_vert_5001(self,nk)
-      case (5002,5003,5004)
+      case (5002,5003,5004,5005)
          cvcode="5002"
          error = encode_vert_5002(self,nk)
       case DEFAULT
@@ -728,7 +782,7 @@ contains
       return
    end function new_build_vert
 
-   integer function new_gen(self,kind,version,hyb,rcoef1,rcoef2,ptop_8,pref_8,ptop_out_8,ip1,ip2,stdout_unit) result(status)
+   integer function new_gen(self,kind,version,hyb,rcoef1,rcoef2,ptop_8,pref_8,ptop_out_8,ip1,ip2,stdout_unit,dhm,dht) result(status)
       use vdescript_1001,      only: vgrid_genab_1001
       use vdescript_1002_5001, only: vgrid_genab_1002_5001
       use vdescript_2001,      only: vgrid_genab_2001
@@ -743,6 +797,7 @@ contains
       real*8, optional, intent(in) :: pref_8            !Reference-level pressure (Pa)
       integer, optional, intent(in) :: ip1,ip2          !IP1,2 values for FST file record [0,0]
       integer, optional, intent(in) :: stdout_unit      !Unit number for verbose output [STDERR]
+      real, optional, intent(in) :: dhm,dht             !Diag levels Height for Momentum/Thermo vaiables
 
       ! Internal variables
       integer :: myip1,myip2,mystdout_unit,error
@@ -805,6 +860,20 @@ contains
             errorInput = .true.
          endif
       endif
+      if(is_valid(self,dhm_valid)) then
+         if(.not.present(dhm))then
+            write(for_msg,*) 'dhm is a required constructor entry'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            errorInput = .true.
+         endif
+      endif
+      if(is_valid(self,dht_valid)) then
+         if(.not.present(dht))then
+            write(for_msg,*) 'dht is a required constructor entry'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            errorInput = .true.
+         endif
+      endif
       if(present(ptop_8).and.(.not.is_valid(self,ptop_8_valid)))then
          write(for_msg,*) 'ptop_8 is not a required constructor entry'
          call msg(MSG_ERROR,VGD_PRFX//for_msg)
@@ -827,6 +896,16 @@ contains
       endif
       if(present(rcoef2).and.(.not.is_valid(self,rcoef2_valid)))then
          write(for_msg,*) 'rcoef2 is not a required constructor entry'
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         errorInput = .true.
+      endif
+      if(present(dhm).and.(.not.is_valid(self,dhm_valid)))then
+         write(for_msg,*) 'dhm is not a required constructor entry'
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         errorInput = .true.
+      endif
+      if(present(dht).and.(.not.is_valid(self,dht_valid)))then
+         write(for_msg,*) 'dht is not a required constructor entry'
          call msg(MSG_ERROR,VGD_PRFX//for_msg)
          errorInput = .true.
       endif
@@ -981,6 +1060,33 @@ contains
               ip1_m=ip1_m,         &
               ip1_t=ip1_t)
          if (error /= VGD_OK) return
+      case (5005)  
+         call vgrid_genab_5002(version,hyb,(/rcoef1,rcoef2/),-2.d0,pref_8, &
+              a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,error,notop_L=.true.,ptop_out_8=ptop_out_8, &
+              dhm=dhm,dht=dht)
+         if (error /= VGD_OK)then
+            if(associated(a_m_8))deallocate(a_m_8)
+            if(associated(b_m_8))deallocate(b_m_8)
+            if(associated(a_t_8))deallocate(a_t_8)
+            if(associated(b_t_8))deallocate(b_t_8)
+            if(associated(ip1_m))deallocate(ip1_m)
+            if(associated(ip1_t))deallocate(ip1_t)
+            return
+         endif
+         error = new_build_vert(self,kind,version,size(hyb), &
+              ip1=myip1,           &
+              ip2=myip2,           &
+              ptop_8=ptop_out_8,   &
+              pref_8=pref_8,       &
+              rcoef1=rcoef1,       &
+              rcoef2=rcoef2,       &
+              a_m_8=a_m_8,         &
+              b_m_8=b_m_8,         &
+              a_t_8=a_t_8,         &
+              b_t_8=b_t_8,         &
+              ip1_m=ip1_m,         &
+              ip1_t=ip1_t)
+         if (error /= VGD_OK) return
       case DEFAULT
          write(for_msg,*)'unsuported IP1 kind = ',kind,', AND/OR version = ',version
          call msg(MSG_ERROR,VGD_PRFX//for_msg)
@@ -1081,7 +1187,7 @@ contains
  end function get_logical
 
   integer function get_int(self,key,value,quiet) result(status)
-    use utils, only: up
+    use utils, only: up,get_error
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
     character(len=*), intent(in) :: key                 !Descriptor key to retrieve
@@ -1145,6 +1251,20 @@ contains
           return
        endif
        value=size(vip)
+    case ('DIPM')
+       if (is_valid(self,dhm_valid)) then
+          value=self%ip1_m(size(self%ip1_m))
+       else
+          value = get_error(key)
+          return
+       endif
+    case ('DIPT')
+       if (is_valid(self,dht_valid)) then
+          value=self%ip1_t(size(self%ip1_t))
+       else
+          value = get_error(key)
+          return
+       endif
     case DEFAULT
        write(for_msg,*) 'invalid key '//trim(key)//' given to gd_get (int)'
        call msg(level_msg,VGD_PRFX//for_msg)
@@ -1238,8 +1358,10 @@ contains
     logical, optional, intent(in) :: quiet       !Do not print massages
 
     ! Internal variables
-    integer :: level_msg
+    integer :: level_msg, iwork,kind
+    real :: work
     logical :: my_quiet
+    character(len=1) :: dum_S 
 
     ! Set error status
     status = VGD_ERROR
@@ -1260,14 +1382,33 @@ contains
        if (is_valid(self,rcoef1_valid)) then
           value = self%rcoef1
        else
-          value = dble(get_error(key))
+          value = get_error(key)
           return
        endif
     case ('RC_2')
        if (is_valid(self,rcoef2_valid)) then
           value = self%rcoef2
        else
-          value = dble(get_error(key))
+          value = get_error(key)
+          return
+       endif
+    case ('DHM ')
+       if (is_valid(self,dhm_valid)) then
+          iwork=self%ip1_m(size(self%ip1_m))          
+          call convip(iwork,work,kind,-1,dum_S,.false.)
+          value=work
+       else
+          value = get_error(key)
+          return
+       endif
+    case ('DHT ')       
+       iwork=vgd_print(self)
+       if (is_valid(self,dht_valid)) then
+          iwork=self%ip1_t(size(self%ip1_t))
+          call convip(iwork,work,kind,-1,dum_S,.false.)
+          value=work
+       else
+          value = get_error(key)
           return
        endif
     case DEFAULT
@@ -1315,6 +1456,7 @@ contains
        if (is_valid(self,ip1_m_valid)) then
           istat = get_allocate(key,value,size(self%ip1_m),ALLOW_RESHAPE,'(VCDM in get_real_1d)')
           if (istat /= 0) return
+          
           call convip(k,value(1),self%kind,0,'',.false.)
           do k=1,size(value)
              call convip(self%ip1_m(k),value(k),self%kind,-1,'',.false.)
@@ -1696,6 +1838,18 @@ contains
        self%rec%ip2 = value
     case ('IP_3')
        self%rec%ip3 = value
+    case ('DIPM')
+       if (is_valid(self,dhm_valid)) then
+          self%ip1_m(size(self%ip1_m))=value
+       else
+          return
+       endif
+    case ('DIPT')
+       if (is_valid(self,dht_valid)) then
+          self%ip1_t(size(self%ip1_t))=value
+       else
+          return
+       endif
     case DEFAULT
        write(for_msg,*) 'invalid key '//trim(key)//' given to gd_put (int)'
        call msg(MSG_ERROR,VGD_PRFX//for_msg)
@@ -2065,11 +2219,11 @@ contains
     logical, intent(in), optional :: convip_L
 
     ! Internal variables
-    integer :: my_stdout,stat,nk,k
+    integer :: my_stdout,stat,nk,k,kind
     character(len=64) :: hr
     character(len=VGD_LEN_NAME) :: name
     logical :: my_convip_L
-    real :: pres
+    real :: pres,height
     character(len=1) :: null_S
     character(len=10) :: kind_S
 
@@ -2173,8 +2327,20 @@ contains
           call msg(MSG_VERBATIM,trim(for_msg))
           write(for_msg,*)'  Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref)'
           call msg(MSG_VERBATIM,trim(for_msg))
+       case (5005)
+          nk=size(self%ip1_m)
+          write(for_msg,*)'  Number of hybrid levels (momentum/thermo levels)',nk-1
+          call msg(MSG_VERBATIM,trim(for_msg))
+          call convip(self%ip1_m(nk),height,kind,-1,"",.false.)
+          write(for_msg,*)'  Diagnostic momentum level (ip1=',self%ip1_m(nk),') at ',height,' m Above Ground Level'
+          call msg(MSG_VERBATIM,trim(for_msg))
+          call convip(self%ip1_t(nk),height,kind,-1,"",.false.)
+          write(for_msg,*)'  Diagnostic thermo   level (ip1=',self%ip1_t(nk),') at ',height,' m Above Ground Level'          
+          call msg(MSG_VERBATIM,trim(for_msg))
+          write(for_msg,*)'  Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref)'
+          call msg(MSG_VERBATIM,trim(for_msg))
        end select
-              
+
        if(my_convip_L)then
           if (is_valid(self,ip1_m_valid))then
              nk=size(self%ip1_m)
@@ -2312,6 +2478,18 @@ contains
        write(for_msg,*)'   Hybrid staggered levels, same number of momentum and themro levels'
        call msg(MSG_VERBATIM,trim(for_msg))
        write(for_msg,*)'   First level at top is a momentum level'
+       call msg(MSG_VERBATIM,trim(for_msg))
+    endif
+    if(vcode.eq.5005.or.vcode==-1)then
+       write(for_msg,*)hr
+       call msg(MSG_VERBATIM,trim(for_msg))
+       write(for_msg,*)'Vcode 5005, kind 5, version 5'
+       call msg(MSG_VERBATIM,trim(for_msg))
+       write(for_msg,*)'   Hybrid staggered levels, same number of momentum and themro levels'
+       call msg(MSG_VERBATIM,trim(for_msg))
+       write(for_msg,*)'   First level at top is a momentum level'
+       call msg(MSG_VERBATIM,trim(for_msg))
+       write(for_msg,*)'   Diag level heights (m AGL) encoded'
        call msg(MSG_VERBATIM,trim(for_msg))
     endif
 
@@ -3126,7 +3304,7 @@ contains
        istat = compute_pressure_2001_8(self,ip1_list,levels,my_in_log)
     case (1003,5001)
        istat = compute_pressure_5001_8(self,sfc_field,ip1_list,levels,my_in_log,my_dpidpis)
-    case (5002,5003,5004)
+    case (5002,5003,5004,5005)
        istat = compute_pressure_5002_8(self,sfc_field,ip1_list,levels,my_in_log,my_dpidpis)
     case DEFAULT
        istat = get_version_info(self,kind,version)
@@ -3443,8 +3621,8 @@ contains
      status = VGD_ERROR
 
      k_plus=1
-     ! Test if version == 4 -> notop
-     if(self%version==4)k_plus=0
+     ! Test if version >= 4 -> notop
+     if(self%version>=4)k_plus=0
 
      ! Allocate table space
      if (associated(self%table)) deallocate(self%table)         
@@ -3783,7 +3961,7 @@ contains
      self%version  = nint(self%table(2,1,1))
      skip          = nint(self%table(3,1,1))
      k_plus=1
-     if(self%version==4)k_plus=0
+     if(self%version>=4)k_plus=0
 
      ! Read header line 2
      self%ptop_8   = self%table(1,2,1)
@@ -4004,6 +4182,11 @@ contains
     case (5002,5003,5004)
        etiket='STG_CP_GEMV4'
        ig2=nint(self%ptop_8*10.d0)
+       ig3=nint(self%rcoef1*100.)
+       ig4=nint(self%rcoef2*100.)
+    case (5005)
+       etiket='STG_CP_GEMV4'
+       ig2=0
        ig3=nint(self%rcoef1*100.)
        ig4=nint(self%rcoef2*100.)
     case DEFAULT
