@@ -53,7 +53,8 @@ contains
    !     ----------------------------------------------------------
    
    subroutine vgrid_genab_5002 (F_version,F_hybuser,F_rcoef,F_ptop_8,F_pref_8, &
-        F_am_8,F_bm_8,F_at_8,F_bt_8,F_ip1_m,F_ip1_t,F_err,lastTatU_L,notop_L,ptop_out_8)
+        F_am_8,F_bm_8,F_at_8,F_bt_8,F_ip1_m,F_ip1_t,F_err,lastTatU_L,notop_L,ptop_out_8, &
+        dhm,dht)
 
     ! Modifs 
     ! Andre Plante June 2012 : force real*8 in compuation of log(F_hybuser(k)*1.d0) in
@@ -72,8 +73,9 @@ contains
     real*8, dimension(:), pointer :: F_am_8, F_bm_8       ! model As and Bs on momentum levels
     real*8, dimension(:), pointer :: F_at_8, F_bt_8       ! model As and Bs on thermodynamic levels
     integer, dimension(:), pointer :: F_ip1_m,F_ip1_t     ! ip1 values for momentum and thermodynamic levels
-    logical, optional :: lastTatU_L                       ! Put last thermodynamic level at last momentum level
-    logical, optional :: notop_L                          ! Do put the top thermodynamic level in output vector
+    logical, optional, intent(in) :: lastTatU_L           ! Put last thermodynamic level at last momentum level
+    logical, optional, intent(in) :: notop_L              ! Do put the top thermodynamic level in output vector
+    real, optional, intent(in) :: dhm, dht                ! Diag levels Height (m) for Momentum/Thermo levels
 
     ! Local variables
     integer :: k, status, nk, k_plus
@@ -85,6 +87,9 @@ contains
     real*8, dimension(:), pointer :: at_8, bt_8
     integer, dimension(:), pointer :: ip1_t
     character(len=100) :: func_name
+    real, parameter :: RGASD       =    0.287050000000E+03
+    real, parameter :: GRAV        =    0.980616000000E+01
+    real, parameter :: TCDK        =    0.273150000000E+03
     !     __________________________________________________________________
 
     func_name='vgrid_genab_5002'
@@ -93,13 +98,23 @@ contains
     
     nullify(hybm,hybt,at_8,bt_8,ip1_t)
 
-    if(F_version.lt.2.or.F_version.gt.4)then
+    if(F_version.lt.2.or.F_version.gt.5)then
        write(for_msg,*) 'In '//trim(func_name)//' : wrong version ->',F_version
        call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
-    if(F_ptop_8.lt.0.and.F_version.ne.4)then
+    if(F_ptop_8.lt.0.and.F_version.lt.4)then
        write(for_msg,*)'In '//trim(func_name)//' F_ptop_8 must by > 0.0 got ',F_ptop_8
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return
+    endif
+    if(.not.present(dhm).and.F_version.eq.5)then
+       write(for_msg,*)'In '//trim(func_name)//' dhm must be present'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return
+    endif
+    if(.not.present(dht).and.F_version.eq.5)then
+       write(for_msg,*)'In '//trim(func_name)//' dht must be present'
        call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
@@ -214,7 +229,17 @@ contains
     enddo
     
     !     Special momentum levels for vert int.
-    F_am_8(Nk+1) = zsrf_8
+    if(F_version.eq.5)then
+       ! Integrating the hydrostatic eq with T=0C
+       ! ln[p(z=dhm)] = ln(ps) - g/(Rd*T)*dhm
+       ! s = ln(ps) - ln(pref)
+       ! ln[p(z=dhm)] = ln(pref) - g/(Rd*T)*dhm + s
+       ! => B=1, A = ln(pref) - g/(Rd*T)*dhm
+       ! We take T at 0C
+       F_am_8(Nk+1) = log(F_pref_8) - GRAV/(RGASD*TCDK)*dhm
+    else
+       F_am_8(Nk+1) = zsrf_8
+    endif
     F_bm_8(Nk+1) = 1.d0 
     
     
@@ -232,6 +257,9 @@ contains
     at_8(1)     = 0.5d0*(F_am_8( 1) + ztop_8)
     at_8(Nk+1)  = 0.5d0*(F_am_8(Nk) + zsrf_8)
     at_8(Nk+2)  = zsrf_8
+    if(F_version.eq.5)then
+       at_8(Nk+2) = log(F_pref_8) - GRAV/(RGASD*TCDK)*dht
+    endif
     
     hybm(1:NK) = F_hybuser(1:NK)
     
@@ -256,6 +284,12 @@ contains
        call convip(ip1_t(k),hybt(k),5,2,'',.false.)
     enddo
     call convip(ip1_t(nk+2),hybt(nk+2),5,2,'',.false.)
+
+    if(F_version.eq.5)then
+       ! Encoding kind= 4       : M  [metres] (height with respect to ground level)
+       call convip(F_ip1_m(nk+1),dhm,4,2,'',.false.)
+       call convip(ip1_t(nk+2),dht,4,2,'',.false.)
+    endif
 
     if(my_notop_L)then
        F_at_8=at_8(2:nk+2)

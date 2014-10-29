@@ -7,9 +7,9 @@ program tests
 
   integer :: stat,lu=0,fnom,fstouv,fstfrm,fclos,ip1,ip2,lutxt=10,test_dpidpis,i
   
-  integer, parameter :: nfile=2
+  integer, parameter :: nfile=3
 
-  character(len=4), dimension(nfile) :: vcode_S=(/"5002","5004"/)
+  character(len=4), dimension(nfile) :: vcode_S=(/"5002","5004","5005"/)
 
   logical :: ok=.true.
 
@@ -56,7 +56,7 @@ integer function test_dpidpis(F_lu,F_ip1,F_ip2) result(stat)
    integer :: F_lu, F_ip1, F_ip2
    
    ! Local variables
-   integer :: ni,nj,nk,fstlir,fstinf,k
+   integer :: ni,nj,nk,fstlir,fstinf,k,kind
    integer, parameter :: i0=20,j0=10
    integer, dimension(:), pointer :: ip1_list
    real, dimension(:,:,:), pointer :: dpidpis_cube
@@ -64,7 +64,7 @@ integer function test_dpidpis(F_lu,F_ip1,F_ip2) result(stat)
    real   :: epsilon  =1.e-5
    real, dimension(:,:), pointer :: p0,px
    real*8, dimension(:,:), pointer :: p0_8
-   real   :: w1
+   real   :: w1,pres
    type(vgrid_descriptor) :: d
    logical :: ok
    real*8, dimension(:), pointer :: coef_b
@@ -107,6 +107,8 @@ integer function test_dpidpis(F_lu,F_ip1,F_ip2) result(stat)
    
    OK=.true.
    do k=1,size(coef_b)
+      call convip(ip1_list(k),pres,kind,-1,"",.false.)
+      if(kind.ne.5)cycle
       stat = fstlir(px,F_lu,ni,nj,nk,-1,'',ip1_list(k),-1,-1,'','PX')
       if(stat < 0)then
          print*,'ERROR problem with fstlir on PX for ip1 ->',ip1_list(k)
@@ -133,6 +135,8 @@ integer function test_dpidpis(F_lu,F_ip1,F_ip2) result(stat)
    
    OK=.true.
    do k=1,size(coef_b)
+      call convip(ip1_list(k),pres,kind,-1,"",.false.)
+      if(kind.ne.5)cycle
       stat = fstlir(px,F_lu,ni,nj,nk,-1,'',ip1_list(k),-1,-1,'','PX')
       if(stat < 0)then
          print*,'ERROR problem with fstlir on PX for ip1 ->',ip1_list(k)
