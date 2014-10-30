@@ -1,6 +1,5 @@
 # User options
 # see setup* files
-#RMN = rmn_014_rc2
 
 # Override incorrect implicits
 SUBDIRS = lib examples tests
