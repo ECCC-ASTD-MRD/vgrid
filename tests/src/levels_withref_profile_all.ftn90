@@ -8,19 +8,34 @@ program levels_withref_profile_all
 
   stat=VGD_OK
   
-  ier=chek_levels_withref('data/dm_1001_from_model_run','')
+  ier=chek_levels_withref('data/dm_1001_from_model_run','','TT')
   if(ier==VGD_ERROR)stat=VGD_ERROR
 
-  ier=chek_levels_withref('data/dm_1002_from_model_run','')
+  ier=chek_levels_withref('data/dm_1002_from_model_run','','TT')
   if(ier==VGD_ERROR)stat=VGD_ERROR
 
-  ier=chek_levels_withref('data/dm_5001_from_model_run','')
+  ier=chek_levels_withref('data/dm_5001_from_model_run','','TT')
   if(ier==VGD_ERROR)stat=VGD_ERROR
 
-  ier=chek_levels_withref('data/dm_5002_from_model_run','data/dm_5002_ips.txt')
+  ier=chek_levels_withref('data/dm_5002_from_model_run','data/dm_5002_ips.txt','TT')
+  if(ier==VGD_ERROR)stat=VGD_ERROR
+  ier=chek_levels_withref('data/dm_5002_from_model_run','data/dm_5002_ips.txt','UU')
   if(ier==VGD_ERROR)stat=VGD_ERROR
   
-  ier=chek_levels_withref('data/dm_5003_from_model_run','data/dm_5003_ips.txt')
+  ier=chek_levels_withref('data/dm_5003_from_model_run','data/dm_5003_ips.txt','TT')
+  if(ier==VGD_ERROR)stat=VGD_ERROR
+  ier=chek_levels_withref('data/dm_5003_from_model_run','data/dm_5003_ips.txt','UU')
+  if(ier==VGD_ERROR)stat=VGD_ERROR
+  
+  ier=chek_levels_withref('data/dm_5004_from_model_run','data/dm_5004_ips.txt','TT')
+  if(ier==VGD_ERROR)stat=VGD_ERROR
+  ier=chek_levels_withref('data/dm_5004_from_model_run','data/dm_5004_ips.txt','UU')
+  if(ier==VGD_ERROR)stat=VGD_ERROR
+
+  ier=chek_levels_withref('data/dm_5005_from_model_run','data/dm_5005_ips.txt','TT')
+  if(ier==VGD_ERROR)stat=VGD_ERROR
+
+  ier=chek_levels_withref('data/dm_5005_from_model_run','data/dm_5005_ips.txt','UU')
   if(ier==VGD_ERROR)stat=VGD_ERROR
   
   call ut_report(stat,'Grid_Descriptors, vgd_new')
@@ -30,13 +45,13 @@ end program levels_withref_profile_all
 !====================================================================
 !====================================================================
 
-integer function chek_levels_withref(F_fst,F_ips) result(status)
+integer function chek_levels_withref(F_fst,F_ips,F_var) result(status)
 
    use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_levels,VGD_ERROR,VGD_OK
 
    implicit none  
 
-   character(len=*) :: F_fst,F_ips
+   character(len=*) :: F_fst,F_ips,F_var
 
    ! Local variables
    integer, save :: lu=10   
@@ -63,7 +78,12 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
    character(len=1)  :: grtyp, ctype, dummy_S
    logical :: rewrit
    
+   nullify(pres,pres_8,p0,px,p0_8,ip1s)
+
    status=VGD_ERROR   
+
+   print*,'================================================================'
+   print*,'Testing, level: ',trim(F_var),' on file ',trim(F_fst)
 
    lu=lu+1
 
@@ -93,9 +113,13 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
       return
    endif
    
-   ier = fstinl(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ','TT',liste,infon,nmax)
+   ier = fstinl(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',F_var,liste,infon,nmax)
+   if(ier>0)then
+      print*,'ERROR: problem with fstinl on ',F_var
+      return
+   endif
    if(infon == 0 )then
-      print*,'pas de record de TT'      
+      print*,'pas de record de ',F_var
       print*,'FILE: ',trim(F_fst)
       return
    endif
@@ -131,7 +155,7 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
            ip1,ip2,ip3,typvar,nomvar,etiket,grtyp,ig1,ig2,ig3,ig4,swa,lng, &
            dltf,ubc,extra1,extra2,extra3)
       if(ier.lt.0)then
-         print*,'Problem with fstprm on TT, ip1=',ip1
+         print*,'Problem with fstprm on ',F_var,', ip1=',ip1
       print*,'FILE: ',trim(F_fst)
          return
       endif
@@ -173,7 +197,7 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
            ip1,ip2,ip3,typvar,nomvar,etiket,grtyp,ig1,ig2,ig3,ig4,swa,lng, &
            dltf,ubc,extra1,extra2,extra3)
       if(ier.lt.0)then
-         print*,'Problem with fstprm on TT, ip1=',ip1
+         print*,'Problem with fstprm on ',F_var,' ip1=',ip1
          print*,'FILE: ',trim(F_fst)
          return
       endif
@@ -204,6 +228,8 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
    enddo
    deallocate(ip1s,px,p0,p0_8,pres,pres_8)
    
+   print*,'   TEST OK!'
+
    ier=fstfrm(lu)
 
    status=VGD_OK   
