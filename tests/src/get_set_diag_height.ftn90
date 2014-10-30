@@ -1,0 +1,71 @@
+program constructor
+  use Vgrid_Descriptors, only: Vgrid_descriptor,Vgd_new,Vgd_get,Vgd_put,Vgd_print,VGD_OK,VGD_ERROR
+  use Unit_Testing, only: ut_report
+
+  implicit none
+
+  type(vgrid_descriptor) :: d
+  integer, parameter :: lu=10
+  integer :: stat,ip1
+  integer :: fnom,fstouv,fstfrm,fclos,kind,version
+  logical :: ok=.true.
+  real :: height
+
+  stat=fnom(lu,"data/dm_5005_from_model_run","RND",0)
+  if(stat.lt.0)then
+     print*,'ERROR with fnom'
+     call abort
+  endif
+  stat=fstouv(lu,'RND')
+  if(stat.le.0)then
+     print*,'No record in RPN file'
+     call abort
+  endif
+
+  ! Construct a new set of 3D coordinate descriptors
+  stat = vgd_new(d,unit=lu,format="fst",ip1=-1,ip2=-1)
+  if(stat.ne.VGD_OK)then
+     print*,'ERROR: problem with vgd_new'
+     stat=fstfrm(lu)
+     call abort
+  endif
+  stat = vgd_print(d)
+  
+  stat = vgd_get(d,key='DHM Diag level Height for Momentum variables',value=height)
+  if(stat.ne.VGD_OK)ok=.false.
+  print*,'Momentum Diag height=',height,' m AGL'
+  stat = vgd_get(d,key='DHT Diag level Height for Thermo variables',value=height)
+  if(stat.ne.VGD_OK)ok=.false.
+  print*,'Thermo Diag height=',height,' m AGL'
+
+  stat = vgd_get(d,key='DIPM Diag level ip1 for Momentum variables',value=ip1)
+  if(stat==VGD_ERROR)OK=.false.
+  print*,'Diag level ip1 for Momentum variables =',ip1
+  stat = vgd_get(d,key='DIPT Diag level ip1 for Thermo variables',value=ip1)
+  if(stat==VGD_ERROR)OK=.false.
+  print*,'Diag level ip1 for Thermo variables =',ip1
+ 
+  stat = vgd_put(d,key='DIPM Diag level ip1 for Momentum variables',value=99)
+  if(stat==VGD_ERROR)OK=.false.
+  stat = vgd_get(d,key='DIPM Diag level ip1 for Momentum variables',value=ip1)
+  if(stat==VGD_ERROR)OK=.false.
+  if(ip1.ne.99)then
+     print*,'Problem with vgd_put on DIPM, put 99 got ',ip1
+  endif
+
+  stat = vgd_put(d,key='DIPT Diag level ip1 for Thermo variables',value=99)
+  if(stat==VGD_ERROR)OK=.false.
+  stat = vgd_get(d,key='DIPT Diag level ip1 for Thermo variables',value=ip1)
+  if(stat==VGD_ERROR)OK=.false.
+  if(ip1.ne.99)then
+     print*,'Problem with vgd_put on DIPT, put 99 got ',ip1
+  endif
+
+  stat=fstfrm(lu)  
+  stat=fclos(lu)
+
+  call ut_report(ok,'Grid_Descriptors, vgd_get on DHM DHT')  
+
+  stat=fstfrm(lu)
+
+end program constructor

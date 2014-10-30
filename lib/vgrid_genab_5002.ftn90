@@ -236,7 +236,7 @@ contains
        ! ln[p(z=dhm)] = ln(pref) - g/(Rd*T)*dhm + s
        ! => B=1, A = ln(pref) - g/(Rd*T)*dhm
        ! We take T at 0C
-       F_am_8(Nk+1) = log(F_pref_8) - GRAV/(RGASD*TCDK)*dhm
+       F_am_8(Nk+1) = log(F_pref_8) - GRAV*dhm/(RGASD*TCDK)
     else
        F_am_8(Nk+1) = zsrf_8
     endif
@@ -258,7 +258,7 @@ contains
     at_8(Nk+1)  = 0.5d0*(F_am_8(Nk) + zsrf_8)
     at_8(Nk+2)  = zsrf_8
     if(F_version.eq.5)then
-       at_8(Nk+2) = log(F_pref_8) - GRAV/(RGASD*TCDK)*dht
+       at_8(Nk+2) = log(F_pref_8) - GRAV*dht/(RGASD*TCDK)
     endif
     
     hybm(1:NK) = F_hybuser(1:NK)
