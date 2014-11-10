@@ -12,6 +12,7 @@ module utils
   public :: up                                  !convert string to upper-case
   public :: get_error,put_error                 !get/put error messaging 
   public :: printingCharacters                  !printable character strings
+  public :: comp_diag_a                         !compute value A of diagnostic level
 
   ! Public vgrid_descriptor constants
 #include "vgrid.hf"
@@ -20,6 +21,10 @@ module utils
   integer, parameter :: LONG_STRING=1024        !number of characters in a long string
 
   ! Private variables
+  interface comp_diag_a
+     module procedure comp_diag_a_height
+     module procedure comp_diag_a_ip1
+  end interface comp_diag_a
 
   interface size_ok
      module procedure size_ok_i1d
@@ -51,8 +56,34 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Check array sizes
+   
+  real*8 function comp_diag_a_height(pref_8,height) result(aaa)
+     implicit none
+     real(kind=8), intent(in) :: pref_8
+     real, intent(in) :: height
+     ! Local variables
+     real, parameter :: RGASD       =    0.287050000000E+03
+     real, parameter :: GRAV        =    0.980616000000E+01
+     real, parameter :: TCDK        =    0.273150000000E+03     
+     aaa=log(pref_8) - GRAV*height/(RGASD*TCDK)
+  end function comp_diag_a_height
+
+  real*8 function comp_diag_a_ip1(pref_8,ip1) result(aaa)
+     implicit none
+     real(kind=8), intent(in) :: pref_8
+     integer, intent(in) :: ip1
+     ! Local variables
+     real :: height
+     real, parameter :: RGASD       =    0.287050000000E+03
+     real, parameter :: GRAV        =    0.980616000000E+01
+     real, parameter :: TCDK        =    0.273150000000E+03     
+     integer :: kind
+     call convip(ip1,height,kind,-1,"",.false.)
+     aaa=log(pref_8) - GRAV*height/(RGASD*TCDK)
+  end function comp_diag_a_ip1
 
   logical function size_ok_i1d(p1,p2) result(ok)
+    implicit none
     ! Check size matching for 3d real8 arrays
     integer, dimension(:), pointer :: p1        !Input pointer 1
     integer, dimension(:), pointer :: p2        !Input pointer 2
@@ -68,6 +99,7 @@ contains
 
   logical function size_ok_r81d(p1,p2) result(ok)
     ! Check size matching for 3d real8 arrays
+    implicit none
     real(kind=8), dimension(:), pointer :: p1   !Input pointer 1
     real(kind=8), dimension(:), pointer :: p2   !Input pointer 2
     ok = .false.
@@ -82,6 +114,7 @@ contains
 
   logical function size_ok_r83d(p1,p2) result(ok)
     ! Check size matching for 3d real8 arrays
+    implicit none
     real(kind=8), dimension(:,:,:), pointer :: p1 !Input pointer 1
     real(kind=8), dimension(:,:,:), pointer :: p2 !Input pointer 2
     ok = .false.
@@ -101,6 +134,7 @@ contains
 
   integer function get_allocate_i1d(key_S,value,len,allow_reshape_L,msg_S) result(istat)
     ! Allocate space for the result value and report error
+    implicit none
     character(len=*), intent(in) :: key_S
     integer, dimension(:), pointer :: value
     integer, intent(in) :: len
@@ -139,6 +173,7 @@ contains
   
   integer function get_allocate_r1d(key_S,value,len,allow_reshape_L,msg_S) result(istat)
     ! Allocate space for the result value and report error
+    implicit none
     character(len=*), intent(in) :: key_S
     real, dimension(:), pointer :: value
     integer, intent(in) :: len
@@ -177,6 +212,7 @@ contains
 
   integer function get_allocate_r81d(key_S,value,len,allow_reshape_L,msg_S) result(istat)
     ! Allocate space for the result value and report error
+    implicit none
     character(len=*), intent(in) :: key_S
     real*8, dimension(:), pointer :: value
     integer, intent(in) :: len
@@ -215,6 +251,7 @@ contains
 
  integer function get_allocate_r3d(key_S,value,len,allow_reshape_L,msg_S) result(istat)
     ! Allocate space for the result value and report error (len is result of 'shape()')
+    implicit none
     character(len=*), intent(in) :: key_S
     real, dimension(:,:,:), pointer :: value
     integer, dimension(:), intent(in) :: len
@@ -260,6 +297,7 @@ contains
 
  integer function get_allocate_r83d(key_S,value,len,allow_reshape_L,msg_S) result(istat)
     ! Allocate space for the result value and report error (len is result of 'shape()')
+    implicit none
     character(len=*), intent(in) :: key_S
     real*8, dimension(:,:,:), pointer :: value
     integer, dimension(:), intent(in) :: len
@@ -308,6 +346,7 @@ contains
 
   function is_big_endian() result(bend)
     ! Determine the endianness of the machine
+    implicit none
     character(len=4) :: str
     logical :: bend
     select case (transfer(1094861636,str))
@@ -325,6 +364,7 @@ contains
 
   integer function flip_transfer_r8(str,val_out) result(status)
     ! Convert string to a little-endian 8-byte real
+    implicit none
     character(len=*), intent(in) :: str                 !string to convert
     real*8, intent(out) :: val_out                      !8-byte real for output
     integer :: i,cnt
@@ -356,6 +396,7 @@ contains
 
   integer function flip_transfer_char(val,str_out) result(status)
     ! Convert a little-endian 8-byte real to a string
+    implicit none
     real*8, intent(in) :: val                           !8-byte real to convert
     character(len=*), intent(out) :: str_out            !string for output
     integer :: i,cnt
@@ -392,6 +433,7 @@ contains
   
   logical function same_vec_i(vec1,vec2) result(equal)
     ! Check for equality between a pair of pointer vectors
+    implicit none
     integer, dimension(:), pointer :: vec1,vec2          !Pointer vectors to compare
     integer :: i
     equal = .false.
@@ -414,6 +456,7 @@ contains
 
   logical function same_vec_r(vec1,vec2) result(equal)
     ! Check for equality between a pair of pointer vectors
+    implicit none
     real, dimension(:), pointer :: vec1,vec2     !Pointer vectors to compare
     integer :: i
     equal = .false.
@@ -436,6 +479,7 @@ contains
  
   logical function same_vec_r8(vec1,vec2) result(equal)
     ! Check for equality between a pair of pointer vectors
+    implicit none
     real(kind=8), dimension(:), pointer :: vec1,vec2     !Pointer vectors to compare
     integer :: i
     equal = .false.
@@ -458,6 +502,7 @@ contains
 
   logical function same_vec_r83d(vec1,vec2) result(equal)
     ! Check for equality between a pair of pointer vectors
+    implicit none
     real(kind=8), dimension(:,:,:), pointer :: vec1,vec2 !Pointer vectors to compare
     integer :: i,j,k
     equal = .false.
@@ -487,6 +532,7 @@ contains
 
   function up (string) result(upper_string)
     ! Convert a string to all upper-case
+    implicit none
     character(len=*), intent(in) :: string      !Input string to upper-case
     character(len=LONG_STRING) :: upper_string  !Upper-cased result
     integer :: i
@@ -508,6 +554,7 @@ contains
   
   real function get_error(key) result(value)
     ! Write error message and return a missing value     
+    implicit none
     character(len=*), intent(in) :: key
     write(for_msg,*) 'Attempt to retrieve invalid key '//trim(key)//' returns VGD_MISSING'
     call msg(MSG_CRITICAL,for_msg)
@@ -528,6 +575,7 @@ contains
 
   function printingCharacters(str) result(str_printing)
     ! Return a string that contains only printable characters
+    implicit none
     character(len=*) :: str
     character(len=LONG_STRING) :: str_printing
     integer :: i,length

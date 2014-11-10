@@ -55,10 +55,12 @@ contains
    subroutine vgrid_genab_5002 (F_version,F_hybuser,F_rcoef,F_ptop_8,F_pref_8, &
         F_am_8,F_bm_8,F_at_8,F_bt_8,F_ip1_m,F_ip1_t,F_err,lastTatU_L,notop_L,ptop_out_8, &
         dhm,dht)
-
+      
     ! Modifs 
     ! Andre Plante June 2012 : force real*8 in compuation of log(F_hybuser(k)*1.d0) in
       
+    use utils, only: comp_diag_a
+
     implicit none
     !      
     ! Arguments
@@ -78,7 +80,7 @@ contains
     real, optional, intent(in) :: dhm, dht                ! Diag levels Height (m) for Momentum/Thermo levels
 
     ! Local variables
-    integer :: k, status, nk, k_plus
+    integer :: k, status, nk, k_plus_top, k_plus_diag
     logical :: wronghyb
     real    :: rcoef
     real*8  :: pr1, ztop_8, zsrf_8, lamba_8,zeta_8, zetau_8,zeta2_8, l_ptop_8
@@ -119,12 +121,15 @@ contains
        return
     endif
 
+    k_plus_diag=0
+    if(present(dhm))k_plus_diag=1
+    
     my_lastTatU_L=.false.
     if(present(lastTatU_L))my_lastTatU_L=lastTatU_L
     my_notop_L=.false.
     if(present(notop_L))my_notop_L=notop_L
-    k_plus=1
-    if(my_notop_L)k_plus=0
+    k_plus_top=1
+    if(my_notop_L)k_plus_top=0
 
     ! Set size of the problem and check for full inputs
     nk = size(F_hybuser)
@@ -135,29 +140,29 @@ contains
     endif
 
     ! Check and allocate as required
-    status = reallocate(F_am_8,1,nk+1)
+    status = reallocate(F_am_8,1,nk+1+k_plus_diag)
     if (status /= VGD_OK) return
-    status = reallocate(F_bm_8,1,nk+1)
+    status = reallocate(F_bm_8,1,nk+1+k_plus_diag)
     if (status /= VGD_OK) return
-    status = reallocate(F_at_8,1,nk+1+k_plus)
+    status = reallocate(F_at_8,1,nk+1+k_plus_diag+k_plus_top)
     if (status /= VGD_OK) return
-    status = reallocate(F_bt_8,1,nk+1+k_plus)
+    status = reallocate(F_bt_8,1,nk+1+k_plus_diag+k_plus_top)
     if (status /= VGD_OK) return
-    status = reallocate(F_ip1_m,1,nk+1)
+    status = reallocate(F_ip1_m,1,nk+1+k_plus_diag)
     if (status /= VGD_OK) return
-    status = reallocate(F_ip1_t,1,nk+1+k_plus)
+    status = reallocate(F_ip1_t,1,nk+1+k_plus_diag+k_plus_top)
     if (status /= VGD_OK) return
 
     ! Allocate working thermo arrays
     status = reallocate(hybm,0,nk+1)
     if (status /= VGD_OK) return
-    status = reallocate(hybt,0,nk+2)
+    status = reallocate(hybt,0,nk+2+k_plus_diag)
     if (status /= VGD_OK) return
-    status = reallocate(at_8,1,nk+2)
+    status = reallocate(at_8,1,nk+2+k_plus_diag)
     if (status /= VGD_OK) return
-    status = reallocate(bt_8,1,nk+2)
+    status = reallocate(bt_8,1,nk+2+k_plus_diag)
     if (status /= VGD_OK) return
-    status = reallocate(ip1_t,1,nk+2)
+    status = reallocate(ip1_t,1,nk+2+k_plus_diag)
     if (status /= VGD_OK) return
 
     zsrf_8  = log(F_pref_8)
@@ -228,7 +233,8 @@ contains
        F_am_8(k) = zeta_8
     enddo
     
-    !     Special momentum levels for vert int.
+    F_am_8(Nk+1) = zsrf_8
+    F_bm_8(Nk+1) = 1.d0 
     if(F_version.eq.5)then
        ! Integrating the hydrostatic eq with T=0C
        ! ln[p(z=dhm)] = ln(ps) - g/(Rd*T)*dhm
@@ -236,12 +242,10 @@ contains
        ! ln[p(z=dhm)] = ln(pref) - g/(Rd*T)*dhm + s
        ! => B=1, A = ln(pref) - g/(Rd*T)*dhm
        ! We take T at 0C
-       F_am_8(Nk+1) = log(F_pref_8) - GRAV*dhm/(RGASD*TCDK)
-    else
-       F_am_8(Nk+1) = zsrf_8
+       !F_am_8(Nk+2) = log(F_pref_8) - GRAV*dhm/(RGASD*TCDK)
+       F_am_8(Nk+2) = comp_diag_a(F_pref_8,dhm)
+       F_bm_8(Nk+2) = 1.d0 
     endif
-    F_bm_8(Nk+1) = 1.d0 
-    
     
     !     Thermodynamic levels
     
@@ -258,7 +262,9 @@ contains
     at_8(Nk+1)  = 0.5d0*(F_am_8(Nk) + zsrf_8)
     at_8(Nk+2)  = zsrf_8
     if(F_version.eq.5)then
-       at_8(Nk+2) = log(F_pref_8) - GRAV*dht/(RGASD*TCDK)
+       !at_8(Nk+3) = log(F_pref_8) - GRAV*dht/(RGASD*TCDK)
+       at_8(Nk+3) = comp_diag_a(F_pref_8,dht)
+       bt_8(Nk+3)  = 1.d0
     endif
     
     hybm(1:NK) = F_hybuser(1:NK)
@@ -287,8 +293,8 @@ contains
 
     if(F_version.eq.5)then
        ! Encoding kind= 4       : M  [metres] (height with respect to ground level)
-       call convip(F_ip1_m(nk+1),dhm,4,2,'',.false.)
-       call convip(ip1_t(nk+2),dht,4,2,'',.false.)
+       call convip(F_ip1_m(nk+2),dhm,4,2,'',.false.)
+       call convip(ip1_t(nk+3),dht,4,2,'',.false.)
     endif
 
     if(my_notop_L)then

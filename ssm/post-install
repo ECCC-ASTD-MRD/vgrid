@@ -1,12 +1,23 @@
-#!/bin/bash
-domainHome=$1
-packageHome=$2
-profileDirPath=${packageHome}/etc/profile.d
-packageName=${packageHome##*/}
-profilePath=${profileDirPath}/${packageName}.sh
-loginPath=${profileDirPath}/${packageName}.csh
-mkdir -p ${profileDirPath}
-Platform=`uname -s` ; [[ $Platform = Linux ]] && Platform=${Platform}-`uname -m`
-cp ${packageHome}/.ssm.d/profile.sh ${profilePath}
-echo "export vgriddescriptors=${packageHome}" >> ${profilePath}
-chmod 644 ${profilePath}
+#! /bin/bash
+## post-install <domain_home> <package_home>
+
+domain_home=$1
+package_home=$2
+
+# set up vars
+package_name=${package_home##*/}
+profile_dir=${package_home}/etc/profile.d
+profile_path=${profile_dir}/${package_name}.sh
+
+# remove old script, if any
+rm -f ${profile_path}
+
+# create scripts .sh
+mkdir -p ${profile_dir}
+cat > "${profile_path}" <<EOF
+if [[ -n "\${VGRIDDESCRIPTORS_VERSION}" && "\${VGRIDDESCRIPTORS_VERSION}" != $(echo ${package_name} | cut -d_ -f2) ]];then
+   echo "You already have a version of vgrid loaded, using two versions at the same time may cause problems"
+fi
+export VGRIDDESCRIPTORS_VERSION=$(echo ${package_name} | cut -d_ -f2)
+EOF
+
