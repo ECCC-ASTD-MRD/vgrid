@@ -1254,6 +1254,7 @@ contains
     case ('DIPM')
        if (is_valid(self,dhm_valid)) then
           value=self%ip1_m(size(self%ip1_m))
+          
        else
           value = get_error(key)
           return
@@ -1802,7 +1803,7 @@ contains
 !!! Put methods
 
   integer function put_int(self,key,value) result(status)
-    use utils, only: up
+    use utils, only: up,comp_diag_a
     ! Set the value of the requested instance variable
     type(vgrid_descriptor), intent(inout) :: self !Vertical descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to set
@@ -1840,14 +1841,28 @@ contains
        self%rec%ip3 = value
     case ('DIPM')
        if (is_valid(self,dhm_valid)) then
-          self%ip1_m(size(self%ip1_m))=value
+          self%ip1_m(size(self%ip1_m))=value          
+          self%a_m_8(size(self%a_m_8))=comp_diag_a(self%pref_8,value)
+          error=table_update(self)
+          if(error==VGD_ERROR)then
+             write(for_msg,*) 'Problem with table_update for key '//trim(key)//' given to gd_put (int)'
+             call msg(MSG_ERROR,VGD_PRFX//for_msg)
+             return
+          endif
        else
           return
        endif
     case ('DIPT')
        if (is_valid(self,dht_valid)) then
           self%ip1_t(size(self%ip1_t))=value
-       else
+          self%a_t_8(size(self%a_t_8))=comp_diag_a(self%pref_8,value)
+          error=table_update(self)
+          if(error==VGD_ERROR)then
+             write(for_msg,*) 'Problem with table_update for key '//trim(key)//' given to gd_put (int)'
+             call msg(MSG_ERROR,VGD_PRFX//for_msg)
+             return
+          endif
+        else
           return
        endif
     case DEFAULT
@@ -2329,7 +2344,7 @@ contains
           call msg(MSG_VERBATIM,trim(for_msg))
        case (5005)
           nk=size(self%ip1_m)
-          write(for_msg,*)'  Number of hybrid levels (momentum/thermo levels)',nk-1
+          write(for_msg,*)'  Number of hybrid levels (momentum/thermo levels)',nk-2          
           call msg(MSG_VERBATIM,trim(for_msg))
           call convip(self%ip1_m(nk),height,kind,-1,"",.false.)
           write(for_msg,*)'  Diagnostic momentum level (ip1=',self%ip1_m(nk),') at ',height,' m Above Ground Level'
@@ -2539,7 +2554,6 @@ contains
 
     ! Write to an RPN Standard file
     case ('FST')
-
     error=fstecr(self%table,dummy,-self%rec%nbits,unit, &
          self%rec%dateo,self%rec%deet,self%rec%npas, &
          ni,nj,nk,self%rec%ip1,self%rec%ip2,self%rec%ip3, &
@@ -3606,31 +3620,75 @@ contains
      status = VGD_OK
   end function encode_vert_5001
 
-  Integer function encode_vert_5002(self,nk) result(status)
+  Integer function encode_vert_5002(self,F_nk,update_L) result(status)
      use utils, only: flip_transfer
      type(vgrid_descriptor), intent(inout) :: self      !Vertical descriptor instance
-     integer, intent(in) :: nk                          !Number of levels
+     integer, intent(in), optional :: F_nk              !Number of levels
+     logical, intent(in), optional :: update_L          !Update table
 
      ! Local variables
-     integer :: nn,error,k,ind,k_plus
+     integer :: nn,error,k,ind,k_plus_top,k_plus_diag,nb,nk
      integer, parameter :: skip=3
      real*8 :: for_char_8
      character(len=8) :: ref_name
+     logical :: my_update_L
 
      ! Set error status
      status = VGD_ERROR
 
-     k_plus=1
-     ! Test if version >= 4 -> notop
-     if(self%version>=4)k_plus=0
-
-     ! Allocate table space
-     if (associated(self%table)) deallocate(self%table)         
-     allocate(self%table(3,(2*nk+2+k_plus)+skip,1),stat=error)
-     if(error < 0)then
-        write(for_msg,*) 'cannot allocate self%table in encode_vert_5002'
+     my_update_L=.false.
+     if(present(update_L))my_update_L=update_L
+     if(my_update_L.and.present(F_nk))then
+        write(for_msg,*) 'Error in encode_vert_5002, optional parameter F_nk must not be used with option update_L set to .true.'
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
+     end if
+
+     !==========================================================================================
+     ! Nk is the number of dynamic momentum levels without hyb = 1.0 and diag level or top level
+     ! Therefore, the number of lines in table is nj =
+     !   nk + 1 for hyb=1 + 0 or 1 for diag                    -> momentum
+     ! + nk + 1 for hyb=1 + 0 or 1 for diag + 0 or 1 for top   -> thermo  
+     ! + skip
+     ! = 
+     ! nj = 2 * ( nk + 1 + diag ) + top + skip
+     !
+     ! ->  nk = ( nj - top - skip ) / 2 - 1 - diag
+     !
+     !==========================================================================================
+     !
+     ! Option notop ?
+     k_plus_top=1
+     ! Test if version >= 4 -> notop
+     if(self%version>=4)k_plus_top=0
+
+     ! Option diag level in meter Above Ground Level included ?
+     k_plus_diag=0
+     if(is_valid(self,dhm_valid))k_plus_diag=1
+
+     if(my_update_L)then
+        nk = ( size(self%table,2) - k_plus_top - skip ) / 2 - 1 - k_plus_diag
+     else
+        if(.not.present(F_nk))then
+           write(for_msg,*) 'Error in encode_vert_5002, internal error with F_nk and update_L'
+           call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        endif
+        nk = F_nk
+     endif
+
+     ! nb              is the number or line for mometum levels
+     ! nb + k_plus_top is the number or line for thermo  levels
+     nb=nk+1+k_plus_diag
+        
+     ! Allocate table space
+     if(.not.my_update_L)then
+        if (associated(self%table)) deallocate(self%table)         
+        allocate(self%table(3,2*nb+k_plus_top+skip,1),stat=error)
+        if(error < 0)then
+           write(for_msg,*) 'cannot allocate self%table in encode_vert_5002'
+           call msg(MSG_ERROR,VGD_PRFX//for_msg)
+           return
+        endif
      endif
      
      ! Associate reference field name
@@ -3638,38 +3696,38 @@ contains
 
      ! Vector size checks
      nn=size(self%ip1_m)
-     if(nn.ne.nk+1)then
-        write(for_msg,*) 'wrong size for ip1_m, is ',nn,'should be ',nk+1
+     if(nn.ne.nb)then
+        write(for_msg,*) 'wrong size for ip1_m, is ',nn,'should be ',nb
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      nn=size(self%a_m_8)
-     if(nn.ne.nk+1)then
-        write(for_msg,*) 'wrong size for a_m_8, is ',nn,'should be ',nk+1
+     if(nn.ne.nb)then
+        write(for_msg,*) 'wrong size for a_m_8, is ',nn,'should be ',nb
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      nn=size(self%b_m_8)
-     if(nn.ne.nk+1)then
-        write(for_msg,*) 'wrong size for b_m_8, is ',nn,'should be ',nk+1
+     if(nn.ne.nb)then
+        write(for_msg,*) 'wrong size for b_m_8, is ',nn,'should be ',nb
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      nn=size(self%ip1_t)
-     if(nn.ne.nk+1+k_plus)then
-        write(for_msg,*) 'wrong size for ip1_t, is ',nn,'should be ',nk+1+k_plus
+     if(nn.ne.nb+k_plus_top)then
+        write(for_msg,*) 'wrong size for ip1_t, is ',nn,'should be ',nb+k_plus_top
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      nn=size(self%a_t_8)
-     if(nn.ne.nk+1+k_plus)then
-        write(for_msg,*) 'wrong size for a_t_8, is ',nn,'should be ',nk+1+k_plus
+     if(nn.ne.nb+k_plus_top)then
+        write(for_msg,*) 'wrong size for a_t_8, is ',nn,'should be ',nb+k_plus_top
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      nn=size(self%b_t_8)
-     if(nn.ne.nk+1+k_plus)then
-        write(for_msg,*) 'wrong size for b_t_8, is ',nn,'should be ',nk+1+k_plus
+     if(nn.ne.nb+k_plus_top)then
+        write(for_msg,*) 'wrong size for b_t_8, is ',nn,'should be ',nb+k_plus_top
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
@@ -3691,14 +3749,14 @@ contains
      self%table(1:3,3,1)=(/dble(self%rcoef2),for_char_8           ,0.d0/)
 
      ! Fill momentum level data
-     do k=1,nk+1
+     do k=1,nb
         ind=k+skip
         self%table(1:3,ind,1)=(/dble(self%ip1_m(k)),self%a_m_8(k),self%b_m_8(k)/)
      enddo     
 
      ! Fill thermodynamic level data
-     do k=1,nk+1+k_plus
-        ind=k+skip+nk+1
+     do k=1,nb+k_plus_top
+        ind=k+skip+nb
         self%table(1:3,ind,1)=(/dble(self%ip1_t(k)),self%a_t_8(k),self%b_t_8(k)/)
      enddo
      
@@ -3951,7 +4009,7 @@ contains
      type(vgrid_descriptor), intent(inout) :: self  !Vertical descriptor instance
      
      ! Local variables
-     integer :: skip,nj,nk,k,ind,error,istat,k_plus
+     integer :: skip,nj,nk,k,ind,error,istat,k_plus_top,k_plus_diag,nb
 
      ! Set error status
      status = VGD_ERROR
@@ -3960,8 +4018,10 @@ contains
      self%kind     = nint(self%table(1,1,1))
      self%version  = nint(self%table(2,1,1))
      skip          = nint(self%table(3,1,1))
-     k_plus=1
-     if(self%version>=4)k_plus=0
+     k_plus_top=1
+     if(self%version>=4)k_plus_top=0
+     k_plus_diag=0
+     if(is_valid(self,dhm_valid))k_plus_diag=1
 
      ! Read header line 2
      self%ptop_8   = self%table(1,2,1)
@@ -3978,32 +4038,34 @@ contains
      endif
      nj=size(self%table,dim=2)
 
-     nk=(nj-2-k_plus-skip)/2
+     nk=(nj-k_plus_top-skip)/2-1-k_plus_diag
+     nb=nk+1+k_plus_diag
 
      ! Allocate and assign momentum level data
      if (associated(self%ip1_m)) deallocate(self%ip1_m)
-     allocate(self%ip1_m(nk+1),stat=istat)
+     
+     allocate(self%ip1_m(nb),stat=istat)
      if (istat /= 0) then
-        write(for_msg,*) 'unable to allocate self%ip1_m(nk+1) in decode_vert_5002'
+        write(for_msg,*) 'unable to allocate self%ip1_m(nb) in decode_vert_5002'
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      if (associated(self%a_m_8)) deallocate(self%a_m_8)
-     allocate(self%a_m_8(nk+1),stat=istat)
+     allocate(self%a_m_8(nb),stat=istat)
      if (istat /= 0) then
-        write(for_msg,*) 'unable to allocate self%a_m_8(nk+1) in decode_vert_5002'
+        write(for_msg,*) 'unable to allocate self%a_m_8(nb) in decode_vert_5002'
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      if (associated(self%b_m_8)) deallocate(self%b_m_8)
-     allocate(self%b_m_8(nk+1),stat=istat)
+     allocate(self%b_m_8(nb),stat=istat)
      if (istat /= 0) then
-        write(for_msg,*) 'unable to allocate self%b_m_8(nk+1) in decode_vert_5002'
+        write(for_msg,*) 'unable to allocate self%b_m_8(nb) in decode_vert_5002'
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
 
-     do k=1,nk+1
+     do k=1,nb
         ind=k+skip
         self%ip1_m(k) = nint(self%table(1,ind,1))
         self%a_m_8(k) =      self%table(2,ind,1)
@@ -4012,29 +4074,29 @@ contains
 
      ! Allocate and assign thermodynamic level data
      if (associated(self%ip1_t)) deallocate(self%ip1_t)
-     allocate(self%ip1_t(nk+1+k_plus),stat=istat)
+     allocate(self%ip1_t(nb+k_plus_top),stat=istat)
      if (istat /= 0) then
         write(for_msg,*) 'unable to allocate self%ip1_t in decode_vert_5002'
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      if (associated(self%a_t_8)) deallocate(self%a_t_8)
-     allocate(self%a_t_8(nk+1+k_plus),stat=istat)
+     allocate(self%a_t_8(nb+k_plus_top),stat=istat)
      if (istat /= 0) then
         write(for_msg,*) 'unable to allocate self%a_t_8 in decode_vert_5002'
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      if (associated(self%b_t_8)) deallocate(self%b_t_8)
-     allocate(self%b_t_8(nk+1+k_plus),stat=istat)
+     allocate(self%b_t_8(nb+k_plus_top),stat=istat)
      if (istat /= 0) then
         write(for_msg,*) 'unable to allocate self%b_t_8 in decode_vert_5002'
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
 
-     do k=1,nk+1+k_plus
-        ind=k+skip+nk+1
+     do k=1,nb+k_plus_top
+        ind=k+skip+nb
         self%ip1_t(k) = nint(self%table(1,ind,1))
         self%a_t_8(k) =      self%table(2,ind,1)
         self%b_t_8(k) =      self%table(3,ind,1)
@@ -5059,5 +5121,46 @@ contains
     status=VGD_OK
 999 deallocate(work)
  end function get_consistent_pt_e1
- 
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!! (PRIVATE) !s/r table_update - update self%table
+!* 
+ integer function table_update(self) result(status)
+    
+    type(vgrid_descriptor), intent(inout) :: self !Vertical descriptor instance
+
+    ! Local variables
+    integer :: error,kind,version
+    character(len=10) :: cvcode
+
+    ! Set error status
+    status = VGD_ERROR
+
+    ! Initializations
+    kind=self%kind
+    version=self%version
+    
+    ! Fill table with version-specific encoder
+    select case (self%vcode)
+    case (5002,5003,5004,5005)
+       cvcode="5002"
+       error = encode_vert_5002(self,update_L=.true.)
+    case DEFAULT
+       write(for_msg,*) 'table_update unsupported kind and version: ',kind,version,' (vcode) ',self%vcode
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return
+    end select
+    if (error /= VGD_OK) then
+       write(for_msg,'(i4)') self%vcode
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       write(for_msg,*) 'problem with encode_vert_'//trim(cvcode)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return
+    endif
+
+    status = VGD_OK
+    return
+    
+ end function table_update
+
 end module vGrid_Descriptors

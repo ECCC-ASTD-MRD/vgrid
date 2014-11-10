@@ -16,9 +16,9 @@ default: lib
 
 OBJECTS = vgrid_descriptors.o vgrid_genab_1001.o vgrid_genab_1002_5001.o vgrid_genab_1004.o vgrid_genab_2001.o vgrid_genab_5002.o utils.o msg.o
 
-all: $(OBJECTS)
+all: Makefile.dep.mk $(OBJECTS)
 
-vgrid_descriptors.o: vgrid_descriptors.ftn90 vgrid_genab_1001.o vgrid_genab_1002_5001.o vgrid_genab_1004.o vgrid_genab_2001.o vgrid_genab_5002.o utils.o
+include Makefile.dep.mk
 
 lib: all
 	ar cru libdescrip.a $(OBJECTS)

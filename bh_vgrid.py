@@ -9,8 +9,8 @@ from bh import bhlib, actions
 def _init(b):
    environ["BH_PROJECT_NAME"] = "vgriddescriptors"
    environ["BH_PACKAGE_NAMES"] = "vgriddescriptors"
-   environ["BH_PACKAGE_VERSION"] = "5.3.0-a1"
-   environ["BH_PULL_SOURCE"] = "/users/dor/afsg/apm/data/vcoord/tags/release-5.3.0-a1"
+   environ["BH_PACKAGE_VERSION"] = "5.3.0-a2"
+   environ["BH_PULL_SOURCE"] = "/users/dor/afsg/apm/data/vcoord/tags/release-5.3.0-a2"
    #environ["RCOMPILE"] = "s.compile"
    b.shell("""export RCOMPILE=s.compile""", environ)
    b.shell("""export RMN=rmn_015""", environ)
@@ -37,7 +37,7 @@ if __name__ == "__main__":
    b.actions.set("pull", actions.pull.copy_dir)
    b.actions.set("clean", ["""(cd ${BH_BUILD_DIR}; ${BH_MAKE} distclean)"""])
    b.actions.set("make", actions.make.make)
-   b.actions.set("test",["""(cd ${BH_BUILD_DIR}/tests; ${BH_MAKE} tests)"""])
+   #b.actions.set("test",["""(cd ${BH_BUILD_DIR}/tests; ${BH_MAKE} tests)"""])
    b.actions.set("package",["""(cd ${BH_BUILD_DIR}/ssm; ${BH_MAKE})"""])
 
    b.supported_platforms = [
