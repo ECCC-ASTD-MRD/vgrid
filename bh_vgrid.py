@@ -25,6 +25,11 @@ def _init(b):
        b.shell(""". ssmuse-sh -d hpcs/201402/01/base -d hpcs/201402/01/pgi1401      -d rpn/libs/15.0""", environ)
        environ["FC"] = "pgi1401"
        environ["BH_MAKE"] = 'make' 
+   elif b.mode == "pgi9xx":
+       b.shell(""". ssmuse-sh -d hpcs/13b/03/base -d rpn/libs/4.0;.  s.ssmuse.dot pgi9xx devtools""", environ)
+       b.shell("""export RMN=rmn_014""", environ)
+       environ["FC"] = "pgi9xx"
+       environ["BH_MAKE"] = 'make' 
    elif b.mode == "xlf13":
        b.shell(""". ssmuse-sh -d hpcs/201402/00/base -d hpcs/ext/xlf_13.1.0.10      -d rpn/libs/15.0""", environ)
        environ["FC"] = "xlf"
@@ -50,5 +55,6 @@ if __name__ == "__main__":
    b.supported_modes = [
       "intel",
       "pgi14",
+      "pgi9xx",
       "xlf13",
    ]
