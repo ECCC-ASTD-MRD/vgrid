@@ -1,6 +1,7 @@
 
-LINUX_COMP=intel13sp1u2
+#LINUX_COMP=intel13sp1u2
 #LINUX_COMP=pgi1401
+LINUX_COMP=pgi9xx
 
 if [ ${BASE_ARCH} = AIX-powerpc7 ];then
 
@@ -26,6 +27,13 @@ else
                     -d hpcs/201402/01/pgi1401\
                     -d rpn/libs/15.0
                  export RMN=rmn_015
+		 :;;
+
+         pgi9xx). ssmuse-sh \
+	            -d hpcs/13b/03/base\
+                    -d rpn/libs/4.0
+                 . s.ssmuse.dot pgi9xx devtools
+                 export RMN=rmn_014
 		 :;;
               *) echo "Add compiler ${LINUX_COMP} in case ";;
    esac
