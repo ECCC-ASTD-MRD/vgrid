@@ -4296,7 +4296,11 @@ contains
     nhours=record%deet*record%npas/3600.d0
     ! Note incdatr prints the following when dateo is zero :
     !    label 1,idate2:           0
-    call incdatr(record%datev,record%dateo,nhours)
+    if (record%dateo == 0 )then
+       record%datev=0
+    else
+       call incdatr(record%datev,record%dateo,nhours)
+    endif
     status = VGD_OK
   end function my_fstprm
 
