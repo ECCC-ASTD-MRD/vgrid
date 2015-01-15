@@ -1,6 +1,6 @@
 # User options
 FCFLAGS=
-#DEBUG_FLAGS='=-C -g'
+DEBUG_FLAGS='=-C -g'
 #RCOMPILE = r.compile
 
 # Set default target
