@@ -15,9 +15,6 @@ rm -f ${profile_path}
 # create scripts .sh
 mkdir -p ${profile_dir}
 
-echo "ANDRE env="
-env
-
 cat > "${profile_path}" <<EOF
 if [[ -n "\${VGRIDDESCRIPTORS_VERSION}" && "\${VGRIDDESCRIPTORS_VERSION}" != $(echo ${package_name} | cut -d_ -f2) ]];then
    echo "You already have a version of vgrid loaded, using two versions at the same time may cause problems"

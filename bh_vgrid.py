@@ -11,7 +11,6 @@ def _init(b):
    environ["BH_PACKAGE_NAMES"] = "vgriddescriptors"
    environ["BH_PACKAGE_VERSION"] = "5.3.1"
    environ["BH_PULL_SOURCE"] = "/users/dor/afsg/apm/data/vcoord/tags/release-5.3.1"
-   #environ["RCOMPILE"] = "s.compile"
    b.shell("""export RCOMPILE=s.compile""", environ)
    environ["DISTINATION_MACH"] = "pollux"
    environ["DISTINATION_DIR"] = "/users/dor/afsg/apm/ords/vgrid/%(BH_PACKAGE_VERSION)s" % environ
@@ -30,6 +29,7 @@ def _init(b):
        b.shell(""".  s.ssmuse.dot pgi9xx devtools; . ssmuse-sh -d hpcs/13b/03/base  -d rpn/libs/${RMN_VERSION};""", environ)
        b.shell("""export RMN_EXT=_014""", environ)
        environ["FC"] = "pgi9xx"
+       b.shell("""export RCOMPILE=r.compile""", environ)
        environ["BH_MAKE"] = 'make' 
    elif b.mode == "xlf13":
        b.shell(""". ssmuse-sh -d hpcs/201402/00/base -d hpcs/ext/xlf_13.1.0.10      -d rpn/libs/${RMN_VERSION}""", environ)
@@ -43,7 +43,7 @@ if __name__ == "__main__":
    b.actions.set("pull", actions.pull.copy_dir)
    b.actions.set("clean", ["""(cd ${BH_BUILD_DIR}; ${BH_MAKE} distclean)"""])
    b.actions.set("make", actions.make.make)
-   b.actions.set("test",["""(cd ${BH_BUILD_DIR}/tests; ${BH_MAKE} tests)"""])
+   #b.actions.set("test",["""(cd ${BH_BUILD_DIR}/tests; ${BH_MAKE} tests)"""])
    b.actions.set("package",["""(cd ${BH_BUILD_DIR}/ssm; ${BH_MAKE})"""])
 
    b.supported_platforms = [
