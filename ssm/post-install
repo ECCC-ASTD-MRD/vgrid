@@ -23,6 +23,6 @@ if [[ -n "\${VGRIDDESCRIPTORS_VERSION}" && "\${VGRIDDESCRIPTORS_VERSION}" != $(e
    echo "You already have a version of vgrid loaded, using two versions at the same time may cause problems"
 fi
 export VGRIDDESCRIPTORS_VERSION=$(echo ${package_name} | cut -d_ -f2)
-export VGRIDDESCRIPTORS_SRC=\${packageHome}/src
+export VGRIDDESCRIPTORS_SRC=${package_home}/src
 EOF
 
