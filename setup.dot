@@ -1,7 +1,7 @@
 
-LINUX_COMP=intel13sp1u2
+#LINUX_COMP=intel13sp1u2
 #LINUX_COMP=pgi1401
-#LINUX_COMP=pgi9xx
+LINUX_COMP=pgi9xx
 
 if [ ${BASE_ARCH} = AIX-powerpc7 ];then
 

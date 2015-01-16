@@ -43,7 +43,7 @@ if __name__ == "__main__":
    b.actions.set("pull", actions.pull.copy_dir)
    b.actions.set("clean", ["""(cd ${BH_BUILD_DIR}; ${BH_MAKE} distclean)"""])
    b.actions.set("make", actions.make.make)
-   #b.actions.set("test",["""(cd ${BH_BUILD_DIR}/tests; ${BH_MAKE} tests)"""])
+   b.actions.set("test",["""(cd ${BH_BUILD_DIR}/tests; ${BH_MAKE} tests)"""])
    b.actions.set("package",["""(cd ${BH_BUILD_DIR}/ssm; ${BH_MAKE})"""])
 
    b.supported_platforms = [
