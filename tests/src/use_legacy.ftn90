@@ -71,7 +71,7 @@ integer function test_it(F_file) result(istat)
   
    allocate(levels(ni,nj,infon),px(ni,nj,infon))
 
-   stat=vgd_levels(vgd,lu,liste(1:infon),levels,in_log=in_log)
+   stat=vgd_levels(vgd,lu,liste(1:infon),levels)
    if(stat.eq.VGD_ERROR)return
    
    do k=1,infon
