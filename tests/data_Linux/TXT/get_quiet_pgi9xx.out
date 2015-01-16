@@ -1,6 +1,4 @@
- label 1,idate2:            0
 Read(999) !!   X  STG_CP_GEMV4     3    60     1  000000000         229       0     0        0        0  E 64  X  5002  6500   100   100
- label 1,idate2:            0
 Read(999) !!   X  STG_CP_GEMV4     3    60     1  000000000         229       0     0        0        0  E 64  X  5002  6500   100   100
 ERROR: (vgd)  invalid key UNDEFINED KEY given to gd_get (int)
 ERROR: (vgd)  invalid key UNDEFINED KEY given to gd_get (int)
