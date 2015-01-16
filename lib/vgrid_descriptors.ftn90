@@ -1432,7 +1432,7 @@ contains
     logical, optional, intent(in) :: quiet      !Do not print massages
 
     ! Internal variables
-    integer :: k,istat,error,level_msg
+    integer :: k,istat,error,level_msg,kind
     integer, dimension(:), pointer :: vipt
     logical :: my_quiet
 
@@ -1457,10 +1457,10 @@ contains
        if (is_valid(self,ip1_m_valid)) then
           istat = get_allocate(key,value,size(self%ip1_m),ALLOW_RESHAPE,'(VCDM in get_real_1d)')
           if (istat /= 0) return
-          
-          call convip(k,value(1),self%kind,0,'',.false.)
+          kind = self%kind
+          call convip(k,value(1),kind,0,'',.false.)
           do k=1,size(value)
-             call convip(self%ip1_m(k),value(k),self%kind,-1,'',.false.)
+             call convip(self%ip1_m(k),value(k),kind,-1,'',.false.)
           enddo
        else
           error = int(get_error(key))
@@ -1478,9 +1478,10 @@ contains
              return
           endif
           istat = get_allocate(key,value,size(vipt),ALLOW_RESHAPE,'(VCDT in get_real_1d)')
-          call convip(k,value(1),self%kind,0,'',.false.)
+          kind = self%kind
+          call convip(k,value(1),kind,0,'',.false.)
           do k=1,size(vipt)
-             call convip(vipt(k),value(k),self%kind,-1,'',.false.)
+             call convip(vipt(k),value(k),kind,-1,'',.false.)
           enddo
           deallocate(vipt)
        else
@@ -2363,7 +2364,7 @@ contains
              call msg(MSG_VERBATIM,trim(for_msg))
              null_S=''
              do k=1,nk                
-                call convip(self%ip1_m(k),pres,self%kind,-1,null_S,.false.)
+                call convip(self%ip1_m(k),pres,kind,-1,null_S,.false.)
                 write(for_msg,*)self%ip1_m(k),pres,self%a_m_8(k),self%b_m_8(k)
                 call msg(MSG_VERBATIM,trim(for_msg))
              enddo
@@ -2373,7 +2374,7 @@ contains
              write(for_msg,*)'  Thermodynamic levels ip1, p, A, B:'
              call msg(MSG_VERBATIM,trim(for_msg))
              do k=1,nk
-                call convip(self%ip1_t(k),pres,self%kind,-1,null_S,.false.)
+                call convip(self%ip1_t(k),pres,kind,-1,null_S,.false.)
                 write(for_msg,*)self%ip1_t(k),pres,self%a_t_8(k),self%b_t_8(k)
                 call msg(MSG_VERBATIM,trim(for_msg))
              enddo
@@ -4522,7 +4523,7 @@ contains
                                                         !   respect to surface hydrostatic pressure(pis)
 
     ! Internal variables
-    integer :: i,j,error,nk
+    integer :: i,j,error,nk,kind
     real*8, dimension(size(sfc_field,dim=1),size(sfc_field,dim=2)) :: s_8
     real*8, dimension(size(ip1_list)) :: aa_8,bb_8
     real :: pppp
@@ -4575,8 +4576,8 @@ contains
        ! Force surface pressure to be equal to sfc_field
        ! Needed by assimilation section.
        do i=1,nk
-          call convip(ip1_list(i),pppp,self%kind,-1,dummy_S,.false.)
-          if(abs(pppp-1.).lt.epsilon(pppp))levels(:,:,i)=sfc_field         
+          call convip(ip1_list(i),pppp,kind,-1,dummy_S,.false.)
+          if(abs(pppp-1.).lt.epsilon(pppp) .and. kind==5)levels(:,:,i)=sfc_field         
        enddo       
     endif
     if(dpidpis)then
