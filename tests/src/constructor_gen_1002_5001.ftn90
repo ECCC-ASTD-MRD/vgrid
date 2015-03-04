@@ -9,7 +9,7 @@ program constructor
   integer :: stat
   real :: my_epsilon=1.e-6
   !From /home/binops/afsi/sio/datafiles/constants/modeles/GEMDM/glb_033L80_g1_20090922/gem_settings.nml
-  real, dimension(28) :: hyb=(/&
+  real, dimension(28) :: hyb2,hyb=(/&
        0.0125000,0.0233625,0.0391625,0.0628625,0.0865625,&
        0.1122375,0.1379125,0.1655625,0.1951875,0.2287625,&
        0.2672750,0.3107250,0.3591125,0.4124375,0.4667500,&
@@ -80,13 +80,33 @@ program constructor
 
   stat = vgd_new(d,kind=5,version=1,hyb=hyb,rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
   if(stat.ne.VGD_ERROR)OK=.false.
-  !
+
+  print*,''
+  print*,'===== Test on Error last hyb not equal 1.0, error message is normal ===='  
+  stat = vgd_new(d,kind=5,version=1,hyb=hyb(1:size(hyb)-1),rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
+  if(stat.ne.VGD_ERROR)OK=.false.
+
+  print*,''
+  print*,'===== hyb not monotone, error message is normal ===='  
+  hyb2=hyb
+  hyb2(size(hyb)-3)=hyb(size(hyb)-2) 
+  stat = vgd_new(d,kind=5,version=1,hyb=hyb2,rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
+  if(stat.ne.VGD_ERROR)OK=.false.
+
   print*,''
   print*,'===== Test on Error ptop<=0, error message is normal ===='
   ptop=-1.
   stat = vgd_new(d,kind=5,version=1,hyb=hyb,rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
   if(stat.ne.VGD_ERROR)OK=.false.
   !
+
+  print*,''
+  print*,'===== Test on Error ptop lower than first level error message is normal ===='
+  ptop=hyb(1)*pref+10.
+  stat = vgd_new(d,kind=5,version=1,hyb=hyb,rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
+  if(stat.ne.VGD_ERROR)OK=.false.
+  !
+  
   print*,''
   print*,'===== Test complete level set ===='
 
