@@ -1,50 +1,90 @@
 #! /usr/bin/env python
-#
-# bh_toto.py
+# -*- coding: utf-8 -*-
 
 from os import environ
 import sys
 from bh import bhlib, actions
 
 def _init(b):
-   environ["BH_PROJECT_NAME"] = "vgriddescriptors"
-   environ["BH_PACKAGE_NAMES"] = "vgriddescriptors"
-   environ["BH_PACKAGE_VERSION"] = "5.3.1"
-   environ["BH_PULL_SOURCE"] = "/users/dor/afsg/apm/data/vcoord/tags/release-5.3.1"
-   b.shell("""export RCOMPILE=s.compile""", environ)
-   environ["DISTINATION_MACH"] = "pollux"
-   environ["DISTINATION_DIR"] = "/users/dor/afsg/apm/ords/vgrid/%(BH_PACKAGE_VERSION)s" % environ
-   environ["RMN_VERSION"] = "15.1" % environ
    
-   if b.mode == "intel":       
-       b.shell(""". ssmuse-sh -d hpcs/201402/01/base -d hpcs/201402/01/intel13sp1u2 -d rpn/libs/${RMN_VERSION}""", environ)
-       environ["FC"] = "intel13sp1u21"
+   # Adjust the folowing
+   environ["BH_PROJECT_NAME"] = "vgriddescriptors"
+   environ["BH_PULL_SOURCE"] = "%(BH_HERE_DIR)s" % environ
+   environ["BH_PULL_SOURCE_GIT_BRANCH"] = "5.3.2"
+
+   # Add compiler if needed, select rmn lib version
+   if b.mode == "intel":
+       b.shell(""". ssmuse-sh -d hpcs/201402/01/base -d hpcs/201402/01/intel13sp1u2 -d rpn/libs/15.1 """, environ)
        environ["BH_MAKE"] = 'make'
-   elif b.mode == "pgi14":
-       b.shell(""". ssmuse-sh -d hpcs/201402/01/base -d hpcs/201402/01/pgi1401      -d rpn/libs/${RMN_VERSION}""", environ)
-       environ["FC"] = "pgi1401"
-       environ["BH_MAKE"] = 'make' 
-   elif b.mode == "pgi9xx":
-       environ["RMN_VERSION"] = "4.0" % environ
-       b.shell(""".  s.ssmuse.dot pgi9xx devtools; . ssmuse-sh -d hpcs/13b/03/base  -d rpn/libs/${RMN_VERSION};""", environ)
-       b.shell("""export RMN_EXT=_014""", environ)
-       environ["FC"] = "pgi9xx"
-       b.shell("""export RCOMPILE=r.compile""", environ)
-       environ["BH_MAKE"] = 'make' 
    elif b.mode == "xlf13":
-       b.shell(""". ssmuse-sh -d hpcs/201402/00/base -d hpcs/ext/xlf_13.1.0.10      -d rpn/libs/${RMN_VERSION}""", environ)
-       environ["FC"] = "xlf"
+       b.shell(""". ssmuse-sh -d hpcs/201402/00/base -d hpcs/ext/xlf_13.1.0.10      -d rpn/libs/15.1""", environ)
        environ["BH_MAKE"] = 'gmake' 
+
+   # Noting to change below this line
+   environ["BH_PACKAGE_NAME"]  = "%(BH_PROJECT_NAME)s" % environ
+   environ["BH_PACKAGE_NAMES"] = "%(BH_PROJECT_NAME)s" % environ
+   environ["BH_PACKAGE_VERSION"] = "%(BH_PULL_SOURCE_GIT_BRANCH)s-%(COMP_ARCH)s" % environ
+   environ["BH_PACKAGE_CONTROL_DIR"] = "%(BH_HERE_DIR)s" % environ
+   environ["SCRIPT_NAME"] = __file__+" -m "+b.mode+" -p "+b.platform % environ
+
+def _make(b):
+   
+    b.shell("""
+            set -e
+            cd ${BH_PULL_SOURCE}
+            REMOTE=$(git remote -v | grep fetch | awk '{print $2}')
+            (
+             CONTROL_DIR=${BH_PACKAGE_CONTROL_DIR}/${BH_PROJECT_NAME}/.ssm.d
+             mkdir -p ${CONTROL_DIR}
+             cp ${BH_TOP_BUILD_DIR}/post-install ${CONTROL_DIR}
+             CONTROL_FILE=${CONTROL_DIR}/control.template
+             echo \"Package: ${BH_PACKAGE_NAME}\"                                                                  > ${CONTROL_FILE}
+             echo \"Version: x\"                                                                                  >> ${CONTROL_FILE}
+             echo \"Platform: x\"                                                                                 >> ${CONTROL_FILE}
+             echo \"Maintainer: cmdn (A. Plante)\"                                                                >> ${CONTROL_FILE}
+             echo \"BuildInfo: git clone ${REMOTE}\"                                                              >> ${CONTROL_FILE}
+             echo \"           cd in new directory\"                                                              >> ${CONTROL_FILE}
+             echo \"           git checkout ${BH_PULL_SOURCE_GIT_BRANCH}"\                                        >> ${CONTROL_FILE}
+             echo \"           ${SCRIPT_NAME##*/}\"                                                               >> ${CONTROL_FILE}
+             echo \"Vertical grid descriptors package\"                                                           >> ${CONTROL_FILE}
+             cd ${BH_BUILD_DIR}/lib
+             ${BH_MAKE}
+            )""",environ)
+   
+def _test(b):
+    b.shell("""
+        (
+         set -e
+         cd ${BH_BUILD_DIR}/tests
+         ${BH_MAKE} tests
+        )""",environ)
+
+def _install(b):
+    b.shell("""
+        (
+         set -e        
+         mkdir -p ${BH_INSTALL_DIR}/lib
+         cd ${BH_INSTALL_DIR}/lib
+         cp ${BH_TOP_BUILD_DIR}/lib/libdescrip.a libdescrip.a_${BH_PULL_SOURCE_GIT_BRANCH}
+         ln -s libdescrip.a_${BH_PULL_SOURCE_GIT_BRANCH} libdescrip.a
+         mkdir -p ${BH_INSTALL_DIR}/include
+         cd ${BH_INSTALL_DIR}/include
+         cp ${BH_TOP_BUILD_DIR}/lib/*.mod .
+         mkdir -p ${BH_INSTALL_DIR}/src
+         cd ${BH_TOP_BUILD_DIR}/lib
+         ${BH_MAKE} clean
+         cp * ${BH_INSTALL_DIR}/src
+        )""")
 
 if __name__ == "__main__":
    dr, b = bhlib.init(sys.argv, bhlib.PackageBuilder)
-
    b.actions.set("init", _init)
-   b.actions.set("pull", actions.pull.copy_dir)
-   b.actions.set("clean", ["""(cd ${BH_BUILD_DIR}; ${BH_MAKE} distclean)"""])
-   b.actions.set("make", actions.make.make)
-   b.actions.set("test",["""(cd ${BH_BUILD_DIR}/tests; ${BH_MAKE} tests)"""])
-   b.actions.set("package",["""(cd ${BH_BUILD_DIR}/ssm; ${BH_MAKE})"""])
+   b.actions.set("pull", [actions.pull.git_archive])
+   b.actions.set("clean", ["""(cd ${BH_BUILD_DIR}/lib; ./make_dependencies.ksh; ${BH_MAKE} clean)"""])
+   b.actions.set("make", _make)
+   #b.actions.set("test",_test)
+   b.actions.set("install", _install)
+   b.actions.set("package", actions.package.to_ssm)
 
    b.supported_platforms = [
       "ubuntu-10.04-amd64-64",
@@ -55,7 +95,8 @@ if __name__ == "__main__":
 
    b.supported_modes = [
       "intel",
-      "pgi14",
-      "pgi9xx",
       "xlf13",
    ]
+
+# Exemple d'appel:
+#   ./bh_vgrid.py -p ubuntu-12.04-amd64-64 -m intel

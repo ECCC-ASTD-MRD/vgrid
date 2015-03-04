@@ -1,0 +1,14 @@
+*~
+*.o
+*.mod
+*.f90
+tests/test*.txt
+tests/test*.out
+tests/data/
+tests/compile.log
+Makefile.test
+examples/lowLevel_levels
+examples/topLevel_levels
+examples/use_dpidpis
+examples/use_new_gen
+examples/use_new_read

@@ -298,9 +298,9 @@ contains
     endif
 
     if(my_notop_L)then
-       F_at_8=at_8(2:nk+2)
-       F_bt_8=bt_8(2:nk+2)
-       F_ip1_t=ip1_t(2:nk+2)
+       F_at_8=at_8(2:nk+2+k_plus_diag)
+       F_bt_8=bt_8(2:nk+2+k_plus_diag)
+       F_ip1_t=ip1_t(2:nk+2+k_plus_diag)
     else
        F_at_8=at_8
        F_bt_8=bt_8
