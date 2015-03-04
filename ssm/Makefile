@@ -8,7 +8,7 @@ ssm:
 	mkdir -p $(SSMPACKAGE)/lib; \
 	mkdir -p $(SSMPACKAGE)/include; \
 	mkdir -p $(SSMPACKAGE)/src; \
-	echo   "print*,'  *          VGRID ${BH_PACKAGE_VERSION} ${COMP_ARCH} ${ORDENV_PLAT} $$(date)'" > $(SSMPACKAGE)/include/vgrid_version.cdk
+	echo   "print*,'  *          VGRID ${BH_PULL_SOURCE_GIT_BRANCH} ${COMP_ARCH} ${ORDENV_PLAT} $$(date)'" > $(SSMPACKAGE)/include/vgrid_version.cdk
 	echo   "print*,'  ********************************************************************************************'" >> $(SSMPACKAGE)/include/vgrid_version.cdk
 	find ../lib -name "*.mod" -type f -exec cp {} $(SSMPACKAGE)/include \; ; \
 	find ../lib -name "lib*.a"        -exec cp {} $(SSMPACKAGE)/lib \; ; \
