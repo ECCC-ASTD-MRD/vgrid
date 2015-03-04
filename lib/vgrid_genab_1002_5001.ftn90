@@ -55,7 +55,7 @@ contains
       
       ! Local variables
       integer :: k,i, status, nk, kind
-      logical :: monotone=.true.,wronghyb=.false.,cptop_L=.true.
+      logical :: monotone,wronghyb
       real    :: rcoef,pres,pr1,hybtop
       real*8  :: ztop_8, zsrf_8, eta_8, zeta_8
       real, parameter :: epsilon=1.0e-6
@@ -65,6 +65,9 @@ contains
 
       !     __________________________________________________________________
       
+      monotone=.true.
+      wronghyb=.false.
+
       F_err = VGD_ERROR
 
       ! Set size of the problem
@@ -84,19 +87,23 @@ contains
       !
       if(F_hybuser(nk).ne.1.d0)then
          wronghyb = .true.
-         write(for_msg,9202)
+         write(for_msg,'(" ===> WRONG SPECIFICATION OF HYB VERTICAL LEVELS: HYB(NK) MUST BE 1.0")')
          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         return
       endif
       do k=2, nk
-         if (F_hybuser(k).le.F_hybuser(k-1))monotone = .false.
+         if (F_hybuser(k).le.F_hybuser(k-1))then
+            monotone = .false.
+            print*,'k,F_hybuser(k).le.F_hybuser(k-1)',k,F_hybuser(k).le.F_hybuser(k-1)
+         endif
       end do
       if(.not.monotone)then
          wronghyb = .true.
-         write(for_msg,9203)
+         write(for_msg,'(" ===> WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING")')
          call msg(MSG_ERROR,VGD_PRFX//for_msg)
       endif
       if (wronghyb) then
-         write(for_msg,9204)
+         write(for_msg,'("      Current choice:")')
          call msg(MSG_ERROR,VGD_PRFX//for_msg)
          do k=1, nk
             write(for_msg,*) F_hybuser(k),k
@@ -176,14 +183,8 @@ contains
       endif
       !
       F_err = VGD_OK
-      return
 
-9202  format (/' ===> WRONG SPECIFICATION OF HYB VERTICAL LEVELS:'/&
-               '      HYB(NK) MUST BE 1.0')
-      
-9203  format (/' ===> WRONG SPECIFICATION OF HYB VERTICAL LEVELS:'/&
-               '      LEVELS MUST BE MONOTONICALLY INCREASING')
-9204  format (/'      Current choice:')
+      return
 
     end subroutine vgrid_genab_1002_5001
    
