@@ -19,7 +19,8 @@ cat > "${profile_path}" <<EOF
 if [[ -n "\${VGRIDDESCRIPTORS_VERSION}" && "\${VGRIDDESCRIPTORS_VERSION}" != $(echo ${package_name} | cut -d_ -f2) ]];then
    echo "You already have a version of vgrid loaded, using two versions at the same time may cause problems"
 fi
-export VGRIDDESCRIPTORS_VERSION=$(echo ${package_name} | cut -d_ -f2)
+export VGRIDDESCRIPTORS_VERSION_COMP=$(echo ${package_name} | cut -d_ -f2)
+export VGRIDDESCRIPTORS_VERSION=$(echo ${package_name} | cut -d_ -f2 | cut -d\- -f1)
 export VGRIDDESCRIPTORS_SRC=${package_home}/src
 EOF
 
