@@ -1,1 +1,1 @@
-../data_AIX/dm_5004_ips.txt
+../data_Linux/dm_5004_ips.txt

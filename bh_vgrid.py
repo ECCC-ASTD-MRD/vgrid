@@ -92,6 +92,7 @@ if __name__ == "__main__":
    b.supported_platforms = [
       "ubuntu-10.04-amd64-64",
       "ubuntu-12.04-amd64-64",
+      "ubuntu-14.04-amd64-64",
       "aix-7.1-ppc7-64",
    ]
    dr.run(b)
