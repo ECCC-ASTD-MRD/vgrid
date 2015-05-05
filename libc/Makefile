@@ -16,11 +16,13 @@ LIB_STATIC 	:= lib$(LIB_NAME).a
 LIB_STATICV	:= lib$(LIB_NAME)-$(LIB_VERSION).a
 LIB_ALL		:= $(LIB_SHARED) $(LIB_STATIC)
 
-COPTIONS		:= -O 2
+COPTIONS	:= -O 2
 LDOPTIONS	+= -librmn
 
-$(SRC_H): $@.h
+Makefile.dep: $(wildcard *.h) $(wildcard *.c)
+	for i in *.h; do grep -l "\\b$$i\\b" *.c | sed "s/\$$/|$$i/"; done | awk -F '|' '{ map[$$1] = map[$$1] " " $$2;} END { for (i in map) { printf("%s:%s\n\n", i, map[i]); } }' >$@
 
+-include Makefile.dep
 
 %.o: %.c
 	$(CC) -src $< $(COPTIONS)
@@ -52,7 +54,7 @@ all: lib
 
 
 clean:
-	-rm -f $(OBJ_C)
+	-rm -f $(OBJ_C) Makefile.dep
 
 
 clear: clean
@@ -60,4 +62,6 @@ clear: clean
 
 
 .PHONY: obj lib clean clear all
+
+.DEFAULT_GOAL := all
 
