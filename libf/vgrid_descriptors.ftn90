@@ -1,0 +1,192 @@
+module vGrid_Descriptors
+
+   ! Autor : Andre Plante
+   !         Based on fortran version from:
+   !         Ron MacTaggart-Cowan, Andre Plante and Cecilien Charette
+
+   ! Naming convention
+   !
+   ! var_8  is of type real*8
+   ! var_L  is of type logical
+   ! var_CP is of type type(c_prt) from iso_c_binging
+
+   use iso_c_binding, only : c_ptr, C_NULL_PTR, c_associated, c_loc
+   
+   implicit none
+   private
+   
+   ! Public methods
+   public :: vgrid_descriptor                    !vertical grid descriptor structure
+   public :: vgd_free                            !class destructor
+   public :: vgd_new                             !class constructor
+   public :: vgd_print                           !dump plain-text contents of instance
+
+   ! Public class constants
+#include "vgrid.hf"
+   
+   type vgrid_descriptor
+      ! The only member of this type is a C pointer
+      type(c_ptr) :: cptr
+   end type vgrid_descriptor
+   
+   interface
+
+      type(c_ptr) function c_vgd_construct () bind(c)
+         use iso_c_binding, only : c_ptr
+      end function c_vgd_construct
+
+      subroutine c_vgd_print(vgd) bind(c)
+         use iso_c_binding, only : c_ptr
+         type(c_ptr), value :: vgd
+      end subroutine c_vgd_print
+
+      integer function c_set_vcode_i(vgd, kind, version) bind(c)
+         use iso_c_binding, only : c_ptr, c_int
+         type(c_ptr), value :: vgd
+         integer (c_int), value :: kind, version
+      end function c_set_vcode_i
+
+      integer function c_new_gen(vgd,kind,version,hyb_CP,size_hyb,rcoef1_CP,rcoef2_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP, &
+           ip1_CP,ip2_CP,stdout_unit_CP,dhm_CP,dht_CP) bind(c)
+         use iso_c_binding, only : c_ptr, c_int
+         type(c_ptr) :: vgd
+         integer (c_int), value :: kind, version, size_hyb
+         type(c_ptr), value :: hyb_CP,rcoef1_CP,rcoef2_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP
+         type(c_ptr), value :: ip1_CP,ip2_CP,stdout_unit_CP,dhm_CP,dht_CP
+      end function c_new_gen
+
+      subroutine c_vgd_free(vgd) bind(c)
+         use iso_c_binding, only : c_ptr
+         type(c_ptr) :: vgd
+      end subroutine c_vgd_free
+      
+   end interface
+   
+   interface vgd_new
+      module procedure new_gen
+   end interface vgd_new
+
+   interface vgd_free
+      module procedure garbage_collection
+   end interface vgd_free
+  
+   interface vgd_print
+      module procedure print_descript
+   end interface vgd_print
+   
+contains
+   
+   integer function new_gen(self,kind,version,hyb,rcoef1,rcoef2,ptop_8,pref_8,ptop_out_8,ip1,ip2,stdout_unit,dhm,dht) result(status)
+      implicit none
+
+      ! Coordinate constructor - build vertical descriptor from hybrid coordinate entries
+      type(vgrid_descriptor),intent(inout) :: self      !Vertical descriptor instance    
+      integer, intent(in) :: kind,version               !Kind,version to create
+      real, target, dimension(:),intent(in) :: hyb              !List of hybrid levels
+      real, optional, intent(in) :: rcoef1,rcoef2       !R-coefficient values for rectification
+      real*8, optional, intent(in) :: ptop_8            !Top-level pressure (Pa) inout
+      real*8, optional, intent(out):: ptop_out_8        !Top-level pressure (Pa) output if ptop_8 < 0
+      real*8, optional, intent(in) :: pref_8            !Reference-level pressure (Pa)
+      integer, optional, intent(in) :: ip1,ip2          !IP1,2 values for FST file record [0,0]
+      integer, optional, intent(in) :: stdout_unit      !Unit number for verbose output [STDERR]
+      real, optional, intent(in) :: dhm,dht             !Diag levels Height for Momentum/Thermo vaiables
+      
+      ! Local variables
+      type(c_ptr) :: hyb_CP, rcoef1_CP, rcoef2_CP, ptop_8_CP, ptop_out_8_CP, pref_8_CP
+      type(c_ptr) :: ip1_CP, ip2_CP, stdout_unit_CP, dhm_CP, dht_CP
+
+      hyb_CP = c_loc(hyb)
+
+      status = VGD_ERROR;
+      ! Assign optional argument to C_NULL_PTR
+      if(present(rcoef1))then
+         rcoef1_CP = c_loc(rcoef1)
+      else
+         rcoef1_CP = C_NULL_PTR
+      endif
+      if(present(rcoef2))then
+         rcoef2_CP = c_loc(rcoef2)
+      else
+         rcoef2_CP = C_NULL_PTR
+      endif
+      if(present(ptop_8))then
+         ptop_8_CP = c_loc(ptop_8)
+      else
+         ptop_8_CP = C_NULL_PTR
+      endif
+      if(present(ptop_out_8))then
+         ptop_out_8_CP = c_loc(ptop_out_8)
+      else
+         ptop_out_8_CP = C_NULL_PTR
+      endif
+      if(present(pref_8))then
+         pref_8_CP = c_loc(pref_8)
+      else
+         pref_8_CP = C_NULL_PTR
+      endif
+      if(present(ip1))then
+         ip1_CP = c_loc(ip1)
+      else
+         ip1_CP = C_NULL_PTR
+      endif
+      if(present(ip2))then
+         ip2_CP = c_loc(ip2)
+      else
+         ip2_CP = C_NULL_PTR
+      endif
+      if(present(stdout_unit))then
+         stdout_unit_CP = c_loc(stdout_unit)
+      else
+         stdout_unit_CP = C_NULL_PTR
+      endif
+      if(present(dhm))then
+         dhm_CP = c_loc(dhm)
+      else
+         dhm_CP = C_NULL_PTR
+      endif
+      if(present(dht))then
+         dht_CP = c_loc(dht)
+      else
+         dht_CP = C_NULL_PTR
+      endif
+      
+      if(.not.c_associated(self%cptr))then
+         self%cptr = C_NULL_PTR
+      endif
+
+      !write(6,'("Dans new_gen       self%cptr  = ",z16)')      self%cptr
+      !write(6,'("Dans new_gen c_loc(self%cptr) = ",z16)')c_loc(self%cptr)
+      if(c_new_gen(self%cptr,kind,version,hyb_CP,size(hyb),rcoef1_CP,rcoef2_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP,ip1_CP,ip2_CP,stdout_unit_CP,dhm_CP,dht_CP))then
+         print*,'dans new_gen, problem with c_new_gen'
+         return
+      endif
+      call flush(6)
+      !print*,'====================='
+      !print*,'In new_gen'
+      call c_vgd_print(self%cptr)
+
+      status = VGD_OK;
+   end function new_gen
+
+   integer function garbage_collection(self) result(status)
+      ! Wrapper function to C c_vgd_free
+      type(vgrid_descriptor) :: self
+      call c_vgd_free(self%cptr)
+      status = VGD_OK
+   end function garbage_collection
+
+   integer function print_descript(self) result(istat)
+      ! Wrapper function to C vgd_print_c
+      type(vgrid_descriptor) :: self
+      istat = VGD_ERROR
+      if(.not.c_associated(self%cptr))then
+         print*,'dans print_descript self%cptr not associated'
+         return
+      endif
+      
+      istat = VGD_OK
+   end function print_descript
+   
+   
+end module vGrid_Descriptors
+
