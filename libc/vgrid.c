@@ -1,9 +1,10 @@
-#include <vgrid.h>
+#include "vgrid.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
 #include "rpnmacros.h"
+
 
 // Constants
 #define MAX_DESC_REC 10000
@@ -11,6 +12,73 @@
 
 // Macros
 #define FREE(x) if(x) { free(x); x=NULL; }
+
+// Validity table for self
+#define VALID_TABLE_SIZE 9
+
+int ptop_out_8_valid [VALID_TABLE_SIZE] = {    0,    0,    0,    0,    0,    0,    0, 5004, 5005};
+int ptop_8_valid     [VALID_TABLE_SIZE] = {    0, 1002, 1003,    0, 5001, 5002, 5003, 5004,    0};
+int pref_8_valid     [VALID_TABLE_SIZE] = {    0,    0,    0, 1003, 5001, 5002, 5003, 5004, 5005};
+int rcoef1_valid     [VALID_TABLE_SIZE] = {    0,    0,    0, 1003, 5001, 5002, 5003, 5004, 5005};
+int rcoef2_valid     [VALID_TABLE_SIZE] = {    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005};
+int a_m_8_valid      [VALID_TABLE_SIZE] = { 1001, 1002, 1003, 2001, 5001, 5002, 5003, 5004, 5005};
+int b_m_8_valid      [VALID_TABLE_SIZE] = { 1001, 1002, 1003, 2001, 5001, 5002, 5003, 5004, 5005};
+int a_t_8_valid      [VALID_TABLE_SIZE] = {    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005};
+int a_t_8_valid_get  [VALID_TABLE_SIZE] = { 1001, 1002,    0, 2001, 5001, 5002, 5003, 5004, 5005};
+int b_t_8_valid      [VALID_TABLE_SIZE] = {    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005};
+int b_t_8_valid_get  [VALID_TABLE_SIZE] = { 1001, 1002,    0, 2001, 5001, 5002, 5003, 5004, 5005};
+int ip1_m_valid      [VALID_TABLE_SIZE] = { 1001, 1002, 1003, 2001, 5001, 5002, 5003, 5004, 5005};
+int ip1_t_valid      [VALID_TABLE_SIZE] = {    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005};
+int ip1_t_valid_get  [VALID_TABLE_SIZE] = { 1001, 1002,    0, 2001, 5001, 5002, 5003, 5004, 5005};
+int ref_name_valid   [VALID_TABLE_SIZE] = { 1001, 1002, 1003,    0, 5001, 5002, 5003, 5004, 5005};
+int dhm_valid        [VALID_TABLE_SIZE] = {    0,    0,    0,    0,    0,    0,    0,    0, 5005};
+int dht_valid        [VALID_TABLE_SIZE] = {    0,    0,    0,    0,    0,    0,    0,    0, 5005};
+
+int is_valid(TVGrid *self, int *table_valid)
+{
+  int k;
+  for( k = 0; k < VALID_TABLE_SIZE; k++){
+    if(self->vcode == table_valid[k]){
+      return(1);
+    }
+  }
+  return 0;
+}
+
+void my_copy_double(double *aa, double **bb, int ind){
+  while (ind--) {
+    (*bb)[ind] = aa[ind];
+  }
+}
+
+void my_copy_int(int *aa, int **bb, int ind){
+  while (ind--) {
+    (*bb)[ind] = aa[ind];
+  }
+}
+
+int c_convip_Level2IP(float level, int kind) {
+
+  int    mode=2,flag=0, IP; 
+  char   format; 
+  
+  // Convertir niveau reel en ip1a
+  f77name(convip)(&IP,&level,&kind,&mode,&format,&flag);
+    
+  return(IP);
+}
+
+float c_convip_IP2Level(int IP,int *kind) {
+
+   int    mode=-1,flag=0;
+   float  level=0.0;
+   char   format;
+
+   /*Convertir en niveau reel*/
+    f77name(convip)(&IP,&level,kind,&mode,&format,&flag);
+
+   return(level);
+}
 
 /*----------------------------------------------------------------------------
  * Nom      : <VDG_FindIp1Idx>
@@ -63,8 +131,17 @@ void VGD_MemInit(double *Arr,double Val,int Size) {
       *Arr++ = Val;
 }
 
+void c_vgd_print(TVGrid *VGrid) {
+  if( VGrid ) {
+    printf("vcode = %d\n",VGrid->vcode);
+    printf("ptop_8 = %f\n",VGrid->ptop_8);
+  } else {
+    printf("TVGrid is NULL\n");
+  }
+}
+
 /*----------------------------------------------------------------------------
- * Nom      : <VGD_New>
+ * Nom      : <c_vgd_construct>
  * Creation : Avril 2015 - E. Legault-Ouellet - CMC/CMOE
  *
  * But      : Initialise et retourne une structure de type TVGrid
@@ -77,28 +154,39 @@ void VGD_MemInit(double *Arr,double Val,int Size) {
  *
  *----------------------------------------------------------------------------
  */
-TVGrid* VGD_New() {
+TVGrid* c_vgd_construct() {
+
    TVGrid *vgrid = malloc(sizeof(TVGrid));
 
    if( vgrid ) {
       vgrid->ptop_8        = VGD_MISSING;
-      vgrid->pref_8        = VGD_MISSING;
+      vgrid->pref_8        = VGD_MISSING;      
       vgrid->table         = NULL;
+      vgrid->table_ni      = 0;
+      vgrid->table_nj      = 0;
+      vgrid->table_nk      = 0;
       vgrid->a_m_8         = NULL;
       vgrid->b_m_8         = NULL;
       vgrid->a_t_8         = NULL;
       vgrid->b_t_8         = NULL;
       vgrid->ip1_m         = NULL;
       vgrid->ip1_t         = NULL;
+      vgrid->abi_m_nk      = 0;
+      vgrid->abi_t_nk      = 0;
+      vgrid->ref_name      = strdup("None");
       vgrid->rcoef1        = VGD_MISSING;
       vgrid->rcoef2        = VGD_MISSING;
-      vgrid->initialized   = 0;
-      vgrid->valid         = 0;
+      vgrid->nk            = 0;
       vgrid->ip1           = 0;
       vgrid->ip2           = 0;
-      vgrid->ref_name      = strdup("None");
+      vgrid->unit          = 0;
+      vgrid->vcode         = 0;
+      vgrid->kind          = 0;
+      vgrid->version       = 0;
+      vgrid->match_ipig    = 0;
+      vgrid->valid         = 0;
 
-      vgrid->rec.initialized = 0;
+      vgrid->rec.fstd_initialized = 0;
       strcpy(vgrid->rec.ETIKET,"            ");
       strcpy(vgrid->rec.NOMVAR,"    ");
       strcpy(vgrid->rec.TYPVAR,"  ");
@@ -122,57 +210,22 @@ TVGrid* VGD_New() {
  *
  *----------------------------------------------------------------------------
  */
-void VGD_Free(TVGrid *VGrid) {
-   if( VGrid ) {
-      FREE(VGrid->table);
-      FREE(VGrid->a_m_8);
-      FREE(VGrid->b_m_8);
-      FREE(VGrid->a_t_8);
-      FREE(VGrid->b_t_8);
-      FREE(VGrid->ip1_m);
-      FREE(VGrid->ip1_t);
-      FREE(VGrid->ref_name);
+void c_vgd_free(TVGrid **VGrid) {
+   if( *VGrid ) {
 
-      free(VGrid);
+      FREE((*VGrid)->table);
+      FREE((*VGrid)->a_m_8);
+      FREE((*VGrid)->b_m_8);
+      FREE((*VGrid)->a_t_8);
+      FREE((*VGrid)->b_t_8);
+      FREE((*VGrid)->ip1_m);
+      FREE((*VGrid)->ip1_t);
+      FREE((*VGrid)->ref_name);
+
+      free(*VGrid);
+      *VGrid = NULL;
+
    }
-}
-
-/*----------------------------------------------------------------------------
- * Nom      : <VGD_Fstprm>
- * Creation : Avril 2015 - E. Legault-Ouellet - CMC/CMOE
- *
- * But      : Get info about a record
- *
- * Parametres :
- *    <H>   : [OUT] Record information
- *    <Key> : Key to a FST file record
- *
- * Retour   :
- *
- * Remarques :
- *
- *----------------------------------------------------------------------------
- */
-int VGD_Fstprm(TFSTD *H,int Key) {
-   int err;
-   double nhours;
-
-   err=c_fstprm(Key,&H->DATEO,&H->DEET,&H->NPAS,&H->NI,&H->NJ,&H->NK,&H->NBITS,&H->DATYP,
-         &H->IP1,&H->IP2,&H->IP3,H->TYPVAR,H->NOMVAR,H->ETIKET,H->GRTYP,&H->IG1,&H->IG2,
-         &H->IG3,&H->IG4,&H->SWA,&H->LNG,&H->DLTF,&H->UBC,&H->EX1,&H->EX2,&H->EX3);
-   if( err ) {
-      fprintf(stderr,"Cannot c_fstprm for key %d\n",Key);
-      return(VGD_ERROR);
-   }
-
-   nhours = H->DEET*H->NPAS/3600.0;
-   err = f77name(incdatr)(&H->DATEV,&H->DATEO,&nhours);
-   if( err ) {
-      fprintf(stderr,"Couldn't get DateV for dateo(%d),deet(%d),npas(%d),nhours(%f) (incdatr)\n",H->DATEO,H->DEET,H->NPAS,nhours);
-      return(VGD_ERROR);
-   }
-
-   return(VGD_OK);
 }
 
 /*----------------------------------------------------------------------------
@@ -200,7 +253,7 @@ int get_version_info(TVGrid *VGrid,int *Kind,int *Version) {
 }
 
 /*----------------------------------------------------------------------------
- * Nom      : <set_vcode_i>
+ * Nom      : <c_set_vcode_i>
  * Creation : Avril 2015 - E. Legault-Ouellet - CMC/CMOE
  *
  * But      : Set and check the vertical code
@@ -216,11 +269,13 @@ int get_version_info(TVGrid *VGrid,int *Kind,int *Version) {
  *
  *----------------------------------------------------------------------------
  */
-int set_vcode_i(TVGrid *VGrid,int Kind,int Version) {
+int c_set_vcode_i(TVGrid *VGrid,int Kind,int Version) {
    if( Kind>MAX_VKIND || Kind<0 || Version>999 || Version<0 ) {
-      fprintf(stderr,"Invalid kind or version in set_vcode_i: kind=%d, version=%d\n",Kind,Version);
+      fprintf(stderr,"Invalid kind or version in c_set_vcode_i: kind=%d, version=%d\n",Kind,Version);
       return(VGD_ERROR);
    }
+
+   //printf("dans c_set_vcode_i, Kind = %d, Version = %d\n", Kind, Version);
 
    VGrid->vcode = Kind*1000 + Version;
 
@@ -228,7 +283,7 @@ int set_vcode_i(TVGrid *VGrid,int Kind,int Version) {
 }
 
 /*----------------------------------------------------------------------------
- * Nom      : <set_vcode>
+ * Nom      : <c_set_vcode>
  * Creation : Avril 2015 - E. Legault-Ouellet - CMC/CMOE
  *
  * But      : Set and check the vertical code
@@ -242,11 +297,11 @@ int set_vcode_i(TVGrid *VGrid,int Kind,int Version) {
  *
  *----------------------------------------------------------------------------
  */
-int set_vcode(TVGrid *VGrid) {
+int c_set_vcode(TVGrid *VGrid) {
    int err,kind,version;
 
    if( !VGrid->table ) {
-      fprintf(stderr,"set_vcode called before constructor\n");
+      fprintf(stderr,"c_set_vcode called before constructor\n");
       return(VGD_ERROR);
    }
 
@@ -255,7 +310,7 @@ int set_vcode(TVGrid *VGrid) {
       return(err);
    }
 
-   return set_vcode_i(VGrid,kind,version);
+   return c_set_vcode_i(VGrid,kind,version);
 }
 
 /*----------------------------------------------------------------------------
@@ -277,12 +332,12 @@ int fstd_init(TVGrid *VGrid) {
    TFSTD *h = &VGrid->rec;
    int err;
 
-   if( h->initialized )
+   if( h->fstd_initialized )
       return(VGD_OK);
 
    h->IG2=h->IG3=h->IG4=0;
 
-   err=set_vcode(VGrid);
+   err=c_set_vcode(VGrid);
 
    switch(VGrid->vcode) {
       case 1001:
@@ -329,156 +384,9 @@ int fstd_init(TVGrid *VGrid) {
    h->NBITS       = 64;
    h->IP3         = 0;
    h->IG1         = VGrid->vcode;
-   h->initialized = 1;
+   h->fstd_initialized = 1;
 
    return(VGD_OK);
-}
-
-/*----------------------------------------------------------------------------
- * Nom      : <new_read>
- * Creation : Avril 2015 - E. Legault-Ouellet - CMC/CMOE
- *
- * But      : Coordinate constructor - read from a file and initialize instance
- *
- * Parametres :
- *    <VGrid>  : The grid structure
- *    <Format> : File format ('fst' or 'bin') default is 'fst'
- *    <Ip1>    : Ip1 value of the desired descriptor
- *    <Ip2>    : Ip2 value of the desired descriptor
- *    <Kind>   : Level kind requested by user.
- *
- * Retour   :
- *
- * Remarques :
- *
- *----------------------------------------------------------------------------
- */
-int new_read(TVGrid *VGrid,int Unit,char *Format,int Ip1,int Ip2,int Kind) {
-   TFSTD* h=&VGrid->rec;
-   int key,err,lkind,version;
-
-   VGrid->valid      = 0;
-   VGrid->unit       = Unit;
-   VGrid->match_ipig = Ip1>=0;
-
-   if( !Format || strcmp(Format,"FST")==0 ) {
-      // RPN standard file input
-      key=c_fstinf(Unit,&h->NI,&h->NJ,&h->NK,-1,"",Ip1,Ip2,-1,"","!!");
-      if( key < 0 ) {
-         fprintf(stderr,"Cannot find !! with the following: ip1=%d ip2=%d\n",Ip1,Ip2);
-         if( VGrid->match_ipig ) {
-            VGrid->vcode = -1;
-            return(VGD_ERROR);
-         }
-
-         // TODO: call vgd_legacy
-
-         if( (err=fstd_init(VGrid)) < 0 ) {
-            fprintf(stderr,"Problem creating record information\n");
-            return(VGD_ERROR);
-         }
-      } else {
-         VGrid->table = malloc(h->NI*h->NJ*h->NK*sizeof(double));
-         if( !VGrid->table ) {
-            fprintf(stderr,"Unable to allocate memory for VGrid->table\n");
-            return(VGD_ERROR);
-         }
-
-         err=c_fstluk(VGrid->table,key,&h->NI,&h->NJ,&h->NK);
-         if( err < 0 ) {
-            fprintf(stderr,"Problem with c_fstluk on !!\n");
-            return(VGD_ERROR);
-         }
-
-         err=fstd_init(VGrid);
-         if( err < 0 ) {
-            fprintf(stderr,"Problem creating record information\n");
-            return(VGD_ERROR);
-         }
-
-         err=c_fstprm(key,&h->DATEO,&h->DEET,&h->NPAS,&h->NI,&h->NJ,&h->NK,&h->NBITS,&h->DATYP,
-               &h->IP1,&h->IP2,&h->IP3,h->TYPVAR,h->NOMVAR,h->ETIKET,h->GRTYP,&h->IG1,&h->IG2,
-               &h->IG3,&h->IG4,&h->SWA,&h->LNG,&h->DLTF,&h->UBC,&h->EX1,&h->EX2,&h->EX3);
-
-         if( Ip1==-1 && Ip2==-1 ) {
-            int keyList[MAX_DESC_REC],nkeys;
-
-            // Check for multiple (different) descriptors
-            err=c_fstinl(Unit,&h->NI,&h->NJ,&h->NK,-1,"",Ip1,Ip2,-1,"!!",keyList,&nkeys,MAX_DESC_REC);
-            if( err < 0 ) {
-               fprintf(stderr,"Problem retrieving !! keys for ip1,ip2: %d,%d\n",Ip1,Ip2);
-               VGrid->vcode = -1;
-               return(VGD_ERROR);
-            }
-
-            if( nkeys > 1 ) {
-               TFSTD l_h;
-               double *l_table;
-               int i;
-
-               l_table = malloc(h->NI*h->NJ*h->NK*sizeof(double));
-               if( !l_table ) {
-                  fprintf(stderr,"Unable to allocate l_table\n");
-                  return(VGD_ERROR);
-               }
-               
-               for(i=1; i<nkeys; ++i) {
-                  err=VGD_Fstprm(&l_h,keyList[i]);
-                  if( err < 0 ) {
-                     fprintf(stderr,"Problem with VGD_Fstprm in new_read\n");
-                     VGrid->vcode = -1;
-                     free(l_table);
-                     return(VGD_ERROR);
-                  }
-
-                  // Make sure the dimensions are the same (else memory corruption could occur while doing the next fstluk)
-                  if( l_h.NI!=h->NI || l_h.NJ!=h->NJ || l_h.NK!=h->NK ) {
-                     fprintf(stderr,"Found different entry dimensions in vertical descriptors after wildcard (-1) search\n");
-                     free(l_table);
-                     return(VGD_ERROR);
-                  }
-
-                  err=c_fstluk(l_table,keyList[i],&l_h.NI,&l_h.NJ,&l_h.NK);
-                  if( err < 0 ) {
-                     fprintf(stderr,"Problem with c_fstluk on l_table i=%d\n",i);
-                     free(l_table);
-                     return(VGD_ERROR);
-                  }
-
-                  if( memcmp(l_table,VGrid->table,h->NI*h->NJ*h->NK*sizeof(double))!=0 ) {
-                     fprintf(stderr,"Found different entries in vertical descriptors after wildcard (-1) search\n");
-                     free(l_table);
-                     return(VGD_ERROR);
-                  }
-               }
-
-               free(l_table);
-            }
-         }
-      }
-   } else if( strcmp(Format,"BIN")==0 ) {
-      // TODO : Check to see if the unit handle is passed from fortran code or C code. The former might be a problem...
-      // TODO : implementation
-      fprintf(stderr,"BIN format is unimplemented\n");
-      return(VGD_ERROR);
-   } else {
-      fprintf(stderr,"Invalid constructor format request %s\n",Format);
-      return(VGD_ERROR);
-   }
-
-   err=get_version_info(VGrid,&lkind,&version);
-   if( lkind!=Kind && Kind!=-1 ) {
-      fprintf(stderr,"Cannot find requested kind=%d in file\n",Kind);
-      return(VGD_ERROR);
-   }
-
-   VGrid->valid = 1;
-   if( VGrid->vcode >= 0 ) {
-      return(VGD_OK);
-   } else {
-      fprintf(stderr,"WARNING: unitilisatized descriptor\n");
-      return(VGD_ERROR);
-   }
 }
 
 // Note the added 'NbLevels' parameter because 'size(Levels)' is not available in C ('sizeof(Levels)' would return the size of the 'Levels' pointer in bytes (aka 8 bytes on a x86_64 system))
@@ -496,7 +404,7 @@ int compute_pressure_1001_8(TVGrid* VGrid,double *SfcField,int *Ip1List,double *
 
    // Find ip1 indexes
    for(k=0; k<NbLevels; ++k) {
-      if( (idxs[k]=VGD_FindIp1Idx(Ip1List[k],VGrid->ip1_m,VGrid->m_nb)) == -1 ) {
+      if( (idxs[k]=VGD_FindIp1Idx(Ip1List[k],VGrid->ip1_m,VGrid->nk)) == -1 ) {
          fprintf(stderr,"Cannot find ip1 %d in compute_pressure_1001_8\n",Ip1List[k]);
          free(idxs);
          return(VGD_ERROR);
@@ -513,4 +421,419 @@ int compute_pressure_1001_8(TVGrid* VGrid,double *SfcField,int *Ip1List,double *
 
    free(idxs);
    return(VGD_OK);
+}
+
+int c_new_gen(TVGrid **self, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2,
+	      double *ptop_8, double *pref_8, double *ptop_out_8,
+	      int *ip1, int *ip2, int *stdout_unit, float *dhm, float *dht)
+{
+
+  float *hybm = NULL;
+  double *a_m_8 = NULL, *b_m_8 = NULL, *a_t_8 = NULL, *b_t_8 = NULL;
+  int *ip1_m = NULL, *ip1_t = NULL;
+
+  //printf("IN c_new_gen avant c_vgd_construct\n");
+  //printf("IN c_new_gen   self %p\n",  self);
+  //printf("IN c_new_gen  *self %p\n", *self);
+  if(! *self){
+    *self = c_vgd_construct();
+    if(! *self){
+      printf("In c_new_gen, ERROR with c_vgd_construct");
+      return (VGD_ERROR);
+    }
+  }
+  //printf("IN c_new_gen apres c_vgd_construct\n");
+  //printf("IN c_new_gen   self %p\n",  self);
+  //printf("IN c_new_gen  *self %p\n", *self);
+  //printf("IN c_new_gen **self %f\n",**self);
+  //printf("==============================================\n");
+
+  if(c_set_vcode_i(*self, kind, version) == VGD_ERROR)  {
+    printf("In c_new_gen, ERROR with c_set_vcode_i");
+    return (VGD_ERROR);
+  }
+  //c_vgd_print(*self);
+
+  //printf("self->vcode = %d\n",(*self)->vcode);
+
+  // TODO : ajout test is_valid sur argument optionel
+
+  int nk = -1, abi_m_nk = -1, abi_t_nk = -1;
+  
+  switch((*self)->vcode) {
+  case 1001:	
+    nk       = size_hyb;
+    abi_m_nk = size_hyb;
+    abi_t_nk = size_hyb;
+    if(c_vgrid_genab_1001(hyb, size_hyb, &hybm, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
+      free(hybm);
+      free(a_m_8);
+      free(b_m_8);
+      free(ip1_m);
+      return(VGD_ERROR);
+    }
+  case 1002:
+    break;
+  case 2001:
+    break;
+  case 1003:
+    break;
+  case 5001:
+    break;
+  case 5002:
+  case 5003:
+  case 5004:
+    break;
+  default:
+    fprintf(stderr,"Invalid kind or version in c_new_gen: kind=%d, version=%d\n",kind,version);
+    return(VGD_ERROR);
+  }
+  if( VGD_ERROR == c_new_build_vert(self,kind,version,nk,ip1,ip2,ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,abi_m_nk,abi_t_nk) ) {
+    fprintf(stderr,"In c_new_gen : problem with new_build_vert for: kind=%d, version=%d\n",kind,version);
+    return(VGD_ERROR);
+  }
+    
+  free(hybm);
+  free(a_m_8);
+  free(b_m_8);
+  free(a_t_8);
+  free(b_t_8);
+  free(ip1_m);  
+  free(ip1_t);  
+  
+  return (VGD_OK);
+}
+
+int c_new_build_vert(TVGrid **self, int kind, int version, int nk, int *ip1, int *ip2, double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2, 
+		     double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int abi_m_nk, int abi_t_nk)
+{
+  char* cvcode;
+
+  //TODO ajout tests is self deja construite
+  //TODO ajout tests is self deja valid
+
+  (*self)->valid      = 1;
+  (*self)->kind       = kind;
+  (*self)->version    = version;
+  (*self)->unit       = -1;
+  (*self)->match_ipig = 1;
+
+  if(c_set_vcode_i(*self, kind, version) == VGD_ERROR)  {
+    printf("In c_new_build_vert, ERROR with c_set_vcode_i");
+    return (VGD_ERROR);
+  }
+  int missingInput = 0;
+  if( is_valid( *self, ptop_8_valid) ) {
+    if(ptop_8) {
+      (*self)->ptop_8 = *ptop_8;
+    } else {
+      printf("ptop_8 is a required constructor entry\n");
+      missingInput = 1;
+    }
+  }
+  if(is_valid( *self, pref_8_valid)) {
+    if(pref_8){
+      (*self)->pref_8 = *pref_8;
+    } else {
+      printf("pref_8 is a required constructor entry\n");
+      missingInput = 1;
+    }
+  }
+  if(is_valid( *self, rcoef1_valid)) {
+    if(rcoef1){
+      (*self)->rcoef1 = *rcoef1;
+    } else {
+      printf("rcoef1 is a required constructor entry\n");
+      missingInput = 1;
+    }
+  }
+  if(is_valid( *self, rcoef2_valid)) {
+    if(rcoef2){
+      (*self)->rcoef2 = *rcoef2;
+    } else {
+      printf("rcoef2 is a required constructor entry\n");
+      missingInput = 1;
+    }
+  }
+  if(is_valid( *self, a_m_8_valid)) {
+    if(a_m_8){
+      free((*self)->a_m_8);
+      (*self)->a_m_8 = malloc( abi_m_nk * sizeof(double) );
+      if(! (*self)->a_m_8) {
+	printf("problem allocating a_m_8 in c_new_build_vert\n");
+	return(VGD_ERROR);
+      }
+      my_copy_double(a_m_8, &((*self)->a_m_8), abi_m_nk);
+    } else {
+      printf("a_m_8 is a required constructor entry\n");
+      missingInput = 1;
+    }
+  }
+  if(is_valid( *self, b_m_8_valid)) {
+    if(b_m_8){
+      free((*self)->b_m_8);
+      (*self)->b_m_8 = malloc( abi_m_nk * sizeof(double) );
+      if(! (*self)->b_m_8) {
+	printf("problem allocating b_m_8 in c_new_build_vert\n");
+	return(VGD_ERROR);
+      }
+      my_copy_double(b_m_8, &((*self)->b_m_8), abi_m_nk);
+    } else {
+      printf("b_m_8 is a required constructor entry\n");
+      missingInput = 1;
+    }
+  }
+  if(is_valid( *self, a_t_8_valid)) {
+    if(a_t_8){
+      free((*self)->a_t_8);
+      (*self)->a_t_8 = malloc( abi_m_nk * sizeof(double) );
+      if(! (*self)->a_t_8) {
+	printf("problem allocating a_t_8 in c_new_build_vert\n");
+	return(VGD_ERROR);
+      }
+      my_copy_double(a_t_8, &((*self)->a_t_8), abi_m_nk);
+    } else {
+      printf("a_t_8 is a required constructor entry\n");
+      missingInput = 1;
+    }
+  }
+  if(is_valid( *self, b_t_8_valid)) {
+    if(b_t_8){
+      free((*self)->b_t_8);
+      (*self)->b_t_8 = malloc( abi_m_nk * sizeof(double) );
+      if(! (*self)->b_t_8) {
+	printf("problem allocating b_t_8 in c_new_build_vert\n");
+	return(VGD_ERROR);
+      }
+      my_copy_double(b_t_8, &((*self)->b_t_8), abi_m_nk);
+    } else {
+      printf("b_t_8 is a required constructor entry\n");
+      missingInput = 1;
+    }
+  }
+  if(is_valid( *self, ip1_m_valid)) {
+    if(ip1_m){
+      free((*self)->ip1_m);
+      (*self)->ip1_m = malloc( abi_m_nk * sizeof(double) );
+      if(! (*self)->ip1_m) {
+	printf("problem allocating ip1_m in c_new_build_vert\n");
+	return(VGD_ERROR);
+      }
+      my_copy_int(ip1_m, &((*self)->ip1_m), abi_m_nk);
+    } else {
+      printf("ip1_m is a required constructor entry\n");
+      missingInput = 1;
+    }
+  }
+  if(is_valid( *self, ip1_t_valid)) {
+    if(ip1_t){
+      free((*self)->ip1_t);
+      (*self)->ip1_t = malloc( abi_m_nk * sizeof(double) );
+      if(! (*self)->ip1_t) {
+	printf("problem allocating ip1_t in c_new_build_vert\n");
+	return(VGD_ERROR);
+      }
+      my_copy_int(ip1_t, &((*self)->ip1_t), abi_m_nk);
+    } else {
+      printf("ip1_t is a required constructor entry\n");
+      missingInput = 1;
+    }
+  }
+
+  if (missingInput)
+    return (VGD_ERROR);
+
+  int ier;
+  // Fill table with version-specific encoder
+  switch((*self)->vcode) {
+  case 1001:
+    cvcode = strdup("1001");
+    ier = c_encode_vert_1001(self,nk);
+    break;
+  case 1002:
+    break;
+  case 2001:
+    break;
+  case 1003:
+    break;
+  case 5001:
+    break;
+  case 5002:
+  case 5003:
+  case 5004:
+    break;
+  default:
+    fprintf(stderr,"IN c_new_build_vert: invalid kind or version : kind=%d, version=%d\n",kind,version);
+    return(VGD_ERROR);
+  }
+
+  if(ier == VGD_ERROR)
+    printf("problem with encode_vert_%s\n",cvcode);
+
+  free(cvcode);
+
+  return(VGD_OK);
+
+}
+
+int c_encode_vert_1001(TVGrid **self,int nk){
+  
+  int skip = 2;
+  free( (*self)->table );
+  (*self)->table = malloc ( 3*(nk+skip)*sizeof(double) );
+  if(! (*self)->table ) {
+    printf("In c_encode_vert_1001: ERROR allocating table of bouble of size %d\n",3*(nk+skip) );
+    return(VGD_ERROR);
+  }
+  strcpy((*self)->ref_name,"P0");
+
+  //TODO : voir run pour error = flip_transfer(self%ref_name,for_char_8)
+  //Fill header
+  (*self)->table[0] = (*self)->kind;
+  (*self)->table[1] = (*self)->version;
+  (*self)->table[2] = skip;
+  //(*self)->table[3] = for_char_8;
+  (*self)->table[3] = 0.;
+  (*self)->table[4] = 0.;
+  (*self)->table[5] = 0.;
+  
+  int k, ind = 6;
+  for ( k = 0; k < nk; k++){
+    printf("ind = %d\n",ind);
+    (*self)->table[ind  ] = (*self)->ip1_m[k];
+    (*self)->table[ind+1] = (*self)->a_m_8[k];
+    (*self)->table[ind+2] = (*self)->b_m_8[k];
+    ind = ind + 3;
+  }
+
+  //(*self)->valid = 1;
+
+  return(VGD_OK);
+}
+
+int c_vgrid_genab_1001(float *hyb, int nk, float **hybm, double **a_m_8, double **b_m_8, int **ip1_m)
+{
+
+  // Andre Plante May 2015. 
+
+  *hybm = malloc( nk*sizeof(float) );
+  if(! *hybm){
+    printf("\tIn c_vgrid_genab_1001, malloc error with *hybm\n");
+    return(VGD_ERROR);
+  }
+
+  *a_m_8 = malloc( nk*sizeof(double) );
+  if(! *a_m_8){
+    printf("\tIn c_vgrid_genab_1001, malloc error with *a_m_8\n");
+    return(VGD_ERROR);
+  }
+
+  *b_m_8 = malloc( nk*sizeof(double) );
+  if(! *b_m_8){
+    printf("\tIn c_vgrid_genab_1001, malloc error with *b_m_8\n");
+    return(VGD_ERROR);
+  }
+
+  *ip1_m = malloc( nk*sizeof(int) );
+  if(! *ip1_m){
+    printf("\tIn c_vgrid_genab_1001, malloc error with *ip1_m\n");
+    return(VGD_ERROR);
+  }
+  
+  int k,ip1, kind2, kind = 1;
+
+  int ok=1;
+  if(hyb[nk-1] != 1.){
+    printf("WRONG SPECIFICATION OF SIGMA VERTICAL LEVELS: SIGMA(NK) MUST BE 1.0\n");
+    ok=0;
+  }
+  //Check monotonicity
+  for ( k = 1; k < nk; k++){
+    if(hyb[k] <= hyb[k-1]){
+      printf("WRONG SPECIFICATION OF SIGMA VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n");
+      ok=0;
+      break;
+    }
+  }
+  if(! ok){
+    printf("   Current choice:\n");
+    for ( k = 0; k < nk; k++){
+      printf("   %f\n", hyb[k]);
+    }
+    return(VGD_ERROR);
+  }
+
+  for ( k = 0; k < nk; k++){
+    (*a_m_8)[k]=0.;
+    // Go back and forth to ip1 in order to make sure hyb value is encodable.
+    ip1 = c_convip_Level2IP(hyb[k],1);
+    (*b_m_8)[k] = (double) c_convip_IP2Level(ip1,&kind2);
+    (*ip1_m)[k] = ip1;
+  }
+
+  return(VGD_OK);
+  
+}
+
+
+
+
+
+int c_vgrid_genab_1001_trial1(TVGrid *VGrid, float *hyb, int size_hyb)
+{
+  if(! VGrid){
+    printf("In c_vgrid_genab_1001, ERROR VGrid not constructed\n");
+    return(VGD_ERROR);
+  }
+  VGrid->nk = size_hyb;
+
+  if(VGrid->a_m_8 && ! ALLOW_RESHAPE){
+    printf("In c_vgrid_genab_1001, ERROR VGrid->a_m_8 alreaddy allocated, you may need to free the vgd structure or set ALLOW_RESHAPE to TRUE\n");
+    return(VGD_ERROR);  
+  } else {
+    free(VGrid->a_m_8);
+  }
+  VGrid->a_m_8 = malloc(size_hyb*sizeof(double));  
+
+  if(VGrid->b_m_8 && ! ALLOW_RESHAPE){
+    printf("In c_vgrid_genab_1001, ERROR VGrid->b_m_8 alreaddy allocated, you may need to free the vgd structure or set ALLOW_RESHAPE to TRUE\n");
+    return(VGD_ERROR);
+  } else {
+    free(VGrid->b_m_8);
+  }
+  VGrid->b_m_8 = malloc(size_hyb*sizeof(double));  
+  
+  int k,ip, kind2, kind = 1;
+
+  int ok=1;
+  if(hyb[VGrid->nk-1] != 1.){
+    printf("WRONG SPECIFICATION OF SIGMA VERTICAL LEVELS: SIGMA(NK) MUST BE 1.0\n");
+    ok=0;
+  }
+  //Check monotonicity
+  for ( k = 1; k < VGrid->nk; k++){
+    if(hyb[k] <= hyb[k-1]){
+      printf("WRONG SPECIFICATION OF SIGMA VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n");
+      ok=0;
+      break;
+    }
+  }
+  if(! ok){
+    printf("   Current choice:\n");
+    for ( k = 0; k < VGrid->nk; k++){
+      printf("   %f\n", hyb[k]);
+    }
+    return(VGD_ERROR);
+  }
+
+  for ( k = 0; k < size_hyb; k++){
+    VGrid->a_m_8[k]=0.;
+    // Go back and forth to ip in order to make sure hyb value is encodable.
+    ip = c_convip_Level2IP(hyb[k],1);
+    VGrid->b_m_8[k] = c_convip_IP2Level(ip,&kind2);
+    //printf("hyb[k] = %f, ip = %d, VGrid->b_m_8[k] = %f, kind2 = %d, VGrid->b_m_8[k] - hyb[k] %f\n",hyb[k], ip, VGrid->b_m_8[k], kind2, VGrid->b_m_8[k] - hyb[k]);
+  }
+  
+  return(VGD_OK);
+
 }
