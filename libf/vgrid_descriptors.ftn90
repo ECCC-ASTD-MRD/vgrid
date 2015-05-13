@@ -35,10 +35,10 @@ module vGrid_Descriptors
          use iso_c_binding, only : c_ptr
       end function c_vgd_construct
 
-      subroutine c_vgd_print(vgd) bind(c)
+      integer function c_print_desc(vgd, stdout, convip) bind(c)
          use iso_c_binding, only : c_ptr
-         type(c_ptr), value :: vgd
-      end subroutine c_vgd_print
+         type(c_ptr), value :: vgd, stdout, convip
+      end function c_print_desc
 
       integer function c_set_vcode_i(vgd, kind, version) bind(c)
          use iso_c_binding, only : c_ptr, c_int
@@ -71,7 +71,7 @@ module vGrid_Descriptors
    end interface vgd_free
   
    interface vgd_print
-      module procedure print_descript
+      module procedure print_desc
    end interface vgd_print
    
 contains
@@ -153,18 +153,10 @@ contains
       if(.not.c_associated(self%cptr))then
          self%cptr = C_NULL_PTR
       endif
-
-      !write(6,'("Dans new_gen       self%cptr  = ",z16)')      self%cptr
-      !write(6,'("Dans new_gen c_loc(self%cptr) = ",z16)')c_loc(self%cptr)
       if(c_new_gen(self%cptr,kind,version,hyb_CP,size(hyb),rcoef1_CP,rcoef2_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP,ip1_CP,ip2_CP,stdout_unit_CP,dhm_CP,dht_CP))then
          print*,'dans new_gen, problem with c_new_gen'
          return
       endif
-      call flush(6)
-      !print*,'====================='
-      !print*,'In new_gen'
-      call c_vgd_print(self%cptr)
-
       status = VGD_OK;
    end function new_gen
 
@@ -175,17 +167,30 @@ contains
       status = VGD_OK
    end function garbage_collection
 
-   integer function print_descript(self) result(istat)
-      ! Wrapper function to C vgd_print_c
+   integer function print_desc(self,stdout,convip_L) result(istat)      
+      ! Wrapper function to C c_print_desc
       type(vgrid_descriptor) :: self
+      integer, target, intent(in), optional :: stdout     !Output unit to write to [6]
+      logical, intent(in), optional :: convip_L
+
+      ! Internal variables
+      type(c_ptr) :: stdout_CP, convip_CP
+
       istat = VGD_ERROR
       if(.not.c_associated(self%cptr))then
          print*,'dans print_descript self%cptr not associated'
          return
       endif
-      
-      istat = VGD_OK
-   end function print_descript
+
+      stdout_CP = C_NULL_PTR
+      convip_CP = C_NULL_PTR
+      if(present(stdout)) stdout_CP = c_loc(stdout)
+      if(present(convip_L))then
+         if(convip_L)convip_CP = c_loc(1)
+      endif
+
+      istat = c_print_desc(self%cptr,stdout_CP,convip_CP)
+   end function print_desc
    
    
 end module vGrid_Descriptors
