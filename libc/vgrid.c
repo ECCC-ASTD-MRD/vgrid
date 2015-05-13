@@ -131,13 +131,99 @@ void VGD_MemInit(double *Arr,double Val,int Size) {
       *Arr++ = Val;
 }
 
-void c_vgd_print(TVGrid *VGrid) {
-  if( VGrid ) {
-    printf("vcode = %d\n",VGrid->vcode);
-    printf("ptop_8 = %f\n",VGrid->ptop_8);
+int c_print_desc(TVGrid *self, int *stdout, int *convip) {
+  if(! self ) {
+    printf("In c_print_desc: vgrid structure not constructed\n");
+    return(VGD_ERROR);
   } else {
-    printf("TVGrid is NULL\n");
-  }
+    if(! self->valid) {
+      printf("In c_print_desc: vgrid structure is not valid\n");
+      return(VGD_ERROR);
+    }
+    if(stdout && *stdout != 6){
+      printf("In c_print_desc : please implement stdout option %d\n",*stdout);
+      return(VGD_ERROR);
+    }
+    if(convip){
+      
+    }
+    
+    // Create horizontal rule
+    char *hr = {"-------------------------------------------------------"};
+
+    // Dump general descriptor information
+    printf("-- Vertical Grid Descriptor Information --\n");
+    //printf("  ip1=%d",(self->rec)->ip1);
+    //printf("  ip2=',self%rec%ip2
+    //printf("',trim(hr)
+    printf("Vcode=%d\n",self->vcode);
+    
+    //printf("  Descriptor Nomvar: %s\n",trim(self%rec%nomvar)
+    printf("  level kind =%2d, level version = %3d\n", self->kind ,self->version);
+    if( is_valid(self, ptop_8_valid) )
+      printf("  ptop=%f Pa\n",self->ptop_8);
+    if( is_valid(self, pref_8_valid) )
+      printf("  pref=%f Pa\n",self->pref_8);
+    if( is_valid(self, rcoef1_valid) )
+      printf("  rcoef1=%f\n",self->rcoef1);
+    if( is_valid(self, rcoef2_valid) )
+      printf("  rcoef2=%f\n",self->rcoef2);
+    if( is_valid(self,ref_name_valid) )
+      printf("  Surface field nomvar %s\n",self->ref_name);
+    
+    switch(self->vcode) {
+    case 1001:
+      printf("  Number of sigma levels %d\n",self->nk);
+      printf("  Equation to compute hydrostatic pressure (pi): pi = B * P0*100\n");
+      break;
+    case 1002:
+      printf("c_print_desc TODO!!!!!!!!! ");
+      return(VGD_ERROR);
+      break;
+    case 2001:
+      printf("c_print_desc TODO!!!!!!!!! ");
+      return(VGD_ERROR);
+      break;
+    case 1003:
+      printf("c_print_desc TODO!!!!!!!!! ");
+      return(VGD_ERROR);
+      break;
+    case 5001:
+      printf("c_print_desc TODO!!!!!!!!! ");
+      return(VGD_ERROR);
+      break;
+    case 5002:
+      printf("c_print_desc TODO!!!!!!!!! ");
+      return(VGD_ERROR);
+      break;
+    case 5003:
+      printf("c_print_desc TODO!!!!!!!!! ");
+      return(VGD_ERROR);
+      break;
+    case 5004:
+      printf("c_print_desc TODO!!!!!!!!! ");
+      return(VGD_ERROR);
+      break;
+    default:
+      printf("Invalid kind or version in fstd_init: kind=%d, version=%d\n",self->kind,self->version);
+      return(VGD_ERROR);
+    }
+    
+    if(convip){
+      printf("c_print_desc TODO!!!!!!!!! ");
+      return(VGD_ERROR); 
+    }
+ 
+    int k;
+    if (is_valid(self, ip1_m_valid) ) {
+      printf("  Momentum levels ip1, A, B:\n");
+      for ( k = 0; k < self->nk; k++) {
+	printf("%d %f %f\n",self->ip1_m[k],self->a_m_8[k],self->b_m_8[k]);
+      }
+    }
+	   
+    return(VGD_OK);
+				  }
 }
 
 /*----------------------------------------------------------------------------
@@ -500,7 +586,7 @@ int c_new_gen(TVGrid **self, int kind, int version, float *hyb, int size_hyb, fl
   free(b_t_8);
   free(ip1_m);  
   free(ip1_t);  
-  
+
   return (VGD_OK);
 }
 
@@ -517,6 +603,9 @@ int c_new_build_vert(TVGrid **self, int kind, int version, int nk, int *ip1, int
   (*self)->version    = version;
   (*self)->unit       = -1;
   (*self)->match_ipig = 1;
+  (*self)->nk         = nk;
+  (*self)->abi_m_nk   = abi_m_nk;
+  (*self)->abi_t_nk   = abi_m_nk;
 
   if(c_set_vcode_i(*self, kind, version) == VGD_ERROR)  {
     printf("In c_new_build_vert, ERROR with c_set_vcode_i");
@@ -699,14 +788,13 @@ int c_encode_vert_1001(TVGrid **self,int nk){
   
   int k, ind = 6;
   for ( k = 0; k < nk; k++){
-    printf("ind = %d\n",ind);
     (*self)->table[ind  ] = (*self)->ip1_m[k];
     (*self)->table[ind+1] = (*self)->a_m_8[k];
     (*self)->table[ind+2] = (*self)->b_m_8[k];
     ind = ind + 3;
   }
 
-  //(*self)->valid = 1;
+  (*self)->valid = 1;
 
   return(VGD_OK);
 }
@@ -773,67 +861,4 @@ int c_vgrid_genab_1001(float *hyb, int nk, float **hybm, double **a_m_8, double 
 
   return(VGD_OK);
   
-}
-
-
-
-
-
-int c_vgrid_genab_1001_trial1(TVGrid *VGrid, float *hyb, int size_hyb)
-{
-  if(! VGrid){
-    printf("In c_vgrid_genab_1001, ERROR VGrid not constructed\n");
-    return(VGD_ERROR);
-  }
-  VGrid->nk = size_hyb;
-
-  if(VGrid->a_m_8 && ! ALLOW_RESHAPE){
-    printf("In c_vgrid_genab_1001, ERROR VGrid->a_m_8 alreaddy allocated, you may need to free the vgd structure or set ALLOW_RESHAPE to TRUE\n");
-    return(VGD_ERROR);  
-  } else {
-    free(VGrid->a_m_8);
-  }
-  VGrid->a_m_8 = malloc(size_hyb*sizeof(double));  
-
-  if(VGrid->b_m_8 && ! ALLOW_RESHAPE){
-    printf("In c_vgrid_genab_1001, ERROR VGrid->b_m_8 alreaddy allocated, you may need to free the vgd structure or set ALLOW_RESHAPE to TRUE\n");
-    return(VGD_ERROR);
-  } else {
-    free(VGrid->b_m_8);
-  }
-  VGrid->b_m_8 = malloc(size_hyb*sizeof(double));  
-  
-  int k,ip, kind2, kind = 1;
-
-  int ok=1;
-  if(hyb[VGrid->nk-1] != 1.){
-    printf("WRONG SPECIFICATION OF SIGMA VERTICAL LEVELS: SIGMA(NK) MUST BE 1.0\n");
-    ok=0;
-  }
-  //Check monotonicity
-  for ( k = 1; k < VGrid->nk; k++){
-    if(hyb[k] <= hyb[k-1]){
-      printf("WRONG SPECIFICATION OF SIGMA VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n");
-      ok=0;
-      break;
-    }
-  }
-  if(! ok){
-    printf("   Current choice:\n");
-    for ( k = 0; k < VGrid->nk; k++){
-      printf("   %f\n", hyb[k]);
-    }
-    return(VGD_ERROR);
-  }
-
-  for ( k = 0; k < size_hyb; k++){
-    VGrid->a_m_8[k]=0.;
-    // Go back and forth to ip in order to make sure hyb value is encodable.
-    ip = c_convip_Level2IP(hyb[k],1);
-    VGrid->b_m_8[k] = c_convip_IP2Level(ip,&kind2);
-    //printf("hyb[k] = %f, ip = %d, VGrid->b_m_8[k] = %f, kind2 = %d, VGrid->b_m_8[k] - hyb[k] %f\n",hyb[k], ip, VGrid->b_m_8[k], kind2, VGrid->b_m_8[k] - hyb[k]);
-  }
-  
-  return(VGD_OK);
-
 }
