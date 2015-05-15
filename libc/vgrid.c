@@ -927,8 +927,12 @@ int c_get_int(TVGrid *self, char *key, int **value, int *quiet)
     **value = self->nl_m;    
   } else if (strcmp(key, "NL_T") == 0){
     **value = self->nl_t;    
+  } else if (strcmp(key, "KIND") == 0){
+    **value = self->kind;        
+  } else if (strcmp(key, "VERSION") == 0){
+    **value = self->version;        
   } else {
-    printf("Invalid key %s given to gd_get (int)",key);
+    printf("Invalid key %s given to gd_get (int)\n",key);
     return(VGD_ERROR);	       
   }
   
