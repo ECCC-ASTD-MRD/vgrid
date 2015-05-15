@@ -1,0 +1,20 @@
+program main
+  use vGrid_Descriptors, only : vgrid_descriptor, vgd_print,VGD_ERROR
+  use Unit_Testing, only: ut_report
+
+  implicit none
+
+  integer :: ier
+  type(vgrid_descriptor) :: vgd
+  logical :: ok=.false.
+
+  print*,'The following error is expected since vgd is not initiaized'
+  ier = vgd_print(vgd)
+  if(ier.eq.VGD_ERROR)then
+     ok=.true.
+     print*,'Problem printing vgd'
+  endif
+  
+  call ut_report(ok,'Test print non initialized')  
+
+end program main
