@@ -1,6 +1,6 @@
 program constructor
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,VGD_ERROR
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_free,vgd_get,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
@@ -29,10 +29,18 @@ program constructor
   stat = vgd_get(d,key='CB_T - vertical B coefficient (t)'   ,value=b_t_8)
   stat = vgd_get(d,key='VIPM - level ip1 list (m)'           ,value=vipm)
   stat = vgd_get(d,key='VIPT - level ip1 list (t)'           ,value=vipt)
-  stat = vgd_get(d,key='VCDM - vertical coordinate (m)'      ,value=vcdm)
-  stat = vgd_get(d,key='VCDT - vertical coordinate (t)'      ,value=vcdt)
-  stat = vgd_get(d,key='NL_M - Number of vertical levels (m)',value=nl_m)
-  stat = vgd_get(d,key='NL_T - Number of vertical levels (t)',value=nl_t)
+
+  !stat = vgd_get(d,key='VCDM - vertical coordinate (m)'      ,value=vcdm)
+  !stat = vgd_get(d,key='VCDT - vertical coordinate (t)'      ,value=vcdt)
+  !stat = vgd_get(d,key='NL_M - Number of vertical levels (m)',valgue=nl_m)
+  !stat = vgd_get(d,key='NL_T - Number of vertical levels (t)',value=nl_t)
+
+
+
+  !deallocate(a_m_8,a_t_8,b_m_8,b_t_8)
+  stat = vgd_free(d)
+
+stop
 
   file='data/data_constructor_gen_1001.txt'
   if(write_control_L)then
@@ -42,7 +50,7 @@ program constructor
      write(10,*)vcdm
      close(10)
   endif
-  
+
   if(nl_m.ne.size(b_m_8))then
      OK=.false.
      print*,'Problem with NL_M 1001 should be',size(b_m_8),' got',nl_m

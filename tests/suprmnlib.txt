@@ -1,0 +1,6 @@
+{
+   rule name
+   Memcheck:Cond
+   ...
+   obj:/ssm/net/cmoe/base/20141127/ubuntu-12.04-amd64-64/lib/librmn.so
+}

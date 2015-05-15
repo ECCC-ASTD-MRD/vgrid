@@ -45,6 +45,50 @@ int is_valid(TVGrid *self, int *table_valid)
   return 0;
 }
 
+int c_is_valid(TVGrid *self, char *valid_table_name)
+{
+  if( strcmp(valid_table_name, "SELF") == 0 ){
+    return(self->valid);
+  } else if( strcmp(valid_table_name, "ptop_out_8_valid") == 0 ){
+    return(is_valid(self,              ptop_out_8_valid));
+  } else if( strcmp(valid_table_name, "ptop_8_valid")     == 0 ){
+    return(is_valid(self,              ptop_8_valid));
+  } else if( strcmp(valid_table_name, "pref_8_valid")     == 0 ){
+    return(is_valid(self,              pref_8_valid));
+  } else if( strcmp(valid_table_name, "rcoef1_valid")     == 0 ){
+    return(is_valid(self,              rcoef1_valid));
+  } else if( strcmp(valid_table_name, "rcoef2_valid")     == 0 ){
+    return(is_valid(self,              rcoef2_valid));
+  } else if( strcmp(valid_table_name, "a_m_8_valid")      == 0 ){
+    return(is_valid(self,              a_m_8_valid));
+  } else if( strcmp(valid_table_name, "b_m_8_valid")      == 0 ){
+    return(is_valid(self,              b_m_8_valid));
+  } else if( strcmp(valid_table_name, "a_t_8_valid")      == 0 ){
+    return(is_valid(self,              a_t_8_valid));
+  } else if( strcmp(valid_table_name, "a_t_8_valid_get")  == 0 ){
+    return(is_valid(self,              a_t_8_valid_get));
+  } else if( strcmp(valid_table_name, "b_t_8_valid")      == 0 ){
+    return(is_valid(self,              b_t_8_valid));
+  } else if( strcmp(valid_table_name, "b_t_8_valid_get")  == 0 ){
+    return(is_valid(self,              b_t_8_valid_get));
+  } else if( strcmp(valid_table_name, "ip1_m_valid")      == 0 ){
+    return(is_valid(self,              ip1_m_valid));
+  } else if( strcmp(valid_table_name, "ip1_t_valid")      == 0 ){
+    return(is_valid(self,              ip1_t_valid));
+  } else if( strcmp(valid_table_name, "ip1_t_valid_get")  == 0 ){
+    return(is_valid(self,              ip1_t_valid_get));
+  } else if( strcmp(valid_table_name, "ref_name_valid")   == 0 ){
+    return(is_valid(self,              ref_name_valid));
+  } else if( strcmp(valid_table_name, "dhm_valid")        == 0 ){
+    return(is_valid(self,              dhm_valid));
+  } else if( strcmp(valid_table_name, "dht_valid")        == 0 ){
+    return(is_valid(self,              dht_valid));
+  } else {
+    printf("Warning : in c_is_valid, valid_table_name '%s' does not exist\n",valid_table_name);
+    return(0);
+  }
+}
+
 void my_copy_double(double *aa, double **bb, int ind){
   while (ind--) {
     (*bb)[ind] = aa[ind];
@@ -257,8 +301,8 @@ TVGrid* c_vgd_construct() {
       vgrid->b_t_8         = NULL;
       vgrid->ip1_m         = NULL;
       vgrid->ip1_t         = NULL;
-      vgrid->abi_m_nk      = 0;
-      vgrid->abi_t_nk      = 0;
+      vgrid->nl_m          = 0;
+      vgrid->nl_t          = 0;
       vgrid->ref_name      = strdup("None");
       vgrid->rcoef1        = VGD_MISSING;
       vgrid->rcoef2        = VGD_MISSING;
@@ -544,13 +588,13 @@ int c_new_gen(TVGrid **self, int kind, int version, float *hyb, int size_hyb, fl
 
   // TODO : ajout test is_valid sur argument optionel
 
-  int nk = -1, abi_m_nk = -1, abi_t_nk = -1;
+  int nk = -1, nl_m = -1, nl_t = -1;
   
   switch((*self)->vcode) {
   case 1001:	
-    nk       = size_hyb;
-    abi_m_nk = size_hyb;
-    abi_t_nk = size_hyb;
+    nk   = size_hyb;
+    nl_m = size_hyb;
+    nl_t = size_hyb;
     if(c_vgrid_genab_1001(hyb, size_hyb, &hybm, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
       free(hybm);
       free(a_m_8);
@@ -574,7 +618,7 @@ int c_new_gen(TVGrid **self, int kind, int version, float *hyb, int size_hyb, fl
     fprintf(stderr,"Invalid kind or version in c_new_gen: kind=%d, version=%d\n",kind,version);
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == c_new_build_vert(self,kind,version,nk,ip1,ip2,ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,abi_m_nk,abi_t_nk) ) {
+  if( VGD_ERROR == c_new_build_vert(self,kind,version,nk,ip1,ip2,ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,nl_m,nl_t) ) {
     fprintf(stderr,"In c_new_gen : problem with new_build_vert for: kind=%d, version=%d\n",kind,version);
     return(VGD_ERROR);
   }
@@ -591,26 +635,36 @@ int c_new_gen(TVGrid **self, int kind, int version, float *hyb, int size_hyb, fl
 }
 
 int c_new_build_vert(TVGrid **self, int kind, int version, int nk, int *ip1, int *ip2, double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2, 
-		     double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int abi_m_nk, int abi_t_nk)
+		     double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int nl_m, int nl_t)
 {
   char* cvcode;
 
-  //TODO ajout tests is self deja construite
-  //TODO ajout tests is self deja valid
+  // Check if self is constructed
+  if(! *self){
+    *self = c_vgd_construct();
+    if(! *self){
+      printf("In c_new_gen, ERROR with c_vgd_construct");
+      return (VGD_ERROR);
+    }
+  }    
+  //TODO ajout tests if self deja valid
 
+  // Initializations
   (*self)->valid      = 1;
   (*self)->kind       = kind;
   (*self)->version    = version;
   (*self)->unit       = -1;
   (*self)->match_ipig = 1;
   (*self)->nk         = nk;
-  (*self)->abi_m_nk   = abi_m_nk;
-  (*self)->abi_t_nk   = abi_m_nk;
+  (*self)->nl_m       = nl_m;
+  (*self)->nl_t       = nl_t;
 
   if(c_set_vcode_i(*self, kind, version) == VGD_ERROR)  {
     printf("In c_new_build_vert, ERROR with c_set_vcode_i");
     return (VGD_ERROR);
   }
+
+  // Check for required inputs
   int missingInput = 0;
   if( is_valid( *self, ptop_8_valid) ) {
     if(ptop_8) {
@@ -647,12 +701,12 @@ int c_new_build_vert(TVGrid **self, int kind, int version, int nk, int *ip1, int
   if(is_valid( *self, a_m_8_valid)) {
     if(a_m_8){
       free((*self)->a_m_8);
-      (*self)->a_m_8 = malloc( abi_m_nk * sizeof(double) );
+      (*self)->a_m_8 = malloc( nl_m * sizeof(double) );
       if(! (*self)->a_m_8) {
 	printf("problem allocating a_m_8 in c_new_build_vert\n");
 	return(VGD_ERROR);
       }
-      my_copy_double(a_m_8, &((*self)->a_m_8), abi_m_nk);
+      my_copy_double(a_m_8, &((*self)->a_m_8), nl_m);
     } else {
       printf("a_m_8 is a required constructor entry\n");
       missingInput = 1;
@@ -661,12 +715,12 @@ int c_new_build_vert(TVGrid **self, int kind, int version, int nk, int *ip1, int
   if(is_valid( *self, b_m_8_valid)) {
     if(b_m_8){
       free((*self)->b_m_8);
-      (*self)->b_m_8 = malloc( abi_m_nk * sizeof(double) );
+      (*self)->b_m_8 = malloc( nl_m * sizeof(double) );
       if(! (*self)->b_m_8) {
 	printf("problem allocating b_m_8 in c_new_build_vert\n");
 	return(VGD_ERROR);
       }
-      my_copy_double(b_m_8, &((*self)->b_m_8), abi_m_nk);
+      my_copy_double(b_m_8, &((*self)->b_m_8), nl_m);
     } else {
       printf("b_m_8 is a required constructor entry\n");
       missingInput = 1;
@@ -675,12 +729,12 @@ int c_new_build_vert(TVGrid **self, int kind, int version, int nk, int *ip1, int
   if(is_valid( *self, a_t_8_valid)) {
     if(a_t_8){
       free((*self)->a_t_8);
-      (*self)->a_t_8 = malloc( abi_m_nk * sizeof(double) );
+      (*self)->a_t_8 = malloc( nl_m * sizeof(double) );
       if(! (*self)->a_t_8) {
 	printf("problem allocating a_t_8 in c_new_build_vert\n");
 	return(VGD_ERROR);
       }
-      my_copy_double(a_t_8, &((*self)->a_t_8), abi_m_nk);
+      my_copy_double(a_t_8, &((*self)->a_t_8), nl_m);
     } else {
       printf("a_t_8 is a required constructor entry\n");
       missingInput = 1;
@@ -689,12 +743,12 @@ int c_new_build_vert(TVGrid **self, int kind, int version, int nk, int *ip1, int
   if(is_valid( *self, b_t_8_valid)) {
     if(b_t_8){
       free((*self)->b_t_8);
-      (*self)->b_t_8 = malloc( abi_m_nk * sizeof(double) );
+      (*self)->b_t_8 = malloc( nl_m * sizeof(double) );
       if(! (*self)->b_t_8) {
 	printf("problem allocating b_t_8 in c_new_build_vert\n");
 	return(VGD_ERROR);
       }
-      my_copy_double(b_t_8, &((*self)->b_t_8), abi_m_nk);
+      my_copy_double(b_t_8, &((*self)->b_t_8), nl_m);
     } else {
       printf("b_t_8 is a required constructor entry\n");
       missingInput = 1;
@@ -703,12 +757,12 @@ int c_new_build_vert(TVGrid **self, int kind, int version, int nk, int *ip1, int
   if(is_valid( *self, ip1_m_valid)) {
     if(ip1_m){
       free((*self)->ip1_m);
-      (*self)->ip1_m = malloc( abi_m_nk * sizeof(double) );
+      (*self)->ip1_m = malloc( nl_m * sizeof(double) );
       if(! (*self)->ip1_m) {
 	printf("problem allocating ip1_m in c_new_build_vert\n");
 	return(VGD_ERROR);
       }
-      my_copy_int(ip1_m, &((*self)->ip1_m), abi_m_nk);
+      my_copy_int(ip1_m, &((*self)->ip1_m), nl_m);
     } else {
       printf("ip1_m is a required constructor entry\n");
       missingInput = 1;
@@ -717,12 +771,12 @@ int c_new_build_vert(TVGrid **self, int kind, int version, int nk, int *ip1, int
   if(is_valid( *self, ip1_t_valid)) {
     if(ip1_t){
       free((*self)->ip1_t);
-      (*self)->ip1_t = malloc( abi_m_nk * sizeof(double) );
+      (*self)->ip1_t = malloc( nl_m * sizeof(double) );
       if(! (*self)->ip1_t) {
 	printf("problem allocating ip1_t in c_new_build_vert\n");
 	return(VGD_ERROR);
       }
-      my_copy_int(ip1_t, &((*self)->ip1_t), abi_m_nk);
+      my_copy_int(ip1_t, &((*self)->ip1_t), nl_m);
     } else {
       printf("ip1_t is a required constructor entry\n");
       missingInput = 1;
@@ -861,4 +915,101 @@ int c_vgrid_genab_1001(float *hyb, int nk, float **hybm, double **a_m_8, double 
 
   return(VGD_OK);
   
+}
+
+int c_get_int(TVGrid *self, char *key, int **value, int *quiet)
+{
+  if(! *value){
+    printf("In c_get_int value is a NULL pointer\n");
+    return(VGD_ERROR);
+  }
+  if (strcmp(key, "NL_M") == 0){
+    **value = self->nl_m;    
+  } else if (strcmp(key, "NL_T") == 0){
+    **value = self->nl_t;    
+  } else {
+    printf("Invalid key %s given to gd_get (int)",key);
+    return(VGD_ERROR);	       
+  }
+  
+  return(VGD_OK);
+
+}
+
+int c_get_int_1d(TVGrid *self, char *key, int **value, int *quiet)
+{
+  
+  if( strcmp(key, "VIPM") == 0 || strcmp(key, "VIP1") == 0 ){
+    if(! *value){
+      (*value) = malloc(self->nl_m * sizeof(int));
+      if(! *value){
+	printf("In c_get_int_1d problem allocating %d int\n",self->nl_m);
+	return(VGD_ERROR);
+      }
+    }
+    my_copy_int(self->ip1_m, value, self->nl_m);
+  } else  if( strcmp(key, "VIPT") == 0 ){
+    if(! *value){
+      (*value) = malloc(self->nl_t * sizeof(int));
+      if(! *value){
+	printf("In c_get_int_1d problem allocating %d int\n",self->nl_t);
+	return(VGD_ERROR);
+      }
+    }
+    my_copy_int(self->ip1_t, value, self->nl_t);
+  }else{
+    printf("In c_get_int_1d: invalid key '%s'\n",key);
+    return(VGD_ERROR);
+  }
+  
+  return(VGD_OK);
+
+}
+
+int c_get_real8_1d(TVGrid *self, char *key, double **value, int *quiet)
+{
+  if( strcmp(key, "CA_M") == 0 || strcmp(key, "COFA") == 0 ){
+    if(! *value){
+      (*value) = malloc(self->nl_m * sizeof(double));
+      if(! *value){
+	printf("In c_get_real8_1d problem allocating %d double\n",self->nl_m);
+	return(VGD_ERROR);
+      }
+    }
+    my_copy_double(self->a_m_8, value, self->nl_m);
+  } else if( strcmp(key, "CB_M") == 0 || strcmp(key, "COFB") == 0 ) {
+    if(! *value){
+      (*value) = malloc(self->nl_m * sizeof(double));
+      if(! *value){
+	printf("In c_get_real8_1d problem allocating %d double\n",self->nl_m);
+	return(VGD_ERROR);
+      }
+    }
+    my_copy_double(self->b_m_8, value, self->nl_m);
+  } else if( strcmp(key, "CA_T") == 0 ){
+    if(! *value){
+      (*value) = malloc(self->nl_t * sizeof(double));
+      if(! *value){
+	printf("In c_get_real8_1d problem allocating %d double\n",self->nl_t);
+	return(VGD_ERROR);
+      }
+    }
+    my_copy_double(self->a_t_8, value, self->nl_t);
+  } else if( strcmp(key, "CB_T") == 0 ){
+    if(! *value){
+      (*value) = malloc(self->nl_t * sizeof(double));
+      if(! *value){
+	printf("In c_get_real8_1d problem allocating %d double\n",self->nl_t);
+	return(VGD_ERROR);
+      }
+    }
+    my_copy_double(self->b_t_8, value, self->nl_t);
+  } else {
+    printf("In c_get_real8_1d: invalid key '%s'\n",key);
+    return(VGD_ERROR);
+  }
+    
+
+  return(VGD_OK);
+
 }

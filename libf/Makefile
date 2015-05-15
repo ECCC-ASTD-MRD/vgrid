@@ -14,7 +14,7 @@ default: lib
 	s.compile -includes . $(MY_INCLUDE_PATH) $(INCLUDE_PATH) -optf =$(FFLAGS) -src $<
 
 #OBJECTS = vgrid_descriptors.o vgrid_genab_1001.o vgrid_genab_1002_5001.o vgrid_genab_1004.o vgrid_genab_2001.o vgrid_genab_5002.o utils.o msg.o
-OBJECTS = vgrid_descriptors.o utils.o msg.o
+OBJECTS = vgrid_descriptors.o vgrid_genab_1001.o utils.o msg.o
 
 all: Makefile.dep.mk $(OBJECTS)
 
