@@ -30,17 +30,10 @@ program constructor
   stat = vgd_get(d,key='VIPM - level ip1 list (m)'           ,value=vipm)
   stat = vgd_get(d,key='VIPT - level ip1 list (t)'           ,value=vipt)
 
-  !stat = vgd_get(d,key='VCDM - vertical coordinate (m)'      ,value=vcdm)
-  !stat = vgd_get(d,key='VCDT - vertical coordinate (t)'      ,value=vcdt)
-  !stat = vgd_get(d,key='NL_M - Number of vertical levels (m)',valgue=nl_m)
-  !stat = vgd_get(d,key='NL_T - Number of vertical levels (t)',value=nl_t)
-
-
-
-  !deallocate(a_m_8,a_t_8,b_m_8,b_t_8)
-  stat = vgd_free(d)
-
-stop
+  stat = vgd_get(d,key='VCDM - vertical coordinate (m)'      ,value=vcdm)
+  stat = vgd_get(d,key='VCDT - vertical coordinate (t)'      ,value=vcdt)
+  stat = vgd_get(d,key='NL_M - Number of vertical levels (m)',value=nl_m)
+  stat = vgd_get(d,key='NL_T - Number of vertical levels (t)',value=nl_t)
 
   file='data/data_constructor_gen_1001.txt'
   if(write_control_L)then
@@ -136,6 +129,9 @@ stop
   sigma2(size(sigma)-3)=sigma2(size(sigma)-2)
   stat = vgd_new(d,kind=1,version=1,hyb=sigma2)
   if(stat.ne.VGD_ERROR)OK=.false.
+
+  deallocate(a_m_8,a_t_8,b_m_8,b_t_8,vipm,vipt,vcdm)
+  stat = vgd_free(d)
 
   call ut_report(OK,'Grid_Descriptors::vgd_new vertical generate initializer (1001) value')
 
