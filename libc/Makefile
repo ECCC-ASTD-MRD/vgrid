@@ -22,7 +22,7 @@ LDOPTIONS	+= -librmn
 Makefile.dep: $(wildcard *.h) $(wildcard *.c)
 	for i in *.h; do grep -l "\\b$$i\\b" *.c | sed "s/\$$/|$$i/"; done | awk -F '|' '{ map[$$1] = map[$$1] " " $$2;} END { for (i in map) { printf("%s:%s\n\n", i, map[i]); } }' >$@
 
--include Makefile.dep
+include Makefile.dep
 
 %.o: %.c
 	$(CC) -src $< $(COPTIONS)
