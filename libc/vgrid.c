@@ -175,7 +175,11 @@ void VGD_MemInit(double *Arr,double Val,int Size) {
       *Arr++ = Val;
 }
 
-int c_print_desc(TVGrid *self, int *stdout, int *convip) {
+int c_print_desc(TVGrid *self, int *sout, int *convip) {
+  // The pointer operation with 6 is to the please xlf compiler
+  int six = 6;
+  int *p_six;
+  p_six = &six;
   if(! self ) {
     printf("In c_print_desc: vgrid structure not constructed\n");
     return(VGD_ERROR);
@@ -184,12 +188,14 @@ int c_print_desc(TVGrid *self, int *stdout, int *convip) {
       printf("In c_print_desc: vgrid structure is not valid\n");
       return(VGD_ERROR);
     }
-    if(stdout && *stdout != 6){
-      printf("In c_print_desc : please implement stdout option %d\n",*stdout);
+    if(sout && *sout != p_six){
+      printf("In c_print_desc : please implement stdout option %d\n",*sout);
       return(VGD_ERROR);
     }
     if(convip){
-      
+      //TODO
+      printf("In c_print_desc : please implement convip option in c_print_desc\n",*sout);
+      return(VGD_ERROR);
     }
     
     // Create horizontal rule
@@ -221,31 +227,35 @@ int c_print_desc(TVGrid *self, int *stdout, int *convip) {
       printf("  Equation to compute hydrostatic pressure (pi): pi = B * P0*100\n");
       break;
     case 1002:
-      printf("c_print_desc TODO!!!!!!!!! ");
+      printf("c_print_desc 1002 TODO!!!!!!!!! ");
       return(VGD_ERROR);
       break;
     case 2001:
-      printf("c_print_desc TODO!!!!!!!!! ");
+      printf("c_print_desc 2001 TODO!!!!!!!!! ");
       return(VGD_ERROR);
       break;
     case 1003:
-      printf("c_print_desc TODO!!!!!!!!! ");
+      printf("c_print_desc 1003 TODO!!!!!!!!! ");
       return(VGD_ERROR);
       break;
     case 5001:
-      printf("c_print_desc TODO!!!!!!!!! ");
+      printf("c_print_desc 5001 TODO!!!!!!!!! ");
       return(VGD_ERROR);
       break;
     case 5002:
-      printf("c_print_desc TODO!!!!!!!!! ");
+      printf("c_print_desc 5002 TODO!!!!!!!!! ");
       return(VGD_ERROR);
       break;
     case 5003:
-      printf("c_print_desc TODO!!!!!!!!! ");
+      printf("c_print_desc 5003 TODO!!!!!!!!! ");
       return(VGD_ERROR);
       break;
     case 5004:
-      printf("c_print_desc TODO!!!!!!!!! ");
+      printf("c_print_desc 5004 TODO!!!!!!!!! ");
+      return(VGD_ERROR);
+      break;
+    case 5005:
+      printf("c_print_desc 5005 TODO!!!!!!!!! ");
       return(VGD_ERROR);
       break;
     default:
@@ -267,7 +277,7 @@ int c_print_desc(TVGrid *self, int *stdout, int *convip) {
     }
 	   
     return(VGD_OK);
-				  }
+  }
 }
 
 /*----------------------------------------------------------------------------

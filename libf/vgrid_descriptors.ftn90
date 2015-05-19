@@ -124,16 +124,16 @@ contains
       implicit none
 
       ! Coordinate constructor - build vertical descriptor from hybrid coordinate entries
-      type(vgrid_descriptor),intent(inout) :: self      !Vertical descriptor instance    
-      integer, intent(in) :: kind,version               !Kind,version to create
-      real, target, dimension(:),intent(in) :: hyb              !List of hybrid levels
-      real, optional, intent(in) :: rcoef1,rcoef2       !R-coefficient values for rectification
-      real*8, optional, intent(in) :: ptop_8            !Top-level pressure (Pa) inout
-      real*8, optional, intent(out):: ptop_out_8        !Top-level pressure (Pa) output if ptop_8 < 0
-      real*8, optional, intent(in) :: pref_8            !Reference-level pressure (Pa)
-      integer, optional, intent(in) :: ip1,ip2          !IP1,2 values for FST file record [0,0]
-      integer, optional, intent(in) :: stdout_unit      !Unit number for verbose output [STDERR]
-      real, optional, intent(in) :: dhm,dht             !Diag levels Height for Momentum/Thermo vaiables
+      type(vgrid_descriptor),intent(inout) :: self         !Vertical descriptor instance    
+      integer, intent(in) :: kind,version                  !Kind,version to create
+      real, target, dimension(:),intent(in) :: hyb         !List of hybrid levels
+      real, target, optional, intent(in) :: rcoef1,rcoef2  !R-coefficient values for rectification
+      real*8, target, optional, intent(in) :: ptop_8       !Top-level pressure (Pa) inout
+      real*8, target, optional, intent(out):: ptop_out_8   !Top-level pressure (Pa) output if ptop_8 < 0
+      real*8, target, optional, intent(in) :: pref_8       !Reference-level pressure (Pa)
+      integer, target, optional, intent(in) :: ip1,ip2     !IP1,2 values for FST file record [0,0]
+      integer, target, optional, intent(in) :: stdout_unit !Unit number for verbose output [STDERR]
+      real, target, optional, intent(in) :: dhm,dht        !Diag levels Height for Momentum/Thermo vaiables
       
       ! Local variables
       type(c_ptr) :: hyb_CP, rcoef1_CP, rcoef2_CP, ptop_8_CP, ptop_out_8_CP, pref_8_CP
@@ -197,7 +197,7 @@ contains
       if(.not.c_associated(self%cptr))then
          self%cptr = C_NULL_PTR
       endif
-      if(c_new_gen(self%cptr,kind,version,hyb_CP,size(hyb),rcoef1_CP,rcoef2_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP,ip1_CP,ip2_CP,stdout_unit_CP,dhm_CP,dht_CP))then
+      if(c_new_gen(self%cptr,kind,version,hyb_CP,size(hyb),rcoef1_CP,rcoef2_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP,ip1_CP,ip2_CP,stdout_unit_CP,dhm_CP,dht_CP) == 0)then
          print*,'dans new_gen, problem with c_new_gen'
          return
       endif
@@ -219,6 +219,9 @@ contains
 
       ! Internal variables
       type(c_ptr) :: stdout_CP, convip_CP
+      integer, target :: one
+
+      one = 1;
 
       istat = VGD_ERROR
       if(.not.c_associated(self%cptr))then
@@ -230,7 +233,7 @@ contains
       convip_CP = C_NULL_PTR
       if(present(stdout)) stdout_CP = c_loc(stdout)
       if(present(convip_L))then
-         if(convip_L)convip_CP = c_loc(1)
+         if(convip_L)convip_CP = c_loc(one)
       endif
 
       istat = c_print_desc(self%cptr,stdout_CP,convip_CP)
@@ -247,12 +250,15 @@ contains
       ! Internal variables
       type(c_ptr) :: quiet_CP, value_CP
       character(len=KEY_LENGTH) :: my_key
+      integer, target :: one
+
+      one = 1
 
       value_CP = c_loc(value)
       
       quiet_CP = C_NULL_PTR
       if (present(quiet))then
-         if(quiet)quiet_CP = c_loc(1)
+         if(quiet)quiet_CP = c_loc(one)
       endif
 
       my_key=up(key(1:KEY_LENGTH))
@@ -273,6 +279,9 @@ contains
       type(c_ptr) :: quiet_CP, value_CP
       logical :: my_quiet
       character(len=KEY_LENGTH) :: my_key
+      integer, target :: one
+
+      one = 1
 
       ! Set error status
       status = VGD_ERROR
@@ -288,7 +297,7 @@ contains
       if (present(quiet)) my_quiet = quiet
       if(my_quiet)then
          level_msg=MSG_QUIET
-         quiet_CP = c_loc(1)
+         quiet_CP = c_loc(one)
       endif
       
       my_key=up(key(1:KEY_LENGTH))
@@ -300,7 +309,7 @@ contains
             istat = get_int(self,'NL_M',nl_)
             istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(VIPM in get_int_1d)')
             if (istat /= 0) return
-            value_CP = c_loc(value)
+            value_CP = c_loc(value(1))
             status = c_get_int_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,quiet_CP)
          else
             error = int(get_error(key))
@@ -312,13 +321,13 @@ contains
                istat = get_int(self,'NL_T',nl_)
                istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(VIPT in get_int_1d)')
                if (istat /= 0) return
-               value_CP = c_loc(value)
+               value_CP = c_loc(value(1))
                status = c_get_int_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,quiet_CP)
             else
                istat = get_int(self,'NL_M',nl_)
                istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(VIPT in get_int_1d)')               
                if (istat /= 0) return
-               value_CP = c_loc(value)
+               value_CP = c_loc(value(1))
                status = c_get_int_1d(self%cptr,"VIPM"//C_NULL_CHAR,value_CP,quiet_CP)
             endif
          else
@@ -351,6 +360,9 @@ contains
       logical :: my_quiet
       type(c_ptr) :: quiet_CP, value_CP
       character(len=KEY_LENGTH) :: my_key
+      integer, target :: one
+
+      one = 1
 
       ! Set error status
       status = VGD_ERROR
@@ -368,7 +380,7 @@ contains
       if (present(quiet)) my_quiet = quiet
       if(my_quiet)then
          level_msg=MSG_QUIET
-         quiet_CP = c_loc(1)
+         quiet_CP = c_loc(one)
       endif
       
       my_key=up(key(1:KEY_LENGTH))
@@ -444,6 +456,9 @@ contains
       type(c_ptr) :: quiet_CP, value_CP
       logical :: my_quiet
       character(len=KEY_LENGTH) :: my_key
+      integer, target :: one
+
+      one = 1
 
       status = VGD_ERROR
 
@@ -458,7 +473,7 @@ contains
       if (present(quiet)) my_quiet = quiet
       if(my_quiet)then
          level_msg=MSG_QUIET
-         quiet_CP = c_loc(1)
+         quiet_CP = c_loc(one)
       endif
 
       my_key=up(key(1:KEY_LENGTH))
@@ -469,7 +484,7 @@ contains
             istat = get_int(self,'NL_M',nl_)
             istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CA_M in get_real8_1d)')         
             if (istat /= 0) return
-            value_CP = c_loc(value)
+            value_CP = c_loc(value(1))
             status = c_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,quiet_CP)
          else
             error = int(get_error(key))
@@ -480,7 +495,7 @@ contains
             istat = get_int(self,'NL_M',nl_)
             istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CB_M in get_real8_1d)')         
             if (istat /= 0) return
-            value_CP = c_loc(value)
+            value_CP = c_loc(value(1))
             status = c_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,quiet_CP)
          else
             error = int(get_error(key))
@@ -492,13 +507,13 @@ contains
                istat = get_int(self,'NL_T',nl_)
                istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CA_T in get_real8_1d)')         
                if (istat /= 0) return
-               value_CP = c_loc(value)
+               value_CP = c_loc(value(1))
                status = c_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,quiet_CP)
             else
                istat = get_int(self,'NL_M',nl_)
                istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CA_T in get_real8_1d)')         
                if (istat /= 0) return
-               value_CP = c_loc(value)
+               value_CP = c_loc(value(1))
                status = c_get_real8_1d(self%cptr,'CA_M'//C_NULL_CHAR,value_CP,quiet_CP)
             endif
          else
@@ -511,13 +526,13 @@ contains
                istat = get_int(self,'NL_T',nl_)
                istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CB_T in get_real8_1d)')         
                if (istat /= 0) return
-               value_CP = c_loc(value)
+               value_CP = c_loc(value(1))
                status = c_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,quiet_CP)
             else
                istat = get_int(self,'NL_M',nl_)
                istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CB_T in get_real8_1d)')         
                if (istat /= 0) return
-               value_CP = c_loc(value)
+               value_CP = c_loc(value(1))
                status = c_get_real8_1d(self%cptr,"CB_M"//C_NULL_CHAR,value_CP,quiet_CP)
             endif
          else
