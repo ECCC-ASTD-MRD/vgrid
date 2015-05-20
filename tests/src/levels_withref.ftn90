@@ -14,6 +14,9 @@ program level_withref_5001
   ier=chek_levels_withref('data/dm_1002_from_model_run','')
   if(ier==VGD_ERROR)stat=VGD_ERROR
 
+  ier=chek_levels_withref('data/2001_from_model_run','')
+  if(ier==VGD_ERROR)stat=VGD_ERROR
+
   ier=chek_levels_withref('data/dm_5001_from_model_run','')
   if(ier==VGD_ERROR)stat=VGD_ERROR
   
@@ -35,7 +38,7 @@ end program level_withref_5001
 
 integer function chek_levels_withref(F_fst,F_ips) result(status)
 
-   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_levels,vgd_putopt,VGD_ERROR,VGD_OK
+   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_levels,vgd_putopt,vgd_get,VGD_ERROR,VGD_OK
 
    implicit none  
 
@@ -60,7 +63,7 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
         ig2, ig3, ig4, ip1, ip2, ip3, iun, key, lng, nbits,&
         ni,  nj, nk, npak, npas, swa, ubc
    character(len=12) :: etiket
-   character(len=4)  :: nomvar
+   character(len=4)  :: nomvar, rfld
    character(len=2)  :: typvar
    character(len=1)  :: grtyp, ctype, dummy_S
    logical :: rewrit
@@ -108,15 +111,28 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
            dltf,ubc,extra1,extra2,extra3)
       ip1s(k)=ip1
    end do
-   
-   key = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ','P0')
-   allocate(p0(ni,nj),px(ni,nj))
-   ier = fstluk(p0,key,ni,nj,nk)
-   if(ier.lt.0)then
-      print*,'Problem with fstluk on P0'
-      return
+
+   call convip(ip1,pppp,kind,-1,dummy_S,.false.)
+   if(kind .eq. 2)then
+      ! pressure levels do not have reference surface fields
+      allocate(p0(ni,nj),px(ni,nj))
+      p0=0.
+   else
+      ier = vgd_get(d,'RFLD',rfld)
+      if(ier == VGD_ERROR)then
+         print*,'Problem with vgd_get "RFLD" for file ',F_fst
+         return
+      endif
+      key = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',rfld)
+      allocate(p0(ni,nj),px(ni,nj))
+      ier = fstluk(p0,key,ni,nj,nk)
+      if(ier.lt.0)then
+         print*,'Problem with fstluk on P0'
+         return
+      endif
+      p0=p0*100.
    endif
-   p0=p0*100.
+      
    allocate(p0_8(ni,nj))
    p0_8=p0
 
