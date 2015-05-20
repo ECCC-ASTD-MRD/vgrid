@@ -44,11 +44,6 @@ program tests
      call exit(1)    
   end if
 
-  if(abs(value_8-pref_8)/pref_8 > epsilon(pref_8))then
-     print*,'This error 2 on value_8 should not happen, please fixit'
-     call exit(1)    
-  endif
-
   call ut_report(ok,message='Grid_Descriptors:: test allow reshape')
 
 end program tests

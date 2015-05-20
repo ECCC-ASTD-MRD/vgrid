@@ -89,11 +89,13 @@ integer function do_it(lu,file) result(status)
   integer, dimension(nmax) :: liste
   integer :: ni,nj,nk,fnom,fstouv,fstfrm,fclos,fstkey,fstlir,fstinf,ier,kind,fstinl,infon
   real :: epsilon=0.01,pres
-  real, dimension(:,:), allocatable :: px
+  real, dimension(:,:), pointer :: px
   real, dimension(:,:,:), pointer :: lev
   character(len=1) :: string
 
   status=VGD_ERROR
+
+  nullify(px,lev)
 
   print*,'===================================================='
   print*,trim(file)
@@ -130,6 +132,7 @@ integer function do_it(lu,file) result(status)
      print*,'Problem with vgd_levels'
      return
   endif
+
   allocate(px(ni,nj))
   ier = fstlir(px,lu,ni,nj,nk,-1,'',prm%ip1,-1,-1,'','PX')
   if(ier.lt.0)then
