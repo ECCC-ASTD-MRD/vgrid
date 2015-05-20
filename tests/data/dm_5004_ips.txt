@@ -1,1 +1,0 @@
-../data_AIX/dm_5004_ips.txt

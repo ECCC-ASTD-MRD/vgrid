@@ -197,8 +197,8 @@ contains
       if(.not.c_associated(self%cptr))then
          self%cptr = C_NULL_PTR
       endif
-      if(c_new_gen(self%cptr,kind,version,hyb_CP,size(hyb),rcoef1_CP,rcoef2_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP,ip1_CP,ip2_CP,stdout_unit_CP,dhm_CP,dht_CP) == 0)then
-         print*,'dans new_gen, problem with c_new_gen'
+      if(c_new_gen(self%cptr,kind,version,hyb_CP,size(hyb),rcoef1_CP,rcoef2_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP,ip1_CP,ip2_CP,stdout_unit_CP,dhm_CP,dht_CP) == VGD_ERROR)then
+         print*,'In new_gen, problem with c_new_gen'
          return
       endif
       status = VGD_OK;
