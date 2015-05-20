@@ -808,6 +808,8 @@ contains
 
       nullify(ip1_m,ip1_t,hybm,hybt,a_m_8,b_m_8,a_t_8,b_t_8)
 
+      if(present(ptop_out_8))ptop_out_8 = VGD_MISSING
+      
       self%valid=.false.
       ! Set error status
       status = VGD_ERROR
@@ -1162,6 +1164,8 @@ contains
     if (present(quiet)) my_quiet = quiet
     if(my_quiet)level_msg=MSG_QUIET
 
+    value = .false.
+
     ! Map key name to derived-type element
     select case (up(key(1:KEY_LENGTH)))
     case ('LOGP')
@@ -1203,6 +1207,7 @@ contains
     status = VGD_ERROR
 
     nullify(vip)
+    value = VGD_MISSING
 
     level_msg=MSG_ERROR
     if(.not.self%valid)then
@@ -1367,6 +1372,8 @@ contains
     ! Set error status
     status = VGD_ERROR
 
+    value = VGD_MISSING
+
     level_msg=MSG_ERROR
     if(.not.self%valid)then
        write(for_msg,*) 'vgrid structure is not valid in get_real'
@@ -1522,6 +1529,8 @@ contains
 
     ! Set error status
     status = VGD_ERROR
+
+    value = VGD_MISSING
 
     level_msg=MSG_ERROR
     if(.not.self%valid)then
@@ -1745,6 +1754,8 @@ contains
     if (present(quiet)) my_quiet = quiet
     if(my_quiet)level_msg=MSG_QUIET
 
+    value=''
+
     ! Map key name to derived-type element
     select case (up(key(1:KEY_LENGTH)))
     case ('ETIK')
@@ -1755,7 +1766,7 @@ contains
        if (is_valid(self,ref_name_valid)) then
           value = printingCharacters(self%ref_name)
        else
-          write(for_msg,'(i8)') get_error(key)
+          write(for_msg,'(f10.1)') get_error(key)
           call msg(level_msg,VGD_PRFX//for_msg)
           return
        endif
@@ -1781,6 +1792,8 @@ contains
      
     ! Set error status
      status=VGD_ERROR
+
+     value=.false.
 
      level_msg=MSG_ERROR
      my_quiet=.false.
