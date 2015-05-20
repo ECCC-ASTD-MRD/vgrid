@@ -1,0 +1,4 @@
+#ord_soumet job_AIX -mach hadar -cm 4G -t 3600 -cpus 16x1
+
+export DISPLAY=CMC-ninjo-dev67:0
+~armnsch/ovbin/AIX-powerpc7/xterm
