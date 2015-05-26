@@ -20,6 +20,7 @@ module vGrid_Descriptors
    public :: vgd_free                            !class destructor
    public :: vgd_get                             !get instance variable value
    public :: vgd_new                             !class constructor
+   public :: vgd_putopt                          !set class variable value
    public :: vgd_print                           !dump plain-text contents of instance
 
    ! Public class constants
@@ -113,6 +114,10 @@ module vGrid_Descriptors
       !module procedure get_char
       !module procedure get_logical
    end interface vgd_get
+
+   interface vgd_putopt
+      module procedure putopt_logical
+   end interface vgd_putopt
    
    interface vgd_print
       module procedure print_desc
@@ -211,6 +216,28 @@ contains
       status = VGD_OK
    end function garbage_collection
 
+   integer function putopt_logical(key,value) result(status)
+      character(len=*), intent(in) :: key           !Descriptor key to retrieve
+      logical, intent(in) :: value                    !Retrieved value
+      
+      ! Local variables
+      
+      ! Set error status
+      status=VGD_ERROR
+      
+      select case(trim(key))
+      case ('ALLOW_RESHAPE')
+         ALLOW_RESHAPE=value
+      case DEFAULT
+         write(for_msg,*) 'invalid key in call to putopt_logical: ',trim(key)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         return
+      end select
+      ! Set status and return
+      status = VGD_OK
+      return
+   end function putopt_logical
+   
    integer function print_desc(self,stdout,convip_L) result(istat)      
       ! Wrapper function to C c_print_desc
       type(vgrid_descriptor) :: self

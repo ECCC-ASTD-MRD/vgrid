@@ -53,12 +53,12 @@ lib: $(LIB_ALL)
 all: lib
 
 
-clean:
-	-rm -f $(OBJ_C) Makefile.dep
+clean:  Makefile.dep
+	rm -f $(OBJ_C) Makefile.dep ;\
 
 
 clear: clean
-	-rm -f $(LIB_ALL) $(LIB_STATICV) $(LIB_SHAREDV)
+	rm -f $(LIB_ALL) $(LIB_STATICV) $(LIB_SHAREDV) ;\
 
 
 .PHONY: obj lib clean clear all
