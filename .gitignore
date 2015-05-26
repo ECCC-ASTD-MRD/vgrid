@@ -1,5 +1,8 @@
 *~
 *.o
+*.a
+*.so
+*.so.*.*.*
 *.mod
 *.f90
 tests/test*.txt

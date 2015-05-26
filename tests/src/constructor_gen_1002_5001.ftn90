@@ -36,9 +36,11 @@ program constructor
   nullify(b_m_8,a_m_8)
 
   stat = vgd_putopt('ALLOW_RESHAPE',.true.)
-
   !
   ! Testing 1002
+  !    NOTE : le changement du calcul des A et des B pour 1002 fait
+  !           que les donnees de control n<ont que 4 chiffre d'identiques car
+  !           les intrants de ces calculs sont a 32 bits.
   !
   print*,''
   print*,'===== 1002 Test on Error ptop<0, error message is normal ===='
@@ -48,11 +50,9 @@ program constructor
   print*,''  
   print*,'===== 1002 Test on complete level set ===='
   stat = vgd_new(d,kind=1,version=2,hyb=hyb_N,ptop_8=ptop_N)
-
   file='data/data_constructor_gen_1002.txt'
   stat = test_1002_5001(d,file,write_control_L)
   if(stat.eq.VGD_ERROR)OK=.false.
-
   print*,''  
   print*,'===== 1002 Test on incomplete level set ===='
   stat = vgd_new(d,kind=1,version=2,hyb=hyb_N(10:28),ptop_8=ptop_N)
@@ -70,7 +70,6 @@ program constructor
      print*,'Probleme avec A 1002 (incomplete level set)'
      print*,a_m_8(1),' should equal ',w1
   endif  
-
   !
   ! Testing 5001
   !
@@ -80,7 +79,6 @@ program constructor
 
   stat = vgd_new(d,kind=5,version=1,hyb=hyb,rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
   if(stat.ne.VGD_ERROR)OK=.false.
-
   print*,''
   print*,'===== Test on Error last hyb not equal 1.0, error message is normal ===='  
   stat = vgd_new(d,kind=5,version=1,hyb=hyb(1:size(hyb)-1),rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
@@ -99,14 +97,12 @@ program constructor
   stat = vgd_new(d,kind=5,version=1,hyb=hyb,rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
   if(stat.ne.VGD_ERROR)OK=.false.
   !
-
   print*,''
   print*,'===== Test on Error ptop lower than first level error message is normal ===='
   ptop=hyb(1)*pref+10.
   stat = vgd_new(d,kind=5,version=1,hyb=hyb,rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
   if(stat.ne.VGD_ERROR)OK=.false.
   !
-  
   print*,''
   print*,'===== Test complete level set ===='
 
@@ -118,6 +114,7 @@ program constructor
      print*,'Probleme avec ptop 5001'
      print*,ptop,' should equal ',w1
   endif
+
   file='data/data_constructor_gen_5001.txt'
   stat = test_1002_5001(d,file,write_control_L)
   if(stat.eq.VGD_ERROR)OK=.false.
@@ -127,7 +124,6 @@ program constructor
   stat = vgd_get(d,key='CB_M - vertical B coefficient',value=b_m_8)
   stat = vgd_get(d,key='CA_M - vertical A coefficient',value=a_m_8)
   w1=8.8046513497829437E-002
-
   if(.not.(abs(b_m_8(1)-w1)/w1<my_epsilon))then
      OK=.false.
      print*,'Probleme avec B 5001'
@@ -161,6 +157,7 @@ integer function test_1002_5001(F_d,F_file,F_write_control_L) result(istat)
    real*8, dimension(:), pointer :: b_m_8,a_m_8,b_t_8,a_t_8,work_8
    integer, dimension(:), pointer :: vipm,vipt,work_i
    integer :: nl_m,nl_t,k,nk,stat,kind,vers,vcode
+   real :: my_real = 0
 
    istat=VGD_OK
 
@@ -209,13 +206,13 @@ integer function test_1002_5001(F_d,F_file,F_write_control_L) result(istat)
   do k=1,nk
      
      if(a_m_8(k).eq.0.)then
-        if(abs(work_8(k)-a_m_8(k))>10.*epsilon(a_m_8(k)))then
+        if(abs(work_8(k)-a_m_8(k))>1000.*epsilon(my_real))then
            istat=VGD_ERROR
            print*,'Probleme avec A, pas dans les limites tollerees'
            print*,work_8(k),'vs',a_m_8(k)
         endif
      else
-        if(abs(work_8(k)-a_m_8(k))/a_m_8(k)>10.*epsilon(a_m_8(k)))then
+        if(abs(work_8(k)-a_m_8(k))/a_m_8(k)>1000.*epsilon(my_real))then
            istat=VGD_ERROR
            print*,'Probleme avec A, pas dans les limites tollerees'
            print*,work_8(k),'vs',a_m_8(k)

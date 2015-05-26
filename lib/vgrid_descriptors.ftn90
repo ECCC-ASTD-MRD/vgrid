@@ -2220,7 +2220,7 @@ contains
      logical, intent(in) :: value                    !Retrieved value
 
      ! Local variables
-     
+    
     ! Set error status
      status=VGD_ERROR
 
