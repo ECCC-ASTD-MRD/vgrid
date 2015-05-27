@@ -334,9 +334,9 @@ TVGrid* c_vgd_construct() {
       vgrid->valid         = 0;
 
       vgrid->rec.fstd_initialized = 0;
-      strcpy(vgrid->rec.ETIKET,"            ");
-      strcpy(vgrid->rec.NOMVAR,"    ");
-      strcpy(vgrid->rec.TYPVAR,"  ");
+      strcpy(vgrid->rec.etiket,"            ");
+      strcpy(vgrid->rec.nomvar,"    ");
+      strcpy(vgrid->rec.typvar,"  ");
    }
 
    return(vgrid);
@@ -482,55 +482,55 @@ int fstd_init(TVGrid *VGrid) {
    if( h->fstd_initialized )
       return(VGD_OK);
 
-   h->IG2=h->IG3=h->IG4=0;
+   h->ig2=h->ig3=h->ig4=0;
 
    err=c_set_vcode(VGrid);
 
    switch(VGrid->vcode) {
       case 1001:
-         strcpy(h->ETIKET,"ETA_GEMV3");
+         strcpy(h->etiket,"ETA_GEMV3");
          break;
       case 1002:
-         strcpy(h->ETIKET,"ETA_GEMV3");
-         h->IG2=(int)round(VGrid->ptop_8*10.0);
+         strcpy(h->etiket,"ETA_GEMV3");
+         h->ig2=(int)round(VGrid->ptop_8*10.0);
          break;
       case 2001:
-         strcpy(h->ETIKET,"PRESSURE");
+         strcpy(h->etiket,"PRESSURE");
          break;
       case 1003:
-         strcpy(h->ETIKET,"HYBNORM_GEM3");
-         h->IG2=(int)round(VGrid->ptop_8*10.0);
-         h->IG3=(int)roundf(VGrid->rcoef1*100.0f);
+         strcpy(h->etiket,"HYBNORM_GEM3");
+         h->ig2=(int)round(VGrid->ptop_8*10.0);
+         h->ig3=(int)roundf(VGrid->rcoef1*100.0f);
          break;
       case 5001:
-         strcpy(h->ETIKET,"HYB_GEMV3");
-         h->IG2=(int)round(VGrid->ptop_8*10.0);
-         h->IG3=(int)roundf(VGrid->rcoef1*100.0f);
+         strcpy(h->etiket,"HYB_GEMV3");
+         h->ig2=(int)round(VGrid->ptop_8*10.0);
+         h->ig3=(int)roundf(VGrid->rcoef1*100.0f);
          break;
       case 5002:
       case 5003:
       case 5004:
-         strcpy(h->ETIKET,"STG_CP_GEMV4");
-         h->IG2=(int)round(VGrid->ptop_8*10.0);
-         h->IG3=(int)roundf(VGrid->rcoef1*100.0f);
-         h->IG4=(int)roundf(VGrid->rcoef2*100.0f);
+         strcpy(h->etiket,"STG_CP_GEMV4");
+         h->ig2=(int)round(VGrid->ptop_8*10.0);
+         h->ig3=(int)roundf(VGrid->rcoef1*100.0f);
+         h->ig4=(int)roundf(VGrid->rcoef2*100.0f);
          break;
       default:
          fprintf(stderr,"Invalid kind or version in fstd_init: kind=%d, version=%d\n",VGrid->kind,VGrid->version);
          return(VGD_ERROR);
    }
 
-   strcpy(h->NOMVAR,"!!");
-   strcpy(h->TYPVAR,"X");
-   strcpy(h->GRTYP,"X");
+   strcpy(h->nomvar,"!!");
+   strcpy(h->typvar,"X");
+   strcpy(h->grtyp,"X");
 
-   h->DATEO       = 0;
-   h->DEET        = 0;
-   h->NPAS        = 0;
-   h->DATYP       = 5;
-   h->NBITS       = 64;
-   h->IP3         = 0;
-   h->IG1         = VGrid->vcode;
+   h->dateo       = 0;
+   h->deet        = 0;
+   h->npas        = 0;
+   h->datyp       = 5;
+   h->nbits       = 64;
+   h->ip3         = 0;
+   h->ig1         = VGrid->vcode;
    h->fstd_initialized = 1;
 
    return(VGD_OK);
@@ -666,12 +666,12 @@ int c_new_build_vert(TVGrid **self, int kind, int version, int nk, int *ip1, int
   if(is_valid( *self, a_t_8_valid)) {
     if(a_t_8){
       free((*self)->a_t_8);
-      (*self)->a_t_8 = malloc( nl_m * sizeof(double) );
+      (*self)->a_t_8 = malloc( nl_t * sizeof(double) );
       if(! (*self)->a_t_8) {
 	printf("problem allocating a_t_8 in c_new_build_vert\n");
 	return(VGD_ERROR);
       }
-      my_copy_double(a_t_8, &((*self)->a_t_8), nl_m);
+      my_copy_double(a_t_8, &((*self)->a_t_8), nl_t);
     } else {
       printf("a_t_8 is a required constructor entry\n");
       missingInput = 1;
@@ -680,12 +680,12 @@ int c_new_build_vert(TVGrid **self, int kind, int version, int nk, int *ip1, int
   if(is_valid( *self, b_t_8_valid)) {
     if(b_t_8){
       free((*self)->b_t_8);
-      (*self)->b_t_8 = malloc( nl_m * sizeof(double) );
+      (*self)->b_t_8 = malloc( nl_t * sizeof(double) );
       if(! (*self)->b_t_8) {
 	printf("problem allocating b_t_8 in c_new_build_vert\n");
 	return(VGD_ERROR);
       }
-      my_copy_double(b_t_8, &((*self)->b_t_8), nl_m);
+      my_copy_double(b_t_8, &((*self)->b_t_8), nl_t);
     } else {
       printf("b_t_8 is a required constructor entry\n");
       missingInput = 1;
@@ -708,12 +708,12 @@ int c_new_build_vert(TVGrid **self, int kind, int version, int nk, int *ip1, int
   if(is_valid( *self, ip1_t_valid)) {
     if(ip1_t){
       free((*self)->ip1_t);
-      (*self)->ip1_t = malloc( nl_m * sizeof(double) );
+      (*self)->ip1_t = malloc( nl_t * sizeof(double) );
       if(! (*self)->ip1_t) {
 	printf("problem allocating ip1_t in c_new_build_vert\n");
 	return(VGD_ERROR);
       }
-      my_copy_int(ip1_t, &((*self)->ip1_t), nl_m);
+      my_copy_int(ip1_t, &((*self)->ip1_t), nl_t);
     } else {
       printf("ip1_t is a required constructor entry\n");
       missingInput = 1;
@@ -739,9 +739,15 @@ int c_new_build_vert(TVGrid **self, int kind, int version, int nk, int *ip1, int
   case 1003:
     break;
   case 5001:
+    cvcode = strdup("5001");
+    ier = c_encode_vert_5001(self,nk);
     break;
   case 5002:
+    cvcode = strdup("5002");
+    ier = c_encode_vert_5002(self,nk);
+    break;
   case 5003:
+    break;
   case 5004:
     break;
   default:
@@ -749,9 +755,11 @@ int c_new_build_vert(TVGrid **self, int kind, int version, int nk, int *ip1, int
     return(VGD_ERROR);
   }
 
-  if(ier == VGD_ERROR)
+  if(ier == VGD_ERROR) {
     printf("problem with encode_vert_%s\n",cvcode);
-
+    free(cvcode);
+    return(VGD_ERROR);
+  }
   free(cvcode);
 
   return(VGD_OK);
@@ -827,14 +835,93 @@ int c_encode_vert_1002(TVGrid **self,int nk){
 }
 
 int c_encode_vert_5001(TVGrid **self,int nk){
-  printf("TODO c_encode_vert_5001\n");
-  return(VGD_ERROR);
+  int skip = 3;
+  free( (*self)->table );
+  (*self)->table = malloc ( 3*(nk+skip)*sizeof(double) );
+  if(! (*self)->table ) {
+    printf("In c_encode_vert_5001: ERROR allocating table of bouble of size %d\n",3*(nk+skip) );
+    return(VGD_ERROR);
+  }
+  strcpy((*self)->ref_name,"P0");
+
+  //TODO : voir Ron pour error = flip_transfer(self%ref_name,for_char_8)
+  //Fill header
+  (*self)->table[0] = (*self)->kind;
+  (*self)->table[1] = (*self)->version;
+  (*self)->table[2] = skip;
+
+  (*self)->table[3] = (*self)->ptop_8;
+  (*self)->table[4] = (*self)->pref_8;
+  (*self)->table[5] = (*self)->rcoef1;
+  
+  //(*self)->table[6] = for_char_8;
+  (*self)->table[6] = 0.;
+  (*self)->table[7] = 0.;
+  (*self)->table[8] = 0.;
+
+  int k, ind = 9;
+  for ( k = 0; k < nk; k++){
+    (*self)->table[ind  ] = (*self)->ip1_m[k];
+    (*self)->table[ind+1] = (*self)->a_m_8[k];
+    (*self)->table[ind+2] = (*self)->b_m_8[k];
+    ind = ind + 3;
+  }
+
+  (*self)->valid = 1;
+
+  return(VGD_OK);
+}
+
+int c_encode_vert_5002(TVGrid **self,int nk){
+  int skip = 3;
+  free( (*self)->table );
+  (*self)->table = malloc ( 3 * ( (*self)->nl_m + (*self)->nl_t + skip )*sizeof(double) );
+  if(! (*self)->table ) {
+    printf("In c_encode_vert_5002: ERROR allocating table of bouble of size %d\n",3*(nk+skip) );
+    return(VGD_ERROR);
+  }
+  strcpy((*self)->ref_name,"P0");
+
+  //TODO : voir Ron pour error = flip_transfer(self%ref_name,for_char_8)
+  //Fill header
+  (*self)->table[0] = (*self)->kind;
+  (*self)->table[1] = (*self)->version;
+  (*self)->table[2] = skip;
+
+  (*self)->table[3] = (*self)->ptop_8;
+  (*self)->table[4] = (*self)->pref_8;
+  (*self)->table[5] = (*self)->rcoef1;
+  
+  (*self)->table[6] = (*self)->rcoef2;
+  //(*self)->table[7] = for_char_8;
+  (*self)->table[7] = 0.;
+  (*self)->table[8] = 0.;
+
+  int k, ind = 9;
+  for ( k = 0; k < (*self)->nl_m; k++){
+    (*self)->table[ind  ] = (*self)->ip1_m[k];
+    (*self)->table[ind+1] = (*self)->a_m_8[k];
+    (*self)->table[ind+2] = (*self)->b_m_8[k];
+    ind = ind + 3;
+  }
+  for ( k = 0; k < (*self)->nl_t; k++){
+    (*self)->table[ind  ] = (*self)->ip1_t[k];
+    (*self)->table[ind+1] = (*self)->a_t_8[k];
+    (*self)->table[ind+2] = (*self)->b_t_8[k];
+    ind = ind + 3;
+  }
+
+  (*self)->valid = 1;
+
+  return(VGD_OK);
 }
 
 int c_vgrid_genab_1001(float *hyb, int nk, float **hybm, double **a_m_8, double **b_m_8, int **ip1_m)
 {
 
   // Andre Plante May 2015. 
+  char ok = 1;
+  int k,ip1, kind2, kind = 1;
 
   *hybm = malloc( nk*sizeof(float) );
   if(! *hybm){
@@ -860,9 +947,6 @@ int c_vgrid_genab_1001(float *hyb, int nk, float **hybm, double **a_m_8, double 
     return(VGD_ERROR);
   }
   
-  int k,ip1, kind2, kind = 1;
-
-  int ok=1;
   if(hyb[nk-1] != 1.){
     printf("WRONG SPECIFICATION OF SIGMA VERTICAL LEVELS: SIGMA(NK) MUST BE 1.0\n");
     ok=0;
@@ -897,7 +981,9 @@ int c_vgrid_genab_1001(float *hyb, int nk, float **hybm, double **a_m_8, double 
 
 int c_vgrid_genab_1002(float *etauser, int nk, double *ptop_8, double **a_m_8, double **b_m_8, int **ip1_m)
 {
-  // Andre Plante May 2015. 
+  // Andre Plante May 2015.   
+  char ok=1;
+  int k;
 
   *a_m_8 = malloc( nk*sizeof(double) );
   if(! *a_m_8){
@@ -915,7 +1001,6 @@ int c_vgrid_genab_1002(float *etauser, int nk, double *ptop_8, double **a_m_8, d
     return(VGD_ERROR);
   }
 
-  int k, ok=1;
   if(etauser[nk-1] != 1.){
     printf("WRONG SPECIFICATION OF ETA VERTICAL LEVELS: ETA(NK) MUST BE 1.0\n");
     ok=0;
@@ -958,6 +1043,8 @@ int c_vgrid_genab_1002(float *etauser, int nk, double *ptop_8, double **a_m_8, d
 int c_vgrid_genab_5001(float *hybuser, int nk, float rcoef, double ptop_8, double pref_8, double **a_m_8, double **b_m_8, int **ip1_m)
 {
   // Andre Plante May 2015. 
+  char ok = 1;
+  int k;
   int complet, ip1, kind2;
   float epsilon=1.0e-6;
   double hybtop = ptop_8 / pref_8;
@@ -979,7 +1066,6 @@ int c_vgrid_genab_5001(float *hybuser, int nk, float rcoef, double ptop_8, doubl
     return(VGD_ERROR);
   }
 
-  int k, ok=1;
   if(hybuser[nk-1] != 1.){
     printf("WRONG SPECIFICATION OF HYB VERTICAL LEVELS: HYB(NK) MUST BE 1.0\n");
     ok=0;
@@ -1037,6 +1123,140 @@ int c_vgrid_genab_5001(float *hybuser, int nk, float rcoef, double ptop_8, doubl
   return(VGD_OK);
 }
 
+int c_vgrid_genab_5002(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t)
+{
+  // Andre Plante May 2015.
+  
+  // Define local pointers pointing to "pointer to pointer" to simplify equation below
+  double *a_m_8, *b_m_8, *a_t_8, *b_t_8;
+  int *ip1_m, *ip1_t;
+    
+  char ok;
+  int k;
+  float *hybm, hybtop, rcoef;
+  double zsrf_8, ztop_8, zeta_8, lamba_8, pr1;  
+  
+  //printf("nk %d, (*nl_m) %d, (*nl_t) %d, rcoef1 %f, rcoef2 %f, ptop_8 %f, pref_8 %f\n",nk, (*nl_m), (*nl_t), rcoef1, rcoef2, ptop_8, pref_8);
+
+  *nl_m = nk + 1;
+  *nl_t = nk + 2;
+
+  *PP_a_m_8 = malloc( (*nl_m)*sizeof(double) );
+  if(! *PP_a_m_8){
+    printf("\tIn c_vgrid_genab_5002, malloc error with *PP_a_m_8\n");
+    return(VGD_ERROR);
+  }
+  *PP_b_m_8 = malloc( (*nl_m)*sizeof(double) );
+  if(! *PP_b_m_8){
+    printf("\tIn c_vgrid_genab_5002, malloc error with *PP_b_m_8\n");
+    return(VGD_ERROR);
+  }
+  *PP_ip1_m = malloc( (*nl_m)*sizeof(int) );
+  if(! *PP_ip1_m){
+    printf("\tIn c_vgrid_genab_5002, malloc error with *PP_ip1_m\n");
+    return(VGD_ERROR);
+  }
+  *PP_a_t_8 = malloc( (*nl_t)*sizeof(double) );
+  if(! *PP_a_t_8){
+    printf("\tIn c_vgrid_genab_5002, malloc error with *PP_a_t_8\n");
+    return(VGD_ERROR);
+  }
+  *PP_b_t_8 = malloc( (*nl_t)*sizeof(double) );
+  if(! *PP_b_t_8){
+    printf("\tIn c_vgrid_genab_5002, malloc error with *PP_b_t_8\n");
+    return(VGD_ERROR);
+  }
+  *PP_ip1_t = malloc( (*nl_t)*sizeof(int) );
+  if(! *PP_ip1_t){
+    printf("\tIn c_vgrid_genab_5002, malloc error with *PP_ip1_t\n");
+    return(VGD_ERROR);
+  }
+
+  a_m_8 = *PP_a_m_8;
+  b_m_8 = *PP_b_m_8;
+  ip1_m = *PP_ip1_m;
+  a_t_8 = *PP_a_t_8;
+  b_t_8 = *PP_b_t_8;
+  ip1_t = *PP_ip1_t;
+
+  zsrf_8  = log(pref_8);
+  if ( ptop_8 <= 0. ) {
+    printf("ERROR in c_vgrid_genab_5002: ptop_8 must be > 0, got %f\n", ptop_8);
+    return(VGD_ERROR);
+  }
+  ztop_8  = log(ptop_8);
+
+  // Checking vertical layering
+
+  //    Check range
+  hybtop = ptop_8 / pref_8;
+  if( hybuser[nk-1] >= 1. ) {
+    printf("ERROR in c_vgrid_genab_5002: hyb must be < 1.0, got %f\n", hybuser[nk-1]);
+    return(VGD_ERROR);
+  }
+  if( hybuser[0] <= hybtop ) {
+    printf("ERROR in c_vgrid_genab_5002: hyb must be > %f, got %f\n", hybtop, hybuser[0]);
+    return(VGD_ERROR);
+  }
+
+  //Check monotonicity
+  for ( k = 1; k < nk; k++){
+    if(hybuser[k] <= hybuser[k-1]){
+      printf(" WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n");
+      ok=0;
+      break;
+    }
+  }
+  if(! ok){
+    printf("   Current choice:\n");
+    for ( k = 0; k < nk; k++){
+      printf("   %f\n", hybuser[k]);
+    }
+    return(VGD_ERROR);
+  }
+
+  // Momentum levels
+  pr1 = 1. / (zsrf_8 - ztop_8);
+  for( k = 0; k < nk; k++ ) {
+    zeta_8  = zsrf_8 + log(hybuser[k]);
+    lamba_8  = ( zeta_8 - ztop_8 ) * pr1;
+    rcoef  = rcoef2 - ( rcoef2 - rcoef1 ) * lamba_8;
+    b_m_8[k] = pow(lamba_8, rcoef);
+    a_m_8[k] = zeta_8;
+  }
+  a_m_8[nk] = zsrf_8;
+  b_m_8[nk] = 1.;
+
+  // Thermodynamic levels    
+  for( k = 1; k < nk; k++ ) {
+    b_t_8[k] = 0.5 * ( b_m_8[k] + b_m_8[k-1] );
+    a_t_8[k] = 0.5 * ( a_m_8[k] + a_m_8[k-1] );
+  }
+  // Special thermo levels
+  b_t_8[0]    = 0.5 * ( b_m_8[0]    + 0.    );
+  b_t_8[nk]   = 0.5 * ( b_m_8[nk-1] + 1.    );
+  b_t_8[nk+1] = 1.;
+  a_t_8[0]    = 0.5 * ( a_m_8[0]    + ztop_8);
+  a_t_8[nk]   = 0.5 * ( a_m_8[nk-1] + zsrf_8);
+  a_t_8[nk+1] = zsrf_8;
+
+  // Compute ip1 values
+  for(k = 0; k <= nk; k++ ) {
+    ip1_m[k] = c_convip_Level2IP(hybuser[k],5);
+  }
+  ip1_m[nk] = c_convip_Level2IP(1.,5);
+  
+  ip1_t[0]    = c_convip_Level2IP( sqrt( hybtop     * hybuser[0]   ), 5 );
+  for(k = 1; k < nk; k++ ) {
+    ip1_t[k]  = c_convip_Level2IP( sqrt( hybuser[k] * hybuser[k-1] ), 5 );
+  }
+  ip1_t[nk]   = c_convip_Level2IP( sqrt( hybuser[nk-1] ), 5 );
+  ip1_t[nk+1] = c_convip_Level2IP(1.,5);
+  
+  return(VGD_OK);
+
+}
+
 int c_get_int(TVGrid *self, char *key, int **value, int *quiet)
 {
   if(! *value){
@@ -1051,6 +1271,8 @@ int c_get_int(TVGrid *self, char *key, int **value, int *quiet)
     **value = self->kind;        
   } else if (strcmp(key, "VERS") == 0){
     **value = self->version;        
+  } else if (strcmp(key, "IP_1") == 0){
+    **value = self->rec.ip1;        
   } else {
     printf("Invalid key %s given to gd_get (int)\n",key);
     return(VGD_ERROR);	       
@@ -1162,7 +1384,7 @@ int c_new_gen(TVGrid **self, int kind, int version, float *hyb, int size_hyb, fl
   // TODO Check for required inputs
 
   int nk = -1, nl_m = -1, nl_t = -1;
-  
+
   switch((*self)->vcode) {
   case 1001:	
     nk   = size_hyb;
@@ -1175,6 +1397,7 @@ int c_new_gen(TVGrid **self, int kind, int version, float *hyb, int size_hyb, fl
       free(ip1_m);
       return(VGD_ERROR);
     }
+    break;
   case 1002:
     nk   = size_hyb;
     nl_m = size_hyb;
@@ -1192,7 +1415,6 @@ int c_new_gen(TVGrid **self, int kind, int version, float *hyb, int size_hyb, fl
     nl_m = size_hyb;
     nl_t = size_hyb;
     if(c_vgrid_genab_5001(hyb, size_hyb, *rcoef1, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
-      free(hybm);
       free(a_m_8);
       free(b_m_8);
       free(ip1_m);
@@ -1204,7 +1426,19 @@ int c_new_gen(TVGrid **self, int kind, int version, float *hyb, int size_hyb, fl
   case 1003:
     break;
   case 5002:
+    nk   = size_hyb;
+    if(c_vgrid_genab_5002(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t) == VGD_ERROR ) {
+      free(a_m_8);
+      free(b_m_8);
+      free(ip1_m);
+      free(a_t_8);
+      free(b_t_8);
+      free(ip1_t);
+      return(VGD_ERROR);
+    }    
+    break;
   case 5003:
+    break;
   case 5004:
     break;
   default:

@@ -36,6 +36,7 @@ program constructor
   character (len=256) :: file
 
   !Use wrong top pressure
+if(.true.)then
   print*,'================== EXPECTED ERROR SECTION BEGINGS================='
   print*,'================== EXPECTED ERROR SECTION BEGINGS================='
   print*,'================== EXPECTED ERROR SECTION BEGINGS================='
@@ -47,16 +48,14 @@ program constructor
   if(stat.ne.VGD_ERROR)OK=.false.  
   stat = vgd_new(d,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-2.d0,pref_8=pref)
   if(stat.ne.VGD_ERROR)OK=.false.  
-  !Use of wrong numver of rcoef
   print*,'The following 3 errors on hyb values are normal'
   call flush(6)
   stat = vgd_new(d,kind=5,version=2,hyb=hyb_wrong1,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
   stat = vgd_new(d,kind=5,version=2,hyb=hyb_wrong2,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
   stat = vgd_new(d,kind=5,version=2,hyb=hyb_wrong3,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
-  print*,'The following error on on missing ptop_out_8 option is normal'
-  !call flush(6)
-  !stat = vgd_new(d,kind=5,version=4,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-1.d0,pref_8=pref)
-  !call flush(6)
+  print*,'The following error on hyb values order is normal'
+  hyb_wrong3=(/.1,.9,.5/)
+  stat = vgd_new(d,kind=5,version=2,hyb=hyb_wrong3,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
   print*,'================== EXPECTED ERROR SECTION ENDS  ================='
   print*,'================== EXPECTED ERROR SECTION ENDS  ================='
   print*,'================== EXPECTED ERROR SECTION ENDS  ================='
@@ -68,11 +67,17 @@ program constructor
   stat = test_5002(d,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
 
+stop
+
+endif
+
   ! Construct a new set of vertical coordinate descriptors 5003
   stat = vgd_new(d,kind=5,version=3,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
   file='data/data_constructor_gen_5003.txt'
   stat = test_5002(d,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
+
+stop
 
   ! Construct a new set of vertical coordinate descriptors 5004
   !
@@ -174,9 +179,9 @@ integer function test_5002(F_d,F_file,F_write_control_L,F_stat) result(istat)
 
   ! Check A
   open(unit=10,file=F_file,ACTION='READ')
-  allocate(work_8(size(a_m_8)))
+  allocate(work_8(size(a_t_8)))
   print*,'Reading A M'
-  read(10,*)work_8
+  read(10,*)work_8(1:size(a_m_8))
 
   do k=1,nk
      if(abs(work_8(k)-a_m_8(k))/a_m_8(k)>100.*epsilon(a_m_8(k)))then
@@ -186,10 +191,9 @@ integer function test_5002(F_d,F_file,F_write_control_L,F_stat) result(istat)
         print*,a_m_8(k)
      endif
   enddo
-
   print*,'Reading A T'
-  read(10,*)work_8
-  do k=1,nk
+  read(10,*)work_8(1:size(a_t_8))
+  do k=1,nk+1
      if(abs(work_8(k)-a_t_8(k))/a_t_8(k)>100.*epsilon(1.))then
         istat=VGD_ERROR
         print*,'Probleme avec A T, pas dans les limites tollerees'
@@ -197,10 +201,10 @@ integer function test_5002(F_d,F_file,F_write_control_L,F_stat) result(istat)
         print*,a_t_8(k)
      endif
   enddo
- 
+
   ! Check B
   print*,'Reading B M'
-  read(10,*)work_8
+  read(10,*)work_8(1:size(b_m_8))
   do k=1,nk
      if(b_m_8(k).eq.0.)then
         if(work_8(k).ne.0.)then
@@ -216,8 +220,8 @@ integer function test_5002(F_d,F_file,F_write_control_L,F_stat) result(istat)
      endif
   enddo
   print*,'Reading B T'
-  read(10,*)work_8
-  do k=1,nk
+  read(10,*)work_8(1:size(b_t_8))
+  do k=1,nk+1
      if(abs(work_8(k)-b_t_8(k))/b_t_8(k)>100.*epsilon(1.))then
         istat=VGD_ERROR
         print*,'Probleme avec B T, pas dans les limites tollerees'
@@ -227,9 +231,9 @@ integer function test_5002(F_d,F_file,F_write_control_L,F_stat) result(istat)
   enddo
 
   ! Check IPs
-  allocate(work_i(size(vipm)))
+  allocate(work_i(size(vipt)))
   print*,'Reading IP M'
-  read(10,*)work_i
+  read(10,*)work_i(1:size(vipm))
   do k=1,nk
      if(work_i(k).ne.vipm(k))then
         istat=VGD_ERROR
@@ -239,20 +243,20 @@ integer function test_5002(F_d,F_file,F_write_control_L,F_stat) result(istat)
      endif
   enddo
   print*,'Reading IP T'
-  read(10,*)work_i
+  read(10,*)work_i(1:size(vipt))
   do k=1,nk
      if(work_i(k).ne.vipt(k))then
         istat=VGD_ERROR
-        print*,'Probleme avec IP:'
+        print*,'Probleme avec IP k sur nk:',k,nk
         print*,work_i(k),'vs'
         print*,vipt(k)
      endif
   enddo
 
   ! Check vcdm
-  allocate(work(size(vcdm)))
+  allocate(work(size(vcdt)))
   print*,'Reading VCDM'
-  read(10,*)work
+  read(10,*)work(1:size(vcdm))
   do k=1,nk
      if(vcdm(k).eq.0.)then
         if(abs(work(k)-vcdm(k))>100.*epsilon(vcdm(k)))then
@@ -272,8 +276,8 @@ integer function test_5002(F_d,F_file,F_write_control_L,F_stat) result(istat)
   enddo
 
   print*,'Reading VCDT'
-  read(10,*)work
-  do k=1,nk
+  read(10,*)work(1:size(vcdt))
+  do k=1,nk+1
      if(vcdt(k).eq.0.)then
         if(abs(work(k)-vcdt(k))>100.*epsilon(vcdt(k)))then
            istat=VGD_ERROR
@@ -290,7 +294,6 @@ integer function test_5002(F_d,F_file,F_write_control_L,F_stat) result(istat)
         endif
      endif
   enddo  
-
   print*,'Reading VCDT'
   read(10,*)my_ip1
   if(my_ip1.ne.ip1)then

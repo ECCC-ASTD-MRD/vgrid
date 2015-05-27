@@ -10,25 +10,25 @@ int ALLOW_RESHAPE = 0;
 typedef struct TFSTD {
    //int   FID;                 // File ID (file unit) dont provient le champ
    //int   KEY;                 // Cle du champs
-   int   DATEO;               // Date d'origine du champs
-   int   DATEV;               // Date de validitee du champs
-   int   DEET;                // Duree d'un pas de temps
-   int   NPAS;                // Pas de temps
-   int   NBITS;               // Nombre de bits du champs
-   int   DATYP;               // Type de donnees
-   int   IP1,IP2,IP3;         // Specificateur du champs
-   int   NI,NJ,NK;            // Dimensions
-   int   IG1,IG2,IG3,IG4;     // Descripteur de grille
-   int   SWA;
-   int   LNG;
-   int   DLTF;
-   int   UBC;
-   int   EX1,EX2,EX3;
-   char  TYPVAR[3];           // Type de variable
-   char  NOMVAR[5];           // Nom de la variable
-   char  ETIKET[13];          // Etiquette du champs
-   char  GRTYP[2];            // Type de grilles
-   char  fstd_initialized;    // If the fstd struct is initialized
+   int   dateo;               // date d'origine du champs
+   int   datev;               // date de validitee du champs
+   int   deet;                // duree d'un pas de temps
+   int   npas;                // pas de temps
+   int   nbits;               // nombre de bits du champs
+   int   datyp;               // type de donnees
+   int   ip1,ip2,ip3;         // specificateur du champs
+   int   ni,nj,nk;            // dimensions
+   int   ig1,ig2,ig3,ig4;     // descripteur de grille
+   int   swa;
+   int   lng;
+   int   dltf;
+   int   ubc;
+   int   ex1,ex2,ex3;
+   char  typvar[3];           // type de variable
+   char  nomvar[5];           // nom de la variable
+   char  etiket[13];          // etiquette du champs
+   char  grtyp[2];            // type de grilles
+   char  fstd_initialized;    // if the fstd struct is initialized
 } TFSTD;
 
 typedef struct TVGrid {

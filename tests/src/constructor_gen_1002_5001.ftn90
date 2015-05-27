@@ -1,6 +1,6 @@
 program constructor
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_putopt,VGD_ERROR
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_putopt, vgd_free,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
@@ -36,6 +36,7 @@ program constructor
   nullify(b_m_8,a_m_8)
 
   stat = vgd_putopt('ALLOW_RESHAPE',.true.)
+
   !
   ! Testing 1002
   !    NOTE : le changement du calcul des A et des B pour 1002 fait
@@ -83,7 +84,6 @@ program constructor
   print*,'===== Test on Error last hyb not equal 1.0, error message is normal ===='  
   stat = vgd_new(d,kind=5,version=1,hyb=hyb(1:size(hyb)-1),rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
   if(stat.ne.VGD_ERROR)OK=.false.
-
   print*,''
   print*,'===== hyb not monotone, error message is normal ===='  
   hyb2=hyb
@@ -105,16 +105,15 @@ program constructor
   !
   print*,''
   print*,'===== Test complete level set ===='
-
   ptop=hyb(1)*pref
   w1=ptop
   stat = vgd_new(d,kind=5,version=1,hyb=hyb,rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
+  if(stat .eq. VGD_ERROR)OK=.false.
   if(.not.(abs(ptop-w1)/w1<my_epsilon))then
      OK=.false.
      print*,'Probleme avec ptop 5001'
      print*,ptop,' should equal ',w1
   endif
-
   file='data/data_constructor_gen_5001.txt'
   stat = test_1002_5001(d,file,write_control_L)
   if(stat.eq.VGD_ERROR)OK=.false.
@@ -135,6 +134,10 @@ program constructor
      print*,'Probleme avec A 5001'
      print*,a_m_8(1),' should equal ',w1
   endif
+
+  stat = vgd_free(d)
+  deallocate(b_m_8,a_m_8)
+stop
 
   call ut_report(OK,'Grid_Descriptors::vgd_new vertical generate initializer (5001) value')
 
@@ -294,5 +297,7 @@ integer function test_1002_5001(F_d,F_file,F_write_control_L) result(istat)
      print*,vcdt
      print*,vcdm
   endif
+
+  deallocate(vcdm,vcdt,work,b_m_8,a_m_8,b_t_8,a_t_8,work_8,vipm,vipt,work_i)
 
 end function test_1002_5001
