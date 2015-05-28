@@ -135,6 +135,13 @@ float c_convip_IP2Level(int IP,int *kind) {
    return(level);
 }
 
+double comp_diag_a_height(double pref_8, float height) {
+  float RGASD       =    0.287050000000E+03;
+  float GRAV        =    0.980616000000E+01;
+  float TCDK        =    0.273150000000E+03;
+  return log(pref_8) - GRAV*height/(RGASD*TCDK);
+}
+
 /*----------------------------------------------------------------------------
  * Nom      : <VDG_FindIp1Idx>
  * Creation : Avril 2015 - E. Legault-Ouellet - CMC/CMOE
@@ -744,11 +751,19 @@ int c_new_build_vert(TVGrid **self, int kind, int version, int nk, int *ip1, int
     break;
   case 5002:
     cvcode = strdup("5002");
-    ier = c_encode_vert_5002(self,nk);
+    ier = c_encode_vert_5002_5003_5004_5005(self);
     break;
   case 5003:
+    cvcode = strdup("5003");
+    ier = c_encode_vert_5002_5003_5004_5005(self);
     break;
   case 5004:
+    cvcode = strdup("5004");
+    ier = c_encode_vert_5002_5003_5004_5005(self);
+    break;
+  case 5005:
+    cvcode = strdup("5005");
+    ier = c_encode_vert_5002_5003_5004_5005(self);
     break;
   default:
     fprintf(stderr,"IN c_new_build_vert: invalid kind or version : kind=%d, version=%d\n",kind,version);
@@ -872,12 +887,12 @@ int c_encode_vert_5001(TVGrid **self,int nk){
   return(VGD_OK);
 }
 
-int c_encode_vert_5002(TVGrid **self,int nk){
-  int skip = 3;
+int c_encode_vert_5002_5003_5004_5005(TVGrid **self){
+  int skip = 3, tsize =   3 * ( (*self)->nl_m + (*self)->nl_t + skip );
   free( (*self)->table );
-  (*self)->table = malloc ( 3 * ( (*self)->nl_m + (*self)->nl_t + skip )*sizeof(double) );
+  (*self)->table = malloc ( tsize * sizeof(double) );
   if(! (*self)->table ) {
-    printf("In c_encode_vert_5002: ERROR allocating table of bouble of size %d\n",3*(nk+skip) );
+    printf("In c_encode_vert_5002_5003_5004_5005: ERROR allocating table of bouble of size %d\n", tsize);
     return(VGD_ERROR);
   }
   strcpy((*self)->ref_name,"P0");
@@ -1123,10 +1138,16 @@ int c_vgrid_genab_5001(float *hybuser, int nk, float rcoef, double ptop_8, doubl
   return(VGD_OK);
 }
 
-int c_vgrid_genab_5002(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t)
+int c_vgrid_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t, int tlift)
 {
   // Andre Plante May 2015.
   
+  // Processing option
+  if( ! ( tlift == 0 || tlift == 1 ) ){
+    printf("ERROR in c_vgrid_genab_5002_5003: wrong value given to tlift, expecting 0 (for false) or 1 (for true), got %d\n",tlift);
+    return(VGD_ERROR);
+  }
+
   // Define local pointers pointing to "pointer to pointer" to simplify equation below
   double *a_m_8, *b_m_8, *a_t_8, *b_t_8;
   int *ip1_m, *ip1_t;
@@ -1143,32 +1164,32 @@ int c_vgrid_genab_5002(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef
 
   *PP_a_m_8 = malloc( (*nl_m)*sizeof(double) );
   if(! *PP_a_m_8){
-    printf("\tIn c_vgrid_genab_5002, malloc error with *PP_a_m_8\n");
+    printf("\tIn c_vgrid_genab_5002_5003, malloc error with *PP_a_m_8\n");
     return(VGD_ERROR);
   }
   *PP_b_m_8 = malloc( (*nl_m)*sizeof(double) );
   if(! *PP_b_m_8){
-    printf("\tIn c_vgrid_genab_5002, malloc error with *PP_b_m_8\n");
+    printf("\tIn c_vgrid_genab_5002_5003, malloc error with *PP_b_m_8\n");
     return(VGD_ERROR);
   }
   *PP_ip1_m = malloc( (*nl_m)*sizeof(int) );
   if(! *PP_ip1_m){
-    printf("\tIn c_vgrid_genab_5002, malloc error with *PP_ip1_m\n");
+    printf("\tIn c_vgrid_genab_5002_5003, malloc error with *PP_ip1_m\n");
     return(VGD_ERROR);
   }
   *PP_a_t_8 = malloc( (*nl_t)*sizeof(double) );
   if(! *PP_a_t_8){
-    printf("\tIn c_vgrid_genab_5002, malloc error with *PP_a_t_8\n");
+    printf("\tIn c_vgrid_genab_5002_5003, malloc error with *PP_a_t_8\n");
     return(VGD_ERROR);
   }
   *PP_b_t_8 = malloc( (*nl_t)*sizeof(double) );
   if(! *PP_b_t_8){
-    printf("\tIn c_vgrid_genab_5002, malloc error with *PP_b_t_8\n");
+    printf("\tIn c_vgrid_genab_5002_5003, malloc error with *PP_b_t_8\n");
     return(VGD_ERROR);
   }
   *PP_ip1_t = malloc( (*nl_t)*sizeof(int) );
   if(! *PP_ip1_t){
-    printf("\tIn c_vgrid_genab_5002, malloc error with *PP_ip1_t\n");
+    printf("\tIn c_vgrid_genab_5002_5003, malloc error with *PP_ip1_t\n");
     return(VGD_ERROR);
   }
 
@@ -1181,7 +1202,7 @@ int c_vgrid_genab_5002(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef
 
   zsrf_8  = log(pref_8);
   if ( ptop_8 <= 0. ) {
-    printf("ERROR in c_vgrid_genab_5002: ptop_8 must be > 0, got %f\n", ptop_8);
+    printf("ERROR in c_vgrid_genab_5002_5003: ptop_8 must be > 0, got %f\n", ptop_8);
     return(VGD_ERROR);
   }
   ztop_8  = log(ptop_8);
@@ -1191,11 +1212,11 @@ int c_vgrid_genab_5002(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef
   //    Check range
   hybtop = ptop_8 / pref_8;
   if( hybuser[nk-1] >= 1. ) {
-    printf("ERROR in c_vgrid_genab_5002: hyb must be < 1.0, got %f\n", hybuser[nk-1]);
+    printf("ERROR in c_vgrid_genab_5002_5003: hyb must be < 1.0, got %f\n", hybuser[nk-1]);
     return(VGD_ERROR);
   }
   if( hybuser[0] <= hybtop ) {
-    printf("ERROR in c_vgrid_genab_5002: hyb must be > %f, got %f\n", hybtop, hybuser[0]);
+    printf("ERROR in c_vgrid_genab_5002_5003: hyb must be > %f, got %f\n", hybtop, hybuser[0]);
     return(VGD_ERROR);
   }
 
@@ -1240,8 +1261,13 @@ int c_vgrid_genab_5002(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef
   a_t_8[nk]   = 0.5 * ( a_m_8[nk-1] + zsrf_8);
   a_t_8[nk+1] = zsrf_8;
 
+  if( tlift ){
+    a_t_8[nk]   = a_m_8[nk-1];
+    b_t_8[nk]   = b_m_8[nk-1];
+  }
+
   // Compute ip1 values
-  for(k = 0; k <= nk; k++ ) {
+  for(k = 0; k < nk; k++ ) {
     ip1_m[k] = c_convip_Level2IP(hybuser[k],5);
   }
   ip1_m[nk] = c_convip_Level2IP(1.,5);
@@ -1250,8 +1276,300 @@ int c_vgrid_genab_5002(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef
   for(k = 1; k < nk; k++ ) {
     ip1_t[k]  = c_convip_Level2IP( sqrt( hybuser[k] * hybuser[k-1] ), 5 );
   }
-  ip1_t[nk]   = c_convip_Level2IP( sqrt( hybuser[nk-1] ), 5 );
+  if( tlift ){
+    ip1_t[nk]   = c_convip_Level2IP( hybuser[nk-1] , 5 );
+  } else {
+    ip1_t[nk]   = c_convip_Level2IP( sqrt( hybuser[nk-1]*1.0 ), 5 );
+  }
   ip1_t[nk+1] = c_convip_Level2IP(1.,5);
+  
+  return(VGD_OK);
+
+}
+
+int c_vgrid_genab_5004(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t)
+{
+  // Andre Plante May 2015.
+  
+  // Processing option
+
+  // Define local pointers pointing to "pointer to pointer" to simplify equation below
+  double *a_m_8, *b_m_8, *a_t_8, *b_t_8;
+  int *ip1_m, *ip1_t;
+    
+  char ok;
+  int k;
+  float *hybm, hybtop, rcoef;
+  double zsrf_8, ztop_8, zeta_8, lamba_8, pr1, zetau_8, zeta2_8, l_ptop_8;  
+  
+  //printf("nk %d, (*nl_m) %d, (*nl_t) %d, rcoef1 %f, rcoef2 %f, ptop_8 %f, pref_8 %f\n",nk, (*nl_m), (*nl_t), rcoef1, rcoef2, ptop_8, pref_8);
+
+  *nl_m = nk + 1;
+  *nl_t = nk + 1;
+
+  *PP_a_m_8 = malloc( (*nl_m)*sizeof(double) );
+  if(! *PP_a_m_8){
+    printf("\tIn c_vgrid_genab_5004, malloc error with *PP_a_m_8\n");
+    return(VGD_ERROR);
+  }
+  *PP_b_m_8 = malloc( (*nl_m)*sizeof(double) );
+  if(! *PP_b_m_8){
+    printf("\tIn c_vgrid_genab_5004, malloc error with *PP_b_m_8\n");
+    return(VGD_ERROR);
+  }
+  *PP_ip1_m = malloc( (*nl_m)*sizeof(int) );
+  if(! *PP_ip1_m){
+    printf("\tIn c_vgrid_genab_5004, malloc error with *PP_ip1_m\n");
+    return(VGD_ERROR);
+  }
+  *PP_a_t_8 = malloc( (*nl_t)*sizeof(double) );
+  if(! *PP_a_t_8){
+    printf("\tIn c_vgrid_genab_5004, malloc error with *PP_a_t_8\n");
+    return(VGD_ERROR);
+  }
+  *PP_b_t_8 = malloc( (*nl_t)*sizeof(double) );
+  if(! *PP_b_t_8){
+    printf("\tIn c_vgrid_genab_5004, malloc error with *PP_b_t_8\n");
+    return(VGD_ERROR);
+  }
+  *PP_ip1_t = malloc( (*nl_t)*sizeof(int) );
+  if(! *PP_ip1_t){
+    printf("\tIn c_vgrid_genab_5004, malloc error with *PP_ip1_t\n");
+    return(VGD_ERROR);
+  }
+
+  a_m_8 = *PP_a_m_8;
+  b_m_8 = *PP_b_m_8;
+  ip1_m = *PP_ip1_m;
+  a_t_8 = *PP_a_t_8;
+  b_t_8 = *PP_b_t_8;
+  ip1_t = *PP_ip1_t;
+
+  zsrf_8  = log(pref_8);
+
+  if ( lrint(ptop_8) == -2 || lrint(ptop_8) == -1 ) {
+    // Auto compute ptop and make B(1) = 0
+    zetau_8 = zsrf_8 + log(hybuser[0]);
+    zeta2_8 = zsrf_8 + log(hybuser[1]);
+    ztop_8  = 0.5 * ( 3. * zetau_8 - zeta2_8);
+    l_ptop_8 = exp(ztop_8);
+    if( lrint(ptop_8) == -1 ) {
+      // Compute B(1) from ztop, B(1) != 0
+      zetau_8 = ztop_8;
+    }
+  } else if (ptop_8 <= 0.) {
+    printf("ERRO In c_vgrid_genab_5004: ptop_8 must be > 0, got %f\n",ptop_8);
+    return(VGD_ERROR);
+  } else {
+    // Take B(1) from user's ztop
+    l_ptop_8 = ptop_8;
+    ztop_8  = log(ptop_8);
+    zetau_8 = ztop_8;
+  }
+
+  // Checking vertical layering
+
+  //    Check range
+  hybtop = l_ptop_8 / pref_8;
+  if( hybuser[nk-1] >= 1. ) {
+    printf("ERROR in c_vgrid_genab_5004: hyb must be < 1.0, got %f\n", hybuser[nk-1]);
+    return(VGD_ERROR);
+  }
+  if( hybuser[0] <= hybtop ) {
+    printf("ERROR in c_vgrid_genab_5004: hyb must be > %f, got %f\n", hybtop, hybuser[0]);
+    return(VGD_ERROR);
+  }
+
+  //Check monotonicity
+  for ( k = 1; k < nk; k++){
+    if(hybuser[k] <= hybuser[k-1]){
+      printf(" WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n");
+      ok=0;
+      break;
+    }
+  }
+  if(! ok){
+    printf("   Current choice:\n");
+    for ( k = 0; k < nk; k++){
+      printf("   %f\n", hybuser[k]);
+    }
+    return(VGD_ERROR);
+  }
+
+  // Momentum levels
+  pr1 = 1. / (zsrf_8 - zetau_8);
+  for( k = 0; k < nk; k++ ) {
+    zeta_8  = zsrf_8 + log(hybuser[k]);
+    lamba_8  = ( zeta_8 - zetau_8 ) * pr1;
+    rcoef  = rcoef2 - ( rcoef2 - rcoef1 ) * lamba_8;
+    b_m_8[k] = pow(lamba_8, rcoef);
+    a_m_8[k] = zeta_8;
+  }
+  a_m_8[nk] = zsrf_8;
+  b_m_8[nk] = 1.;
+
+  // Thermodynamic levels    
+  for( k = 0; k < nk; k++ ) {
+    b_t_8[k] = 0.5 * ( b_m_8[k+1] + b_m_8[k] );
+    a_t_8[k] = 0.5 * ( a_m_8[k+1] + a_m_8[k] );
+  }
+  // Special thermo levels
+  b_t_8[nk] = 1.;
+  a_t_8[nk] = zsrf_8;
+
+  // Compute ip1 values
+  for(k = 0; k < nk; k++ ) {
+    ip1_m[k] = c_convip_Level2IP(hybuser[k],5);    
+  }
+  ip1_m[nk] = c_convip_Level2IP(1.,5);
+
+  for(k = 0; k < nk-1; k++ ) {
+    ip1_t[k]  = c_convip_Level2IP( sqrt( hybuser[k+1] * hybuser[k] ), 5 );
+  }
+  ip1_t[nk-1] = c_convip_Level2IP( sqrt( 1. * hybuser[nk-1] ), 5 );
+  ip1_t[nk]   = c_convip_Level2IP(1.,5);
+  
+  return(VGD_OK);
+
+}
+
+int c_vgrid_genab_5005(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double **ptop_out_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t, float dhm, float dht)
+{
+  // Andre Plante May 2015.
+
+  // Define local pointers pointing to "pointer to pointer" to simplify equation below
+  double *a_m_8, *b_m_8, *a_t_8, *b_t_8;
+  int *ip1_m, *ip1_t;
+    
+  char ok;
+  int k;
+  float *hybm, hybtop, rcoef;
+  double zsrf_8, ztop_8, zeta_8, lamba_8, pr1, zetau_8, zeta2_8;
+  
+  *nl_m = nk + 2;
+  *nl_t = nk + 2;
+
+  *PP_a_m_8 = malloc( (*nl_m)*sizeof(double) );
+  if(! *PP_a_m_8){
+    printf("\tIn c_vgrid_genab_5005, malloc error with *PP_a_m_8\n");
+    return(VGD_ERROR);
+  }
+  *PP_b_m_8 = malloc( (*nl_m)*sizeof(double) );
+  if(! *PP_b_m_8){
+    printf("\tIn c_vgrid_genab_5005, malloc error with *PP_b_m_8\n");
+    return(VGD_ERROR);
+  }
+  *PP_ip1_m = malloc( (*nl_m)*sizeof(int) );
+  if(! *PP_ip1_m){
+    printf("\tIn c_vgrid_genab_5005, malloc error with *PP_ip1_m\n");
+    return(VGD_ERROR);
+  }
+  *PP_a_t_8 = malloc( (*nl_t)*sizeof(double) );
+  if(! *PP_a_t_8){
+    printf("\tIn c_vgrid_genab_5005, malloc error with *PP_a_t_8\n");
+    return(VGD_ERROR);
+  }
+  *PP_b_t_8 = malloc( (*nl_t)*sizeof(double) );
+  if(! *PP_b_t_8){
+    printf("\tIn c_vgrid_genab_5005, malloc error with *PP_b_t_8\n");
+    return(VGD_ERROR);
+  }
+  *PP_ip1_t = malloc( (*nl_t)*sizeof(int) );
+  if(! *PP_ip1_t){
+    printf("\tIn c_vgrid_genab_5005, malloc error with *PP_ip1_t\n");
+    return(VGD_ERROR);
+  }
+
+  a_m_8 = *PP_a_m_8;
+  b_m_8 = *PP_b_m_8;
+  ip1_m = *PP_ip1_m;
+  a_t_8 = *PP_a_t_8;
+  b_t_8 = *PP_b_t_8;
+  ip1_t = *PP_ip1_t;
+
+  zsrf_8  = log(pref_8);
+  
+  // Auto compute ptop and make B(0) = 0
+  zetau_8 = zsrf_8 + log(hybuser[0]);
+  zeta2_8 = zsrf_8 + log(hybuser[1]);
+  ztop_8  = 0.5 * ( 3. * zetau_8 - zeta2_8);
+  (**ptop_out_8) = exp(ztop_8);
+
+  // Checking vertical layering
+
+  //    Check range
+  hybtop = (**ptop_out_8) / pref_8;
+  if( hybuser[nk-1] >= 1. ) {
+    printf("ERROR in c_vgrid_genab_5005: hyb must be < 1.0, got %f\n", hybuser[nk-1]);
+    return(VGD_ERROR);
+  }
+  if( hybuser[0] <= hybtop ) {
+    printf("ERROR in c_vgrid_genab_5005: hyb must be > %f, got %f\n", hybtop, hybuser[0]);
+    return(VGD_ERROR);
+  }
+
+  //Check monotonicity
+  for ( k = 1; k < nk; k++){
+    if(hybuser[k] <= hybuser[k-1]){
+      printf(" WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n");
+      ok=0;
+      break;
+    }
+  }
+  if(! ok){
+    printf("   Current choice:\n");
+    for ( k = 0; k < nk; k++){
+      printf("   %f\n", hybuser[k]);
+    }
+    return(VGD_ERROR);
+  }
+
+  // Momentum levels
+  pr1 = 1. / (zsrf_8 - zetau_8);
+  for( k = 0; k < nk; k++ ) {
+    zeta_8  = zsrf_8 + log(hybuser[k]);
+    lamba_8  = ( zeta_8 - zetau_8 ) * pr1;
+    rcoef  = rcoef2 - ( rcoef2 - rcoef1 ) * lamba_8;
+    b_m_8[k] = pow(lamba_8, rcoef);
+    a_m_8[k] = zeta_8;
+  }
+  a_m_8[nk] = zsrf_8;
+  b_m_8[nk] = 1.;
+  // Integrating the hydrostatic eq with T=0C
+  // ln[p(z=dhm)] = ln(ps) - g/(Rd*T)*dhm
+  // s = ln(ps) - ln(pref)
+  // ln[p(z=dhm)] = ln(pref) - g/(Rd*T)*dhm + s
+  // => B=1, A = ln(pref) - g/(Rd*T)*dhm
+  // We take T at 0C
+  a_m_8[nk+1] = comp_diag_a_height(pref_8,dhm);
+  b_m_8[nk+1] = 1.;
+
+  // Thermodynamic levels    
+  for( k = 0; k < nk; k++ ) {
+    b_t_8[k] = 0.5 * ( b_m_8[k+1] + b_m_8[k] );
+    a_t_8[k] = 0.5 * ( a_m_8[k+1] + a_m_8[k] );
+  }
+  // Special thermo levels
+  b_t_8[nk]   = 1.;
+  a_t_8[nk]   = zsrf_8;
+  a_t_8[nk+1] = comp_diag_a_height(pref_8,dht);
+  b_t_8[nk+1] = 1.;
+
+  // Compute ip1 values
+  for(k = 0; k < nk; k++ ) {
+    ip1_m[k] = c_convip_Level2IP(hybuser[k],5);    
+  }
+  ip1_m[nk] = c_convip_Level2IP(1.,5);
+  // Encoding kind= 4       : M  [metres] (height with respect to ground level)
+  ip1_m[nk+1] = c_convip_Level2IP(dhm,4);
+
+  for(k = 0; k < nk-1; k++ ) {
+    ip1_t[k]  = c_convip_Level2IP( sqrt( hybuser[k+1] * hybuser[k] ), 5 );
+  }
+  ip1_t[nk-1] = c_convip_Level2IP( sqrt( 1. * hybuser[nk-1] ), 5 );
+  ip1_t[nk]   = c_convip_Level2IP(1.,5);
+  // Encoding kind= 4       : M  [metres] (height with respect to ground level)
+  ip1_t[nk+1] = c_convip_Level2IP(dht,4);
   
   return(VGD_OK);
 
@@ -1365,8 +1683,8 @@ int c_new_gen(TVGrid **self, int kind, int version, float *hyb, int size_hyb, fl
 {
 
   float *hybm = NULL;
-  double *a_m_8 = NULL, *b_m_8 = NULL, *a_t_8 = NULL, *b_t_8 = NULL;
-  int *ip1_m = NULL, *ip1_t = NULL;
+  double *a_m_8 = NULL, *b_m_8 = NULL, *a_t_8 = NULL, *b_t_8 = NULL, l_ptop;
+  int *ip1_m = NULL, *ip1_t = NULL, tlift;
 
   if(! *self){
     *self = c_vgd_construct();
@@ -1427,7 +1745,8 @@ int c_new_gen(TVGrid **self, int kind, int version, float *hyb, int size_hyb, fl
     break;
   case 5002:
     nk   = size_hyb;
-    if(c_vgrid_genab_5002(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t) == VGD_ERROR ) {
+    tlift = 0;
+    if(c_vgrid_genab_5002_5003(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t, tlift) == VGD_ERROR ) {
       free(a_m_8);
       free(b_m_8);
       free(ip1_m);
@@ -1438,8 +1757,41 @@ int c_new_gen(TVGrid **self, int kind, int version, float *hyb, int size_hyb, fl
     }    
     break;
   case 5003:
+    nk   = size_hyb;
+    tlift = 1;
+    if(c_vgrid_genab_5002_5003(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t, tlift) == VGD_ERROR ) {
+      free(a_m_8);
+      free(b_m_8);
+      free(ip1_m);
+      free(a_t_8);
+      free(b_t_8);
+      free(ip1_t);
+      return(VGD_ERROR);
+    }    
     break;
   case 5004:
+    nk   = size_hyb;
+    if(c_vgrid_genab_5004(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t) == VGD_ERROR ) {
+      free(a_m_8);
+      free(b_m_8);
+      free(ip1_m);
+      free(a_t_8);
+      free(b_t_8);
+      free(ip1_t);
+      return(VGD_ERROR);
+    }    
+     break;
+  case 5005:
+    nk   = size_hyb;
+    if(c_vgrid_genab_5005(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, &ptop_out_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t, *dhm, *dht) == VGD_ERROR ) {
+      free(a_m_8);
+      free(b_m_8);
+      free(ip1_m);
+      free(a_t_8);
+      free(b_t_8);
+      free(ip1_t);
+      return(VGD_ERROR);
+    }
     break;
   default:
     fprintf(stderr,"Invalid kind or version in c_new_gen: kind=%d, version=%d\n",kind,version);

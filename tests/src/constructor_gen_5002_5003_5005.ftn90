@@ -36,7 +36,7 @@ program constructor
   character (len=256) :: file
 
   !Use wrong top pressure
-if(.true.)then
+
   print*,'================== EXPECTED ERROR SECTION BEGINGS================='
   print*,'================== EXPECTED ERROR SECTION BEGINGS================='
   print*,'================== EXPECTED ERROR SECTION BEGINGS================='
@@ -67,26 +67,21 @@ if(.true.)then
   stat = test_5002(d,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
 
-stop
-
-endif
-
   ! Construct a new set of vertical coordinate descriptors 5003
   stat = vgd_new(d,kind=5,version=3,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
   file='data/data_constructor_gen_5003.txt'
   stat = test_5002(d,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
 
-stop
-
   ! Construct a new set of vertical coordinate descriptors 5004
   !
   stat = vgd_new(d,kind=5,version=4,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-1.d0,pref_8=pref,ptop_out_8=ptop)
+  
   file='data/data_constructor_gen_5004.txt'
   stat = test_5002(d,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
   print*,'ptop',ptop
-  
+
   ! Construct a new set of vertical coordinate descriptors 5004 with flat Momentum(1) level B(1)=0.
   ! 
   stat = vgd_new(d,kind=5,version=4,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-2.d0,pref_8=pref,ptop_out_8=ptop)
@@ -193,7 +188,7 @@ integer function test_5002(F_d,F_file,F_write_control_L,F_stat) result(istat)
   enddo
   print*,'Reading A T'
   read(10,*)work_8(1:size(a_t_8))
-  do k=1,nk+1
+  do k=1,size(a_t_8)
      if(abs(work_8(k)-a_t_8(k))/a_t_8(k)>100.*epsilon(1.))then
         istat=VGD_ERROR
         print*,'Probleme avec A T, pas dans les limites tollerees'
@@ -221,7 +216,7 @@ integer function test_5002(F_d,F_file,F_write_control_L,F_stat) result(istat)
   enddo
   print*,'Reading B T'
   read(10,*)work_8(1:size(b_t_8))
-  do k=1,nk+1
+  do k=1,size(b_t_8)
      if(abs(work_8(k)-b_t_8(k))/b_t_8(k)>100.*epsilon(1.))then
         istat=VGD_ERROR
         print*,'Probleme avec B T, pas dans les limites tollerees'
@@ -244,7 +239,7 @@ integer function test_5002(F_d,F_file,F_write_control_L,F_stat) result(istat)
   enddo
   print*,'Reading IP T'
   read(10,*)work_i(1:size(vipt))
-  do k=1,nk
+  do k=1,size(vipt)
      if(work_i(k).ne.vipt(k))then
         istat=VGD_ERROR
         print*,'Probleme avec IP k sur nk:',k,nk
@@ -277,7 +272,7 @@ integer function test_5002(F_d,F_file,F_write_control_L,F_stat) result(istat)
 
   print*,'Reading VCDT'
   read(10,*)work(1:size(vcdt))
-  do k=1,nk+1
+  do k=1,size(vcdt)
      if(vcdt(k).eq.0.)then
         if(abs(work(k)-vcdt(k))>100.*epsilon(vcdt(k)))then
            istat=VGD_ERROR
