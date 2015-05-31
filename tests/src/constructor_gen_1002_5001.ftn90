@@ -137,7 +137,6 @@ program constructor
 
   stat = vgd_free(d)
   deallocate(b_m_8,a_m_8)
-stop
 
   call ut_report(OK,'Grid_Descriptors::vgd_new vertical generate initializer (5001) value')
 

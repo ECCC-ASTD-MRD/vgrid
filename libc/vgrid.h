@@ -63,9 +63,9 @@ typedef struct TVGrid {
 
 int c_new_gen(TVGrid **self, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2,
 	      double *ptop_8, double *pref_8, double *ptop_out_8,
-	      int *ip1, int *ip2, int *stdout_unit, float *dhm, float *dht);
+	      int ip1, int ip2, int *stdout_unit, float *dhm, float *dht);
 
-int c_new_build_vert(TVGrid **self, int kind, int version, int nk, int *ip1, int *ip2, double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2, 
+int c_new_build_vert(TVGrid **self, int kind, int version, int nk, int ip1, int ip2, double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2, 
 		     double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int nl_m, int nl_t);
 
 int c_vgrid_genab_1001(float *hyb, int nk, float **hybm, double **a_m_8, double **b_m_8, int **ip1_m);
