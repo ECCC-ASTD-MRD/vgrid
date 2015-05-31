@@ -27,6 +27,7 @@ program constructor
   enddo
   !
   stat = vgd_new(d,kind=2,version=1,nk=size(pres),ip1_m=ip1s,a_m_8=pres,b_m_8=b)
+
   stat = vgd_get(d,key='VTBL - vertical coordinate table',value=tbl)
   OK=abs(tbl(2,2,1)-pres(1)) < epsilon(pres)
   !
@@ -38,6 +39,10 @@ program constructor
   hyb=pres/100.
   !
   stat = vgd_new(d2,kind=2,version=1,hyb=hyb)
+  if(stat == VGD_ERROR)then
+     print*,'Error avec vgd_new'
+     stop
+  endif
   !
   file='data_Linux/data_constructor_build_2001.txt'
   stat = test_2001(d,file,.false.)
@@ -91,7 +96,7 @@ integer function test_2001(F_d,F_file,F_write_control_L) result(istat)
       print*,'Problem with NL_M should be',size(b_m_8),' got',nl_m
       return
    endif
-   if(nl_t.ne.size(b_m_8))then
+   if(nl_t.ne.-1)then
       print*,'Problem with NL_T should be',size(b_m_8),' got',nl_t
       return
    endif
