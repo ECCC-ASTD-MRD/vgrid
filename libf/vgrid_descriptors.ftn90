@@ -55,6 +55,13 @@ module vGrid_Descriptors
          character(kind=c_char) :: key(*)
       end function c_get_int_1d
    
+      integer function c_get_real(vgd_CP, key, value_CP, quiet_CP) bind(c)
+         use iso_c_binding, only: c_ptr, c_char
+         type(c_ptr), value :: vgd_CP, quiet_CP
+         type(c_ptr) :: value_CP
+         character(kind=c_char) :: key(*)
+      end function c_get_real
+
       integer function c_get_real8_1d(vgd_CP, key, value_CP, quiet_CP) bind(c)
          use iso_c_binding, only: c_ptr, c_char
          type(c_ptr), value :: vgd_CP, quiet_CP
@@ -133,7 +140,7 @@ module vGrid_Descriptors
    interface vgd_get
       module procedure get_int
       module procedure get_int_1d
-      !module procedure get_real
+      module procedure get_real
       module procedure get_real_1d
       !module procedure get_real8
       module procedure get_real8_1d
@@ -257,8 +264,10 @@ contains
       ! Local variables
       type(c_ptr) :: rcoef1_CP, rcoef2_CP, ptop_8_CP, pref_8_CP
       type(c_ptr) :: a_m_8_CP, b_m_8_CP, a_t_8_CP, b_t_8_CP, ip1_m_CP, ip1_t_CP
-      integer l_ip1,l_ip2,nl_m, nl_t
-      
+      integer l_ip1,l_ip2,nl_m, nl_t, tempo
+
+      status = VGD_ERROR
+
       nl_m=nk
       nl_t=-1
 
@@ -324,15 +333,22 @@ contains
       else
          ip1_t_CP = C_NULL_PTR
       endif
+      !if(c_new_build_vert(self%cptr,kind,version,nk,l_ip1,l_ip2, &
+      !     ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, &
+      !     a_m_8_CP, b_m_8_CP, a_t_8_CP, b_t_8_CP, ip1_m_CP, ip1_t_CP, nl_m, nl_t) == VGD_ERROR)then
 
-      if(c_new_build_vert(self%cptr,kind,version,nk,l_ip1,l_ip2, &
+      print*,'new_build_vert nk, nl_m, nl_t',nk, nl_m, nl_t
+
+      tempo=c_new_build_vert(self%cptr,kind,version,nk,l_ip1,l_ip2, &
            ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, &
-           a_m_8_CP, b_m_8_CP, a_t_8_CP, b_t_8_CP, ip1_m_CP, ip1_t_CP, nl_m, nl_t) == VGD_ERROR)then
-         print*,'In new_gen, problem with c_new_gen'
+           a_m_8_CP, b_m_8_CP, a_t_8_CP, b_t_8_CP, ip1_m_CP, ip1_t_CP, nl_m, nl_t)
+      if(tempo == VGD_ERROR)then
+         
+         print*,'In new_build_vert, problem with c_new_build_vert',tempo,VGD_ERROR
          return
       endif
 
-      status = VGD_ERROR;
+      status = VGD_OK;
 
    end function new_build_vert
 
@@ -407,14 +423,13 @@ contains
       integer, target :: one
 
       one = 1
-
-      value_CP = c_loc(value)
       
       quiet_CP = C_NULL_PTR
       if (present(quiet))then
-         if(quiet)quiet_CP = c_loc(one)
+         if(quiet) quiet_CP = c_loc(one)
       endif
 
+      value_CP = c_loc(value)
       my_key=up(key(1:KEY_LENGTH))
       status = c_get_int(self%cptr,my_key//C_NULL_CHAR, value_CP, quiet_CP)
       
@@ -499,6 +514,36 @@ contains
       return
       
    end function get_int_1d
+   
+   integer function get_real(self,key,value,quiet) result(status)
+      use utils, only: up
+      ! Retrieve the value of the requested instance variable
+      type(vgrid_descriptor), intent(in) :: self   !Vertical descriptor instance
+      character(len=*), intent(in) :: key          !Descriptor key to retrieve
+      real, intent(out) :: value                   !Retrieved value
+      logical, optional, intent(in) :: quiet       !Do not print massages
+      
+      ! Internal variables
+      type(c_ptr) :: quiet_CP, value_CP
+      character(len=KEY_LENGTH) :: my_key
+      integer, target :: one
+
+      one = 1
+
+      value = VGD_MISSING      
+
+      quiet_CP = C_NULL_PTR
+      if (present(quiet))then
+         if(quiet) quiet_CP = c_loc(one)
+      endif
+
+      value_CP = c_loc(value)
+      my_key=up(key(1:KEY_LENGTH))
+      status = c_get_real(self%cptr,my_key//C_NULL_CHAR,value_CP,quiet_CP)
+      
+      return
+   end function get_real
+  
 
    integer function get_real_1d(self,key,value,quiet) result(status)
       use utils, only: get_allocate,up,get_error

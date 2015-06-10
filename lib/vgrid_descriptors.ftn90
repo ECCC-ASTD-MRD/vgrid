@@ -88,7 +88,7 @@ module vGrid_Descriptors
      real(kind=8), dimension(:), pointer :: a_t_8=>null()!A-coefficients for thermodynamic levels
      real(kind=8), dimension(:), pointer :: b_t_8=>null()!B-coefficients for thermodynamic levels
      real :: dhm                                        ! Diag level Height (m) for Momentum variables UU,VV
-     real :: dht                                        ! Diag level Height (m) for Thermo variables TT,HU, etc
+     real :: dht                                        ! Diag level Height (t) for Thermo variables TT,HU, etc
      integer, dimension(:), pointer :: ip1_m=>null()    !ip1 values for momentum levels
      integer, dimension(:), pointer :: ip1_t=>null()    !ip1 values for thermodynamic levels
      real :: rcoef1=VGD_MISSING,rcoef2=VGD_MISSING      !Rectification coefficients
@@ -1258,8 +1258,7 @@ contains
        value=size(vip)
     case ('DIPM')
        if (is_valid(self,dhm_valid)) then
-          value=self%ip1_m(size(self%ip1_m))
-          
+          value=self%ip1_m(size(self%ip1_m))        
        else
           value = get_error(key)
           return

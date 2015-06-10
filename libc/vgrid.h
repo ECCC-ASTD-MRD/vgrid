@@ -47,6 +47,8 @@ typedef struct TVGrid {
   int      *ip1_t;        // ip1 values for momentum levels
   int      nl_m;          // Number of momentum      level (size of a_m_8, b_m_8 and ip1_m)
   int      nl_t;          // Number ot thermodynamic level (size of a_t_8, b_t_8 and ip1_t)
+  float    dhm;           // Diag level Height (m) for Momentum variables UU,VV
+  float    dht;           // Diag level Height (t) for Thermo variables TT,HU, etc
   char*    ref_name;      // Reference field name
   float    rcoef1;        // Rectification coefficient
   float    rcoef2;        // Rectification coefficient
