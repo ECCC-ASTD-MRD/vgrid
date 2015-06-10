@@ -1,3 +1,6 @@
+# Pour avoir d.valgrind
+. ssmuse-sh -d cmda/base/trunk/default
+
 
 LINUX_COMP=intel13sp1u2
 #LINUX_COMP=pgi1401

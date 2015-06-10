@@ -1,5 +1,5 @@
 program constructor
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_print,VGD_ERROR
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_print, vgd_free, VGD_ERROR
   use Unit_Testing, only: ut_report
   !
   implicit none
@@ -9,7 +9,7 @@ program constructor
   integer :: stat,ip1
   integer, dimension(:), pointer :: ip1_m,ip1_t
   real*8, dimension(:), pointer :: a_m_8,b_m_8,a_t_8,b_t_8
-  real :: height
+  real :: height=-1
   logical :: OK=.true.
 
   nullify(ip1_m,ip1_t,a_m_8,b_m_8,a_t_8,b_t_8)
@@ -23,7 +23,13 @@ program constructor
   ip1_t=(/97698159,96939212,95939513,94597899,94877531,95139482,95323042,93423264,76746048/)
   a_t_8=(/2.89364884405945,6.15320066567627,8.55467550398551,10.0259661797048,10.8310952652232,11.2484934057893,11.4628969443959,11.51293,11.5126753323904/)
   b_t_8=(/5.767296480554498E-009,7.010292926951782E-003,0.227561997481228,0.648350006620964,0.878891216792279,0.963738779730914,0.994233214440677,1.00000000000000,1.00000000000000/)
-  
+
+  !print*,"The following error 'vgrid structure is not valid' is normal"
+  !stat = vgd_get(vgd,key='DHM Diag level Height for Momentum variables',value=height)
+  !if(stat/=VGD_ERROR)OK=.false.
+
+  !call flush(6)
+
   stat=vgd_new(vgd,kind=5,version=5,nk=nk-2,ip1=1,ip2=2,&
        pref_8=100000.d0,&
        rcoef1=1.,rcoef2=10.,&
@@ -51,6 +57,7 @@ program constructor
   if(stat==VGD_ERROR)OK=.false.
   print*,'Diag level ip1 for Thermo variables =',ip1
 
+  stat = vgd_free(vgd)
   !
   call ut_report(OK,'Grid_Descriptors:: vgd_new new_gen')
   !
