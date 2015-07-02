@@ -9,6 +9,7 @@ program constructor
 
   ! Construct a new set of 3D coordinate descriptors
   stat = vgd_new(d,kind=5,version=1,nk=10)
+
   call ut_report(stat == VGD_ERROR,'Grid_Descriptors::vgd_new vertical build initializer')
 
 end program constructor

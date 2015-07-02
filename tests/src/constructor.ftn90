@@ -2,13 +2,13 @@ program constructor
 
   ! Object: construct vgrid_descriptor
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new, VGD_OK
   use Unit_Testing, only: ut_report
 
   implicit none
 
   type(vgrid_descriptor) :: d
-  integer :: lu=0,lutxt=69
+  integer :: lu=10,lutxt=69
   integer :: stat,ip1,ip2
   integer :: fnom,fstouv,fstfrm
   logical :: ok
@@ -19,7 +19,7 @@ program constructor
      call abort
   endif
   stat=fstouv(lu,'RND')
-  if(stat.le.0)then
+  if(stat.le.0)then 
      print*,'No record in RPN file'
      call abort
   endif
@@ -27,9 +27,31 @@ program constructor
   read(lutxt,*) ip1,ip2
   close(lutxt)
 
+if(.false.)then
+  
   ! Construct a new set of 3D coordinate descriptors
+  print*,'The following error on optional ip2 is expected'
+  stat = vgd_new(d,unit=lu,format="fst",ip1=ip1)
+  if(stat.eq.VGD_OK)ok=.false.
+
+  print*,'The following error on optional ip1 is expected'
+  stat = vgd_new(d,unit=lu,format="fst",ip2=ip2)
+  if(stat.eq.VGD_OK)ok=.false.
+
+  print*,'The following error on format is expected'
+  stat = vgd_new(d,unit=lu,format="toto")
+  if(stat.eq.VGD_OK)ok=.false.  
+
+  print*,'The following error matching ip1 ip2 is expected'
+  stat = vgd_new(d,unit=lu,format="fst",ip1=123,ip2=456)
+  if(stat.eq.VGD_OK)ok=.false.  
+  
+endif
+
   stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
   call ut_report(stat,'Grid_Descriptors, vgd_new, vgd_get CA')
+
+stop
 
   stat=fstfrm(lu)
 
