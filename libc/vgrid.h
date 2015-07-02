@@ -5,11 +5,29 @@
 #define VGD_OK       0
 #define VGD_ERROR    -1
 #define VGD_MISSING  -9999.
+#define MAXSTR_NOMVAR 5
+#define MAXSTR_TYPVAR 3
+#define MAXSTR_ETIKET 13
+#define MAXSTR_GRTYP  2
+
 int ALLOW_RESHAPE = 0;
 
 typedef struct TFSTD {
-   //int   FID;                 // File ID (file unit) dont provient le champ
-   //int   KEY;                 // Cle du champs
+   int   dateo;                 // date d'origine du champs
+   int   deet;                  // duree d'un pas de temps
+   int   npas;                  // pas de temps
+   int   nbits;                 // nombre de bits du champs
+   int   datyp;                 // type de donnees
+   int   ip1,ip2,ip3;           // specificateur du champs
+   int   ig1,ig2,ig3,ig4;       // descripteur de grille
+   char  typvar[MAXSTR_TYPVAR]; // type de variable
+   char  nomvar[MAXSTR_NOMVAR]; // nom de la variable
+   char  etiket[MAXSTR_ETIKET]; // etiquette du champs
+   char  grtyp[MAXSTR_GRTYP];   // type de grilles
+   char  fstd_initialized;      // if the fstd struct is initialized
+} TFSTD;
+
+typedef struct TFSTD_ext {
    int   dateo;               // date d'origine du champs
    int   datev;               // date de validitee du champs
    int   deet;                // duree d'un pas de temps
@@ -23,13 +41,13 @@ typedef struct TFSTD {
    int   lng;
    int   dltf;
    int   ubc;
-   int   ex1,ex2,ex3;
-   char  typvar[3];           // type de variable
-   char  nomvar[5];           // nom de la variable
-   char  etiket[13];          // etiquette du champs
-   char  grtyp[2];            // type de grilles
-   char  fstd_initialized;    // if the fstd struct is initialized
-} TFSTD;
+   int   extra1,extra2,extra3;
+   char  typvar[MAXSTR_TYPVAR]; // type de variable
+   char  nomvar[MAXSTR_NOMVAR]; // nom de la variable
+   char  etiket[MAXSTR_ETIKET]; // etiquette du champs
+   char  grtyp[MAXSTR_GRTYP];   // type de grilles
+   char  fstd_initialized;      // if the fstd struct is initialized
+} TFSTD_ext;
 
 typedef struct TVGrid {
   TFSTD    rec;           // RPN standard file header
