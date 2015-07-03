@@ -146,6 +146,27 @@ void my_copy_int(int *aa, int **bb, int ind){
   }
 }
 
+int same_vec_i(int *vec1, int n1, int *vec2, int n2) {
+  int i;
+  if(vec1) {
+    if (vec2) {
+      if ( n1 == n2 ) {
+	for(i = 0; i < n1; i++) {
+	  if ( vec1[i] != vec2[i] ) return(-1);
+	}
+      } else {
+	// Vectors are not the same size.
+	return(-2);
+      }
+    } else {
+      // vec2 not allocated
+      return(-3);
+    }
+  }
+  // Vector are the same or are not allocated.
+  return(0);
+}
+
 int c_convip_Level2IP(float level, int kind) {
 
   int    mode=2,flag=0, IP; 
@@ -196,7 +217,7 @@ int my_fstprm(int key,TFSTD_ext *ff) {
 	        ff->typvar,  ff->nomvar,  ff->etiket,
 	        ff->grtyp,  &ff->ig1,    &ff->ig2,    &ff->ig3, &ff->ig4,
 	       &ff->swa,    &ff->lng,    &ff->dltf,   &ff->ubc,
-	       &ff->extra1, &ff->extra2, &ff->extra3) == VGD_ERROR) {
+	       &ff->extra1, &ff->extra2, &ff->extra3) < 0 ) {
     printf("(vgd) cannot fstprm for fstkey %d\n",key);
     return(VGD_ERROR);
   }
@@ -206,7 +227,6 @@ int my_fstprm(int key,TFSTD_ext *ff) {
 int correct_kind_and_version(int key, int kind, int version, TFSTD_ext *var, int *status) {
   
   *status=0;
-
   if( my_fstprm(key, var) == VGD_ERROR ) {
     printf("(vgd) ERROR: in correct_kind_and_version, with my_fstprm on key %d\n",key);
     return(VGD_ERROR);
@@ -233,6 +253,73 @@ int correct_kind_and_version(int key, int kind, int version, TFSTD_ext *var, int
   *status = 1;
   return(VGD_OK);
 
+}
+
+int load_toctoc(TVGrid *self, TFSTD_ext var, int key) {
+
+  int table_size, istat, ni, nj, nk;
+
+  self->table_ni = var.ni;
+  self->table_nj = var.nj;
+  self->table_nk = var.nk;
+
+  table_size = self->table_ni * self->table_nj * self->table_nk;
+  self->table = malloc ( table_size * sizeof(double) );
+  if(! self->table ) {
+    printf("In load_toctoc: ERROR allocating table of bouble of size %d\n",table_size );
+    return(VGD_ERROR);
+  }
+  istat = c_fstluk(self->table, key, &ni, &nj, &nk);
+  if(istat < 0) {
+    printf("(vgd) ERROR in load_toctoc problem with fstluk\n");
+    free(self->table);
+    return(VGD_ERROR);
+  }
+  if(fstd_init(self) == VGD_ERROR) {
+    printf("(vgd) in load_toctoc, problem creating record information");
+  }
+  self->rec.dateo        = var.dateo;
+  self->rec.deet         = var.deet;
+  self->rec.npas         = var.npas;
+  self->rec.nbits        = var.nbits;
+  self->rec.datyp        = var.datyp;
+  self->rec.ip1          = var.ip1;
+  self->rec.ip2          = var.ip2;
+  self->rec.ip3          = var.ip3;
+  strcpy(self->rec.typvar, var.typvar);
+  strcpy(self->rec.nomvar, var.nomvar);
+  strcpy(self->rec.etiket, var.etiket);
+  strcpy(self->rec.grtyp,  var.grtyp);
+  self->rec.ig1          = var.ig1;
+  self->rec.ig2          = var.ig2;
+  self->rec.ig3          = var.ig3;
+  self->rec.ig4          = var.ig4;
+
+  return(VGD_OK);
+}
+
+int vgdcmp(TVGrid vgd1, TVGrid vgd2) {
+
+  // Check each element of the structure (except FST attributes) for equality
+  if (vgd1.vcode != vgd2.vcode)                   return(-1);
+  if (vgd1.kind != vgd2.kind)                     return(-2);
+  if (vgd1.version != vgd2.version)               return(-3);
+  if (strcmp(vgd1.ref_name, vgd2.ref_name) != 0 ) return(-4);
+  if (vgd1.ptop_8 != vgd2.ptop_8)                 return(-5);
+  if (vgd1.pref_8 != vgd2.pref_8)                 return(-6);
+  if (vgd1.rcoef1 != vgd2.rcoef1)                 return(-7);
+  if (vgd1.rcoef2 != vgd2.rcoef2)                 return(-8);
+
+   // Check pointer associations and values
+  if(same_vec_i(vgd1.ip1_m, vgd1.nl_m, vgd2.ip1_m, vgd2.nl_m) != 0) return (-9);
+   /* if (.not.same_vec(vgd1.ip1_t,vgd2.ip1_t)) return */
+   /* if (.not.same_vec(vgd1.a_m_8,vgd2.a_m_8)) return */
+   /* if (.not.same_vec(vgd1.b_m_8,vgd2.b_m_8)) return */
+   /* if (.not.same_vec(vgd1.a_t_8,vgd2.a_t_8)) return */
+   /* if (.not.same_vec(vgd1.b_t_8,vgd2.b_t_8)) return */
+   /* if (.not.same_vec(vgd1.table,vgd2.table)) return */
+
+  return(0);
 }
 
 double comp_diag_a_height(double pref_8, float height) {
@@ -2148,15 +2235,19 @@ int C_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int *k
   int fstinl;
   int toc_found, count, nkeyList = MAX_DESC_REC;
   int keyList[nkeyList], status;
-  TFSTD_ext *var;
+  TFSTD_ext var;
+  TVGrid *self2;
 
-  if(! *self){
-    *self = c_vgd_construct();
-    if(! *self){
-      printf("ERROR (vgd): in C_new_read, null pointer returned by c_vgd_construct\n");
-      return (VGD_ERROR);
-    }
+  if(*self){
+    C_vgd_free(self);
   }
+  
+  *self = c_vgd_construct();
+  if(! *self){
+    printf("ERROR (vgd): in C_new_read, null pointer returned by c_vgd_construct\n");
+    return (VGD_ERROR);
+  }
+  
   if(ip1) {
     l_ip1     = *ip1;
     (*self)->match_ipig = 1;
@@ -2173,9 +2264,13 @@ int C_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int *k
   }
   if(kind)    l_kind    = *kind;
   if(version) l_version = *version;	
-
+  
   //printf("Unit = %d, format = %s, ip1 = %d, ip1 = %d, kind = %d, version = %d\n",unit, format, l_ip1, l_ip2 , l_kind, l_version);
+  
+  //==============================
   if (strcmp(format, "FST") == 0){
+    //----------------------------
+
     error = c_fstinl(unit, &ni, &nj, &nk, -1, " ", l_ip1, l_ip2, -1, " ", ZNAME, keyList, &count, nkeyList);
     if (error < 0) {
       printf("(vgd) ERROR: in C_new_read, with fstinl on nomvar !!");
@@ -2183,51 +2278,64 @@ int C_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int *k
     }
     if(count == 0){
       printf("(vgd) cannot find %s with the following ips: ip1=%d, ip2=%d\n", ZNAME, l_ip1, l_ip2);
-	if((*self)->match_ipig) {
-	  (*self)->vcode = -1;
-	  return(VGD_ERROR);
-	}
-	printf("(vgd) Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)\n");
-	printf("in C_new_read, call to c_vgd_legacy TODO");
-	if(c_vgd_legacy(self,unit,l_kind) == VGD_ERROR){
-	  return(VGD_ERROR);
-	}
-	if(fstd_init(*self) == VGD_ERROR) {
-	  printf("(vgd) in C_new_read, problem creating record information");
-	}
+      if((*self)->match_ipig) {
+	(*self)->vcode = -1;
+	return(VGD_ERROR);
+      }
+      printf("(vgd) Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)\n");
+      printf("in C_new_read, call to c_vgd_legacy TODO");
+      if(c_vgd_legacy(self,unit,l_kind) == VGD_ERROR){
+	return(VGD_ERROR);
+      }
+      if(fstd_init(*self) == VGD_ERROR) {
+	printf("(vgd) in C_new_read, problem creating record information");
+      }
     }
     // Loop on all !! found
     toc_found = 0;
     for( i=0; i < count; i++) {     
-
       // Check if kind and version match, skip the !! if not.
-      if( correct_kind_and_version(keyList[i], l_kind, l_version, var, &status) == VGD_ERROR) {
+      if( correct_kind_and_version(keyList[i], l_kind, l_version, &var, &status) == VGD_ERROR) {
 	(*self)->valid = 0;
 	return(VGD_ERROR);
       }
       if( status != 1) {
 	continue;
       }
-      // If we reached this stage then the toc satisfy the selection criteria but
-      // it may not be the only one.
+      // If we reached this stage then the toc satisfy the selection criteria but it may not be the only one.
       if(! toc_found) {
 	toc_found = 1;
-	
-
-	printf("var->etiket='%s'\n",var->etiket);
-	printf("Found !!, continue work \n");
+	if( load_toctoc(*self,var,keyList[i]) == VGD_ERROR ) {
+	  printf("(vgd) ERROR: in C_new_read, cannot load !!\n");
+	  return(VGD_ERROR);
+	}
+	continue;
+      }
+      // If we get at this point this means that there are more than one toc satisfying the selection criteria.
+      // We load then all to check if they are the same. If not, we return with an error message.
+      self2 = c_vgd_construct();
+      if( my_fstprm(keyList[i], &var) == VGD_ERROR ) {
+	printf("(vgd) ERROR: in C_new_read, with my_fstprm on keyList[i] = %d\n",keyList[i]);
 	return(VGD_ERROR);
       }
-    }
+      if( load_toctoc(self2,var,keyList[i]) == VGD_ERROR ) {
+	printf("(vgd) ERROR: in C_new_read, cannot load !!\n");
+	return(VGD_ERROR);
+      }
+      status = vgdcmp(**self,*self2);
+      if ( status != 0 ){
+	printf("(vgd) ERROR: in C_new_read, found different entries in vertical descriptors after search on ip1 = %d, ip2 = %d, kind = %d, version = %d, status code is %d\n",l_ip1,l_ip2,l_kind,l_version,status);
+      }
+      // Ce C_vgd_free n'est pas correct car cela devarait etre **
+      //C_vgd_free(&self2);  
+    return(VGD_ERROR);
+  } // Loop in !! 
+    
   } else if (strcmp(format, "BIN") == 0){
-      printf("TODO C_new_read BIN\n");
-      return(VGD_ERROR);
+    printf("(vgd) ERROR: in C_new_read, TODO format = \"BIN\"\n");
+    return(VGD_ERROR);
   } else {
-    printf("(vgd) ERROR: in C_new_read, invalid constructor format request, expecting 'FST' or 'BIN' got '%s'\n", format);
-    return (VGD_ERROR);
+    printf("(vgd) ERROR: in C_new_read, wrong value given to format, expecting FST or BIN got %s\n", format);
+    return(VGD_ERROR);
   }
-  
-
-  return (VGD_ERROR);
-
 }

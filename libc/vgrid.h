@@ -46,7 +46,6 @@ typedef struct TFSTD_ext {
    char  nomvar[MAXSTR_NOMVAR]; // nom de la variable
    char  etiket[MAXSTR_ETIKET]; // etiquette du champs
    char  grtyp[MAXSTR_GRTYP];   // type de grilles
-   char  fstd_initialized;      // if the fstd struct is initialized
 } TFSTD_ext;
 
 typedef struct TVGrid {
