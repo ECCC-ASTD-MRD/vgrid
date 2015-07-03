@@ -23,7 +23,8 @@ module vGrid_Descriptors
    public :: vgd_putopt                          !set class variable value
    public :: vgd_print                           !dump plain-text contents of instance
    public :: vgd_write                           !write coordinates to a file
-  
+   public :: operator(==)                        !overload equivalence operator
+
    ! Public class constants
 #include "vgrid.hf"
 
@@ -90,7 +91,12 @@ module vGrid_Descriptors
       !   type(c_ptr), value :: vgd_CP
       !   integer (c_int), value :: kind, version
       !end function f_set_vcode_i
-      
+
+      integer function f_vgdcmp(vgd1_CP, vgd2_CP) bind(c, name='C_vgdcmp')
+         use iso_c_binding, only: c_ptr
+         type(c_ptr), value :: vgd1_CP, vgd2_CP
+      end function f_vgdcmp
+
       integer function f_new_read(vgd,unit,format,ip1_CP,ip2_CP,kind_CP,version_CP) bind(c, name='C_new_read')
          use iso_c_binding, only : c_ptr, c_int, c_char
          type(c_ptr) :: vgd
@@ -173,6 +179,10 @@ module vGrid_Descriptors
    interface vgd_write
       module procedure write_desc
    end interface vgd_write
+
+   interface operator (==)
+      module procedure test_equality
+   end interface operator (==)
    
 contains
    
@@ -438,6 +448,26 @@ contains
       return
    end function putopt_logical
    
+   logical function test_equality(vgd1,vgd2) result(equal)
+      type(vgrid_descriptor), intent(in) :: vgd1,vgd2      !vertical grid descriptors to compare
+
+      ! Local variables
+      integer :: ier
+
+      ! Assume that structures are not identical
+      equal = .false.
+      
+      ier = f_vgdcmp(vgd1%cptr, vgd2%cptr)
+      if( ier /= 0 )then
+         print*,'Descriptor not equal, ier=',ier
+         return
+      end if
+
+      ! The full structure is equivalent
+      equal = .true.
+      return
+   end function test_equality
+
    integer function print_desc(self,stdout,convip_L) result(istat)      
       type(vgrid_descriptor) :: self
       integer, target, intent(in), optional :: stdout     !Output unit to write to [6]
