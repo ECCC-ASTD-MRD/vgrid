@@ -319,31 +319,33 @@ int load_toctoc(TVGrid *self, TFSTD_ext var, int key) {
   return(VGD_OK);
 }
 
-int vgdcmp(TVGrid vgd1, TVGrid vgd2) {
+int C_vgdcmp(TVGrid *vgd1, TVGrid *vgd2) {
 
   int nt1, nt2;
 
+  printf("vgd1->vcode = %d, vgd2->vcode = %d\n", vgd1->vcode, vgd2->vcode);
+
   // Check each element of the structure (except FST attributes) for equality
-  if (vgd1.vcode != vgd2.vcode)                   return(-1);
-  if (vgd1.kind != vgd2.kind)                     return(-2);
-  if (vgd1.version != vgd2.version)               return(-3);
-  if (strcmp(vgd1.ref_name, vgd2.ref_name) != 0 ) return(-4);
-  if (vgd1.ptop_8 != vgd2.ptop_8)                 return(-5);
-  if (vgd1.pref_8 != vgd2.pref_8)                 return(-6);
-  if (vgd1.rcoef1 != vgd2.rcoef1)                 return(-7);
-  if (vgd1.rcoef2 != vgd2.rcoef2)                 return(-8);
+  if (vgd1->vcode != vgd2->vcode)                   return(-1);
+  if (vgd1->kind != vgd2->kind)                     return(-2);
+  if (vgd1->version != vgd2->version)               return(-3);
+  if (strcmp(vgd1->ref_name, vgd2->ref_name) != 0 ) return(-4);
+  if (vgd1->ptop_8 != vgd2->ptop_8)                 return(-5);
+  if (vgd1->pref_8 != vgd2->pref_8)                 return(-6);
+  if (vgd1->rcoef1 != vgd2->rcoef1)                 return(-7);
+  if (vgd1->rcoef2 != vgd2->rcoef2)                 return(-8);
 
    // Check pointer associations and values
-  if(same_vec_i (vgd1.ip1_m, vgd1.nl_m, vgd2.ip1_m, vgd2.nl_m) != 0) return (-9);
-  if(same_vec_i (vgd1.ip1_t, vgd1.nl_t, vgd2.ip1_t, vgd2.nl_t) != 0) return (-10);
-  if(same_vec_r8(vgd1.a_m_8, vgd1.nl_m, vgd2.a_m_8, vgd2.nl_m) != 0) return (-11);
-  if(same_vec_r8(vgd1.b_m_8, vgd1.nl_m, vgd2.b_m_8, vgd2.nl_m) != 0) return (-12);
-  if(same_vec_r8(vgd1.a_t_8, vgd1.nl_t, vgd2.a_t_8, vgd2.nl_t) != 0) return (-13);
-  if(same_vec_r8(vgd1.b_t_8, vgd1.nl_t, vgd2.b_t_8, vgd2.nl_t) != 0) return (-14);
+  if(same_vec_i (vgd1->ip1_m, vgd1->nl_m, vgd2->ip1_m, vgd2->nl_m) != 0) return (-9);
+  if(same_vec_i (vgd1->ip1_t, vgd1->nl_t, vgd2->ip1_t, vgd2->nl_t) != 0) return (-10);
+  if(same_vec_r8(vgd1->a_m_8, vgd1->nl_m, vgd2->a_m_8, vgd2->nl_m) != 0) return (-11);
+  if(same_vec_r8(vgd1->b_m_8, vgd1->nl_m, vgd2->b_m_8, vgd2->nl_m) != 0) return (-12);
+  if(same_vec_r8(vgd1->a_t_8, vgd1->nl_t, vgd2->a_t_8, vgd2->nl_t) != 0) return (-13);
+  if(same_vec_r8(vgd1->b_t_8, vgd1->nl_t, vgd2->b_t_8, vgd2->nl_t) != 0) return (-14);
 
-  nt1 = vgd1.table_ni * vgd1.table_nj * vgd1.table_nk;
-  nt2 = vgd2.table_ni * vgd2.table_nj * vgd2.table_nk;
-  if(same_vec_r8(vgd1.table, nt1, vgd2.table, nt2 )            != 0) return (-15);
+  nt1 = vgd1->table_ni * vgd1->table_nj * vgd1->table_nk;
+  nt2 = vgd2->table_ni * vgd2->table_nj * vgd2->table_nk;
+  if(same_vec_r8(vgd1->table, nt1, vgd2->table, nt2 )            != 0) return (-15);
 
   return(0);
 }
@@ -2348,7 +2350,7 @@ int C_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int *k
 	printf("(vgd) ERROR: in C_new_read, cannot load !!\n");
 	return(VGD_ERROR);
       }
-      status = vgdcmp(**self,*self2);
+      status = C_vgdcmp(*self,self2);
       if ( status != 0 ){
 	printf("(vgd) ERROR: in C_new_read, found different entries in vertical descriptors after search on ip1 = %d, ip2 = %d, kind = %d, version = %d, status code is %d\n",l_ip1,l_ip2,l_kind,l_version,status);
       }
@@ -2379,8 +2381,6 @@ int C_write_desc (TVGrid *self, int unit, char *format) {
     return(VGD_ERROR);
   }
   if (strcmp(format, "FST") == 0){
-    printf("self->rec.nbits=%d\n",self->rec.nbits);
-
     if( c_fstecr( self->table,      work,            -self->rec.nbits, unit, 
 		  self->rec.dateo,  self->rec.deet,   self->rec.npas, 
 		  self->table_ni,   self->table_nj,   self->table_nk, 
