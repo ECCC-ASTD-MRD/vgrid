@@ -49,7 +49,7 @@ int is_valid(TVGrid *self, int *table_valid)
 int C_is_valid(TVGrid *self, char *valid_table_name)
 {
   if(! self){
-    printf("ERROR (vgd) : in C_is_valid vgrid descriptor not constructed\n");
+    printf("(vgd) ERROR in C_is_valid, vgrid descriptor not constructed\n");
     return(VGD_MISSING);
   }
   if( strcmp(valid_table_name, "SELF") == 0 ){
@@ -2363,4 +2363,42 @@ int C_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int *k
     printf("(vgd) ERROR: in C_new_read, wrong value given to format, expecting FST or BIN got %s\n", format);
     return(VGD_ERROR);
   }
+  (*self)->valid=1;
+}
+
+int C_write_desc (TVGrid *self, int unit, char *format) {
+  
+  float work[1];
+
+  if(! self){
+    printf("(vgd) ERROR in C_write_desc, vgrid descriptor not constructed\n");
+    return(VGD_ERROR);
+  }  
+  if(! self->valid) {
+    printf("(vgd) ERROR in C_write_desc, vgrid structure is not valid %d\n", self->valid);    
+    return(VGD_ERROR);
+  }
+  if (strcmp(format, "FST") == 0){
+    printf("self->rec.nbits=%d\n",self->rec.nbits);
+
+    if( c_fstecr( self->table,      work,            -self->rec.nbits, unit, 
+		  self->rec.dateo,  self->rec.deet,   self->rec.npas, 
+		  self->table_ni,   self->table_nj,   self->table_nk, 
+		  self->rec.ip1,    self->rec.ip2,    self->rec.ip3,
+		  self->rec.typvar, self->rec.nomvar, self->rec.etiket, 
+		  self->rec.grtyp,  self->rec.ig1,    self->rec.ig2,    self->rec.ig3, self->rec.ig4,
+		  self->rec.datyp, 1) , 0 ) {
+      printf("(vgd) ERROR in C_write_desc, problem with fstecr\n");
+      return(VGD_ERROR);
+    }
+  } else if (strcmp(format, "BIN") == 0){
+    printf("(vgd) ERROR: in C_write_desc, TODO format = \"BIN\"\n");
+    return(VGD_ERROR);
+  } else {
+    printf("(vgd) ERROR: in C_write_desc, wrong value given to format, expecting FST or BIN got %s\n", format);
+    return(VGD_ERROR);
+  }
+
+  return(VGD_OK);
+
 }
