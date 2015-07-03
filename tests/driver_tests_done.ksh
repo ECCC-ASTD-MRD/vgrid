@@ -6,6 +6,6 @@ make tests ONLY=constructor_build_2001_stat
 make tests ONLY=constructor_build_all
 make tests ONLY=constructor_build_vert
 make tests ONLY=constructor_gen_wrong_version
+make tests ONLY=constructor
 # Next todo:
-#constructor
 #constructor_simple_gen_1001 necessite vgd_print
