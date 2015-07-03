@@ -167,6 +167,27 @@ int same_vec_i(int *vec1, int n1, int *vec2, int n2) {
   return(0);
 }
 
+int same_vec_r8(double *vec1, int n1, double *vec2, int n2) {
+  int i;
+  if(vec1) {
+    if (vec2) {
+      if ( n1 == n2 ) {
+	for(i = 0; i < n1; i++) {
+	  if ( vec1[i] != vec2[i] ) return(-1);
+	}
+      } else {
+	// Vectors are not the same size.
+	return(-2);
+      }
+    } else {
+      // vec2 not allocated
+      return(-3);
+    }
+  }
+  // Vector are the same or are not allocated.
+  return(0);
+}
+
 int c_convip_Level2IP(float level, int kind) {
 
   int    mode=2,flag=0, IP; 
@@ -300,6 +321,8 @@ int load_toctoc(TVGrid *self, TFSTD_ext var, int key) {
 
 int vgdcmp(TVGrid vgd1, TVGrid vgd2) {
 
+  int nt1, nt2;
+
   // Check each element of the structure (except FST attributes) for equality
   if (vgd1.vcode != vgd2.vcode)                   return(-1);
   if (vgd1.kind != vgd2.kind)                     return(-2);
@@ -311,13 +334,16 @@ int vgdcmp(TVGrid vgd1, TVGrid vgd2) {
   if (vgd1.rcoef2 != vgd2.rcoef2)                 return(-8);
 
    // Check pointer associations and values
-  if(same_vec_i(vgd1.ip1_m, vgd1.nl_m, vgd2.ip1_m, vgd2.nl_m) != 0) return (-9);
-   /* if (.not.same_vec(vgd1.ip1_t,vgd2.ip1_t)) return */
-   /* if (.not.same_vec(vgd1.a_m_8,vgd2.a_m_8)) return */
-   /* if (.not.same_vec(vgd1.b_m_8,vgd2.b_m_8)) return */
-   /* if (.not.same_vec(vgd1.a_t_8,vgd2.a_t_8)) return */
-   /* if (.not.same_vec(vgd1.b_t_8,vgd2.b_t_8)) return */
-   /* if (.not.same_vec(vgd1.table,vgd2.table)) return */
+  if(same_vec_i (vgd1.ip1_m, vgd1.nl_m, vgd2.ip1_m, vgd2.nl_m) != 0) return (-9);
+  if(same_vec_i (vgd1.ip1_t, vgd1.nl_t, vgd2.ip1_t, vgd2.nl_t) != 0) return (-10);
+  if(same_vec_r8(vgd1.a_m_8, vgd1.nl_m, vgd2.a_m_8, vgd2.nl_m) != 0) return (-11);
+  if(same_vec_r8(vgd1.b_m_8, vgd1.nl_m, vgd2.b_m_8, vgd2.nl_m) != 0) return (-12);
+  if(same_vec_r8(vgd1.a_t_8, vgd1.nl_t, vgd2.a_t_8, vgd2.nl_t) != 0) return (-13);
+  if(same_vec_r8(vgd1.b_t_8, vgd1.nl_t, vgd2.b_t_8, vgd2.nl_t) != 0) return (-14);
+
+  nt1 = vgd1.table_ni * vgd1.table_nj * vgd1.table_nk;
+  nt2 = vgd2.table_ni * vgd2.table_nj * vgd2.table_nk;
+  if(same_vec_r8(vgd1.table, nt1, vgd2.table, nt2 )            != 0) return (-15);
 
   return(0);
 }
@@ -2327,8 +2353,7 @@ int C_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int *k
 	printf("(vgd) ERROR: in C_new_read, found different entries in vertical descriptors after search on ip1 = %d, ip2 = %d, kind = %d, version = %d, status code is %d\n",l_ip1,l_ip2,l_kind,l_version,status);
       }
       // Ce C_vgd_free n'est pas correct car cela devarait etre **
-      //C_vgd_free(&self2);  
-    return(VGD_ERROR);
+      C_vgd_free(&self2);  
   } // Loop in !! 
     
   } else if (strcmp(format, "BIN") == 0){
