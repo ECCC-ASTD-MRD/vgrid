@@ -11,9 +11,9 @@ program constructor
   integer :: fnom,fstouv,fstfrm,fclos
   logical :: ok
 
-	print*, 'top'
-	call flush(6)
-
+  print*, 'top'
+  call flush(6)
+ 
   stat=fnom(lu,"data/dm_5002_from_model_run-interp","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'

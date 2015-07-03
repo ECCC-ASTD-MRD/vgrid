@@ -27,8 +27,6 @@ program constructor
   read(lutxt,*) ip1,ip2
   close(lutxt)
 
-if(.false.)then
-  
   ! Construct a new set of 3D coordinate descriptors
   print*,'The following error on optional ip2 is expected'
   stat = vgd_new(d,unit=lu,format="fst",ip1=ip1)
@@ -46,12 +44,8 @@ if(.false.)then
   stat = vgd_new(d,unit=lu,format="fst",ip1=123,ip2=456)
   if(stat.eq.VGD_OK)ok=.false.  
   
-endif
-
   stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
   call ut_report(stat,'Grid_Descriptors, vgd_new, vgd_get CA')
-
-stop
 
   stat=fstfrm(lu)
 

@@ -1,5 +1,5 @@
 program constructor
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_write
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_write, VGD_OK, VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
@@ -9,7 +9,7 @@ program constructor
   integer :: stat,ip1,ip2
   integer :: fnom,fstouv,fstfrm
   real*8, dimension(:), pointer :: my_a
-  logical :: ok
+  logical :: ok=.true.
 
   stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
   if(stat.lt.0)then
@@ -32,9 +32,17 @@ program constructor
   endif
   stat=fstouv(lu2,'RND')
 
+  ! Try to write unconstructed
+  print*,'The following error on vgrid descriptor not constructed is normal '
+  stat = vgd_write(d,unit=lu2,format="fst")
+  if(stat /= VGD_ERROR) ok=.false.
+
   ! Construct a new set of 3D coordinate descriptors
   stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
+  if(stat /= VGD_OK)ok=.false.
   stat = vgd_write(d,unit=lu2,format="fst")
+  if(stat /= VGD_OK)ok=.false.
+
   call ut_report(stat,'Grid_Descriptors, vgd_new, vgd_get CA')
 
   stat=fstfrm(lu)
