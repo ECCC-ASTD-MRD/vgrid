@@ -8,7 +8,9 @@ make tests ONLY=constructor_build_vert
 make tests ONLY=constructor_gen_wrong_version
 make tests ONLY=constructor
 make tests ONLY=read_write_toc
+# Current work:
+#make tests ONLY=read_write_read_all
+#make tests ONLY=put_invalid
 # Next todo:
-#make tests ONLY=read_write_read_all_write_read_all
 #make tests ONLY=constructor_any
 #constructor_simple_gen_1001 necessite vgd_print
