@@ -19,6 +19,7 @@ module vGrid_Descriptors
    public :: vgrid_descriptor                    !vertical grid descriptor structure
    public :: vgd_free                            !class destructor
    public :: vgd_get                             !get instance variable value
+   public :: vgd_put                             !set instance variable value
    public :: vgd_new                             !class constructor
    public :: vgd_putopt                          !set class variable value
    public :: vgd_print                           !dump plain-text contents of instance
@@ -74,10 +75,17 @@ module vGrid_Descriptors
          type(c_ptr) :: value_CP
          character(kind=c_char) :: key(*)
       end function f_get_real8_3d
-   
+      
+      integer function f_put_int(vgd_CP, key, value) bind(c, name='C_put_int')
+         use iso_c_binding, only: c_ptr, c_char, c_int
+         type(c_ptr) :: vgd_CP
+         integer (c_int), value :: value
+         character(kind=c_char) :: key(*)
+      end function f_put_int
+
       integer function f_is_valid(vgd_CP, valid_table_name) bind(c, name='C_is_valid')
          use iso_c_binding, only: c_ptr, c_char
-         type(c_ptr), value :: vgd_CP
+         type(c_ptr) :: vgd_CP
          character(kind=c_char) :: valid_table_name(*)
       end function f_is_valid
 
@@ -167,6 +175,16 @@ module vGrid_Descriptors
       !module procedure get_char
       !module procedure get_logical
    end interface vgd_get
+
+   interface vgd_put
+      module procedure put_int
+      !module procedure put_int_1d
+      !module procedure put_real_1d
+      !module procedure put_real8
+      !module procedure put_real8_1d
+      !module procedure put_real8_3d
+      !module procedure put_char
+   end interface vgd_put
 
    interface vgd_putopt
       module procedure putopt_logical
@@ -921,6 +939,19 @@ contains
       return
    end function get_real8_3d
     
+   integer function put_int(self, key, value) result(status)
+      use utils, only : up
+      type(vgrid_descriptor), intent(inout) :: self !Vertical descriptor instance
+      character(len=*), intent(in) :: key           !Descriptor key to set
+      integer, target, intent(in) :: value          !Value to set
+
+      ! Internal variables
+      character(len=KEY_LENGTH) :: my_key
+
+      my_key = up(key(1:KEY_LENGTH))
+      status = f_put_int(self%cptr, trim(my_key)//C_NULL_CHAR, value)
+   end function put_int
+
    logical function is_valid(self,element_valid_S) result(valid)
       ! Check for validity of the element
       type(vgrid_descriptor) :: self          !Vertical descriptor instance
