@@ -1226,6 +1226,91 @@ int c_encode_vert_5002_5003_5004_5005(TVGrid **self){
   return(VGD_OK);
 }
 
+int c_decode_vert_5002_5003_5004_5005(TVGrid **self) {
+  int skip, k, ind, k_plus_top, k_plus_diag, nk, nb;
+  
+  k_plus_top = 1;
+  //TODO : voir Ron pour error = flip_transfer(self%ref_name,for_char_8)
+  (*self)->kind    = (*self)->table[0];
+  (*self)->version = (*self)->table[1];
+  skip             = (*self)->table[2];
+  (*self)->ptop_8  = (*self)->table[3];
+  (*self)->pref_8  = (*self)->table[4];
+  (*self)->rcoef1  = (*self)->table[5];
+  (*self)->rcoef2  = (*self)->table[6];
+  //for_char_8       = (*self)->table[7];  
+
+  if( C_set_vcode_i(*self, (*self)->kind, (*self)->version) == VGD_ERROR ) {
+    printf("(C_vgd) ERROR in c_decode_vert_5002_5003_5004_5005, cannot set vcode\n");
+    return(VGD_ERROR);
+  }
+  switch((*self)->vcode) {
+  case 5002:
+  case 5003:
+    k_plus_top=1;
+    break;
+  case 5004:
+  case 5005:
+    k_plus_top=0;
+    break;
+  default:
+    printf("(C_vgd) ERROR in c_decode_vert_5002_5003_5004_5005, Vcode %d not supported\n", (*self)->vcode);
+    return(VGD_ERROR);
+  }
+
+  k_plus_diag = 0;
+  if(is_valid(*self,dhm_valid)) {
+    k_plus_diag=1;
+  }
+
+  // The next value in table is not used, so we continue with ind = 9
+  ind = 9;
+  // nk is the number of momentum level without hyb=1.0 and the diag level in m
+  nk = ( (*self)->table_nj - k_plus_top - skip ) / 2 -1 -k_plus_diag;
+  // Allocate and assign momentum level data, there are nb of them nk + hyb=1 and possibly the diag in m
+  nb = nk + 1 + k_plus_diag;
+  free((*self)->ip1_m);
+  free((*self)->a_m_8);
+  free((*self)->b_m_8);
+  (*self)->ip1_m = malloc( nb * sizeof(int) );
+  (*self)->a_m_8 = malloc( nb * sizeof(double) );
+  (*self)->b_m_8 = malloc( nb * sizeof(double) );
+  if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 ){
+    printf("(C_vgd) ERROR in c_decode_vert_5002_5003_5004_5005, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nb);
+    return(VGD_ERROR);
+  }
+  for ( k = 0; k < nb; k++){
+    (*self)->ip1_m[k] = (int) (*self)->table[ind  ];
+    (*self)->a_m_8[k] =       (*self)->table[ind+1];
+    (*self)->b_m_8[k] =       (*self)->table[ind+2];
+    ind = ind + 3;
+  }
+
+  // Allocate and assign thermodynamic level data
+  nb = nb + k_plus_top;
+  free((*self)->ip1_t);
+  free((*self)->a_t_8);
+  free((*self)->b_t_8);
+  (*self)->ip1_t = malloc( nb * sizeof(int) );
+  (*self)->a_t_8 = malloc( nb * sizeof(double) );
+  (*self)->b_t_8 = malloc( nb * sizeof(double) );
+  if( !(*self)->ip1_t || !(*self)->a_t_8 || !(*self)->b_t_8 ){
+    printf("(C_vgd) ERROR in c_decode_vert_5002_5003_5004_5005, cannot allocate,  ip1_t, a_t_8 and b_t_8 of size %d\n", nb);
+    return(VGD_ERROR);
+  }
+  for ( k = 0; k < nb; k++){
+    (*self)->ip1_t[k] = (int) (*self)->table[ind  ];
+    (*self)->a_t_8[k] =       (*self)->table[ind+1];
+    (*self)->b_t_8[k] =       (*self)->table[ind+2];
+    ind = ind + 3;
+  }
+  (*self)->valid = 1;
+
+  return(VGD_OK);  
+
+}
+
+
 int c_vgrid_genab_1001(float *hyb, int nk, float **hybm, double **a_m_8, double **b_m_8, int **ip1_m)
 {
 
@@ -1289,8 +1374,8 @@ int c_vgrid_genab_1001(float *hyb, int nk, float **hybm, double **a_m_8, double 
   
 }
 
-int C_new_from_table(TVGrid **self, double table, int ni, int nj, int nk) {
-  int table_size, istat, ni, nj, nk, i, j, k;
+int C_new_from_table(TVGrid **self, double *table, int ni, int nj, int nk) {
+  int table_size, istat, i, j, k;
 
   // Coordinate constructor - build vertical descriptor from table input
   // Set internal vcode (if all above was successful)
@@ -1315,8 +1400,40 @@ int C_new_from_table(TVGrid **self, double table, int ni, int nj, int nk) {
     }
   }
   // Fill remainder of structure
-  printf("In C_new_from_table TODO\n");
-  return(VGD_ERROR);
+  if( C_set_vcode(*self) == VGD_ERROR ) {
+    printf("(C_vgd) ERROR in C_new_from_table, cannot set vcode\n");
+    return(VGD_ERROR);
+  }
+  switch((*self)->vcode) {
+  case 1001:
+    printf("TODO 1001 in C_new_from_table\n");
+    return(VGD_ERROR);
+    break;
+  case 1002:
+    printf("TODO 1002 in C_new_from_table\n");
+    return(VGD_ERROR);
+    break;
+  case 2001:
+    printf("TODO 2001 in C_new_from_table\n");
+    return(VGD_ERROR);
+    break;
+  case 1003:
+  case 5001:
+    printf("TODO 1003, 5001  in C_new_from_table\n");
+    return(VGD_ERROR);
+    break;
+  case 5002:
+  case 5003:
+  case 5004:
+  case 5005:
+    if( c_decode_vert_5002_5003_5004_5005(self) == VGD_ERROR ) {
+      printf("(C_vgd) in C_new_from_table, problem decoding table with vcode 5002,5003,5004 or 5005\n");
+	return(VGD_ERROR);
+    }
+  default:
+    printf("(C_vgd) in C_new_from_table, invalid Vcode %d\n", (*self)->vcode);
+    return(VGD_ERROR);
+  }
   (*self)->valid = 1;
 }
 
@@ -2149,7 +2266,6 @@ int C_put_int(TVGrid **self, char *key, int value) {
     printf("(C_vgd) ERROR in C_put_int, vgrid is a null pointer.\n");
     return(VGD_ERROR);
   }
-  printf("ANDRE self = %p, *self = %p\n", self, *self);
   
   if(! C_is_valid((*self),"SELF")){
     printf("(C_vgd) ERROR in C_put_int, invalid vgrid.\n");
@@ -2447,9 +2563,9 @@ int C_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int *k
 	  printf("(C_vgd) ERROR: in C_new_read, cannot load !!\n");
 	  return(VGD_ERROR);
 	}
-	ni=(*self)->ni;
-	nj=(*self)->nj;
-	nk=(*self)->nk;
+	ni=(*self)->table_ni;
+	nj=(*self)->table_nj;
+	nk=(*self)->table_nk;
 	continue;
       }
       // If we get at this point this means that there are more than one toc satisfying the selection criteria.
@@ -2485,7 +2601,7 @@ int C_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int *k
     return(VGD_ERROR);
   }
 
-  printf("In C_new_read *(self)->valid = %d, *(self)->nl_m = %d\n",(*self)->nl_m);
+  printf("In C_new_read (*self)->valid = %d, *(self)->nl_m = %d\n", (*self)->valid, (*self)->nl_m);
 
 }
 
