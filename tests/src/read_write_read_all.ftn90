@@ -1,5 +1,5 @@
 program constructor
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_print,vgd_write,VGD_OK,operator(==),vgd_put,vgd_print
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_print,vgd_write,VGD_OK,operator(==),vgd_print, vgd_put, vgd_free
   use Unit_Testing, only: ut_report
 
   ! TODO: add other vcode than 5005
@@ -10,7 +10,6 @@ program constructor
   integer, parameter :: lu=10,lu2=20,lutxt=69
   integer :: stat,ip1,ip2
   integer :: fnom,fstouv,fstfrm,fclos
-  real*8, dimension(:), pointer :: my_a
   logical :: ok=.true.
 
   stat=fnom(lu,"data/dm_5005_from_model_run","RND",0)
@@ -37,6 +36,7 @@ program constructor
   ! Construct a new set of 3D coordinate descriptors
   stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
   if(stat/=VGD_OK)ok=.false.
+  stat = vgd_print(d)
 
   stat = vgd_put(d,key='DIPM Diag level ip1 for Momentum variables',value=75697472)
   stat = vgd_put(d,key='DIPT Diag level ip1 for Thermo variables',value=76946048)
@@ -52,13 +52,18 @@ program constructor
 
   stat = vgd_new(d2,unit=lu2,format="fst")
   if(stat/=VGD_OK)ok=.false.
-  
+
   if (.not. (d2 == d) )ok=.false.
+
   stat=vgd_print(d2)
+
+  stat = vgd_free(d)
+  stat = vgd_free(d2)
+
+  stat=fstfrm(lu)
+  stat=fstfrm(lu2)
 
   call ut_report(stat,'Grid_Descriptors, vgd_new, vgd_get CA')
   
-  stat=fstfrm(lu)
-  stat=fstfrm(lu2)
 
 end program constructor
