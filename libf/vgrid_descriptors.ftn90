@@ -62,6 +62,13 @@ module vGrid_Descriptors
          character(kind=c_char) :: key(*)
       end function f_get_real
 
+      integer function f_get_real8(vgd_CP, key, value_CP, quiet_CP) bind(c, name='C_get_real8')
+         use iso_c_binding, only: c_ptr, c_char
+         type(c_ptr), value :: vgd_CP, quiet_CP
+         type(c_ptr) :: value_CP
+         character(kind=c_char) :: key(*)
+      end function f_get_real8
+
       integer function f_get_real8_1d(vgd_CP, key, value_CP, quiet_CP) bind(c, name='C_get_real8_1d')
          use iso_c_binding, only: c_ptr, c_char
          type(c_ptr), value :: vgd_CP, quiet_CP
@@ -83,9 +90,16 @@ module vGrid_Descriptors
          character(kind=c_char) :: key(*)
       end function f_put_int
 
+      integer function f_put_real8(vgd_CP, key, value) bind(c, name='C_put_real8')
+         use iso_c_binding, only: c_ptr, c_char, c_double
+         type(c_ptr) :: vgd_CP
+         integer (c_double), value :: value
+         character(kind=c_char) :: key(*)
+      end function f_put_real8
+
       integer function f_is_valid(vgd_CP, valid_table_name) bind(c, name='C_is_valid')
          use iso_c_binding, only: c_ptr, c_char
-         type(c_ptr) :: vgd_CP
+         type(c_ptr), value :: vgd_CP
          character(kind=c_char) :: valid_table_name(*)
       end function f_is_valid
 
@@ -167,9 +181,9 @@ module vGrid_Descriptors
    interface vgd_get
       module procedure get_int
       module procedure get_int_1d
-      module procedure get_real
+      !module procedure get_real
       module procedure get_real_1d
-      !module procedure get_real8
+      module procedure get_real8
       module procedure get_real8_1d
       module procedure get_real8_3d
       !module procedure get_char
@@ -180,7 +194,7 @@ module vGrid_Descriptors
       module procedure put_int
       !module procedure put_int_1d
       !module procedure put_real_1d
-      !module procedure put_real8
+      module procedure put_real8
       !module procedure put_real8_1d
       !module procedure put_real8_3d
       !module procedure put_char
@@ -244,7 +258,7 @@ contains
       endif
 
       if( f_new_read(self%cptr, unit, trim(myformat)//C_NULL_CHAR, ip1_CP, ip2_CP, kind_CP, version_CP) == VGD_ERROR )then
-         print*,'(vgd) ERROR: In new_read, problem with f_new_read'
+         print*,'(F_vgd) ERROR: In new_read, problem with f_new_read'
          return
       endif
       
@@ -332,7 +346,7 @@ contains
       endif
 
       if(f_new_gen(self%cptr,kind,version,hyb_CP,size(hyb),rcoef1_CP,rcoef2_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP,my_ip1,my_ip2,stdout_unit_CP,dhm_CP,dht_CP) == VGD_ERROR)then
-         print*,'In new_gen, problem with f_new_gen'
+         print*,'(F_vgd) ERROR in new_gen, problem with f_new_gen'
          return
       endif
       status = VGD_OK;
@@ -358,7 +372,7 @@ contains
       ! Local variables
       type(c_ptr) :: rcoef1_CP, rcoef2_CP, ptop_8_CP, pref_8_CP
       type(c_ptr) :: a_m_8_CP, b_m_8_CP, a_t_8_CP, b_t_8_CP, ip1_m_CP, ip1_t_CP
-      integer l_ip1,l_ip2,nl_m, nl_t, tempo
+      integer l_ip1,l_ip2,nl_m, nl_t
 
       status = VGD_ERROR
 
@@ -430,7 +444,7 @@ contains
       if( f_new_build_vert(self%cptr,kind,version,nk,l_ip1,l_ip2, &
            ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, &
            a_m_8_CP, b_m_8_CP, a_t_8_CP, b_t_8_CP, ip1_m_CP, ip1_t_CP, nl_m, nl_t) == VGD_ERROR )then
-         print*,'In new_build_vert, problem with c_new_build_vert',tempo,VGD_ERROR
+         print*,'(F_vgd) ERROR in new_build_vert, problem with c_new_build_vert',VGD_ERROR
          return
       endif
 
@@ -477,7 +491,7 @@ contains
       
       ier = f_vgdcmp(vgd1%cptr, vgd2%cptr)
       if( ier /= 0 )then
-         print*,'Descriptor not equal, ier=',ier
+         print*,'(F_vgd) Descriptor not equal, ier=',ier
          return
       end if
 
@@ -499,7 +513,7 @@ contains
 
       istat = VGD_ERROR
       if(.not.c_associated(self%cptr))then
-         print*,'dans print_descript self%cptr not associated'
+         print*,'(F_vgd) ERROR in print_descript, self%cptr not associated'
          return
       endif
 
@@ -533,7 +547,7 @@ contains
       if (present(format)) myformat = trim(up(format))
 
       if( f_write_desc(self%cptr,unit,trim(myformat)//C_NULL_CHAR)  == VGD_ERROR )then
-         print*,'(vgd) ERROR: In write_desc, problem with f_write_desc'
+         print*,'(F_vgd) ERROR: In write_desc, problem with f_write_desc'
          return
       endif
 
@@ -775,6 +789,39 @@ contains
       return
    end function get_real_1d
    
+   integer function get_real8(self,key,value,quiet) result(status)
+      use utils, only: up
+      type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
+      character(len=*), intent(in) :: key         !Descriptor key to retrieve
+      real(kind=8), intent(out) :: value          !Retrieved value
+      logical, optional, intent(in) :: quiet      !Do not print massages
+
+      ! Internal variables
+      type(c_ptr) :: quiet_CP, value_CP
+      character(len=KEY_LENGTH) :: my_key
+      integer, target :: zero, one
+
+      zero = 0; one = 1
+      ! Set error status
+      status = VGD_ERROR
+      
+      value = VGD_MISSING
+      
+      quiet_CP = C_NULL_PTR
+      if (present(quiet))then
+         if(quiet) then
+            quiet_CP = c_loc(one)
+         else
+            quiet_CP = c_loc(zero)
+         endif         
+      endif
+      
+      value_CP = c_loc(value)
+      my_key=up(key(1:KEY_LENGTH))
+      status = f_get_real8(self%cptr,my_key//C_NULL_CHAR,value_CP,quiet_CP)
+      
+   end function get_real8
+
    integer function get_real8_1d(self,key,value,quiet) result(status)
       use utils, only: get_allocate,up,get_error
       ! Wrapper function to C f_get_real8_1d
@@ -951,6 +998,20 @@ contains
       my_key = up(key(1:KEY_LENGTH))
       status = f_put_int(self%cptr, trim(my_key)//C_NULL_CHAR, value)
    end function put_int
+
+   integer function put_real8(self, key, value) result(status)
+      use utils, only : up
+      type(vgrid_descriptor), intent(inout) :: self !Vertical descriptor instance
+      character(len=*), intent(in) :: key           !Descriptor key to set
+      real(kind=8), target, intent(in) :: value     !Value to set
+
+      ! Internal variables
+      character(len=KEY_LENGTH) :: my_key
+
+      my_key = up(key(1:KEY_LENGTH))
+      status = f_put_real8(self%cptr, trim(my_key)//C_NULL_CHAR, value)
+      
+   end function put_real8
 
    logical function is_valid(self,element_valid_S) result(valid)
       ! Check for validity of the element
