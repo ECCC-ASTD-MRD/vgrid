@@ -134,10 +134,22 @@ void C_table_shape(TVGrid *self, int **tshape) {
   (*tshape)[2] = self->table_nk;
 }
 
-static int table_update(TVGrid **self) {
-  printf("TODO table_update\n");
-  return(VGD_ERROR);
-  
+static int c_table_update(TVGrid **self) {
+  switch((*self)->vcode) {
+  case 5002:
+  case 5003:
+  case 5004:
+  case 5005:
+    if( c_encode_vert_5002_5003_5004_5005(self, 1) == VGD_ERROR ) {
+      printf("(C_vgd) ERROR: in c_table_update, cannot encode\n");
+      return(VGD_ERROR);
+    }
+    break;
+  default:
+    printf("(C_vgd) ERROR: in c_table_update, unsupported Vcode %d",(*self)->vcode);
+    return(VGD_ERROR);
+  }	
+  return(VGD_OK);  
 }
 
 void my_copy_double(double *aa, double **bb, int ind){
@@ -329,7 +341,7 @@ int C_vgdcmp(TVGrid *vgd1, TVGrid *vgd2) {
 
   int nt1, nt2;
 
-  printf("vgd1->vcode = %d, vgd2->vcode = %d\n", vgd1->vcode, vgd2->vcode);
+  //printf("vgd1->vcode = %d, vgd2->vcode = %d\n", vgd1->vcode, vgd2->vcode);
 
   // Check each element of the structure (except FST attributes) for equality
   if (vgd1->vcode != vgd2->vcode)                   return(-1);
@@ -992,19 +1004,19 @@ int C_new_build_vert(TVGrid **self, int kind, int version, int nk, int ip1, int 
     break;
   case 5002:
     strcpy(cvcode,"5002");
-    ier = c_encode_vert_5002_5003_5004_5005(self);
+    ier = c_encode_vert_5002_5003_5004_5005(self, 0);
     break;
   case 5003:
     strcpy(cvcode,"5003");
-    ier = c_encode_vert_5002_5003_5004_5005(self);
+    ier = c_encode_vert_5002_5003_5004_5005(self, 0);
     break;
   case 5004:
     strcpy(cvcode,"5004");
-    ier = c_encode_vert_5002_5003_5004_5005(self);
+    ier = c_encode_vert_5002_5003_5004_5005(self, 0);
     break;
   case 5005:
     strcpy(cvcode,"5005");
-    ier = c_encode_vert_5002_5003_5004_5005(self);
+    ier = c_encode_vert_5002_5003_5004_5005(self, 0);
     break;
   default:
     fprintf(stderr,"IN C_new_build_vert: invalid kind or version : kind=%d, version=%d\n",kind,version);
@@ -1177,22 +1189,24 @@ int c_encode_vert_5001(TVGrid **self,int nk){
   return(VGD_OK);
 }
 
-int c_encode_vert_5002_5003_5004_5005(TVGrid **self){
+int c_encode_vert_5002_5003_5004_5005(TVGrid **self, char update){
 
   //printf("c_encode_vert_5002_5003_5004_5005, (*self)->nk = %d, (*self)->nl_m = %d, (*self)->nl_t = %d\n",(*self)->nk, (*self)->nl_m, (*self)->nl_t);
 
   int skip = 3, table_size;
-  free( (*self)->table );
-  (*self)->table_ni = 3;
-  (*self)->table_nj = (*self)->nl_m + (*self)->nl_t + skip;
-  (*self)->table_nk = 1;
-  table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
-  (*self)->table = malloc ( table_size * sizeof(double) );
-  if(! (*self)->table ) {
-    printf("In c_encode_vert_5002_5003_5004_5005: ERROR allocating table of bouble of size %d\n", table_size);
-    return(VGD_ERROR);
+  if(! update) {
+    free( (*self)->table );
+    (*self)->table_ni = 3;
+    (*self)->table_nj = (*self)->nl_m + (*self)->nl_t + skip;
+    (*self)->table_nk = 1;
+    table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
+    (*self)->table = malloc ( table_size * sizeof(double) );
+    if(! (*self)->table ) {
+      printf("In c_encode_vert_5002_5003_5004_5005: ERROR allocating table of bouble of size %d\n", table_size);
+      return(VGD_ERROR);
+    }
+    strcpy((*self)->ref_name,"P0");
   }
-  strcpy((*self)->ref_name,"P0");
 
   //TODO : voir Ron pour error = flip_transfer(self%ref_name,for_char_8)
   //Fill header
@@ -1269,6 +1283,7 @@ int c_decode_vert_5002_5003_5004_5005(TVGrid **self) {
   nk = ( (*self)->table_nj - k_plus_top - skip ) / 2 -1 -k_plus_diag;
   // Allocate and assign momentum level data, there are nb of them nk + hyb=1 and possibly the diag in m
   nb = nk + 1 + k_plus_diag;
+  (*self)->nl_m = nb;
   free((*self)->ip1_m);
   free((*self)->a_m_8);
   free((*self)->b_m_8);
@@ -1288,6 +1303,7 @@ int c_decode_vert_5002_5003_5004_5005(TVGrid **self) {
 
   // Allocate and assign thermodynamic level data
   nb = nb + k_plus_top;
+  (*self)->nl_t = nb;
   free((*self)->ip1_t);
   free((*self)->a_t_8);
   free((*self)->b_t_8);
@@ -1375,30 +1391,35 @@ int c_vgrid_genab_1001(float *hyb, int nk, float **hybm, double **a_m_8, double 
 }
 
 int C_new_from_table(TVGrid **self, double *table, int ni, int nj, int nk) {
-  int table_size, istat, i, j, k;
+  int table_size, istat, i;
+  double *ltable;
 
   // Coordinate constructor - build vertical descriptor from table input
   // Set internal vcode (if all above was successful)
 
-  (*self)->valid = 0;
+  (*self)->valid = 0;  
+  // Since table passed in argument may be the (*self)->table, we take a copy before the call to free
+  table_size = ni * nj * nk;
+  ltable = malloc ( table_size * sizeof(double) );
+  if(! ltable ) {
+    printf("(C_vgd) ERROR in C_new_from_table, cannot allocate ltable of bouble of size %d\n", table_size);
+    return(VGD_ERROR);
+  }
+  my_copy_double(table, &ltable, table_size);  
   free((*self)->table);
 
   (*self)->table_ni = ni;
   (*self)->table_nj = nj;
   (*self)->table_nk = nk;
-
   (*self)->table = malloc ( ni * nj * nk * sizeof(double) );
   if(! (*self)->table ) {
     printf("(C_vgd) ERROR in C_new_from_table, cannot allocate table of bouble of size %d\n",table_size );
     return(VGD_ERROR);
   }
-  for(i = 0; i < nj; i++) {
-    for(j = 0; j < nj; j++) {
-      for(k = 0; k < nk; k++) {
-	(*self)->table[i,j,k] = table[i,j,k];
-      }
-    }
+  for(i = 0; i < table_size; i++) {
+    (*self)->table[i] = ltable[i];
   }
+  free(ltable);
   // Fill remainder of structure
   if( C_set_vcode(*self) == VGD_ERROR ) {
     printf("(C_vgd) ERROR in C_new_from_table, cannot set vcode\n");
@@ -1428,8 +1449,9 @@ int C_new_from_table(TVGrid **self, double *table, int ni, int nj, int nk) {
   case 5005:
     if( c_decode_vert_5002_5003_5004_5005(self) == VGD_ERROR ) {
       printf("(C_vgd) in C_new_from_table, problem decoding table with vcode 5002,5003,5004 or 5005\n");
-	return(VGD_ERROR);
+      return(VGD_ERROR);
     }
+    break;
   default:
     printf("(C_vgd) in C_new_from_table, invalid Vcode %d\n", (*self)->vcode);
     return(VGD_ERROR);
@@ -2289,11 +2311,10 @@ int C_put_int(TVGrid **self, char *key, int value) {
     (*self)->rec.ip3 = value;
   } else if( strcmp(key, "DIPM") == 0 ) {
     if ( is_valid((*self), dhm_valid)) {
-      printf("*(self)->nl_m = %d\n",(*self)->nl_m);
       (*self)->ip1_m[(*self)->nl_m -1 ] = value;
       (*self)->a_m_8[(*self)->nl_m -1 ] = comp_diag_a_height((*self)->pref_8, value);
-      if( table_update(self) == VGD_ERROR) {
-	printf("(C_vgd) ERROR in C_put_int, problem with table_update for key %s\n",key);
+      if( c_table_update(self) == VGD_ERROR) {
+	printf("(C_vgd) ERROR in C_put_int, problem with c_table_update for key %s\n",key);
 	return(VGD_ERROR);
       }
     } else {
@@ -2303,8 +2324,8 @@ int C_put_int(TVGrid **self, char *key, int value) {
     if ( is_valid((*self), dht_valid)) {
       (*self)->ip1_t[(*self)->nl_t - 1] = value;
       (*self)->a_t_8[(*self)->nl_t - 1] = comp_diag_a_height((*self)->pref_8, value);
-      if( table_update(self) == VGD_ERROR) {
-	printf("(C_vgd) ERROR in C_put_int, problem with table_update for key %s\n", key);
+      if( c_table_update(self) == VGD_ERROR) {
+	printf("(C_vgd) ERROR in C_put_int, problem with c_table_update for key %s\n", key);
 	return(VGD_ERROR);
       }
     } else {
@@ -2498,7 +2519,7 @@ int C_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int *k
   }
   *self = c_vgd_construct();
   if(! *self){
-    printf("ERROR (C_vgd): in C_new_read, null pointer returned by c_vgd_construct\n");
+    printf("(C_vgd) ERROR: in C_new_read, null pointer returned by c_vgd_construct\n");
     return (VGD_ERROR);
   }
   
@@ -2519,7 +2540,7 @@ int C_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int *k
   if(kind)    l_kind    = *kind;
   if(version) l_version = *version;	
   
-  printf("Unit = %d, format = %s, ip1 = %d, ip1 = %d, kind = %d, version = %d\n",unit, format, l_ip1, l_ip2 , l_kind, l_version);
+  //printf("Unit = %d, format = %s, ip1 = %d, ip1 = %d, kind = %d, version = %d\n",unit, format, l_ip1, l_ip2 , l_kind, l_version);
   
   //==============================
   if (strcmp(format, "FST") == 0){
@@ -2531,18 +2552,18 @@ int C_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int *k
       return(VGD_ERROR);
     }
     if(count == 0){
-      printf("(C_vgd) cannot find %s with the following ips: ip1=%d, ip2=%d\n", ZNAME, l_ip1, l_ip2);
+      printf("(C_vgd) ERROR: in C_new_read, cannot find %s with the following ips: ip1=%d, ip2=%d\n", ZNAME, l_ip1, l_ip2);
       if((*self)->match_ipig) {
 	(*self)->vcode = -1;
 	return(VGD_ERROR);
       }
-      printf("(C_vgd) Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)\n");
+      printf("(C_vgd) ERROR: in C_new_read, Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)\n");
       printf("in C_new_read, call to c_vgd_legacy TODO");
       if(c_vgd_legacy(self,unit,l_kind) == VGD_ERROR){
 	return(VGD_ERROR);
       }
       if(fstd_init(*self) == VGD_ERROR) {
-	printf("(C_vgd) in C_new_read, problem creating record information");
+	printf("(C_vgd) ERROR: in C_new_read, problem creating record information");
       }
     }
     // Loop on all !! found
@@ -2576,15 +2597,15 @@ int C_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int *k
 	return(VGD_ERROR);
       }
       if( load_toctoc(self2,var,keyList[i]) == VGD_ERROR ) {
-	printf("(C_vgd) ERROR: in C_new_read, cannot load !!\n");
-	return(VGD_ERROR);
+      	printf("(C_vgd) ERROR: in C_new_read, cannot load !!\n");
+      	return(VGD_ERROR);
       }
       status = C_vgdcmp(*self,self2);
       if ( status != 0 ){
-	printf("(C_vgd) ERROR: in C_new_read, found different entries in vertical descriptors after search on ip1 = %d, ip2 = %d, kind = %d, version = %d, status code is %d\n",l_ip1,l_ip2,l_kind,l_version,status);
+      	printf("(C_vgd) ERROR: in C_new_read, found different entries in vertical descriptors after search on ip1 = %d, ip2 = %d, kind = %d, version = %d, status code is %d\n",l_ip1,l_ip2,l_kind,l_version,status);
       }
-      // Ce C_vgd_free n'est pas correct car cela devrait etre **
-      C_vgd_free(&self2);  
+      // TODO verivier si ce C_vgd_free est correct 
+      C_vgd_free(&self2);
   } // Loop in !! 
     
   } else if (strcmp(format, "BIN") == 0){
@@ -2600,8 +2621,6 @@ int C_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int *k
     printf("(C_vgd) ERROR: in C_new_read, unable to construct from table\n");
     return(VGD_ERROR);
   }
-
-  printf("In C_new_read (*self)->valid = %d, *(self)->nl_m = %d\n", (*self)->valid, (*self)->nl_m);
 
 }
 
