@@ -1,6 +1,6 @@
 # User options
 #FFLAGS=$(FFLAGS_INTEL)
-FFLAGS="$(FFLAGS_INTEL) -C -g"
+FFLAGS="$(FFLAGS_INTEL) -C -g -O0"
 
 # Set default target
 default: lib

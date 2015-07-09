@@ -35,6 +35,7 @@ program tests
    if(stat /= VGD_OK) OK=.false.
    
    stat = vgd_get(vgd,'PTOP',value=v1_8)
+   v1_8=v1_8+1
    stat = vgd_put(vgd,'PTOP',value=v1_8)
    stat = vgd_get(vgd,'PTOP',value=v2_8)
    print*,'PTOP',v1_8, v2_8
@@ -44,6 +45,7 @@ program tests
    endif
 
    stat = vgd_get(vgd,'PREF',value=v1_8)
+   v1_8=v1_8+1
    stat = vgd_put(vgd,'PREF',value=v1_8)
    stat = vgd_get(vgd,'PREF',value=v2_8)
    print*,'PREF',v1_8, v2_8
@@ -53,6 +55,7 @@ program tests
    endif
 
    stat = vgd_get(vgd,'RC_1',value=v1_8)
+   v1_8=v1_8+1
    stat = vgd_put(vgd,'RC_1',value=v1_8)
    stat = vgd_get(vgd,'RC_1',value=v2_8)
    print*,'RC_1',v1_8, v2_8
@@ -62,6 +65,7 @@ program tests
    endif
 
    stat = vgd_get(vgd,'RC_2',value=v1_8)
+   v1_8=v1_8+1
    stat = vgd_put(vgd,'RC_2',value=v1_8)
    stat = vgd_get(vgd,'RC_2',value=v2_8)
    print*,'RC_2',v1_8, v2_8
@@ -70,10 +74,10 @@ program tests
       OK=.false.
    endif
 
-   call ut_report(OK,message='Grid_Descriptors::vgd_get get valid value')
-   
    ! Close files
    stat = fstfrm(lu)
    stat = fclos(lu)
-   
+
+   call ut_report(OK,message='Grid_Descriptors::vgd_get get valid value')
+      
 end program tests
