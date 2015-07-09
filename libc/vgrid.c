@@ -2213,11 +2213,15 @@ int C_get_real(TVGrid *self, char *key, float **value, int *quiet)
 
 int C_get_real8(TVGrid *self, char *key, double **value_get, int *quiet)
 {
-  int value_put; //Will not be used
-  return(c_get_put_real8(&self, key, *value_get, value_put, "GET"));
+  double value_put; //Will not be used
+  TVGrid **lself;
+  lself = &self;
+  // TODO ajoute quiet
+  return(c_get_put_real8(lself, key, *value_get, value_put, "GET"));
 }
 
 static int c_get_put_real8(TVGrid **self, char *key, double *value_get, double value_put, char *action) {
+  // TODO ajoute quiet
   int get;
   if(! C_is_valid(*self,"SELF")){
     printf("(C_vgd) ERROR in c_get_real8, invalid vgrid.\n");
@@ -2232,12 +2236,11 @@ static int c_get_put_real8(TVGrid **self, char *key, double *value_get, double v
     printf("(C_vgd) INTERNAL ERROR using c_get_put_real8, please report to developers\n");
     return(VGD_ERROR);
   }
-
   if( strcmp(key, "PTOP") == 0 ) {
     if(! is_valid(*self, ptop_8_valid)){
       printf("(C_vgd) ERROR in C_put_real8, PTOP cannot be put for Vcode %d\n", (*self)->vcode);
       return(VGD_ERROR);
-    }
+    }    
     if(get) {
       *value_get = (*self)->ptop_8;
     } else {
@@ -2418,7 +2421,7 @@ int C_put_int(TVGrid **self, char *key, int value) {
 
 int C_put_real8(TVGrid **self, char *key, double value_put) {
   double *value_get; // Will not be used
-  return(c_get_put_real8(self, key, value_get, value_put, "GET"));
+  return(c_get_put_real8(self, key, value_get, value_put, "PUT"));
 }
 
 int C_new_gen(TVGrid **self, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2,
