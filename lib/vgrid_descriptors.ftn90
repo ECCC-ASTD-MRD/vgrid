@@ -1402,9 +1402,7 @@ contains
        endif
     case ('DHM ')
        if (is_valid(self,dhm_valid)) then
-          iwork=self%ip1_m(size(self%ip1_m))          
-          call convip(iwork,work,kind,-1,dum_S,.false.)
-          value=work
+          value=self%dhm
        else
           value = get_error(key)
           return
@@ -1412,9 +1410,7 @@ contains
     case ('DHT ')       
        iwork=vgd_print(self)
        if (is_valid(self,dht_valid)) then
-          iwork=self%ip1_t(size(self%ip1_t))
-          call convip(iwork,work,kind,-1,dum_S,.false.)
-          value=work
+          value=self%dht
        else
           value = get_error(key)
           return
@@ -3959,8 +3955,6 @@ contains
      
      ! Local variables
      integer :: skip,nj,nk,k,ind,error,istat
-
-     ! Set error status
      status = VGD_ERROR
 
      ! Read header line 1
@@ -4023,7 +4017,9 @@ contains
      type(vgrid_descriptor), intent(inout) :: self  !Vertical descriptor instance
      
      ! Local variables
-     integer :: skip,nj,nk,k,ind,error,istat,k_plus_top,k_plus_diag,nb
+     integer :: skip,nj,nk,k,ind,error,istat,k_plus_top,k_plus_diag,nb,kind
+     character(len=1) :: dum_S
+     ! Set error status
 
      ! Set error status
      status = VGD_ERROR
@@ -4085,6 +4081,7 @@ contains
         self%a_m_8(k) =      self%table(2,ind,1)
         self%b_m_8(k) =      self%table(3,ind,1)
      enddo
+     call convip(self%ip1_m(nb),self%dhm,kind,-1,dum_S,.false.)     
 
      ! Allocate and assign thermodynamic level data
      if (associated(self%ip1_t)) deallocate(self%ip1_t)
@@ -4115,6 +4112,7 @@ contains
         self%a_t_8(k) =      self%table(2,ind,1)
         self%b_t_8(k) =      self%table(3,ind,1)
      enddo     
+     call convip(self%ip1_t(nb+k_plus_top),self%dht,kind,-1,dum_S,.false.)          
 
      ! Set status and return
      status = VGD_OK
