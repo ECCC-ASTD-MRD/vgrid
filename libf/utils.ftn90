@@ -7,6 +7,7 @@ module utils
    ! Public utilities
    public :: get_allocate                        !allocation of array values
    public :: get_error,put_error                 !get/put error messaging 
+   public :: same_vec                            !check for equivalence of arrays
    public :: up                                  !convert string to upper-case
 
    ! Public vgrid_descriptor constants
@@ -25,6 +26,13 @@ module utils
       module procedure get_allocate_r83d
    end interface get_allocate
    
+   interface same_vec
+      module procedure same_vec_i
+      module procedure same_vec_r
+      module procedure same_vec_r8
+      module procedure same_vec_r83d
+   end interface same_vec
+
 contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Allocate space for pointer returns
@@ -145,6 +153,103 @@ contains
        istat=0
     endif
  end function get_allocate_r81d
+
+  logical function same_vec_i(vec1,vec2) result(equal)
+    ! Check for equality between a pair of pointer vectors
+    implicit none
+    integer, dimension(:), pointer :: vec1,vec2          !Pointer vectors to compare
+    integer :: i
+    equal = .false.
+    if (associated(vec1)) then
+       if (associated(vec2)) then
+          if (size(vec1) == size(vec2)) then
+             do i=1,size(vec1)
+                if (vec1(i) /= vec2(i)) return
+             enddo
+          endif
+       else
+          return
+       endif
+    else
+       if (associated(vec2)) return
+    endif
+    equal = .true.
+    return
+  end function same_vec_i
+
+  logical function same_vec_r(vec1,vec2) result(equal)
+    ! Check for equality between a pair of pointer vectors
+    implicit none
+    real, dimension(:), pointer :: vec1,vec2     !Pointer vectors to compare
+    integer :: i
+    equal = .false.
+    if (associated(vec1)) then
+       if (associated(vec2)) then
+          if (size(vec1) == size(vec2)) then
+             do i=1,size(vec1)
+                if (vec1(i) /= vec2(i)) return
+             enddo
+          endif
+       else
+          return
+       endif
+    else
+       if (associated(vec2)) return
+    endif
+    equal = .true.
+    return
+  end function same_vec_r
+ 
+  logical function same_vec_r8(vec1,vec2) result(equal)
+    ! Check for equality between a pair of pointer vectors
+    implicit none
+    real(kind=8), dimension(:), pointer :: vec1,vec2     !Pointer vectors to compare
+    integer :: i
+    equal = .false.
+    if (associated(vec1)) then
+       if (associated(vec2)) then
+          if (size(vec1) == size(vec2)) then
+             do i=1,size(vec1)
+                if (vec1(i) /= vec2(i)) return
+             enddo
+          endif
+       else
+          return
+       endif
+    else
+       if (associated(vec2)) return
+    endif
+    equal = .true.
+    return
+  end function same_vec_r8
+
+  logical function same_vec_r83d(vec1,vec2) result(equal)
+    ! Check for equality between a pair of pointer vectors
+    implicit none
+    real(kind=8), dimension(:,:,:), pointer :: vec1,vec2 !Pointer vectors to compare
+    integer :: i,j,k
+    equal = .false.
+    if (associated(vec1)) then
+       if (associated(vec2)) then
+          if (size(vec1) == size(vec2)) then
+             do k=1,size(vec1,dim=3)
+                do j=1,size(vec1,dim=2)
+                   do i=1,size(vec1,dim=1)
+                      if (vec1(i,j,k) /= vec2(i,j,k)) return
+                   enddo
+                enddo
+             enddo
+          endif
+       else
+          return
+       endif
+    else
+       if (associated(vec2)) return
+    endif
+    equal = .true.
+    return
+  end function same_vec_r83d
+
  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Convert string to upper-case
 

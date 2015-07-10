@@ -181,7 +181,7 @@ module vGrid_Descriptors
    interface vgd_get
       module procedure get_int
       module procedure get_int_1d
-      !module procedure get_real
+      module procedure get_real
       module procedure get_real_1d
       module procedure get_real8
       module procedure get_real8_1d

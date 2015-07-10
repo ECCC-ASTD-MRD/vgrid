@@ -37,6 +37,7 @@ program tests
   stat = vgd_new(vgd,unit=lu,format="fst")
   call flush(6)
 
+
   ! Get information about the coordinate
   
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_int)
@@ -60,13 +61,13 @@ program tests
   if(stat==VGD_ERROR)print*,'Error with get_real detected and message not printed above'
   call flush(6)
 
-  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real_1d)
-  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real_1d,quiet=.false.)
-  if(stat==VGD_ERROR)print*,'Error with get_real_1d detected and message printed above'
-  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real_1d,quiet=.true.)
-  if(stat==VGD_ERROR)print*,'Error with get_real_1d detected and message not printed above'
-  call flush(6)
-
+!!$  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real_1d)
+!!$  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real_1d,quiet=.false.)
+!!$  if(stat==VGD_ERROR)print*,'Error with get_real_1d detected and message printed above'
+!!$  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real_1d,quiet=.true.)
+!!$  if(stat==VGD_ERROR)print*,'Error with get_real_1d detected and message not printed above'
+!!$  call flush(6)
+!!$
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real8)
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real8,quiet=.false.)
   if(stat==VGD_ERROR)print*,'Error with get_real8 detected and message printed above'
@@ -87,24 +88,24 @@ program tests
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real8_3d,quiet=.true.)
   if(stat==VGD_ERROR)print*,'Error with get_real8_3d detected and message not printed above'
   call flush(6)
-
-  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_char)
-  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_char,quiet=.false.)
-  if(stat==VGD_ERROR)print*,'Error with get_char detected and message printed above'
-  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_char,quiet=.true.)
-  if(stat==VGD_ERROR)print*,'Error with get_char detected but message not printed above'
-  call flush(6)  
-  
-  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_logical)
-  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_logical,quiet=.false.)
-  if(stat==VGD_ERROR)print*,'Error with get_logical detected and message printed above'
-  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_logical,quiet=.true.)
-  if(stat==VGD_ERROR)print*,'Error with get_logical detected but message not printed above'
-  call flush(6)  
-  
-  !===================================
-  ! Tests get method on value returned
- 
+!!$
+!!$  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_char)
+!!$  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_char,quiet=.false.)
+!!$  if(stat==VGD_ERROR)print*,'Error with get_char detected and message printed above'
+!!$  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_char,quiet=.true.)
+!!$  if(stat==VGD_ERROR)print*,'Error with get_char detected but message not printed above'
+!!$  call flush(6)  
+!!$  
+!!$  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_logical)
+!!$  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_logical,quiet=.false.)
+!!$  if(stat==VGD_ERROR)print*,'Error with get_logical detected and message printed above'
+!!$  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_logical,quiet=.true.)
+!!$  if(stat==VGD_ERROR)print*,'Error with get_logical detected but message not printed above'
+!!$  call flush(6)  
+!!$  
+!!$  !===================================
+!!$  ! Tests get method on value returned
+!!$ 
   ! int
   stat = vgd_get(vgd,'KIND',my_int)
   if(stat==VGD_ERROR)ok=.false.
@@ -114,17 +115,17 @@ program tests
   stat = vgd_get(vgd,'KIND',my_int2,quiet=.true.)
   if(stat==VGD_ERROR)ok=.false.
   if(.not.(my_int==my_int2))call message(ok,'Test2 on get_int failed')
-
-  ! int 1d
-  stat = vgd_get(vgd,'VIPM',my_int_1d)
-  if(stat==VGD_ERROR)ok=.false.
-  stat = vgd_get(vgd,'VIPM',my_int2_1d,quiet=.false.)
-  if(stat==VGD_ERROR)ok=.false.
-  if(.not.same_vec(my_int_1d,my_int2_1d))call message(ok,'Test1 on get_int_1d failed')  
-  stat = vgd_get(vgd,'VIPM',my_int2_1d,quiet=.true.)
-  if(stat==VGD_ERROR)ok=.false.
-  if(.not.same_vec(my_int_1d,my_int2_1d))call message(ok,'Test2 on get_int_1d failed')
-
+!!$
+!!$  ! int 1d
+!!$  stat = vgd_get(vgd,'VIPM',my_int_1d)
+!!$  if(stat==VGD_ERROR)ok=.false.
+!!$  stat = vgd_get(vgd,'VIPM',my_int2_1d,quiet=.false.)
+!!$  if(stat==VGD_ERROR)ok=.false.
+!!$  if(.not.same_vec(my_int_1d,my_int2_1d))call message(ok,'Test1 on get_int_1d failed')  
+!!$  stat = vgd_get(vgd,'VIPM',my_int2_1d,quiet=.true.)
+!!$  if(stat==VGD_ERROR)ok=.false.
+!!$  if(.not.same_vec(my_int_1d,my_int2_1d))call message(ok,'Test2 on get_int_1d failed')
+!!$
   ! real 
   stat = vgd_get(vgd,'RC_1',my_real)
   if(stat==VGD_ERROR)ok=.false.
@@ -175,25 +176,25 @@ program tests
   if(stat==VGD_ERROR)ok=.false.
   if(.not.same_vec(my_real8_3d,my_real82_3d))call message(ok,'Test2 on get_my_real8_3d failed')
 
-  stat = vgd_get(vgd,'LOGP',my_logical)
-  if(stat==VGD_ERROR)ok=.false.
-  stat = vgd_get(vgd,'LOGP',my_logical2,quiet=.false.)
-  if(stat==VGD_ERROR)ok=.false.
-  if(.not.(my_logical.and.my_logical2))call message(ok,'Test1 on get_logical failed')
-  stat = vgd_get(vgd,'LOGP',my_logical2,quiet=.true.)
-  if(stat==VGD_ERROR)ok=.false.
-  if(.not.(my_logical.and.my_logical2))call message(ok,'Test2 on get_logical failed')
-
-  stat = vgd_get(vgd,'RFLD',my_char)
-  if(stat==VGD_ERROR)ok=.false.
-  stat = vgd_get(vgd,'RFLD',my_char2,quiet=.false.)
-  if(stat==VGD_ERROR)ok=.false.
-  if(.not.(my_char==my_char2))call message(ok,'Test1 on get_char failed')
-  stat = vgd_get(vgd,'RFLD',my_char2,quiet=.true.)
-  if(stat==VGD_ERROR)ok=.false.
-  if(.not.(my_char==my_char2))call message(ok,'Test2 on get_char failed')
-
-  call ut_report(ok,message='Grid_Descriptors::vgd_get get character value')
+!!$  stat = vgd_get(vgd,'LOGP',my_logical)
+!!$  if(stat==VGD_ERROR)ok=.false.
+!!$  stat = vgd_get(vgd,'LOGP',my_logical2,quiet=.false.)
+!!$  if(stat==VGD_ERROR)ok=.false.
+!!$  if(.not.(my_logical.and.my_logical2))call message(ok,'Test1 on get_logical failed')
+!!$  stat = vgd_get(vgd,'LOGP',my_logical2,quiet=.true.)
+!!$  if(stat==VGD_ERROR)ok=.false.
+!!$  if(.not.(my_logical.and.my_logical2))call message(ok,'Test2 on get_logical failed')
+!!$
+!!$  stat = vgd_get(vgd,'RFLD',my_char)
+!!$  if(stat==VGD_ERROR)ok=.false.
+!!$  stat = vgd_get(vgd,'RFLD',my_char2,quiet=.false.)
+!!$  if(stat==VGD_ERROR)ok=.false.
+!!$  if(.not.(my_char==my_char2))call message(ok,'Test1 on get_char failed')
+!!$  stat = vgd_get(vgd,'RFLD',my_char2,quiet=.true.)
+!!$  if(stat==VGD_ERROR)ok=.false.
+!!$  if(.not.(my_char==my_char2))call message(ok,'Test2 on get_char failed')
+!!$
+!!$  call ut_report(ok,message='Grid_Descriptors::vgd_get get character value')
 
   stat = fstfrm(lu)
   stat = fclos(lu)
