@@ -38,7 +38,7 @@ program constructor
   stat = vgd_write(d,unit=lu2,format="fst")
   stat = vgd_new(d2,unit=lu2,format="fst",ip1=ip1,ip2=ip2)
   if(.not.d2==d)stat=vgd_ERROR
-  
+
   call ut_report(stat,'Grid_Descriptors, vgd_new, vgd_get CA')
 
   stat=fstfrm(lu)
