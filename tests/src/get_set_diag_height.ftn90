@@ -32,7 +32,7 @@ program constructor
      stat=fstfrm(lu)
      call abort
   endif
-  !stat = vgd_print(d)
+  stat = vgd_print(d)
   
   stat = vgd_get(d,key='DHM Diag level Height for Momentum variables',value=height)
   if(stat.ne.VGD_OK)ok=.false.
@@ -42,8 +42,6 @@ program constructor
   endif
   print*,'Momentum Diag height=',height,' m AGL'
 
-stop
-
   stat = vgd_get(d,key='DHT Diag level Height for Thermo variables',value=height)
   if(stat.ne.VGD_OK)ok=.false.
   if(abs(height-2.) > epsilon(height))then
@@ -52,21 +50,38 @@ stop
   endif
   print*,'Thermo Diag height=',height,' m AGL'
 
-stop
-
   stat = vgd_get(d,key='DIPM Diag level ip1 for Momentum variables',value=ip1)
   if(stat==VGD_ERROR)OK=.false.
+  if(ip1 /= 75597472)then
+     print*,'!!!!!!!!!!!!!!!!!!!! OUPS ip1 should be 75597472 got ',ip1
+     ok=.false.
+  endif
   print*,'Diag level ip1 for Momentum variables =',ip1
+
   stat = vgd_get(d,key='DIPT Diag level ip1 for Thermo variables',value=ip1)
   if(stat==VGD_ERROR)OK=.false.
+  if(ip1 /= 76746048)then
+     print*,'!!!!!!!!!!!!!!!!!!!! OUPS ip1 should be 76746048 got ',ip1
+     ok=.false.
+  endif
   print*,'Diag level ip1 for Thermo variables =',ip1
 
-stop
-
   stat = vgd_get(d,key='VIPM - level ip1 list (m)',value=ip1_list)
+  if(stat==VGD_ERROR)OK=.false.
+  if(ip1_list(1) /= 97618238 .or. ip1_list(size(ip1_list)) /=  75597472)then
+     print*,'!!!!!!!!!!!!!!!!!!!! OUPS ip1_list(1)              should be 97618238 got ',ip1_list(1)
+     print*,'!!!!!!!!!!!!!!!!!!!! OUPS ip1_list(size(ip1_list)) should be 75597472 got ',ip1_list(size(ip1_list))
+     ok=.false.
+  endif
   print*,'ip1_list M',ip1_list
 
   stat = vgd_get(d,key='VIPT - level ip1 list (m)',value=ip1_list)
+  if(stat==VGD_ERROR)OK=.false.
+  if(ip1_list(1) /= 97698159 .or. ip1_list(size(ip1_list)) /=  76746048)then
+     print*,'!!!!!!!!!!!!!!!!!!!! OUPS ip1_list(1)              should be 97698159 got ',ip1_list(1)
+     print*,'!!!!!!!!!!!!!!!!!!!! OUPS ip1_list(size(ip1_list)) should be 76746048 got ',ip1_list(size(ip1_list))
+     ok=.false.
+  endif  
   print*,'ip1_list T',ip1_list
  
   stat = vgd_put(d,key='DIPM Diag level ip1 for Momentum variables',value=99)
@@ -87,8 +102,6 @@ stop
   
   stat=fstfrm(lu)  
   stat=fclos(lu)
-
-stop
 
   call ut_report(ok,'Grid_Descriptors, vgd_get on DHM DHT')  
 

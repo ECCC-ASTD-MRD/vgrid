@@ -603,31 +603,33 @@ TVGrid* c_vgd_construct() {
    return(vgrid);
 }
 
-/*----------------------------------------------------------------------------
- * Nom      : <VGD_Free>
- * Creation : Avril 2015 - E. Legault-Ouellet - CMC/CMOE
- *
- * But      : Libère la mémoire d'une structure de type TVGrid
- *
- * Parametres :
- *    <VGrid>  : Structure dont il faut libérer la mémoire
- *
- * Retour   :
- *
- * Remarques :
- *
- *----------------------------------------------------------------------------
- */
 void C_vgd_free(TVGrid **VGrid) {
    if( *VGrid ) {
 
       FREE((*VGrid)->table);
+
+      // Thermo pointers may be pointing to momentum for certain Vcode, only nullify them if this is the case.
+      if( (*VGrid)->a_t_8 == (*VGrid)->a_m_8 ) {
+	(*VGrid)->a_t_8 = NULL;
+      } else {
+	FREE((*VGrid)->a_t_8);      
+      }
+
+      if( (*VGrid)->b_t_8 == (*VGrid)->b_m_8 ) {
+	(*VGrid)->b_t_8 = NULL;
+      } else {
+	FREE((*VGrid)->b_t_8);
+      }
+
+      if( (*VGrid)->ip1_t == (*VGrid)->ip1_m ) {
+	(*VGrid)->ip1_t = NULL;
+      } else {
+	FREE((*VGrid)->ip1_t);
+      }
+
       FREE((*VGrid)->a_m_8);
       FREE((*VGrid)->b_m_8);
-      FREE((*VGrid)->a_t_8);
-      FREE((*VGrid)->b_t_8);
       FREE((*VGrid)->ip1_m);
-      FREE((*VGrid)->ip1_t);
       FREE((*VGrid)->ref_name);
 
       free(*VGrid);
@@ -839,7 +841,7 @@ int C_new_build_vert(TVGrid **self, int kind, int version, int nk, int ip1, int 
 		     double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int nl_m, int nl_t)
 {
 
-  char cvcode[4];
+  char cvcode[5];
   int errorInput = 0;
   
   if(*self){
@@ -943,6 +945,10 @@ int C_new_build_vert(TVGrid **self, int kind, int version, int nk, int ip1, int 
       printf("(C_vgd) a_t_8 is a required constructor entry\n");
       errorInput = 1;
     }
+  } else if ( is_valid( *self, a_t_8_valid_get) ) {
+    // b_t_8 is not a valid component put may be get in which case we return the momentum values
+    (*self)->a_t_8 = (*self)->a_m_8;
+    (*self)->nl_t = (*self)->nl_m;
   }
   if(is_valid( *self, b_t_8_valid)) {
     if(b_t_8){
@@ -957,7 +963,12 @@ int C_new_build_vert(TVGrid **self, int kind, int version, int nk, int ip1, int 
       printf("(C_vgd) b_t_8 is a required constructor entry\n");
       errorInput = 1;
     }
+  } else if ( is_valid( *self, b_t_8_valid_get) ) {
+    // a_t_8 is not a valid component put may be get in which case we return the momentum values
+    (*self)->b_t_8 = (*self)->b_m_8;
+    (*self)->nl_t = (*self)->nl_m;
   }
+
   if(is_valid( *self, ip1_m_valid)) {
     if(ip1_m){
       free((*self)->ip1_m);
@@ -985,6 +996,10 @@ int C_new_build_vert(TVGrid **self, int kind, int version, int nk, int ip1, int 
       printf("(C_vgd) ip1_t is a required constructor entry\n");
       errorInput = 1;
     }
+  } else if ( is_valid( *self, ip1_t_valid_get) ) {
+    // ip1_t is not a valid compnent put may be get in which case we return the momentum values
+    (*self)->ip1_t = (*self)->ip1_m;
+    (*self)->nl_t = (*self)->nl_m;
   }
   if (errorInput > 0) {
     return (VGD_ERROR);
@@ -1671,6 +1686,7 @@ int c_vgrid_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float 
   // Processing option
   if( ! ( tlift == 0 || tlift == 1 ) ){
     printf("(C_vgd) ERROR in c_vgrid_genab_5002_5003, wrong value given to tlift, expecting 0 (for false) or 1 (for true), got %d\n",tlift);
+    fflush(stdout);
     return(VGD_ERROR);
   }
 
@@ -1678,7 +1694,7 @@ int c_vgrid_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float 
   double *a_m_8, *b_m_8, *a_t_8, *b_t_8;
   int *ip1_m, *ip1_t;
     
-  char ok;
+  char ok = 1;
   int k;
   float *hybm, hybtop, rcoef;
   double zsrf_8, ztop_8, zeta_8, lamba_8, pr1;  
@@ -1729,6 +1745,7 @@ int c_vgrid_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float 
   zsrf_8  = log(pref_8);
   if ( ptop_8 <= 0. ) {
     printf("(C_vgd) ERROR in c_vgrid_genab_5002_5003: ptop_8 must be > 0, got %f\n", ptop_8);
+    fflush(stdout);
     return(VGD_ERROR);
   }
   ztop_8  = log(ptop_8);
@@ -1739,10 +1756,12 @@ int c_vgrid_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float 
   hybtop = ptop_8 / pref_8;
   if( hybuser[nk-1] >= 1. ) {
     printf("(C_vgd) ERROR in c_vgrid_genab_5002_5003: hyb must be < 1.0, got %f\n", hybuser[nk-1]);
+    fflush(stdout);
     return(VGD_ERROR);
   }
   if( hybuser[0] <= hybtop ) {
     printf("(C_vgd) ERROR in c_vgrid_genab_5002_5003: hyb must be > %f, got %f\n", hybtop, hybuser[0]);
+    fflush(stdout);
     return(VGD_ERROR);
   }
 
@@ -1759,6 +1778,7 @@ int c_vgrid_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float 
     for ( k = 0; k < nk; k++){
       printf("   %f\n", hybuser[k]);
     }
+    fflush(stdout);
     return(VGD_ERROR);
   }
 
@@ -1823,7 +1843,7 @@ int c_vgrid_genab_5004(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef
   double *a_m_8, *b_m_8, *a_t_8, *b_t_8;
   int *ip1_m, *ip1_t;
     
-  char ok;
+  char ok = 1;
   int k;
   float *hybm, hybtop, rcoef;
   double zsrf_8, ztop_8, zeta_8, lamba_8, pr1, zetau_8, zeta2_8, l_ptop_8;  
@@ -1967,7 +1987,7 @@ int c_vgrid_genab_5005(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef
   double *a_m_8, *b_m_8, *a_t_8, *b_t_8;
   int *ip1_m, *ip1_t;
     
-  char ok;
+  char ok = 1;
   int k;
   float *hybm, hybtop, rcoef;
   double zsrf_8, ztop_8, zeta_8, lamba_8, pr1, zetau_8, zeta2_8;
@@ -2223,6 +2243,71 @@ int C_get_real(TVGrid *self, char *key, float **value, int *quiet) {
   }
   return(VGD_OK);
 
+}
+
+int C_get_real_1d(TVGrid *self, char *key, float **value, int *quiet)
+{
+  char key2[5];
+  int *vip1=NULL, kind, k, OK = 1;
+  int lquiet = 0; // Not quiet by default
+  if(quiet) lquiet = *quiet;   
+  if(! C_is_valid(self,"SELF")){
+    printf("(C_vgd) ERROR in C_get_real8_1d, invalid vgrid.\n");
+    return(VGD_ERROR);
+  }
+  if( strcmp(key, "VCDM") == 0 ){
+    if (is_valid(self,ip1_m_valid)) {
+      if(! *value){
+	(*value) = malloc(self->nl_m * sizeof(float));
+	if(! *value){
+	  printf("(C_vgd) ERROR in C_get_real_1d, problem allocating %d double\n",self->nl_m);
+	  return(VGD_ERROR);
+	}
+      }    
+      strcpy(key2,"VIPM");
+      C_get_int_1d(self, key2, &vip1, quiet);
+      for(k = 0; k < self->nl_m; k++){
+	(*value)[k] = c_convip_IP2Level(vip1[k], &kind);
+	//printf("k = %d, vip1[k]= %d, (*value)[k] = %f\n",k, vip1[k], (*value)[k]);
+      }    
+      free(vip1);
+    } else {
+      OK = 0;
+    }
+  } else if( strcmp(key, "VCDT") == 0 ){
+    if (is_valid(self,ip1_t_valid_get)) {
+      if(! *value){
+	(*value) = malloc(self->nl_t * sizeof(float));
+	if(! *value){
+	  printf("(C_vgd) ERROR in C_get_real_1d, problem allocating %d double\n",self->nl_t);
+	  return(VGD_ERROR);
+	}
+      }  
+      strcpy(key2,"VIPT");
+      C_get_int_1d(self, key2, &vip1, quiet);
+      for(k = 0; k < self->nl_t; k++){
+	(*value)[k] = c_convip_IP2Level(vip1[k], &kind);
+	//Printf("k = %d, vip1[k]= %d, (*value)[k] = %f\n",k, vip1[k], (*value)[k]);
+      }    
+      free(vip1);
+    } else {
+      OK = 0;
+    }
+  } else {
+    OK = 0;
+  }
+  
+  if(! OK){
+    if(! quiet) {
+      printf("(C_vgd) ERROR in C_get_real_1d, invalid key '%s' for vcode %d.\n",key, self->vcode);
+      fflush(stdout);
+    }
+    return(VGD_ERROR);    
+  }
+  
+  return(VGD_OK);
+  
+ 
 }
 
 static int c_get_put_real8(TVGrid **self, char *key, double *value_get, double value_put, int quiet, char *action) {
@@ -2586,6 +2671,7 @@ int C_new_gen(TVGrid **self, int kind, int version, float *hyb, int size_hyb, fl
       free(b_t_8);
       free(ip1_t);
       return(VGD_ERROR);
+
     }
     break;
   default:
