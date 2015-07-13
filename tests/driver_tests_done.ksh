@@ -24,12 +24,12 @@ make tests ONLY=get_ip1set_value
 # Next todo:
 #make tests ONLY=get_case_stat
 #make tests ONLY=get_char
-
 #make tests ONLY=get_kind_version
 #make tests ONLY=get_levels_from_keys
 #make tests ONLY=get_logp
 #make tests ONLY=get_nonalpha
 #make tests ONLY=get_rpn_vert_value
+
 #make tests ONLY=get_set_diag_height
 #make tests ONLY=get_valid
 #make tests ONLY=read_toc_get_wrong_key

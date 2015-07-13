@@ -96,10 +96,6 @@ integer function test_2001(F_d,F_file,F_write_control_L) result(istat)
       print*,'Problem with NL_M should be',size(b_m_8),' got',nl_m
       return
    endif
-   if(nl_t.ne.-1)then
-      print*,'Problem with NL_T should be',size(b_m_8),' got',nl_t
-      return
-   endif
    !
    nk=size(a_m_8)
    !   
