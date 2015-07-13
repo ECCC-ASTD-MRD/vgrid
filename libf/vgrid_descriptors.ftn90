@@ -646,19 +646,11 @@ contains
          endif
       case ('VIPT')
          if (is_valid(self,"ip1_t_valid_get")) then
-            if (is_valid(self,"ip1_t_valid")) then
-               istat = get_int(self,'NL_T',nl_)
-               istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(VIPT in get_int_1d)')
-               if (istat /= 0) return
-               value_CP = c_loc(value(1))
-               status = f_get_int_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,quiet_CP)
-            else
-               istat = get_int(self,'NL_M',nl_)
-               istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(VIPT in get_int_1d)')               
-               if (istat /= 0) return
-               value_CP = c_loc(value(1))
-               status = f_get_int_1d(self%cptr,"VIPM"//C_NULL_CHAR,value_CP,quiet_CP)
-            endif
+            istat = get_int(self,'NL_T',nl_)
+            istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(VIPT in get_int_1d)')
+            if (istat /= 0) return
+            value_CP = c_loc(value(1))
+            status = f_get_int_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,quiet_CP)
          else
             error = int(get_error(key))
             return
@@ -669,8 +661,6 @@ contains
          return
       end select
       
-      ! Set status and return
-      status = VGD_OK
       return
       
    end function get_int_1d
@@ -914,8 +904,6 @@ contains
          call msg(level_msg,VGD_PRFX//for_msg)
          return
       end select
-      ! Set status and return
-      status = VGD_OK
       return      
    end function get_real8_1d
 

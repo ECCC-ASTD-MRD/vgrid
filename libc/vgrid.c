@@ -603,38 +603,37 @@ TVGrid* c_vgd_construct() {
    return(vgrid);
 }
 
-void C_vgd_free(TVGrid **VGrid) {
-   if( *VGrid ) {
+void c_vgd_free_abi(TVGrid **self) {
+  if( *self ) {
+    // Thermo pointers may be pointing to momentum for certain Vcode, only nullify them if this is the case.
+    if( (*self)->a_t_8 == (*self)->a_m_8 ) {
+      (*self)->a_t_8 = NULL;
+    } else {
+      FREE((*self)->a_t_8);      
+    }
+    if( (*self)->b_t_8 == (*self)->b_m_8 ) {
+      (*self)->b_t_8 = NULL;
+    } else {
+      FREE((*self)->b_t_8);
+    }
+    if( (*self)->ip1_t == (*self)->ip1_m ) {
+      (*self)->ip1_t = NULL;
+    } else {
+      FREE((*self)->ip1_t);
+    }
+    FREE((*self)->a_m_8);
+    FREE((*self)->b_m_8);
+    FREE((*self)->ip1_m);
+  }
+}
 
-      FREE((*VGrid)->table);
-
-      // Thermo pointers may be pointing to momentum for certain Vcode, only nullify them if this is the case.
-      if( (*VGrid)->a_t_8 == (*VGrid)->a_m_8 ) {
-	(*VGrid)->a_t_8 = NULL;
-      } else {
-	FREE((*VGrid)->a_t_8);      
-      }
-
-      if( (*VGrid)->b_t_8 == (*VGrid)->b_m_8 ) {
-	(*VGrid)->b_t_8 = NULL;
-      } else {
-	FREE((*VGrid)->b_t_8);
-      }
-
-      if( (*VGrid)->ip1_t == (*VGrid)->ip1_m ) {
-	(*VGrid)->ip1_t = NULL;
-      } else {
-	FREE((*VGrid)->ip1_t);
-      }
-
-      FREE((*VGrid)->a_m_8);
-      FREE((*VGrid)->b_m_8);
-      FREE((*VGrid)->ip1_m);
-      FREE((*VGrid)->ref_name);
-
-      free(*VGrid);
-      *VGrid = NULL;
-
+void C_vgd_free(TVGrid **self) {
+   if( *self ) {
+      FREE((*self)->table);
+      c_vgd_free_abi(self);
+      FREE((*self)->ref_name);      
+      free(*self);
+      *self = NULL;
    }
 }
 
@@ -1262,6 +1261,48 @@ int c_encode_vert_5002_5003_5004_5005(TVGrid **self, char update){
   return(VGD_OK);
 }
 
+int c_decode_vert_1003_5001(TVGrid **self) {
+  int skip, k, ind, nk, nb, kind;
+  
+  //TODO : voir Ron pour error = flip_transfer(self%ref_name,for_char_8)
+  (*self)->kind    = (*self)->table[0];
+  (*self)->version = (*self)->table[1];
+  skip             = (*self)->table[2];
+  (*self)->ptop_8  = (*self)->table[3];
+  (*self)->pref_8  = (*self)->table[4];
+  (*self)->rcoef1  = (*self)->table[5];
+  //for_char_8       = (*self)->table[6];  
+
+  // The next two value in table is not used, so we continue with ind = 9
+  ind = 9;
+  nk = (*self)->table_nj - skip;
+
+  // Free A, B and Ip1 vectors for momentum and thermo.
+  c_vgd_free_abi(self);
+
+  // Allocate and assign momentum level data, there are nk of them
+  (*self)->nl_m = nk;
+  (*self)->ip1_m = malloc( nk * sizeof(int) );
+  (*self)->a_m_8 = malloc( nk * sizeof(double) );
+  (*self)->b_m_8 = malloc( nk * sizeof(double) );
+  if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 ){
+    printf("(C_vgd) ERROR in c_decode_vert_1003_5001, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nk);
+    return(VGD_ERROR);
+  }
+  for ( k = 0; k < nk; k++){    
+    (*self)->ip1_m[k] = (int) (*self)->table[ind  ];
+    (*self)->a_m_8[k] =       (*self)->table[ind+1];
+    (*self)->b_m_8[k] =       (*self)->table[ind+2];
+    ind = ind + 3;
+  }
+  (*self)->nl_m = nk;
+  (*self)->ip1_t = (*self)->ip1_m;
+  (*self)->a_t_8 = (*self)->a_m_8;
+  (*self)->b_t_8 = (*self)->b_m_8;
+  
+  return(VGD_OK);
+}
+
 int c_decode_vert_5002_5003_5004_5005(TVGrid **self) {
   int skip, k, ind, k_plus_top, k_plus_diag, nk, nb, kind;
   
@@ -1303,12 +1344,13 @@ int c_decode_vert_5002_5003_5004_5005(TVGrid **self) {
   ind = 9;
   // nk is the number of momentum level without hyb=1.0 and the diag level in m
   nk = ( (*self)->table_nj - k_plus_top - skip ) / 2 -1 -k_plus_diag;
+
+  // Free A, B and Ip1 vectors for momentum and thermo.
+  c_vgd_free_abi(self);
+
   // Allocate and assign momentum level data, there are nb of them nk + hyb=1 and possibly the diag in m
   nb = nk + 1 + k_plus_diag;
   (*self)->nl_m = nb;
-  free((*self)->ip1_m);
-  free((*self)->a_m_8);
-  free((*self)->b_m_8);
   (*self)->ip1_m = malloc( nb * sizeof(int) );
   (*self)->a_m_8 = malloc( nb * sizeof(double) );
   (*self)->b_m_8 = malloc( nb * sizeof(double) );
@@ -1327,9 +1369,6 @@ int c_decode_vert_5002_5003_5004_5005(TVGrid **self) {
   // Allocate and assign thermodynamic level data
   nb = nb + k_plus_top;
   (*self)->nl_t = nb;
-  free((*self)->ip1_t);
-  free((*self)->a_t_8);
-  free((*self)->b_t_8);
   (*self)->ip1_t = malloc( nb * sizeof(int) );
   (*self)->a_t_8 = malloc( nb * sizeof(double) );
   (*self)->b_t_8 = malloc( nb * sizeof(double) );
@@ -1464,8 +1503,10 @@ int C_new_from_table(TVGrid **self, double *table, int ni, int nj, int nk) {
     break;
   case 1003:
   case 5001:
-    printf("TODO 1003, 5001  in C_new_from_table\n");
-    return(VGD_ERROR);
+    if( c_decode_vert_1003_5001(self) == VGD_ERROR ) {
+      printf("(C_vgd) in C_new_from_table, problem decoding table with vcode 1003 or 5001\n");
+      return(VGD_ERROR);
+    }
     break;
   case 5002:
   case 5003:
@@ -2161,39 +2202,58 @@ int C_get_int(TVGrid *self, char *key, int **value, int *quiet)
 
 int C_get_int_1d(TVGrid *self, char *key, int **value, int *quiet)
 {
+  int OK = 1;
   int lquiet = 0; // Not quiet by default
   if(quiet) lquiet = *quiet;   
   if(! C_is_valid(self,"SELF")){
     printf("(C_vgd) ERROR in C_get_int_1d, invalid vgrid.\n");
     return(VGD_ERROR);
   }
-
-  if( strcmp(key, "VIPM") == 0 || strcmp(key, "VIP1") == 0 ){
-    if(! *value){
-      (*value) = malloc(self->nl_m * sizeof(int));
-      if(! *value){
-	printf("(C_vgd) ERROR in C_get_int_1d, problem allocating %d int\n",self->nl_m);
-	return(VGD_ERROR);
-      }
+  if(strcmp(key, "VIP1") == 0 ){
+    if( is_valid(self,ip1_m_valid) ){
+      printf("(C_vgd) ERROR in C_get_int_1d, depricated key '%s' use VIPM instead.\n", key);
+      fflush(stdout);
+      return(VGD_ERROR);
+    } else {
+      OK = 0;
     }
-    my_copy_int(self->ip1_m, value, self->nl_m);
+  }
+  if( strcmp(key, "VIPM") == 0 ){
+    if( is_valid(self,ip1_m_valid) ){
+      if(! *value){
+	(*value) = malloc(self->nl_m * sizeof(int));
+	if(! *value){
+	  printf("(C_vgd) ERROR in C_get_int_1d, problem allocating %d int\n",self->nl_m);
+	  return(VGD_ERROR);
+	}
+      }
+      my_copy_int(self->ip1_m, value, self->nl_m);
+    } else {
+      OK = 0;
+    }
   } else  if( strcmp(key, "VIPT") == 0 ){
-    if(! *value){
-      (*value) = malloc(self->nl_t * sizeof(int));
+    if( is_valid(self,ip1_t_valid_get) ){
       if(! *value){
-	printf("(C_vgd) ERROR in C_get_int_1d, problem allocating %d int\n",self->nl_t);
-	return(VGD_ERROR);
+	(*value) = malloc(self->nl_t * sizeof(int));
+	if(! *value){
+	  printf("(C_vgd) ERROR in C_get_int_1d, problem allocating %d int\n",self->nl_t);
+	  return(VGD_ERROR);
+	}
       }
+      my_copy_int(self->ip1_t, value, self->nl_t);
+    } else {
+      OK = 0;
     }
-    my_copy_int(self->ip1_t, value, self->nl_t);
   }else{
+    OK = 0;
+  }
+  if(! OK) {
     if(! quiet) {
-      printf("(C_vgd) ERROR in C_get_int_1d, invalid key '%s'\n",key);
+      printf("(C_vgd) ERROR in C_get_int_1d, invalid key '%s' for Vcode %d\n",key, self->vcode);
       fflush(stdout);
     }
-    return(VGD_ERROR);
+    return(VGD_ERROR);    
   }
-  
   return(VGD_OK);
 
 }
@@ -2210,7 +2270,7 @@ int C_get_real(TVGrid *self, char *key, float **value, int *quiet) {
     return(VGD_ERROR);
   }  
 
-  if( strcmp(key, "RC_1" ) == 0 ){
+  if( strcmp(key, "RC_1" ) == 0 ){    
     if( is_valid(self,rcoef1_valid) ){
       **value = self->rcoef1;
     } else {
@@ -2296,7 +2356,6 @@ int C_get_real_1d(TVGrid *self, char *key, float **value, int *quiet)
   } else {
     OK = 0;
   }
-  
   if(! OK){
     if(! quiet) {
       printf("(C_vgd) ERROR in C_get_real_1d, invalid key '%s' for vcode %d.\n",key, self->vcode);
@@ -2304,10 +2363,7 @@ int C_get_real_1d(TVGrid *self, char *key, float **value, int *quiet)
     }
     return(VGD_ERROR);    
   }
-  
   return(VGD_OK);
-  
- 
 }
 
 static int c_get_put_real8(TVGrid **self, char *key, double *value_get, double value_put, int quiet, char *action) {
@@ -2390,6 +2446,7 @@ int C_get_real8(TVGrid *self, char *key, double **value_get, int *quiet)
 
 int C_get_real8_1d(TVGrid *self, char *key, double **value, int *quiet)
 {
+  int OK = 1;
   int lquiet = 0; // Not quiet by default
   if(quiet) lquiet = *quiet;   
   if(! C_is_valid(self,"SELF")){
@@ -2398,49 +2455,68 @@ int C_get_real8_1d(TVGrid *self, char *key, double **value, int *quiet)
   }
 
   if( strcmp(key, "CA_M") == 0 || strcmp(key, "COFA") == 0 ){
-    if(! *value){
-      (*value) = malloc(self->nl_m * sizeof(double));
+    if( is_valid(self,a_m_8_valid) ) {
       if(! *value){
-	printf("(C_vgd) ERROR in C_get_real8_1d, problem allocating %d double\n",self->nl_m);
-	return(VGD_ERROR);
+	(*value) = malloc(self->nl_m * sizeof(double));
+	if(! *value){
+	  printf("(C_vgd) ERROR in C_get_real8_1d, problem allocating %d double\n",self->nl_m);
+	  return(VGD_ERROR);
+	}
       }
+      my_copy_double(self->a_m_8, value, self->nl_m);
+    } else {
+      OK = 0;
     }
-    my_copy_double(self->a_m_8, value, self->nl_m);
   } else if( strcmp(key, "CB_M") == 0 || strcmp(key, "COFB") == 0 ) {
-    if(! *value){
-      (*value) = malloc(self->nl_m * sizeof(double));
+    if( is_valid(self,b_m_8_valid) ) {
       if(! *value){
-	printf("(C_vgd) ERROR in C_get_real8_1d, problem allocating %d double\n",self->nl_m);
-	return(VGD_ERROR);
+	(*value) = malloc(self->nl_m * sizeof(double));
+	if(! *value){
+	  printf("(C_vgd) ERROR in C_get_real8_1d, problem allocating %d double\n",self->nl_m);
+	  return(VGD_ERROR);
+	}
       }
+      my_copy_double(self->b_m_8, value, self->nl_m);
+    } else {
+      OK = 0;
     }
-    my_copy_double(self->b_m_8, value, self->nl_m);
   } else if( strcmp(key, "CA_T") == 0 ){
-    if(! *value){
-      (*value) = malloc(self->nl_t * sizeof(double));
+    if (is_valid(self,a_t_8_valid_get) ) {
       if(! *value){
-	printf("(C_vgd) ERROR in C_get_real8_1d, problem allocating %d double\n",self->nl_t);
-	return(VGD_ERROR);
+	(*value) = malloc(self->nl_t * sizeof(double));
+	if(! *value){
+	  printf("(C_vgd) ERROR in C_get_real8_1d, problem allocating %d double\n",self->nl_t);
+	  return(VGD_ERROR);
+	}
       }
+      my_copy_double(self->a_t_8, value, self->nl_t);
+    } else {
+      OK = 0;
     }
-    my_copy_double(self->a_t_8, value, self->nl_t);
   } else if( strcmp(key, "CB_T") == 0 ){
-    if(! *value){
-      (*value) = malloc(self->nl_t * sizeof(double));
+    if( is_valid(self,b_t_8_valid_get) ) {
       if(! *value){
-	printf("(C_vgd) ERROR in C_get_real8_1d, problem allocating %d double\n",self->nl_t);
-	return(VGD_ERROR);
+	(*value) = malloc(self->nl_t * sizeof(double));
+	if(! *value){
+	  printf("(C_vgd) ERROR in C_get_real8_1d, problem allocating %d double\n",self->nl_t);
+	  return(VGD_ERROR);
+	}
       }
+      my_copy_double(self->b_t_8, value, self->nl_t);
+    } else {
+      OK =0;
     }
-    my_copy_double(self->b_t_8, value, self->nl_t);
   } else {
+    OK = 0;
+  }    
+  if( ! OK) {
     if(! quiet) {
-      printf("(C_vgd) ERROR in C_get_real8_1d, invalid key '%s'\n",key);
+      printf("(C_vgd) ERROR in C_get_real8_1d, invalid key '%s' for vcode %d\n", key, self->vcode);
       fflush(stdout);
     }
     return(VGD_ERROR);
-  }    
-  
+  }
+
   return(VGD_OK);
 
 }

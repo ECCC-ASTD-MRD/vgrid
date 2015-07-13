@@ -14,9 +14,10 @@ make tests ONLY=get_put_get
 make tests ONLY=constructor_any
 make tests ONLY=constructor_simple_gen_1001 necessite vgd_print
 make tests ONLY=get_excl #Ce test me semble insignifiant
-make tests ONLY=get_ip1converted.ftn90
+make tests ONLY=get_ip1converted
 make tests ONLY=get_ip1set_value
-
+make tests ONLY=get_set_diag_height
+make tests ONLY=read_toc_get_wrong_key
 
 # Current work:
 # make tests ONLY=get_quiet # C_get_real_1d, C_get_char, C_get_logical pas fait
@@ -30,7 +31,5 @@ make tests ONLY=get_ip1set_value
 #make tests ONLY=get_nonalpha
 #make tests ONLY=get_rpn_vert_value
 
-#make tests ONLY=get_set_diag_height
 #make tests ONLY=get_valid
-#make tests ONLY=read_toc_get_wrong_key
 
