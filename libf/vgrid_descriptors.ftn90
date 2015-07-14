@@ -41,92 +41,92 @@ module vGrid_Descriptors
    
    interface
 
-      integer function f_get_int(vgd_CP, key, value_CP, quiet_CP) bind(c, name='C_get_int')
+      integer function f_get_int(vgd_CP, key, value_CP, quiet_CP) bind(c, name='Cvgd_get_int')
          use iso_c_binding, only: c_ptr, c_char
          type(c_ptr), value :: vgd_CP, quiet_CP
          type(c_ptr) :: value_CP
          character(kind=c_char) :: key(*)
       end function f_get_int
      
-      integer function f_get_int_1d(vgd_CP, key, value_CP, quiet_CP) bind(c, name='C_get_int_1d')
+      integer function f_get_int_1d(vgd_CP, key, value_CP, quiet_CP) bind(c, name='Cvgd_get_int_1d')
          use iso_c_binding, only: c_ptr, c_char
          type(c_ptr), value :: vgd_CP, quiet_CP
          type(c_ptr) :: value_CP
          character(kind=c_char) :: key(*)
       end function f_get_int_1d
    
-      integer function f_get_real(vgd_CP, key, value_CP, quiet_CP) bind(c, name='C_get_real')
+      integer function f_get_real(vgd_CP, key, value_CP, quiet_CP) bind(c, name='Cvgd_get_real')
          use iso_c_binding, only: c_ptr, c_char
          type(c_ptr), value :: vgd_CP, quiet_CP
          type(c_ptr) :: value_CP
          character(kind=c_char) :: key(*)
       end function f_get_real
       
-      integer function f_get_real_1d(vgd_CP, key, value_CP, quiet_CP) bind(c, name='C_get_real_1d')
+      integer function f_get_real_1d(vgd_CP, key, value_CP, quiet_CP) bind(c, name='Cvgd_get_real_1d')
          use iso_c_binding, only: c_ptr, c_char
          type(c_ptr), value :: vgd_CP, quiet_CP
          type(c_ptr) :: value_CP
          character(kind=c_char) :: key(*)
       end function f_get_real_1d
 
-      integer function f_get_real8(vgd_CP, key, value_CP, quiet_CP) bind(c, name='C_get_real8')
+      integer function f_get_real8(vgd_CP, key, value_CP, quiet_CP) bind(c, name='Cvgd_get_real8')
          use iso_c_binding, only: c_ptr, c_char
          type(c_ptr), value :: vgd_CP, quiet_CP
          type(c_ptr) :: value_CP
          character(kind=c_char) :: key(*)
       end function f_get_real8
 
-      integer function f_get_real8_1d(vgd_CP, key, value_CP, quiet_CP) bind(c, name='C_get_real8_1d')
+      integer function f_get_real8_1d(vgd_CP, key, value_CP, quiet_CP) bind(c, name='Cvgd_get_real8_1d')
          use iso_c_binding, only: c_ptr, c_char
          type(c_ptr), value :: vgd_CP, quiet_CP
          type(c_ptr) :: value_CP
          character(kind=c_char) :: key(*)
       end function f_get_real8_1d
 
-      integer function f_get_real8_3d(vgd_CP, key, value_CP, quiet_CP) bind(c, name='C_get_real8_3d')
+      integer function f_get_real8_3d(vgd_CP, key, value_CP, quiet_CP) bind(c, name='Cvgd_get_real8_3d')
          use iso_c_binding, only: c_ptr, c_char
          type(c_ptr), value :: vgd_CP, quiet_CP
          type(c_ptr) :: value_CP
          character(kind=c_char) :: key(*)
       end function f_get_real8_3d
       
-      integer function f_put_int(vgd_CP, key, value) bind(c, name='C_put_int')
+      integer function f_put_int(vgd_CP, key, value) bind(c, name='Cvgd_put_int')
          use iso_c_binding, only: c_ptr, c_char, c_int
          type(c_ptr) :: vgd_CP
          integer (c_int), value :: value
          character(kind=c_char) :: key(*)
       end function f_put_int
 
-      integer function f_put_real8(vgd_CP, key, value) bind(c, name='C_put_real8')
+      integer function f_put_real8(vgd_CP, key, value) bind(c, name='Cvgd_put_real8')
          use iso_c_binding, only: c_ptr, c_char, c_double
          type(c_ptr) :: vgd_CP
          real (c_double), value :: value
          character(kind=c_char) :: key(*)
       end function f_put_real8
 
-      integer function f_is_valid(vgd_CP, valid_table_name) bind(c, name='C_is_valid')
+      integer function f_is_valid(vgd_CP, valid_table_name) bind(c, name='Cvgd_is_valid')
          use iso_c_binding, only: c_ptr, c_char
          type(c_ptr), value :: vgd_CP
          character(kind=c_char) :: valid_table_name(*)
       end function f_is_valid
 
-      integer function f_print_desc(vgd_CP, stdout_CP, convip_CP) bind(c, name='C_print_desc')
+      integer function f_print_desc(vgd_CP, stdout_CP, convip_CP) bind(c, name='Cvgd_print_desc')
          use iso_c_binding, only : c_ptr
          type(c_ptr), value :: vgd_CP, stdout_CP, convip_CP
       end function f_print_desc
 
-      !integer function f_set_vcode_i(vgd_CP, kind, version) bind(c, name='C_set_vcode_i')
+      !integer function f_set_vcode_i(vgd_CP, kind, version) bind(c, name='Cvgd_set_vcode_i')
       !   use iso_c_binding, only : c_ptr, c_int
       !   type(c_ptr), value :: vgd_CP
       !   integer (c_int), value :: kind, version
       !end function f_set_vcode_i
 
-      integer function f_vgdcmp(vgd1_CP, vgd2_CP) bind(c, name='C_vgdcmp')
+      integer function f_vgdcmp(vgd1_CP, vgd2_CP) bind(c, name='Cvgd_vgdcmp')
          use iso_c_binding, only: c_ptr
          type(c_ptr), value :: vgd1_CP, vgd2_CP
       end function f_vgdcmp
 
-      integer function f_new_read(vgd,unit,format,ip1_CP,ip2_CP,kind_CP,version_CP) bind(c, name='C_new_read')
+      integer function f_new_read(vgd,unit,format,ip1_CP,ip2_CP,kind_CP,version_CP) bind(c, name='Cvgd_new_read')
          use iso_c_binding, only : c_ptr, c_int, c_char
          type(c_ptr) :: vgd
          integer (c_int), value :: unit
@@ -135,7 +135,7 @@ module vGrid_Descriptors
       end function f_new_read
       
       integer function f_new_gen(vgd,kind,version,hyb_CP,size_hyb,rcoef1_CP,rcoef2_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP, &
-           ip1,ip2,stdout_unit_CP,dhm_CP,dht_CP) bind(c, name='C_new_gen')
+           ip1,ip2,stdout_unit_CP,dhm_CP,dht_CP) bind(c, name='Cvgd_new_gen')
          use iso_c_binding, only : c_ptr, c_int
          type(c_ptr) :: vgd
          integer (c_int), value :: kind, version, size_hyb
@@ -146,7 +146,7 @@ module vGrid_Descriptors
       
       integer function f_new_build_vert(vgd,kind,version,nk,ip1,ip2, &
            ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, &
-           a_m_8_CP, b_m_8_CP, a_t_8_CP, b_t_8_CP, ip1_m_CP, ip1_t_CP, nl_m, nl_t) bind(c, name='C_new_build_vert')         
+           a_m_8_CP, b_m_8_CP, a_t_8_CP, b_t_8_CP, ip1_m_CP, ip1_t_CP, nl_m, nl_t) bind(c, name='Cvgd_new_build_vert')         
          use iso_c_binding, only : c_ptr, c_int
          type(c_ptr) :: vgd
          integer (c_int), value :: kind,version,nk,ip1,ip2
@@ -155,18 +155,18 @@ module vGrid_Descriptors
          integer (c_int), value :: nl_m, nl_t
       end function f_new_build_vert
 
-      subroutine f_vgd_free(vgd_CP) bind(c, name='C_vgd_free')
+      subroutine f_vgd_free(vgd_CP) bind(c, name='Cvgd_vgd_free')
          use iso_c_binding, only : c_ptr
          type(c_ptr) :: vgd_CP
       end subroutine f_vgd_free
       
-      subroutine f_table_shape(vgd_CP, tshape_CP) bind(c, name='C_table_shape')
+      subroutine f_table_shape(vgd_CP, tshape_CP) bind(c, name='Cvgd_table_shape')
          use iso_c_binding, only : c_ptr
          type(c_ptr), value :: vgd_CP
          type(c_ptr) :: tshape_CP
       end subroutine f_table_shape
          
-      integer function f_write_desc(vgd_CP,unit,format) bind(c, name='C_write_desc')
+      integer function f_write_desc(vgd_CP,unit,format) bind(c, name='Cvgd_write_desc')
          use iso_c_binding, only : c_ptr, c_int, c_char
          type(c_ptr), value :: vgd_CP
          integer (c_int), value :: unit
