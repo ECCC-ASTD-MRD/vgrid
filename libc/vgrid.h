@@ -10,7 +10,7 @@
 #define MAXSTR_ETIKET 13
 #define MAXSTR_GRTYP  2
 
-int ALLOW_RESHAPE = 0;
+#define ALLOW_RESHAPE 0
 
 typedef struct TFSTD {
    int   dateo;                 // date d'origine du champs
