@@ -7,6 +7,7 @@
 *.f90
 tests/test*.txt
 tests/test*.out
+tests/*.ftn90
 tests/data/
 tests/compile.log
 Makefile.test
@@ -19,3 +20,5 @@ log-*-*-*-*-*
 report-*-*-*-*-*
 vgriddescriptors_*
 vgriddescriptors/
+README_COMMIT
+libc/Makefile.dep
