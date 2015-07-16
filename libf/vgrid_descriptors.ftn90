@@ -44,49 +44,53 @@ module vGrid_Descriptors
       integer function f_get_int(vgd_CP, key, value_CP, quiet_CP) bind(c, name='Cvgd_get_int')
          use iso_c_binding, only: c_ptr, c_char
          type(c_ptr), value :: vgd_CP, quiet_CP
-         type(c_ptr) :: value_CP
+         type(c_ptr), value :: value_CP
          character(kind=c_char) :: key(*)
       end function f_get_int
      
-      integer function f_get_int_1d(vgd_CP, key, value_CP, quiet_CP) bind(c, name='Cvgd_get_int_1d')
+      integer function f_get_int_1d(vgd_CP, key, value_CP, nk_CP, quiet_CP) bind(c, name='Cvgd_get_int_1d')
          use iso_c_binding, only: c_ptr, c_char
          type(c_ptr), value :: vgd_CP, quiet_CP
          type(c_ptr) :: value_CP
+         type(c_ptr), value :: nk_CP
          character(kind=c_char) :: key(*)
       end function f_get_int_1d
    
       integer function f_get_real(vgd_CP, key, value_CP, quiet_CP) bind(c, name='Cvgd_get_real')
          use iso_c_binding, only: c_ptr, c_char
          type(c_ptr), value :: vgd_CP, quiet_CP
-         type(c_ptr) :: value_CP
+         type(c_ptr), value :: value_CP
          character(kind=c_char) :: key(*)
       end function f_get_real
       
-      integer function f_get_real_1d(vgd_CP, key, value_CP, quiet_CP) bind(c, name='Cvgd_get_real_1d')
+      integer function f_get_real_1d(vgd_CP, key, value_CP, nk_CP, quiet_CP) bind(c, name='Cvgd_get_real_1d')
          use iso_c_binding, only: c_ptr, c_char
          type(c_ptr), value :: vgd_CP, quiet_CP
          type(c_ptr) :: value_CP
+         type(c_ptr), value :: nk_CP
          character(kind=c_char) :: key(*)
       end function f_get_real_1d
 
       integer function f_get_real8(vgd_CP, key, value_CP, quiet_CP) bind(c, name='Cvgd_get_real8')
          use iso_c_binding, only: c_ptr, c_char
          type(c_ptr), value :: vgd_CP, quiet_CP
-         type(c_ptr) :: value_CP
+         type(c_ptr), value :: value_CP
          character(kind=c_char) :: key(*)
       end function f_get_real8
 
-      integer function f_get_real8_1d(vgd_CP, key, value_CP, quiet_CP) bind(c, name='Cvgd_get_real8_1d')
+      integer function f_get_real8_1d(vgd_CP, key, value_CP, nk_CP, quiet_CP) bind(c, name='Cvgd_get_real8_1d')
          use iso_c_binding, only: c_ptr, c_char
          type(c_ptr), value :: vgd_CP, quiet_CP
          type(c_ptr) :: value_CP
+         type(c_ptr), value :: nk_CP
          character(kind=c_char) :: key(*)
       end function f_get_real8_1d
 
-      integer function f_get_real8_3d(vgd_CP, key, value_CP, quiet_CP) bind(c, name='Cvgd_get_real8_3d')
+      integer function f_get_real8_3d(vgd_CP, key, value_CP, ni_CP, nj_CP, nk_CP, quiet_CP) bind(c, name='Cvgd_get_real8_3d')
          use iso_c_binding, only: c_ptr, c_char
          type(c_ptr), value :: vgd_CP, quiet_CP
          type(c_ptr) :: value_CP
+         type(c_ptr), value :: ni_CP, nj_CP, nk_CP
          character(kind=c_char) :: key(*)
       end function f_get_real8_3d
       
@@ -603,11 +607,12 @@ contains
       
       ! Internal variables
       integer :: nl_, istat, level_msg, error
-      type(c_ptr) :: quiet_CP, value_CP
+      type(c_ptr) :: quiet_CP, value_CP, nk_CP
       character(len=KEY_LENGTH) :: my_key
-      integer, target :: zero, one
+      integer, target :: zero, one, nk
 
       zero = 0; one = 1
+      nk_CP = c_loc(nk)
 
       ! Set error status
       status = VGD_ERROR
@@ -638,8 +643,8 @@ contains
             istat = get_int(self,'NL_M',nl_)
             istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(VIPM in get_int_1d)')
             if (istat /= 0) return
-            value_CP = c_loc(value(1))
-            status = f_get_int_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,quiet_CP)
+            value_CP = c_loc(value(1))            
+            status = f_get_int_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,nk_CP,quiet_CP)
          else
             error = int(get_error(key))
             return
@@ -650,7 +655,7 @@ contains
             istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(VIPT in get_int_1d)')
             if (istat /= 0) return
             value_CP = c_loc(value(1))
-            status = f_get_int_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,quiet_CP)
+            status = f_get_int_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,nk_CP,quiet_CP)
          else
             error = int(get_error(key))
             return
@@ -747,7 +752,7 @@ contains
             istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(VCDM in get_real_1d)')
             if (istat /= 0) return
             value_CP = c_loc(value(1))
-            istat = f_get_real_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,quiet_CP)
+            istat = f_get_real_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,quiet_CP)
             if (istat == VGD_ERROR) return
          else
             error = int(get_error(key))
@@ -759,7 +764,7 @@ contains
             istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(VCDT in get_real_1d)')
             if (istat /= 0) return
             value_CP = c_loc(value(1))
-            istat = f_get_real_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,quiet_CP)
+            istat = f_get_real_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,quiet_CP)
             if (istat == VGD_ERROR) return
          else
             error = int(get_error(key))
@@ -861,7 +866,7 @@ contains
             istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CA_M in get_real8_1d)')         
             if (istat /= 0) return
             value_CP = c_loc(value(1))
-            status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,quiet_CP)
+            status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,quiet_CP)
          else
             error = int(get_error(key))
             return
@@ -872,7 +877,7 @@ contains
             istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CB_M in get_real8_1d)')         
             if (istat /= 0) return
             value_CP = c_loc(value(1))
-            status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,quiet_CP)
+            status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,quiet_CP)
          else
             error = int(get_error(key))
             return
@@ -883,7 +888,7 @@ contains
             istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CA_T in get_real8_1d)')         
             if (istat /= 0) return
             value_CP = c_loc(value(1))
-            status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,quiet_CP)            
+            status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,quiet_CP)            
          else
             error = int(get_error(key))
             return
@@ -894,7 +899,7 @@ contains
             istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CB_T in get_real8_1d)')         
             if (istat /= 0) return
             value_CP = c_loc(value(1))
-            status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,quiet_CP)
+            status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,quiet_CP)
          else
             error = int(get_error(key))
             return
@@ -953,7 +958,7 @@ contains
          istat = get_allocate(key,value,tshape,ALLOW_RESHAPE,'(VTBL) in get_real8_3d)')         
          if (istat /= 0) return
          value_CP = c_loc(value(1,1,1))
-         status = f_get_real8_3d(self%cptr,"VTBL"//C_NULL_CHAR,value_CP,quiet_CP)
+         status = f_get_real8_3d(self%cptr,"VTBL"//C_NULL_CHAR,C_NULL_PTR,C_NULL_PTR,C_NULL_PTR,value_CP,quiet_CP)
          
       case DEFAULT
          write(for_msg,*) 'invalid key '//trim(key)//' given to gd_get (real8 3D)'

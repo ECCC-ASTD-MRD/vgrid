@@ -1460,7 +1460,15 @@ int Cvgd_new_from_table(TVGrid **self, double *table, int ni, int nj, int nk) {
   // Coordinate constructor - build vertical descriptor from table input
   // Set internal vcode (if all above was successful)
 
-  (*self)->valid = 0;  
+  if(! *self){
+    *self = c_vgd_construct();
+    if(! *self){
+      printf("(Cvgd) ERROR in Cvgd_new_from_table, null pointer returned by c_vgd_construct\n");
+      return (VGD_ERROR);
+    }
+  }
+
+  (*self)->valid = 0;
   // Since table passed in argument may be the (*self)->table, we take a copy before the call to free
   table_size = ni * nj * nk;
   ltable = malloc ( table_size * sizeof(double) );
@@ -2162,7 +2170,7 @@ int c_vgrid_genab_5005(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef
 
 }
 
-int Cvgd_get_int(TVGrid *self, char *key, int **value, int *quiet)
+int Cvgd_get_int(TVGrid *self, char *key, int *value, int *quiet)
 {  
   int lquiet = 0; // Not quiet by default
   if(quiet) lquiet = *quiet; 
@@ -2170,24 +2178,24 @@ int Cvgd_get_int(TVGrid *self, char *key, int **value, int *quiet)
     printf("(Cvgd) ERROR in Cvgd_get_int, invalid vgrid.\n");
     return(VGD_ERROR);
   }
-  if(! *value){
+  if(! value){
     printf("(Cvgd) ERROR in c_get_int, value is a NULL pointer\n");
     return(VGD_ERROR);
   }
   if (strcmp(key, "NL_M") == 0){
-    **value = self->nl_m;
+    *value = self->nl_m;
   } else if (strcmp(key, "NL_T") == 0){
-    **value = self->nl_t;
+    *value = self->nl_t;
   } else if (strcmp(key, "KIND") == 0){
-    **value = self->kind;
+    *value = self->kind;
   } else if (strcmp(key, "VERS") == 0){
-    **value = self->version;
+    *value = self->version;
   } else if (strcmp(key, "IP_1") == 0){
-    **value = self->rec.ip1;
+    *value = self->rec.ip1;
   } else if (strcmp(key, "DIPM") == 0){
-    **value = self->ip1_m[self->nl_m-1];
+    *value = self->ip1_m[self->nl_m-1];
   } else if (strcmp(key, "DIPT") == 0){
-    **value = self->ip1_t[self->nl_t-1];
+    *value = self->ip1_t[self->nl_t-1];
   } else {
     if(! lquiet) {
       printf("(Cvgd) ERROR in c_get_int, invalid key %s\n",key);
@@ -2200,11 +2208,12 @@ int Cvgd_get_int(TVGrid *self, char *key, int **value, int *quiet)
 
 }
 
-int Cvgd_get_int_1d(TVGrid *self, char *key, int **value, int *quiet)
+int Cvgd_get_int_1d(TVGrid *self, char *key, int **value, int *nk, int *quiet)
 {
   int OK = 1;
   int lquiet = 0; // Not quiet by default
   if(quiet) lquiet = *quiet;   
+  if(nk) *nk = -1;
   if(! Cvgd_is_valid(self,"SELF")){
     printf("(Cvgd) ERROR in Cvgd_get_int_1d, invalid vgrid.\n");
     return(VGD_ERROR);
@@ -2228,6 +2237,7 @@ int Cvgd_get_int_1d(TVGrid *self, char *key, int **value, int *quiet)
 	}
       }
       my_copy_int(self->ip1_m, value, self->nl_m);
+      if(nk) *nk = self->nl_m;
     } else {
       OK = 0;
     }
@@ -2241,6 +2251,7 @@ int Cvgd_get_int_1d(TVGrid *self, char *key, int **value, int *quiet)
 	}
       }
       my_copy_int(self->ip1_t, value, self->nl_t);
+      if(nk) *nk = self->nl_t;
     } else {
       OK = 0;
     }
@@ -2258,41 +2269,41 @@ int Cvgd_get_int_1d(TVGrid *self, char *key, int **value, int *quiet)
 
 }
 
-int Cvgd_get_real(TVGrid *self, char *key, float **value, int *quiet) {
+int Cvgd_get_real(TVGrid *self, char *key, float *value, int *quiet) {
   int lquiet = 0; // Not quiet by default
   if(quiet) lquiet = *quiet;   
   if(! Cvgd_is_valid(self,"SELF")){
     printf("(Cvgd) ERROR in Cvgd_get_real, invalid vgrid.\n");
     return(VGD_ERROR);
   }
-  if(! *value){
+  if(! value){
     printf("(Cvgd) ERROR in Cvgd_get_real, value is a NULL pointer\n");
     return(VGD_ERROR);
   }  
 
   if( strcmp(key, "RC_1" ) == 0 ){    
     if( is_valid(self,rcoef1_valid) ){
-      **value = self->rcoef1;
+      *value = self->rcoef1;
     } else {
-      **value = (float) c_get_error(key);
+      *value = (float) c_get_error(key);
     }
   } else  if( strcmp(key, "RC_2" ) == 0 ){
     if( is_valid(self,rcoef2_valid) ){
-      **value = self->rcoef2;
+      *value = self->rcoef2;
     } else {
-      **value = (float) c_get_error(key);
+      *value = (float) c_get_error(key);
     }
   } else  if( strcmp(key, "DHM " ) == 0 ){
     if( is_valid(self,dhm_valid) ){
-      **value = self->dhm;
+      *value = self->dhm;
     } else {
-      **value = (float) c_get_error(key);
+      *value = (float) c_get_error(key);
     }
   } else  if( strcmp(key, "DHT " ) == 0 ){
     if( is_valid(self,dht_valid) ){
-      **value = self->dht;
+      *value = self->dht;
     } else {
-      **value = (float) c_get_error(key);
+      *value = (float) c_get_error(key);
     }
   } else {
     if(! quiet) {
@@ -2305,14 +2316,15 @@ int Cvgd_get_real(TVGrid *self, char *key, float **value, int *quiet) {
 
 }
 
-int Cvgd_get_real_1d(TVGrid *self, char *key, float **value, int *quiet)
+int Cvgd_get_real_1d(TVGrid *self, char *key, float **value, int *nk, int *quiet)
 {
   char key2[5];
   int *vip1=NULL, kind, k, OK = 1;
   int lquiet = 0; // Not quiet by default
   if(quiet) lquiet = *quiet;   
+  if(nk) *nk = -1;
   if(! Cvgd_is_valid(self,"SELF")){
-    printf("(Cvgd) ERROR in Cvgd_get_real8_1d, invalid vgrid.\n");
+    printf("(Cvgd) ERROR in Cvgd_get_real_1d, invalid vgrid.\n");
     return(VGD_ERROR);
   }
   if( strcmp(key, "VCDM") == 0 ){
@@ -2325,12 +2337,13 @@ int Cvgd_get_real_1d(TVGrid *self, char *key, float **value, int *quiet)
 	}
       }    
       strcpy(key2,"VIPM");
-      Cvgd_get_int_1d(self, key2, &vip1, quiet);
+      Cvgd_get_int_1d(self, key2, &vip1, NULL, quiet);
       for(k = 0; k < self->nl_m; k++){
 	(*value)[k] = c_convip_IP2Level(vip1[k], &kind);
 	//printf("k = %d, vip1[k]= %d, (*value)[k] = %f\n",k, vip1[k], (*value)[k]);
-      }    
+      }
       free(vip1);
+      if(nk) *nk = self->nl_m;
     } else {
       OK = 0;
     }
@@ -2344,12 +2357,13 @@ int Cvgd_get_real_1d(TVGrid *self, char *key, float **value, int *quiet)
 	}
       }  
       strcpy(key2,"VIPT");
-      Cvgd_get_int_1d(self, key2, &vip1, quiet);
+      Cvgd_get_int_1d(self, key2, &vip1, NULL, quiet);
       for(k = 0; k < self->nl_t; k++){
 	(*value)[k] = c_convip_IP2Level(vip1[k], &kind);
 	//Printf("k = %d, vip1[k]= %d, (*value)[k] = %f\n",k, vip1[k], (*value)[k]);
       }    
       free(vip1);
+      if(nk) *nk = self->nl_t;
     } else {
       OK = 0;
     }
@@ -2436,24 +2450,24 @@ int Cvgd_put_real8(TVGrid **self, char *key, double value_put) {
   return(c_get_put_real8(self, key, value_get, value_put, quiet, "PUT"));
 }
 
-int Cvgd_get_real8(TVGrid *self, char *key, double **value_get, int *quiet)
+int Cvgd_get_real8(TVGrid *self, char *key, double *value_get, int *quiet)
 {
   double value_put; //Will not be used
   int lquiet = 0; // Not quiet by default
   if(quiet) lquiet = *quiet;
-  return(c_get_put_real8(&self, key, *value_get, value_put, lquiet, "GET"));
+  return(c_get_put_real8(&self, key, value_get, value_put, lquiet, "GET"));
 }
 
-int Cvgd_get_real8_1d(TVGrid *self, char *key, double **value, int *quiet)
+int Cvgd_get_real8_1d(TVGrid *self, char *key, double **value, int *nk, int *quiet)
 {
   int OK = 1;
   int lquiet = 0; // Not quiet by default
   if(quiet) lquiet = *quiet;   
+  if(nk) *nk = -1;
   if(! Cvgd_is_valid(self,"SELF")){
     printf("(Cvgd) ERROR in Cvgd_get_real8_1d, invalid vgrid.\n");
     return(VGD_ERROR);
   }
-
   if( strcmp(key, "CA_M") == 0 || strcmp(key, "COFA") == 0 ){
     if( is_valid(self,a_m_8_valid) ) {
       if(! *value){
@@ -2464,6 +2478,7 @@ int Cvgd_get_real8_1d(TVGrid *self, char *key, double **value, int *quiet)
 	}
       }
       my_copy_double(self->a_m_8, value, self->nl_m);
+      if(nk) *nk = self->nl_m;
     } else {
       OK = 0;
     }
@@ -2477,6 +2492,7 @@ int Cvgd_get_real8_1d(TVGrid *self, char *key, double **value, int *quiet)
 	}
       }
       my_copy_double(self->b_m_8, value, self->nl_m);
+      if(nk) *nk = self->nl_m;
     } else {
       OK = 0;
     }
@@ -2490,6 +2506,7 @@ int Cvgd_get_real8_1d(TVGrid *self, char *key, double **value, int *quiet)
 	}
       }
       my_copy_double(self->a_t_8, value, self->nl_t);
+      if(nk) *nk = self->nl_t;
     } else {
       OK = 0;
     }
@@ -2503,6 +2520,7 @@ int Cvgd_get_real8_1d(TVGrid *self, char *key, double **value, int *quiet)
 	}
       }
       my_copy_double(self->b_t_8, value, self->nl_t);
+      if(nk) *nk = self->nl_t;
     } else {
       OK =0;
     }
@@ -2521,15 +2539,17 @@ int Cvgd_get_real8_1d(TVGrid *self, char *key, double **value, int *quiet)
 
 }
 
-int Cvgd_get_real8_3d(TVGrid *self, char *key, double **value, int *quiet)
+int Cvgd_get_real8_3d(TVGrid *self, char *key, double **value, int *ni, int *nj, int *nk, int *quiet)
 {
   int lquiet = 0; // Not quiet by default
   if(quiet) lquiet = *quiet;   
+  if(ni) *ni = -1;
+  if(nj) *nj = -1;
+  if(nk) *nk = -1;    
   if(! Cvgd_is_valid(self,"SELF")){
     printf("(Cvgd) ERROR in Cvgd_get_real8_3d, invalid vgrid.\n");
     return(VGD_ERROR);
   }
-
   int table_size = self->table_ni * self->table_nj * self->table_nk;
   if( strcmp(key, "VTBL") == 0 ){
     if(! *value){
@@ -2540,6 +2560,9 @@ int Cvgd_get_real8_3d(TVGrid *self, char *key, double **value, int *quiet)
       }
     }
     my_copy_double(self->table, value, table_size);
+    if(ni) *ni = self->table_ni;
+    if(nj) *nj = self->table_nj;
+    if(nk) *nk = self->table_nk;
   } else {
     if(! quiet) {
       printf("(Cvgd) ERROR in Cvgd_get_real8_3d, invalid key '%s'\n",key);
