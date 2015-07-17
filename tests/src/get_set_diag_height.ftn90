@@ -99,7 +99,7 @@ program constructor
   if(ip1.ne.99)then
      print*,'Problem with vgd_put on DIPT, put 99 got ',ip1
   endif
-  
+
   stat=fstfrm(lu)  
   stat=fclos(lu)
 

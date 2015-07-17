@@ -18,6 +18,11 @@ program constructor
   logical, parameter :: write_control_L=.false.
   character (len=256) :: file
   !
+  nullify(vipm,vipt,work_i,tbl,a_m_8,a_t_8,b_m_8,b_t_8,work_8,hyb)
+  !
+  allocate(hyb(size(pres)))
+  hyb=pres/100.
+  !
   ! Construct a new set of 3D coordinate descriptors
   pres = pres*100. !convert mb to Pa
   allocate(ip1s(size(pres)))
@@ -27,7 +32,6 @@ program constructor
   enddo
   !
   stat = vgd_new(d,kind=2,version=1,nk=size(pres),ip1_m=ip1s,a_m_8=pres,b_m_8=b)
-
   stat = vgd_get(d,key='VTBL - vertical coordinate table',value=tbl)
   OK=abs(tbl(2,2,1)-pres(1)) < epsilon(pres)
   !
@@ -35,10 +39,8 @@ program constructor
   stat = test_2001(d,file,write_control_L)
   if(stat.eq.VGD_ERROR)OK=.false.
   !
-  allocate(hyb(size(pres)))
-  hyb=pres/100.
-  !
   stat = vgd_new(d2,kind=2,version=1,hyb=hyb)
+  !
   if(stat == VGD_ERROR)then
      print*,'Error avec vgd_new'
      stop
@@ -46,6 +48,7 @@ program constructor
   !
   file='data_Linux/data_constructor_build_2001.txt'
   stat = test_2001(d,file,.false.)
+
   if(stat.eq.VGD_ERROR)OK=.false.  
   !
   call ut_report(OK,'Grid_Descriptors::vgd_new vertical build initializer (2001) value')

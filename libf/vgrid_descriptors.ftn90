@@ -794,7 +794,7 @@ contains
       use utils, only: up
       type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
       character(len=*), intent(in) :: key         !Descriptor key to retrieve
-      real(kind=8), intent(out) :: value          !Retrieved value
+      real(kind=8), target, intent(out) :: value  !Retrieved value
       logical, optional, intent(in) :: quiet      !Do not print massages
 
       ! Internal variables
@@ -958,8 +958,7 @@ contains
          istat = get_allocate(key,value,tshape,ALLOW_RESHAPE,'(VTBL) in get_real8_3d)')         
          if (istat /= 0) return
          value_CP = c_loc(value(1,1,1))
-         status = f_get_real8_3d(self%cptr,"VTBL"//C_NULL_CHAR,C_NULL_PTR,C_NULL_PTR,C_NULL_PTR,value_CP,quiet_CP)
-         
+         status = f_get_real8_3d(self%cptr,"VTBL"//C_NULL_CHAR,value_CP,C_NULL_PTR,C_NULL_PTR,C_NULL_PTR,quiet_CP)         
       case DEFAULT
          write(for_msg,*) 'invalid key '//trim(key)//' given to gd_get (real8 3D)'
          call msg(level_msg,VGD_PRFX//for_msg)

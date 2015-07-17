@@ -17,7 +17,8 @@ rm -rf WORK/$EC_ARCH
 mkdir -p WORK/$EC_ARCH
 cd WORK/$EC_ARCH
 
-ln -s ${MASTER}/../lib .
+ln -s ${MASTER}/../libf .
+ln -s ${MASTER}/../libc .
 
 NCPUS=1
 DONE=0
