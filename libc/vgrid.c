@@ -123,6 +123,57 @@ int is_required_float(TVGrid *self, float *ptr, int *table_valid, char *message)
   return(1);
 }
 
+int is_bigendian() {
+  int n = 1;
+  // little endian if true
+  if(*(char *)&n == 1) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+double reverseDouble (char *c) {
+    double d;
+    char *p = (char *)&d;
+    p[0] = c[7];
+    p[1] = c[6];
+    p[2] = c[5];
+    p[3] = c[4];
+    p[4] = c[3];
+    p[5] = c[2];
+    p[6] = c[1];
+    p[7] = c[0];
+    return d;
+}
+
+void flip_transfer_d2c(char *name, double val_8) {
+  union {
+    double d;
+    char c[sizeof(double)];
+  } u;
+  u.d = val_8;
+  if(! is_bigendian()) {
+    u.d = reverseDouble(u.c);
+  }
+  strncpy(name, u.c, 4);
+}
+
+void flip_transfer_c2d(char *name, double *val_8) {
+  // TODO, pas certain que cela soit ok.
+  // les valeurs de u.d semblent etranges
+  union {
+    double d;
+    char c[sizeof(double)];
+  } u;
+  strcpy(u.c,"ABCDEFGH");
+  strncpy(u.c, name, 4);
+  if(! is_bigendian()) {
+    u.d = reverseDouble(u.c);
+  }
+  *val_8 = u.d;
+}
+
 double c_get_error(char *key) {
   printf("(Cvgd) ERROR in c_get_error, attempt to retrieve invalid key %s\n",key);
   return(VGD_MISSING);
@@ -1070,13 +1121,11 @@ int c_encode_vert_1001(TVGrid **self,int nk){
   }
   strcpy((*self)->ref_name,"P0");
 
-  //TODO : voir Ron pour error = flip_transfer(self%ref_name,for_char_8)
   //Fill header
   (*self)->table[0] = (*self)->kind;
   (*self)->table[1] = (*self)->version;
   (*self)->table[2] = skip;
-  //(*self)->table[3] = for_char_8;
-  (*self)->table[3] = 0.;
+  flip_transfer_c2d((*self)->ref_name, &((*self)->table[3]));
   (*self)->table[4] = 0.;
   (*self)->table[5] = 0.;
   
@@ -1109,13 +1158,11 @@ int c_encode_vert_1002(TVGrid **self,int nk){
   }
   strcpy((*self)->ref_name,"P0");
 
-  //TODO : voir Ron pour error = flip_transfer(self%ref_name,for_char_8)
   //Fill header
   (*self)->table[0] = (*self)->kind;
   (*self)->table[1] = (*self)->version;
   (*self)->table[2] = skip;
-  //(*self)->table[3] = for_char_8;
-  (*self)->table[3] = 0.;
+  flip_transfer_c2d((*self)->ref_name, &((*self)->table[3]));
   (*self)->table[4] = 0.;
   (*self)->table[5] = 0.;
   
@@ -1148,7 +1195,6 @@ int c_encode_vert_2001(TVGrid **self,int nk){
   }
   strcpy((*self)->ref_name,"");
 
-  //TODO : voir Ron pour error = flip_transfer(self%ref_name,for_char_8)
   //Fill header
   (*self)->table[0] = (*self)->kind;
   (*self)->table[1] = (*self)->version;
@@ -1182,7 +1228,6 @@ int c_encode_vert_5001(TVGrid **self,int nk){
   }
   strcpy((*self)->ref_name,"P0");
 
-  //TODO : voir Ron pour error = flip_transfer(self%ref_name,for_char_8)
   //Fill header
   (*self)->table[0] = (*self)->kind;
   (*self)->table[1] = (*self)->version;
@@ -1192,8 +1237,7 @@ int c_encode_vert_5001(TVGrid **self,int nk){
   (*self)->table[4] = (*self)->pref_8;
   (*self)->table[5] = (*self)->rcoef1;
   
-  //(*self)->table[6] = for_char_8;
-  (*self)->table[6] = 0.;
+  flip_transfer_c2d((*self)->ref_name, &((*self)->table[6]));
   (*self)->table[7] = 0.;
   (*self)->table[8] = 0.;
 
@@ -1228,8 +1272,7 @@ int c_encode_vert_5002_5003_5004_5005(TVGrid **self, char update){
     }
     strcpy((*self)->ref_name,"P0");
   }
-
-  //TODO : voir Ron pour error = flip_transfer(self%ref_name,for_char_8)
+  
   //Fill header
   (*self)->table[0] = (*self)->kind;
   (*self)->table[1] = (*self)->version;
@@ -1238,8 +1281,7 @@ int c_encode_vert_5002_5003_5004_5005(TVGrid **self, char update){
   (*self)->table[4] = (*self)->pref_8;
   (*self)->table[5] = (*self)->rcoef1;  
   (*self)->table[6] = (*self)->rcoef2;
-  //(*self)->table[7] = for_char_8;
-  (*self)->table[7] = 0.;
+  flip_transfer_c2d((*self)->ref_name, &((*self)->table[7]));
   (*self)->table[8] = 0.;
 
   int k, ind = 9;
@@ -1264,14 +1306,13 @@ int c_encode_vert_5002_5003_5004_5005(TVGrid **self, char update){
 int c_decode_vert_1003_5001(TVGrid **self) {
   int skip, k, ind, nk, nb, kind;
   
-  //TODO : voir Ron pour error = flip_transfer(self%ref_name,for_char_8)
   (*self)->kind    = (*self)->table[0];
   (*self)->version = (*self)->table[1];
   skip             = (*self)->table[2];
   (*self)->ptop_8  = (*self)->table[3];
   (*self)->pref_8  = (*self)->table[4];
   (*self)->rcoef1  = (*self)->table[5];
-  //for_char_8       = (*self)->table[6];  
+  flip_transfer_d2c((*self)->ref_name,(*self)->table[6]);
 
   // The next two value in table is not used, so we continue with ind = 9
   ind = 9;
@@ -1307,7 +1348,6 @@ int c_decode_vert_5002_5003_5004_5005(TVGrid **self) {
   int skip, k, ind, k_plus_top, k_plus_diag, nk, nb, kind;
   
   k_plus_top = 1;
-  //TODO : voir Ron pour error = flip_transfer(self%ref_name,for_char_8)
   (*self)->kind    = (*self)->table[0];
   (*self)->version = (*self)->table[1];
   skip             = (*self)->table[2];
@@ -1315,7 +1355,7 @@ int c_decode_vert_5002_5003_5004_5005(TVGrid **self) {
   (*self)->pref_8  = (*self)->table[4];
   (*self)->rcoef1  = (*self)->table[5];
   (*self)->rcoef2  = (*self)->table[6];
-  //for_char_8       = (*self)->table[7];  
+  flip_transfer_d2c((*self)->ref_name,(*self)->table[7]);
 
   if( Cvgd_set_vcode_i(*self, (*self)->kind, (*self)->version) == VGD_ERROR ) {
     printf("(Cvgd) ERROR in c_decode_vert_5002_5003_5004_5005, cannot set vcode\n");
