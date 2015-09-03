@@ -533,35 +533,31 @@ int Cvgd_print_desc(TVGrid *self, int *sout, int *convip) {
       printf("  Equation to compute hydrostatic pressure (pi): pi = B * P0*100\n");
       break;
     case 1002:
-      printf("Cvgd_print_desc 1002 TODO!!!!!!!!! \n");
-      return(VGD_ERROR);
+      printf("  Number of pressure levels %d\n", self->nl_m );
       break;
     case 2001:
-      printf("Cvgd_print_desc 2001 TODO!!!!!!!!! \n");
-      return(VGD_ERROR);
+      printf("  Number of eta levels %d\n", self->nl_m );
+      printf("  Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100\n");
       break;
     case 1003:
       printf("Cvgd_print_desc 1003 TODO!!!!!!!!! \n");
       return(VGD_ERROR);
       break;
     case 5001:
-      printf("Cvgd_print_desc 5001 TODO!!!!!!!!! \n");
-      return(VGD_ERROR);
+      printf("  Number of hybrid levels (momentum levels)", self->nl_m );
+      printf("  Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref)\n");
       break;
     case 5002:
-      printf("Cvgd_print_desc 5002 TODO!!!!!!!!! \n");
-      return(VGD_ERROR);
-      break;
     case 5003:
-      printf("Cvgd_print_desc 5003 TODO!!!!!!!!! \n");
-      return(VGD_ERROR);
+      printf("  Number of hybrid levels %d\n", self->nl_m );
+      printf("  Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100\n");
       break;
     case 5004:
       printf("Cvgd_print_desc 5004 TODO!!!!!!!!! \n");
       return(VGD_ERROR);
       break;
     case 5005:
-       printf("  Number of hybrid levels (momentum/thermo levels) %d\n", self->nl_m );
+      printf("  Number of hybrid levels (momentum/thermo levels) %d\n", self->nl_m );
       ip1=self->ip1_m[self->nl_m-1];
       printf("  Diagnostic momentum level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
       ip1=self->ip1_t[self->nl_t-1];
@@ -892,7 +888,7 @@ int Cvgd_new_build_vert(TVGrid **self, int kind, int version, int nk, int ip1, i
 {
 
   char cvcode[5];
-  int errorInput = 0;
+  int errorInput = 0, ier;
   
   if(*self){
     Cvgd_vgd_free(self);
@@ -914,11 +910,13 @@ int Cvgd_new_build_vert(TVGrid **self, int kind, int version, int nk, int ip1, i
   (*self)->nl_t       = nl_t;
   (*self)->rec.ip1    = ip1;
   (*self)->rec.ip2    = ip2;
-
+  strcpy((*self)->rec.nomvar,"!!  ");
   if(Cvgd_set_vcode_i(*self, kind, version) == VGD_ERROR)  {
     printf("(Cvgd) ERROR in Cvgd_new_build_vert, problem with Cvgd_set_vcode_i");
     return (VGD_ERROR);
   }
+  (*self)->rec.ig1   = (*self)->vcode;
+
   // Check for required inputs
   int missingInput = 0;
   if( is_valid( *self, ptop_8_valid) ) {
@@ -1054,7 +1052,6 @@ int Cvgd_new_build_vert(TVGrid **self, int kind, int version, int nk, int ip1, i
   if (errorInput > 0) {
     return (VGD_ERROR);
   }
-  int ier;
   // Fill table with version-specific encoder
   switch((*self)->vcode) {
   case 1001:
@@ -1303,6 +1300,95 @@ int c_encode_vert_5002_5003_5004_5005(TVGrid **self, char update){
   return(VGD_OK);
 }
 
+int c_decode_vert_1001(TVGrid **self) {
+  int skip, nk, k, ind;
+  (*self)->kind    = (*self)->table[0];
+  (*self)->version = (*self)->table[1];
+  skip             = (*self)->table[2];
+  flip_transfer_d2c((*self)->ref_name,(*self)->table[3]);
+  // The next two values in table are not used, so we continue with ind = 6
+  ind = 6;
+  
+  nk = (*self)->table_nj - skip;
+  // Free A, B and Ip1 vectors for momentum and thermo.
+  c_vgd_free_abi(self);
+  // Allocate and assign level data, there are nk of them
+  (*self)->nl_m = nk;
+  (*self)->ip1_m = malloc( nk * sizeof(int) );
+  (*self)->a_m_8 = malloc( nk * sizeof(double) );
+  (*self)->b_m_8 = malloc( nk * sizeof(double) );
+  if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 ){
+    printf("(Cvgd) ERROR in c_decode_vert_1001, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nk);
+    return(VGD_ERROR);
+  }
+  for ( k = 0; k < nk; k++){      
+    (*self)->ip1_m[k] = (int) (*self)->table[ind  ];
+    (*self)->a_m_8[k] =       (*self)->table[ind+1];
+    (*self)->b_m_8[k] =       (*self)->table[ind+2];
+    ind = ind + 3;
+  }
+}
+
+int c_decode_vert_1002(TVGrid **self) {
+  int skip, nk, k, ind;
+  (*self)->kind    = (*self)->table[0];
+  (*self)->version = (*self)->table[1];
+  skip             = (*self)->table[2];
+  (*self)->ptop_8  = (*self)->table[3];
+  flip_transfer_d2c((*self)->ref_name,(*self)->table[4]);
+  // The value in table is not used, so we continue with ind = 6
+  ind = 6;
+  
+  nk = (*self)->table_nj - skip;
+  
+  // Free A, B and Ip1 vectors for momentum and thermo.
+  c_vgd_free_abi(self);
+  // Allocate and assign level data, there are nk of them
+  (*self)->nl_m = nk;
+  (*self)->ip1_m = malloc( nk * sizeof(int) );
+  (*self)->a_m_8 = malloc( nk * sizeof(double) );
+  (*self)->b_m_8 = malloc( nk * sizeof(double) );
+  if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 ){
+    printf("(Cvgd) ERROR in c_decode_vert_1002, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nk);
+    return(VGD_ERROR);
+  }
+  for ( k = 0; k < nk; k++){      
+    (*self)->ip1_m[k] = (int) (*self)->table[ind  ];
+    (*self)->a_m_8[k] =       (*self)->table[ind+1];
+    (*self)->b_m_8[k] =       (*self)->table[ind+2];
+    ind = ind + 3;
+  }
+}
+
+int c_decode_vert_2001(TVGrid **self) {
+  int skip, nk, k, ind;
+  (*self)->kind    = (*self)->table[0];
+  (*self)->version = (*self)->table[1];
+  skip             = (*self)->table[2];
+  ind = 3;
+
+  nk = (*self)->table_nj - skip;
+
+  // Free A, B and Ip1 vectors for momentum and thermo.
+  c_vgd_free_abi(self);
+  // Allocate and assign level data, there are nk of them
+  (*self)->nl_m = nk;
+  (*self)->ip1_m = malloc( nk * sizeof(int) );
+  (*self)->a_m_8 = malloc( nk * sizeof(double) );
+  (*self)->b_m_8 = malloc( nk * sizeof(double) );
+  if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 ){
+    printf("(Cvgd) ERROR in c_decode_vert_1002, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nk);
+    return(VGD_ERROR);
+  }
+  for ( k = 0; k < nk; k++){      
+    (*self)->ip1_m[k] = (int) (*self)->table[ind  ];
+    (*self)->a_m_8[k] =       (*self)->table[ind+1];
+    (*self)->b_m_8[k] =       (*self)->table[ind+2];
+    ind = ind + 3;
+  }
+  
+}
+
 int c_decode_vert_1003_5001(TVGrid **self) {
   int skip, k, ind, nk, nb, kind;
   
@@ -1314,7 +1400,7 @@ int c_decode_vert_1003_5001(TVGrid **self) {
   (*self)->rcoef1  = (*self)->table[5];
   flip_transfer_d2c((*self)->ref_name,(*self)->table[6]);
 
-  // The next two value in table is not used, so we continue with ind = 9
+  // The next two values in table are not used, so we continue with ind = 9
   ind = 9;
   nk = (*self)->table_nj - skip;
 
@@ -1538,16 +1624,22 @@ int Cvgd_new_from_table(TVGrid **self, double *table, int ni, int nj, int nk) {
   }
   switch((*self)->vcode) {
   case 1001:
-    printf("TODO 1001 in Cvgd_new_from_table\n");
-    return(VGD_ERROR);
+    if( c_decode_vert_1001(self) == VGD_ERROR ) {
+      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 1001\n");
+      return(VGD_ERROR);
+    }
     break;
   case 1002:
-    printf("TODO 1002 in Cvgd_new_from_table\n");
-    return(VGD_ERROR);
+    if( c_decode_vert_1002(self) == VGD_ERROR ) {
+      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 1002\n");
+      return(VGD_ERROR);
+    }
     break;
   case 2001:
-    printf("TODO 2001 in Cvgd_new_from_table\n");
-    return(VGD_ERROR);
+    if( c_decode_vert_2001(self) == VGD_ERROR ) {
+      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 2001\n");
+      return(VGD_ERROR);
+    }
     break;
   case 1003:
   case 5001:
@@ -2213,7 +2305,7 @@ int c_vgrid_genab_5005(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef
 int Cvgd_get_int(TVGrid *self, char *key, int *value, int *quiet)
 {  
   int lquiet = 0; // Not quiet by default
-  if(quiet) lquiet = *quiet; 
+  if(quiet) lquiet = *quiet;
   if(! Cvgd_is_valid(self,"SELF")){
     printf("(Cvgd) ERROR in Cvgd_get_int, invalid vgrid.\n");
     return(VGD_ERROR);
@@ -2232,6 +2324,8 @@ int Cvgd_get_int(TVGrid *self, char *key, int *value, int *quiet)
     *value = self->version;
   } else if (strcmp(key, "IP_1") == 0){
     *value = self->rec.ip1;
+  } else if (strcmp(key, "IP_2") == 0){
+    *value = self->rec.ip2;
   } else if (strcmp(key, "DIPM") == 0){
     *value = self->ip1_m[self->nl_m-1];
   } else if (strcmp(key, "DIPT") == 0){
@@ -2299,7 +2393,7 @@ int Cvgd_get_int_1d(TVGrid *self, char *key, int **value, int *nk, int *quiet)
     OK = 0;
   }
   if(! OK) {
-    if(! quiet) {
+    if(! lquiet) {
       printf("(Cvgd) ERROR in Cvgd_get_int_1d, invalid key '%s' for Vcode %d\n",key, self->vcode);
       fflush(stdout);
     }
@@ -2312,6 +2406,7 @@ int Cvgd_get_int_1d(TVGrid *self, char *key, int **value, int *nk, int *quiet)
 int Cvgd_get_real(TVGrid *self, char *key, float *value, int *quiet) {
   int lquiet = 0; // Not quiet by default
   if(quiet) lquiet = *quiet;   
+
   if(! Cvgd_is_valid(self,"SELF")){
     printf("(Cvgd) ERROR in Cvgd_get_real, invalid vgrid.\n");
     return(VGD_ERROR);
@@ -2346,7 +2441,7 @@ int Cvgd_get_real(TVGrid *self, char *key, float *value, int *quiet) {
       *value = (float) c_get_error(key);
     }
   } else {
-    if(! quiet) {
+    if(! lquiet) {
       printf("(Cvgd) ERROR in Cvgd_get_real, invalid key '%s'\n",key);
       fflush(stdout);
     }
@@ -2411,7 +2506,7 @@ int Cvgd_get_real_1d(TVGrid *self, char *key, float **value, int *nk, int *quiet
     OK = 0;
   }
   if(! OK){
-    if(! quiet) {
+    if(! lquiet) {
       printf("(Cvgd) ERROR in Cvgd_get_real_1d, invalid key '%s' for vcode %d.\n",key, self->vcode);
       fflush(stdout);
     }
@@ -2568,7 +2663,7 @@ int Cvgd_get_real8_1d(TVGrid *self, char *key, double **value, int *nk, int *qui
     OK = 0;
   }    
   if( ! OK) {
-    if(! quiet) {
+    if(! lquiet) {
       printf("(Cvgd) ERROR in Cvgd_get_real8_1d, invalid key '%s' for vcode %d\n", key, self->vcode);
       fflush(stdout);
     }
@@ -2604,7 +2699,7 @@ int Cvgd_get_real8_3d(TVGrid *self, char *key, double **value, int *ni, int *nj,
     if(nj) *nj = self->table_nj;
     if(nk) *nk = self->table_nk;
   } else {
-    if(! quiet) {
+    if(! lquiet) {
       printf("(Cvgd) ERROR in Cvgd_get_real8_3d, invalid key '%s'\n",key);
       fflush(stdout);
     }
@@ -2960,7 +3055,7 @@ int Cvgd_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int
 }
 
 int Cvgd_write_desc (TVGrid *self, int unit, char *format) {
-  
+  int ip1, ip2;
   float work[1];
 
   if(! self){
@@ -2972,10 +3067,14 @@ int Cvgd_write_desc (TVGrid *self, int unit, char *format) {
     return(VGD_ERROR);
   }
   if (strcmp(format, "FST") == 0){
+    ip1=self->rec.ip1;
+    if(self->rec.ip1 < 0) ip1=0;
+    ip2=self->rec.ip2;
+    if(self->rec.ip2 < 0) ip2=0;
     if( c_fstecr( self->table,      work,            -self->rec.nbits, unit, 
 		  self->rec.dateo,  self->rec.deet,   self->rec.npas, 
 		  self->table_ni,   self->table_nj,   self->table_nk, 
-		  self->rec.ip1,    self->rec.ip2,    self->rec.ip3,
+		  ip1,              ip2,              self->rec.ip3,
 		  self->rec.typvar, self->rec.nomvar, self->rec.etiket, 
 		  self->rec.grtyp,  self->rec.ig1,    self->rec.ig2,    self->rec.ig3, self->rec.ig4,
 		  self->rec.datyp, 1) , 0 ) {

@@ -1,6 +1,6 @@
 #!/bin/ksh
 
-MAX_CPUS=5
+MAX_CPUS=10
 
 set -e
 

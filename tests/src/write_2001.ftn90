@@ -1,11 +1,11 @@
 program constructor
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_write,VGD_ERROR
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_write,vgd_print,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
 
   type(vgrid_descriptor) :: d,d_rtn
-  integer :: stat,lu=0,fnom,fstouv,fstfrm,fclos,k,ip1
+  integer :: stat,lu=0,fnom,fstouv,fstfrm,fclos,k,ip1,ip2
   integer, parameter :: LEVS=4
   integer, dimension(LEVS) :: ip1s
   real(kind=8), dimension(LEVS) :: pres=(/1000.,925.,850.,700./),b=(/0.,0.,0.,0./)
@@ -28,19 +28,21 @@ program constructor
      call convip(ip1s(k),pres(k),2,2,'',.false.)
   enddo
   pres = pres*100. !convert mb to Pa
-  stat = vgd_new(d,kind=2,version=1,nk=size(pres),ip1_m=ip1s,a_m_8=pres,b_m_8=b)
+  stat = vgd_new(d,kind=2,version=1,nk=size(pres),ip1_m=ip1s,a_m_8=pres,b_m_8=b,ip1=111,ip2=222)
   if(stat==VGD_ERROR)then
      call system('rm -f test.fst')
      call exit(1)
   endif
   stat = vgd_write(d,unit=lu,format='fst')
   stat = vgd_get(d,'IP_1 - record ip1',ip1)
-  stat = vgd_new(d_rtn,unit=lu,format='fst',ip1=ip1)
+  stat = vgd_get(d,'IP_2 - record ip2',ip2)
+  stat = vgd_new(d_rtn,unit=lu,format='fst',ip1=ip1,ip2=ip2)
   if(stat==VGD_ERROR)then
      call system('rm -f test.fst')
      call exit(1)
   endif
   stat = vgd_get(d_rtn,key='COFA - vertical A coefficient',value=pres_rtn)
+
   call ut_report(abs(pres_rtn(1)-pres(1)) < epsilon(pres),'Grid_Descriptors::vgd_new vertical build initializer (2001) value')
 
   stat=fstfrm(lu)
