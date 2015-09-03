@@ -45,7 +45,7 @@ for test in ${tests[*]} ; do
    echo "   test ${test}"
    make tests ONLY=${test} > ../log_${test} 2>&1 &
    if [[ ${DONE} = 0 ]];then
-       # This is to account for the fact that the lib may not be compiled yet
+       # This is to account for the fact that the libs may not be compiled yet
        DONE=1
        echo "================================================================================="
        echo "The first compilation may need to compile the lib, so only one thread is launched"
