@@ -81,6 +81,7 @@ program constructor
 
   ! Construct a new set of 3D coordinate descriptors
   stat = vgd_write(d,lu,format='fst')
+
   call ut_report(stat,'Grid_Descriptors, vgd_new, vgd_write')
 
   stat=fstfrm(lu)
