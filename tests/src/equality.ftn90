@@ -33,6 +33,7 @@ program constructor
   else
      stat = VGD_ERROR
   endif
+
   call ut_report(stat,'Grid_Descriptors, equality')
 
   stat=fstfrm(lu)

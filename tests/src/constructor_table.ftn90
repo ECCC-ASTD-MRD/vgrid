@@ -111,7 +111,8 @@ integer function test_it(F_file_from_model_run,F_file_with_ips) result(status)
       return
    endif
 
-   ! Write table in fst and check it fst parameters
+   ! Write table in fst and check its fst parameters
+   call system('rm -f data/WORK/trash')
    ier=fnom(lu2,"data/WORK/trash","RND",0)
    if(ier.lt.0)then
       print*,'ERROR with fnom 2'

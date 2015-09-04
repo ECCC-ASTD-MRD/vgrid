@@ -138,6 +138,13 @@ module vGrid_Descriptors
          type(c_ptr), value :: ip1_CP,ip2_CP,kind_CP,version_CP
       end function f_new_read
       
+      integer function f_new_from_table(vgd, table_CP, ni, nj, nk) bind(c, name='Cvgd_new_from_table')
+         use iso_c_binding, only : c_ptr, c_int
+         type(c_ptr) :: vgd
+         type(c_ptr), value :: table_CP
+         integer (c_int), value :: ni, nj, nk
+      end function f_new_from_table
+
       integer function f_new_gen(vgd,kind,version,hyb_CP,size_hyb,rcoef1_CP,rcoef2_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP, &
            ip1,ip2,stdout_unit_CP,dhm_CP,dht_CP) bind(c, name='Cvgd_new_gen')
          use iso_c_binding, only : c_ptr, c_int
@@ -181,6 +188,7 @@ module vGrid_Descriptors
    
    interface vgd_new
       module procedure new_read
+      module procedure new_from_table
       module procedure new_build_vert
       module procedure new_gen      
    end interface vgd_new
@@ -276,6 +284,26 @@ contains
       status = VGD_OK
 
    end function new_read
+
+    integer function new_from_table(self,table) result(status)
+       ! Coordinate constructor - build vertical descriptor from table input
+       ! Set internal vcode (if all above was successful)
+       type(vgrid_descriptor), target, intent(inout) :: self !Vertical descriptor instance    
+       real(kind=8), dimension(:,:,:), pointer :: table   !Raw table of vgrid records
+
+       ! Local variables
+       type(c_ptr) :: table_CP
+       table_CP = c_loc(table)
+       
+       status = VGD_ERROR
+       if ( f_new_from_table(self%cptr, table_CP, size(table,dim=1), size(table,dim=2), size(table,dim=3)) )then
+         print*,'(F_vgd) ERROR: in new_from_table, problem with f_new_from_table'
+         return
+      endif      
+      
+      status = VGD_OK
+      
+    end function new_from_table
 
    integer function new_gen(self,kind,version,hyb,rcoef1,rcoef2,ptop_8,pref_8,ptop_out_8,ip1,ip2,stdout_unit,dhm,dht) result(status)
       implicit none
@@ -459,7 +487,7 @@ contains
          return
       endif
 
-      status = VGD_OK;
+      status = VGD_OK
 
    end function new_build_vert
 

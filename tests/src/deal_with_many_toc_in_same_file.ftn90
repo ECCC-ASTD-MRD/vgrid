@@ -47,7 +47,7 @@ program constructor
      ok=.false.
      print*,'Test failed'
   endif     
-     
+
   print*,'=========================================================================='
   print*,'3) The folling should NOT produce an error since there is only one !!'
   stat = vgd_new(d,unit=lu,format="fst",ip1=2009,ip2=1000,kind=1,version=1)
@@ -61,8 +61,8 @@ program constructor
   stat = vgd_new(d,unit=lu,format="fst",kind=2)
   if(stat.ne.VGD_OK)then
      ok=.false.  
-      print*,'Test failed'
-   endif
+     print*,'Test failed'
+  endif
 
   print*,'=========================================================================='
   print*,'5) The folling should produce an error since option kind must be used with option version'
@@ -71,7 +71,7 @@ program constructor
      ok=.false.  
      print*,'Test failed'
   endif
-  
+
   print*,'=========================================================================='
   print*,'6) The folling should produce an error since vcode doesnt exist'
   stat = vgd_new(d,unit=lu,format="fst",kind=5,version=10)
@@ -79,7 +79,7 @@ program constructor
      ok=.false.  
      print*,'Test failed'
   endif
-   
+
   call ut_report(ok,'Grid_Descriptors, deal_with_two_toc_toc_same_ver_put_diff_ips vgd_new,  5002')
 
   stat=fstfrm(lu)

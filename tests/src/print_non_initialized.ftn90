@@ -14,7 +14,7 @@ program main
      ok=.true.
      print*,'Problem printing vgd'
   endif
-  
+
   call ut_report(ok,'Test print non initialized')  
 
 end program main

@@ -1662,6 +1662,9 @@ int Cvgd_new_from_table(TVGrid **self, double *table, int ni, int nj, int nk) {
     return(VGD_ERROR);
   }
   (*self)->valid = 1;
+  if(fstd_init(*self) == VGD_ERROR) {
+    printf("(Cvgd) ERROR in Cvgd_new_from_table, problem creating record information\n");
+  }
 }
 
 int c_vgrid_genab_1002(float *etauser, int nk, double *ptop_8, double **a_m_8, double **b_m_8, int **ip1_m)
@@ -2311,7 +2314,7 @@ int Cvgd_get_int(TVGrid *self, char *key, int *value, int *quiet)
     return(VGD_ERROR);
   }
   if(! value){
-    printf("(Cvgd) ERROR in c_get_int, value is a NULL pointer\n");
+    printf("(Cvgd) ERROR in Cvgd_get_int, value is a NULL pointer\n");
     return(VGD_ERROR);
   }
   if (strcmp(key, "NL_M") == 0){
@@ -2322,6 +2325,14 @@ int Cvgd_get_int(TVGrid *self, char *key, int *value, int *quiet)
     *value = self->kind;
   } else if (strcmp(key, "VERS") == 0){
     *value = self->version;
+  } else if (strcmp(key, "IG_1") == 0){
+    *value = self->rec.ig1;
+  } else if (strcmp(key, "IG_2") == 0){
+    *value = self->rec.ig2;
+  } else if (strcmp(key, "IG_3") == 0){
+    *value = self->rec.ig3;
+  } else if (strcmp(key, "IG_4") == 0){
+    *value = self->rec.ig4;
   } else if (strcmp(key, "IP_1") == 0){
     *value = self->rec.ip1;
   } else if (strcmp(key, "IP_2") == 0){
@@ -2332,7 +2343,7 @@ int Cvgd_get_int(TVGrid *self, char *key, int *value, int *quiet)
     *value = self->ip1_t[self->nl_t-1];
   } else {
     if(! lquiet) {
-      printf("(Cvgd) ERROR in c_get_int, invalid key %s\n",key);
+      printf("(Cvgd) ERROR in Cvgd_get_int, invalid key %s\n",key);
       fflush(stdout);
     }
     return(VGD_ERROR);
@@ -2967,8 +2978,14 @@ int Cvgd_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int
     printf("(Cvgd) ERROR in Cvgd_new_read, expecting optional value ip1\n");      
     return (VGD_ERROR);
   }
-  if(kind)    l_kind    = *kind;
-  if(version) l_version = *version;	
+  if(kind) l_kind = *kind;
+  if(version) {    
+    l_version = *version;
+    if(l_kind == -1 && l_version != -1) {
+      printf("(Cvgd) ERROR in Cvgd_new_read, option kind must be used with option version\n");
+      return (VGD_ERROR);
+    }
+  }
   
   //printf("Unit = %d, format = %s, ip1 = %d, ip1 = %d, kind = %d, version = %d\n",unit, format, l_ip1, l_ip2 , l_kind, l_version);
   
@@ -3033,19 +3050,26 @@ int Cvgd_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int
       status = Cvgd_vgdcmp(*self,self2);
       if ( status != 0 ){
       	printf("(Cvgd) ERROR in Cvgd_new_read, found different entries in vertical descriptors after search on ip1 = %d, ip2 = %d, kind = %d, version = %d, status code is %d\n",l_ip1,l_ip2,l_kind,l_version,status);
+	return(VGD_ERROR);
       }
-      // TODO verivier si ce Cvgd_vgd_free est correct 
+      // TODO verifier si ce Cvgd_vgd_free est correct 
       Cvgd_vgd_free(&self2);
   } // Loop in !! 
     
   } else if (strcmp(format, "BIN") == 0){
     printf("(Cvgd) ERROR in Cvgd_new_read, TODO format = \"BIN\"\n");
+    //TODO toc_found will have to be set to 1 or zero depending on read success!!!!!
     return(VGD_ERROR);
   } else {
     printf("(Cvgd) ERROR in Cvgd_new_read, wrong value given to format, expecting FST or BIN got %s\n", format);
     return(VGD_ERROR);
   }
 
+  if(! toc_found) {
+    printf("(Cvgd) ERROR in Cvgd_new_read, cannot find !! of kind = %d and version = %d",l_kind,l_version);
+    return(VGD_ERROR);
+  }
+  
   // Fill structure from input table
   if( Cvgd_new_from_table(self, (*self)->table, ni, nj, nk) == VGD_ERROR ) {
     printf("(Cvgd) ERROR in Cvgd_new_read, unable to construct from table\n");
