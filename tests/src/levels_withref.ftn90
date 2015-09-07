@@ -7,9 +7,13 @@ program level_withref_5001
   integer :: stat,ier,chek_levels_withref
 
   stat=VGD_OK
+
+if(.false.)then
   
   ier=chek_levels_withref('data/dm_1001_from_model_run','')
   if(ier==VGD_ERROR)stat=VGD_ERROR
+
+end if
 
   ier=chek_levels_withref('data/dm_1002_from_model_run','')
   if(ier==VGD_ERROR)stat=VGD_ERROR
@@ -20,6 +24,8 @@ program level_withref_5001
   ier=chek_levels_withref('data/dm_5001_from_model_run','')
   if(ier==VGD_ERROR)stat=VGD_ERROR
   
+! Cette partie est compltee
+
   ier=chek_levels_withref('data/dm_5002_from_model_run','data/dm_5002_ips.txt')
   if(ier==VGD_ERROR)stat=VGD_ERROR
   
@@ -38,7 +44,7 @@ end program level_withref_5001
 
 integer function chek_levels_withref(F_fst,F_ips) result(status)
 
-   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_levels,vgd_putopt,vgd_get,VGD_ERROR,VGD_OK
+   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_putopt,vgd_levels,vgd_get,VGD_ERROR,VGD_OK
 
    implicit none  
 
@@ -69,6 +75,8 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
    logical :: rewrit
    
    status=VGD_ERROR   
+
+   nullify(pres, pres_8, p0, px, p0_8, ip1s)
 
    ier=vgd_putopt('ALLOW_RESHAPE',.true.)
 
