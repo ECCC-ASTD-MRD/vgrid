@@ -544,7 +544,7 @@ int Cvgd_print_desc(TVGrid *self, int *sout, int *convip) {
       return(VGD_ERROR);
       break;
     case 5001:
-      printf("  Number of hybrid levels (momentum levels)", self->nl_m );
+      printf("  Number of hybrid levels (momentum levels) %d\n", self->nl_m );
       printf("  Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref)\n");
       break;
     case 5002:
@@ -591,6 +591,130 @@ int Cvgd_print_desc(TVGrid *self, int *sout, int *convip) {
     
     return(VGD_OK);
   }
+}
+
+static int C_compute_pressure_5002_5003_5004_5005_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double **levels, double *sfc_field, int *in_log, int *dpidpis) {
+
+  double *aa_8, *bb_8, *s_8, lvl;
+  int ij, k, ijk, ind, l_in_log, l_dpidpis, kind;
+  float hyb;
+
+  l_in_log=0;
+  if(in_log){
+    l_in_log = *in_log;
+  }
+  l_dpidpis=0;
+  if(dpidpis){
+    l_dpidpis = *dpidpis;
+  }
+  
+
+  aa_8 = malloc(nk*sizeof(double));
+  if(! aa_8 ) {
+    printf("(Cvgd) ERROR in C_compute_pressure_5002_5003_5004_5005_8, cannot allocate aa_8 of bouble of size %d\n", nk);
+    return(VGD_ERROR);
+  }  
+  bb_8 = malloc(nk*sizeof(double));
+  if(! bb_8 ) {
+    printf("(Cvgd) ERROR in C_compute_pressure_5002_5003_5004_5005_8, cannot allocate bb_8 of bouble of size %d\n", nk);
+    free(aa_8);
+    return(VGD_ERROR);
+  }
+
+  for(k=0; k < nk; k++) {
+    if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_m, self->nl_m) ) != -1 ) {
+      aa_8[k] = self->a_m_8[ind];
+      bb_8[k] = self->b_m_8[ind];
+    } else {
+      if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_t, self->nl_t) ) != -1 ) {
+	aa_8[k] = self->a_t_8[ind];
+	bb_8[k] = self->b_t_8[ind];
+      } else {
+	printf("(Cvgd) ERROR in C_compute_pressure_5002_5003_5004_5005_8, cannot find ip1 %d in vgrid descriptor.\n",ip1_list[k]);
+	free(aa_8);
+	free(bb_8);  	
+	return(VGD_ERROR);	
+      }
+    }
+  }
+  s_8 = malloc(ni*nj*sizeof(double));
+  if(! s_8 ) {
+    printf("(Cvgd) ERROR in C_compute_pressure_5002_5003_5004_5005_8, cannot allocate s_8 of bouble of size %dx%d\n", ni,nj);
+    free(aa_8);
+    free(bb_8);
+    return(VGD_ERROR);
+  }
+  for(ij=0; ij < ni*nj; ij++) {
+    s_8[ij] = log(sfc_field[ij]/self->pref_8);
+  }
+  for(k=0, ijk=0; k < nk; k++) {
+    for(ij=0; ij < ni*nj; ij++, ijk++) {
+      lvl = aa_8[k] + bb_8[k]*s_8[ij];
+      //printf("k %d,ijk %d,aa_8[k] %f,bb_8[k] %f,s_8[ij] %f,sfc_field[ij] %f,self->pref_8 %f, lvl %f, exp(lvl) %f\n",k,ijk,aa_8[k],bb_8[k],s_8[ij],sfc_field[ij],self->pref_8,lvl,exp(lvl));
+      //return(VGD_ERROR);
+      (*levels)[ijk] = l_in_log ? lvl : exp(lvl);
+    }
+  }
+  // Force surface pressure to be equal to sfc_field
+  // Needed by assimilation section.  
+  if(! l_in_log) {
+    for(k=0; k < nk; k++) {
+      hyb = c_convip_IP2Level(ip1_list[k],&kind);
+      //printf("k = %d, hyb = %f, hyb - 1. = %f, fabs(hyb - 1.) = %f\n",k, hyb, hyb - 1., fabs(hyb-1.));
+      if(fabs(hyb - 1.) < .000001 && kind == 5) {
+	ijk=k*ni*nj;
+	for(ij=0; ij < ni*nj; ij++, ijk++) {
+	  (*levels)[ijk] = sfc_field[ij];
+	}
+      }
+    }
+  }
+							  
+  free(s_8);
+  free(aa_8);
+  free(bb_8);
+
+  return(VGD_OK);
+
+}
+
+int Cvgd_diag_withref_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double **levels, double *sfc_field, int *in_log, int *dpidpis) {
+
+    if(! Cvgd_is_valid(self,"SELF")){
+      printf("(Cvgd) ERROR in Cvgd_diag_withref_8, invalid vgrid.\n");
+      return(VGD_ERROR);
+    }
+    switch(self->vcode) {
+    case 1001:
+      printf("TODO Cvgd_diag_withref_8 1001\n");
+      return(VGD_ERROR);
+      break;
+    case 1002:
+      printf("TODO Cvgd_diag_withref_8 1002\n");
+      return(VGD_ERROR);
+      break;
+    case 2001:
+      printf("TODO Cvgd_diag_withref_8 2001\n");
+      return(VGD_ERROR);
+      break;
+    case 1003:
+    case 5001:
+      printf("TODO Cvgd_diag_withref_8 1003 5001\n");
+      return(VGD_ERROR);
+      break;
+    case 5002:
+    case 5003:
+    case 5004:
+    case 5005:
+      if( C_compute_pressure_5002_5003_5004_5005_8(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log, dpidpis) == VGD_ERROR) {
+	return(VGD_ERROR);
+      }
+      break;
+    default:
+      printf("(Cvgd) ERROR in Cvgd_diag_withref_8, invalid kind or version: kind = %d, version = %d\n",self->kind,self->version);
+      return(VGD_ERROR);
+    }
+    
 }
 
 /*----------------------------------------------------------------------------
@@ -855,7 +979,8 @@ int compute_pressure_1001_8(TVGrid* VGrid,double *SfcField,int *Ip1List,double *
    int k,*idxs,ij,ijk;
    double lvl;
 
-   // Is this temporary table really necessary? (Can Levels be modified halfway trough before an error is encountered or is data integrity the goal here?)
+   // ELO : Is this temporary table really necessary? (Can Levels be modified halfway trough before an error is encountered or is data integrity the goal here?)
+   // AP  : Yes this temporary table is necessary since Ip1List is a subset of all possible levels in general, some ips con come from momentum level other from thermo levels.
    idxs = malloc(NbLevels*sizeof(int));
    if( !idxs ) {
       fprintf(stderr,"Could not allocate memory for idxs in compute_pressure_1001_8\n");
@@ -2718,6 +2843,25 @@ int Cvgd_get_real8_3d(TVGrid *self, char *key, double **value, int *ni, int *nj,
   }
 
   return(VGD_OK);
+}
+
+int Cvgd_get_char(TVGrid *self, char *key, char out[], int *quiet) {
+  int lquiet = 0; // Not quiet by default
+  if(quiet) lquiet = *quiet;   
+  if(! Cvgd_is_valid(self,"SELF")){
+    printf("(Cvgd) ERROR in Cvgd_get_char, invalid vgrid.\n");
+    return(VGD_ERROR);
+  }
+  if( strcmp(key, "ETIK") == 0 ){
+    strcpy(out,self->rec.etiket);
+  } else if( strcmp(key, "NAME") == 0 ){
+    strcpy(out,self->rec.nomvar);
+  } else if( strcmp(key, "RFLD") == 0 ){
+    strcpy(out,self->ref_name);
+  } else {
+    printf("(Cvgd) ERROR in Cvgd_get_char, invalid key -> '%s'\n",key);
+    return(VGD_ERROR);
+  }
 }
 
 int Cvgd_put_int(TVGrid **self, char *key, int value) {

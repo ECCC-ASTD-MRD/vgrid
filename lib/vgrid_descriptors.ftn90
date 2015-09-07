@@ -3,7 +3,7 @@ module vGrid_Descriptors
   ! Autors : Ron MacTaggart-Cowan and Andre Plante
   ! Contributors : Cecilien Charette
 
-  implicit none
+  implicit non
   private
 
   ! Note : all pressure is hydrostatic
