@@ -123,6 +123,33 @@ int is_required_float(TVGrid *self, float *ptr, int *table_valid, char *message)
   return(1);
 }
 
+int my_alloc_int(int **vec, int size, char *message){
+  *vec = malloc ( size * sizeof(int) );
+  if(! *vec){    
+    printf("%s %d\n",message, size);
+    return(VGD_ERROR);
+  }
+  return(VGD_OK);
+}
+
+int my_alloc_float(float **vec, int size, char *message){
+  *vec = malloc ( size * sizeof(float) );
+  if(! *vec){    
+    printf("%s %d\n",message, size);
+    return(VGD_ERROR);
+  }
+  return(VGD_OK);
+}
+
+int my_alloc_double(double **vec, int size, char *message){
+  *vec = malloc ( size * sizeof(double) );
+  if(! *vec){    
+    printf("%s %d\n",message, size);
+    return(VGD_ERROR);
+  }
+  return(VGD_OK);
+}
+
 int is_bigendian() {
   int n = 1;
   // little endian if true
@@ -172,6 +199,15 @@ void flip_transfer_c2d(char *name, double *val_8) {
     u.d = reverseDouble(u.c);
   }
   *val_8 = u.d;
+}
+
+int max_int(int *vec, int ni) {
+  int i, ind = 0;
+  for( i = 1; i < ni; i++){
+    if( vec[i] > vec[ind] )
+      ind = i;
+  }
+  return(vec[ind]);
 }
 
 double c_get_error(char *key) {
@@ -593,6 +629,36 @@ int Cvgd_print_desc(TVGrid *self, int *sout, int *convip) {
   }
 }
 
+static int C_compute_pressure_1001_1002_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log) {
+  
+  int k,*ind,ij,ijk;
+  double lvl;
+  
+  if( my_alloc_int(&ind, nk, "(Cvgd) ERROR in C_compute_pressure_1001_1002_8, cannot allocate ind of int of size\n") == VGD_ERROR )
+    return(VGD_ERROR);
+  
+  // Find ip1 indexes
+  for( k = 0; k < nk; ++k ){
+    if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],self->ip1_m,self->nk)) == -1 ) {
+      printf("(Cvgd) ERROR in C_compute_pressure_1001_1002_8, cannot find ip1 %d in vgrid descriptor.\n",ip1_list[k]);
+      free(ind);
+      return(VGD_ERROR);
+    }
+  }
+  
+  // Compute pressure
+  for( k = 0, ijk=0; k < nk; ++k ){
+    for( ij = 0; ij < ni*nj; ++ij, ++ijk ){
+      lvl = self->a_m_8[ind[k]] + self->b_m_8[ind[k]] * sfc_field[ij];
+      levels[ijk] = in_log ? log(lvl) : lvl;
+    }
+  }
+  //printf("self->a_m_8[ind[0]] = %f, self->b_m_8[ind[0]] = %f, levels[0] = %f\n",self->a_m_8[ind[0]], self->b_m_8[ind[0]], levels[0]);
+  free(ind);
+  return(VGD_OK);
+
+}
+
 static int C_compute_pressure_5002_5003_5004_5005_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double **levels, double *sfc_field, int *in_log, int *dpidpis) {
 
   double *aa_8, *bb_8, *s_8, lvl;
@@ -607,7 +673,6 @@ static int C_compute_pressure_5002_5003_5004_5005_8(TVGrid *self, int ni, int nj
   if(dpidpis){
     l_dpidpis = *dpidpis;
   }
-  
 
   aa_8 = malloc(nk*sizeof(double));
   if(! aa_8 ) {
@@ -678,43 +743,64 @@ static int C_compute_pressure_5002_5003_5004_5005_8(TVGrid *self, int ni, int nj
 
 }
 
-int Cvgd_diag_withref_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double **levels, double *sfc_field, int *in_log, int *dpidpis) {
+int Cvgd_diag_withref_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int *in_log, int *dpidpis) {
 
-    if(! Cvgd_is_valid(self,"SELF")){
-      printf("(Cvgd) ERROR in Cvgd_diag_withref_8, invalid vgrid.\n");
+  int l_in_log, l_dpidpis, error;
+  
+  if(! Cvgd_is_valid(self,"SELF")){
+    printf("(Cvgd) ERROR in Cvgd_diag_withref_8, invalid vgrid.\n");
+    return(VGD_ERROR);
+  }
+  
+  l_in_log=0;
+  if(in_log){
+    l_in_log = *in_log;
+  }
+  l_dpidpis=0;
+  if(dpidpis){
+    l_dpidpis = *dpidpis;
+  }
+  
+  switch(self->vcode) {
+  case 1001:
+    if( C_compute_pressure_1001_1002_8(self, ni, nj, nk, ip1_list, levels, sfc_field, l_in_log) == VGD_ERROR) {      
       return(VGD_ERROR);
     }
-    switch(self->vcode) {
-    case 1001:
-      printf("TODO Cvgd_diag_withref_8 1001\n");
-      return(VGD_ERROR);
-      break;
-    case 1002:
-      printf("TODO Cvgd_diag_withref_8 1002\n");
-      return(VGD_ERROR);
-      break;
-    case 2001:
-      printf("TODO Cvgd_diag_withref_8 2001\n");
-      return(VGD_ERROR);
-      break;
-    case 1003:
-    case 5001:
-      printf("TODO Cvgd_diag_withref_8 1003 5001\n");
-      return(VGD_ERROR);
-      break;
-    case 5002:
-    case 5003:
-    case 5004:
-    case 5005:
-      if( C_compute_pressure_5002_5003_5004_5005_8(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log, dpidpis) == VGD_ERROR) {
-	return(VGD_ERROR);
-      }
-      break;
-    default:
-      printf("(Cvgd) ERROR in Cvgd_diag_withref_8, invalid kind or version: kind = %d, version = %d\n",self->kind,self->version);
+    break;
+  case 1002:
+    if( l_dpidpis ){
+      printf("(Cvgd) ERROR: dpidpis not implemented for vertical coordinate 1002\n");
       return(VGD_ERROR);
     }
-    
+    if( C_compute_pressure_1001_1002_8(self, ni, nj, nk, ip1_list, levels, sfc_field, l_in_log) == VGD_ERROR) {      
+      return(VGD_ERROR);
+    }
+    break;
+  case 2001:
+    printf("TODO Cvgd_diag_withref_8 2001\n");
+    break;
+  case 1003:
+  case 5001:
+    printf("TODO Cvgd_diag_withref_8 1003 5001\n");
+    return(VGD_ERROR);
+    break;
+  case 5002:
+  case 5003:
+  case 5004:
+  case 5005:
+    //if( C_compute_pressure_5002_5003_5004_5005_8(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log, dpidpis) == VGD_ERROR) {
+    //  return(VGD_ERROR);
+    //}
+    printf("(Cvgd) ERROR in Cvgd_diag_withref_8 TO CHECK for ** or * C_compute_pressure_5002_5003_5004_5005_8\n");
+    return(VGD_ERROR);
+    break;
+  default:
+    printf("(Cvgd) ERROR in Cvgd_diag_withref_8, invalid kind or version: kind = %d, version = %d\n",self->kind,self->version);
+    return(VGD_ERROR);
+  }
+  
+  return(VGD_OK);
+
 }
 
 /*----------------------------------------------------------------------------
@@ -809,30 +895,6 @@ void Cvgd_vgd_free(TVGrid **self) {
 }
 
 /*----------------------------------------------------------------------------
- * Nom      : <get_version_info>
- * Creation : Avril 2015 - E. Legault-Ouellet - CMC/CMOE
- *
- * But      : Retrieve kind and version information from the table
- *
- * Parametres :
- *    <VGrid>  : The grid structure
- *    <Kind>   : Kind of the vertical coord
- *    <Version>: Version of the vertical coord
- *
- * Retour   :
- *
- * Remarques :
- *
- *----------------------------------------------------------------------------
- */
-int get_version_info(TVGrid *VGrid,int *Kind,int *Version) {
-   *Kind    = (int)round(VGrid->table[0]);
-   *Version = (int)round(VGrid->table[1]);
-
-   return(VGD_OK);
-}
-
-/*----------------------------------------------------------------------------
  * Nom      : <Cvgd_set_vcode_i>
  * Creation : Avril 2015 - E. Legault-Ouellet - CMC/CMOE
  *
@@ -883,12 +945,7 @@ int Cvgd_set_vcode(TVGrid *VGrid) {
       return(VGD_ERROR);
    }
 
-   if( (err=get_version_info(VGrid,&kind,&version)) != VGD_OK ) {
-      fprintf(stderr,"Cannot decode table to read kind and version\n");
-      return(err);
-   }
-
-   return Cvgd_set_vcode_i(VGrid,kind,version);
+   return Cvgd_set_vcode_i(VGrid,VGrid->kind,VGrid->version);
 }
 
 /*----------------------------------------------------------------------------
@@ -973,45 +1030,9 @@ int fstd_init(TVGrid *VGrid) {
    return(VGD_OK);
 }
 
-// Note the added 'NbLevels' parameter because 'size(Levels)' is not available in C ('sizeof(Levels)' would return the size of the 'Levels' pointer in bytes (aka 8 bytes on a x86_64 system))
-// Also note the added 'NIJ' required to correctly set 'Levels'.
-int compute_pressure_1001_8(TVGrid* VGrid,double *SfcField,int *Ip1List,double *Levels,int NbLevels,int NIJ,char InLog) {
-   int k,*idxs,ij,ijk;
-   double lvl;
-
-   // ELO : Is this temporary table really necessary? (Can Levels be modified halfway trough before an error is encountered or is data integrity the goal here?)
-   // AP  : Yes this temporary table is necessary since Ip1List is a subset of all possible levels in general, some ips con come from momentum level other from thermo levels.
-   idxs = malloc(NbLevels*sizeof(int));
-   if( !idxs ) {
-      fprintf(stderr,"Could not allocate memory for idxs in compute_pressure_1001_8\n");
-      return(VGD_ERROR);
-   }
-
-   // Find ip1 indexes
-   for(k=0; k<NbLevels; ++k) {
-      if( (idxs[k]=VGD_FindIp1Idx(Ip1List[k],VGrid->ip1_m,VGrid->nk)) == -1 ) {
-         fprintf(stderr,"Cannot find ip1 %d in compute_pressure_1001_8\n",Ip1List[k]);
-         free(idxs);
-         return(VGD_ERROR);
-      }
-   }
-
-   // Compute pressure
-   for(k=0,ijk=0; k<NbLevels; ++k) {
-      for(ij=0; ij<NIJ; ++ij,++ijk) {
-         lvl = VGrid->a_m_8[idxs[k]] + VGrid->b_m_8[idxs[k]]*SfcField[ij];
-         Levels[ijk] = InLog ? log(lvl) : lvl;
-      }
-   }
-
-   free(idxs);
-   return(VGD_OK);
-}
-
 int Cvgd_new_build_vert(TVGrid **self, int kind, int version, int nk, int ip1, int ip2, double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2, 
 		     double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int nl_m, int nl_t)
 {
-
   char cvcode[5];
   int errorInput = 0, ier;
   
@@ -1141,7 +1162,6 @@ int Cvgd_new_build_vert(TVGrid **self, int kind, int version, int nk, int ip1, i
     (*self)->b_t_8 = (*self)->b_m_8;
     (*self)->nl_t = (*self)->nl_m;
   }
-
   if(is_valid( *self, ip1_m_valid)) {
     if(ip1_m){
       free((*self)->ip1_m);
@@ -1176,7 +1196,7 @@ int Cvgd_new_build_vert(TVGrid **self, int kind, int version, int nk, int ip1, i
   }
   if (errorInput > 0) {
     return (VGD_ERROR);
-  }
+  }  
   // Fill table with version-specific encoder
   switch((*self)->vcode) {
   case 1001:
@@ -1185,7 +1205,7 @@ int Cvgd_new_build_vert(TVGrid **self, int kind, int version, int nk, int ip1, i
     break;
   case 1002:
     strcpy(cvcode,"1002");
-    ier = c_encode_vert_1002(self,nk);    
+    ier = c_encode_vert_1002(self,nk);
     break;
   case 2001:
     ier = c_encode_vert_2001(self,nk);
@@ -1297,7 +1317,6 @@ int c_encode_vert_1002(TVGrid **self,int nk){
   }
 
   (*self)->valid = 1;
-
   return(VGD_OK);
 }
 
@@ -1463,7 +1482,6 @@ int c_decode_vert_1002(TVGrid **self) {
   flip_transfer_d2c((*self)->ref_name,(*self)->table[4]);
   // The value in table is not used, so we continue with ind = 6
   ind = 6;
-  
   nk = (*self)->table_nj - skip;
   
   // Free A, B and Ip1 vectors for momentum and thermo.
@@ -1695,7 +1713,7 @@ int c_vgrid_genab_1001(float *hyb, int nk, float **hybm, double **a_m_8, double 
   for ( k = 0; k < nk; k++){
     (*a_m_8)[k]=0.;
     // Go back and forth to ip1 in order to make sure hyb value is encodable.
-    ip1 = c_convip_Level2IP(hyb[k],1);
+    ip1 = c_convip_Level2IP_old_style(hyb[k],1);
     (*b_m_8)[k] = (double) c_convip_IP2Level(ip1,&kind2);
     (*ip1_m)[k] = ip1;
   }
@@ -1741,6 +1759,7 @@ int Cvgd_new_from_table(TVGrid **self, double *table, int ni, int nj, int nk) {
   for(i = 0; i < table_size; i++) {
     (*self)->table[i] = ltable[i];
   }
+  
   free(ltable);
   // Fill remainder of structure
   if( Cvgd_set_vcode(*self) == VGD_ERROR ) {
@@ -1790,6 +1809,7 @@ int Cvgd_new_from_table(TVGrid **self, double *table, int ni, int nj, int nk) {
   if(fstd_init(*self) == VGD_ERROR) {
     printf("(Cvgd) ERROR in Cvgd_new_from_table, problem creating record information\n");
   }
+  return(VGD_OK);
 }
 
 int c_vgrid_genab_1002(float *etauser, int nk, double *ptop_8, double **a_m_8, double **b_m_8, int **ip1_m)
@@ -2858,6 +2878,7 @@ int Cvgd_get_char(TVGrid *self, char *key, char out[], int *quiet) {
     strcpy(out,self->rec.nomvar);
   } else if( strcmp(key, "RFLD") == 0 ){
     strcpy(out,self->ref_name);
+    printf("out = %s, self->ref_name = %s\n",out,self->ref_name );
   } else {
     printf("(Cvgd) ERROR in Cvgd_get_char, invalid key -> '%s'\n",key);
     return(VGD_ERROR);
@@ -2979,7 +3000,6 @@ int Cvgd_new_gen(TVGrid **self, int kind, int version, float *hyb, int size_hyb,
     nl_m = size_hyb;
     nl_t = size_hyb;
     if(c_vgrid_genab_1002(hyb, size_hyb, ptop_8, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
-      free(hybm);
       free(a_m_8);
       free(b_m_8);
       free(ip1_m);
@@ -3072,7 +3092,6 @@ int Cvgd_new_gen(TVGrid **self, int kind, int version, float *hyb, int size_hyb,
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_new_gen, problem with new_build_vert for kind = %d, version = %d\n",kind,version);
     return(VGD_ERROR);
   }
-
   free(hybm);
   free(a_m_8);
   free(b_m_8);
@@ -3084,9 +3103,276 @@ int Cvgd_new_gen(TVGrid **self, int kind, int version, float *hyb, int size_hyb,
   return (VGD_OK);
 }
 
-int c_vgd_legacy(TVGrid **self, int unit, int kind) {
-  printf("c_vgd_legacy TODO\n");
+static int C_get_consistent_pt_e1(int iun, float *val, char *nomvar ){
+  int error, ni, nj, nk, nmax=1000, infon, k;
+  int liste[nmax];
+  float *work;
+  TFSTD_ext var;
+
+  error = c_fstinl(iun, &ni, &nj, &nk, -1, " ", -1, -1, -1, " ", nomvar, liste, &infon, nmax);
+  if (error < 0) {
+    printf("(Cvgd) ERROR in C_get_consistent_pt_e1, with fstinl\n");
+    return(VGD_ERROR);
+  }
+  
+  if( infon > 1 ){
+    printf("(Cvgd)  More than one %s checking consistency ...\n",nomvar);
+  }
+
+  if( my_alloc_float(&work, ni*nj, "(Cvgd) ERROR in C_get_consistent_pt_e1, unable to allocate work") == VGD_ERROR )
+    return(VGD_ERROR);
+
+  for( k = 0; k < infon; k++ ){
+    if( my_fstprm(liste[k], &var) == VGD_ERROR ){
+      goto bomb;
+    }
+    if ( var.ni != ni && var.nj != nj && var.nk != nk ){
+	printf("(Cvgd) ERROR: in C_get_consistent_pt_e1, dim misatch for %s, expected (%d,%d,%d), got (%d,%d,%d)\n", nomvar, ni, nj, nk, var.ni, var.nj, var.nk);
+      goto bomb;
+    }
+    if( c_fstluk(work,liste[k],&ni,&nj,&nk) < 0 ){
+      printf("(Cvgd) ERROR: in C_get_consistent_pt_e1, with c_fstluk");
+    }
+    if( k == 0 ){
+      *val = work[0];
+    } else {
+      if( work[0] != *val ){
+	printf("(Cvgd) ERROR: in C_get_consistent_pt_e1, inconsistent %s, %f v %f\n", nomvar, work[0], val);
+	goto bomb;
+      }
+    }
+  }
+  printf("(Cvgd)   All %s consistent\n", nomvar);
+  free(work);
+  return(VGD_OK);
+ bomb:
+  free(work);
   return(VGD_ERROR);
+}
+
+static int C_gen_legacy_desc(TVGrid **self, int unit, int *ip1list, int *keylist , int nb ){
+  
+  int *ip1 = NULL;
+  int kind, origkind, k, ni, nj, nk, hy_key, pt_key, e1_key;
+  float ptop;
+  float *hyb = NULL, *hybm = NULL;
+  double ptop_8, pref_8;
+  double *a_m_8 = NULL, *b_m_8 = NULL;
+  TFSTD_ext var, va2;
+
+  if(my_alloc_float (&hyb  ,nb,"(Cvgd) ERROR: in C_gen_legacy_desc, cannot allocate hyb of size")   == VGD_ERROR)
+    return(VGD_ERROR);
+  if(my_alloc_float (&hybm ,nb,"(Cvgd) ERROR: in C_gen_legacy_desc, cannot allocate hybm of size")  == VGD_ERROR)
+    return(VGD_ERROR);
+
+  if( my_fstprm(keylist[0], &var) == VGD_ERROR ){
+    printf("(Cvgd) ERROR: in C_gen_legacy_desc, fstprm 1 on key %d\n", keylist[0]);
+    goto bomb;
+  }
+  hyb[0] = c_convip_IP2Level(var.ip1,&kind);
+  if( kind != 1 && kind != 2 && kind != 5 ){
+    printf("(Cvgd) ERROR: in C_gen_legacy_desc, kind = %d, has to be 1, 2 or 5\n", kind);
+    goto bomb;
+  }
+  origkind=kind;
+
+  for( k = 1; k < nb; k++ ){
+    if( my_fstprm(keylist[k], &va2) == VGD_ERROR ){
+      printf("(Cvgd) ERROR: in C_gen_legacy_desc, fstprm 2 on key %d\n", keylist[k]);
+      goto bomb;
+    }
+    if ( va2.ni != var.ni && va2.nj != var.nj && va2.nk != var.nk ){
+      printf("(Cvgd) ERROR: in C_gen_legacy_desc, dim misatch expected (%d,%d,%d), got (%d,%d,%d)\n", var.ni, var.nj, var.nk, va2.ni, va2.nj, va2.nk);
+      goto bomb;
+    }
+    hyb[k] = c_convip_IP2Level(va2.ip1,&kind);
+    if( kind != origkind ){
+      printf("(Cvgd) ERROR: in C_gen_legacy_desc, expecting kind = %d, got kind = %d\n",origkind, kind);
+      goto bomb;
+    }
+  }
+
+  hy_key = c_fstinf (unit,&ni,&nj,&nk,-1," ",-1,  -1,  -1," ","HY  ");
+  pt_key = c_fstinf (unit,&ni,&nj,&nk,-1," ",-1,  -1,  -1," ","PT  ");
+  e1_key = c_fstinf (unit,&ni,&nj,&nk,-1," ",-1,  -1,  -1," ","E1  ");
+
+  if( kind == 1 ){
+    if( pt_key >= 0){
+      //=============================================
+      // PT PT PT PT PT PT PT PT PT PT PT PT PT PT PT
+      //---------------------------------------------
+      // TODO verify presence of HY bomb if there
+      if( C_get_consistent_pt_e1(unit, &ptop,"PT  ") == VGD_ERROR ){
+	printf("(Cvgd) ERROR in C_gen_legacy_desc, consistency check on PT failed\n");
+	goto bomb;
+      }
+      if( e1_key >= 0){
+	printf("(Cvgd) TODO in C_gen_legacy_desc, add support to 1004 etasef coordinate");
+	goto bomb;
+      } else {
+	printf("(Cvgd)   eta coordinate found\n");
+	ptop_8 = ptop*100.;
+	if( c_vgrid_genab_1002(hyb, nb, &ptop_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ){	  
+	  goto bomb;
+	}
+	if( Cvgd_new_build_vert(self, kind, 2, nb, var.ip1, var.ip2, &ptop_8, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, ip1, NULL, nb, NULL) == VGD_ERROR ){
+	  goto bomb;
+	}
+      }
+    } else if ( hy_key >= 0){
+      //================================================
+      // HY HY HY HY HY HY HY HY HY HY HY HY HY HY HY HY
+      //------------------------------------------------
+      printf("C_gen_legacy_desc TODO 1002_5001 avec HY\n");
+      return(VGD_ERROR);
+    } else {
+      // SIGMA SIGMA SIGMASIGMA SIGMA SIGMASIGMA SIGMA
+      if( c_vgrid_genab_1001(hyb, nb, &hybm, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ){
+	goto bomb;
+      }
+      if( Cvgd_new_build_vert(self, kind, 1, nb, var.ip1, var.ip2, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, ip1, NULL, nb, NULL) == VGD_ERROR ){
+	goto bomb;
+      }
+    }
+    
+  }
+  
+  
+  free(ip1);
+  free(hyb);
+  free(hybm);
+  free(a_m_8);
+  free(b_m_8);
+  return(VGD_OK);
+  
+ bomb:
+  free(ip1);
+  free(hyb);
+  free(hybm);
+  free(a_m_8);
+  free(b_m_8);
+  printf("TODO C_gen_legacy_desc\n");
+  return(VGD_ERROR);
+
+}
+
+int Cvgd_legacy(TVGrid **self, int unit, int F_kind) {
+  // Construct vertical structure from legacy encoding (PT,HY...)
+
+  int error, ni, nj, nk, nip1, i, j, k, kind, nb_kind=100, aa, nb;
+  int count, nkeylist = MAX_DESC_REC, valid_kind;
+  int keylist[nkeylist], ip1list[nkeylist], status, num_in_kind[nb_kind];
+  float preslist[nkeylist], xx;
+  TFSTD_ext var;
+
+  for( i = 0; i < nb_kind; i++){
+    num_in_kind[i] = 0;
+  }
+
+  if(F_kind > 0) {
+    printf("(Cvgd) Looking for kind = %d",F_kind);
+  }
+  error = c_fstinl(unit, &ni, &nj, &nk, -1, " ", -1, -1, -1, " ", " ", keylist, &count, nkeylist);
+  if (error < 0) {
+    printf("(Cvgd) ERROR in Cvgd_legacy, with fstinl\n");
+    return(VGD_ERROR);
+  }
+  nip1 = 0;
+  for( i = 0; i < count; i++){
+    error = my_fstprm(keylist[i], &var);
+    if (error == VGD_ERROR) {
+      printf("(Cvgd) ERROR in Cvgd_legacy, error return from fstprm wrapper for fst key = %d",keylist[i]);
+      return(VGD_ERROR);
+    }
+    preslist[i] = c_convip_IP2Level(var.ip1,&kind);
+    if( strcmp(var.nomvar, ">>  ") == 0 )
+      continue;
+    if( strcmp(var.nomvar, "^^  ") == 0 )
+      continue;
+    if( strcmp(var.nomvar, "^>  ") == 0 )
+      continue;
+    if( strcmp(var.nomvar, "P0   ") == 0 )
+      continue;
+    if( strcmp(var.nomvar, "PT  ") == 0 )
+      continue;
+    if( strcmp(var.nomvar, "HY  ") == 0 )
+      continue;
+    if( kind == 2 && preslist[i] == 0. )
+      continue;
+    if(F_kind > 0 && kind != F_kind)
+      continue;
+    if(kind == 1 || kind == 2 || kind == 5) {
+      num_in_kind[kind] = num_in_kind[kind]+1;
+      ip1list[nip1]=var.ip1;
+      keylist[nip1]=keylist[i];
+      preslist[nip1]=preslist[i];
+      valid_kind=kind;
+      nip1++;
+    }
+  }
+  if(max_int(num_in_kind,nb_kind) != nip1){
+    printf("(Cvgd) ERROR: more than one pressure/sigma/hyb coordinate in file\n");
+    for(i = 0; i < nb_kind; i++){
+      if(num_in_kind[i] > 0) {
+	printf("(Cvgd)           There are %d records of kind %d\n",num_in_kind[i],i);
+      }
+    }
+    return(VGD_ERROR);
+  }
+  // Sort levels in ascending order
+  for( i = 0; i < nip1 - 1; i++){
+    k = i;
+    for( j = i + 1; j < nip1; j++){
+      if( preslist[j] < preslist[k] )
+	k = j;
+    }
+    if( k != i ){
+      // hyb
+      xx          = preslist[k];
+      preslist[k] = preslist[i];
+      preslist[i] = xx;
+      // ip1
+      aa          = ip1list[k];
+      ip1list[k]  = ip1list[i];
+      ip1list[i]  = aa;	
+      // fstkey
+      aa          = keylist[k];
+      keylist[k]  = keylist[i];
+      keylist[i]  = aa;
+    }
+  }
+  // Remove duplictate (there must be a better way to do this)
+  for( i = 0; i < nip1-1; i++ ){
+    if( ip1list[i] != -1 ){
+      for( j = i+1; j < nip1; j++ ){
+	if( ip1list[j] == ip1list[i] ){
+	  ip1list[j] = -1;
+	}
+      }
+    }
+  }
+  nb=0;
+  for( i = 0; i < nip1; i++ ){
+    if( ip1list[i] != -1 ){
+      ip1list[nb]  = ip1list[i];
+      keylist[nb]  = keylist[i];
+      // pres is not used below but adjusting for consistency and possible future use.
+      preslist[nb] = preslist[i];
+      nb++;
+    }
+  }
+  if( nb == 0){
+    printf("(Cvgd) ERROR: No record of type pressure/sigma/hyb in file");
+    return(VGD_ERROR);
+  }
+  printf("(Cvgd)   Found %d unique ip1 of kind %d among the %d records in file to construct the vertical descriptor\n", nb, valid_kind, count);
+  error = C_gen_legacy_desc(self, unit, ip1list, keylist , nb);
+  if( error == VGD_ERROR ){
+    printf("(Cvgd) ERROR: problem with C_gen_legacy_desc\n");
+    return(VGD_ERROR);
+  }  
+  printf("(Cvgd)   Vertical descriptor successfully reconstructed\n");
+  return(VGD_OK);
 }
 
 int Cvgd_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int *kind, int *version) {
@@ -3110,7 +3396,6 @@ int Cvgd_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int
   
   if(ip1) {
     l_ip1     = *ip1;
-    (*self)->match_ipig = 1;
     if(ip2) {
       l_ip2     = *ip2;
     } else {
@@ -3121,6 +3406,10 @@ int Cvgd_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int
   if(ip2 && !ip1){
     printf("(Cvgd) ERROR in Cvgd_new_read, expecting optional value ip1\n");      
     return (VGD_ERROR);
+  }
+  (*self)->match_ipig = 0;
+  if(l_ip1 > 0){
+    (*self)->match_ipig = 1;
   }
   if(kind) l_kind = *kind;
   if(version) {    
@@ -3139,66 +3428,67 @@ int Cvgd_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int
 
     error = c_fstinl(unit, &ni, &nj, &nk, -1, " ", l_ip1, l_ip2, -1, " ", ZNAME, keyList, &count, nkeyList);
     if (error < 0) {
-      printf("(Cvgd) ERROR in Cvgd_new_read, with fstinl on nomvar !!");
+      printf("(Cvgd) ERROR in Cvgd_new_read, with fstinl on nomvar !!\n");
       return(VGD_ERROR);
     }
     if(count == 0){
-      printf("(Cvgd) ERROR in Cvgd_new_read, cannot find %s with the following ips: ip1=%d, ip2=%d\n", ZNAME, l_ip1, l_ip2);
+      printf("(Cvgd) Cannot find %s with the following ips: ip1=%d, ip2=%d\n", ZNAME, l_ip1, l_ip2);
       if((*self)->match_ipig) {
 	(*self)->vcode = -1;
 	return(VGD_ERROR);
       }
-      printf("(Cvgd) ERROR in Cvgd_new_read, Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)\n");
-      printf("in Cvgd_new_read, call to c_vgd_legacy TODO");
-      if(c_vgd_legacy(self,unit,l_kind) == VGD_ERROR){
+      printf("(Cvgd) Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)\n");
+      if(Cvgd_legacy(self,unit,l_kind) == VGD_ERROR){
+	printf("(Cvgd) ERROR: failed to construct vgrid descriptor from legacy encoding\n");
 	return(VGD_ERROR);
       }
       if(fstd_init(*self) == VGD_ERROR) {
-	printf("(Cvgd) ERROR in Cvgd_new_read, problem creating record information");
+	printf("(Cvgd) ERROR in Cvgd_new_read, problem creating record information\n");
       }
-    }
-    // Loop on all !! found
-    toc_found = 0;
-    for( i=0; i < count; i++) {     
-      // Check if kind and version match, skip the !! if not.
-      if( correct_kind_and_version(keyList[i], l_kind, l_version, &var, &status) == VGD_ERROR) {
-	(*self)->valid = 0;
-	return(VGD_ERROR);
-      }
-      if( status != 1) {
-	continue;
-      }
-      // If we reached this stage then the toc satisfy the selection criteria but it may not be the only one.
-      if(! toc_found) {
-	toc_found = 1;
-	if( load_toctoc(*self,var,keyList[i]) == VGD_ERROR ) {
+    } else {
+      // Loop on all !! found
+      toc_found = 0;
+      for( i=0; i < count; i++) {     
+	// Check if kind and version match, skip the !! if not.
+	if( correct_kind_and_version(keyList[i], l_kind, l_version, &var, &status) == VGD_ERROR) {
+	  (*self)->valid = 0;
+	  return(VGD_ERROR);
+	}
+	if( status != 1) {
+	  continue;
+	}
+	// If we reached this stage then the toc satisfy the selection criteria but it may not be the only one.
+	if(! toc_found) {
+	  toc_found = 1;
+	  if( load_toctoc(*self,var,keyList[i]) == VGD_ERROR ) {
+	    printf("(Cvgd) ERROR in Cvgd_new_read, cannot load !!\n");
+	    return(VGD_ERROR);
+	  }
+	  ni=(*self)->table_ni;
+	  nj=(*self)->table_nj;
+	  nk=(*self)->table_nk;
+	  continue;
+	}
+	// If we get at this point this means that there are more than one toc satisfying the selection criteria.
+	// We load then all to check if they are the same. If not, we return with an error message.
+	self2 = c_vgd_construct();
+	if( my_fstprm(keyList[i], &var) == VGD_ERROR ) {
+	  printf("(Cvgd) ERROR in Cvgd_new_read, with my_fstprm on keyList[i] = %d\n",keyList[i]);
+	  return(VGD_ERROR);
+	}
+	if( load_toctoc(self2,var,keyList[i]) == VGD_ERROR ) {
 	  printf("(Cvgd) ERROR in Cvgd_new_read, cannot load !!\n");
 	  return(VGD_ERROR);
 	}
-	ni=(*self)->table_ni;
-	nj=(*self)->table_nj;
-	nk=(*self)->table_nk;
-	continue;
-      }
-      // If we get at this point this means that there are more than one toc satisfying the selection criteria.
-      // We load then all to check if they are the same. If not, we return with an error message.
-      self2 = c_vgd_construct();
-      if( my_fstprm(keyList[i], &var) == VGD_ERROR ) {
-	printf("(Cvgd) ERROR in Cvgd_new_read, with my_fstprm on keyList[i] = %d\n",keyList[i]);
-	return(VGD_ERROR);
-      }
-      if( load_toctoc(self2,var,keyList[i]) == VGD_ERROR ) {
-      	printf("(Cvgd) ERROR in Cvgd_new_read, cannot load !!\n");
-      	return(VGD_ERROR);
-      }
-      status = Cvgd_vgdcmp(*self,self2);
-      if ( status != 0 ){
-      	printf("(Cvgd) ERROR in Cvgd_new_read, found different entries in vertical descriptors after search on ip1 = %d, ip2 = %d, kind = %d, version = %d, status code is %d\n",l_ip1,l_ip2,l_kind,l_version,status);
-	return(VGD_ERROR);
-      }
-      // TODO verifier si ce Cvgd_vgd_free est correct 
-      Cvgd_vgd_free(&self2);
-  } // Loop in !! 
+	status = Cvgd_vgdcmp(*self,self2);
+	if ( status != 0 ){
+	  printf("(Cvgd) ERROR in Cvgd_new_read, found different entries in vertical descriptors after search on ip1 = %d, ip2 = %d, kind = %d, version = %d, status code is %d\n",l_ip1,l_ip2,l_kind,l_version,status);
+	  return(VGD_ERROR);
+	}
+	// TODO verifier si ce Cvgd_vgd_free est correct 
+	Cvgd_vgd_free(&self2);
+      } // Loop in !! 
+    } //if(count == 0)
     
   } else if (strcmp(format, "BIN") == 0){
     printf("(Cvgd) ERROR in Cvgd_new_read, TODO format = \"BIN\"\n");
@@ -3210,16 +3500,16 @@ int Cvgd_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int
   }
 
   if(! toc_found) {
-    printf("(Cvgd) ERROR in Cvgd_new_read, cannot find !! of kind = %d and version = %d",l_kind,l_version);
+    printf("(Cvgd) ERROR in Cvgd_new_read, cannot find !! or it generate from legacy encoding\n");
     return(VGD_ERROR);
   }
-  
   // Fill structure from input table
-  if( Cvgd_new_from_table(self, (*self)->table, ni, nj, nk) == VGD_ERROR ) {
+  if( Cvgd_new_from_table(self, (*self)->table, (*self)->table_ni, (*self)->table_nj, (*self)->table_nk) == VGD_ERROR ) {
     printf("(Cvgd) ERROR in Cvgd_new_read, unable to construct from table\n");
     return(VGD_ERROR);
   }
 
+  return(VGD_OK);
 }
 
 int Cvgd_write_desc (TVGrid *self, int unit, char *format) {

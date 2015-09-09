@@ -48,7 +48,7 @@ module vGrid_Descriptors
       integer function f_diag_withref_8(vgd_CP, ni, nj, nk, ip1_list_CP, levels_CP,sfc_field_CP, in_log_CP,dpidpis_CP) bind(c, name='Cvgd_diag_withref_8')
          use iso_c_binding, only: c_ptr, c_int
          type(c_ptr), value :: vgd_CP, ip1_list_CP, sfc_field_CP, in_log_CP,dpidpis_CP
-         type(c_ptr)        :: levels_CP
+         type(c_ptr), value  :: levels_CP
          integer (c_int), value :: ni, nj, nk
       end function f_diag_withref_8
 
