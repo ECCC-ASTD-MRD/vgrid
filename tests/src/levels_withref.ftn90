@@ -8,15 +8,17 @@ program level_withref_5001
 
   stat=VGD_OK
 
-if(.false.)then
+if(.true.)then
   
   ier=chek_levels_withref('data/dm_1001_from_model_run','')
   if(ier==VGD_ERROR)stat=VGD_ERROR
 
-end if
-
   ier=chek_levels_withref('data/dm_1002_from_model_run','')
   if(ier==VGD_ERROR)stat=VGD_ERROR
+
+endif
+
+stop
 
   ier=chek_levels_withref('data/2001_from_model_run','')
   if(ier==VGD_ERROR)stat=VGD_ERROR
@@ -44,7 +46,7 @@ end program level_withref_5001
 
 integer function chek_levels_withref(F_fst,F_ips) result(status)
 
-   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_putopt,vgd_levels,vgd_get,VGD_ERROR,VGD_OK
+   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_putopt,vgd_levels,vgd_get,vgd_free,VGD_ERROR,VGD_OK
 
    implicit none  
 
@@ -53,7 +55,7 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
    ! Local variables
    integer, save :: lu=10   
    integer :: fnom,fstouv,fstfrm,lutxt=69,kind
-   type(vgrid_descriptor) :: d
+   type(vgrid_descriptor) :: vgd
    integer, parameter :: nmax=1000
    integer, dimension(nmax) :: liste
    integer :: ier,fstinl,fstprm,fstinf,fstluk,infon,i,j,k
@@ -73,7 +75,7 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
    character(len=2)  :: typvar
    character(len=1)  :: grtyp, ctype, dummy_S
    logical :: rewrit
-   
+
    status=VGD_ERROR   
 
    nullify(pres, pres_8, p0, px, p0_8, ip1s)
@@ -101,7 +103,8 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
    endif
 
    ! Get vertical grid descriptor
-   ier = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
+   ier = vgd_new(vgd,unit=lu,format="fst",ip1=ip1,ip2=ip2)
+
    if(ier == VGD_ERROR )then
       print*,'Problem getting vertical grid descriptor'
       return
@@ -126,11 +129,18 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
       allocate(p0(ni,nj),px(ni,nj))
       p0=0.
    else
-      ier = vgd_get(d,'RFLD',rfld)
+      ier = vgd_get(vgd,'RFLD',rfld)
       if(ier == VGD_ERROR)then
          print*,'Problem with vgd_get "RFLD" for file ',F_fst
          return
       endif
+
+rfld="P0"
+!if(trim(rfld) /= "P0")then
+!   print*,'ERROR rfld devrait egaler P0'
+!   stop
+!endif
+
       key = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',rfld)
       allocate(p0(ni,nj),px(ni,nj))
       ier = fstluk(p0,key,ni,nj,nk)
@@ -145,11 +155,12 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
    p0_8=p0
 
    ! Test 32 bits interface
-   ier = vgd_levels(d,ip1s,pres,p0)
+   ier = vgd_levels(vgd,ip1s,pres,p0)
    if(ier == VGD_ERROR )then
       print*,'Problem with vgd_levels 32 bits'
       return
    endif
+
    do k=1,infon
       ier = fstprm(liste(k),dateo,deet,npas,ni,nj,nk,nbits,datyp, &
            ip1,ip2,ip3,typvar,nomvar,etiket,grtyp,ig1,ig2,ig3,ig4,swa,lng, &
@@ -188,9 +199,9 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
          enddo
       enddo
    enddo
-   
+
    ! Test 64 bits interface
-   ier = vgd_levels(d,ip1s,pres_8,p0_8)
+   ier = vgd_levels(vgd,ip1s,pres_8,p0_8)
    if(ier == VGD_ERROR )then
       print*,'Problem with vgd_levels 64 bits'
       return
@@ -236,6 +247,8 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
    enddo
    deallocate(ip1s,px,p0,p0_8,pres,pres_8)
    
+   ier=vgd_free(vgd)
+
    ier=fstfrm(lu)
 
    status=VGD_OK   
