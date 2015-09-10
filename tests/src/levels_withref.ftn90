@@ -8,25 +8,17 @@ program level_withref_5001
 
   stat=VGD_OK
 
-if(.true.)then
-  
   ier=chek_levels_withref('data/dm_1001_from_model_run','')
   if(ier==VGD_ERROR)stat=VGD_ERROR
 
   ier=chek_levels_withref('data/dm_1002_from_model_run','')
   if(ier==VGD_ERROR)stat=VGD_ERROR
 
-endif
-
-stop
-
   ier=chek_levels_withref('data/2001_from_model_run','')
   if(ier==VGD_ERROR)stat=VGD_ERROR
 
   ier=chek_levels_withref('data/dm_5001_from_model_run','')
   if(ier==VGD_ERROR)stat=VGD_ERROR
-  
-! Cette partie est compltee
 
   ier=chek_levels_withref('data/dm_5002_from_model_run','data/dm_5002_ips.txt')
   if(ier==VGD_ERROR)stat=VGD_ERROR
@@ -104,12 +96,11 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
 
    ! Get vertical grid descriptor
    ier = vgd_new(vgd,unit=lu,format="fst",ip1=ip1,ip2=ip2)
-
    if(ier == VGD_ERROR )then
       print*,'Problem getting vertical grid descriptor'
       return
    endif
-   
+
    ier = fstinl(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ','TT',liste,infon,nmax)
    if(infon == 0 )then
       print*,'pas de record de TT'      
@@ -153,7 +144,6 @@ rfld="P0"
       
    allocate(p0_8(ni,nj))
    p0_8=p0
-
    ! Test 32 bits interface
    ier = vgd_levels(vgd,ip1s,pres,p0)
    if(ier == VGD_ERROR )then
@@ -250,7 +240,6 @@ rfld="P0"
    ier=vgd_free(vgd)
 
    ier=fstfrm(lu)
-
    status=VGD_OK   
    
 end function chek_levels_withref

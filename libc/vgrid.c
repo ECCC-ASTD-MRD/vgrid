@@ -381,7 +381,7 @@ int correct_kind_and_version(int key, int kind, int version, TFSTD_ext *var, int
 
 }
 
-int load_toctoc(TVGrid *self, TFSTD_ext var, int key) {
+int C_load_toctoc(TVGrid *self, TFSTD_ext var, int key) {
 
   int table_size, istat, ni, nj, nk;
 
@@ -392,17 +392,20 @@ int load_toctoc(TVGrid *self, TFSTD_ext var, int key) {
   table_size = self->table_ni * self->table_nj * self->table_nk;
   self->table = malloc ( table_size * sizeof(double) );
   if(! self->table ) {
-    printf("(Cvgd) ERROR in load_toctoc, cannot allocate table of bouble of size %d\n",table_size );
+    printf("(Cvgd) ERROR in C_load_toctoc, cannot allocate table of bouble of size %d\n",table_size );
     return(VGD_ERROR);
   }
   istat = c_fstluk(self->table, key, &ni, &nj, &nk);
   if(istat < 0) {
-    printf("(Cvgd) ERROR in load_toctoc, problem with fstluk\n");
+    printf("(Cvgd) ERROR in C_load_toctoc, problem with fstluk\n");
     free(self->table);
     return(VGD_ERROR);
   }
+  self->kind             = self->table[0];
+  self->version          = self->table[1];
   if(fstd_init(self) == VGD_ERROR) {
-    printf("(Cvgd) ERROR in load_toctoc, problem creating record information\n");
+    printf("(Cvgd) ERROR in C_load_toctoc, problem creating record information\n");
+    return(VGD_ERROR);
   }
   self->rec.dateo        = var.dateo;
   self->rec.deet         = var.deet;
@@ -659,7 +662,80 @@ static int C_compute_pressure_1001_1002_8(TVGrid *self, int ni, int nj, int nk, 
 
 }
 
-static int C_compute_pressure_5002_5003_5004_5005_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double **levels, double *sfc_field, int *in_log, int *dpidpis) {
+static int C_compute_pressure_2001_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double *levels, int in_log) {
+  
+  int k,*ind,ij,ijk;
+  double lvl;
+  
+  if( my_alloc_int(&ind, nk, "(Cvgd) ERROR in C_compute_pressure_2001_8, cannot allocate ind of int of size\n") == VGD_ERROR )
+    return(VGD_ERROR);
+  
+  // Find ip1 indexes
+  for( k = 0; k < nk; ++k ){
+    if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],self->ip1_m,self->nk)) == -1 ) {
+      printf("(Cvgd) ERROR in C_compute_pressure_2001_8, cannot find ip1 %d in vgrid descriptor.\n",ip1_list[k]);
+      free(ind);
+      return(VGD_ERROR);
+    }
+  }
+  
+  // Compute pressure
+  for( k = 0, ijk=0; k < nk; ++k ){
+    for( ij = 0; ij < ni*nj; ++ij, ++ijk ){
+      lvl = self->a_m_8[ind[k]];
+      levels[ijk] = in_log ? log(lvl) : lvl;
+    }
+  }
+  //printf("self->a_m_8[ind[0]] = %f, self->b_m_8[ind[0]] = %f, levels[0] = %f\n",self->a_m_8[ind[0]], self->b_m_8[ind[0]], levels[0]);
+  free(ind);
+  return(VGD_OK);
+
+}
+
+static int C_compute_pressure_1003_5001_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log, int dpidpis ){
+  int k,*ind,ij,ijk;
+  double lvl;
+  
+  if( my_alloc_int(&ind, nk, "(Cvgd) ERROR in C_compute_pressure_1003_5001_8, cannot allocate ind of int of size\n") == VGD_ERROR )
+    return(VGD_ERROR);
+  
+  // Find ip1 indexes
+  for( k = 0; k < nk; ++k ){
+    if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],self->ip1_m,self->nk)) == -1 ) {
+      printf("(Cvgd) ERROR in C_compute_pressure_1003_5001_8, cannot find ip1 %d in vgrid descriptor.\n",ip1_list[k]);
+      free(ind);
+      return(VGD_ERROR);
+    }
+  }
+  
+  if( dpidpis ){
+    if(in_log){
+      printf("(Cvgd) ERROR in C_compute_pressure_1003_5001_8, option in_log not allowed with option dpidpis\n");
+      return(VGD_ERROR);
+    }
+    for( k = 0, ijk=0; k < nk; ++k ){
+      for( ij = 0; ij < ni*nj; ++ij, ++ijk ){
+	levels[ijk] = self->b_m_8[ind[k]];
+      }
+    }    
+    free(ind);
+    return(VGD_OK);
+  }
+  // Compute pressure
+  for( k = 0, ijk=0; k < nk; ++k ){
+    for( ij = 0; ij < ni*nj; ++ij, ++ijk ){
+      lvl = self->a_m_8[ind[k]] + self->b_m_8[ind[k]] * sfc_field[ij];
+      levels[ijk] = in_log ? log(lvl) : lvl;
+    }
+  }
+  //printf("self->a_m_8[ind[0]] = %f, self->b_m_8[ind[0]] = %f, levels[0] = %f\n",self->a_m_8[ind[0]], self->b_m_8[ind[0]], levels[0]);
+  free(ind);
+  
+  return(VGD_OK);
+}
+
+
+static int C_compute_pressure_5002_5003_5004_5005_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int *in_log, int *dpidpis) {
 
   double *aa_8, *bb_8, *s_8, lvl;
   int ij, k, ijk, ind, l_in_log, l_dpidpis, kind;
@@ -717,7 +793,7 @@ static int C_compute_pressure_5002_5003_5004_5005_8(TVGrid *self, int ni, int nj
       lvl = aa_8[k] + bb_8[k]*s_8[ij];
       //printf("k %d,ijk %d,aa_8[k] %f,bb_8[k] %f,s_8[ij] %f,sfc_field[ij] %f,self->pref_8 %f, lvl %f, exp(lvl) %f\n",k,ijk,aa_8[k],bb_8[k],s_8[ij],sfc_field[ij],self->pref_8,lvl,exp(lvl));
       //return(VGD_ERROR);
-      (*levels)[ijk] = l_in_log ? lvl : exp(lvl);
+      levels[ijk] = l_in_log ? lvl : exp(lvl);
     }
   }
   // Force surface pressure to be equal to sfc_field
@@ -729,7 +805,7 @@ static int C_compute_pressure_5002_5003_5004_5005_8(TVGrid *self, int ni, int nj
       if(fabs(hyb - 1.) < .000001 && kind == 5) {
 	ijk=k*ni*nj;
 	for(ij=0; ij < ni*nj; ij++, ijk++) {
-	  (*levels)[ijk] = sfc_field[ij];
+	  levels[ijk] = sfc_field[ij];
 	}
       }
     }
@@ -777,22 +853,27 @@ int Cvgd_diag_withref_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, dou
     }
     break;
   case 2001:
-    printf("TODO Cvgd_diag_withref_8 2001\n");
+    if( l_dpidpis ){
+      printf("(Cvgd) ERROR: dpidpis not implemented for vertical coordinate 2001\n");
+      return(VGD_ERROR);
+    }
+    if( C_compute_pressure_2001_8(self, ni, nj, nk, ip1_list, levels, l_in_log) == VGD_ERROR) {      
+      return(VGD_ERROR);
+    }
     break;
   case 1003:
   case 5001:
-    printf("TODO Cvgd_diag_withref_8 1003 5001\n");
-    return(VGD_ERROR);
+    if( C_compute_pressure_1003_5001_8(self, ni, nj, nk, ip1_list, levels, sfc_field, l_in_log, l_dpidpis) == VGD_ERROR ){
+      return(VGD_ERROR);
+    }
     break;
   case 5002:
   case 5003:
   case 5004:
   case 5005:
-    //if( C_compute_pressure_5002_5003_5004_5005_8(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log, dpidpis) == VGD_ERROR) {
-    //  return(VGD_ERROR);
-    //}
-    printf("(Cvgd) ERROR in Cvgd_diag_withref_8 TO CHECK for ** or * C_compute_pressure_5002_5003_5004_5005_8\n");
-    return(VGD_ERROR);
+    if( C_compute_pressure_5002_5003_5004_5005_8(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log, dpidpis) == VGD_ERROR) {
+      return(VGD_ERROR);
+    }
     break;
   default:
     printf("(Cvgd) ERROR in Cvgd_diag_withref_8, invalid kind or version: kind = %d, version = %d\n",self->kind,self->version);
@@ -1986,10 +2067,10 @@ int c_vgrid_genab_5001(float *hybuser, int nk, float rcoef, double ptop_8, doubl
   pr1 = 1./(1.-hybtop);
   
   // Find out if first level is at top
-  if( abs( hybuser[0] - ptop_8 ) / pref_8 < epsilon) {
+  if( abs( ptop_8 - hybuser[0] * pref_8 ) / ptop_8 < epsilon) {
     complet = 1;
   } else {
-    printf("(Cvgd) NOTE: First hyb level is not at model top\n");
+    printf("(Cvgd)   NOTE: First hyb level is not at model top\n");
     complet = 0;
   }
 
@@ -3150,13 +3231,56 @@ static int C_get_consistent_pt_e1(int iun, float *val, char *nomvar ){
   return(VGD_ERROR);
 }
 
+static int C_get_consistent_hy(int iun, TFSTD_ext var, TFSTD_ext *va2, char *nomvar ){
+  int error, ni, nj, nk, nmax=1000, infon, ijk, ind;
+  int liste[nmax];
+  TFSTD_ext va3;
+
+  // Note: HY has dateo not datev
+  error = c_fstinl(iun, &ni, &nj, &nk, var.dateo, var.etiket, -1, -1, -1, " ", nomvar, liste, &infon, nmax);
+  if (error < 0) {
+    printf("(Cvgd) ERROR in C_get_consistent_hy, with fstinl\n");
+    return(VGD_ERROR);
+  }
+  
+  if( infon == 0 ){
+    printf("(Cvgd)  ERROR in C_get_consistent_hy, no record of nomvar = %s, date = %d, etiket = %s found\n", nomvar, var.dateo, var.etiket);
+    return(VGD_ERROR);
+  }
+  
+  for( ind = 0; ind < infon; ind++ ){
+    if( ind == 0 ){
+      if( my_fstprm(liste[ind], va2) == VGD_ERROR ){
+	return(VGD_ERROR);
+      }
+      printf("(Cvgd)   Found matching HY\n");
+    } else {
+      printf("(Cvgd)   More than one %s, checking consistency ...\n",nomvar);
+      if( my_fstprm(liste[ind], &va3) == VGD_ERROR ){
+	return(VGD_ERROR);
+      }
+      if ( va3.ni != ni && va3.nj != nj && va3.nk != nk ){
+	printf("(Cvgd) ERROR: in C_get_consistent_hy, dim misatch for %s, expected (%d,%d,%d), got (%d,%d,%d)\n", nomvar, ni, nj, nk, va3.ni, va3.nj, va3.nk);
+	return(VGD_ERROR);
+      }
+      if ( va3.ig1 != va2->ig1 && va3.ig2 != va2->ig2 && va3.ig3 != va2->ig3 && va3.ig4 != va2->ig4 ){
+	printf("(Cvgd) ERROR: in C_get_consistent_hy, igs misatch for %s, expected (%d,%d,%d,%d), got (%d,%d,%d,%d)\n", nomvar, va2->ig1, va2->ig2, va2->ig3, va2->ig4, va3.ig1, va3.ig2, va3.ig3, va3.ig4);
+	return(VGD_ERROR);
+      } 
+    }
+  }
+  if( infon > 1 )
+    printf("(Cvgd)   All %s consistent\n", nomvar);
+  return(VGD_OK);
+}
+
 static int C_gen_legacy_desc(TVGrid **self, int unit, int *ip1list, int *keylist , int nb ){
   
   int *ip1 = NULL;
-  int kind, origkind, k, ni, nj, nk, hy_key, pt_key, e1_key;
-  float ptop;
+  int kind, origkind, kind2, k, ni, nj, nk, hy_key, pt_key, e1_key;
+  float ptop, pref, rcoef;
   float *hyb = NULL, *hybm = NULL;
-  double ptop_8, pref_8;
+  double ptop_8, pref_8, nhours;
   double *a_m_8 = NULL, *b_m_8 = NULL;
   TFSTD_ext var, va2;
 
@@ -3197,6 +3321,9 @@ static int C_gen_legacy_desc(TVGrid **self, int unit, int *ip1list, int *keylist
   e1_key = c_fstinf (unit,&ni,&nj,&nk,-1," ",-1,  -1,  -1," ","E1  ");
 
   if( kind == 1 ){
+    //============================
+    // SIGMA ETA HYBRID-NORMALIZED
+    //----------------------------
     if( pt_key >= 0){
       //=============================================
       // PT PT PT PT PT PT PT PT PT PT PT PT PT PT PT
@@ -3223,7 +3350,12 @@ static int C_gen_legacy_desc(TVGrid **self, int unit, int *ip1list, int *keylist
       //================================================
       // HY HY HY HY HY HY HY HY HY HY HY HY HY HY HY HY
       //------------------------------------------------
-      printf("C_gen_legacy_desc TODO 1002_5001 avec HY\n");
+      printf("(Cvgd)   hybrid (normalized) coordinate found\n");
+      if( C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR ){
+	printf("(Cvgd) ERROR in C_gen_legacy_record, consistency check on HY failed\n");
+	goto bomb;
+      }
+      printf("C_gen_legacy_desc TO CONTINUE 5001 avec HY\n");
       return(VGD_ERROR);
     } else {
       // SIGMA SIGMA SIGMASIGMA SIGMA SIGMASIGMA SIGMA
@@ -3235,9 +3367,40 @@ static int C_gen_legacy_desc(TVGrid **self, int unit, int *ip1list, int *keylist
       }
     }
     
+  } else if ( kind == 2 ){
+    printf("(Cvgd)   pressure coordinate found\n");
+    if( c_vgrid_genab_2001(hyb, nb, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ){
+      goto bomb;
+    }
+    if( Cvgd_new_build_vert(self, kind, 1, nb, var.ip1, var.ip2, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, ip1, NULL, nb, NULL) == VGD_ERROR ){
+      goto bomb;
+    }	
+  } else if ( kind == 5 ){
+    printf("(Cvgd)   Hybrid coordinate found\n");
+    if( C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR ){
+      printf("(Cvgd) ERROR in C_gen_legacy_desc, consistency check on HY failed\n");
+      goto bomb;
+    }
+    // In consultation with Vivian Lee, with decode explicitly instead of using f77 read_decode_hyb
+    ptop_8 = c_convip_IP2Level(va2.ip1, &kind2) * 100.;
+    pref_8 = va2.ig1 * 100.;
+    rcoef = va2.ig2/1000.;
+    //nhours=va2.deet*va2.npas/3600.;
+    //f77name(incdatr)(&(va2.datev),&(va2.dateo),&nhours);
+    // Warning, read_decode_hyb will seg fault if there is an internal print. This should not happend since C_get_consistent_hy
+    // made the same chack as (read_decode_hyb.
+    //printf("%d\n",f77name(read_decode_hyb)(&unit,&(va2.nomvar),&(va2.ip2),&(va2.ip3),&(va2.etiket),&(va2.datev),&ptop,&pref,&rcoef) );
+    //printf("ptop = %f, pref = %f, rcoef = %f\n",ptop, pref, rcoef);    
+    if( c_vgrid_genab_5001(hyb, nb, rcoef, ptop_8, pref_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ){
+      goto bomb;
+    }
+    if( Cvgd_new_build_vert(self, kind, 1, nb, var.ip1, var.ip2, &ptop_8, &pref_8, &rcoef, NULL, a_m_8, b_m_8, NULL, NULL, ip1, NULL, nb, NULL) == VGD_ERROR ){
+      goto bomb;
+    }	
+  } else {
+    printf("(Cvgd ERROR: in C_gen_legacy_desc, kind %d is not supported\n",kind);
+    return(VGD_ERROR);
   }
-  
-  
   free(ip1);
   free(hyb);
   free(hybm);
@@ -3460,7 +3623,7 @@ int Cvgd_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int
 	// If we reached this stage then the toc satisfy the selection criteria but it may not be the only one.
 	if(! toc_found) {
 	  toc_found = 1;
-	  if( load_toctoc(*self,var,keyList[i]) == VGD_ERROR ) {
+	  if( C_load_toctoc(*self,var,keyList[i]) == VGD_ERROR ) {
 	    printf("(Cvgd) ERROR in Cvgd_new_read, cannot load !!\n");
 	    return(VGD_ERROR);
 	  }
@@ -3476,7 +3639,7 @@ int Cvgd_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int
 	  printf("(Cvgd) ERROR in Cvgd_new_read, with my_fstprm on keyList[i] = %d\n",keyList[i]);
 	  return(VGD_ERROR);
 	}
-	if( load_toctoc(self2,var,keyList[i]) == VGD_ERROR ) {
+	if( C_load_toctoc(self2,var,keyList[i]) == VGD_ERROR ) {
 	  printf("(Cvgd) ERROR in Cvgd_new_read, cannot load !!\n");
 	  return(VGD_ERROR);
 	}
@@ -3508,7 +3671,6 @@ int Cvgd_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int
     printf("(Cvgd) ERROR in Cvgd_new_read, unable to construct from table\n");
     return(VGD_ERROR);
   }
-
   return(VGD_OK);
 }
 
