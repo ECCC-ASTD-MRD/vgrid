@@ -551,7 +551,7 @@ int Cvgd_print_desc(TVGrid *self, int *sout, int *convip) {
     //printf("  ip1=%d",(self->rec)->ip1);
     //printf("  ip2=',self%rec%ip2
     //printf("',trim(hr)
-    printf("Vcode=%d\n",self->vcode);
+    printf("  Vcode=%d\n",self->vcode);
     
     //printf("  Descriptor Nomvar: %s\n",trim(self%rec%nomvar)
     printf("  level kind =%2d, level version = %3d\n", self->kind ,self->version);
@@ -933,9 +933,23 @@ TVGrid* c_vgd_construct() {
       vgrid->valid         = 0;
 
       vgrid->rec.fstd_initialized = 0;
-      strcpy(vgrid->rec.etiket,"            ");
-      strcpy(vgrid->rec.nomvar,"    ");
+      vgrid->rec.dateo = 0;
+      vgrid->rec.deet = 0;
+      vgrid->rec.npas = 0;
+      vgrid->rec.nbits = -64;
+      vgrid->rec.datyp = 0;
+      vgrid->rec.datyp = 0;
+      vgrid->rec.ip1 = 0;
+      vgrid->rec.ip2 = 0;
+      vgrid->rec.ip3 = 0;
+      vgrid->rec.ig1 = 0;
+      vgrid->rec.ig2 = 0;
+      vgrid->rec.ig3 = 0;
+      vgrid->rec.ig4 = 0;
       strcpy(vgrid->rec.typvar,"  ");
+      strcpy(vgrid->rec.nomvar,"    ");
+      strcpy(vgrid->rec.etiket,"            ");
+      strcpy(vgrid->rec.grtyp," ");
    }
 
    return(vgrid);
@@ -1322,6 +1336,11 @@ int Cvgd_new_build_vert(TVGrid **self, int kind, int version, int nk, int ip1, i
     printf("(Cvgd) ERROR in Cvgd_new_build_vert, problem with encode_vert_%s\n",cvcode);
     free(cvcode);
     return(VGD_ERROR);
+  }
+  
+  (*self)->valid = 1;
+  if(fstd_init(*self) == VGD_ERROR) {
+    printf("(Cvgd) ERROR in Cvgd_new_build_vert, problem with fstd_init\n");
   }
 
   return(VGD_OK);
@@ -1739,37 +1758,19 @@ int c_decode_vert_5002_5003_5004_5005(TVGrid **self) {
 
 }
 
-
-int c_vgrid_genab_1001(float *hyb, int nk, float **hybm, double **a_m_8, double **b_m_8, int **ip1_m)
+static int C_genab_1001(float *hyb, int nk, double **a_m_8, double **b_m_8, int **ip1_m)
 {
 
   // Andre Plante May 2015. 
   char ok = 1;
   int k,ip1, kind2, kind = 1;
-  
-  *hybm = malloc( nk*sizeof(float) );
-  if(! *hybm){
-    printf("(Cvgd) ERROR in c_vgrid_genab_1001, malloc error with *hybm\n");
-    return(VGD_ERROR);
-  }
 
-  *a_m_8 = malloc( nk*sizeof(double) );
-  if(! *a_m_8){
-    printf("(Cvgd) ERROR im c_vgrid_genab_1001, malloc error with *a_m_8\n");
+  if( my_alloc_double(a_m_8, nk, "(Cvgd) ERROR in C_genab_1001, malloc error with a_m_8") == VGD_ERROR )
     return(VGD_ERROR);
-  }
-
-  *b_m_8 = malloc( nk*sizeof(double) );
-  if(! *b_m_8){
-    printf("(Cvgd) ERROR in c_vgrid_genab_1001, malloc error with *b_m_8\n");
+  if( my_alloc_double(b_m_8, nk, "(Cvgd) ERROR in C_genab_1001, malloc error with b_m_8") == VGD_ERROR )
     return(VGD_ERROR);
-  }
-
-  *ip1_m = malloc( nk*sizeof(int) );
-  if(! *ip1_m){
-    printf("(Cvgd) ERROR in c_vgrid_genab_1001, malloc error with *ip1_m\n");
+  if( my_alloc_int   (ip1_m, nk, "(Cvgd) ERROR in C_genab_1001, malloc error with ip1_m") == VGD_ERROR )
     return(VGD_ERROR);
-  }
   
   if(hyb[nk-1] != 1.){
     printf("WRONG SPECIFICATION OF SIGMA VERTICAL LEVELS: SIGMA(NK) MUST BE 1.0\n");
@@ -1817,7 +1818,6 @@ int Cvgd_new_from_table(TVGrid **self, double *table, int ni, int nj, int nk) {
       return (VGD_ERROR);
     }
   }
-
   (*self)->valid = 0;
   // Since table passed in argument may be the (*self)->table, we take a copy before the call to free
   table_size = ni * nj * nk;
@@ -1828,7 +1828,6 @@ int Cvgd_new_from_table(TVGrid **self, double *table, int ni, int nj, int nk) {
   }
   my_copy_double(table, &ltable, table_size);  
   free((*self)->table);
-
   (*self)->table_ni = ni;
   (*self)->table_nj = nj;
   (*self)->table_nk = nk;
@@ -1840,13 +1839,15 @@ int Cvgd_new_from_table(TVGrid **self, double *table, int ni, int nj, int nk) {
   for(i = 0; i < table_size; i++) {
     (*self)->table[i] = ltable[i];
   }
-  
   free(ltable);
+  (*self)->kind    = (*self)->table[0];
+  (*self)->version = (*self)->table[1];
   // Fill remainder of structure
   if( Cvgd_set_vcode(*self) == VGD_ERROR ) {
     printf("(Cvgd) ERROR in Cvgd_new_from_table, cannot set vcode\n");
     return(VGD_ERROR);
   }
+
   switch((*self)->vcode) {
   case 1001:
     if( c_decode_vert_1001(self) == VGD_ERROR ) {
@@ -1890,30 +1891,22 @@ int Cvgd_new_from_table(TVGrid **self, double *table, int ni, int nj, int nk) {
   if(fstd_init(*self) == VGD_ERROR) {
     printf("(Cvgd) ERROR in Cvgd_new_from_table, problem creating record information\n");
   }
+
   return(VGD_OK);
 }
 
-int c_vgrid_genab_1002(float *etauser, int nk, double *ptop_8, double **a_m_8, double **b_m_8, int **ip1_m)
+static int C_genab_1002(float *etauser, int nk, double *ptop_8, double **a_m_8, double **b_m_8, int **ip1_m)
 {
   // Andre Plante May 2015.   
   char ok=1;
   int k;
 
-  *a_m_8 = malloc( nk*sizeof(double) );
-  if(! *a_m_8){
-    printf("(Cvgd) ERROR in c_vgrid_genab_1002, malloc error with *a_m_8\n");
+  if( my_alloc_double(a_m_8, nk, "(Cvgd) ERROR in C_genab_1002, malloc error with a_m_8") == VGD_ERROR )
     return(VGD_ERROR);
-  }
-  *b_m_8 = malloc( nk*sizeof(double) );
-  if(! *b_m_8){
-    printf("(Cvgd) ERROR in c_vgrid_genab_1002, malloc error with *b_m_8\n");
+  if( my_alloc_double(b_m_8, nk, "(Cvgd) ERROR in C_genab_1002, malloc error with b_m_8") == VGD_ERROR )
     return(VGD_ERROR);
-  }
-  *ip1_m = malloc( nk*sizeof(int) );
-  if(! *ip1_m){
-    printf("(Cvgd) ERROR in c_vgrid_genab_1002, malloc error with *ip1_m\n");
+  if( my_alloc_int   (ip1_m, nk, "(Cvgd) ERROR in C_genab_1002, malloc error with ip1_m") == VGD_ERROR )
     return(VGD_ERROR);
-  }
 
   if(etauser[nk-1] != 1.){
     printf("WRONG SPECIFICATION OF ETA VERTICAL LEVELS: ETA(NK) MUST BE 1.0\n");
@@ -1936,7 +1929,7 @@ int c_vgrid_genab_1002(float *etauser, int nk, double *ptop_8, double **a_m_8, d
   }
 
   if( *ptop_8 <= 0.) {
-    printf("(Cvgd) ERROR in c_vgrid_genab_1002: ptop = %f must be greater than zero\n", *ptop_8);
+    printf("(Cvgd) ERROR in C_genab_1002: ptop = %f must be greater than zero\n", *ptop_8);
     return(VGD_ERROR);
   }
 
@@ -1954,30 +1947,19 @@ int c_vgrid_genab_1002(float *etauser, int nk, double *ptop_8, double **a_m_8, d
   return(VGD_OK);
 }
 
-int c_vgrid_genab_2001(float *pres, int nk, double **a_m_8, double **b_m_8, int **ip1_m)
+int C_genab_2001(float *pres, int nk, double **a_m_8, double **b_m_8, int **ip1_m)
 {
 
   // Andre Plante May 2015. 
   char ok = 1;
   int k,ip1, kind2, kind = 1;
   
-  *a_m_8 = malloc( nk*sizeof(double) );
-  if(! *a_m_8){
-    printf("(Cvgd) ERROR in c_vgrid_genab_2001, malloc error with *a_m_8\n");
+  if( my_alloc_double(a_m_8, nk, "(Cvgd) ERROR in C_genab_2001, malloc error with a_m_8") == VGD_ERROR )
     return(VGD_ERROR);
-  }
-
-  *b_m_8 = malloc( nk*sizeof(double) );
-  if(! *b_m_8){
-    printf("(Cvgd) ERROR in c_vgrid_genab_2001, malloc error with *b_m_8\n");
+  if( my_alloc_double(b_m_8, nk, "(Cvgd) ERROR in C_genab_2001, malloc error with b_m_8") == VGD_ERROR )
     return(VGD_ERROR);
-  }
-
-  *ip1_m = malloc( nk*sizeof(int) );
-  if(! *ip1_m){
-    printf("(Cvgd) ERROR in c_vgrid_genab_2001, malloc error with *ip1_m\n");
+  if( my_alloc_int   (ip1_m, nk, "(Cvgd) ERROR in C_genab_2001, malloc error with ip1_m") == VGD_ERROR )
     return(VGD_ERROR);
-  }
   
   //Check monotonicity
   for ( k = 1; k < nk; k++){
@@ -2006,7 +1988,7 @@ int c_vgrid_genab_2001(float *pres, int nk, double **a_m_8, double **b_m_8, int 
   
 }
 
-int c_vgrid_genab_5001(float *hybuser, int nk, float rcoef, double ptop_8, double pref_8, double **a_m_8, double **b_m_8, int **ip1_m)
+static int C_genab_5001(float *hybuser, int nk, float rcoef, double ptop_8, double pref_8, double **a_m_8, double **b_m_8, int **ip1_m)
 {
   // Andre Plante May 2015. 
   char ok = 1;
@@ -2016,21 +1998,12 @@ int c_vgrid_genab_5001(float *hybuser, int nk, float rcoef, double ptop_8, doubl
   double hybtop = ptop_8 / pref_8;
   double hyb, pr1;
    
-  *a_m_8 = malloc( nk*sizeof(double) );
-  if(! *a_m_8){
-    printf("(Cvgd) ERROR in c_vgrid_genab_5001, malloc error with *a_m_8\n");
+  if( my_alloc_double(a_m_8, nk, "(Cvgd) ERROR in C_genab_5001, malloc error with a_m_8") == VGD_ERROR )
     return(VGD_ERROR);
-  }
-  *b_m_8 = malloc( nk*sizeof(double) );
-  if(! *b_m_8){
-    printf("(Cvgd) ERROR in c_vgrid_genab_5001, malloc error with *b_m_8\n");
+  if( my_alloc_double(b_m_8, nk, "(Cvgd) ERROR in C_genab_5001, malloc error with b_m_8") == VGD_ERROR )
     return(VGD_ERROR);
-  }
-  *ip1_m = malloc( nk*sizeof(int) );
-  if(! *ip1_m){
-    printf("(Cvgd) ERROR in c_vgrid_genab_5001, malloc error with *ip1_m\n");
+  if( my_alloc_int   (ip1_m, nk, "(Cvgd) ERROR in C_genab_5001, malloc error with ip1_m") == VGD_ERROR )
     return(VGD_ERROR);
-  }
 
   if(hybuser[nk-1] != 1.){
     printf("WRONG SPECIFICATION OF HYB VERTICAL LEVELS: HYB(NK) MUST BE 1.0\n");
@@ -2053,12 +2026,12 @@ int c_vgrid_genab_5001(float *hybuser, int nk, float rcoef, double ptop_8, doubl
   }
 
   if( ptop_8 <= 0.) {
-    printf("ERROR in c_vgrid_genab_5001: ptop = %f must be greater than zero\n", ptop_8);
+    printf("ERROR in C_genab_5001: ptop = %f must be greater than zero\n", ptop_8);
     return(VGD_ERROR);
   }
 
   if( ( ptop_8 - hybuser[0] * pref_8 ) / ptop_8 > epsilon ) {
-    printf("ERROR in c_vgrid_genab_5001: ptop = %f is lower than first hyb level = %f\n", ptop_8, hybuser[0]*pref_8);
+    printf("ERROR in C_genab_5001: ptop = %f is lower than first hyb level = %f\n", ptop_8, hybuser[0]*pref_8);
     return(VGD_ERROR);
   }
 
@@ -2089,13 +2062,13 @@ int c_vgrid_genab_5001(float *hybuser, int nk, float rcoef, double ptop_8, doubl
   return(VGD_OK);
 }
 
-int c_vgrid_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t, int tlift)
+static int C_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t, int tlift)
 {
   // Andre Plante May 2015.
   
   // Processing option
   if( ! ( tlift == 0 || tlift == 1 ) ){
-    printf("(Cvgd) ERROR in c_vgrid_genab_5002_5003, wrong value given to tlift, expecting 0 (for false) or 1 (for true), got %d\n",tlift);
+    printf("(Cvgd) ERROR in C_genab_5002_5003, wrong value given to tlift, expecting 0 (for false) or 1 (for true), got %d\n",tlift);
     fflush(stdout);
     return(VGD_ERROR);
   }
@@ -2116,32 +2089,32 @@ int c_vgrid_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float 
 
   *PP_a_m_8 = malloc( (*nl_m)*sizeof(double) );
   if(! *PP_a_m_8){
-    printf("(Cvgd) ERROR in c_vgrid_genab_5002_5003, malloc error with *PP_a_m_8\n");
+    printf("(Cvgd) ERROR in C_genab_5002_5003, malloc error with *PP_a_m_8\n");
     return(VGD_ERROR);
   }
   *PP_b_m_8 = malloc( (*nl_m)*sizeof(double) );
   if(! *PP_b_m_8){
-    printf("(Cvgd) ERROR in c_vgrid_genab_5002_5003, malloc error with *PP_b_m_8\n");
+    printf("(Cvgd) ERROR in C_genab_5002_5003, malloc error with *PP_b_m_8\n");
     return(VGD_ERROR);
   }
   *PP_ip1_m = malloc( (*nl_m)*sizeof(int) );
   if(! *PP_ip1_m){
-    printf("(Cvgd) ERROR in c_vgrid_genab_5002_5003, malloc error with *PP_ip1_m\n");
+    printf("(Cvgd) ERROR in C_genab_5002_5003, malloc error with *PP_ip1_m\n");
     return(VGD_ERROR);
   }
   *PP_a_t_8 = malloc( (*nl_t)*sizeof(double) );
   if(! *PP_a_t_8){
-    printf("(Cvgd) ERROR in c_vgrid_genab_5002_5003, malloc error with *PP_a_t_8\n");
+    printf("(Cvgd) ERROR in C_genab_5002_5003, malloc error with *PP_a_t_8\n");
     return(VGD_ERROR);
   }
   *PP_b_t_8 = malloc( (*nl_t)*sizeof(double) );
   if(! *PP_b_t_8){
-    printf("(Cvgd) ERROR in c_vgrid_genab_5002_5003, malloc error with *PP_b_t_8\n");
+    printf("(Cvgd) ERROR in C_genab_5002_5003, malloc error with *PP_b_t_8\n");
     return(VGD_ERROR);
   }
   *PP_ip1_t = malloc( (*nl_t)*sizeof(int) );
   if(! *PP_ip1_t){
-    printf("(Cvgd) ERROR in c_vgrid_genab_5002_5003, malloc error with *PP_ip1_t\n");
+    printf("(Cvgd) ERROR in C_genab_5002_5003, malloc error with *PP_ip1_t\n");
     return(VGD_ERROR);
   }
 
@@ -2154,7 +2127,7 @@ int c_vgrid_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float 
 
   zsrf_8  = log(pref_8);
   if ( ptop_8 <= 0. ) {
-    printf("(Cvgd) ERROR in c_vgrid_genab_5002_5003: ptop_8 must be > 0, got %f\n", ptop_8);
+    printf("(Cvgd) ERROR in C_genab_5002_5003: ptop_8 must be > 0, got %f\n", ptop_8);
     fflush(stdout);
     return(VGD_ERROR);
   }
@@ -2165,12 +2138,12 @@ int c_vgrid_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float 
   //    Check range
   hybtop = ptop_8 / pref_8;
   if( hybuser[nk-1] >= 1. ) {
-    printf("(Cvgd) ERROR in c_vgrid_genab_5002_5003: hyb must be < 1.0, got %f\n", hybuser[nk-1]);
+    printf("(Cvgd) ERROR in C_genab_5002_5003: hyb must be < 1.0, got %f\n", hybuser[nk-1]);
     fflush(stdout);
     return(VGD_ERROR);
   }
   if( hybuser[0] <= hybtop ) {
-    printf("(Cvgd) ERROR in c_vgrid_genab_5002_5003: hyb must be > %f, got %f\n", hybtop, hybuser[0]);
+    printf("(Cvgd) ERROR in C_genab_5002_5003: hyb must be > %f, got %f\n", hybtop, hybuser[0]);
     fflush(stdout);
     return(VGD_ERROR);
   }
@@ -2243,7 +2216,7 @@ int c_vgrid_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float 
 
 }
 
-int c_vgrid_genab_5004(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t)
+static int C_genab_5004(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t)
 {
   // Andre Plante May 2015.
   
@@ -2265,32 +2238,32 @@ int c_vgrid_genab_5004(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef
 
   *PP_a_m_8 = malloc( (*nl_m)*sizeof(double) );
   if(! *PP_a_m_8){
-    printf("(Cvgd) ERROR in c_vgrid_genab_5004, malloc error with *PP_a_m_8\n");
+    printf("(Cvgd) ERROR in C_genab_5004, malloc error with *PP_a_m_8\n");
     return(VGD_ERROR);
   }
   *PP_b_m_8 = malloc( (*nl_m)*sizeof(double) );
   if(! *PP_b_m_8){
-    printf("(Cvgd) ERROR in c_vgrid_genab_5004, malloc error with *PP_b_m_8\n");
+    printf("(Cvgd) ERROR in C_genab_5004, malloc error with *PP_b_m_8\n");
     return(VGD_ERROR);
   }
   *PP_ip1_m = malloc( (*nl_m)*sizeof(int) );
   if(! *PP_ip1_m){
-    printf("(Cvgd) ERROR in c_vgrid_genab_5004, malloc error with *PP_ip1_m\n");
+    printf("(Cvgd) ERROR in C_genab_5004, malloc error with *PP_ip1_m\n");
     return(VGD_ERROR);
   }
   *PP_a_t_8 = malloc( (*nl_t)*sizeof(double) );
   if(! *PP_a_t_8){
-    printf("(Cvgd) ERROR in c_vgrid_genab_5004, malloc error with *PP_a_t_8\n");
+    printf("(Cvgd) ERROR in C_genab_5004, malloc error with *PP_a_t_8\n");
     return(VGD_ERROR);
   }
   *PP_b_t_8 = malloc( (*nl_t)*sizeof(double) );
   if(! *PP_b_t_8){
-    printf("(Cvgd) ERROR in c_vgrid_genab_5004, malloc error with *PP_b_t_8\n");
+    printf("(Cvgd) ERROR in C_genab_5004, malloc error with *PP_b_t_8\n");
     return(VGD_ERROR);
   }
   *PP_ip1_t = malloc( (*nl_t)*sizeof(int) );
   if(! *PP_ip1_t){
-    printf("(Cvgd) ERROR in c_vgrid_genab_5004, malloc error with *PP_ip1_t\n");
+    printf("(Cvgd) ERROR in C_genab_5004, malloc error with *PP_ip1_t\n");
     return(VGD_ERROR);
   }
 
@@ -2314,7 +2287,7 @@ int c_vgrid_genab_5004(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef
       zetau_8 = ztop_8;
     }
   } else if (ptop_8 <= 0.) {
-    printf("(Cvgd) ERROR in c_vgrid_genab_5004: ptop_8 must be > 0, got %f\n",ptop_8);
+    printf("(Cvgd) ERROR in C_genab_5004: ptop_8 must be > 0, got %f\n",ptop_8);
     return(VGD_ERROR);
   } else {
     // Take B(1) from user's ztop
@@ -2328,11 +2301,11 @@ int c_vgrid_genab_5004(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef
   //    Check range
   hybtop = l_ptop_8 / pref_8;
   if( hybuser[nk-1] >= 1. ) {
-    printf("(Cvgd) ERROR in c_vgrid_genab_5004: hyb must be < 1.0, got %f\n", hybuser[nk-1]);
+    printf("(Cvgd) ERROR in C_genab_5004: hyb must be < 1.0, got %f\n", hybuser[nk-1]);
     return(VGD_ERROR);
   }
   if( hybuser[0] <= hybtop ) {
-    printf("(Cvgd) ERROR in c_vgrid_genab_5004: hyb must be > %f, got %f\n", hybtop, hybuser[0]);
+    printf("(Cvgd) ERROR in C_genab_5004: hyb must be > %f, got %f\n", hybtop, hybuser[0]);
     return(VGD_ERROR);
   }
 
@@ -3068,7 +3041,7 @@ int Cvgd_new_gen(TVGrid **self, int kind, int version, float *hyb, int size_hyb,
     nk   = size_hyb;
     nl_m = size_hyb;
     nl_t = size_hyb;
-    if(c_vgrid_genab_1001(hyb, size_hyb, &hybm, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
+    if(C_genab_1001(hyb, size_hyb, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
       free(hybm);
       free(a_m_8);
       free(b_m_8);
@@ -3080,7 +3053,7 @@ int Cvgd_new_gen(TVGrid **self, int kind, int version, float *hyb, int size_hyb,
     nk   = size_hyb;
     nl_m = size_hyb;
     nl_t = size_hyb;
-    if(c_vgrid_genab_1002(hyb, size_hyb, ptop_8, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
+    if(C_genab_1002(hyb, size_hyb, ptop_8, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
       free(a_m_8);
       free(b_m_8);
       free(ip1_m);
@@ -3095,7 +3068,7 @@ int Cvgd_new_gen(TVGrid **self, int kind, int version, float *hyb, int size_hyb,
     nk   = size_hyb;
     nl_m = size_hyb;
     nl_t = -1;
-    if(c_vgrid_genab_2001(hyb, size_hyb, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
+    if(C_genab_2001(hyb, size_hyb, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
       free(a_m_8);
       free(b_m_8);
       free(ip1_m);
@@ -3106,7 +3079,7 @@ int Cvgd_new_gen(TVGrid **self, int kind, int version, float *hyb, int size_hyb,
     nk   = size_hyb;
     nl_m = size_hyb;
     nl_t = size_hyb;
-    if(c_vgrid_genab_5001(hyb, size_hyb, *rcoef1, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
+    if(C_genab_5001(hyb, size_hyb, *rcoef1, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
       free(a_m_8);
       free(b_m_8);
       free(ip1_m);
@@ -3116,7 +3089,7 @@ int Cvgd_new_gen(TVGrid **self, int kind, int version, float *hyb, int size_hyb,
   case 5002:
     nk   = size_hyb;
     tlift = 0;
-    if(c_vgrid_genab_5002_5003(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t, tlift) == VGD_ERROR ) {
+    if(C_genab_5002_5003(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t, tlift) == VGD_ERROR ) {
       free(a_m_8);
       free(b_m_8);
       free(ip1_m);
@@ -3129,7 +3102,7 @@ int Cvgd_new_gen(TVGrid **self, int kind, int version, float *hyb, int size_hyb,
   case 5003:
     nk   = size_hyb;
     tlift = 1;
-    if(c_vgrid_genab_5002_5003(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t, tlift) == VGD_ERROR ) {
+    if(C_genab_5002_5003(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t, tlift) == VGD_ERROR ) {
       free(a_m_8);
       free(b_m_8);
       free(ip1_m);
@@ -3141,7 +3114,7 @@ int Cvgd_new_gen(TVGrid **self, int kind, int version, float *hyb, int size_hyb,
     break;
   case 5004:
     nk   = size_hyb;
-    if(c_vgrid_genab_5004(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t) == VGD_ERROR ) {
+    if(C_genab_5004(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t) == VGD_ERROR ) {
       free(a_m_8);
       free(b_m_8);
       free(ip1_m);
@@ -3339,7 +3312,7 @@ static int C_gen_legacy_desc(TVGrid **self, int unit, int *ip1list, int *keylist
       } else {
 	printf("(Cvgd)   eta coordinate found\n");
 	ptop_8 = ptop*100.;
-	if( c_vgrid_genab_1002(hyb, nb, &ptop_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ){	  
+	if( C_genab_1002(hyb, nb, &ptop_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ){	  
 	  goto bomb;
 	}
 	if( Cvgd_new_build_vert(self, kind, 2, nb, var.ip1, var.ip2, &ptop_8, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, ip1, NULL, nb, NULL) == VGD_ERROR ){
@@ -3359,7 +3332,7 @@ static int C_gen_legacy_desc(TVGrid **self, int unit, int *ip1list, int *keylist
       return(VGD_ERROR);
     } else {
       // SIGMA SIGMA SIGMASIGMA SIGMA SIGMASIGMA SIGMA
-      if( c_vgrid_genab_1001(hyb, nb, &hybm, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ){
+      if( C_genab_1001(hyb, nb, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ){
 	goto bomb;
       }
       if( Cvgd_new_build_vert(self, kind, 1, nb, var.ip1, var.ip2, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, ip1, NULL, nb, NULL) == VGD_ERROR ){
@@ -3369,7 +3342,7 @@ static int C_gen_legacy_desc(TVGrid **self, int unit, int *ip1list, int *keylist
     
   } else if ( kind == 2 ){
     printf("(Cvgd)   pressure coordinate found\n");
-    if( c_vgrid_genab_2001(hyb, nb, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ){
+    if( C_genab_2001(hyb, nb, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ){
       goto bomb;
     }
     if( Cvgd_new_build_vert(self, kind, 1, nb, var.ip1, var.ip2, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, ip1, NULL, nb, NULL) == VGD_ERROR ){
@@ -3391,7 +3364,7 @@ static int C_gen_legacy_desc(TVGrid **self, int unit, int *ip1list, int *keylist
     // made the same chack as (read_decode_hyb.
     //printf("%d\n",f77name(read_decode_hyb)(&unit,&(va2.nomvar),&(va2.ip2),&(va2.ip3),&(va2.etiket),&(va2.datev),&ptop,&pref,&rcoef) );
     //printf("ptop = %f, pref = %f, rcoef = %f\n",ptop, pref, rcoef);    
-    if( c_vgrid_genab_5001(hyb, nb, rcoef, ptop_8, pref_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ){
+    if( C_genab_5001(hyb, nb, rcoef, ptop_8, pref_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ){
       goto bomb;
     }
     if( Cvgd_new_build_vert(self, kind, 1, nb, var.ip1, var.ip2, &ptop_8, &pref_8, &rcoef, NULL, a_m_8, b_m_8, NULL, NULL, ip1, NULL, nb, NULL) == VGD_ERROR ){
@@ -3543,7 +3516,7 @@ int Cvgd_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int
   int l_ip1 = -1, l_ip2 = -1, l_kind = -1, l_version = -1, error;
   int i, ni, nj, nk;
   int fstinl;
-  int toc_found, count, nkeyList = MAX_DESC_REC;
+  int toc_found = 0, count, nkeyList = MAX_DESC_REC;
   int keyList[nkeyList], status;
   TFSTD_ext var;
   TVGrid *self2;
@@ -3608,9 +3581,9 @@ int Cvgd_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int
       if(fstd_init(*self) == VGD_ERROR) {
 	printf("(Cvgd) ERROR in Cvgd_new_read, problem creating record information\n");
       }
+      toc_found = 1;
     } else {
       // Loop on all !! found
-      toc_found = 0;
       for( i=0; i < count; i++) {     
 	// Check if kind and version match, skip the !! if not.
 	if( correct_kind_and_version(keyList[i], l_kind, l_version, &var, &status) == VGD_ERROR) {
@@ -3691,6 +3664,9 @@ int Cvgd_write_desc (TVGrid *self, int unit, char *format) {
     if(self->rec.ip1 < 0) ip1=0;
     ip2=self->rec.ip2;
     if(self->rec.ip2 < 0) ip2=0;
+
+    printf("DANS Cvgd_write_desc, self->rec.etiket = %s\n",self->rec.etiket);
+
     if( c_fstecr( self->table,      work,            -self->rec.nbits, unit, 
 		  self->rec.dateo,  self->rec.deet,   self->rec.npas, 
 		  self->table_ni,   self->table_nj,   self->table_nk, 
