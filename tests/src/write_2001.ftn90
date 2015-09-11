@@ -1,5 +1,5 @@
 program constructor
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_write,vgd_print,VGD_ERROR
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_write,vgd_print,vgd_free,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
@@ -8,8 +8,12 @@ program constructor
   integer :: stat,lu=0,fnom,fstouv,fstfrm,fclos,k,ip1,ip2
   integer, parameter :: LEVS=4
   integer, dimension(LEVS) :: ip1s
-  real(kind=8), dimension(LEVS) :: pres=(/1000.,925.,850.,700./),b=(/0.,0.,0.,0./)
+  real :: pres
+  real(kind=8), dimension(LEVS) :: pres_8=(/1000.,925.,850.,700./),bb=(/0.,0.,0.,0./)
   real*8, dimension(:), pointer :: pres_rtn
+  character(len=1) :: dummy_S=" "
+
+  nullify(pres_rtn)
 
   call system('rm -f test.fst')
   stat=fnom(lu,"test.fst","RND",0)
@@ -25,10 +29,15 @@ program constructor
 
   ! Construct a new set of 3D coordinate descriptors
   do k=1,LEVS
-     call convip(ip1s(k),pres(k),2,2,'',.false.)
+     pres = pres_8(k)
+     call convip(ip1s(k),pres,2,2,dummy_S,.false.)
+     print*,'ip1s(k),pres',ip1s(k),pres
   enddo
-  pres = pres*100. !convert mb to Pa
-  stat = vgd_new(d,kind=2,version=1,nk=size(pres),ip1_m=ip1s,a_m_8=pres,b_m_8=b,ip1=111,ip2=222)
+
+  pres_8 = pres_8*100. !convert mb to Pa
+  stat = vgd_new(d,kind=2,version=1,nk=size(pres_8),ip1_m=ip1s,a_m_8=pres_8,b_m_8=bb,ip1=111,ip2=222)
+
+  stat = vgd_print(d)
   if(stat==VGD_ERROR)then
      call system('rm -f test.fst')
      call exit(1)
@@ -41,9 +50,13 @@ program constructor
      call system('rm -f test.fst')
      call exit(1)
   endif
+
   stat = vgd_get(d_rtn,key='COFA - vertical A coefficient',value=pres_rtn)
 
-  call ut_report(abs(pres_rtn(1)-pres(1)) < epsilon(pres),'Grid_Descriptors::vgd_new vertical build initializer (2001) value')
+  stat = vgd_free(d)
+  stat = vgd_free(d_rtn)
+
+  call ut_report(abs(pres_rtn(1)-pres_8(1)) < epsilon(pres_8),'Grid_Descriptors::vgd_new vertical build initializer (2001) value')
 
   stat=fstfrm(lu)
   stat=fclos(lu)

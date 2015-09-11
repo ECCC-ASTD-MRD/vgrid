@@ -28,7 +28,7 @@ program level_withref_5001
   
   ier=chek_levels_withref('data/dm_5002_from_model_run_ig4_ip1_link','')
   if(ier==VGD_ERROR)stat=VGD_ERROR
-
+stop
   call ut_report(stat,'Grid_Descriptors, vgd_new')
 
 end program level_withref_5001
@@ -126,7 +126,7 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
          return
       endif
 
-rfld="P0"
+!rfld="P0"
 !if(trim(rfld) /= "P0")then
 !   print*,'ERROR rfld devrait egaler P0'
 !   stop

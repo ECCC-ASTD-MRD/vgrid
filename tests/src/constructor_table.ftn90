@@ -26,8 +26,8 @@ contains
          write(6,*) 'cannot fstprm for fstkey ',fstkey
          return
       end if
-      nhours=record%deet*record%npas/3600.d0
-      call incdatr(record%datev,record%dateo,nhours)
+      !nhours=record%deet*record%npas/3600.d0
+      !call incdatr(record%datev,record%dateo,nhours)
       status = 0
    end function my_fstprm
 end module mod_constructor_table
@@ -42,7 +42,6 @@ program constructor
    character(len=4), dimension(nversion) :: vcode_S=(/"5002","5003","5004","5005"/)
 
    do i=1,nversion
-      
       print*,"============="//vcode_S(i)//"=============="
       stat=test_it("data/dm_"//vcode_S(i)//"_from_model_run","data/dm_"//vcode_S(i)//"_ips.txt")
       if(stat.ne.VGD_OK)then
@@ -58,7 +57,7 @@ end program constructor
 integer function test_it(F_file_from_model_run,F_file_with_ips) result(status)
  
    use mod_constructor_table, only:FSTD_ext,my_fstprm
-   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,operator(==),vgd_write,VGD_OK,VGD_ERROR
+   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_free,operator(==),vgd_write,VGD_OK,VGD_ERROR
    use Unit_Testing, only: ut_report
    
    implicit none
@@ -129,7 +128,6 @@ integer function test_it(F_file_from_model_run,F_file_with_ips) result(status)
       print*, 'ERROR with vgd_write'
       return
    endif
-
    ! Get parameters of original !!
    key = fstinf(lu ,ni,nj,nk,-1,' ',-1,-1,-1,' ','!!')
    ier = my_fstprm(key,prm_orig)
@@ -159,9 +157,13 @@ integer function test_it(F_file_from_model_run,F_file_with_ips) result(status)
       return
    endif
    
+   deallocate(table)
+   ier = vgd_free(vgrid)
+   ier = vgd_free(vgrid_rebuilt)
+
    ier=fstfrm(lu)
-   ier=fstfrm(lu2)
    call fclos(lu)
+   ier=fstfrm(lu2)
    call fclos(lu2)
    
    status=VGD_OK
