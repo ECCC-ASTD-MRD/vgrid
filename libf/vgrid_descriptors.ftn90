@@ -1240,12 +1240,15 @@ contains
       ! Internal variables
       type(c_ptr) :: quiet_CP, value_CP
       character(len=KEY_LENGTH) :: my_key
-      character(len=13) :: my_char
+      character(kind=c_char) :: my_char(13)
       integer, target :: zero, one
+      integer :: i, nchar
 
       zero = 0; one = 1
       ! Set error status
       status = VGD_ERROR
+
+      value="";
 
       quiet_CP = C_NULL_PTR
       if (present(quiet))then
@@ -1255,12 +1258,28 @@ contains
             quiet_CP = c_loc(zero)
          endif         
       endif
-            
       my_key=up(key(1:KEY_LENGTH))
       status = f_get_char(self%cptr, my_key//C_NULL_CHAR, my_char, quiet_CP)
+      select case(trim(key))
+         case ('ETIK')
+            nchar=12
+         case ('NAME')
+            nchar=4
+         case ('RFLD')
+            nchar=4
+         case DEFAULT
+            write(for_msg,*) 'invalid key in call to get_char: ',trim(key)
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            return
+         end select
+      do i=1,nchar
+         if(my_char(i) == C_NULL_CHAR)then
+            value(i:i)=' '
+            cycle
+         end if
+         value(i:i)=my_char(i)         
+      enddo
       
-      value = trim(my_char)
-
    end function get_char
     
    integer function put_int(self, key, value) result(status)

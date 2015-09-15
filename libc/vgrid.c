@@ -1404,8 +1404,8 @@ int c_encode_vert_1002(TVGrid **self,int nk){
   (*self)->table[0] = (*self)->kind;
   (*self)->table[1] = (*self)->version;
   (*self)->table[2] = skip;
-  flip_transfer_c2d((*self)->ref_name, &((*self)->table[3]));
-  (*self)->table[4] = 0.;
+  (*self)->table[3] = (*self)->ptop_8;
+  flip_transfer_c2d((*self)->ref_name, &((*self)->table[4]));
   (*self)->table[5] = 0.;
   
   int k, ind = 6;
@@ -1579,8 +1579,8 @@ int c_decode_vert_1002(TVGrid **self) {
   (*self)->version = (*self)->table[1];
   skip             = (*self)->table[2];
   (*self)->ptop_8  = (*self)->table[3];
-  flip_transfer_d2c((*self)->ref_name,(*self)->table[4]);
-  // The value in table is not used, so we continue with ind = 6
+    flip_transfer_d2c((*self)->ref_name,(*self)->table[4]);
+  // The next value in table is not used, so we continue with ind = 6
   ind = 6;
   nk = (*self)->table_nj - skip;
   
@@ -2932,7 +2932,6 @@ int Cvgd_get_char(TVGrid *self, char *key, char out[], int *quiet) {
     strcpy(out,self->rec.nomvar);
   } else if( strcmp(key, "RFLD") == 0 ){
     strcpy(out,self->ref_name);
-    printf("out = %s, self->ref_name = %s\n",out,self->ref_name );
   } else {
     printf("(Cvgd) ERROR in Cvgd_get_char, invalid key -> '%s'\n",key);
     return(VGD_ERROR);
@@ -3644,6 +3643,7 @@ int Cvgd_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int
     printf("(Cvgd) ERROR in Cvgd_new_read, unable to construct from table\n");
     return(VGD_ERROR);
   }
+
   return(VGD_OK);
 }
 
