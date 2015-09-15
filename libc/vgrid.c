@@ -491,7 +491,6 @@ double Cvgd_comp_diag_a_ip1(double pref_8, int ip1) {
  */
 int VGD_FindIp1Idx(int Ip1,int *Lst,int Size) {
    int idx=0;
-
    while( Size-- ) {
       if( *Lst++ == Ip1 )
          return idx;
@@ -642,7 +641,7 @@ static int C_compute_pressure_1001_1002_8(TVGrid *self, int ni, int nj, int nk, 
   
   // Find ip1 indexes
   for( k = 0; k < nk; ++k ){
-    if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],self->ip1_m,self->nk)) == -1 ) {
+    if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],self->ip1_m,self->nl_m)) == -1 ) {
       printf("(Cvgd) ERROR in C_compute_pressure_1001_1002_8, cannot find ip1 %d in vgrid descriptor.\n",ip1_list[k]);
       free(ind);
       return(VGD_ERROR);
@@ -672,7 +671,7 @@ static int C_compute_pressure_2001_8(TVGrid *self, int ni, int nj, int nk, int *
   
   // Find ip1 indexes
   for( k = 0; k < nk; ++k ){
-    if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],self->ip1_m,self->nk)) == -1 ) {
+    if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],self->ip1_m,self->nl_m)) == -1 ) {
       printf("(Cvgd) ERROR in C_compute_pressure_2001_8, cannot find ip1 %d in vgrid descriptor.\n",ip1_list[k]);
       free(ind);
       return(VGD_ERROR);
@@ -701,7 +700,7 @@ static int C_compute_pressure_1003_5001_8(TVGrid *self, int ni, int nj, int nk, 
   
   // Find ip1 indexes
   for( k = 0; k < nk; ++k ){
-    if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],self->ip1_m,self->nk)) == -1 ) {
+    if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],self->ip1_m,self->nl_m)) == -1 ) {
       printf("(Cvgd) ERROR in C_compute_pressure_1003_5001_8, cannot find ip1 %d in vgrid descriptor.\n",ip1_list[k]);
       free(ind);
       return(VGD_ERROR);
@@ -741,7 +740,6 @@ static int C_compute_pressure_5002_5003_5004_5005_8(TVGrid *self, int ni, int nj
   int ij, k, ijk, ind, l_in_log, l_dpidpis, kind;
   float hyb;
 
-  l_in_log=0;
   if(in_log){
     l_in_log = *in_log;
   }
@@ -810,7 +808,18 @@ static int C_compute_pressure_5002_5003_5004_5005_8(TVGrid *self, int ni, int nj
       }
     }
   }
-							  
+  if( l_dpidpis ){
+    if( l_in_log ){
+      printf("(Cvgd) ERROR: in C_compute_pressure_5002_5003_5004_5005_8, cannot get dpidpis in log\n");
+      return(VGD_ERROR);
+    }
+    for(k=0, ijk=0; k < nk; k++) {
+      for(ij=0; ij < ni*nj; ij++, ijk++) {
+	levels[ijk] = bb_8[k]*levels[ijk]/sfc_field[ij];
+      }
+    }
+  }
+						  
   free(s_8);
   free(aa_8);
   free(bb_8);

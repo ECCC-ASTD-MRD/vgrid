@@ -4346,7 +4346,7 @@ contains
              found = .true.
              aa_8(i) = self%a_m_8(j)
              bb_8(i) = self%b_m_8(j)
-             exit
+             exit(1)
           endif
        enddo
        if (.not.found) then
@@ -4394,7 +4394,7 @@ contains
              found = .true.
              aa_8(i) = self%a_m_8(j)
              bb_8(i) = self%b_m_8(j)
-             exit
+             exit(1)
           endif
        enddo
        if (.not.found) then
@@ -4490,7 +4490,7 @@ contains
              found = .true.
              aa_8(i) = self%a_m_8(j)
              bb_8(i) = self%b_m_8(j)
-             exit
+             exit(1)
           endif
        enddo
        if (.not.found) then
@@ -4556,7 +4556,7 @@ contains
              found = .true.
              aa_8(i) = self%a_m_8(j)
              bb_8(i) = self%b_m_8(j)
-             exit
+             exit(1)
           endif
        enddo
        if (.not.found) then
@@ -4565,7 +4565,7 @@ contains
                 found = .true.
                 aa_8(i) = self%a_t_8(j)
                 bb_8(i) = self%b_t_8(j)
-                exit
+                exit(1)
              endif
           enddo
        endif

@@ -16,9 +16,9 @@ program tests
   type(vgrid_descriptor) :: d
   logical :: ok
 
-  nullify(ip1_list,pres_profil,pres_profil_8,p0,px)
+  nullify (ip1_list,pres_profil,pres_profil_8,p0,px)
 
-  stat=fnom(lu,"data/dm_1002_from_model_run_plus_toc","RND",0)
+  stat=fnom(lu,"data/dm_5001_from_model_run_plus_toc","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
      call abort
@@ -28,22 +28,22 @@ program tests
      print*,'No record in RPN file'
      call abort
   endif
-  open(unit=lutxt,file='data/dm_1002_ips.txt',status='OLD')
+  open(unit=lutxt,file='data/dm_5001_ips.txt',status='OLD')
   read(lutxt,*) ip1,ip2
   close(lutxt)
 
   ! Get physical levelling information
-  stat = vgd_new(d,unit=lu,ip1=ip1,ip2=ip2)
+  stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
   
   stat = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',"UU")
 
   allocate(p0(ni,nj),ip1_list(5),px(ni,nj))
 
-  ip1_list=(/11220,11550,11800,11930,12000/)
+  ip1_list=(/95332840,95345840,95356840,95366840,93423264/)
 
   stat = fstlir(p0,lu,ni,nj,nk,-1,'',-1,-1,-1,'','P0')
   p0 = p0*100. !mb to Pa
-  
+   
   OK=.true.
   ! Test 32 bits interface
   local_pres=p0(i0,j0)  
@@ -81,8 +81,8 @@ program tests
         print*,'OUPS 64 bits'
         OK=.false.
      endif
-  enddo  
-  
+  enddo
+
   call ut_report(ok,message='Grid_Descriptors::vgd_levels level calculation status')
 
   stat=fstfrm(lu)
