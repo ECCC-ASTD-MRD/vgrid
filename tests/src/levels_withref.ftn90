@@ -28,7 +28,7 @@ program level_withref_5001
   
   ier=chek_levels_withref('data/dm_5002_from_model_run_ig4_ip1_link','')
   if(ier==VGD_ERROR)stat=VGD_ERROR
-stop
+
   call ut_report(stat,'Grid_Descriptors, vgd_new')
 
 end program level_withref_5001
@@ -76,14 +76,16 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
 
    lu=lu+1
 
+   print*,'Tests '//trim(F_fst)
+
    ier=fnom(lu,F_fst,"RND",0)
    if(ier.lt.0)then
-      print*,'ERROR with fnom on ',trim(F_fst)
+      print*,'(Test) ERROR with fnom on ',trim(F_fst)
       return
    endif
    ier=fstouv(lu,'RND')
    if(ier.le.0)then
-      print*,'No record in RPN file ',trim(F_fst),ier
+      print*,'(Test) No record in RPN file ',trim(F_fst),ier
       return
    endif
    if(trim(F_ips).eq.'')then
@@ -97,13 +99,13 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
    ! Get vertical grid descriptor
    ier = vgd_new(vgd,unit=lu,format="fst",ip1=ip1,ip2=ip2)
    if(ier == VGD_ERROR )then
-      print*,'Problem getting vertical grid descriptor'
+      print*,'(Test) Problem getting vertical grid descriptor'
       return
    endif
 
    ier = fstinl(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ','TT',liste,infon,nmax)
    if(infon == 0 )then
-      print*,'pas de record de TT'      
+      print*,'(Test) pas de record de TT'      
       return
    endif
    allocate(ip1s(infon))
@@ -122,8 +124,12 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
    else
       ier = vgd_get(vgd,'RFLD',rfld)
       if(ier == VGD_ERROR)then
-         print*,'Problem with vgd_get "RFLD" for file ',F_fst
+         print*,'(Test) Problem with vgd_get "RFLD" for file ',F_fst
          return
+      endif
+      if(trim(rfld) /= "P0")then
+         print*,'(Test) Problem with vgd_get RFLD, did not get "P0", got "',rfld,'"'
+         stop
       endif
 
 !rfld="P0"
@@ -136,7 +142,7 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
       allocate(p0(ni,nj),px(ni,nj))
       ier = fstluk(p0,key,ni,nj,nk)
       if(ier.lt.0)then
-         print*,'Problem with fstluk on P0'
+         print*,'(Test) Problem with fstluk on P0'
          return
       endif
       p0=p0*100.
@@ -147,7 +153,7 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
    ! Test 32 bits interface
    ier = vgd_levels(vgd,ip1s,pres,p0)
    if(ier == VGD_ERROR )then
-      print*,'Problem with vgd_levels 32 bits'
+      print*,'(Test) Problem with vgd_levels 32 bits'
       return
    endif
 
@@ -156,7 +162,7 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
            ip1,ip2,ip3,typvar,nomvar,etiket,grtyp,ig1,ig2,ig3,ig4,swa,lng, &
            dltf,ubc,extra1,extra2,extra3)
       if(ier.lt.0)then
-         print*,'Problem with fstprm on TT, ip1=',ip1
+         print*,'(Test) Problem with fstprm on TT, ip1=',ip1
          return
       endif
       ! Surface pressure must be equal to P0 for surface levels
@@ -165,7 +171,7 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
          do j=1,nj
             do i=1,ni
                if(pres(i,j,k).ne.p0(i,j))then
-                  print*,'Surface pressure must be exacly equal to p0'
+                  print*,'(Test) Surface pressure must be exacly equal to p0'
                   print*,'i,j,k,pres(i,j,k),p0(i,j)',i,j,k,pres(i,j,k),p0(i,j)
                   return
                endif
@@ -176,13 +182,13 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
       key=fstinf(lu,ni,nj,nk,datev,' ',ip1,ip2,-1,typvar,'PX')     
       ier = fstluk(px,key,ni,nj,nk)
       if(ier.lt.0)then
-         print*,'Problem with fstinf on PX, ip1=',ip1
+         print*,'(Test) Problem with fstinf on PX, ip1=',ip1
          return
       endif
       do j=1,nj
          do i=1,ni
             if(abs((px(i,j)-pres(i,j,k)/100.)/px(i,j))>epsilon)then
-               print*,'32 bits: Difference in pressure is too large at'
+               print*,'(Test) 32 bits: Difference in pressure is too large at'
                print*,'i,j,k,px(i,j),pres(i,j,k)/100.',i,j,k,px(i,j),pres(i,j,k)/100.
                return
             endif
@@ -193,7 +199,7 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
    ! Test 64 bits interface
    ier = vgd_levels(vgd,ip1s,pres_8,p0_8)
    if(ier == VGD_ERROR )then
-      print*,'Problem with vgd_levels 64 bits'
+      print*,'(Test) Problem with vgd_levels 64 bits'
       return
    endif 
    do k=1,infon
@@ -222,13 +228,13 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
       key=fstinf(lu,ni,nj,nk,datev,' ',ip1,ip2,-1,typvar,'PX')     
       ier = fstluk(px,key,ni,nj,nk)
       if(ier.lt.0)then
-         print*,'Problem with fstinf on PX, ip1=',ip1
+         print*,'(Test) Problem with fstinf on PX, ip1=',ip1
          return
       endif
       do j=1,nj
          do i=1,ni
             if(abs((px(i,j)-pres_8(i,j,k)/100.d0)/px(i,j))>epsilon)then
-               print*,'64 bits: Difference in pressure is too large at'
+               print*,'(Test) 64 bits: Difference in pressure is too large at'
                print*,'i,j,k,px(i,j),pres_8(i,j,k)/100.d0',i,j,k,px(i,j),pres_8(i,j,k)/100.d0
                return
             endif
