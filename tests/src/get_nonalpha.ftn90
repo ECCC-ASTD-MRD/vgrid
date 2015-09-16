@@ -1,13 +1,13 @@
 program tests
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,VGD_MISSING
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,VGD_LEN_NAME
   use Unit_Testing, only: ut_report
 
   implicit none
 
   type(vgrid_descriptor) :: d
-  integer :: stat,lu=0,lutxt=69,ip1,ip2
-  real*8 :: ptop_8
-  
+  integer :: stat,lu=10,lutxt=69,ip1,ip2
+  real*8, dimension(:), pointer :: coef_a_m_8
+
   integer, external :: fnom,fstouv,fclos,fstfrm
 
   ! Open test file
@@ -29,8 +29,9 @@ program tests
   stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
 
   ! Get information about the coordinate
-  stat = vgd_get(d,key='PTOP - top level pressure',value=ptop_8)
-  call ut_report(stat,message='Grid_Descriptors::vgd_get get valid value')
+  stat = vgd_get(d,key='CA_M - vertical A coefficient (M)',value=coef_a_m_8)
+
+  call ut_report(stat,message='Grid_Descriptors::vgd_get non-alphanumeric entry')
 
   ! Close files
   stat = fstfrm(lu)

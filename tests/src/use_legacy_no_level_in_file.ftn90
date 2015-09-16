@@ -21,10 +21,10 @@ program constructor
      print*,'Error with fstouv'
      call abort
   endif
-  
+  print*,'The following should produce an error since there is no levels in file'
   stat=vgd_new(d,lu)
   OK=stat.eq.VGD_ERROR
 
-  call ut_report(OK,'Grid_Descriptors::vgd_vintage no levels in file')
+  call ut_report(OK,'Grid_Descriptors::legacy no levels in file')
   
 end program constructor
