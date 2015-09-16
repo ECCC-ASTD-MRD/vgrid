@@ -36,9 +36,32 @@ module vGrid_Descriptors
    ! Private class variables
    logical :: ALLOW_RESHAPE=.false.              ! Allow reshape of class pointer members
    integer, parameter :: KEY_LENGTH=4            !length of key string considered for get/put operations
+   integer, parameter :: ETIK_LENGTH=12          !length of standard file etikets
+   character(len=1), dimension(3), parameter :: MATCH_GRTYP=(/'X','Y','Z'/) !grid types with ip1,2 to ig1,2 mapping
    character(len=1) :: one_char                  !character mold for tranfer function
 
-
+   ! FST file record structure
+   type FSTD
+      sequence
+      private
+      integer :: ip1,ip2,ip3,ig1,ig2,ig3,ig4,dateo,deet,npas,datyp,nbits
+      logical :: initialized=.false.
+      ! intel compiler needs minimum character lenght to be 4 in order to make correct alignment.
+      character(len=4) :: grtyp
+      character(len=4) :: typvar
+      character(len=KEY_LENGTH) :: nomvar
+      character(len=ETIK_LENGTH) :: etiket
+   end type FSTD
+   type FSTD_ext
+      sequence
+      private
+      integer :: ig1,ig2,ig3,ig4,dateo,deet,npas,datyp,nbits,ni,nj,nk
+      integer :: ip1,ip2,ip3,swa,lng,dltf,ubc,extra1,extra2,extra3,datev
+      character(len=4) :: grtyp
+      character(len=4) :: typvar
+      character(len=KEY_LENGTH) :: nomvar
+      character(len=ETIK_LENGTH) :: etiket
+   end type FSTD_ext
    type :: vgrid_descriptor
       ! The only member of this type is a C pointer
       type(c_ptr) :: cptr = C_NULL_PTR
@@ -251,8 +274,8 @@ module vGrid_Descriptors
    end interface vgd_write
 
    interface vgd_levels
-      !module procedure levels_toplevel
-      !module procedure levels_readref
+      module procedure levels_toplevel
+      module procedure levels_readref
       module procedure levels_withref
       module procedure levels_withref_8
       module procedure levels_withref_prof
@@ -262,8 +285,8 @@ module vGrid_Descriptors
    interface vgd_dpidpis
       module procedure dpidpis_withref
       module procedure dpidpis_withref_8
-      !module procedure dpidpis_withref_prof
-      !module procedure dpidpis_withref_prof_8
+      module procedure dpidpis_withref_prof
+      module procedure dpidpis_withref_prof_8
    end interface vgd_dpidpis
    
    interface operator (==)
@@ -602,6 +625,244 @@ contains
       istat = f_print_desc(self%cptr,stdout_CP,convip_CP)
    end function print_desc
 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!! Compute vertical levelling
+
+  integer function levels_toplevel(unit,fstkeys,levels,in_log) result(status)
+    ! Top-level interface for computing physical levelling information
+    integer, intent(in) :: unit                         !File unit associated with the key
+    integer, dimension(:), intent(in) :: fstkeys        !Key of prototype field
+    real, dimension(:,:,:), pointer :: levels           !Physical level values
+    logical, optional, intent(in) :: in_log             !Compute levels in ln() [.false.]
+
+    ! Local variables
+    real :: lev
+    integer :: ip1,kind
+    character(len=1) :: blk_S
+    integer :: error,ig1,ig2,ig3,i
+    character(len=1) :: grtyp
+    logical :: construct,multiple_grids,my_in_log
+    type(vgrid_descriptor) :: gd
+    type(FSTD_ext) :: var
+
+    ! Set error status
+    status = VGD_ERROR
+
+    ! Set default values
+    my_in_log = .false.
+    if (present(in_log)) my_in_log = in_log
+
+    ! Construct appropriate grid_descriptor object (rebuild if new ig1-3 values are found)
+    multiple_grids = .false.
+    grids: do i=1,size(fstkeys)
+       error = my_fstprm(fstkeys(i),var)
+       if (error /= VGD_OK) then
+          write(for_msg,*) 'return from fstprm wrapper for fst key ',fstkeys(i)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return
+       endif
+       if (i==1) then
+          ig1 = var%ig1
+          ig2 = var%ig2
+          ig3 = var%ig3
+          grtyp = var%grtyp(1:1)
+          ip1 = var%ip1
+       endif
+       if (var%ig1 /= ig1 .or. var%ig2 /= ig2 .or. var%ig3 /= ig3 .or. trim(var%grtyp(1:1)) /= trim(grtyp)) then
+          write(for_msg,*) 'multiple grids defined in fstkeys vector'
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return
+       endif
+    enddo grids
+
+    call convip (ip1, lev, kind,-1, blk_S, .false.)
+    ! Create grid descriptor instance and call level calculator
+    if (any(MATCH_GRTYP == grtyp)) then
+       error = new_read(gd,unit=unit,format='fst',ip1=ig1,ip2=ig2,kind=kind)
+       if(error==VGD_ERROR)then
+          write(for_msg,*) 'The above error was produce with call to new_read with specific ip1 and 1p2, trying with wild card -1, if there is no error below, disregard the above error.'
+          call msg(MSG_WARNING,VGD_PRFX//for_msg)
+          error = new_read(gd,unit=unit,format='fst',                kind=kind)
+       endif
+    else
+       error = new_read(gd,unit=unit,format='fst',ip1=-1,ip2=-1,kind=kind)
+    endif
+
+    if (error /= VGD_OK) then
+       write(for_msg,*) 'cannot build grid descriptor instance for fst key ',fstkeys(1)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return
+    endif
+
+    error = levels_readref(gd,unit=unit,fstkeys=fstkeys,levels=levels,in_log=my_in_log)
+    if (error /= VGD_OK) then
+       write(for_msg,*) 'problem computing level information for fst key ',fstkeys(1)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return
+    endif
+
+    ! Set status and return
+    status = VGD_OK
+
+    return
+  end function levels_toplevel
+
+  integer function levels_readref(self,unit,fstkeys,levels,in_log) result(status)
+    ! Reading referent, compute physical levelling information from the vertical description
+    type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
+    integer, intent(in) :: unit                         !File unit associated with the key
+    integer, dimension(:), intent(in) :: fstkeys        !Key of prototype field
+    real, dimension(:,:,:), pointer :: levels           !Physical level values
+    logical, optional, intent(in) :: in_log             !Compute levels in ln() [.false.]
+
+    ! Internal variables
+    integer :: fstinf,ni,nj,nk,sfc_key,istat,error,fstluk,i,ip1,ip2,match_ipig
+    integer, dimension(size(fstkeys)) :: ip1_list
+    type(FSTD_ext) prmk,prm_p0,prm_check
+    real, dimension(:,:), pointer :: p0
+    logical :: my_in_log, relax_ipig_match_L
+    character(len=4) :: ref_name
+
+    nullify(p0)
+    
+    relax_ipig_match_L=.false.
+
+    ! Set error status
+    status = VGD_ERROR
+
+    if(.not.is_valid(self,'SELF'))then
+       write(for_msg,*) 'vgrid structure is not valid in levels_readref'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+       return
+    endif
+
+    ! Set default values
+    my_in_log = .false.
+    if (present(in_log)) my_in_log=in_log
+
+    ! Check input keys
+    if(size(fstkeys)<1)then
+       write(for_msg,*) 'fstkeys vector passed to vgd_levels is null'                             
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return                                                                
+    endif
+    istat=my_fstprm(fstkeys(1),prmk)
+    if(istat < 0)then
+       write(for_msg,*) 'problem with my_fstprm in levels_readref'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+    endif
+    check_times: do i=1,size(fstkeys)
+       istat=my_fstprm(fstkeys(i),prm_check)
+       ip1_list(i) = prm_check%ip1
+       if (prm_check%datev /= prmk%datev) then
+          write(for_msg,*) 'multiple valid times given in fstkeys vector'
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return
+       endif
+       if (prm_check%ig1 /= prmk%ig1 .or. prm_check%ig2 /= prmk%ig2) then
+          write(for_msg,*) 'multiple grids given in fstkeys vector'
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return
+       endif
+    enddo check_times
+    if ( vgd_get(self,"MIPG match !! IPs and IGs with records",match_ipig) == VGD_ERROR )then
+       write(for_msg,*) 'ERROR in levels_readref with vgd_get on MIPG'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return
+    endif
+
+    if ( vgd_get(self,"IP_1",ip1) == VGD_ERROR )then
+       write(for_msg,*) 'ERROR in levels_readref with vgd_get on IP_1'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return
+    endif
+    if ( vgd_get(self,"IP_2",ip2) == VGD_ERROR )then
+       write(for_msg,*) 'ERROR in levels_readref with vgd_get on IP_2'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return
+    endif
+    if ( vgd_get(self,"RFLD",ref_name) == VGD_ERROR )then
+       write(for_msg,*) 'ERROR in levels_readref with vgd_get on RFLD'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return
+    endif
+    if (match_ipig == 1) then
+       if (prmk%ig1 /= ip1 .or. prmk%ig2 /= ip2) then
+          write(for_msg,*) 'fstkeys do not correspond to the correct grid descriptor'
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          write(for_msg,'("   expecting (ip1,ip2)->(",i8,",",i8,"), got (ig1,ig2)->(",i8,",",i8,")")')&
+          prmk%ig1,prmk%ig2,ip1,ip2
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return
+       endif
+    endif
+
+    ! Check surface field if needed
+    sfc_valid: if (is_valid(self,"ref_name_valid")) then
+       sfc_key = fstinf(unit,ni,nj,nk,prmk%datev,prmk%etiket,-1,prmk%ip2,prmk%ip3,' ',ref_name)
+       if(sfc_key < 0)then
+          write(for_msg,*) 'cannot find ',ref_name,' for :'
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          write(for_msg,*) 'datev=',prmk%datev,' etiket=',prmk%etiket,' ip2=',prmk%ip2,' ip3=',prmk%ip3
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return   
+       endif
+       istat=my_fstprm(sfc_key,prm_p0)
+       if(prm_p0%ni.ne.prmk%ni.or.prm_p0%nj.ne.prmk%nj)then
+          write(for_msg,*) 'horizontal grid mismatch for '//trim(ref_name),ni,nj,' vs',prmk%ni,prmk%nj
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return
+       endif
+       if (match_ipig == 1) then
+          if (prm_p0%ig1 /= ip1 .or. prm_p0%ig2 /= ip2) then
+             write(for_msg,*) 'sfc_field ig1 ig2 do not correspond to the correct grid descriptor'
+             call msg(MSG_ERROR,VGD_PRFX//for_msg)
+             write(for_msg,'("   expecting (ip1,ip2)->(",i8,",",i8,"), got (ig1,ig2)->(",i8,",",i8,")")')&
+                  ip1,ip2,prm_p0%ig1,prm_p0%ig2
+             call msg(MSG_ERROR,VGD_PRFX//for_msg)                            
+             return
+          endif
+       endif
+       allocate(p0(ni,nj),stat=error)
+       if (error /= 0) then
+          nullify(p0)
+          write(for_msg,*) 'cannot allocate space for p0 in levels_readref'
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return
+       endif
+       error = fstluk(p0,sfc_key,ni,nj,nk)
+       if(error < 0 )then
+          write(for_msg,*) 'problem with fstluk '//trim(ref_name)//' in levels_readref'
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          deallocate(p0)
+          return
+       endif
+       if (trim(ref_name) == 'P0') p0 = p0*100. !convert mb to Pa
+    else
+       allocate(p0(1,1),stat=error)
+       if (error /= 0) then
+          nullify(p0)
+          write(for_msg,*) 'cannot allocate space for p0 in levels_readref'
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return
+       endif
+       p0 = VGD_MISSING
+    endif sfc_valid
+   
+    ! Wrap call to level calculator
+    error = levels_withref(self,sfc_field=p0,ip1_list=ip1_list,levels=levels,in_log=my_in_log)
+    deallocate(p0)
+    if (error /= VGD_OK) then
+       write(for_msg,*) 'got error return from levels_withref in levels_readref'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return
+    endif
+
+    ! Set status and return
+    status = VGD_OK
+    return
+  end function levels_readref
+
   integer function levels_withref_prof(self,ip1_list,levels,sfc_field,in_log) result(status)
      use utils, only: get_allocate
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
@@ -681,6 +942,82 @@ contains
      status = diag_withref_prof_8(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log)
      return
   end function levels_withref_prof_8
+
+  integer function dpidpis_withref_prof(self,ip1_list,dpidpis,sfc_field) result(status)
+     use utils, only: get_allocate,up,get_error
+     type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
+     integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
+     real, dimension(:), pointer :: dpidpis                      !Derivative values
+     real, optional, intent(in) :: sfc_field                     !Surface field reference for coordinate [none]
+
+     ! Local variables
+     real*8 :: my_sfc_field_8
+     real*8, dimension(:), pointer :: dpidpis_8
+     integer :: error,stat
+
+     nullify(dpidpis_8)
+
+     ! Set return value
+     status = VGD_ERROR
+
+     if(.not.is_valid(self,'SELF'))then
+        write(for_msg,*) 'vgrid structure is not valid in dpidpis_withref_prof'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+        return
+     endif
+
+     ! Set default values
+     my_sfc_field_8 = VGD_MISSING
+     if (present(sfc_field)) my_sfc_field_8 = sfc_field
+     
+     ! Wrap call to level calculation
+     stat = diag_withref_prof_8(self,ip1_list,dpidpis_8,sfc_field=my_sfc_field_8,dpidpis=.true.)
+     if(stat==VGD_ERROR)then
+        if(associated(dpidpis_8))deallocate(dpidpis_8)
+        return
+     endif
+     error = get_allocate('dpidpis',dpidpis,size(dpidpis_8),ALLOW_RESHAPE,'(in dpidpis_withref_prof)')
+     if (error /= 0)then
+        if(associated(dpidpis_8))deallocate(dpidpis_8)
+        return
+     endif
+     dpidpis=dpidpis_8
+     deallocate(dpidpis_8)
+     status=VGD_OK
+     return
+  end function dpidpis_withref_prof
+
+  integer function dpidpis_withref_prof_8(self,ip1_list,dpidpis,sfc_field) result(status)
+     use utils, only: get_allocate,up,get_error
+     type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
+     integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
+     real*8, dimension(:), pointer :: dpidpis                      !Derivative values
+     real*8, optional, intent(in) :: sfc_field                     !Surface field reference for coordinate [none]
+
+     ! Local variables
+     real*8 :: my_sfc_field_8
+     integer :: error,stat
+
+     ! Set return value
+     status = VGD_ERROR
+     if(.not.is_valid(self,'SELF'))then
+        write(for_msg,*) 'vgrid structure is not valid in dpidpis_withref_prof_8'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+        return
+     endif
+
+     ! Set default values
+     my_sfc_field_8 = VGD_MISSING
+     if (present(sfc_field)) my_sfc_field_8 = sfc_field
+     ! Wrap call to level calculation
+     stat = diag_withref_prof_8(self,ip1_list,dpidpis,sfc_field=my_sfc_field_8,dpidpis=.true.)
+     if(stat==VGD_ERROR)then
+        write(for_msg,*) 'ERROR with diag_withref_prof_8 in dpidpis_withref_prof_8'
+        return
+     endif
+     status = VGD_OK
+     return
+  end function dpidpis_withref_prof_8
 
   integer function diag_withref_prof_8(self,ip1_list,levels,sfc_field,in_log,dpidpis) result(status)
      use utils, only: get_allocate
@@ -982,8 +1319,8 @@ contains
       
       ! Local variables
       integer kind,version,istat,ni,nj,nk,error
-      logical :: my_in_log, my_dpidpis
       type (c_ptr) :: ip1_list_CP ,levels_CP ,sfc_field_CP ,in_log_CP, dpidpis_CP
+      logical :: my_dpidpis
 
       ! Set error status
       status = VGD_ERROR
@@ -1524,7 +1861,7 @@ contains
       endif
       my_key=up(key(1:KEY_LENGTH))
       status = f_get_char(self%cptr, my_key//C_NULL_CHAR, my_char, quiet_CP)
-      select case(trim(key))
+      select case(trim(my_key))
          case ('ETIK')
             nchar=12
          case ('NAME')
@@ -1543,6 +1880,8 @@ contains
          end if
          value(i:i)=my_char(i)         
       enddo
+
+      status = VGD_OK
       
    end function get_char
     
@@ -1580,6 +1919,36 @@ contains
       valid =  f_is_valid(self%cptr,element_valid_S//C_NULL_CHAR) == 1
       return
    end function is_valid
-      
+
+   integer function my_fstprm(fstkey,record) result(status)
+      ! Use fstprm function to get information about the record
+      integer, intent(in) :: fstkey               !Key from FST file record
+      type(FSTD_ext) :: record                    !Record information
+      ! Local variables
+      integer :: error,ni,nj,nk
+      integer, external :: fstprm,fstinf
+      real*8 :: nhours
+      status = VGD_ERROR
+      error=fstprm(fstkey,record%dateo,record%deet,record%npas, &
+           record%ni,record%nj,record%nk,record%nbits,record%datyp,record%ip1,record%ip2, &
+           record%ip3,record%typvar,record%nomvar,record%etiket,record%grtyp, &
+           record%ig1,record%ig2,record%ig3,record%ig4,record%swa, &
+           record%lng,record%dltf,record%ubc,record%extra1,record%extra2, &
+           record%extra3)
+      if (error < 0) then
+         write(6,*) 'cannot fstprm for fstkey ',fstkey
+         return
+      end if
+      nhours=record%deet*record%npas/3600.d0
+      ! Note incdatr prints the following when dateo is zero :
+      !    label 1,idate2:           0
+      if (record%dateo == 0 )then
+         record%datev=0
+      else
+         call incdatr(record%datev,record%dateo,nhours)
+      endif
+      status = VGD_OK
+   end function my_fstprm
+   
 end module vGrid_Descriptors
 

@@ -97,7 +97,6 @@ program tests
         endif
      endif
   enddo
-
   call ut_report(ok,message='Grid_Descriptors::vgd_dpidpis level calculation status')
 
   stat=fstfrm(lu)

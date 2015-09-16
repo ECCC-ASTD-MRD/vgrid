@@ -740,9 +740,11 @@ static int C_compute_pressure_5002_5003_5004_5005_8(TVGrid *self, int ni, int nj
   int ij, k, ijk, ind, l_in_log, l_dpidpis, kind;
   float hyb;
 
+  l_in_log = 0;
   if(in_log){
     l_in_log = *in_log;
   }
+
   l_dpidpis=0;
   if(dpidpis){
     l_dpidpis = *dpidpis;
@@ -811,7 +813,7 @@ static int C_compute_pressure_5002_5003_5004_5005_8(TVGrid *self, int ni, int nj
   if( l_dpidpis ){
     if( l_in_log ){
       printf("(Cvgd) ERROR: in C_compute_pressure_5002_5003_5004_5005_8, cannot get dpidpis in log\n");
-      return(VGD_ERROR);
+      goto bomb;
     }
     for(k=0, ijk=0; k < nk; k++) {
       for(ij=0; ij < ni*nj; ij++, ijk++) {
@@ -819,12 +821,19 @@ static int C_compute_pressure_5002_5003_5004_5005_8(TVGrid *self, int ni, int nj
       }
     }
   }
-						  
+  
   free(s_8);
   free(aa_8);
   free(bb_8);
 
   return(VGD_OK);
+
+ bomb:
+  free(s_8);
+  free(aa_8);
+  free(bb_8);
+
+  return(VGD_ERROR);
 
 }
 
@@ -2549,6 +2558,8 @@ int Cvgd_get_int(TVGrid *self, char *key, int *value, int *quiet)
     *value = self->ip1_m[self->nl_m-1];
   } else if (strcmp(key, "DIPT") == 0){
     *value = self->ip1_t[self->nl_t-1];
+  } else if (strcmp(key, "MIPG") == 0){
+    *value = self->match_ipig;
   } else {
     if(! lquiet) {
       printf("(Cvgd) ERROR in Cvgd_get_int, invalid key %s\n",key);
@@ -3414,7 +3425,7 @@ int Cvgd_legacy(TVGrid **self, int unit, int F_kind) {
   }
 
   if(F_kind > 0) {
-    printf("(Cvgd) Looking for kind = %d",F_kind);
+    printf("(Cvgd) Looking for kind = %d\n",F_kind);
   }
   error = c_fstinl(unit, &ni, &nj, &nk, -1, " ", -1, -1, -1, " ", " ", keylist, &count, nkeylist);
   if (error < 0) {
@@ -3522,7 +3533,7 @@ int Cvgd_legacy(TVGrid **self, int unit, int F_kind) {
 int Cvgd_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int *kind, int *version) {
 
   int l_ip1 = -1, l_ip2 = -1, l_kind = -1, l_version = -1, error;
-  int i, ni, nj, nk;
+  int i, ni, nj, nk, match_ipig;
   int fstinl;
   int toc_found = 0, count, nkeyList = MAX_DESC_REC;
   int keyList[nkeyList], status;
@@ -3551,9 +3562,9 @@ int Cvgd_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int
     printf("(Cvgd) ERROR in Cvgd_new_read, expecting optional value ip1\n");      
     return (VGD_ERROR);
   }
-  (*self)->match_ipig = 0;
+  match_ipig = 0;  
   if(l_ip1 > 0){
-    (*self)->match_ipig = 1;
+    match_ipig = 1;
   }
   if(kind) l_kind = *kind;
   if(version) {    
@@ -3563,7 +3574,7 @@ int Cvgd_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int
       return (VGD_ERROR);
     }
   }
-  
+
   //printf("Unit = %d, format = %s, ip1 = %d, ip1 = %d, kind = %d, version = %d\n",unit, format, l_ip1, l_ip2 , l_kind, l_version);
   
   //==============================
@@ -3577,7 +3588,7 @@ int Cvgd_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int
     }
     if(count == 0){
       printf("(Cvgd) Cannot find %s with the following ips: ip1=%d, ip2=%d\n", ZNAME, l_ip1, l_ip2);
-      if((*self)->match_ipig) {
+      if(match_ipig) {
 	(*self)->vcode = -1;
 	return(VGD_ERROR);
       }
@@ -3652,6 +3663,7 @@ int Cvgd_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int
     printf("(Cvgd) ERROR in Cvgd_new_read, unable to construct from table\n");
     return(VGD_ERROR);
   }
+  (*self)->match_ipig = match_ipig;  
 
   return(VGD_OK);
 }
@@ -3673,8 +3685,6 @@ int Cvgd_write_desc (TVGrid *self, int unit, char *format) {
     if(self->rec.ip1 < 0) ip1=0;
     ip2=self->rec.ip2;
     if(self->rec.ip2 < 0) ip2=0;
-
-    printf("DANS Cvgd_write_desc, self->rec.etiket = %s\n",self->rec.etiket);
 
     if( c_fstecr( self->table,      work,            -self->rec.nbits, unit, 
 		  self->rec.dateo,  self->rec.deet,   self->rec.npas, 

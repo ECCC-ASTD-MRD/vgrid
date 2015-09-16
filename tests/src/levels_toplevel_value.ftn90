@@ -102,49 +102,49 @@ integer function do_it(lu,file) result(status)
 
   ier=fnom(lu,file,"RND+R/O",0)
   if(ier.lt.0)then
-     print*,'ERROR with fnom on file ',file
+     print*,'(Test) ERROR with fnom on file ',file
      return
   endif
   ier=fstouv(lu,'RND')
   if(ier.lt.0)then
-     print*,'No record in RPN file ',file
+     print*,'(Test) No record in RPN file ',file
      return
   endif
 
   ! Get physical levelling information
   ier = fstinl(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ' ,'TT',liste,infon,nmax)
   if(infon.le.0)then
-     print*,'ERROR cannot find any TT in input file ',file
+     print*,'(Test) ERROR cannot find any TT in input file ',file
      return
   endif    
   ! treat middle level record
   ier=my_fstprm(liste(infon/2),prm)
   call convip(prm%ip1,pres,kind,-1,string,.false.)
-  print*,'Treating TT at ip1=',prm%ip1,' ->',pres
+  print*,'(Test) Treating TT at ip1=',prm%ip1,' ->',pres
 
   fstkey = fstinf(lu,ni,nj,nk,-1,'',prm%ip1,-1,-1,'','TT')
   if(fstkey.le.0)then
-     print*,'ERROR cannot find any TT in input file ',file
+     print*,'(Test) ERROR cannot find any TT in input file ',file
      return
   endif
   ier = vgd_levels(unit=lu,fstkeys=(/fstkey/),levels=lev)
   if(ier==VGD_ERROR)then
-     print*,'Problem with vgd_levels'
+     print*,'(Test) Problem with vgd_levels'
      return
   endif
 
   allocate(px(ni,nj))
   ier = fstlir(px,lu,ni,nj,nk,-1,'',prm%ip1,-1,-1,'','PX')
   if(ier.lt.0)then
-     print*,'ERROR with fstlir on PX for ip1,file ',prm%ip1,file
+     print*,'(Test) ERROR with fstlir on PX for ip1,file ',prm%ip1,file
      return
   endif  
 
   if(abs(lev(10,10,1)/100.-px(10,10))>epsilon)then
-     print*,'ERROR difference in pressure to high',lev(10,10,1)/100.,' VS',px(10,10)
+     print*,'(Test) ERROR difference in pressure to high',lev(10,10,1)/100.,' VS',px(10,10)
      return
   else
-     print*,'Difference in pressure are OK',lev(10,10,1)/100.,' VS',px(10,10)
+     print*,'(Test) Difference in pressure are OK',lev(10,10,1)/100.,' VS',px(10,10)
   endif
 
   deallocate(px,lev)

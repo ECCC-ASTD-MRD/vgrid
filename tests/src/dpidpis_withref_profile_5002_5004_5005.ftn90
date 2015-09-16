@@ -45,7 +45,7 @@ end program tests
 
 integer function test_it(F_lu,F_ip1,F_ip2) result(stat)
    
-   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_dpidpis,VGD_ERROR,VGD_OK
+   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_dpidpis,vgd_free,VGD_ERROR,VGD_OK
    
    implicit none
    
@@ -58,13 +58,13 @@ integer function test_it(F_lu,F_ip1,F_ip2) result(stat)
    real, dimension(:), pointer :: dpidpis_profil
    real*8, dimension(:), pointer :: dpidpis_profil_8
    real :: epsilon=1.e-5
-   real, dimension(:,:), allocatable :: p0,px
+   real, dimension(:,:), pointer :: p0,px
    real :: local_pres,w1,pres
    real*8 :: local_pres_8
    type(vgrid_descriptor) :: d
    real*8, dimension(:), pointer :: coef_b   
 
-   nullify(ip1_list,dpidpis_profil,dpidpis_profil_8,coef_b)
+   nullify(ip1_list,dpidpis_profil,dpidpis_profil_8,p0,px,coef_b)
 
    stat=VGD_ERROR
 
@@ -136,7 +136,8 @@ integer function test_it(F_lu,F_ip1,F_ip2) result(stat)
       endif
    enddo
    
-   deallocate(ip1_list,dpidpis_profil,dpidpis_profil_8,coef_b)
+   deallocate(ip1_list,dpidpis_profil,dpidpis_profil_8,p0,px,coef_b)
+   stat=vgd_free(d)
 
    stat=VGD_OK
        
