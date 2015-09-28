@@ -1219,7 +1219,7 @@ contains
          call msg(MSG_ERROR,VGD_PRFX//for_msg)       
          return
       endif
-\      ! Set default values
+      ! Set default values
       if (present(sfc_field)) then
          ni = size(sfc_field,dim=1); nj = size(sfc_field,dim=2)
       else
