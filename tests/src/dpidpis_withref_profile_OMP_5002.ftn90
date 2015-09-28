@@ -1,5 +1,5 @@
 program tests
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_dpidpis,VGD_OK
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_dpidpis,vgd_free,VGD_OK
   use Unit_Testing, only: ut_report
 
   implicit none
@@ -22,18 +22,18 @@ program tests
   type(vgrid_descriptor) :: d
   logical :: ok
   real*8, dimension(:), pointer :: coef_b
-  
-  nullify(ip1_list,dpidpis_3d,dpidpis_3d_from_prof,dpidpis_3d_from_prof_8,p0,px,p0_8,p00,p00_8,coef_b)
+
+  nullify(dpidpis_profil,dpidpis_profil_8,ip1_list,dpidpis_3d,dpidpis_3d_8,dpidpis_3d_from_prof,dpidpis_3d_from_prof_8,p0,px,p0_8,p00,p00_8,coef_b)
 
   stat=fnom(lu,"data/dm_5002_from_model_run","RND+R/O",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
-     call abort
+     call exit(1)
   endif
   stat=fstouv(lu,'RND')
   if(stat.lt.0)then
      print*,'No record in RPN file'
-     call abort
+     call exit(1)
   endif
   open(unit=lutxt,file='data/dm_5002_ips.txt',status='OLD')
   read(lutxt,*) ip1,ip2
@@ -61,7 +61,7 @@ program tests
   stat = vgd_dpidpis(d,sfc_field=p0  ,ip1_list=ip1_list,dpidpis=dpidpis_3d)  
   stat = vgd_dpidpis(d,sfc_field=p0_8,ip1_list=ip1_list,dpidpis=dpidpis_3d_8)  
 
-!$omp parallel private(tid,dpidpis_profil,dpidpis_profil_8,stat,ii,jj,k)
+!$omp parallel private(tid,dpidpis_profil,dpidpis_profil_8,ii,jj,k,stat)
   tid=omp_get_thread_num()
   if (tid .eq. 0) then
      print*,'number of threads=',omp_get_num_threads()
@@ -74,14 +74,14 @@ program tests
      if(stat.ne.VGD_OK)then
         print*,'ERROR: problem with vgd_dpidpis profil for i=',i
         stat=fstfrm(lu)
-        call abort
+        call exit(1)
      endif
      nullify(dpidpis_profil_8)
      stat = vgd_dpidpis(d,sfc_field=p00_8(i),ip1_list=ip1_list,dpidpis=dpidpis_profil_8)         
      if(stat.ne.VGD_OK)then
         print*,'ERROR: problem with vgd_dpidpis profil real*8 for i=',i
         stat=fstfrm(lu)
-        call abort
+        call exit(1)
      endif
      ii=mod(i,ni)
      if(ii.eq.0)ii=ni
@@ -96,47 +96,44 @@ program tests
 !$omp enddo
 !$omp end parallel
 
-if(associated(dpidpis_profil))deallocate(dpidpis_profil)
-stat = vgd_dpidpis(d,sfc_field=p0(i0,j0),ip1_list=ip1_list,dpidpis=dpidpis_profil)
-if(stat.ne.VGD_OK)then
-   print*,'ERROR: problem with vgd_dpidpis'
-   stat=fstfrm(lu)
-   call abort
-endif
-
-if(associated(dpidpis_profil_8))deallocate(dpidpis_profil_8)
-stat = vgd_dpidpis(d,sfc_field=p0_8(i0,j0),ip1_list=ip1_list,dpidpis=dpidpis_profil_8)
-if(stat.ne.VGD_OK)then
-   print*,'ERROR: problem with vgd_dpidpis real*8'
-   stat=fstfrm(lu)
-   call abort
-endif
-
-OK=.true.
-do k=1,nk
-   do j=1,nj
-      do i=1,ni
-         if(dpidpis_3d_from_prof(i,j,k).ne.dpidpis_3d(i,j,k))then
-            print*,'Problem : OpenMP do not reproduce result'
-            print*,'problem in i,k,j',i,k,j,dpidpis_3d_from_prof(i,j,k),dpidpis_3d(i,j,k)
-            OK=.false.
-            exit
-         endif
-         if(dpidpis_3d_from_prof_8(i,j,k).ne.dpidpis_3d_8(i,j,k))then
-            print*,'Problem : OpenMP do not reproduce result for reak*8'
-            print*,'problem in i,k,j',i,k,j,dpidpis_3d_from_prof_8(i,j,k),dpidpis_3d_8(i,j,k)
-            OK=.false.
-            exit
-         endif         
-      enddo
-   enddo
-enddo
+  if(associated(dpidpis_profil))deallocate(dpidpis_profil)
+  stat = vgd_dpidpis(d,sfc_field=p0(i0,j0),ip1_list=ip1_list,dpidpis=dpidpis_profil)
+  if(stat.ne.VGD_OK)then
+     print*,'ERROR: problem with vgd_dpidpis'
+     stat=fstfrm(lu)
+     call exit(1)
+  endif
+  
+  if(associated(dpidpis_profil_8))deallocate(dpidpis_profil_8)
+  stat = vgd_dpidpis(d,sfc_field=p0_8(i0,j0),ip1_list=ip1_list,dpidpis=dpidpis_profil_8)
+  if(stat.ne.VGD_OK)then
+     print*,'ERROR: problem with vgd_dpidpis real*8'
+     stat=fstfrm(lu)
+     call exit(1)
+  endif
+  
+  OK=.true.
+  do k=1,nk
+     do j=1,nj
+        do i=1,ni
+           if(dpidpis_3d_from_prof(i,j,k).ne.dpidpis_3d(i,j,k))then
+              print*,'Problem : OpenMP do not reproduce result for real'
+              print*,'problem in i,k,j',i,k,j,dpidpis_3d_from_prof(i,j,k),dpidpis_3d(i,j,k)
+              OK=.false.
+              exit
+           endif
+           if(dpidpis_3d_from_prof_8(i,j,k).ne.dpidpis_3d_8(i,j,k))then
+              print*,'Problem : OpenMP do not reproduce result for real*8'
+              print*,'problem in i,k,j',i,k,j,dpidpis_3d_from_prof_8(i,j,k),dpidpis_3d_8(i,j,k)
+              OK=.false.
+              exit
+           endif
+        enddo
+     enddo
+  enddo
 
   do k=1,size(coef_b)
      stat = fstlir(px,lu,ni,nj,nkk,-1,'',ip1_list(k),-1,-1,'','PX')
-
-     PRINT*,'andre k,i0,j0=',k,i0,j0
-
      w1=coef_b(k)*px(i0,j0)*100./p0(i0,j0)
      print*,w1,dpidpis_profil(k)
      if(abs(dpidpis_profil(k)- w1)/w1>epsilon)then
@@ -144,9 +141,14 @@ enddo
         OK=.false.
      endif
   enddo
-
-  call ut_report(ok,message='Grid_Descriptors::vgd_dpidpis level calculation status')
-
+  
+  deallocate(dpidpis_profil,dpidpis_profil_8)
+  deallocate(p0,p00,p0_8,P00_8,px,dpidpis_3d,dpidpis_3d_8,dpidpis_3d_from_prof,dpidpis_3d_from_prof_8,ip1_list,coef_b)
+  
+  stat = vgd_free(d)
+  
   stat=fstfrm(lu)
-
+  
+  call ut_report(ok,message='Grid_Descriptors::vgd_dpidpis level calculation status')
+  
 end program tests
