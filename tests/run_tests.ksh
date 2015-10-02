@@ -54,7 +54,7 @@ failed=0
 for test in ${tests[*]} ; do
   if echo ${test} | grep -q OMP ;then  
     if [ ${BASE_ARCH} != Linux ];then
-       export OMP_NUM_THREADS=4
+       export OMP_NUM_THREADS=12
        MESSAGE=" with OMP_NUM_THREADS=${OMP_NUM_THREADS} "
     else
       export OMP_NUM_THREADS=1

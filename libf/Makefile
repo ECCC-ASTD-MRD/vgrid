@@ -1,6 +1,6 @@
 # User options
 #FFLAGS=$(FFLAGS_INTEL)
-FFLAGS="$(FFLAGS_INTEL) -C -g -O0"
+FFLAGS="$(FFLAGS_INTEL) -C -g -O0 -openmp"
 
 # Set default target
 default: lib
