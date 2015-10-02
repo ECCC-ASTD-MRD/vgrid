@@ -1,15 +1,5 @@
 module vGrid_Descriptors
 
-   ! Autor of C version : Andre Plante
-   !                      Based on fortran version from:
-   !                      Ron MacTaggart-Cowan, Andre Plante and Cecilien Charette
-
-   ! Naming convention
-   !
-   ! var_8  is of type real*8
-   ! var_L  is of type logical
-   ! var_CP is of type type(c_prt) from iso_c_binging
-
    use iso_c_binding, only : c_ptr, C_NULL_PTR, C_CHAR, C_NULL_CHAR, c_associated, c_loc
    
    implicit none
@@ -75,6 +65,13 @@ module vGrid_Descriptors
          type(c_ptr), value  :: levels_CP
          integer (c_int), value :: ni, nj, nk
       end function f_diag_withref_8
+
+      integer function f_diag_withref_8_debug(ni, nj, nk, ip1_list_CP, levels_CP,sfc_field_CP) bind(c, name='C_compute_pressure_5002_5003_5004_5005_8_debug')
+         use iso_c_binding, only: c_ptr, c_int
+         type(c_ptr), value :: ip1_list_CP, sfc_field_CP
+         type(c_ptr), value  :: levels_CP
+         integer (c_int), value :: ni, nj, nk
+      end function f_diag_withref_8_debug
 
       integer function f_get_int(vgd_CP, key, value_CP, quiet_CP) bind(c, name='Cvgd_get_int')
          use iso_c_binding, only: c_ptr, c_char
@@ -278,6 +275,7 @@ module vGrid_Descriptors
       module procedure levels_readref
       module procedure levels_withref
       module procedure levels_withref_8
+      module procedure levels_withref_8_debug
       module procedure levels_withref_prof
       module procedure levels_withref_prof_8
    end interface vgd_levels
@@ -1198,6 +1196,42 @@ contains
       return
    end function levels_withref_8
 
+  integer function levels_withref_8_debug(ip1_list,levels,sfc_field) result(status)
+      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
+      real*8, dimension(:,:,:), pointer :: levels                   !Physical level values
+      real*8, dimension(:,:), optional, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
+
+      ! Local variables
+      integer :: error,ni,nj
+      real*8, dimension(:,:), pointer :: my_sfc_field
+      
+      nullify(my_sfc_field)
+
+      ! Set return value
+      status = VGD_ERROR
+
+      if (present(sfc_field)) then
+         ni = size(sfc_field,dim=1); nj = size(sfc_field,dim=2)
+      else
+         ni = 1; nj = 1
+      endif
+      allocate(my_sfc_field(ni,nj),stat=error)
+
+      if (present(sfc_field)) then
+         my_sfc_field = sfc_field
+      else
+         my_sfc_field = VGD_MISSING
+      endif
+      
+      ! Wrap call to level calculator
+      status=diag_withref_8_debug(ip1_list,levels,my_sfc_field)
+      deallocate(my_sfc_field)
+      
+      status = VGD_OK
+      
+      return
+   end function levels_withref_8_debug
+
    integer function dpidpis_withref(self,ip1_list,dpidpis,sfc_field) result(status)
       use utils, only: get_allocate
       ! Given referent, compute physical levelling information from the vertical description
@@ -1414,6 +1448,39 @@ contains
       status = VGD_OK
       return
    end function diag_withref_8
+
+   integer function diag_withref_8_debug(ip1_list,levels,sfc_field) result(status)
+      ! Given referent, compute physical levelling information from the vertical description
+      integer, target, dimension(:), intent(in) :: ip1_list               !Key of prototype field
+      real*8, dimension(:,:,:), pointer :: levels                   !Physical level values
+      real*8, dimension(:,:), pointer, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
+      
+      ! Local variables
+      integer istat,ni,nj,nk,error
+      type (c_ptr) :: ip1_list_CP ,levels_CP ,sfc_field_CP ,in_log_CP, dpidpis_CP
+
+      ! Set error status
+      status = VGD_ERROR
+      
+      ! Set size of output and allocate space
+      ni = size(sfc_field,dim=1); nj = size(sfc_field,dim=2); nk = size(ip1_list)
+
+
+      !if(associated(levels)) deallocate(levels)
+      allocate(levels(ni,nj,nk),stat=error)
+
+      ip1_list_CP  = c_loc(ip1_list(1))
+      levels_CP    = c_loc(levels(1,1,1))
+      sfc_field_CP = c_loc(sfc_field(1,1))
+
+      !print*,sfc_field_CP,ni,nj,nk
+      !!write(6,'("ANDRE DANS diag_withref_8_debug",z16,3i5)')sfc_field_CP,ni,nj,nk
+
+      istat = f_diag_withref_8_debug(ni,nj,nk,ip1_list_CP,levels_CP,sfc_field_CP)      
+
+      status = VGD_OK
+      return
+   end function diag_withref_8_debug
    
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Write descriptors

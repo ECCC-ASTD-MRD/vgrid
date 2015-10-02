@@ -832,6 +832,34 @@ static int C_compute_pressure_5002_5003_5004_5005_8(TVGrid *self, int ni, int nj
   return(VGD_OK);
 
 }
+int C_compute_pressure_5002_5003_5004_5005_8_debug(int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field) {
+
+  int ij, k, ijk;
+
+  //printf("ANDRE C_compute_pressure_5002_5003_5004_5005_8_debug = %p\n", levels);
+
+  if(! sfc_field){
+    printf("sfc_field not allocated !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+  }
+
+  // Ca plante
+  /* for(k=0; k < ni*nj; k++){ */
+  /*   levels[k] = sfc_field[k]; */
+  /* } */
+
+  // Ca plante pas
+  /* for(k=0; k < ni*nj*nk; k++){ */
+  /*   levels[k] = 1.; */
+  /* } */
+  
+  /* for(k=0, ijk=0; k < nk; k++) { */
+  /*   for(ij=0; ij < ni*nj; ij++, ijk++) { */
+  /*     levels[ijk] = sfc_field[ij]; */
+  /*   } */
+  /* } */
+ return(VGD_OK);
+
+}
 
 int Cvgd_diag_withref_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int *in_log, int *dpidpis) {
 
