@@ -24,7 +24,7 @@ else
                     -d hpcs/201402/02/base\
                     -d hpcs/201402/02/intel13sp1u2\
                     -d rpn/libs/15.2
-                 export FFLAGS_INTEL='-fp-model source'
+                 export FFLAGS_INTEL='-fp-model source -warn all'
 		 :;;
          pgi1401). ssmuse-sh \
 	            -d hpcs/201402/02/base\

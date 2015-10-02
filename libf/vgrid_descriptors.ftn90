@@ -351,7 +351,7 @@ contains
 
        ! Local variables
        type(c_ptr) :: table_CP
-       table_CP = c_loc(table)
+       table_CP = c_loc(table(1,1,1))
        
        status = VGD_ERROR
        
@@ -1010,11 +1010,12 @@ contains
      my_sfc_field_8 = VGD_MISSING
      if (present(sfc_field)) my_sfc_field_8 = sfc_field
      ! Wrap call to level calculation
-     stat = diag_withref_prof_8(self,ip1_list,dpidpis,sfc_field=my_sfc_field_8,dpidpis=.true.)
+     stat = diag_withref_prof_8(self,ip1_list,dpidpis,sfc_field=my_sfc_field_8,dpidpis=.true.)     
      if(stat==VGD_ERROR)then
         write(for_msg,*) 'ERROR with diag_withref_prof_8 in dpidpis_withref_prof_8'
         return
      endif
+     !write(6,'("ANDRE DANS dpidpis_withref_prof_8",z16)')c_loc(dpidpis)
      status = VGD_OK
      return
   end function dpidpis_withref_prof_8
@@ -1077,6 +1078,7 @@ contains
      error = get_allocate('levels',levels,nk,ALLOW_RESHAPE,'(in diag_withref_prof_8)')
      if(error/=0)return
      levels=levels_3d(1,1,1:nk)
+     !write(6,'("ANDRE DANS diag_withref_prof_8",z16," mis dans "z16)')c_loc(levels_3d),c_loc(levels)
      deallocate(sfc_field_2d,levels_3d)
      ! Set status and return
      status = VGD_OK
@@ -1158,7 +1160,7 @@ contains
 
       ! Local variables
       integer :: error,ni,nj
-      real*8, dimension(:,:), allocatable :: my_sfc_field
+      real*8, dimension(:,:), pointer :: my_sfc_field
       logical :: my_in_log
       
       ! Set return value
@@ -1298,6 +1300,7 @@ contains
       endif
       ! Wrap call to level calculator
       stat=diag_withref_8(self,ip1_list,dpidpis,sfc_field=my_sfc_field_8,dpidpis=.true.)
+      !write(6,'("ANDRE DANS dpidpis_withref_8",z16)')c_loc(dpidpis)
       if(stat==VGD_ERROR)then
          deallocate(my_sfc_field_8)
          return
@@ -1310,17 +1313,17 @@ contains
    integer function diag_withref_8(self,ip1_list,levels,sfc_field,in_log,dpidpis) result(status)
       ! Given referent, compute physical levelling information from the vertical description
       type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
-      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
+      integer, target, dimension(:), intent(in) :: ip1_list               !Key of prototype field
       real*8, dimension(:,:,:), pointer :: levels                   !Physical level values
-      real*8, dimension(:,:), optional, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
+      real*8, dimension(:,:), pointer, optional, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
       logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]
       logical, optional, intent(in) :: dpidpis                    !Compute partial derivative of hydrostatic pressure (pi) with
       !   respect to surface hydrostatic pressure(pis) [.false.]
       
       ! Local variables
-      integer kind,version,istat,ni,nj,nk,error
+      integer kind,version,istat,ni,nj,nk,error,i,j,k
       type (c_ptr) :: ip1_list_CP ,levels_CP ,sfc_field_CP ,in_log_CP, dpidpis_CP
-      logical :: my_dpidpis
+      logical :: my_dpidpis, allocate_L
 
       ! Set error status
       status = VGD_ERROR
@@ -1343,12 +1346,10 @@ contains
       my_dpidpis=.false.
       if(present(dpidpis))my_dpidpis=dpidpis
       dpidpis_CP = C_NULL_PTR
-      if (present(dpidpis))then
-         if(dpidpis)then
-            dpidpis_CP = c_loc(one)
-         else
-            dpidpis_CP = c_loc(zero)
-         endif
+      if(my_dpidpis)then
+         dpidpis_CP = c_loc(one)
+      else
+         dpidpis_CP = c_loc(zero)
       endif
       
       ! Set size of output and allocate space
@@ -1363,26 +1364,41 @@ contains
             ni = 1; nj = 1; nk = size(ip1_list)
          endif
       endif
+
       if (associated(levels)) then
-         if (size(levels,dim=1) /= ni .or. size(levels,dim=2) /= nj .or. size(levels,dim=3) /= nk) then
-            write(for_msg,*) 'Levels array size error - will be reallocated'
-            call msg(MSG_WARNING,VGD_PRFX//for_msg)
+         if (size(levels,dim=1) == ni .and. size(levels,dim=2) == nj .and. size(levels,dim=3) == nk) then
+            allocate_L = .false.
+         else
+            if(ALLOW_RESHAPE)then
+               write(for_msg,*) 'Levels array size error - will be reallocated'
+               call msg(MSG_WARNING,VGD_PRFX//for_msg)
+            else
+               write(for_msg,*) 'Levels array size error - will not be reallocated, please reallocated with size ',ni,nj,nk
+               call msg(MSG_ERROR,VGD_PRFX//for_msg)
+               return
+            endif
          endif
-         deallocate(levels)
+         allocate_L = .true.
+         deallocate(levels)         
+      else
+         allocate_L = .true.
       endif
-      allocate(levels(ni,nj,nk),stat=error)
-      if (error /= 0) then
-         write(for_msg,*) 'cannot allocate space for levels in diag_withref_8'
-         call msg(MSG_ERROR,VGD_PRFX//for_msg)
-         return
+      if(allocate_L)then
+         allocate(levels(ni,nj,nk),stat=error)
+         if (error /= 0) then
+            write(for_msg,*) 'cannot allocate space for levels in diag_withref_8'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            return
+         endif
       endif
-
-      ip1_list_CP  = c_loc(ip1_list)
-      levels_CP    = c_loc(levels)
-      sfc_field_CP = c_loc(sfc_field)
       
-      istat = f_diag_withref_8(self%cptr,ni,nj,nk,ip1_list_CP,levels_CP,sfc_field_CP,in_log_CP,dpidpis_CP)
-
+      ip1_list_CP  = c_loc(ip1_list)
+      levels_CP    = c_loc(levels(1,1,1))
+      sfc_field_CP = C_NULL_PTR
+      if(present(sfc_field)) sfc_field_CP = c_loc(sfc_field(1,1))
+      !write(6,'("ANDRE DANS diag_withref_8",z16)')levels_CP
+      
+      istat = f_diag_withref_8(self%cptr,ni,nj,nk,ip1_list_CP,levels_CP,sfc_field_CP,in_log_CP,dpidpis_CP)      
       if (istat /= VGD_OK) then
          if(my_dpidpis)then
             write(for_msg,*) 'error computing dpidpis in diag_withref_8'
@@ -1393,7 +1409,7 @@ contains
          endif
          return
       endif
-      
+
       ! Set status and return
       status = VGD_OK
       return
