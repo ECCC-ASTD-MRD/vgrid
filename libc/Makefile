@@ -16,8 +16,9 @@ LIB_STATIC 	:= lib$(LIB_NAME).a
 LIB_STATICV	:= lib$(LIB_NAME)-$(LIB_VERSION).a
 LIB_ALL		:= $(LIB_SHARED) $(LIB_STATIC)
 
-#COPTIONS	:= -O 2 -optc '=-g'
-COPTIONS	:= -O 0 -optc '=-g'
+#COPTIONS	:= -O 2 -optc '=-g -openmp'
+#COPTIONS	:= -O 0 -optc '=-g'
+
 LDOPTIONS	+= -librmn
 
 Makefile.dep: $(wildcard *.h) $(wildcard *.c)
@@ -26,7 +27,7 @@ Makefile.dep: $(wildcard *.h) $(wildcard *.c)
 include Makefile.dep
 
 %.o: %.c
-	$(CC) -src $< $(COPTIONS)
+	$(CC) -src $< $(COPTIONS) 
 
 
 obj: $(OBJ_C)

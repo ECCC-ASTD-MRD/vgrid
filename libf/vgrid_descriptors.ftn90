@@ -1315,7 +1315,7 @@ contains
       type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
       integer, target, dimension(:), intent(in) :: ip1_list               !Key of prototype field
       real*8, dimension(:,:,:), pointer :: levels                   !Physical level values
-      real*8, dimension(:,:), pointer, optional, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
+      real*8, dimension(:,:), pointer, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
       logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]
       logical, optional, intent(in) :: dpidpis                    !Compute partial derivative of hydrostatic pressure (pi) with
       !   respect to surface hydrostatic pressure(pis) [.false.]
@@ -1353,17 +1353,7 @@ contains
       endif
       
       ! Set size of output and allocate space
-      if (present(sfc_field)) then
-         ni = size(sfc_field,dim=1); nj = size(sfc_field,dim=2); nk = size(ip1_list)
-      else
-         if (is_valid(self,"ref_name_valid")) then
-            write(for_msg,*) 'reference field must be provided to diag_withref_8'
-            call msg(MSG_ERROR,VGD_PRFX//for_msg)
-            return
-         else
-            ni = 1; nj = 1; nk = size(ip1_list)
-         endif
-      endif
+      ni = size(sfc_field,dim=1); nj = size(sfc_field,dim=2); nk = size(ip1_list)
 
       if (associated(levels)) then
          if (size(levels,dim=1) == ni .and. size(levels,dim=2) == nj .and. size(levels,dim=3) == nk) then
@@ -1394,8 +1384,7 @@ contains
       
       ip1_list_CP  = c_loc(ip1_list)
       levels_CP    = c_loc(levels(1,1,1))
-      sfc_field_CP = C_NULL_PTR
-      if(present(sfc_field)) sfc_field_CP = c_loc(sfc_field(1,1))
+      sfc_field_CP = c_loc(sfc_field(1,1))
       !write(6,'("ANDRE DANS diag_withref_8",z16)')levels_CP
       
       istat = f_diag_withref_8(self%cptr,ni,nj,nk,ip1_list_CP,levels_CP,sfc_field_CP,in_log_CP,dpidpis_CP)      
