@@ -148,7 +148,7 @@ program tests
   stat = vgd_free(d)
   
   stat=fstfrm(lu)
-  
+  stop
   call ut_report(ok,message='Grid_Descriptors::vgd_dpidpis level calculation status')
   
 end program tests

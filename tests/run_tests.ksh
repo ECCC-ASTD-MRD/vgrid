@@ -25,8 +25,10 @@ rm -f ${compile_log}
 for test in ${tests[*]} ; do
   if echo ${test} | grep -q OMP ;then
       OPENMP=-openmp
+      OPENMP_MESSAGE='OPENMP=-openmp'
   else
       OPENMP=''
+      OPENMP_MESSAGE=''
   fi  
   printf "Building ${test} ${OPENMP} ..."
   ln -sf src/${test}.ftn90 .
@@ -34,7 +36,7 @@ for test in ${tests[*]} ; do
   echo "Compiling ${test}" >>${compile_log} 2>&1
   ${BH_MAKE} -f Makefile.test ${test} OPENMP=${OPENMP} >>${compile_log} 2>&1
   if [ ! $? -eq 0 ] ; then
-    printf "\n ERROR compiling test ${test} ... aborting (try '${BH_MAKE} -f Makefile.test ${test}' for details)\n"
+    printf "\n ERROR compiling test ${test} ... aborting (try '${BH_MAKE} -f Makefile.test ${test} ${OPENMP_MESSAGE}' for details)\n"
     exit 1
   fi
   rm -f ${test}.ftn90
