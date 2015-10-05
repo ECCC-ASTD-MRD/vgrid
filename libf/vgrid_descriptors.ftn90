@@ -23,6 +23,7 @@ module vGrid_Descriptors
    public :: vgd_get                             !get instance variable value
    public :: vgd_put                             !set instance variable value
    public :: vgd_new                             !class constructor
+   public :: vgd_getopt                          !get class variable value
    public :: vgd_putopt                          !set class variable value
    public :: vgd_print                           !dump plain-text contents of instance
    public :: vgd_write                           !write coordinates to a file
@@ -150,6 +151,12 @@ module vGrid_Descriptors
          character(kind=c_char) :: key(*)
       end function f_put_real8
 
+      integer function f_put_char(vgd_CP, key, value) bind(c, name='Cvgd_put_char')
+         use iso_c_binding, only: c_ptr, c_char, c_char
+         type(c_ptr) :: vgd_CP
+         character(kind=c_char) :: key(*), value(*)
+      end function f_put_char
+
       integer function f_is_valid(vgd_CP, valid_table_name) bind(c, name='Cvgd_is_valid')
          use iso_c_binding, only: c_ptr, c_char
          type(c_ptr), value :: vgd_CP
@@ -160,6 +167,11 @@ module vGrid_Descriptors
          use iso_c_binding, only : c_ptr
          type(c_ptr), value :: vgd_CP, stdout_CP, convip_CP
       end function f_print_desc
+
+      integer function f_print_vcode_description(vcode) bind(c, name='Cvgd_print_vcode_description')
+         use iso_c_binding, only : c_int
+         integer (c_int), value :: vcode
+      end function f_print_vcode_description
 
       !integer function f_set_vcode_i(vgd_CP, kind, version) bind(c, name='Cvgd_set_vcode_i')
       !   use iso_c_binding, only : c_ptr, c_int
@@ -248,7 +260,7 @@ module vGrid_Descriptors
       module procedure get_real8_1d
       module procedure get_real8_3d
       module procedure get_char
-      !module procedure get_logical
+      module procedure get_logical
    end interface vgd_get
 
    interface vgd_put
@@ -258,15 +270,20 @@ module vGrid_Descriptors
       module procedure put_real8
       !module procedure put_real8_1d
       !module procedure put_real8_3d
-      !module procedure put_char
+      module procedure put_char
    end interface vgd_put
 
+   interface vgd_getopt
+      module procedure getopt_logical
+   end interface vgd_getopt
+   
    interface vgd_putopt
       module procedure putopt_logical
    end interface vgd_putopt
    
    interface vgd_print
       module procedure print_desc
+      module procedure print_vcode_description
    end interface vgd_print
    
    interface vgd_write
@@ -306,39 +323,66 @@ contains
       integer, target,optional, intent(in) :: version     ! Level version requested by user.
       
       ! Local variables
+      integer :: ni,nj,nk, istat, error
       character(len=100) :: myformat
+      real*8, dimension(:,:,:), pointer :: table_8
       type(c_ptr) :: ip1_CP, ip2_CP, kind_CP, version_CP
 
       status = VGD_ERROR
 
       myformat='FST'
       if (present(format)) myformat = trim(up(format))
-      if(present(ip1))then
-         ip1_CP = c_loc(ip1)
-      else
-         ip1_CP = C_NULL_PTR
-      endif
-      if(present(ip2))then
-         ip2_CP = c_loc(ip2)
-      else
-         ip2_CP = C_NULL_PTR
-      endif
-      if(present(kind))then
-         kind_CP = c_loc(kind)
-      else
-         kind_CP = C_NULL_PTR
-      endif
-      if(present(version))then
-         version_CP = c_loc(version)
-      else
-         version_CP = C_NULL_PTR
-      endif
-
-      if( f_new_read(self%cptr, unit, trim(myformat)//C_NULL_CHAR, ip1_CP, ip2_CP, kind_CP, version_CP) == VGD_ERROR )then
-         print*,'(F_vgd) ERROR: In new_read, problem with f_new_read'
+      select case (trim(up(myformat)))
+      case ('FST')      
+         if(present(ip1))then
+            ip1_CP = c_loc(ip1)
+         else
+            ip1_CP = C_NULL_PTR
+         endif
+         if(present(ip2))then
+            ip2_CP = c_loc(ip2)
+         else
+            ip2_CP = C_NULL_PTR
+         endif
+         if(present(kind))then
+            kind_CP = c_loc(kind)
+         else
+            kind_CP = C_NULL_PTR
+         endif
+         if(present(version))then
+            version_CP = c_loc(version)
+         else
+            version_CP = C_NULL_PTR
+         endif
+         
+         if( f_new_read(self%cptr, unit, trim(myformat)//C_NULL_CHAR, ip1_CP, ip2_CP, kind_CP, version_CP) == VGD_ERROR )then
+            print*,'(F_vgd) ERROR: In new_read, problem with f_new_read'
+            return
+         endif
+      case ('BIN')
+         read(unit) ni,nj,nk
+         allocate(table_8(ni,nj,nk),stat=istat)
+         if (istat /= 0) then
+            write(for_msg,*) 'unable to allocate table_8'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            return
+         endif
+         read(unit) table_8
+         print*,'table_8(1:3,1,1)',table_8(1:3,1,1)
+         
+         error = new_from_table(self,table_8)
+         if (error < 0) then
+            write(for_msg,*) 'In new_read, problem creating record information'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            return
+         endif
+         ! Warn user on invalid input format specification
+      case DEFAULT
+         write(for_msg,*) 'invalid constructor format request ',trim(myformat)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
          return
-      endif
-      
+      end select
+
       status = VGD_OK
 
    end function new_read
@@ -556,6 +600,38 @@ contains
       status = VGD_OK
    end function garbage_collection
 
+   integer function getopt_logical(key,value,quiet) result(status)
+      character(len=*), intent(in) :: key           !Descriptor key to retrieve
+      logical, intent(out) :: value                 !Retrieved value
+      logical, intent(in), optional :: quiet        !Do not generate messages
+
+      ! Local variables
+      integer :: error,level_msg
+      logical :: my_quiet
+      
+      ! Set error status
+      status=VGD_ERROR
+      
+      value=.false.
+      
+      level_msg=MSG_ERROR
+      my_quiet=.false.
+      if (present(quiet)) my_quiet = quiet
+      if(my_quiet)level_msg=MSG_QUIET
+      
+      select case(trim(key))
+      case ('ALLOW_RESHAPE')
+         value=ALLOW_RESHAPE
+      case DEFAULT
+         write(for_msg,*) 'invalid key in call to getopt_logical: ',trim(key)
+         call msg(level_msg,VGD_PRFX//for_msg)
+         return
+      end select
+      ! Set status and return
+      status = VGD_OK
+      return
+   end function getopt_logical
+   
    integer function putopt_logical(key,value) result(status)
       character(len=*), intent(in) :: key           !Descriptor key to retrieve
       logical, intent(in) :: value                    !Retrieved value
@@ -624,6 +700,17 @@ contains
 
       istat = f_print_desc(self%cptr,stdout_CP,convip_CP)
    end function print_desc
+
+   integer function print_vcode_description(vcode) result(status)
+      ! Dump plain text vcode descriptor information to the requested file unit
+      integer, intent(in) :: vcode      
+
+      ! Set error status
+      status = VGD_ERROR
+      
+      status = f_print_vcode_description(vcode)
+    
+   end function print_vcode_description
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Compute vertical levelling
@@ -988,7 +1075,7 @@ contains
   end function dpidpis_withref_prof
 
   integer function dpidpis_withref_prof_8(self,ip1_list,dpidpis,sfc_field) result(status)
-     use utils, only: get_allocate,up,get_error
+     use utils, only: up,get_error
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
      real*8, dimension(:), pointer :: dpidpis                      !Derivative values
@@ -1311,6 +1398,7 @@ contains
    end function dpidpis_withref_8
 
    integer function diag_withref_8(self,ip1_list,levels,sfc_field,in_log,dpidpis) result(status)
+      use utils, only: get_allocate
       ! Given referent, compute physical levelling information from the vertical description
       type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
       integer, target, dimension(:), intent(in) :: ip1_list               !Key of prototype field
@@ -1322,6 +1410,7 @@ contains
       
       ! Local variables
       integer kind,version,istat,ni,nj,nk,error,i,j,k
+      integer :: length(3)
       type (c_ptr) :: ip1_list_CP ,levels_CP ,sfc_field_CP ,in_log_CP, dpidpis_CP
       logical :: my_dpidpis, allocate_L
 
@@ -1354,38 +1443,16 @@ contains
       
       ! Set size of output and allocate space
       ni = size(sfc_field,dim=1); nj = size(sfc_field,dim=2); nk = size(ip1_list)
+      length=(/ni, nj, nk/)
+      error = get_allocate("levels",levels,length,ALLOW_RESHAPE," (in diag_withref_8)")
+      if (error /= 0) then
+         if(associated(levels))deallocate(levels)
+         return
+      endif
 
-      if (associated(levels)) then
-         if (size(levels,dim=1) == ni .and. size(levels,dim=2) == nj .and. size(levels,dim=3) == nk) then
-            allocate_L = .false.
-         else
-            if(ALLOW_RESHAPE)then
-               write(for_msg,*) 'Levels array size error - will be reallocated'
-               call msg(MSG_WARNING,VGD_PRFX//for_msg)
-            else
-               write(for_msg,*) 'Levels array size error - will not be reallocated, please reallocated with size ',ni,nj,nk
-               call msg(MSG_ERROR,VGD_PRFX//for_msg)
-               return
-            endif
-         endif
-         allocate_L = .true.
-         deallocate(levels)         
-      else
-         allocate_L = .true.
-      endif
-      if(allocate_L)then
-         allocate(levels(ni,nj,nk),stat=error)
-         if (error /= 0) then
-            write(for_msg,*) 'cannot allocate space for levels in diag_withref_8'
-            call msg(MSG_ERROR,VGD_PRFX//for_msg)
-            return
-         endif
-      endif
-      
       ip1_list_CP  = c_loc(ip1_list)
       levels_CP    = c_loc(levels(1,1,1))
       sfc_field_CP = c_loc(sfc_field(1,1))
-      !write(6,'("ANDRE DANS diag_withref_8",z16)')levels_CP
       
       istat = f_diag_withref_8(self%cptr,ni,nj,nk,ip1_list_CP,levels_CP,sfc_field_CP,in_log_CP,dpidpis_CP)      
       if (istat /= VGD_OK) then
@@ -1408,7 +1475,7 @@ contains
 !!! Write descriptors
    
    integer function write_desc(self,unit,format) result(status)     
-      use utils, only: up
+      use utils, only: up, get_allocate
       ! Write descriptors to the requested file
       type(vgrid_descriptor), intent(in) :: self       !Vertical descriptor instance
       integer, intent(in) :: unit                      !File unit to write to
@@ -1416,18 +1483,45 @@ contains
 
       ! Local variables
       integer ier
+      integer, target, dimension(3) :: tshape
+      real*8, dimension(:,:,:), pointer :: table_8
+      type(c_ptr) :: tshape_CP      
       character(len=100) :: myformat
 
       ! Set error status
       status = VGD_ERROR
       myformat='FST'
       if (present(format)) myformat = trim(up(format))
-
-      if( f_write_desc(self%cptr,unit,trim(myformat)//C_NULL_CHAR)  == VGD_ERROR )then
-         print*,'(F_vgd) ERROR: In write_desc, problem with f_write_desc'
-         return
-      endif
-
+      
+      ! Write to the desired output file type
+      select case (trim(up(myformat)))
+         
+         ! Write to an RPN Standard file
+      case ('FST')         
+         if( f_write_desc(self%cptr,unit,trim(myformat)//C_NULL_CHAR)  == VGD_ERROR )then
+            print*,'(F_vgd) ERROR: In write_desc, problem with f_write_desc'
+            return
+         endif
+      ! Write to a Fortran binary file
+      case ('BIN')
+         tshape_CP = c_loc(tshape)
+         call f_table_shape(self%cptr, tshape_CP)
+         ier = get_allocate('table_8',table_8,tshape,ALLOW_RESHAPE,'(BIN) in write_desc')         
+         if (ier /= 0) then
+            deallocate(table_8)
+            return
+         endif
+         if( get_real8_3d(self,'VTBL',table_8) == VGD_ERROR)then
+            print*,'(F_vgd) ERROR: In write_desc, problem with get_real8_3d'
+            return
+         endif
+         write(unit) tshape
+         write(unit) table_8
+      ! Warn user afor unknown format
+      case DEFAULT
+         write(for_msg,*) 'No write done for unknown format ',trim(myformat)
+         call msg(MSG_WARNING,VGD_PRFX//for_msg)
+      end select      
      ! Set status and return
       status = VGD_OK
       return
@@ -1890,6 +1984,42 @@ contains
       
    end function get_char
     
+   integer function get_logical(self,key,value,quiet) result(status)
+      use utils, only: up
+      ! Retrieve the value of the requested instance variable
+      type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
+      character(len=*), intent(in) :: key                 !Descriptor key to retrieve
+      logical, intent(out) :: value                       !Retrieved value
+      logical, optional, intent(in) :: quiet              !Do not print massages    
+      
+      ! Local variables
+      type(c_ptr) :: quiet_CP, my_value_CP
+      integer :: error, my_value
+      character(len=KEY_LENGTH) :: my_key
+      integer, target :: zero, one
+      
+      ! Set error status
+      status = VGD_ERROR
+      value = .false.
+      
+      quiet_CP = C_NULL_PTR
+      if (present(quiet))then
+         if(quiet) then
+            quiet_CP = c_loc(one)
+         else
+            quiet_CP = c_loc(zero)
+         endif         
+      endif
+      my_value_CP = c_loc(my_value)
+      my_key=up(key(1:KEY_LENGTH))
+      if(f_get_int(self%cptr,my_key//C_NULL_CHAR, my_value_CP, quiet_CP) == VGD_ERROR)return
+      if(my_value.eq.1)value = .true.
+      
+      status = VGD_ERROR
+
+   end function get_logical
+
+
    integer function put_int(self, key, value) result(status)
       use utils, only : up
       type(vgrid_descriptor), intent(inout) :: self !Vertical descriptor instance
@@ -1916,6 +2046,33 @@ contains
       status = f_put_real8(self%cptr, trim(my_key)//C_NULL_CHAR, value)
       
    end function put_real8
+
+   integer function put_char(self,key,value) result(status)
+      use utils, only: up,put_error
+      ! Set the value of the requested instance variable
+      type(vgrid_descriptor), intent(in) :: self  !Descriptor instance
+      character(len=*), intent(in) :: key         !Descriptor key to set
+      character(len=*), intent(in) :: value       !Value to set
+      
+      ! Internal variables
+      integer :: error
+      character(len=KEY_LENGTH) :: my_key
+      
+      ! Set error status
+      status = VGD_ERROR
+      
+      if(.not.is_valid(self,'SELF'))then
+         write(for_msg,*) 'vgrid structure is not valid in put_char'
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+         return
+      endif
+    
+      my_key = up(key(1:KEY_LENGTH))      
+
+      status = f_put_char(self%cptr, trim(my_key)//C_NULL_CHAR, trim(value)//C_NULL_CHAR)
+
+   end function put_char
+
 
    logical function is_valid(self,element_valid_S) result(valid)
       ! Check for validity of the element
