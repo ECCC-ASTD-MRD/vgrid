@@ -34,7 +34,7 @@ int ip1_t_valid_get  [VALID_TABLE_SIZE] = { 1001, 1002,    0, 2001, 5001, 5002, 
 int ref_name_valid   [VALID_TABLE_SIZE] = { 1001, 1002, 1003,    0, 5001, 5002, 5003, 5004, 5005};
 int dhm_valid        [VALID_TABLE_SIZE] = {    0,    0,    0,    0,    0,    0,    0,    0, 5005};
 int dht_valid        [VALID_TABLE_SIZE] = {    0,    0,    0,    0,    0,    0,    0,    0, 5005};
-
+int is_in_logp       [VALID_TABLE_SIZE] = {    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005};
 int is_valid(TVGrid *self, int *table_valid)
 {
   int k;
@@ -88,6 +88,8 @@ int Cvgd_is_valid(TVGrid *self, char *valid_table_name)
     return(is_valid(self,              dhm_valid));
   } else if( strcmp(valid_table_name, "dht_valid")        == 0 ){
     return(is_valid(self,              dht_valid));
+  } else if( strcmp(valid_table_name, "is_in_logp")        == 0 ){
+    return(is_valid(self,              is_in_logp));
   } else {
     printf("Warning : in Cvgd_is_valid, valid_table_name '%s' does not exist\n",valid_table_name);
     return(0);
@@ -631,21 +633,70 @@ int Cvgd_print_desc(TVGrid *self, int *sout, int *convip) {
   }
 }
 
-static int C_compute_pressure_1001_1002_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log) {
+int Cvgd_print_vcode_description(int vcode){
   
+  // Create horizontal rule
+  char *hr = {"-------------------------------------------------------"};
+
+  if(vcode == 1001 || vcode == -1){
+    printf("%s\nVcode 1001, kind 1, version 1\n",hr);
+    printf("  Sigma levels\n");
+  }
+  if(vcode == 1002 || vcode == -1) {
+    printf("%s\nVcode 1002, kind 1, version 2\n", hr);
+    printf("   Eta levels\n");
+  }
+  if(vcode == 1003 || vcode == -1){
+    printf("%s\nVcode 1003, kind 1, version 3\n", hr);
+    printf("   Hybrid normalized levels\n");
+  }
+  if(vcode == 2001 || vcode==-1){
+    printf("%s\nVcode 2001, kind 2, version 1\n", hr);
+    printf("   Pressure levels\n");
+  }
+  if(vcode == 5001 || vcode == -1){
+    printf("%s\nVcode 5001, kind 5, version 1\n", hr);
+    printf("   Hybrid levels, unstaggered\n");
+  }
+  if(vcode == 5002 || vcode==-1){
+    printf("%s\nVcode 5002, kind 5, version 2\n", hr);
+    printf("   Hybrid staggered levels, nk momentum levels, nk+1 thermo levels\n");
+    printf("   First level at top is a thermo level\n");
+  }
+  if(vcode == 5003 || vcode==-1){
+    printf("%s\nVcode 5003, kind 5, version 3\n", hr);
+    printf("   Hybrid staggered levels, nk momentum levels, nk+1 thermo levels\n");
+    printf("   First level at top is a thermo level\n");
+    printf("   Last thermo level is unstaggered (tlift)\n");
+  }
+  if(vcode == 5004 || vcode == -1){
+    printf("%s\nVcode 5004, kind 5, version 4\n", hr);
+    printf("   Hybrid staggered levels, same number of momentum and themro levels\n");
+    printf("   First level at top is a momentum level\n");
+  }
+  if(vcode == 5005 || vcode == -1){
+      printf("%s\nVcode 5005, kind 5, version 5\n",  hr);
+      printf("   Hybrid staggered levels, same number of momentum and themro levels\n");
+      printf("   First level at top is a momentum level\n");
+      printf("   Diag level heights (m AGL) encoded\n");
+  }
+}
+
+static int C_compute_pressure_1001_1002_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log) {
+
   int k,*ind,ij,ijk;
   double lvl;
   
   if( my_alloc_int(&ind, nk, "(Cvgd) ERROR in C_compute_pressure_1001_1002_8, cannot allocate ind of int of size\n") == VGD_ERROR )
     return(VGD_ERROR);
   
-  // Find ip1 indexes
+  // Find ip1 indexes  
   for( k = 0; k < nk; ++k ){
     if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],self->ip1_m,self->nl_m)) == -1 ) {
       printf("(Cvgd) ERROR in C_compute_pressure_1001_1002_8, cannot find ip1 %d in vgrid descriptor.\n",ip1_list[k]);
       free(ind);
       return(VGD_ERROR);
-    }
+    }    
   }
   
   // Compute pressure
@@ -655,10 +706,9 @@ static int C_compute_pressure_1001_1002_8(TVGrid *self, int ni, int nj, int nk, 
       levels[ijk] = in_log ? log(lvl) : lvl;
     }
   }
-  //printf("self->a_m_8[ind[0]] = %f, self->b_m_8[ind[0]] = %f, levels[0] = %f\n",self->a_m_8[ind[0]], self->b_m_8[ind[0]], levels[0]);
   free(ind);
   return(VGD_OK);
-
+  
 }
 
 static int C_compute_pressure_2001_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double *levels, int in_log) {
@@ -2538,6 +2588,8 @@ int Cvgd_get_int(TVGrid *self, char *key, int *value, int *quiet)
     *value = self->kind;
   } else if (strcmp(key, "VERS") == 0){
     *value = self->version;
+  } else if( strcmp(key, "DATE") == 0){
+    *value = self->rec.dateo;
   } else if (strcmp(key, "IG_1") == 0){
     *value = self->rec.ig1;
   } else if (strcmp(key, "IG_2") == 0){
@@ -2556,6 +2608,8 @@ int Cvgd_get_int(TVGrid *self, char *key, int *value, int *quiet)
     *value = self->ip1_t[self->nl_t-1];
   } else if (strcmp(key, "MIPG") == 0){
     *value = self->match_ipig;
+  } else if (strcmp(key, "LOGP") == 0){
+    *value = is_valid(self,is_in_logp);
   } else {
     if(! lquiet) {
       printf("(Cvgd) ERROR in Cvgd_get_int, invalid key %s\n",key);
@@ -2939,7 +2993,7 @@ int Cvgd_get_char(TVGrid *self, char *key, char out[], int *quiet) {
   int lquiet = 0; // Not quiet by default
   if(quiet) lquiet = *quiet;   
   if(! Cvgd_is_valid(self,"SELF")){
-    printf("(Cvgd) ERROR in Cvgd_get_char, invalid vgrid.\n");
+    printf("(Cvgd) ERROR in Cvgd_get_char, invalid vgrid structure.\n");
     return(VGD_ERROR);
   }
   if( strcmp(key, "ETIK") == 0 ){
@@ -2950,6 +3004,23 @@ int Cvgd_get_char(TVGrid *self, char *key, char out[], int *quiet) {
     strcpy(out,self->ref_name);
   } else {
     printf("(Cvgd) ERROR in Cvgd_get_char, invalid key -> '%s'\n",key);
+    return(VGD_ERROR);
+  }
+}
+
+int Cvgd_put_char(TVGrid **self, char *key, char *value) {
+  if(! Cvgd_is_valid(*self,"SELF")){
+    printf("(Cvgd) ERROR in Cvgd_put_char, invalid vgrid.\n");
+    return(VGD_ERROR);
+  }
+  if( strcmp(key, "ETIK") == 0 ){
+    strcpy((*self)->rec.etiket,value);
+  } else if( strcmp(key, "NAME") == 0 ){
+    strcpy((*self)->rec.nomvar,value);
+  } else if( strcmp(key, "RFLD") == 0 ){
+    strcpy((*self)->ref_name,value);
+  } else {
+    printf("(Cvgd) ERROR in Cvgd_out_char, invalid key -> '%s'\n",key);
     return(VGD_ERROR);
   }
 }

@@ -20,6 +20,7 @@ program tests
      print*,'This vgd_new error should not happen, please fixit'
      call exit(1)
   end if  
+
   stat = vgd_get(vgd,'PREF - reference pressure',value_8)
   if(stat==VGD_ERROR)then
      print*,'This vgd_get error should not happen, please fixit'
