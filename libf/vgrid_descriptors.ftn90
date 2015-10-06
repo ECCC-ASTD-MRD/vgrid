@@ -231,11 +231,10 @@ module vGrid_Descriptors
          type(c_ptr) :: tshape_CP
       end subroutine f_table_shape
          
-      integer function f_write_desc(vgd_CP,unit,format) bind(c, name='Cvgd_write_desc')
+      integer function f_write_desc(vgd_CP,unit) bind(c, name='Cvgd_write_desc')
          use iso_c_binding, only : c_ptr, c_int, c_char
          type(c_ptr), value :: vgd_CP
          integer (c_int), value :: unit
-         character(kind=c_char) :: format(*)
       end function f_write_desc
 
    end interface
@@ -1495,7 +1494,7 @@ contains
          
          ! Write to an RPN Standard file
       case ('FST')         
-         if( f_write_desc(self%cptr,unit,trim(myformat)//C_NULL_CHAR)  == VGD_ERROR )then
+         if( f_write_desc(self%cptr,unit)  == VGD_ERROR )then
             print*,'(F_vgd) ERROR: In write_desc, problem with f_write_desc'
             return
          endif
