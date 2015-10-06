@@ -329,6 +329,14 @@ float c_convip_IP2Level(int IP,int *kind) {
    return(level);
 }
 
+void decode_HY(TFSTD_ext var, double *ptop_8, double *pref_8, float *rcoef){
+  int kind;
+  *ptop_8 = c_convip_IP2Level(var.ip1, &kind) * 100.;
+  printf("decode_HY var.ip1 = %d, *ptop_8 = %f\n",var.ip1, *ptop_8);
+  *pref_8 = var.ig1 * 100.;
+  *rcoef = var.ig2/1000.;
+}
+
 int my_fstprm(int key,TFSTD_ext *ff) {
   int fstprm;
   //var->ip1 = 62;
@@ -580,8 +588,8 @@ int Cvgd_print_desc(TVGrid *self, int *sout, int *convip) {
       printf("  Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100\n");
       break;
     case 1003:
-      printf("Cvgd_print_desc 1003 TODO!!!!!!!!! \n");
-      return(VGD_ERROR);
+      printf("  Number of hybrid normalized levels %d\n", self->nl_m );
+      printf("  Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100\n");
       break;
     case 5001:
       printf("  Number of hybrid levels (momentum levels) %d\n", self->nl_m );
@@ -2799,7 +2807,6 @@ int Cvgd_get_real_1d(TVGrid *self, char *key, float **value, int *nk, int *quiet
 }
 
 static int c_get_put_real8(TVGrid **self, char *key, double *value_get, double value_put, int quiet, char *action) {
-  // TODO ajoute quiet
   int get, OK = 1;
   if(! Cvgd_is_valid(*self,"SELF")){
     printf("(Cvgd) ERROR in c_get_real8, invalid vgrid.\n");
@@ -3392,10 +3399,26 @@ static int C_gen_legacy_desc(TVGrid **self, int unit, int *ip1list, int *keylist
       //=============================================
       // PT PT PT PT PT PT PT PT PT PT PT PT PT PT PT
       //---------------------------------------------
-      // TODO verify presence of HY bomb if there
       if( C_get_consistent_pt_e1(unit, &ptop,"PT  ") == VGD_ERROR ){
 	printf("(Cvgd) ERROR in C_gen_legacy_desc, consistency check on PT failed\n");
 	goto bomb;
+      }
+      if(hy_key >= 0){
+	// Verify if HY constistant with PT
+	if( C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR ){
+	  printf("(Cvgd) ERROR in C_gen_legacy_record, consistency check on HY failed (1)\n");
+	  goto bomb;
+	}
+	decode_HY(va2, &ptop_8, &pref_8, &rcoef);
+	if( abs(rcoef - 1.0) > 1.e-5){
+	  printf("(Cvgd) ERROR in C_gen_legacy_desc, HY rcoef should by 1.0 since PT record is present in file\n");
+	  goto bomb;
+	}
+	if( abs( ptop - ptop_8/100.) > 1.e-5 ){
+	  printf("(Cvgd) ERROR in C_gen_legacy_desc, ptop from HY is %f while it is %f in PT record\n",ptop_8/100., ptop);
+	  goto bomb;
+	}
+	printf("(Cvgd) INFO : in C_gen_legacy_desc HY record consistent with PT\n");
       }
       if( e1_key >= 0){
 	printf("(Cvgd) TODO in C_gen_legacy_desc, add support to 1004 etasef coordinate");
@@ -3416,7 +3439,7 @@ static int C_gen_legacy_desc(TVGrid **self, int unit, int *ip1list, int *keylist
       //------------------------------------------------
       printf("(Cvgd)   hybrid (normalized) coordinate found\n");
       if( C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR ){
-	printf("(Cvgd) ERROR in C_gen_legacy_record, consistency check on HY failed\n");
+	printf("(Cvgd) ERROR in C_gen_legacy_record, consistency check on HY failed (2)\n");
 	goto bomb;
       }
       printf("C_gen_legacy_desc TO CONTINUE 5001 avec HY\n");
@@ -3478,7 +3501,6 @@ static int C_gen_legacy_desc(TVGrid **self, int unit, int *ip1list, int *keylist
   free(hybm);
   free(a_m_8);
   free(b_m_8);
-  printf("TODO C_gen_legacy_desc\n");
   return(VGD_ERROR);
 
 }
@@ -3740,7 +3762,7 @@ int Cvgd_new_read(TVGrid **self, int unit, char *format, int *ip1, int *ip2, int
   return(VGD_OK);
 }
 
-int Cvgd_write_desc (TVGrid *self, int unit, char *format) {
+int Cvgd_write_desc (TVGrid *self, int unit) {
   int ip1, ip2;
   float work[1];
 
@@ -3752,27 +3774,19 @@ int Cvgd_write_desc (TVGrid *self, int unit, char *format) {
     printf("(Cvgd) ERROR in Cvgd_write_desc, vgrid structure is not valid %d\n", self->valid);    
     return(VGD_ERROR);
   }
-  if (strcmp(format, "FST") == 0){
-    ip1=self->rec.ip1;
-    if(self->rec.ip1 < 0) ip1=0;
-    ip2=self->rec.ip2;
-    if(self->rec.ip2 < 0) ip2=0;
-
-    if( c_fstecr( self->table,      work,            -self->rec.nbits, unit, 
-		  self->rec.dateo,  self->rec.deet,   self->rec.npas, 
-		  self->table_ni,   self->table_nj,   self->table_nk, 
-		  ip1,              ip2,              self->rec.ip3,
-		  self->rec.typvar, self->rec.nomvar, self->rec.etiket, 
-		  self->rec.grtyp,  self->rec.ig1,    self->rec.ig2,    self->rec.ig3, self->rec.ig4,
-		  self->rec.datyp, 1) , 0 ) {
-      printf("(Cvgd) ERROR in Cvgd_write_desc, problem with fstecr\n");
-      return(VGD_ERROR);
-    }
-  } else if (strcmp(format, "BIN") == 0){
-    printf("(Cvgd) ERROR in Cvgd_write_desc, TODO format = \"BIN\"\n");
-    return(VGD_ERROR);
-  } else {
-    printf("(Cvgd) ERROR in Cvgd_write_desc, wrong value given to format, expecting FST or BIN got %s\n", format);
+  ip1=self->rec.ip1;
+  if(self->rec.ip1 < 0) ip1=0;
+  ip2=self->rec.ip2;
+  if(self->rec.ip2 < 0) ip2=0;
+  
+  if( c_fstecr( self->table,      work,            -self->rec.nbits, unit, 
+		self->rec.dateo,  self->rec.deet,   self->rec.npas, 
+		self->table_ni,   self->table_nj,   self->table_nk, 
+		ip1,              ip2,              self->rec.ip3,
+		self->rec.typvar, self->rec.nomvar, self->rec.etiket, 
+		self->rec.grtyp,  self->rec.ig1,    self->rec.ig2,    self->rec.ig3, self->rec.ig4,
+		self->rec.datyp, 1) , 0 ) {
+    printf("(Cvgd) ERROR in Cvgd_write_desc, problem with fstecr\n");
     return(VGD_ERROR);
   }
 
