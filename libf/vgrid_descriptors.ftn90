@@ -681,9 +681,6 @@ contains
 
       ! Internal variables
       type(c_ptr) :: stdout_CP, convip_CP
-      integer, target :: zero, one
-
-      zero = 0; one = 1;
 
       istat = VGD_ERROR
       if(.not.c_associated(self%cptr))then
@@ -1538,9 +1535,6 @@ contains
       ! Internal variables
       type(c_ptr) :: quiet_CP, value_CP
       character(len=KEY_LENGTH) :: my_key
-      integer, target :: zero, one
-
-      zero = 0; one = 1
       
       quiet_CP = C_NULL_PTR
       if (present(quiet))then
@@ -1569,9 +1563,8 @@ contains
       integer :: nl_, istat, level_msg, error
       type(c_ptr) :: quiet_CP, value_CP, nk_CP
       character(len=KEY_LENGTH) :: my_key
-      integer, target :: zero, one, nk
+      integer, target :: nk
 
-      zero = 0; one = 1
       nk_CP = c_loc(nk)
 
       ! Set error status
@@ -1641,9 +1634,6 @@ contains
       ! Internal variables
       type(c_ptr) :: quiet_CP, value_CP
       character(len=KEY_LENGTH) :: my_key
-      integer, target :: zero, one
-
-      zero = 0; one = 1
 
       value = VGD_MISSING      
 
@@ -1677,9 +1667,6 @@ contains
       integer, dimension(:), pointer :: vipt
       type(c_ptr) :: quiet_CP, value_CP
       character(len=KEY_LENGTH) :: my_key
-      integer, target :: zero, one
-
-      zero = 0; one = 1
 
       ! Set error status
       status = VGD_ERROR
@@ -1760,9 +1747,7 @@ contains
       ! Internal variables
       type(c_ptr) :: quiet_CP, value_CP
       character(len=KEY_LENGTH) :: my_key
-      integer, target :: zero, one
 
-      zero = 0; one = 1
       ! Set error status
       status = VGD_ERROR
       
@@ -1795,9 +1780,6 @@ contains
       integer :: nl_, istat, level_msg, error
       type(c_ptr) :: quiet_CP, value_CP
       character(len=KEY_LENGTH) :: my_key
-      integer, target :: zero, one
-
-      zero = 0; one = 1
 
       status = VGD_ERROR
 
@@ -1885,9 +1867,7 @@ contains
       integer, target, dimension(3) :: tshape
       type(c_ptr) :: quiet_CP, value_CP, tshape_CP
       character(len=KEY_LENGTH) :: my_key
-      integer, target :: zero, one
 
-      zero = 0; one = 1
 
       ! Set error status
       status = VGD_ERROR
@@ -1941,17 +1921,18 @@ contains
       type(c_ptr) :: quiet_CP, value_CP
       character(len=KEY_LENGTH) :: my_key
       character(kind=c_char) :: my_char(13)
-      integer, target :: zero, one
       integer :: i, nchar
+      logical :: my_quiet, end_L
 
-      zero = 0; one = 1
       ! Set error status
       status = VGD_ERROR
 
       value="";
 
       quiet_CP = C_NULL_PTR
+      my_quiet = .false.
       if (present(quiet))then
+         my_quiet = quiet
          if(quiet) then
             quiet_CP = c_loc(one)
          else
@@ -1961,25 +1942,29 @@ contains
       my_key=up(key(1:KEY_LENGTH))
       status = f_get_char(self%cptr, my_key//C_NULL_CHAR, my_char, quiet_CP)
       select case(trim(my_key))
-         case ('ETIK')
-            nchar=12
-         case ('NAME')
-            nchar=4
-         case ('RFLD')
-            nchar=4
-         case DEFAULT
+      case ('ETIK')
+         nchar=12
+      case ('NAME')
+         nchar=4
+      case ('RFLD')
+         nchar=4
+      case DEFAULT
+         if( .not. my_quiet)then
             write(for_msg,*) 'invalid key in call to get_char: ',trim(key)
             call msg(MSG_ERROR,VGD_PRFX//for_msg)
-            return
-         end select
+         end if
+         return
+      end select
+      end_L=.false.
       do i=1,nchar
-         if(my_char(i) == C_NULL_CHAR)then
+         if(my_char(i) == C_NULL_CHAR .or. end_L)then
             value(i:i)=' '
+            end_L=.true.
             cycle
          end if
          value(i:i)=my_char(i)         
       enddo
-
+      
       status = VGD_OK
       
    end function get_char
@@ -1996,7 +1981,6 @@ contains
       type(c_ptr) :: quiet_CP, my_value_CP
       integer :: error, my_value
       character(len=KEY_LENGTH) :: my_key
-      integer, target :: zero, one
       
       ! Set error status
       status = VGD_ERROR
@@ -2012,10 +1996,10 @@ contains
       endif
       my_value_CP = c_loc(my_value)
       my_key=up(key(1:KEY_LENGTH))
-      if(f_get_int(self%cptr,my_key//C_NULL_CHAR, my_value_CP, quiet_CP) == VGD_ERROR)return
+      if(f_get_int(self%cptr,my_key//C_NULL_CHAR, my_value_CP, quiet_CP) == VGD_ERROR)return         
       if(my_value.eq.1)value = .true.
-      
-      status = VGD_ERROR
+
+      status = VGD_OK
 
    end function get_logical
 

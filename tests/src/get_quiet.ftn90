@@ -37,7 +37,6 @@ program tests
   stat = vgd_new(vgd,unit=lu,format="fst")
   call flush(6)
 
-
   ! Get information about the coordinate
   
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_int)
@@ -89,24 +88,23 @@ program tests
   if(stat==VGD_ERROR)print*,'Error with get_real8_3d detected and message not printed above'
   call flush(6)
 
-!!$
-!!$  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_char)
-!!$  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_char,quiet=.false.)
-!!$  if(stat==VGD_ERROR)print*,'Error with get_char detected and message printed above'
-!!$  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_char,quiet=.true.)
-!!$  if(stat==VGD_ERROR)print*,'Error with get_char detected but message not printed above'
-!!$  call flush(6)  
-!!$  
-!!$  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_logical)
-!!$  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_logical,quiet=.false.)
-!!$  if(stat==VGD_ERROR)print*,'Error with get_logical detected and message printed above'
-!!$  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_logical,quiet=.true.)
-!!$  if(stat==VGD_ERROR)print*,'Error with get_logical detected but message not printed above'
-!!$  call flush(6)  
-!!$  
-!!$  !===================================
-!!$  ! Tests get method on value returned
-!!$ 
+  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_char)
+  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_char,quiet=.false.)
+  if(stat==VGD_ERROR)print*,'Error with get_char detected and message printed above'
+  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_char,quiet=.true.)
+  if(stat==VGD_ERROR)print*,'Error with get_char detected but message not printed above'
+  call flush(6)  
+
+  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_logical)
+  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_logical,quiet=.false.)
+  if(stat==VGD_ERROR)print*,'Error with get_logical detected and message printed above'
+  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_logical,quiet=.true.)
+  if(stat==VGD_ERROR)print*,'Error with get_logical detected but message not printed above'
+  call flush(6)  
+  
+  !===================================
+  ! Tests get method on value returned
+ 
   ! int
   stat = vgd_get(vgd,'KIND',my_int)
   if(stat==VGD_ERROR)ok=.false.
@@ -177,25 +175,25 @@ program tests
   if(stat==VGD_ERROR)ok=.false.
   if(.not.same_vec(my_real8_3d,my_real82_3d))call message(ok,'Test2 on get_my_real8_3d failed')
 
-!!$  stat = vgd_get(vgd,'LOGP',my_logical)
-!!$  if(stat==VGD_ERROR)ok=.false.
-!!$  stat = vgd_get(vgd,'LOGP',my_logical2,quiet=.false.)
-!!$  if(stat==VGD_ERROR)ok=.false.
-!!$  if(.not.(my_logical.and.my_logical2))call message(ok,'Test1 on get_logical failed')
-!!$  stat = vgd_get(vgd,'LOGP',my_logical2,quiet=.true.)
-!!$  if(stat==VGD_ERROR)ok=.false.
-!!$  if(.not.(my_logical.and.my_logical2))call message(ok,'Test2 on get_logical failed')
-!!$
-!!$  stat = vgd_get(vgd,'RFLD',my_char)
-!!$  if(stat==VGD_ERROR)ok=.false.
-!!$  stat = vgd_get(vgd,'RFLD',my_char2,quiet=.false.)
-!!$  if(stat==VGD_ERROR)ok=.false.
-!!$  if(.not.(my_char==my_char2))call message(ok,'Test1 on get_char failed')
-!!$  stat = vgd_get(vgd,'RFLD',my_char2,quiet=.true.)
-!!$  if(stat==VGD_ERROR)ok=.false.
-!!$  if(.not.(my_char==my_char2))call message(ok,'Test2 on get_char failed')
-!!$
-!!$  call ut_report(ok,message='Grid_Descriptors::vgd_get get character value')
+  stat = vgd_get(vgd,'LOGP',my_logical)
+  if(stat==VGD_ERROR)ok=.false.
+  stat = vgd_get(vgd,'LOGP',my_logical2,quiet=.false.)
+  if(stat==VGD_ERROR)ok=.false.
+  if(.not.(my_logical.and.my_logical2))call message(ok,'Test1 on get_logical failed')
+  stat = vgd_get(vgd,'LOGP',my_logical2,quiet=.true.)
+  if(stat==VGD_ERROR)ok=.false.
+  if(.not.(my_logical.and.my_logical2))call message(ok,'Test2 on get_logical failed')
+
+  stat = vgd_get(vgd,'RFLD',my_char)
+  if(stat==VGD_ERROR)ok=.false.
+  stat = vgd_get(vgd,'RFLD',my_char2,quiet=.false.)
+  if(stat==VGD_ERROR)ok=.false.
+  if(.not.(my_char==my_char2))call message(ok,'Test1 on get_char failed')
+  stat = vgd_get(vgd,'RFLD',my_char2,quiet=.true.)
+  if(stat==VGD_ERROR)ok=.false.
+  if(.not.(my_char==my_char2))call message(ok,'Test2 on get_char failed')
+
+  call ut_report(ok,message='Grid_Descriptors::vgd_get get character value')
 
   stat = fstfrm(lu)
   stat = fclos(lu)

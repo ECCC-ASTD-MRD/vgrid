@@ -1370,6 +1370,8 @@ int Cvgd_new_build_vert(TVGrid **self, int kind, int version, int nk, int ip1, i
     ier = c_encode_vert_2001(self,nk);
     break;
   case 1003:
+    printf("New build for Vcode 1003 not supported by this package,  please contact developer to add this feature.\n");
+    return(VGD_ERROR);
     break;
   case 5001:
     strcpy(cvcode,"5001");
@@ -2572,6 +2574,7 @@ int Cvgd_get_int(TVGrid *self, char *key, int *value, int *quiet)
 {  
   int lquiet = 0; // Not quiet by default
   if(quiet) lquiet = *quiet;
+
   if(! Cvgd_is_valid(self,"SELF")){
     printf("(Cvgd) ERROR in Cvgd_get_int, invalid vgrid.\n");
     return(VGD_ERROR);
@@ -2626,7 +2629,7 @@ int Cvgd_get_int_1d(TVGrid *self, char *key, int **value, int *nk, int *quiet)
 {
   int OK = 1;
   int lquiet = 0; // Not quiet by default
-  if(quiet) lquiet = *quiet;   
+  if(quiet) lquiet = *quiet;
   if(nk) *nk = -1;
   if(! Cvgd_is_valid(self,"SELF")){
     printf("(Cvgd) ERROR in Cvgd_get_int_1d, invalid vgrid.\n");
@@ -3003,7 +3006,9 @@ int Cvgd_get_char(TVGrid *self, char *key, char out[], int *quiet) {
   } else if( strcmp(key, "RFLD") == 0 ){
     strcpy(out,self->ref_name);
   } else {
-    printf("(Cvgd) ERROR in Cvgd_get_char, invalid key -> '%s'\n",key);
+    if(! lquiet){
+      printf("(Cvgd) ERROR in Cvgd_get_char, invalid key -> '%s'\n",key);
+    }
     return(VGD_ERROR);
   }
 }
