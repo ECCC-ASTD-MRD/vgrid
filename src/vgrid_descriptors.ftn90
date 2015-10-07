@@ -184,11 +184,10 @@ module vGrid_Descriptors
          type(c_ptr), value :: vgd1_CP, vgd2_CP
       end function f_vgdcmp
 
-      integer function f_new_read(vgd,unit,format,ip1_CP,ip2_CP,kind_CP,version_CP) bind(c, name='Cvgd_new_read')
+      integer function f_new_read(vgd,unit,ip1_CP,ip2_CP,kind_CP,version_CP) bind(c, name='Cvgd_new_read')
          use iso_c_binding, only : c_ptr, c_int, c_char
          type(c_ptr) :: vgd
          integer (c_int), value :: unit
-         character(kind=c_char) :: format(*)
          type(c_ptr), value :: ip1_CP,ip2_CP,kind_CP,version_CP
       end function f_new_read
       
@@ -354,7 +353,7 @@ contains
             version_CP = C_NULL_PTR
          endif
          
-         if( f_new_read(self%cptr, unit, trim(myformat)//C_NULL_CHAR, ip1_CP, ip2_CP, kind_CP, version_CP) == VGD_ERROR )then
+         if( f_new_read(self%cptr, unit, ip1_CP, ip2_CP, kind_CP, version_CP) == VGD_ERROR )then
             print*,'(F_vgd) ERROR: In new_read, problem with f_new_read'
             return
          endif
@@ -605,7 +604,7 @@ contains
       logical, intent(in), optional :: quiet        !Do not generate messages
 
       ! Local variables
-      integer :: error,level_msg
+      integer :: level_msg
       logical :: my_quiet
       
       ! Set error status
@@ -724,7 +723,7 @@ contains
     character(len=1) :: blk_S
     integer :: error,ig1,ig2,ig3,i
     character(len=1) :: grtyp
-    logical :: construct,multiple_grids,my_in_log
+    logical :: multiple_grids,my_in_log
     type(vgrid_descriptor) :: gd
     type(FSTD_ext) :: var
 
@@ -1079,7 +1078,7 @@ contains
 
      ! Local variables
      real*8 :: my_sfc_field_8
-     integer :: error,stat
+     integer :: stat
 
      ! Set return value
      status = VGD_ERROR
@@ -1405,10 +1404,10 @@ contains
       !   respect to surface hydrostatic pressure(pis) [.false.]
       
       ! Local variables
-      integer kind,version,istat,ni,nj,nk,error,i,j,k
+      integer istat,ni,nj,nk,error
       integer :: length(3)
       type (c_ptr) :: ip1_list_CP ,levels_CP ,sfc_field_CP ,in_log_CP, dpidpis_CP
-      logical :: my_dpidpis, allocate_L
+      logical :: my_dpidpis
 
       ! Set error status
       status = VGD_ERROR
@@ -1662,7 +1661,7 @@ contains
       logical, optional, intent(in) :: quiet      !Do not print massages
 
       ! Internal variables
-      integer :: istat,error,level_msg,k,kind,nl_
+      integer :: error,istat,level_msg,nl_
       integer, dimension(:), pointer :: vipt
       type(c_ptr) :: quiet_CP, value_CP
       character(len=KEY_LENGTH) :: my_key
@@ -1917,7 +1916,7 @@ contains
       logical, optional, intent(in) :: quiet      !Do not print massages
       
       ! Internal variables
-      type(c_ptr) :: quiet_CP, value_CP
+      type(c_ptr) :: quiet_CP
       character(len=KEY_LENGTH) :: my_key
       character(kind=c_char) :: my_char(13)
       integer :: i, nchar
@@ -1978,7 +1977,7 @@ contains
       
       ! Local variables
       type(c_ptr) :: quiet_CP, my_value_CP
-      integer :: error, my_value
+      integer :: my_value
       character(len=KEY_LENGTH) :: my_key
       
       ! Set error status
@@ -2038,7 +2037,6 @@ contains
       character(len=*), intent(in) :: value       !Value to set
       
       ! Internal variables
-      integer :: error
       character(len=KEY_LENGTH) :: my_key
       
       ! Set error status
@@ -2070,7 +2068,7 @@ contains
       integer, intent(in) :: fstkey               !Key from FST file record
       type(FSTD_ext) :: record                    !Record information
       ! Local variables
-      integer :: error,ni,nj,nk
+      integer :: error
       integer, external :: fstprm,fstinf
       real*8 :: nhours
       status = VGD_ERROR

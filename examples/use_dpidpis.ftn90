@@ -1,7 +1,7 @@
 program tests
   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_dpidpis,VGD_OK
   implicit none
-  integer :: stat,lu=0,ni,nj,nk,fnom,fstouv,fstfrm,fclos
+  integer :: stat,lu=0,fnom,fstouv,fstfrm
   integer, dimension(:), pointer :: ip1_list
   real, dimension(:), pointer :: dpidpis_profil
   real, dimension(:,:,:), pointer :: dpidpis_cube
