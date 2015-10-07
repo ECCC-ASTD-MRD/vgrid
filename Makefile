@@ -2,7 +2,7 @@
 # see setup* files
 
 # Override incorrect implicits
-SUBDIRS = lib libf libc examples tests
+SUBDIRS = lib examples tests
 
 all:
 	for dir in $(SUBDIRS) ; do\

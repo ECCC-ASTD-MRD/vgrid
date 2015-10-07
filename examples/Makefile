@@ -1,7 +1,8 @@
 # User options
-#FFLAGS=$(FFLAGS_INTEL)
-FFLAGS="$(FFLAGS_INTEL) -C -g -O0"
-CFLAGS="$(FFLAGS_INTEL) -g -O0"
+FFLAGS="$(FFLAGS_INTEL)"
+#FFLAGS="$(FFLAGS_INTEL) -C -g -O0"
+CFLAGS="$(FFLAGS_INTEL)"
+#CFLAGS="$(FFLAGS_INTEL) -g -O0"
 DESCRIP_F_PATH = ../libf
 DESCRIP_C_PATH = ../libc
 
@@ -15,7 +16,7 @@ DIST=use_new_read use_new_gen topLevel_levels lowLevel_levels use_dpidpis c_use_
 	$(RCOMPILE) -optf =$(FFLAGS) -includes $(DESCRIP_F_PATH) -src $<
 
 .c.o:
-	$(RCOMPILE) -optf =$(CFLAGS) -src $<
+	$(RCOMPILE) -optc =$(CFLAGS) -src $<
 
 OBJECTS_F = $(DESCRIP_F_PATH)/vgrid_descriptors.o $(DESCRIP_F_PATH)/utils.o $(DESCRIP_F_PATH)/msg.o
 
