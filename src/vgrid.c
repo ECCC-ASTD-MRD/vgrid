@@ -683,6 +683,9 @@ int Cvgd_print_vcode_description(int vcode){
       printf("   First level at top is a momentum level\n");
       printf("   Diag level heights (m AGL) encoded\n");
   }
+
+  return(VGD_OK);
+
 }
 
 static int C_compute_pressure_1001_1002_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log) {
@@ -1631,7 +1634,8 @@ int c_decode_vert_1001(TVGrid **self) {
     (*self)->a_m_8[k] =       (*self)->table[ind+1];
     (*self)->b_m_8[k] =       (*self)->table[ind+2];
     ind = ind + 3;
-  }
+  }  
+  return(VGD_OK);
 }
 
 int c_decode_vert_1002(TVGrid **self) {
@@ -1662,6 +1666,7 @@ int c_decode_vert_1002(TVGrid **self) {
     (*self)->b_m_8[k] =       (*self)->table[ind+2];
     ind = ind + 3;
   }
+  return(VGD_OK);
 }
 
 int c_decode_vert_2001(TVGrid **self) {
@@ -1690,7 +1695,7 @@ int c_decode_vert_2001(TVGrid **self) {
     (*self)->b_m_8[k] =       (*self)->table[ind+2];
     ind = ind + 3;
   }
-  
+  return(VGD_OK);
 }
 
 int c_decode_vert_1003_5001(TVGrid **self) {
@@ -2998,6 +3003,7 @@ int Cvgd_get_char(TVGrid *self, char *key, char out[], int *quiet) {
     }
     return(VGD_ERROR);
   }
+  return(VGD_OK);
 }
 
 int Cvgd_put_char(TVGrid **self, char *key, char *value) {
@@ -3015,6 +3021,7 @@ int Cvgd_put_char(TVGrid **self, char *key, char *value) {
     printf("(Cvgd) ERROR in Cvgd_out_char, invalid key -> '%s'\n",key);
     return(VGD_ERROR);
   }
+  return(VGD_OK);
 }
 
 int Cvgd_put_int(TVGrid **self, char *key, int value) {
@@ -3072,6 +3079,7 @@ int Cvgd_put_int(TVGrid **self, char *key, int value) {
     printf("(Cvgd) ERROR in Cvgd_put_int, invalid key %s\n", key);
     return(VGD_ERROR);
   }
+  return(VGD_OK);
 }
 
 int Cvgd_new_gen(TVGrid **self, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2,
@@ -3269,7 +3277,7 @@ static int C_get_consistent_pt_e1(int iun, float *val, char *nomvar ){
       *val = work[0];
     } else {
       if( work[0] != *val ){
-	printf("(Cvgd) ERROR: in C_get_consistent_pt_e1, inconsistent %s, %f v %f\n", nomvar, work[0], val);
+	printf("(Cvgd) ERROR: in C_get_consistent_pt_e1, inconsistent %s, %f v %f\n", nomvar, work[0], *val);
 	goto bomb;
       }
     }

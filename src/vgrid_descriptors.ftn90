@@ -32,7 +32,7 @@ module vGrid_Descriptors
    public :: operator(==)                        !overload equivalence operator
 
    ! Public class constants
-#include "vgrid.hf"
+#include "vgrid_descriptors.hf"
 
    ! Private class variables
    logical :: ALLOW_RESHAPE=.false.              ! Allow reshape of class pointer members

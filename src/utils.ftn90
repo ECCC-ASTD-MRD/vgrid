@@ -11,7 +11,7 @@ module utils
    public :: up                                  !convert string to upper-case
 
    ! Public vgrid_descriptor constants
-#include "vgrid.hf"
+#include "vgrid_descriptors.hf"
    
    ! Private constants
    integer, parameter :: LONG_STRING=1024        !number of characters in a long string
