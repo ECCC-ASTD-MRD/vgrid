@@ -466,13 +466,13 @@ int Cvgd_vgdcmp(TVGrid *vgd1, TVGrid *vgd2) {
   return(0);
 }
 
-double Cvgd_comp_diag_a_height(double pref_8, float height) {
+double c_comp_diag_a_height(double pref_8, float height) {
   float RGASD       =    0.287050000000E+03;
   float GRAV        =    0.980616000000E+01;
   float TCDK        =    0.273150000000E+03;
   return log(pref_8) - GRAV*height/(RGASD*TCDK);
 }
-double Cvgd_comp_diag_a_ip1(double pref_8, int ip1) {
+double c_comp_diag_a_ip1(double pref_8, int ip1) {
   float RGASD       =    0.287050000000E+03;
   float GRAV        =    0.980616000000E+01;
   float TCDK        =    0.273150000000E+03;
@@ -2531,7 +2531,7 @@ int c_vgrid_genab_5005(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef
   // ln[p(z=dhm)] = ln(pref) - g/(Rd*T)*dhm + s
   // => B=1, A = ln(pref) - g/(Rd*T)*dhm
   // We take T at 0C
-  a_m_8[nk+1] = Cvgd_comp_diag_a_height(pref_8,dhm);
+  a_m_8[nk+1] = c_comp_diag_a_height(pref_8,dhm);
   b_m_8[nk+1] = 1.;
 
   // Thermodynamic levels    
@@ -2542,7 +2542,7 @@ int c_vgrid_genab_5005(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef
   // Special thermo levels
   b_t_8[nk]   = 1.;
   a_t_8[nk]   = zsrf_8;
-  a_t_8[nk+1] = Cvgd_comp_diag_a_height(pref_8,dht);
+  a_t_8[nk+1] = c_comp_diag_a_height(pref_8,dht);
   b_t_8[nk+1] = 1.;
 
   // Compute ip1 values
@@ -3054,7 +3054,7 @@ int Cvgd_put_int(TVGrid **self, char *key, int value) {
   } else if( strcmp(key, "DIPM") == 0 ) {
     if ( is_valid((*self), dhm_valid)) {
       (*self)->ip1_m[(*self)->nl_m -1 ] = value;
-      (*self)->a_m_8[(*self)->nl_m -1 ] = Cvgd_comp_diag_a_ip1((*self)->pref_8, value);
+      (*self)->a_m_8[(*self)->nl_m -1 ] = c_comp_diag_a_ip1((*self)->pref_8, value);
       if( c_table_update(self) == VGD_ERROR) {
 	printf("(Cvgd) ERROR in Cvgd_put_int, problem with c_table_update for key %s\n",key);
 	return(VGD_ERROR);
@@ -3066,7 +3066,7 @@ int Cvgd_put_int(TVGrid **self, char *key, int value) {
   } else if( strcmp(key, "DIPT") == 0 ) {
     if ( is_valid((*self), dht_valid)) {
       (*self)->ip1_t[(*self)->nl_t - 1] = value;
-      (*self)->a_t_8[(*self)->nl_t - 1] = Cvgd_comp_diag_a_ip1((*self)->pref_8, value);
+      (*self)->a_t_8[(*self)->nl_t - 1] = c_comp_diag_a_ip1((*self)->pref_8, value);
       if( c_table_update(self) == VGD_ERROR) {
 	printf("(Cvgd) ERROR in Cvgd_put_int, problem with c_table_update for key %s\n", key);
 	return(VGD_ERROR);
@@ -3484,7 +3484,7 @@ static int C_gen_legacy_desc(TVGrid **self, int unit, int *ip1list, int *keylist
 
 }
 
-int Cvgd_legacy(TVGrid **self, int unit, int F_kind) {
+int c_legacy(TVGrid **self, int unit, int F_kind) {
   // Construct vertical structure from legacy encoding (PT,HY...)
 
   int error, ni, nj, nk, nip1, i, j, k, kind, nb_kind=100, aa, nb;
@@ -3502,14 +3502,14 @@ int Cvgd_legacy(TVGrid **self, int unit, int F_kind) {
   }
   error = c_fstinl(unit, &ni, &nj, &nk, -1, " ", -1, -1, -1, " ", " ", keylist, &count, nkeylist);
   if (error < 0) {
-    printf("(Cvgd) ERROR in Cvgd_legacy, with fstinl\n");
+    printf("(Cvgd) ERROR in c_legacy, with fstinl\n");
     return(VGD_ERROR);
   }
   nip1 = 0;
   for( i = 0; i < count; i++){
     error = my_fstprm(keylist[i], &var);
     if (error == VGD_ERROR) {
-      printf("(Cvgd) ERROR in Cvgd_legacy, error return from fstprm wrapper for fst key = %d",keylist[i]);
+      printf("(Cvgd) ERROR in c_legacy, error return from fstprm wrapper for fst key = %d",keylist[i]);
       return(VGD_ERROR);
     }
     preslist[i] = c_convip_IP2Level(var.ip1,&kind);
@@ -3660,7 +3660,7 @@ int Cvgd_new_read(TVGrid **self, int unit, int *ip1, int *ip2, int *kind, int *v
       return(VGD_ERROR);
     }
     printf("(Cvgd) Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)\n");
-    if(Cvgd_legacy(self,unit,l_kind) == VGD_ERROR){
+    if(c_legacy(self,unit,l_kind) == VGD_ERROR){
       printf("(Cvgd) ERROR: failed to construct vgrid descriptor from legacy encoding\n");
       return(VGD_ERROR);
     }
