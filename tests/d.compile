@@ -1,0 +1,421 @@
+#!/bin/ksh93
+set -e
+
+# get program arguments into an array
+options=(${@})
+
+SCRIPT=`readlink -f $0`
+SCRIPT_PATH=`dirname $SCRIPT`
+
+if [[ "${1}" == "-usage" || "${1}" == "-?" ]]; then
+    echo "USAGE: d.compile -o libburp.a -src burp_api.c"
+    echo "       please refer to the documentation at: https://wiki.cmc.ec.gc.ca/wiki/D.compile"
+    echo "       (accepts all the same parameters as s.compile: http://web-mrb.cmc.ec.gc.ca/mrb/si/eng/si/LIBRARY_INDEX/r/r.compile.html)"
+    exit 0
+fi
+
+# split a string using IFS (no child process)
+function split
+{
+    saved_IFS="${IFS}"
+    IFS="${2}"
+    split_results=(${1})
+    IFS="${saved_IFS}"
+}
+
+####################
+# GET VERSION INFO #
+####################
+echo "Getting version info"
+
+version=""
+# get version number
+if [[ -r ../.ssm.d/control ]]; then
+    # try meta-data file first
+    set +e # don't error out if we can't find the version info in the control file
+    version=$(grep "Version:" ../.ssm.d/control)
+    set -e
+    version=${version/Version: /}
+fi
+
+if [[ -z "${version}" && -d .svn ]]; then
+    # or just use the revision number from Subversion
+    version=$(svn info . | grep 'Last Changed Rev:')
+    version=${version/Last Changed Rev: /}
+fi
+
+if [[ -z "${version}" && -d .git ]]; then
+    # or git if this is a git package
+    version=$(git describe --tags)
+    # remove underscore from version number to avoid conflicts with SSM
+    version=${version//_}
+fi
+
+if [[ -z "${version}" ]]; then
+    echo "WARNING: can't get version information from .ssm.d/control, svn, or git" >&2
+    echo "         (skipping generation of version header files)" >&2
+    echo "         it is strongly encouraged to use a version control system" >&2
+else
+    echo "#define VERSION \"${version}\"" > version.h
+    echo "character(len=*), parameter :: VERSION = '${version}'" > version.f90
+    echo "VERSION=\"${version}\"" > version.sh
+fi
+
+# calling without any parameters will just generate the version info for a shell script
+if [[ ${#} == 0 ]]; then
+    rm -rf version.h
+    rm -rf version.f90
+    exit 0
+fi
+
+
+#################
+# CHECK OPTIONS #
+#################
+
+# gather some preliminary information
+is_c_plus_plus="false"
+requests_portland="false"
+typeset -A additional_domains
+typeset -A additional_packages
+for option in ${options[@]}; do
+   if [[ "${option}" == *.cpp ]]; then
+       is_c_plus_plus="true"
+   elif [[ "${option}" == "-pgi" ]]; then
+       requests_portland="true"
+   elif [[ "${previous_option}" == "-o" ]]; then
+       output_filename=${option}
+   elif [[ "${previous_option}" == "-domain" ]]; then
+       additional_domains+=" ${option}"
+   elif [[ "${previous_option}" == "-info" ]]; then
+       requests_info="${option}"
+   fi
+   previous_option=${option}
+done
+
+####################
+# LOAD ENVIRONMENT #
+####################
+if [[ -z "${DCOMPILE_ENV_LOADED}" ]]; then 
+    echo "Loading environment"
+
+    if [[ -n ${COMP_ARCH} ]]; then
+       echo
+       echo "WARNING: Another compiler has already been loaded."
+       echo "This will likely cause interference with d.compile's compiler and produce unexpected results."
+       echo "Please run d.compile from an environment without any compilers or libraries already loaded."
+       read
+    fi
+
+    if [[ "${ORDENV_PLAT}" == aix* ]]; then
+        . ssmuse-sh -d hpcs/201402/02/base/ -d hpcs/ext/xlf_13.1.0.10/
+        #. ssmuse-sh -d hpcs/201402/02/base/ -d hpcs/ext/xlf_14.1.0.3/
+    elif [[ "${ORDENV_PLAT}" == ubuntu* ]]; then
+        if [[ "${PUBLISH_ARCH}" == pgi* || "${requests_portland}" == "true" ]]; then
+            . ssmuse-sh -d hpcs/201402/02/base -d hpcs/201402/02/pgi1401
+        else
+            . ssmuse-sh -d hpcs/201402/02/base/ -d hpcs/201402/02/intel13sp1u2/        
+        fi
+    else
+       echo "Unsupported platform: ${ORDENV_PLAT}"
+       exit 1
+    fi
+
+    # allow the user to specify their own domains and automatically add the COMP_ARCH for them
+    for domain in ${additional_domains[@]}; do
+        echo "Loading user domain: ${domain}/${COMP_ARCH}"
+        . ssmuse-sh -d ${domain}/${COMP_ARCH}
+    done
+
+    if [[ -n $(echo ${LD_LIBRARY_PATH} | grep -E "/cmda/libs/|/cmds/base/*/${COMP_ARCH}|/rpn/libs/") ]]; then
+       echo
+       echo "WARNING: CMDA, CMDS, or RPN ibraries have already been loaded."
+       echo "This will likely cause the wrong version of libraries to be used."
+       echo "Please run d.compile from an environment without any compilers of libraries already loaded."
+       read
+    fi
+
+    # locate CMDA library domain based on location of utils domain
+    cmda_libs=`dirname ${SCRIPT_PATH}`                   # remove trailing bin directory
+    cmda_libs=`dirname ${cmda_libs}`                     # remove trailing package or platform directory
+    cmda_libs="${cmda_libs/utils/libs}/${COMP_ARCH}/"    # substitude utils for libs and add compiler architecture to path
+    echo "Loading domain: ${cmda_libs}"
+    . ssmuse-sh -d ${cmda_libs} # for our own library dependencies
+    echo "Loading domain: cmds/base/201508/00/${COMP_ARCH}/"
+    . ssmuse-sh -d cmds/base/201508/00/${COMP_ARCH}/
+    echo "Loading domain: rpn/libs/15.2/"
+    . ssmuse-sh -d rpn/libs/15.2/
+    if [[ "${ORDENV_PLAT}" == aix* ]]; then
+        rpn_rpath="/ssm/net/rpn/libs/15.2/${ORDENV_PLAT}/lib/AIX-powerpc/${COMP_ARCH}/"
+    elif  [[ "${ORDENV_PLAT}" == ubuntu* ]]; then
+        rpn_rpath="/ssm/net/rpn/libs/15.2/${ORDENV_PLAT}/lib/Linux_x86-64/${COMP_ARCH}/"
+    fi
+    echo "Loading domain: hpcs/ext/idl82/"
+    . ssmuse-sh -d hpcs/ext/idl82/                       # for $IDL_DIR to find idl_export.h
+
+    # set LD_RUN_PATH which is used to set the rpath in shared objects which is used 
+    # to find dependencies at run time
+    OLD_LD_RUN_PATH=${LD_RUN_PATH}
+    if [[ -z ${LD_RUN_PATH} ]]; then
+       export LD_RUN_PATH=${LD_LIBRARY_PATH}:${rpn_rpath}
+    else
+       export LD_RUN_PATH=${LD_RUN_PATH}:${LD_LIBRARY_PATH}:${rpn_rpath}
+    fi
+
+    export DCOMPILE_ENV_LOADED="true"
+    echo "Done loading environment"
+fi
+
+####################
+# HELPER FUNCTIONS #
+####################
+# split using IFS (no child process)
+function split
+{
+    saved_IFS="${IFS}"
+    IFS="${2}"
+    split_results=(${1})
+    IFS="${saved_IFS}"
+}
+
+################################
+# ADD CMDA COMPILATION OPTIONS #
+################################
+# (for when they aren't in the Compiler Rules yet
+
+# new parameters to add
+typeset -A new_options
+if [[ "${COMP_ARCH}" == intel* ]]; then
+    # ensure results are consistent from run to run
+    new_options["-optc"]+=" =-fp-model =precise"
+    new_options["-optf"]+=" =-fp-model =source"
+    new_options["-optc"]+=" =-Wall"
+fi
+# set the appropriate flag if we are compiling a shared library
+if [[ "${output_filename}" == *.so ]]; then
+    # dynamic compilation
+    if [[ "${COMP_ARCH}" != pgi* ]]; then
+        # compiler definition for pgi compiler is missing - in "-shared" so we skip passing
+        # this option to s.compile and pass it directly to the compiler below instead
+        new_options["-shared"]=""
+    else
+        # workaround for bug in Compiler Rules for -shared parameter with PGI compiler
+        # missing dash - in Compiler Rules
+        new_options["-optc"]+=" =-shared"
+        new_options["-optf"]+=" =-shared"
+    fi
+    if [[ "${COMP_ARCH}" == xlf* ]]; then
+        # -G Generates a shared object enabled for runtime linking (necessary to find secondary dependencies?)
+        # -Wl,-bernotok - generate errors instead of warnings for undefined symbols in shared dependencies
+        # -Wl,-brtl - let xlf/xlc find .so files (otherwise it ignores them altogether)
+        # -Wl,-R... - specify the rpath on AIX
+        new_options["-optc"]+=" =-Wl,-brtl"
+        new_options["-optf"]+=" =-Wl,-brtl"
+    else
+        # --no-undefined - report unresolved symbols in your shared object
+        # --no-allow-shlib-undefined - also report unresolved symbols in the shared libraries that you link to
+        #                              (can't enable this one because ther are unresolved symbols in libc etc.)
+        # --export-dynamic - add all symbols to dynamic symbol table (not just the ones referenced by objects in the link)
+        #                    (helps getting traceback info, and helps dlopen in some cases)
+        #                    (same as -rdynamic for gcc)
+        new_options["-optc"]+=" =-Wl,--no-undefined =-Wl,--export-dynamic"
+        new_options["-optf"]+=" =-Wl,--no-undefined =-Wl,--export-dynamic"
+    fi
+else
+    # static compilation
+    # to avoid potential issues with moving or changing dynamic libraries
+
+    # can't use statically compiled libraries for generating shared libraries with Intel compiler:
+    #ld: /ssm/net/hpcs/201402/master/intelcomp_2013sp1u2_multi/composer_xe_2013_sp1.2.144/compiler/lib/intel64/libifcoremt.a(for_close.o): relocation R_X86_64_32 against `.rodata.str1.4' can not be used when making a shared object; recompile with -fPIC
+    #/ssm/net/hpcs/201402/master/intelcomp_2013sp1u2_multi/composer_xe_2013_sp1.2.144/compiler/lib/intel64/libifcoremt.a: could not read symbols: Bad values
+
+    #/usr/bin/ld: /usr/lib/x86_64-linux-gnu/libm.a(k_standard.o): relocation R_X86_64_32S against `.rodata' can not be used when making a shared object; recompile with -fPIC
+    #/usr/bin/ld: /usr/lib/x86_64-linux-gnu/libpthread.a(pthread_create.o): relocation R_X86_64_32S against `.data' can not be used when making a shared object; recompile with -fPIC
+
+    # can't use static compilation on AIX (isn't able to find system libraries)
+
+    # can't use -bstatic for AIX we get a bunch of undefined symbols for all of the system/libc functions
+    #if [[ "${COMP_ARCH}" == xlf* ]]; then
+    #    new_options["-optc"]+=" =-bstatic"
+    #    new_options["-optf"]+=" =-bstatic"
+    #el
+    if [[ "${ORDENV_PLAT}" == ubuntu* ]]; then
+        new_options["-optc"]+=" =-Bstatic"
+        new_options["-optf"]+=" =-Bstatic"
+        if [[ "${COMP_ARCH}" == intel* ]]; then
+            new_options["-optc"]+=" =-static-intel"
+            new_optoins["-optf"]+=" =-static-intel"
+        fi
+    fi
+fi
+
+# if I can't link everything in statically, at least try the intel libraries
+# (this is required for d.sqlite/libudfsqlite to function properly on Linux - at least the c option)
+# NOTE: you may need to move just the fortran option back into the static compilation section above if you see if libifcoremt.a message at some point
+#if [[ "${COMP_ARCH}" == intel* ]]; then
+    #new_options["-optc"]+=" =-static-intel"
+    #new_optoins["-optf"]+=" =-static-intel"
+#fi
+
+
+# set number of bits to compile for AIX
+if [[ "${ORDENV_PLAT}" == aix*64 ]]; then
+   OBJECT_MODE=64
+   new_options["-optc"]+=" =-q64"
+   new_options["-optf"]+=" =-q64"
+elif [[ "${ORDENV_PLAT}" == aix*32 ]]; then
+   OBJECT_MODE=32
+   new_options["-optc"]+=" =-q32"
+   new_options["-optf"]+=" =-q32"
+fi
+# if we are compiling a c++ program then link against the c++ standard libaries
+# (this is normally done by the linker for us but since we are using Fortran linker to link against rmnlib we need to do this ourselves)
+if [[ "${is_c_plus_plus}" == "true" ]]; then
+   if [[ "${ORDENV_PLAT}" == aix* ]]; then
+       new_options["-libsys"]+=" C"
+       # required define to use <array> header
+       new_options["-defines"]+=" =-D__IBMCPP_TR1__"
+       # enable c++11x features
+       new_options["-optc"]+=" =-qlanglvl=extended0x"
+   elif [[ "${ORDENV_PLAT}" == ubuntu* ]]; then
+       new_options["-libsys"]+=" stdc++"
+       # enable c++11x features
+       new_options["-optc"]+=" =-std=c++11"
+   fi
+fi
+# make sure debugging symbols are included so we can track down errors if necessary
+new_options["-debug"]=""
+new_options["-includes"]+=" ${IDL_DIR}/external/include"
+
+# if user has already used the parameter
+# then add our values
+typeset -A found_option
+skip_next="false"
+for option in ${options[@]}; do
+    if [[ "${skip_next}" == "true" ]]; then
+        skip_next="false"
+        continue
+    fi
+    if [[ "${option}" == "-o" ]]; then
+        found_output_filename="true"
+        continue
+    fi
+    if [[ "${found_output_filename}" == "true" ]]; then
+        if [[ "${output_filename}" == *.a ]]; then
+            # s.compile can't create .a files directly so we don't pass this parameter on
+            found_output_filename="false"
+            continue
+        else
+            final_options+=("-o")
+        fi
+        found_output_filename="false"
+    fi
+    if [[ "${option}" == "-pgi" ]]; then
+        # -pgi option is not an s.compile option (skip it)
+        continue
+    fi
+    if [[ "${option}" == "-domain" ]]; then
+        # -domain option is not an s.compile option (skip it)
+        skip_next="true"
+        continue
+    fi
+    if [[ "${option}" == "-info" ]]; then
+        # -info option is not an s.compile option (skip it)
+        skip_next="true"
+        continue
+    fi
+    final_options+=(${option})
+    if [[ "${new_options[${option}]}" ]]; then
+        found_option[${option}]="true"
+        final_options+=(${new_options[${option}]})
+    fi
+done
+
+# if user hasn't used the parameter
+# then add the parameter AND its value 
+for option in ${!new_options[@]}; do
+    if [[ "${found_option[$option]}" != "true" ]]; then
+        final_options+=($option)
+        final_options+=(${new_options[${option}]})
+    fi
+done
+
+###################################
+# CLEAN UP PREVIOUS OR JUNK FILES #
+###################################
+echo "Cleaning"
+set -x
+rm -rf core *.mod *.o *~ a.out ${output_filename}
+set +x
+
+###########
+# COMPILE #
+###########
+echo "Compiling"
+set -x
+s.compile "${final_options[@]}"
+set +x
+
+# if this is a library then we have to finish building it
+if [[ "${output_filename}" == *.a ]]; then
+    echo "Archiving"
+    if [[ "${ORDENV_PLAT}" == aix*64 ]]; then
+        archive_parameter=-X64
+    elif [[ "${ORDENV_PLAT}" == aix*32 ]]; then
+        archive_parameter=-X32
+    fi
+    set -x
+    ar ${archive_parameter} scru ${output_filename} *.o
+    ranlib ${output_filename}
+    set +x
+fi
+
+###########
+# INSTALL #
+###########
+if [[ -d ../.ssm.d/ ]]; then
+    echo "Installing"
+    if [[ "${output_filename}" == *.a || "${output_filename}" == *.so ]]; then
+        if [[ -w "../lib" ]]; then
+            set -x
+            mv -f ${output_filename} ../lib/
+            ln -s ../lib/${output_filename}
+            set +x
+        fi
+    else
+        if [[ -w "../bin" ]]; then
+            set -x
+            mv -f ${output_filename} ../bin/
+            ln -s ../bin/${output_filename}
+            cp -f version.sh ../bin/
+            set +x
+        fi
+    fi
+    if [[ -w "../include" ]]; then
+        if [[ -n $(find * -name "*.h") ]]; then
+            set -x
+            cp -f *.h ../include/
+            # we don't want a copy of version.h in every SSM package
+            rm -rf ../include/version.h
+            set +x
+        fi
+        if [[ -n $(find * -name "*.mod") ]]; then
+            set -x
+            cp -f *.mod ../include/
+            set +x
+        fi
+    fi
+fi
+
+if [ "${requests_info}" != "" ];then
+   echo COMP_ARCH=${COMP_ARCH} >> ${requests_info}
+fi
+
+###########################################
+# UNLOAD TEMPORARY CHANGES TO ENVIRONMENT #
+###########################################
+if [[ -z "${DCOMPILE_ENV_LOADED}" ]]; then
+    export LD_RUN_PATH=${OLD_LD_RUN_PATH}
+fi
+
+echo "Done"

@@ -1,48 +1,36 @@
 # User options
-FFLAGS="$(FFLAGS_INTEL) -C -g -O0"
-DESCRIP_F_PATH = ../libf
-DESCRIP_C_PATH = ../libc
-# Use the setup* dot files in ../ to set the following variables 
+FFLAGS="=-C =-g =-O0"
+CFLAGS="    =-g =-O0"
+DESCRIP_PATH = ../src
 
 # Override incorrect implicits
 %.o : %.mod
 
 # Define suffix rules
-.SUFFIXES: .ftn90 .o
+.SUFFIXES: .ftn90 .c .o
+
+# Incapable de faire des .o a partir des .c c'est toujours cc qui est utilise comme compilateur!
+# Pour les .ftn90 ca marche!
+.c.o:
+	d.compile -libpath $(DESCRIP_PATH) -optf $(CFLAGS) -includes $(DESCRIP_PATH) -src $<
+
 .ftn90.o:
-	echo $(DESCRIP_F_PATH)
-	s.compile -libpath $(MY_LIBPATH) $(LIBRARY_PATH) -optf =$(FFLAGS) -includes $(DESCRIP_F_PATH) -src $<
+	d.compile -libpath $(DESCRIP_PATH) -optf $(FFLAGS) -includes $(DESCRIP_PATH) -src $<
 
-OBJECTS = $(DESCRIP_C_PATH)/vgrid.o $(DESCRIP_F_PATH)/utils.o $(DESCRIP_F_PATH)/msg.o  $(DESCRIP_F_PATH)/vgrid_descriptors.o unit_testing.o
+c_ut_report.o: c_ut_report.c
+	d.compile -libpath $(DESCRIP_PATH) -optf $(CFLAGS) -includes $(DESCRIP_PATH) -src c_ut_report.c
 
-UNIT_TEST: UNIT_TEST.ftn90 $(OBJECTS)
-	s.compile $(OPENMP) -optf =$(FFLAGS) -includes $(MY_INCLUDE_PATH) $(DESCRIP_F_PATH) $(INCLUDE_PATH) -obj $(OBJECTS) -src UNIT_TEST.ftn90 -o UNIT_TEST  -libpath $(MY_LIBPATH) $(LIBRARY_PATH) -libappl $(MODELUTILS) rmn
+# Le *.o sont effaces par d.compile, on ne peut donc les passer avec la cle -obj!
+OBJECTS = unit_testing.o c_ut_report.o
 
-unit_testing.o: unit_testing.ftn90
+UNIT_TEST_F: unit_testing.ftn90 UNIT_TEST_F.ftn90 $(DESCRIP_PATH)/libdescrip_debug.a
+	/users/dor/afsg/apm/ords/cmdn/vgrid/tests/d.compile $(OPENMP) -optf $(FFLAGS) -includes $(DESCRIP_PATH) -src unit_testing.ftn90 UNIT_TEST_F.ftn90 -o UNIT_TEST_F -libpath $(DESCRIP_PATH) $(LIBRARY_PATH) -librmn -libappl descrip_debug -info $(PWD)/compile_INFO
 
-$(DESCRIP_F_PATH)/vgrid_descriptors.o: $(DESCRIP_F_PATH)/vgrid_descriptors.ftn90
-	(cd $(DESCRIP_F_PATH) && $(MAKE) vgrid_descriptors.o)
+UNIT_TEST_C: c_ut_report.c UNIT_TEST_C.c $(DESCRIP_PATH)/libdescrip_debug.a
+	d.compile $(OPENMP) -optc $(CFLAGS) -includes $(DESCRIP_PATH) -src c_ut_report.c UNIT_TEST_C.c -o UNIT_TEST_C  -libpath $(DESCRIP_PATH) $(LIBRARY_PATH) -librmn -libappl descrip_debug -bidon c -main UNIT_TEST_C
 
-$(DESCRIP_F_PATH)/vgrid_genab_5002.o: $(DESCRIP_F_PATH)/vgrid_genab_5002.ftn90
-	(cd $(DESCRIP_F_PATH) && $(MAKE) vgrid_genab_5002.o)
-
-$(DESCRIP_F_PATH)/vgrid_genab_1002_5001.o: $(DESCRIP_F_PATH)/vgrid_genab_1002_5001.ftn90
-	(cd $(DESCRIP_F_PATH) && $(MAKE) vgrid_genab_1002_5001.o)
-
-$(DESCRIP_F_PATH)/vgrid_genab_1001.o: $(DESCRIP_F_PATH)/vgrid_genab_1001.ftn90
-	(cd $(DESCRIP_F_PATH) && $(MAKE) vgrid_genab_1001.o)
-
-$(DESCRIP_F_PATH)/vgrid_genab_1004.o: $(DESCRIP_F_PATH)/vgrid_genab_1004.ftn90
-	(cd $(DESCRIP_F_PATH) && $(MAKE) vgrid_genab_1004.o)
-
-$(DESCRIP_F_PATH)/utils.o: $(DESCRIP_F_PATH)/utils.ftn90
-	(cd $(DESCRIP_F_PATH) && $(MAKE) utils.o)
-
-$(DESCRIP_F_PATH)/msg.o: $(DESCRIP_F_PATH)/msg.ftn90
-	(cd $(DESCRIP_F_PATH) && $(MAKE) msg.o)
-
-$(DESCRIP_C_PATH)/vgrid.o: $(DESCRIP_C_PATH)/vgrid.c	
-	(cd $(DESCRIP_C_PATH) && $(MAKE) vgrid.o)
+$(DESCRIP_PATH)/libdescrip_debug.a: 
+	cd $(DESCRIP_PATH) && gmake libdescrip_debug.a
 
 clean:
 	rm -f *.f90 *.o *.mod
