@@ -20,40 +20,40 @@ void c_use_new_read() {
   ier = c_fnom(iun,filename,mode,0);
   if( ier < 0 ) {
     printf("ERROR with c_fnom on iun, file %s\n", filename);
-    return 1;
+    return;
   }
   ier = c_fstouv(iun,"RND");  
   if( ier < 0 ) {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
-    return 1;
+    return;
   }
   
   if( Cvgd_new_read(&vgd, iun, ip1, ip2, kind, version) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
-    return 1;
+    return;
   }
   if( Cvgd_get_int_1d(vgd, "VIPT", &i_val, NULL, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_int for VIPT\n");
-    return 1;
+    return;
   }
   if( Cvgd_get_real_1d(vgd, "VCDT", &f_val, NULL , quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_real_1d for VCDT\n");
-    return 1;
+    return;
   }
   if( Cvgd_get_real8_1d(vgd, "CA_T", &a_8_t, NULL, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_real8_1d for CA_T\n");
-    return 1;
+    return;
   }
   if( Cvgd_get_real8_1d(vgd, "CB_T", &b_8_t, &nt, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_real8_1d for CB_T\n");
-    return 1;
+    return;
   }
 
   // Size of thermo may also be obtained by this:
   ier = Cvgd_get_int(vgd, "NL_T", &nl_t, quiet);
   if(nl_t != nt ) {
     printf("ERROR: nt and nl_t should be equal, got %d, %d\n",nt, nl_t);
-    return(-1);
+    return;
   }
   printf("nl_t = %d\n", nl_t);
   
@@ -66,35 +66,35 @@ void c_use_new_read() {
   // obtained with fstlir, but why do it id vgd already contains it!)
   if ( Cvgd_get_real8_3d(vgd, "VTBL", &table, &ni, &nj, &nk, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_real8_3d for VTBL\n");
-    return 1;
+    return;
   }
   
   // Constructing new vgd with this table
   if ( Cvgd_new_from_table(&vgd2, table, ni, nj, nk) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_new_from_table for VTBL\n");
-    return 1;
+    return;
   }
 
   // Comparing new table with original table, must be the same.
   if( Cvgd_vgdcmp(vgd, vgd2) != 0 ){
     printf("ERROR, vgd and vgd2 shouldne the same\n");
-    return(1);
+    return;
   }
 
   // Write descriptor in new file
   ier = c_fnom(iun2,"to_erase",mode,0);
   if( ier < 0 ) {
     printf("ERROR with c_fnom on iun2\n");
-    return 1;
+    return;
   }
   ier = c_fstouv(iun2,"RND");  
   if( ier < 0 ) {
     printf("ERROR with c_fstouv on iun2\n");
-    return 1;
+    return;
   }
   if( Cvgd_write_desc(vgd, iun2, "FST") == VGD_ERROR ){
     printf("ERROR with Cvgd_write_desc on iun2\n");
-    return 1;
+    return;
   }
 
   // Compute 3D pressure levels
@@ -102,22 +102,22 @@ void c_use_new_read() {
   key = c_fstinf( iun, &ni2, &nj2, &nk2, -1, " ", -1, -1, -1, " ", "P0");
   if(key < 0){
     printf("Problem getting info for P0\n");
-    return 1;
+    return;
   }
   p0 = malloc(ni2*nj2 * sizeof(float));
   if(! p0){
     printf("Problem allocating P0 of size %d\n",ni2*nj2);
-    return 1;
+    return;
   }
   p0_8 = malloc(ni2*nj2 * sizeof(double));
   if(! p0_8){
     printf("Problem allocating P0_8 of size %d\n",ni2*nj2);
-    return 1;
+    return;
   }
   levels_8 = malloc(ni2*nj2*nl_t * sizeof(double));
   if(! levels_8){
     printf("Problem allocating levels_8 of size %d\n",ni2*nj2);
-    return 1;
+    return;
   }
   ier = c_fstluk( p0, key, &ni2, &nj2, &nk2 );
   if( ier < 0 ){
@@ -136,18 +136,18 @@ void c_use_new_read() {
     key = c_fstinf( iun, &ni2, &nj2, &nk2, -1, " ", i_val[k], -1, -1, " ", "PX");
     if(key < 0){
       printf("Problem getting info for PX for ip1 = %d\n",i_val[k]);
-      return 1;
+      return;
     }
     // To simplify, PX are assumed to be on the same grid as P0. bur rhis should be check in an operational program!
     ier = c_fstluk( p0, key, &ni2, &nj2, &nk2 );    
     if( ier < 0 ){
       printf("Problem with fstluk on px ip1 = %d\n", i_val[k]);
-      return 1;
+      return;
     }
     for( ij = 0; ij < ni2*nj2; ij++, ijk++){
       if( abs(p0[ij] - levels_8[ijk]/100.) > 1.e-6 ) {
 	printf("Difference is too large, expected %f, got %f\n", p0[ij], levels_8[ijk]/100.);
-	return 1;
+	return;
       }
     }
   }
@@ -159,20 +159,20 @@ void c_use_new_read() {
   ier = c_fnom(iun2,"to_erase",mode,0);
   if( ier < 0 ) {
     printf("ERROR with c_fnom on iun2\n");
-    return 1;
+    return;
   }
   ier = c_fstouv(iun2,"RND");  
   if( ier < 0 ) {
     printf("ERROR with c_fstouv on iun2\n");
-    return 1;
+    return;
   }
   if( Cvgd_new_read(&vgd2, iun, ip1, ip2, kind, version) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read vgd2\n");
-    return 1;
+    return;
   }
   if( Cvgd_vgdcmp(vgd, vgd2) != 0 ){
     printf("ERROR, vgd and vgd2 shouldne the same after write in file, read from file\n");
-    return(1);
+    return;
   }
 
   Cvgd_vgd_free(&vgd);

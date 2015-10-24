@@ -886,19 +886,19 @@ static int C_compute_pressure_5002_5003_5004_5005_8(TVGrid *self, int ni, int nj
 
 }
 
-int Cvgd_diag_withref(TVGrid *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int *in_log, int *dpidpis) {
+int Cvgd_levels(TVGrid *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int *in_log) {
   double *levels_8, *sfc_field_8;
   int ij, ijk;
-  if( my_alloc_double(&levels_8   , ni*nj*nk, "(Cvgd) ERROR in Cvgd_diag_withref, malloc error with levels_8")  == VGD_ERROR )
+  if( my_alloc_double(&levels_8   , ni*nj*nk, "(Cvgd) ERROR in Cvgd_levels, malloc error with levels_8")  == VGD_ERROR )
     return(VGD_ERROR);
-  if( my_alloc_double(&sfc_field_8, ni*nj   , "(Cvgd) ERROR in Cvgd_diag_withref, malloc error with sfc_field_8") == VGD_ERROR )
+  if( my_alloc_double(&sfc_field_8, ni*nj   , "(Cvgd) ERROR in Cvgd_levels, malloc error with sfc_field_8") == VGD_ERROR )
     return(VGD_ERROR);
 
   for( ij = 0; ij < ni*nj; ij++){
     sfc_field_8[ij] = sfc_field[ij];
   }  
 
-  if(Cvgd_diag_withref_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log, dpidpis) == VGD_ERROR )
+  if(Cvgd_diag_withref_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log, NULL) == VGD_ERROR )
     return(VGD_ERROR);
 
   for( ijk = 0; ijk < ni*nj*nk; ijk++){
@@ -910,6 +910,11 @@ int Cvgd_diag_withref(TVGrid *self, int ni, int nj, int nk, int *ip1_list, float
   return(VGD_OK);
 }
 
+int Cvgd_levels_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8, int *in_log) {
+  if(Cvgd_diag_withref_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log, NULL) == VGD_ERROR )
+    return(VGD_ERROR);
+  return(VGD_OK);
+}
 
 int Cvgd_diag_withref_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int *in_log, int *dpidpis) {
 
