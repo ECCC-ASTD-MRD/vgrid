@@ -2,7 +2,7 @@
 
 # Get list of tests
 if [ -z "$*" ] ; then
-  set -A tests `ls -1 src/*.ftn90 | perl -p -e 's|src/(.+)\.ftn90|$1|g'`
+  set -A tests $(ls -1 src_tests/*.ftn90 | perl -p -e 's|src_tests/(.+)\.ftn90|$1|g') $(ls -1 src_tests/*.c | perl -p -e 's|src_tests/(.+)\.c|$1|g')
 else
   set -A tests $*
 fi
@@ -23,24 +23,39 @@ template=Makefile.tmpl
 compile_log=compile.log
 rm -f ${compile_log}
 for test in ${tests[*]} ; do
+
+  # OpenMP ?
   if echo ${test} | grep -q OMP ;then
       OPENMP=-openmp
       OPENMP_MESSAGE='OPENMP=-openmp'
   else
       OPENMP=''
       OPENMP_MESSAGE=''
-  fi  
+  fi
+
+  # Fortran or C ?
+  if echo ${test} | grep -q '^c_' ;then
+     IS_C=yes
+     EXT=.c
+  else
+     IS_C=no
+     EXT=.ftn90
+  fi
   printf "Building ${test} ${OPENMP} ..."
-  ln -sf src/${test}.ftn90 .
-  perl -p -e "s/UNIT_TEST/${test}/g" ${template} >Makefile.test
+  ln -sf src_tests/${test}${EXT} .
+  if [ ${IS_C} = yes ] ;then
+      perl -p -e "s/UNIT_TEST_C/${test}/g" ${template} >Makefile.test
+  else
+      perl -p -e "s/UNIT_TEST_F/${test}/g" ${template} >Makefile.test
+  fi
   echo "Compiling ${test}" >>${compile_log} 2>&1
-  ${BH_MAKE} -f Makefile.test ${test} OPENMP=${OPENMP} >>${compile_log} 2>&1
+  gmake -f Makefile.test ${test} OPENMP=${OPENMP} >>${compile_log} 2>&1
   if [ ! $? -eq 0 ] ; then
-    printf "\n ERROR compiling test ${test} ... aborting (try '${BH_MAKE} -f Makefile.test ${test} ${OPENMP_MESSAGE}' for details)\n"
+    printf "\n ERROR compiling test ${test} ... aborting (try 'gmake -f Makefile.test ${test} ${OPENMP_MESSAGE}' for details)\n"
     exit 1
   fi
-  rm -f ${test}.ftn90
-  ${BH_MAKE} -f Makefile.test clean >/dev/null 2>&1
+  rm -f ${test}${EXT}
+  gmake -f Makefile.test clean >/dev/null 2>&1
   printf " ok\n"
 done
 printf " * All Builds Succeeded\n"

@@ -1,12 +1,12 @@
 #!/bin/ksh
 
-MAX_CPUS=10
+MAX_CPUS=12
 
 set -e
 
 # Get list of tests
 if [ -z "$*" ] ; then
-  set -A tests `ls -1 src/*.ftn90 | perl -p -e 's|src/(.+)\.ftn90|$1|g'`
+  set -A tests $(ls -1 src_tests/*.ftn90 | perl -p -e 's|src_tests/(.+)\.ftn90|$1|g') $(ls -1 src_tests/*.c | perl -p -e 's|src_tests/(.+)\.c|$1|g')
 else
   set -A tests $*
 fi
@@ -17,8 +17,7 @@ rm -rf WORK/$EC_ARCH
 mkdir -p WORK/$EC_ARCH
 cd WORK/$EC_ARCH
 
-ln -s ${MASTER}/../libf .
-ln -s ${MASTER}/../libc .
+ln -s ${MASTER}/../src .
 
 NCPUS=1
 DONE=0
@@ -34,18 +33,19 @@ for test in ${tests[*]} ; do
    cd ${test}
    ln -s ${MASTER}/data_AIX .
    ln -s ${MASTER}/data_Linux .
-   ln -s ${MASTER}/src .
+   ln -s ${MASTER}/src_tests .
    ln -s ${MASTER}/Makefile.tmpl
    ln -s ${MASTER}/Makefile
    ln -s ${MASTER}/run_tests.ksh
    ln -s ${MASTER}/unit_testing.ftn90
+   ln -s ${MASTER}/c_ut_report.c
    ln -s ${MASTER}/ksh .
    mkdir data
 
    echo "   test ${test}"
    make tests ONLY=${test} > ../log_${test} 2>&1 &
    if [[ ${DONE} = 0 ]];then
-       # This is to account for the fact that the libs may not be compiled yet
+       # This is to account for the fact that the lib may not be compiled yet
        DONE=1
        echo "================================================================================="
        echo "The first compilation may need to compile the lib, so only one thread is launched"

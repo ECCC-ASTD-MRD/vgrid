@@ -1,6 +1,6 @@
 # User options
-FFLAGS="$(FFLAGS_INTEL) -C -g"
-DESCRIP_F_PATH = ../libf
+FFLAGS="=-C =-g"
+DESCRIP_PATH = ../src
 DATA_ARCH=`uname -s`
 
 # Override incorrect implicits
@@ -9,22 +9,17 @@ DATA_ARCH=`uname -s`
 # Define suffix rules
 .SUFFIXES: .ftn90 .o
 .ftn90.o:
-	s.compile -libpath $(MY_LIBPATH) $(LIBRARY_PATH) -optf =$(FFLAGS) -includes $(MY_INCLUDE_PATH) $(DESCRIP_F_PATH) -src $<
+	d.compile -libpath $(DESCRIP_PATH) -optf $(FFLAGS) -includes $(DESCRIP_PATH) -src $<
 
-OBJECTS = $(DESCRIP_F_PATH)/vgrid_descriptors.o $(DESCRIP_F_PATH)/utils.o unit_testing.o
-
-unit_testing.o: unit_testing.ftn90 $(DESCRIP_F_PATH)/vgrid_descriptors.o $(DESCRIP_F_PATH)/utils.o
+unit_testing.o: unit_testing.ftn90 $(DESCRIP_PATH)/libdescrip_debug.a
 
 alltests:
-	make tests DATA_ARCH=Linux; \
-        make tests DATA_ARCH=AIX
+	gmake tests DATA_ARCH=Linux; \
+        gmake tests DATA_ARCH=AIX
 
 
-$(DESCRIP_F_PATH)/vgrid_descriptors.o: $(DESCRIP_F_PATH)/vgrid_descriptors.ftn90
-	(cd $(DESCRIP_F_PATH) && $(MAKE) $(MAKEFLAGS) vgrid_descriptors.o)
-
-$(DESCRIP_F_PATH)/utils.o: $(DESCRIP_F_PATH)/utils.ftn90
-	(cd $(DESCRIP_F_PATH) && $(MAKE) $(MAKEFLAGS) utils.o)
+$(DESCRIP_PATH)/libdescrip_debug.a:
+	cd $(DESCRIP_PATH) && gmake libdescrip_debug.a ; \
 
 tests:
 	rm -rf data/* 2>/dev/null; \
