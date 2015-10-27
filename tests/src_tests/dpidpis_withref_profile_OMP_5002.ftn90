@@ -4,10 +4,10 @@ program tests
 
   implicit none
 
-  integer :: stat,lu=0,ni,nj,nk,nkk,fnom,fstouv,fstfrm,fclos,fstlir,fstinf,k,lutxt=69,ip1,ip2
+  integer :: stat,lu=0,ni,nj,nk,nkk,fnom,fstouv,fstfrm,fstlir,fstinf,k,lutxt=69,ip1,ip2
   integer, parameter :: i0=20,j0=10
   integer, dimension(:), pointer :: ip1_list
-  integer :: i,j,tid,ii,jj,icor
+  integer :: i,j,tid,ii,jj
   integer, external :: omp_get_thread_num,omp_get_num_threads
   real, dimension(:), pointer :: dpidpis_profil
   real*8, dimension(:), pointer :: dpidpis_profil_8
@@ -18,7 +18,7 @@ program tests
   real*8, dimension(:,:), pointer ::  p0_8
   real, dimension(:), pointer :: p00
   real*8, dimension(:), pointer :: p00_8
-  real :: local_pres,w1
+  real :: w1
   type(vgrid_descriptor) :: d
   logical :: ok
   real*8, dimension(:), pointer :: coef_b

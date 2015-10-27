@@ -4,7 +4,7 @@ program constructor
   !
   implicit none
   !
-  type(vgrid_descriptor) :: vgd,vgd2
+  type(vgrid_descriptor) :: vgd
   integer, parameter :: nk=9 ! including diag level
   integer :: stat,ip1
   integer, dimension(:), pointer :: ip1_m,ip1_t

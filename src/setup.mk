@@ -9,12 +9,12 @@ HPCS_BASE = hpcs/201402/02/base/
 
 ifeq ($(ORDENV_PLAT),ubuntu-12.04-amd64-64)
    HPCS_COMP = hpcs/201402/02/intel13sp1u2
-   FFLAGS = "-fp-model source $(MY_FFLAGS)"
-   CFLAGS = "-fp-model source $(MY_CFLAGS)"
+   FFLAGS = '$(MY_FFLAGS) -fp-model source  -warn all'
+   CFLAGS = '$(MY_CFLAGS) -fp-model precise -Wall'
    defaut: libdescrip.a
    ifeq ($(DEBUG),1)
-      FFLAGS = "-fp-model source $(MY_FFLAGS_DEBUG)"
-      CFLAGS = "-fp-model source $(MY_CFLAGS_DEBUG)"
+      FFLAGS = '$(MY_FFLAGS_DEBUG) -fp-model source -warn all'
+      CFLAGS = '$(MY_CFLAGS_DEBUG) -fp-model precise -Wall'
       defaut: libdescrip_debug.a
    endif
 endif

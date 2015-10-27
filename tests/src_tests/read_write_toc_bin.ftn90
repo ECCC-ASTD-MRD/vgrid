@@ -11,6 +11,8 @@ program constructor
   real(kind=8), dimension(LEVS) :: pres=(/1000.,925.,850.,700./),b=(/0.,0.,0.,0./)
   real*8, dimension(:), pointer :: pres_rtn
 
+  nullify(pres_rtn)
+
   lu = 10
   open(unit=lu,file='test.bin',form='unformatted')
 
