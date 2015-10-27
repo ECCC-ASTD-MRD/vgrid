@@ -6,8 +6,10 @@ program tests
 
   integer :: stat,lu=0,ni,nj,nk,fnom,fstouv,fstfrm,fclos,fstkey,fstlir,fstinf
   real :: epsilon=0.01
-  real, dimension(:,:), allocatable :: px
+  real, dimension(:,:), pointer :: px
   real, dimension(:,:,:), pointer :: lev
+
+  nullify(px,lev)
 
   stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
   if(stat.lt.0)then
