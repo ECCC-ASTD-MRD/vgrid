@@ -22,6 +22,7 @@ vgriddescriptors_*
 vgriddescriptors/
 README_COMMIT
 libc/Makefile.dep
+src/dependencies.mk
 tests/*.out
 tests/WORK
 

@@ -1,36 +1,31 @@
-# User options
-FFLAGS="=-C =-g =-O0"
-CFLAGS="    =-g =-O0"
 DESCRIP_PATH = ../src
 
-# Override incorrect implicits
-%.o : %.mod
+RPN_LIB=rpn/libs/15.2
 
-# Define suffix rules
-.SUFFIXES: .ftn90 .c .o
+include $(DESCRIP_PATH)/setup.mk
 
-# Incapable de faire des .o a partir des .c c'est toujours cc qui est utilise comme compilateur!
-# Pour les .ftn90 ca marche!
-.c.o:
-	d.compile -libpath $(DESCRIP_PATH) -optf $(CFLAGS) -includes $(DESCRIP_PATH) -src $<
+ALL_SSM = -d $(HPCS_BASE) -d $(HPCS_COMP) -d $(RPN_LIB)
 
-.ftn90.o:
-	d.compile -libpath $(DESCRIP_PATH) -optf $(FFLAGS) -includes $(DESCRIP_PATH) -src $<
+%.o: %.ftn90
+	. ssmuse-sh $(ALL_SSM) ;\
+	s.compile -src $< -optf =$(FFLAGS) -libpath $(DESCRIP_PATH) -includes $(DESCRIP_PATH)
 
-c_ut_report.o: c_ut_report.c
-	d.compile -libpath $(DESCRIP_PATH) -optf $(CFLAGS) -includes $(DESCRIP_PATH) -src c_ut_report.c
+%.o: %.c
+	. ssmuse-sh $(ALL_SSM) ;\
+	s.compile -src $< -optc =$(CFLAGS) -libpath $(DESCRIP_PATH) -includes $(DESCRIP_PATH)
 
-# Le *.o sont effaces par d.compile, on ne peut donc les passer avec la cle -obj!
 OBJECTS = unit_testing.o c_ut_report.o
 
-UNIT_TEST_F: unit_testing.ftn90 UNIT_TEST_F.ftn90 $(DESCRIP_PATH)/libdescrip_debug.a
-	/users/dor/afsg/apm/ords/cmdn/vgrid/tests/d.compile $(OPENMP) -optf $(FFLAGS) -includes $(DESCRIP_PATH) -src unit_testing.ftn90 UNIT_TEST_F.ftn90 -o UNIT_TEST_F -libpath $(DESCRIP_PATH) $(LIBRARY_PATH) -librmn -libappl descrip_debug -info $(PWD)/compile_INFO
+UNIT_TEST_F: $(OBJECTS) UNIT_TEST_F.ftn90 $(DESCRIP_PATH)/libdescrip_debug.a
+	. ssmuse-sh $(ALL_SSM) ;\
+	s.compile $(OPENMP) -optf =$(FFLAGS) -includes $(DESCRIP_PATH) -src UNIT_TEST_F.ftn90 -o UNIT_TEST_F -libpath $(DESCRIP_PATH) -librmn -libappl descrip_debug -obj $(OBJECTS)
 
-UNIT_TEST_C: c_ut_report.c UNIT_TEST_C.c $(DESCRIP_PATH)/libdescrip_debug.a
-	d.compile $(OPENMP) -optc $(CFLAGS) -includes $(DESCRIP_PATH) -src c_ut_report.c UNIT_TEST_C.c -o UNIT_TEST_C  -libpath $(DESCRIP_PATH) $(LIBRARY_PATH) -librmn -libappl descrip_debug -bidon c -main UNIT_TEST_C
+UNIT_TEST_C: $(OBJECTS) UNIT_TEST_C.c $(DESCRIP_PATH)/libdescrip_debug.a
+	. ssmuse-sh $(ALL_SSM) ;\
+	s.compile $(OPENMP) -optc =$(CFLAGS) -includes $(DESCRIP_PATH) -src UNIT_TEST_C.c -o UNIT_TEST_C -libpath $(DESCRIP_PATH) -librmn -libappl descrip_debug -bidon c -main UNIT_TEST_C -obj $(OBJECTS)
 
 $(DESCRIP_PATH)/libdescrip_debug.a: 
-	cd $(DESCRIP_PATH) && gmake libdescrip_debug.a
+	cd $(DESCRIP_PATH) && gmake DEBUG=1
 
 clean:
 	rm -f *.f90 *.o *.mod
