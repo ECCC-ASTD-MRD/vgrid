@@ -1,21 +1,33 @@
-# User options
-FFLAGS="-openmp"
-FFLAGS_DEBUG="=-openmp =-C =-g =-O0"
+#=============================================
+# Usage: make
+# To make libdescrip_debug.a do the following:
+# make DEBUG=1
+#=============================================
 
-COPTIONS = "-openmp"
-COPTIONS_DEBUG = "=-openmp =-g =-O0"
+include setup.mk
 
-# Set default target
-default: libdescrip.a libdescrip_debug.a
+dependencies.mk: *.c *.ftn90
+	. ssmuse-sh -d $(HPCS_BASE) ;\
+	ls *.c *.ftn90 | s.dependencies.pl > dependencies.mk ;\
 
-SOURCES = msg.ftn90 utils.ftn90 vgrid_descriptors.ftn90 vgrid.c
+include dependencies.mk
 
-libdescrip.a: ${SOURCES}
-	rm -f libdescrip.a && d.compile -o libdescrip.a -optc $(COPTIONS) -optf $(FFLAGS) -src $(SOURCES)
+%.o: %.ftn90
+	. ssmuse-sh -d $(HPCS_BASE) -d $(HPCS_COMP) ;\
+	s.compile -src $< -optf =$(FFLAGS)
 
-libdescrip_debug.a: ${SOURCES}
-	rm -f libdescrip_debug.a &&  d.compile -o libdescrip_debug.a -optc $(COPTIONS_DEBUG) -optf $(FFLAGS_DEBUG) -src $(SOURCES)
+%.o: %.c
+	. ssmuse-sh -d $(HPCS_BASE) -d $(HPCS_COMP) ;\
+	s.compile -src $< -optc =$(CFLAGS)
+
+libdescrip.a: $(OBJECTS)
+	rm -f libdescrip.a && ar scru libdescrip.a *.o ;\
+
+libdescrip_debug.a: $(OBJECTS)
+	rm -f libdescrip_debug.a && ar scru libdescrip_debug.a *.o ;\
 
 clean:
-	rm -f *.f90 *.o *.mod lib*.a ../lib*.a
+	rm -f *.f90 *.o *.mod dependencies.mk ;\
 
+distclean: clean
+	rm -f libdescrip.a libdescrip_debug.a ;\
