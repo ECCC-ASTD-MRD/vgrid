@@ -11,10 +11,10 @@ tests:
 	mkdir -p WORK ; \
         ln -s ../data_$(DATA_ARCH)/* . ; \
 	cd .. ; \
-	./run_tests.ksh $(ONLY)
+	./run_tests.ksh -ONLY $(ONLY)
 
 clean:
 	rm -f *.f90 *.o *.mod *.out
 
 distclean: clean
-	rm -f data/*
+	rm -rf data/*

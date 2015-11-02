@@ -15,6 +15,8 @@ program tests
   real :: rcoef1=0.,rcoef2=1.
   real*8 :: ptop=1000d0,pref=100000d0
     
+  nullify(p0)
+
   !===================================
   !===================================
   ! Reshaping structure
@@ -109,6 +111,8 @@ integer function test_functions(lu,p0,ni,nj,reshape_L) result(status)
    real*8, dimension(:), pointer :: r81d
    real*8, dimension(:,:,:), pointer :: table_8
    type(vgrid_descriptor) :: vgd
+
+   nullify(ip1_list,i1d,lev,lev_1d,r1d,r81d,table_8)
 
    ! Allocate so they can be dealloca below
    allocate(ip1_list(1),lev(1,1,1),lev_1d(1),r1d(1),r81d(1),table_8(1,1,1))

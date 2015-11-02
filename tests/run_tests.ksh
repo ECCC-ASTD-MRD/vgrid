@@ -1,10 +1,14 @@
 #!/bin/ksh
 
+eval `cclargs \
+ -ONLY   "" ""     "[Test to run, leave blank to run all tests]"\
+ ++ $*`
+
 # Get list of tests
-if [ -z "$*" ] ; then
+if [ "${ONLY}" = "" ] ; then
   set -A tests $(ls -1 src_tests/*.ftn90 | perl -p -e 's|src_tests/(.+)\.ftn90|$1|g') $(ls -1 src_tests/*.c | perl -p -e 's|src_tests/(.+)\.c|$1|g')
 else
-  set -A tests $*
+  set -A tests ${ONLY}
 fi
 
 #==============

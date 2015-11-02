@@ -8,12 +8,14 @@ program tests
        dateo,deet,npas,nbits,datyp,ip2,ip3,ig1,ig2,ig3,ig4,swa,lng,dltf,ubc,ex1,ex2,ex3
   integer :: testLev=10
   integer, dimension(100) :: fstkeys
-  integer, dimension(:), allocatable :: ip1s
+  integer, dimension(:), pointer :: ip1s
   real :: epsilon=0.01
-  real, dimension(:,:), allocatable :: p0,px
+  real, dimension(:,:), pointer :: p0,px
   real, dimension(:,:,:), pointer :: lev
   character(len=12) :: typvar,nomvar,etiket,grtyp
   type(vgrid_descriptor) :: d
+
+  nullify(ip1s,p0,px,lev)
 
   stat=fnom(lu,"data/dm_5002_from_model_run-interp","RND",0)
   if(stat.lt.0)then

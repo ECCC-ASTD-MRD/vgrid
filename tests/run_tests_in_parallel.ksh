@@ -1,6 +1,8 @@
 #!/bin/ksh
 
-MAX_CPUS=12
+eval `cclargs \
+ -MAX_CPUS 12  12  "[Number of cpus to run tests]"\
+ ++ $*`
 
 set -e
 
@@ -25,6 +27,8 @@ DONE=0
 echo "==============================================================================="
 echo "Tests begin"
 echo
+echo "Using ${MAX_CPUS} cpus"
+echo
 
 for test in ${tests[*]} ; do
 
@@ -43,16 +47,7 @@ for test in ${tests[*]} ; do
    mkdir data
 
    echo "   test ${test}"
-   make tests ONLY=${test} > ../log_${test} 2>&1 &
-   if [[ ${DONE} = 0 ]];then
-       # This is to account for the fact that the lib may not be compiled yet
-       DONE=1
-       echo "================================================================================="
-       echo "The first compilation may need to compile the lib, so only one thread is launched"
-       echo "waiting for cpus"
-       echo "---------------------------------------------------------------------------------"
-       wait
-   fi
+   gmake tests ONLY=${test} > ../log_${test} 2>&1 &
    ((NCPUS=NCPUS+1))
    if [[ ${NCPUS} -gt ${MAX_CPUS} ]];then
       NCPUS=1

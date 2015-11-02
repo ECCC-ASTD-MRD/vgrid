@@ -1977,7 +1977,7 @@ contains
       
       ! Local variables
       type(c_ptr) :: quiet_CP, my_value_CP
-      integer :: my_value
+      integer, target :: my_value
       character(len=KEY_LENGTH) :: my_key
       
       ! Set error status
