@@ -1,7 +1,5 @@
 DESCRIP_PATH = ../src
 
-RPN_LIB=rpn/libs/15.2
-
 include $(DESCRIP_PATH)/setup.mk
 
 ALL_SSM = -d $(HPCS_BASE) -d $(HPCS_COMP) -d $(RPN_LIB)
@@ -16,16 +14,14 @@ ALL_SSM = -d $(HPCS_BASE) -d $(HPCS_COMP) -d $(RPN_LIB)
 
 OBJECTS = unit_testing.o c_ut_report.o
 
-UNIT_TEST_F: $(OBJECTS) UNIT_TEST_F.ftn90 $(DESCRIP_PATH)/libdescrip_debug.a
+UNIT_TEST_F: $(OBJECTS) UNIT_TEST_F.ftn90
 	. ssmuse-sh $(ALL_SSM) ;\
-	s.compile $(OPENMP) -optf =$(FFLAGS) -includes $(DESCRIP_PATH) -src UNIT_TEST_F.ftn90 -o UNIT_TEST_F -libpath $(DESCRIP_PATH) -librmn -libappl descrip_debug -obj $(OBJECTS)
+	echo COMP_ARCH=${COMP_ARCH} > compile_INFO ;\
+	s.compile $(OPENMP) -optf =$(FFLAGS) -includes $(DESCRIP_PATH) -src UNIT_TEST_F.ftn90 -o UNIT_TEST_F -obj $(OBJECTS) -libpath $(DESCRIP_PATH) -librmn -libappl descrip
 
-UNIT_TEST_C: $(OBJECTS) UNIT_TEST_C.c $(DESCRIP_PATH)/libdescrip_debug.a
+UNIT_TEST_C: $(OBJECTS) UNIT_TEST_C.c
 	. ssmuse-sh $(ALL_SSM) ;\
-	s.compile $(OPENMP) -optc =$(CFLAGS) -includes $(DESCRIP_PATH) -src UNIT_TEST_C.c -o UNIT_TEST_C -libpath $(DESCRIP_PATH) -librmn -libappl descrip_debug -bidon c -main UNIT_TEST_C -obj $(OBJECTS)
-
-$(DESCRIP_PATH)/libdescrip_debug.a: 
-	cd $(DESCRIP_PATH) && gmake DEBUG=1
+	s.compile $(OPENMP) -optc =$(CFLAGS) -includes $(DESCRIP_PATH) -src UNIT_TEST_C.c -o UNIT_TEST_C -bidon c -main UNIT_TEST_C -obj $(OBJECTS) -libpath $(DESCRIP_PATH) -librmn -libappl descrip
 
 clean:
 	rm -f *.f90 *.o *.mod

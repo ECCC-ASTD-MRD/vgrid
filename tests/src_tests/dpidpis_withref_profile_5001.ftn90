@@ -15,7 +15,7 @@ program tests
   logical :: ok
   real*8, dimension(:), pointer :: coef_b
   
-  nullify(ip1_list,dpidpis_cube,coef_b)
+  nullify(ip1_list,dpidpis_cube,dpidpis_cube_8,coef_b)
 
   stat=fnom(lu,"data/dm_5001_from_model_run","RND",0)
   if(stat.lt.0)then

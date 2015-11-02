@@ -120,6 +120,8 @@ integer function test_5002(F_d,F_file,F_write_control_L,F_stat) result(istat)
    integer, dimension(:), pointer :: vipm,vipt,work_i
    integer :: nl_m,nl_t,k,nk,stat,kind,vers,vcode,ip1,my_ip1
 
+   nullify(vcdm,vcdt,work,b_m_8,a_m_8,b_t_8,a_t_8,work_8,vipm,vipt,work_i)
+
    istat=VGD_OK
 
    call flush(6)

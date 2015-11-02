@@ -1449,7 +1449,8 @@ int c_encode_vert_1001(TVGrid **self,int nk){
   
   int skip = 2, table_size;
 
-  free( (*self)->table );
+  if( (*self)->table )
+    free( (*self)->table );
   (*self)->table_ni = 3;
   (*self)->table_nj = nk+skip;
   (*self)->table_nk = 1;
@@ -1486,7 +1487,8 @@ int c_encode_vert_1002(TVGrid **self,int nk){
   
   int skip = 2, table_size;
   
-  free( (*self)->table );
+  if( (*self)->table )
+    free( (*self)->table );
   (*self)->table_ni = 3;
   (*self)->table_nj = nk+skip;
   (*self)->table_nk = 1;
@@ -1522,7 +1524,8 @@ int c_encode_vert_2001(TVGrid **self,int nk){
   
   int skip = 1, table_size;
   
-  free( (*self)->table );
+  if( (*self)->table )
+    free( (*self)->table );
   (*self)->table_ni = 3;
   (*self)->table_nj = nk+skip;
   (*self)->table_nk = 1;
@@ -1555,7 +1558,8 @@ int c_encode_vert_2001(TVGrid **self,int nk){
 int c_encode_vert_5001(TVGrid **self,int nk){
   int skip = 3, table_size;
 
-  free( (*self)->table );
+  if( (*self)->table )
+    free( (*self)->table );
   (*self)->table_ni = 3;
   (*self)->table_nj = nk+skip;
   (*self)->table_nk = 1;
@@ -1595,8 +1599,13 @@ int c_encode_vert_5001(TVGrid **self,int nk){
 
 int c_encode_vert_5002_5003_5004_5005(TVGrid **self, char update){
   int skip = 3, table_size;
-  if(! update) {
-    free( (*self)->table );
+  if(! *self ) {
+    printf("(Cvgd) ERROR in c_encode_vert_5002_5003_5004_5005, vgrid descriptor not constructed\n");
+    return(VGD_ERROR);
+  }
+  if(! update) {    
+    if( (*self)->table )
+      free( (*self)->table );
     (*self)->table_ni = 3;
     (*self)->table_nj = (*self)->nl_m + (*self)->nl_t + skip;
     (*self)->table_nk = 1;
@@ -1608,7 +1617,6 @@ int c_encode_vert_5002_5003_5004_5005(TVGrid **self, char update){
     }
     strcpy((*self)->ref_name,"P0");
   }
-  
   //Fill header
   (*self)->table[0] = (*self)->kind;
   (*self)->table[1] = (*self)->version;

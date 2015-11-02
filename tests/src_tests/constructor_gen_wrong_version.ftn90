@@ -24,6 +24,8 @@ program constructor
   real*8, dimension(:), pointer :: b_t_8
   logical :: test_OK=.true.
 
+  nullify(b_t_8)
+
   print*,'Test on wrong version ====='
   stat = vgd_new(d,kind=5,version=-1,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
   if(stat.eq.VGD_OK)then

@@ -11,6 +11,8 @@ program constructor
   real*8, dimension(:), pointer :: my_a
   logical :: ok
 
+  nullify(my_a)
+
   stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'

@@ -40,6 +40,8 @@ integer function test_it(F_file) result(istat)
    
    logical :: in_log
    
+   nullify(levels,px)
+
    istat=VGD_ERROR
 
    print*,'========================================================'
