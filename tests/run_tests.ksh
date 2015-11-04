@@ -13,7 +13,6 @@ fi
 
 #==============
 function Other_Tests {
-
    result_o=' ok'
    if [ ${test} = get_quiet ];then
        . ksh/other_test.dot

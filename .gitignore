@@ -25,4 +25,5 @@ libc/Makefile.dep
 src/dependencies.mk
 tests/*.out
 tests/WORK
+tests/compile_INFO
 

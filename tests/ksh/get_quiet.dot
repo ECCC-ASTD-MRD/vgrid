@@ -1,4 +1,4 @@
-if ! diff ${test}.out data_$(uname -s)/TXT/${test}_${COMP_ARCH}.out > /dev/null 2>&1;then
+if ! diff ${test}.out data_$(uname -s)/TXT/${test}_${COMPILER}.out > /dev/null 2>&1;then
    result_o=' notok'
-   echo "   These files should be the same: ${test}.out data_$(uname -s)/TXT/${test}_${COMP_ARCH}.out"
+   echo "   These files should be the same: ${test}.out data_$(uname -s)/TXT/${test}_${COMPILER}.out"
 fi
