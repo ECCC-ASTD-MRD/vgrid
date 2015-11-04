@@ -689,32 +689,13 @@ int Cvgd_print_vcode_description(int vcode){
 }
 
 static int C_compute_pressure_1001_1002_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log) {
+  char proc_name[] = "C_compute_pressure_1001_1002_8";
+#include "BODY_C_compute_pressure_1001_1002.hc"
+}
 
-  int k,*ind,ij,ijk;
-  double lvl;
-  
-  if( my_alloc_int(&ind, nk, "(Cvgd) ERROR in C_compute_pressure_1001_1002_8, cannot allocate ind of int of size\n") == VGD_ERROR )
-    return(VGD_ERROR);
-  
-  // Find ip1 indexes  
-  for( k = 0; k < nk; ++k ){
-    if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],self->ip1_m,self->nl_m)) == -1 ) {
-      printf("(Cvgd) ERROR in C_compute_pressure_1001_1002_8, cannot find ip1 %d in vgrid descriptor.\n",ip1_list[k]);
-      free(ind);
-      return(VGD_ERROR);
-    }    
-  }
-  
-  // Compute pressure
-  for( k = 0, ijk=0; k < nk; ++k ){
-    for( ij = 0; ij < ni*nj; ++ij, ++ijk ){
-      lvl = self->a_m_8[ind[k]] + self->b_m_8[ind[k]] * sfc_field[ij];
-      levels[ijk] = in_log ? log(lvl) : lvl;
-    }
-  }
-  free(ind);
-  return(VGD_OK);
-  
+static int C_compute_pressure_1001_1002(TVGrid *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log) {
+  char proc_name[] = "C_compute_pressure_1001_1002";
+#include "BODY_C_compute_pressure_1001_1002.hc"
 }
 
 static int C_compute_pressure_2001_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double *levels, int in_log) {
@@ -747,167 +728,24 @@ static int C_compute_pressure_2001_8(TVGrid *self, int ni, int nj, int nk, int *
 }
 
 static int C_compute_pressure_1003_5001_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log, int dpidpis ){
-  int k,*ind,ij,ijk;
-  double lvl;
-  
-  if( my_alloc_int(&ind, nk, "(Cvgd) ERROR in C_compute_pressure_1003_5001_8, cannot allocate ind of int of size\n") == VGD_ERROR )
-    return(VGD_ERROR);
-  
-  // Find ip1 indexes
-  for( k = 0; k < nk; ++k ){
-    if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],self->ip1_m,self->nl_m)) == -1 ) {
-      printf("(Cvgd) ERROR in C_compute_pressure_1003_5001_8, cannot find ip1 %d in vgrid descriptor.\n",ip1_list[k]);
-      free(ind);
-      return(VGD_ERROR);
-    }
-  }
-  
-  if( dpidpis ){
-    if(in_log){
-      printf("(Cvgd) ERROR in C_compute_pressure_1003_5001_8, option in_log not allowed with option dpidpis\n");
-      return(VGD_ERROR);
-    }
-    for( k = 0, ijk=0; k < nk; ++k ){
-      for( ij = 0; ij < ni*nj; ++ij, ++ijk ){
-	levels[ijk] = self->b_m_8[ind[k]];
-      }
-    }    
-    free(ind);
-    return(VGD_OK);
-  }
-  // Compute pressure
-  for( k = 0, ijk=0; k < nk; ++k ){
-    for( ij = 0; ij < ni*nj; ++ij, ++ijk ){
-      lvl = self->a_m_8[ind[k]] + self->b_m_8[ind[k]] * sfc_field[ij];
-      levels[ijk] = in_log ? log(lvl) : lvl;
-    }
-  }
-  free(ind);
-  
-  return(VGD_OK);
+  char proc_name[] = "C_compute_pressure_1003_5001_8";
+#include "BODY_C_compute_pressure_1003_5001.hc"
+}
+
+static int C_compute_pressure_1003_5001(TVGrid *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log, int dpidpis ){
+  char proc_name[] = "C_compute_pressure_1003_5001";
+#include "BODY_C_compute_pressure_1003_5001.hc"
 }
 
 
 static int C_compute_pressure_5002_5003_5004_5005_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int *in_log, int *dpidpis) {
-
-  double *aa_8, *bb_8, *s_8, lvl;
-  int ij, k, ijk, ind, l_in_log, l_dpidpis, kind;
-  float hyb;
-
-  l_in_log = 0;
-  if(in_log){
-    l_in_log = *in_log;
-  }
-
-  l_dpidpis=0;
-  if(dpidpis){
-    l_dpidpis = *dpidpis;
-  }
-
-  aa_8 = malloc(nk*sizeof(double));
-  if(! aa_8 ) {
-    printf("(Cvgd) ERROR in C_compute_pressure_5002_5003_5004_5005_8, cannot allocate aa_8 of bouble of size %d\n", nk);
-    return(VGD_ERROR);
-  }  
-  bb_8 = malloc(nk*sizeof(double));
-  if(! bb_8 ) {
-    printf("(Cvgd) ERROR in C_compute_pressure_5002_5003_5004_5005_8, cannot allocate bb_8 of bouble of size %d\n", nk);
-    free(aa_8);
-    return(VGD_ERROR);
-  }
-
-  for(k=0; k < nk; k++) {
-    if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_m, self->nl_m) ) != -1 ) {
-      aa_8[k] = self->a_m_8[ind];
-      bb_8[k] = self->b_m_8[ind];
-    } else {
-      if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_t, self->nl_t) ) != -1 ) {
-	aa_8[k] = self->a_t_8[ind];
-	bb_8[k] = self->b_t_8[ind];
-      } else {
-	printf("(Cvgd) ERROR in C_compute_pressure_5002_5003_5004_5005_8, cannot find ip1 %d in vgrid descriptor.\n",ip1_list[k]);
-	free(aa_8);
-	free(bb_8);  	
-	return(VGD_ERROR);	
-      }
-    }
-  }
-  s_8 = malloc(ni*nj*sizeof(double));
-  if(! s_8 ) {
-    printf("(Cvgd) ERROR in C_compute_pressure_5002_5003_5004_5005_8, cannot allocate s_8 of bouble of size %dx%d\n", ni,nj);
-    free(aa_8);
-    free(bb_8);
-    return(VGD_ERROR);
-  }
-  for(ij=0; ij < ni*nj; ij++) {
-    s_8[ij] = log(sfc_field[ij]/self->pref_8);
-  }
-
-  for(k=0, ijk=0; k < nk; k++) {
-    for(ij=0; ij < ni*nj; ij++, ijk++) {
-      lvl = aa_8[k] + bb_8[k]*s_8[ij];
-      levels[ijk] = l_in_log ? lvl : exp(lvl);
-    }
-  }
-  //Force surface pressure to be equal to sfc_field
-  //Needed by assimilation section.  
-  if(! l_in_log) {
-    for(k=0; k < nk; k++) {
-      hyb = c_convip_IP2Level(ip1_list[k],&kind);
-      if(fabs(hyb - 1.) < .000001 && kind == 5) {
-  	ijk=k*ni*nj;
-  	for(ij=0; ij < ni*nj; ij++, ijk++) {
-  	  levels[ijk] = sfc_field[ij];
-  	}
-      }
-    }
-  }
-
-  if( l_dpidpis ){
-    if( l_in_log ){
-      printf("(Cvgd) ERROR: in C_compute_pressure_5002_5003_5004_5005_8, cannot get dpidpis in log\n");
-      free(s_8);
-      free(aa_8);
-      free(bb_8);
-      return(VGD_ERROR);
-    }
-    for(k=0, ijk=0; k < nk; k++) {
-      for(ij=0; ij < ni*nj; ij++, ijk++) {
-  	levels[ijk] = bb_8[k]*levels[ijk]/sfc_field[ij];
-      }
-    }
-  }
-  
-  free(s_8);
-  free(aa_8);
-  free(bb_8);
-
-  return(VGD_OK);
-
+  char proc_name[] = "C_compute_pressure_5002_5003_5004_5005_8";
+#include "BODY_C_compute_pressure_5002_5003_5004_5005.hc"
 }
 
-int Cvgd_levels(TVGrid *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int *in_log) {
-  double *levels_8, *sfc_field_8;
-  int ij, ijk;
-  if( my_alloc_double(&levels_8   , ni*nj*nk, "(Cvgd) ERROR in Cvgd_levels, malloc error with levels_8")  == VGD_ERROR )
-    return(VGD_ERROR);
-  if( my_alloc_double(&sfc_field_8, ni*nj   , "(Cvgd) ERROR in Cvgd_levels, malloc error with sfc_field_8") == VGD_ERROR )
-    return(VGD_ERROR);
-
-  for( ij = 0; ij < ni*nj; ij++){
-    sfc_field_8[ij] = sfc_field[ij];
-  }  
-
-  if(Cvgd_diag_withref_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log, NULL) == VGD_ERROR )
-    return(VGD_ERROR);
-
-  for( ijk = 0; ijk < ni*nj*nk; ijk++){
-    levels[ijk] = (float) levels_8[ijk];
-  }
-
-  free(levels_8);
-  free(sfc_field_8);
-  return(VGD_OK);
+static int C_compute_pressure_5002_5003_5004_5005(TVGrid *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int *in_log, int *dpidpis) {
+  char proc_name[] = "C_compute_pressure_5002_5003_5004_5005";
+#include "BODY_C_compute_pressure_5002_5003_5004_5005.hc"
 }
 
 int Cvgd_levels_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8, int *in_log) {
@@ -916,69 +754,26 @@ int Cvgd_levels_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double *l
   return(VGD_OK);
 }
 
-int Cvgd_diag_withref_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int *in_log, int *dpidpis) {
-
-  int l_in_log, l_dpidpis, error,k,ijk,ij;
-  
-  if(! Cvgd_is_valid(self,"SELF")){
-    printf("(Cvgd) ERROR in Cvgd_diag_withref_8, invalid vgrid.\n");
+int Cvgd_levels(TVGrid *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int *in_log) {
+  if(Cvgd_diag_withref(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log, NULL) == VGD_ERROR )
     return(VGD_ERROR);
-  }
-  
-  l_in_log=0;
-  if(in_log){
-    l_in_log = *in_log;
-  }
-  l_dpidpis=0;
-  if(dpidpis){
-    l_dpidpis = *dpidpis;
-  }
-  
-  switch(self->vcode) {
-  case 1001:
-    if( C_compute_pressure_1001_1002_8(self, ni, nj, nk, ip1_list, levels, sfc_field, l_in_log) == VGD_ERROR) {      
-      return(VGD_ERROR);
-    }
-    break;
-  case 1002:
-    if( l_dpidpis ){
-      printf("(Cvgd) ERROR: dpidpis not implemented for vertical coordinate 1002\n");
-      return(VGD_ERROR);
-    }
-    if( C_compute_pressure_1001_1002_8(self, ni, nj, nk, ip1_list, levels, sfc_field, l_in_log) == VGD_ERROR) {      
-      return(VGD_ERROR);
-    }
-    break;
-  case 2001:
-    if( l_dpidpis ){
-      printf("(Cvgd) ERROR: dpidpis not implemented for vertical coordinate 2001\n");
-      return(VGD_ERROR);
-    }
-    if( C_compute_pressure_2001_8(self, ni, nj, nk, ip1_list, levels, l_in_log) == VGD_ERROR) {      
-      return(VGD_ERROR);
-    }
-    break;
-  case 1003:
-  case 5001:
-    if( C_compute_pressure_1003_5001_8(self, ni, nj, nk, ip1_list, levels, sfc_field, l_in_log, l_dpidpis) == VGD_ERROR ){
-      return(VGD_ERROR);
-    }
-    break;
-  case 5002:
-  case 5003:
-  case 5004:
-  case 5005:
-    if( C_compute_pressure_5002_5003_5004_5005_8(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log, dpidpis) == VGD_ERROR) {
-      return(VGD_ERROR);
-    }
-    break;
-  default:
-    printf("(Cvgd) ERROR in Cvgd_diag_withref_8, invalid kind or version: kind = %d, version = %d\n",self->kind,self->version);
-    return(VGD_ERROR);
-  }
-  
   return(VGD_OK);
+}
 
+int Cvgd_diag_withref_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8, int *in_log, int *dpidpis) {
+  char proc_name[] = "Cvgd_diag_withref_8";
+  char double_interface = 1;
+  // The following pointers will never be used but they are needed to compile
+  float *levels = NULL, *sfc_field = NULL;
+#include "BODY_Cvgd_diag_withref.hc"
+}
+
+int Cvgd_diag_withref(TVGrid *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int *in_log, int *dpidpis) {
+  char proc_name[] = "Cvgd_diag_withref";
+  char double_interface = 0;
+  // The following pointers will never be used but they are needed to compile
+  double *levels_8 = NULL, *sfc_field_8 = NULL;
+#include "BODY_Cvgd_diag_withref.hc"
 }
 
 /*----------------------------------------------------------------------------
@@ -1225,7 +1020,7 @@ int Cvgd_new_build_vert(TVGrid **self, int kind, int version, int nk, int ip1, i
 		     double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int nl_m, int nl_t)
 {
   char cvcode[5];
-  int errorInput = 0, ier;
+  int errorInput = 0, ier,k;
   
   if(*self){
     Cvgd_vgd_free(self);
@@ -1331,7 +1126,6 @@ int Cvgd_new_build_vert(TVGrid **self, int kind, int version, int nk, int ip1, i
       errorInput = 1;
     }
   } else if ( is_valid( *self, a_t_8_valid_get) ) {
-    // b_t_8 is not a valid component put may be get in which case we return the momentum values
     (*self)->a_t_8 = (*self)->a_m_8;
     (*self)->nl_t = (*self)->nl_m;
   }
@@ -1479,7 +1273,6 @@ int c_encode_vert_1001(TVGrid **self,int nk){
   }
 
   (*self)->valid = 1;
-
   return(VGD_OK);
 }
 
@@ -1661,6 +1454,7 @@ int c_decode_vert_1001(TVGrid **self) {
   c_vgd_free_abi(self);
   // Allocate and assign level data, there are nk of them
   (*self)->nl_m = nk;
+  (*self)->nl_t = nk;
   (*self)->ip1_m = malloc( nk * sizeof(int) );
   (*self)->a_m_8 = malloc( nk * sizeof(double) );
   (*self)->b_m_8 = malloc( nk * sizeof(double) );
@@ -1674,6 +1468,9 @@ int c_decode_vert_1001(TVGrid **self) {
     (*self)->b_m_8[k] =       (*self)->table[ind+2];
     ind = ind + 3;
   }  
+  (*self)->ip1_t = (*self)->ip1_m;
+  (*self)->a_t_8 = (*self)->a_m_8;
+  (*self)->b_t_8 = (*self)->b_m_8;
   return(VGD_OK);
 }
 
@@ -1692,6 +1489,7 @@ int c_decode_vert_1002(TVGrid **self) {
   c_vgd_free_abi(self);
   // Allocate and assign level data, there are nk of them
   (*self)->nl_m = nk;
+  (*self)->nl_t = nk;
   (*self)->ip1_m = malloc( nk * sizeof(int) );
   (*self)->a_m_8 = malloc( nk * sizeof(double) );
   (*self)->b_m_8 = malloc( nk * sizeof(double) );
@@ -1699,12 +1497,15 @@ int c_decode_vert_1002(TVGrid **self) {
     printf("(Cvgd) ERROR in c_decode_vert_1002, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nk);
     return(VGD_ERROR);
   }
-  for ( k = 0; k < nk; k++){      
+   for ( k = 0; k < nk; k++){      
     (*self)->ip1_m[k] = (int) (*self)->table[ind  ];
     (*self)->a_m_8[k] =       (*self)->table[ind+1];
     (*self)->b_m_8[k] =       (*self)->table[ind+2];
     ind = ind + 3;
   }
+  (*self)->ip1_t = (*self)->ip1_m;
+  (*self)->a_t_8 = (*self)->a_m_8;
+  (*self)->b_t_8 = (*self)->b_m_8;
   return(VGD_OK);
 }
 
@@ -1721,6 +1522,7 @@ int c_decode_vert_2001(TVGrid **self) {
   c_vgd_free_abi(self);
   // Allocate and assign level data, there are nk of them
   (*self)->nl_m = nk;
+  (*self)->nl_t = nk;
   (*self)->ip1_m = malloc( nk * sizeof(int) );
   (*self)->a_m_8 = malloc( nk * sizeof(double) );
   (*self)->b_m_8 = malloc( nk * sizeof(double) );
@@ -1734,6 +1536,9 @@ int c_decode_vert_2001(TVGrid **self) {
     (*self)->b_m_8[k] =       (*self)->table[ind+2];
     ind = ind + 3;
   }
+  (*self)->ip1_t = (*self)->ip1_m;
+  (*self)->a_t_8 = (*self)->a_m_8;
+  (*self)->b_t_8 = (*self)->b_m_8;
   return(VGD_OK);
 }
 
@@ -1757,6 +1562,7 @@ int c_decode_vert_1003_5001(TVGrid **self) {
 
   // Allocate and assign momentum level data, there are nk of them
   (*self)->nl_m = nk;
+  (*self)->nl_t = nk;
   (*self)->ip1_m = malloc( nk * sizeof(int) );
   (*self)->a_m_8 = malloc( nk * sizeof(double) );
   (*self)->b_m_8 = malloc( nk * sizeof(double) );
@@ -1770,7 +1576,6 @@ int c_decode_vert_1003_5001(TVGrid **self) {
     (*self)->b_m_8[k] =       (*self)->table[ind+2];
     ind = ind + 3;
   }
-  (*self)->nl_m = nk;
   (*self)->ip1_t = (*self)->ip1_m;
   (*self)->a_t_8 = (*self)->a_m_8;
   (*self)->b_t_8 = (*self)->b_m_8;
@@ -2661,7 +2466,7 @@ int Cvgd_get_int(TVGrid *self, char *key, int *value, int *quiet)
 
 int Cvgd_get_int_1d(TVGrid *self, char *key, int **value, int *nk, int *quiet)
 {
-  int OK = 1;
+  int OK = 1,i;
   int lquiet = 0; // Not quiet by default
   if(quiet) lquiet = *quiet;
   if(nk) *nk = -1;

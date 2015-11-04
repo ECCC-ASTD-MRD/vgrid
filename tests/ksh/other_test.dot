@@ -4,6 +4,7 @@ if [ ! -f ${TEST} ];then
    echo "   test ${TEST} should exist and does not"
    result_o=' notok'
 else
+   . ./compile_INFO
    . ${TEST}
 
 fi

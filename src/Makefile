@@ -1,16 +1,10 @@
-#=============================================
-# Usage: make
-# To make libdescrip_debug.a do the following:
-# make DEBUG=1
-#=============================================
-
 include setup.mk
 
 default: libdescrip.a
 
-dependencies.mk: *.c *.ftn90
+dependencies.mk: *.c *.ftn90 *.h *.hc
 	. ssmuse-sh -d $(HPCS_BASE) ;\
-	ls *.c *.ftn90 | s.dependencies.pl > dependencies.mk ;\
+	ls *.c *.ftn90 | ./s.dependencies.pl > dependencies.mk ;\
 
 include dependencies.mk
 
