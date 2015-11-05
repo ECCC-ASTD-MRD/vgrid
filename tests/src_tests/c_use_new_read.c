@@ -36,16 +36,16 @@ void c_use_new_read() {
     printf("ERROR with Cvgd_get_int for VIPT\n");
     return;
   }
-  if( Cvgd_get_real_1d(vgd, "VCDT", &f_val, NULL , quiet) ==  VGD_ERROR ) {
-    printf("ERROR with Cvgd_get_real_1d for VCDT\n");
+  if( Cvgd_get_float_1d(vgd, "VCDT", &f_val, NULL , quiet) ==  VGD_ERROR ) {
+    printf("ERROR with Cvgd_get_float_1d for VCDT\n");
     return;
   }
-  if( Cvgd_get_real8_1d(vgd, "CA_T", &a_8_t, NULL, quiet) ==  VGD_ERROR ) {
-    printf("ERROR with Cvgd_get_real8_1d for CA_T\n");
+  if( Cvgd_get_double_1d(vgd, "CA_T", &a_8_t, NULL, quiet) ==  VGD_ERROR ) {
+    printf("ERROR with Cvgd_get_double_1d for CA_T\n");
     return;
   }
-  if( Cvgd_get_real8_1d(vgd, "CB_T", &b_8_t, &nt, quiet) ==  VGD_ERROR ) {
-    printf("ERROR with Cvgd_get_real8_1d for CB_T\n");
+  if( Cvgd_get_double_1d(vgd, "CB_T", &b_8_t, &nt, quiet) ==  VGD_ERROR ) {
+    printf("ERROR with Cvgd_get_double_1d for CB_T\n");
     return;
   }
 
@@ -64,8 +64,8 @@ void c_use_new_read() {
 
   // Load table (this is the actual data in fst record !! which may also be
   // obtained with fstlir, but why do it id vgd already contains it!)
-  if ( Cvgd_get_real8_3d(vgd, "VTBL", &table, &ni, &nj, &nk, quiet) ==  VGD_ERROR ) {
-    printf("ERROR with Cvgd_get_real8_3d for VTBL\n");
+  if ( Cvgd_get_double_3d(vgd, "VTBL", &table, &ni, &nj, &nk, quiet) ==  VGD_ERROR ) {
+    printf("ERROR with Cvgd_get_double_3d for VTBL\n");
     return;
   }
   
