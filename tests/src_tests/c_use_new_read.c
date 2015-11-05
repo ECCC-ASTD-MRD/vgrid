@@ -13,7 +13,7 @@ void c_use_new_read() {
   char name[5];
   float *f_val = NULL, *p0 = NULL, *px = NULL;
   double *a_8_t = NULL, *b_8_t = NULL, *table = NULL, *levels_8 = NULL, *p0_8 = NULL;
-  TVGrid *vgd = NULL, *vgd2 = NULL;
+  vgrid_descriptor *vgd = NULL, *vgd2 = NULL;
 
   status = VGD_OK;
 
