@@ -8,8 +8,8 @@ ERROR: (vgd)  invalid key UNDEFINED KEY given to gd_get (int 1D)
 ERROR: (vgd)  invalid key UNDEFINED KEY given to gd_get (int 1D)
  Error with get_int_1d detected and message printed above
  Error with get_int_1d detected and message not printed above
-(Cvgd) ERROR in Cvgd_get_real, invalid key 'UNDE'
-(Cvgd) ERROR in Cvgd_get_real, invalid key 'UNDE'
+(Cvgd) ERROR in Cvgd_get_float, invalid key 'UNDE'
+(Cvgd) ERROR in Cvgd_get_float, invalid key 'UNDE'
  Error with get_real detected and message printed above
  Error with get_real detected and message not printed above
 ERROR: (vgd)  invalid key UNDEFINED KEY given to gd_get (real 1D)

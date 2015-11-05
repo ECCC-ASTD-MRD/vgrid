@@ -92,14 +92,14 @@ module vGrid_Descriptors
          character(kind=c_char) :: key(*)
       end function f_get_int_1d
    
-      integer function f_get_real(vgd_CP, key, value_CP, quiet_CP) bind(c, name='Cvgd_get_real')
+      integer function f_get_real(vgd_CP, key, value_CP, quiet_CP) bind(c, name='Cvgd_get_float')
          use iso_c_binding, only: c_ptr, c_char
          type(c_ptr), value :: vgd_CP, quiet_CP
          type(c_ptr), value :: value_CP
          character(kind=c_char) :: key(*)
       end function f_get_real
       
-      integer function f_get_real_1d(vgd_CP, key, value_CP, nk_CP, quiet_CP) bind(c, name='Cvgd_get_real_1d')
+      integer function f_get_real_1d(vgd_CP, key, value_CP, nk_CP, quiet_CP) bind(c, name='Cvgd_get_float_1d')
          use iso_c_binding, only: c_ptr, c_char
          type(c_ptr), value :: vgd_CP, quiet_CP
          type(c_ptr) :: value_CP
@@ -107,14 +107,14 @@ module vGrid_Descriptors
          character(kind=c_char) :: key(*)
       end function f_get_real_1d
 
-      integer function f_get_real8(vgd_CP, key, value_CP, quiet_CP) bind(c, name='Cvgd_get_real8')
+      integer function f_get_real8(vgd_CP, key, value_CP, quiet_CP) bind(c, name='Cvgd_get_double')
          use iso_c_binding, only: c_ptr, c_char
          type(c_ptr), value :: vgd_CP, quiet_CP
          type(c_ptr), value :: value_CP
          character(kind=c_char) :: key(*)
       end function f_get_real8
 
-      integer function f_get_real8_1d(vgd_CP, key, value_CP, nk_CP, quiet_CP) bind(c, name='Cvgd_get_real8_1d')
+      integer function f_get_real8_1d(vgd_CP, key, value_CP, nk_CP, quiet_CP) bind(c, name='Cvgd_get_double_1d')
          use iso_c_binding, only: c_ptr, c_char
          type(c_ptr), value :: vgd_CP, quiet_CP
          type(c_ptr) :: value_CP
@@ -122,7 +122,7 @@ module vGrid_Descriptors
          character(kind=c_char) :: key(*)
       end function f_get_real8_1d
 
-      integer function f_get_real8_3d(vgd_CP, key, value_CP, ni_CP, nj_CP, nk_CP, quiet_CP) bind(c, name='Cvgd_get_real8_3d')
+      integer function f_get_real8_3d(vgd_CP, key, value_CP, ni_CP, nj_CP, nk_CP, quiet_CP) bind(c, name='Cvgd_get_double_3d')
          use iso_c_binding, only: c_ptr, c_char
          type(c_ptr), value :: vgd_CP, quiet_CP
          type(c_ptr) :: value_CP
@@ -144,7 +144,7 @@ module vGrid_Descriptors
          character(kind=c_char) :: key(*)
       end function f_put_int
 
-      integer function f_put_real8(vgd_CP, key, value) bind(c, name='Cvgd_put_real8')
+      integer function f_put_real8(vgd_CP, key, value) bind(c, name='Cvgd_put_double')
          use iso_c_binding, only: c_ptr, c_char, c_double
          type(c_ptr) :: vgd_CP
          real (c_double), value :: value

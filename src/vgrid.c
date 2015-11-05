@@ -2525,16 +2525,16 @@ int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk, int
 
 }
 
-int Cvgd_get_real(vgrid_descriptor *self, char *key, float *value, int *quiet) {
+int Cvgd_get_float(vgrid_descriptor *self, char *key, float *value, int *quiet) {
   int lquiet = 0; // Not quiet by default
   if(quiet) lquiet = *quiet;   
 
   if(! Cvgd_is_valid(self,"SELF")){
-    printf("(Cvgd) ERROR in Cvgd_get_real, invalid vgrid.\n");
+    printf("(Cvgd) ERROR in Cvgd_get_float, invalid vgrid.\n");
     return(VGD_ERROR);
   }
   if(! value){
-    printf("(Cvgd) ERROR in Cvgd_get_real, value is a NULL pointer\n");
+    printf("(Cvgd) ERROR in Cvgd_get_float, value is a NULL pointer\n");
     return(VGD_ERROR);
   }  
 
@@ -2564,7 +2564,7 @@ int Cvgd_get_real(vgrid_descriptor *self, char *key, float *value, int *quiet) {
     }
   } else {
     if(! lquiet) {
-      printf("(Cvgd) ERROR in Cvgd_get_real, invalid key '%s'\n",key);
+      printf("(Cvgd) ERROR in Cvgd_get_float, invalid key '%s'\n",key);
       fflush(stdout);
     }
     return(VGD_ERROR);
@@ -2573,7 +2573,7 @@ int Cvgd_get_real(vgrid_descriptor *self, char *key, float *value, int *quiet) {
 
 }
 
-int Cvgd_get_real_1d(vgrid_descriptor *self, char *key, float **value, int *nk, int *quiet)
+int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk, int *quiet)
 {
   char key2[5];
   int *vip1=NULL, kind, k, OK = 1;
@@ -2581,7 +2581,7 @@ int Cvgd_get_real_1d(vgrid_descriptor *self, char *key, float **value, int *nk, 
   if(quiet) lquiet = *quiet;   
   if(nk) *nk = -1;
   if(! Cvgd_is_valid(self,"SELF")){
-    printf("(Cvgd) ERROR in Cvgd_get_real_1d, invalid vgrid.\n");
+    printf("(Cvgd) ERROR in Cvgd_get_float_1d, invalid vgrid.\n");
     return(VGD_ERROR);
   }
   if( strcmp(key, "VCDM") == 0 ){
@@ -2589,7 +2589,7 @@ int Cvgd_get_real_1d(vgrid_descriptor *self, char *key, float **value, int *nk, 
       if(! *value){
 	(*value) = malloc(self->nl_m * sizeof(float));
 	if(! *value){
-	  printf("(Cvgd) ERROR in Cvgd_get_real_1d, problem allocating %d double\n",self->nl_m);
+	  printf("(Cvgd) ERROR in Cvgd_get_float_1d, problem allocating %d double\n",self->nl_m);
 	  return(VGD_ERROR);
 	}
       }    
@@ -2608,7 +2608,7 @@ int Cvgd_get_real_1d(vgrid_descriptor *self, char *key, float **value, int *nk, 
       if(! *value){
 	(*value) = malloc(self->nl_t * sizeof(float));
 	if(! *value){
-	  printf("(Cvgd) ERROR in Cvgd_get_real_1d, problem allocating %d double\n",self->nl_t);
+	  printf("(Cvgd) ERROR in Cvgd_get_float_1d, problem allocating %d double\n",self->nl_t);
 	  return(VGD_ERROR);
 	}
       }  
@@ -2627,7 +2627,7 @@ int Cvgd_get_real_1d(vgrid_descriptor *self, char *key, float **value, int *nk, 
   }
   if(! OK){
     if(! lquiet) {
-      printf("(Cvgd) ERROR in Cvgd_get_real_1d, invalid key '%s' for vcode %d.\n",key, self->vcode);
+      printf("(Cvgd) ERROR in Cvgd_get_float_1d, invalid key '%s' for vcode %d.\n",key, self->vcode);
       fflush(stdout);
     }
     return(VGD_ERROR);    
@@ -2635,10 +2635,10 @@ int Cvgd_get_real_1d(vgrid_descriptor *self, char *key, float **value, int *nk, 
   return(VGD_OK);
 }
 
-static int c_get_put_real8(vgrid_descriptor **self, char *key, double *value_get, double value_put, int quiet, char *action) {
+static int c_get_put_double(vgrid_descriptor **self, char *key, double *value_get, double value_put, int quiet, char *action) {
   int get, OK = 1;
   if(! Cvgd_is_valid(*self,"SELF")){
-    printf("(Cvgd) ERROR in c_get_real8, invalid vgrid.\n");
+    printf("(Cvgd) ERROR in c_get_double, invalid vgrid.\n");
     return(VGD_ERROR);
   }
   
@@ -2647,7 +2647,7 @@ static int c_get_put_real8(vgrid_descriptor **self, char *key, double *value_get
   } else if (strcmp(action,"PUT") == 0 ) {
     get = 0;
   } else {
-    printf("(Cvgd) INTERNAL ERROR using c_get_put_real8, please report to developers\n");
+    printf("(Cvgd) INTERNAL ERROR using c_get_put_double, please report to developers\n");
     return(VGD_ERROR);
   }
   if( strcmp(key, "PTOP") == 0 ) {
@@ -2680,7 +2680,7 @@ static int c_get_put_real8(vgrid_descriptor **self, char *key, double *value_get
     }
   } else {
     if(! quiet) {
-      printf("(Cvgd) ERROR in Cvgd_put_real8, invalid key '%s'\n", key);
+      printf("(Cvgd) ERROR in Cvgd_put_double, invalid key '%s'\n", key);
       fflush(stdout);
     }
     return(VGD_ERROR);
@@ -2688,7 +2688,7 @@ static int c_get_put_real8(vgrid_descriptor **self, char *key, double *value_get
   
   if(! OK) {
     if(! quiet) {
-      printf("(Cvgd) ERROR in Cvgd_put_real8, %s cannot be put for Vcode %d\n", key, (*self)->vcode);
+      printf("(Cvgd) ERROR in Cvgd_put_double, %s cannot be put for Vcode %d\n", key, (*self)->vcode);
       fflush(stdout);
     }
     return(VGD_ERROR);
@@ -2698,28 +2698,28 @@ static int c_get_put_real8(vgrid_descriptor **self, char *key, double *value_get
 
 }
 
-int Cvgd_put_real8(vgrid_descriptor **self, char *key, double value_put) {
+int Cvgd_put_double(vgrid_descriptor **self, char *key, double value_put) {
   double *value_get; // Will not be used
   int quiet = 0; //not quiet
-  return(c_get_put_real8(self, key, value_get, value_put, quiet, "PUT"));
+  return(c_get_put_double(self, key, value_get, value_put, quiet, "PUT"));
 }
 
-int Cvgd_get_real8(vgrid_descriptor *self, char *key, double *value_get, int *quiet)
+int Cvgd_get_double(vgrid_descriptor *self, char *key, double *value_get, int *quiet)
 {
   double value_put; //Will not be used
   int lquiet = 0; // Not quiet by default
   if(quiet) lquiet = *quiet;
-  return(c_get_put_real8(&self, key, value_get, value_put, lquiet, "GET"));
+  return(c_get_put_double(&self, key, value_get, value_put, lquiet, "GET"));
 }
 
-int Cvgd_get_real8_1d(vgrid_descriptor *self, char *key, double **value, int *nk, int *quiet)
+int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *nk, int *quiet)
 {
   int OK = 1;
   int lquiet = 0; // Not quiet by default
   if(quiet) lquiet = *quiet;   
   if(nk) *nk = -1;
   if(! Cvgd_is_valid(self,"SELF")){
-    printf("(Cvgd) ERROR in Cvgd_get_real8_1d, invalid vgrid.\n");
+    printf("(Cvgd) ERROR in Cvgd_get_double_1d, invalid vgrid.\n");
     return(VGD_ERROR);
   }
   if( strcmp(key, "CA_M") == 0 || strcmp(key, "COFA") == 0 ){
@@ -2727,7 +2727,7 @@ int Cvgd_get_real8_1d(vgrid_descriptor *self, char *key, double **value, int *nk
       if(! *value){
 	(*value) = malloc(self->nl_m * sizeof(double));
 	if(! *value){
-	  printf("(Cvgd) ERROR in Cvgd_get_real8_1d, problem allocating %d double\n",self->nl_m);
+	  printf("(Cvgd) ERROR in Cvgd_get_double_1d, problem allocating %d double\n",self->nl_m);
 	  return(VGD_ERROR);
 	}
       }
@@ -2741,7 +2741,7 @@ int Cvgd_get_real8_1d(vgrid_descriptor *self, char *key, double **value, int *nk
       if(! *value){
 	(*value) = malloc(self->nl_m * sizeof(double));
 	if(! *value){
-	  printf("(Cvgd) ERROR in Cvgd_get_real8_1d, problem allocating %d double\n",self->nl_m);
+	  printf("(Cvgd) ERROR in Cvgd_get_double_1d, problem allocating %d double\n",self->nl_m);
 	  return(VGD_ERROR);
 	}
       }
@@ -2755,7 +2755,7 @@ int Cvgd_get_real8_1d(vgrid_descriptor *self, char *key, double **value, int *nk
       if(! *value){
 	(*value) = malloc(self->nl_t * sizeof(double));
 	if(! *value){
-	  printf("(Cvgd) ERROR in Cvgd_get_real8_1d, problem allocating %d double\n",self->nl_t);
+	  printf("(Cvgd) ERROR in Cvgd_get_double_1d, problem allocating %d double\n",self->nl_t);
 	  return(VGD_ERROR);
 	}
       }
@@ -2769,7 +2769,7 @@ int Cvgd_get_real8_1d(vgrid_descriptor *self, char *key, double **value, int *nk
       if(! *value){
 	(*value) = malloc(self->nl_t * sizeof(double));
 	if(! *value){
-	  printf("(Cvgd) ERROR in Cvgd_get_real8_1d, problem allocating %d double\n",self->nl_t);
+	  printf("(Cvgd) ERROR in Cvgd_get_double_1d, problem allocating %d double\n",self->nl_t);
 	  return(VGD_ERROR);
 	}
       }
@@ -2783,7 +2783,7 @@ int Cvgd_get_real8_1d(vgrid_descriptor *self, char *key, double **value, int *nk
   }    
   if( ! OK) {
     if(! lquiet) {
-      printf("(Cvgd) ERROR in Cvgd_get_real8_1d, invalid key '%s' for vcode %d\n", key, self->vcode);
+      printf("(Cvgd) ERROR in Cvgd_get_double_1d, invalid key '%s' for vcode %d\n", key, self->vcode);
       fflush(stdout);
     }
     return(VGD_ERROR);
@@ -2793,7 +2793,7 @@ int Cvgd_get_real8_1d(vgrid_descriptor *self, char *key, double **value, int *nk
 
 }
 
-int Cvgd_get_real8_3d(vgrid_descriptor *self, char *key, double **value, int *ni, int *nj, int *nk, int *quiet)
+int Cvgd_get_double_3d(vgrid_descriptor *self, char *key, double **value, int *ni, int *nj, int *nk, int *quiet)
 {
   int lquiet = 0; // Not quiet by default
   if(quiet) lquiet = *quiet;   
@@ -2801,7 +2801,7 @@ int Cvgd_get_real8_3d(vgrid_descriptor *self, char *key, double **value, int *ni
   if(nj) *nj = -1;
   if(nk) *nk = -1;    
   if(! Cvgd_is_valid(self,"SELF")){
-    printf("(Cvgd) ERROR in Cvgd_get_real8_3d, invalid vgrid.\n");
+    printf("(Cvgd) ERROR in Cvgd_get_double_3d, invalid vgrid.\n");
     return(VGD_ERROR);
   }
   int table_size = self->table_ni * self->table_nj * self->table_nk;
@@ -2809,7 +2809,7 @@ int Cvgd_get_real8_3d(vgrid_descriptor *self, char *key, double **value, int *ni
     if(! *value){
       (*value) = malloc( table_size * sizeof(double));
       if(! *value){
-	printf("(Cvgd) ERROR in Cvgd_get_real8_3d, problem allocating %d double.\n",table_size);
+	printf("(Cvgd) ERROR in Cvgd_get_double_3d, problem allocating %d double.\n",table_size);
 	return(VGD_ERROR);
       }
     }
@@ -2819,7 +2819,7 @@ int Cvgd_get_real8_3d(vgrid_descriptor *self, char *key, double **value, int *ni
     if(nk) *nk = self->table_nk;
   } else {
     if(! lquiet) {
-      printf("(Cvgd) ERROR in Cvgd_get_real8_3d, invalid key '%s'\n",key);
+      printf("(Cvgd) ERROR in Cvgd_get_double_3d, invalid key '%s'\n",key);
       fflush(stdout);
     }
     return(VGD_ERROR);
