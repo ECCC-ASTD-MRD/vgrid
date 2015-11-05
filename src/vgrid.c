@@ -329,7 +329,7 @@ float c_convip_IP2Level(int IP,int *kind) {
    return(level);
 }
 
-void decode_HY(TFSTD_ext var, double *ptop_8, double *pref_8, float *rcoef){
+void decode_HY(VGD_TFSTD_ext var, double *ptop_8, double *pref_8, float *rcoef){
   // In consultation with Vivian Lee, with decode explicitly instead of using f77 read_decode_hyb
   int kind;
   *ptop_8 = c_convip_IP2Level(var.ip1, &kind) * 100.;
@@ -337,13 +337,13 @@ void decode_HY(TFSTD_ext var, double *ptop_8, double *pref_8, float *rcoef){
   *rcoef = var.ig2/1000.;
 }
 
-int my_fstprm(int key,TFSTD_ext *ff) {
+int my_fstprm(int key,VGD_TFSTD_ext *ff) {
   int fstprm;
   //var->ip1 = 62;
-  STR_INIT(ff->typvar,MAXSTR_TYPVAR);
-  STR_INIT(ff->nomvar,MAXSTR_NOMVAR);
-  STR_INIT(ff->etiket,MAXSTR_ETIKET);
-  STR_INIT(ff->grtyp, MAXSTR_GRTYP);
+  STR_INIT(ff->typvar,VGD_MAXSTR_TYPVAR);
+  STR_INIT(ff->nomvar,VGD_MAXSTR_NOMVAR);
+  STR_INIT(ff->etiket,VGD_MAXSTR_ETIKET);
+  STR_INIT(ff->grtyp, VGD_MAXSTR_GRTYP);
  
   if( c_fstprm(key,
 	       &ff->dateo,  &ff->deet,   &ff->npas, 
@@ -360,7 +360,7 @@ int my_fstprm(int key,TFSTD_ext *ff) {
   return(VGD_OK);
 }
 
-int correct_kind_and_version(int key, int kind, int version, TFSTD_ext *var, int *status) {
+int correct_kind_and_version(int key, int kind, int version, VGD_TFSTD_ext *var, int *status) {
   
   *status=0;
   if( my_fstprm(key, var) == VGD_ERROR ) {
@@ -391,7 +391,7 @@ int correct_kind_and_version(int key, int kind, int version, TFSTD_ext *var, int
 
 }
 
-int C_load_toctoc(vgrid_descriptor *self, TFSTD_ext var, int key) {
+int C_load_toctoc(vgrid_descriptor *self, VGD_TFSTD_ext var, int key) {
 
   int table_size, istat, ni, nj, nk;
 
@@ -871,7 +871,7 @@ void c_vgd_free_abi(vgrid_descriptor **self) {
   }
 }
 
-void Cvgd_vgd_free(vgrid_descriptor **self) {
+void Cvgd_free(vgrid_descriptor **self) {
    if( *self ) {
       FREE((*self)->table);
       c_vgd_free_abi(self);
@@ -950,7 +950,7 @@ int Cvgd_set_vcode(vgrid_descriptor *VGrid) {
  *----------------------------------------------------------------------------
  */
 int fstd_init(vgrid_descriptor *VGrid) {
-   TFSTD *h = &VGrid->rec;
+   VGD_TFSTD *h = &VGrid->rec;
    int err;
 
    if( h->fstd_initialized )
@@ -1023,7 +1023,7 @@ int Cvgd_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, 
   int errorInput = 0, ier,k;
   
   if(*self){
-    Cvgd_vgd_free(self);
+    Cvgd_free(self);
   }
   *self = c_vgd_construct();
   if(! *self){
@@ -2936,7 +2936,7 @@ int Cvgd_new_gen(vgrid_descriptor **self, int kind, int version, float *hyb, int
   int *ip1_m = NULL, *ip1_t = NULL, tlift, errorInput;
 
   if(*self){
-    Cvgd_vgd_free(self);
+    Cvgd_free(self);
   }
 
   *self = c_vgd_construct();
@@ -3091,7 +3091,7 @@ static int C_get_consistent_pt_e1(int iun, float *val, char *nomvar ){
   int error, ni, nj, nk, nmax=1000, infon, k;
   int liste[nmax];
   float *work;
-  TFSTD_ext var;
+  VGD_TFSTD_ext var;
 
   error = c_fstinl(iun, &ni, &nj, &nk, -1, " ", -1, -1, -1, " ", nomvar, liste, &infon, nmax);
   if (error < 0) {
@@ -3134,10 +3134,10 @@ static int C_get_consistent_pt_e1(int iun, float *val, char *nomvar ){
   return(VGD_ERROR);
 }
 
-static int C_get_consistent_hy(int iun, TFSTD_ext var, TFSTD_ext *va2, char *nomvar ){
+static int C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, char *nomvar ){
   int error, ni, nj, nk, nmax=1000, infon, ijk, ind;
   int liste[nmax];
-  TFSTD_ext va3;
+  VGD_TFSTD_ext va3;
 
   // Note: HY has dateo not datev
   error = c_fstinl(iun, &ni, &nj, &nk, var.dateo, var.etiket, -1, -1, -1, " ", nomvar, liste, &infon, nmax);
@@ -3185,7 +3185,7 @@ static int C_gen_legacy_desc(vgrid_descriptor **self, int unit, int *ip1list, in
   float *hyb = NULL, *hybm = NULL;
   double ptop_8, pref_8, nhours;
   double *a_m_8 = NULL, *b_m_8 = NULL;
-  TFSTD_ext var, va2;
+  VGD_TFSTD_ext var, va2;
 
   if(my_alloc_float (&hyb  ,nb,"(Cvgd) ERROR: in C_gen_legacy_desc, cannot allocate hyb of size")   == VGD_ERROR)
     return(VGD_ERROR);
@@ -3335,7 +3335,7 @@ int c_legacy(vgrid_descriptor **self, int unit, int F_kind) {
   int count, nkeylist = MAX_DESC_REC, valid_kind;
   int keylist[nkeylist], ip1list[nkeylist], status, num_in_kind[nb_kind];
   float preslist[nkeylist], xx;
-  TFSTD_ext var;
+  VGD_TFSTD_ext var;
 
   for( i = 0; i < nb_kind; i++){
     num_in_kind[i] = 0;
@@ -3454,11 +3454,11 @@ int Cvgd_new_read(vgrid_descriptor **self, int unit, int *ip1, int *ip2, int *ki
   int fstinl;
   int toc_found = 0, count, nkeyList = MAX_DESC_REC;
   int keyList[nkeyList], status;
-  TFSTD_ext var;
+  VGD_TFSTD_ext var;
   vgrid_descriptor *self2;
 
   if(*self){
-    Cvgd_vgd_free(self);
+    Cvgd_free(self);
   }
   *self = c_vgd_construct();
   if(! *self){
@@ -3551,8 +3551,8 @@ int Cvgd_new_read(vgrid_descriptor **self, int unit, int *ip1, int *ip2, int *ki
 	printf("(Cvgd) ERROR in Cvgd_new_read, found different entries in vertical descriptors after search on ip1 = %d, ip2 = %d, kind = %d, version = %d, status code is %d\n",l_ip1,l_ip2,l_kind,l_version,status);
 	return(VGD_ERROR);
       }
-      // TODO verifier si ce Cvgd_vgd_free est correct 
-      Cvgd_vgd_free(&self2);
+      // TODO verifier si ce Cvgd_free est correct 
+      Cvgd_free(&self2);
     } // Loop in !! 
   } //if(count == 0)
 

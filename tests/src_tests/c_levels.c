@@ -124,7 +124,7 @@ void c_levels() {
   ier = c_fstfrm(iun);
   ier = c_fclos(iun);
 
-  Cvgd_vgd_free(&vgd);
+  Cvgd_free(&vgd);
   free(p0);
   free(levels);
   free(i_val);

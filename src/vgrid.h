@@ -5,14 +5,14 @@
 #define VGD_OK       0
 #define VGD_ERROR    -1
 #define VGD_MISSING  -9999.
-#define MAXSTR_NOMVAR 5
-#define MAXSTR_TYPVAR 3
-#define MAXSTR_ETIKET 13
-#define MAXSTR_GRTYP  2
+#define VGD_MAXSTR_NOMVAR 5
+#define VGD_MAXSTR_TYPVAR 3
+#define VGD_MAXSTR_ETIKET 13
+#define VGD_MAXSTR_GRTYP  2
 
-#define ALLOW_RESHAPE 0
+#define VGRID_ALLOW_RESHAPE 0
 
-typedef struct TFSTD {
+typedef struct VGD_TFSTD {
    int   dateo;                 // date d'origine du champs
    int   deet;                  // duree d'un pas de temps
    int   npas;                  // pas de temps
@@ -20,14 +20,14 @@ typedef struct TFSTD {
    int   datyp;                 // type de donnees
    int   ip1,ip2,ip3;           // specificateur du champs
    int   ig1,ig2,ig3,ig4;       // descripteur de grille
-   char  typvar[MAXSTR_TYPVAR]; // type de variable
-   char  nomvar[MAXSTR_NOMVAR]; // nom de la variable
-   char  etiket[MAXSTR_ETIKET]; // etiquette du champs
-   char  grtyp[MAXSTR_GRTYP];   // type de grilles
+   char  typvar[VGD_MAXSTR_TYPVAR]; // type de variable
+   char  nomvar[VGD_MAXSTR_NOMVAR]; // nom de la variable
+   char  etiket[VGD_MAXSTR_ETIKET]; // etiquette du champs
+   char  grtyp[VGD_MAXSTR_GRTYP];   // type de grilles
    char  fstd_initialized;      // if the fstd struct is initialized
-} TFSTD;
+} VGD_TFSTD;
 
-typedef struct TFSTD_ext {
+typedef struct VGD_TFSTD_ext {
    int   dateo;               // date d'origine du champs
    int   datev;               // date de validitee du champs
    int   deet;                // duree d'un pas de temps
@@ -42,14 +42,14 @@ typedef struct TFSTD_ext {
    int   dltf;
    int   ubc;
    int   extra1,extra2,extra3;
-   char  typvar[MAXSTR_TYPVAR]; // type de variable
-   char  nomvar[MAXSTR_NOMVAR]; // nom de la variable
-   char  etiket[MAXSTR_ETIKET]; // etiquette du champs
-   char  grtyp[MAXSTR_GRTYP];   // type de grilles
-} TFSTD_ext;
+   char  typvar[VGD_MAXSTR_TYPVAR]; // type de variable
+   char  nomvar[VGD_MAXSTR_NOMVAR]; // nom de la variable
+   char  etiket[VGD_MAXSTR_ETIKET]; // etiquette du champs
+   char  grtyp[VGD_MAXSTR_GRTYP];   // type de grilles
+} VGD_TFSTD_ext;
 
 typedef struct vgrid_descriptor {
-  TFSTD    rec;           // RPN standard file header
+  VGD_TFSTD rec;          // RPN standard file header
   double   ptop_8;        // Top level pressure (Pa)
   double   pref_8;        // Reference pressure (Pa)
   double   *table;        // Complete grid descriptor record

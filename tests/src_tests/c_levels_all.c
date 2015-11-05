@@ -127,7 +127,7 @@ int test_it(char *filename) {
   ier = c_fstfrm(iun);
   ier = c_fclos(iun);
       
-  Cvgd_vgd_free(&vgd);
+  Cvgd_free(&vgd);
   free(p0);
   free(levels);
   free(p0_8);
