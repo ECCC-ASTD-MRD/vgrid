@@ -18,9 +18,13 @@ include dependencies.mk
 
 libdescrip.a: $(OBJECTS) dependencies.mk
 	rm -f libdescrip.a && ar scru libdescrip.a *.o ;\
+	mkdir -p ../lib ../include ;\
+	cp libdescrip.a ../lib ;\
+	cp *.mod *.h ../include ;\
 
 clean:
 	rm -f *.f90 *.o *.mod dependencies.mk ;\
+	rm -f ../include/*.mod ../include/*.h
 
 distclean: clean
-	rm -f libdescrip.a libdescrip_debug.a ;\
+	rm -f libdescrip.a ../lib/libdescrip.a ;\
