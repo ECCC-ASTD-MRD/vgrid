@@ -22,7 +22,7 @@ int test_it(char *filename) {
   char name[5];
   float *f_val = NULL, *p0 = NULL, *px = NULL, *levels = NULL;
   double *p0_8 = NULL, *levels_8 = NULL;
-  TVGrid *vgd = NULL;
+  vgrid_descriptor *vgd = NULL;
       
   ier = c_fnom(iun,filename,mode,0);
   if( ier < 0 ) {

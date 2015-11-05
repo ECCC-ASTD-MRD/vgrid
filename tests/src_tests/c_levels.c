@@ -13,7 +13,7 @@ void c_levels() {
   char name[5];
   float *f_val = NULL, *p0 = NULL, *px = NULL, *levels = NULL;
   double *p0_8 = NULL, *levels_8 = NULL;
-  TVGrid *vgd = NULL;
+  vgrid_descriptor *vgd = NULL;
 
   status = VGD_OK;
 

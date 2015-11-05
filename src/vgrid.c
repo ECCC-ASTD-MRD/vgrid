@@ -35,7 +35,7 @@ int ref_name_valid   [VALID_TABLE_SIZE] = { 1001, 1002, 1003,    0, 5001, 5002, 
 int dhm_valid        [VALID_TABLE_SIZE] = {    0,    0,    0,    0,    0,    0,    0,    0, 5005};
 int dht_valid        [VALID_TABLE_SIZE] = {    0,    0,    0,    0,    0,    0,    0,    0, 5005};
 int is_in_logp       [VALID_TABLE_SIZE] = {    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005};
-int is_valid(TVGrid *self, int *table_valid)
+int is_valid(vgrid_descriptor *self, int *table_valid)
 {
   int k;
   for( k = 0; k < VALID_TABLE_SIZE; k++){
@@ -46,7 +46,7 @@ int is_valid(TVGrid *self, int *table_valid)
   return 0;
 }
 
-int Cvgd_is_valid(TVGrid *self, char *valid_table_name)
+int Cvgd_is_valid(vgrid_descriptor *self, char *valid_table_name)
 {
   if(! self){
     printf("(Cvgd) ERROR in Cvgd_is_valid, vgrid descriptor not constructed\n");
@@ -96,7 +96,7 @@ int Cvgd_is_valid(TVGrid *self, char *valid_table_name)
   }
 }
 
-int is_required_double(TVGrid *self, double *ptr, int *table_valid, char *message) {
+int is_required_double(vgrid_descriptor *self, double *ptr, int *table_valid, char *message) {
   if( is_valid(self,table_valid)) {
     if (! ptr) {
       printf("(Cvgd) ERROR: %s is a required constructor entry\n", message);
@@ -110,7 +110,7 @@ int is_required_double(TVGrid *self, double *ptr, int *table_valid, char *messag
   }
   return(1);
 }
-int is_required_float(TVGrid *self, float *ptr, int *table_valid, char *message) {
+int is_required_float(vgrid_descriptor *self, float *ptr, int *table_valid, char *message) {
   if( is_valid(self,table_valid)) {
     if (! ptr) {
       printf("(Cvgd) ERROR: %s is a required constructor entry\n", message);
@@ -217,13 +217,13 @@ double c_get_error(char *key) {
   return(VGD_MISSING);
 }
 
-void Cvgd_table_shape(TVGrid *self, int **tshape) {
+void Cvgd_table_shape(vgrid_descriptor *self, int **tshape) {
   (*tshape)[0] = self->table_ni;
   (*tshape)[1] = self->table_nj;
   (*tshape)[2] = self->table_nk;
 }
 
-static int c_table_update(TVGrid **self) {
+static int c_table_update(vgrid_descriptor **self) {
   switch((*self)->vcode) {
   case 5002:
   case 5003:
@@ -391,7 +391,7 @@ int correct_kind_and_version(int key, int kind, int version, TFSTD_ext *var, int
 
 }
 
-int C_load_toctoc(TVGrid *self, TFSTD_ext var, int key) {
+int C_load_toctoc(vgrid_descriptor *self, TFSTD_ext var, int key) {
 
   int table_size, istat, ni, nj, nk;
 
@@ -437,7 +437,7 @@ int C_load_toctoc(TVGrid *self, TFSTD_ext var, int key) {
   return(VGD_OK);
 }
 
-int Cvgd_vgdcmp(TVGrid *vgd1, TVGrid *vgd2) {
+int Cvgd_vgdcmp(vgrid_descriptor *vgd1, vgrid_descriptor *vgd2) {
 
   int nt1, nt2;
 
@@ -530,7 +530,7 @@ void VGD_MemInit(double *Arr,double Val,int Size) {
       *Arr++ = Val;
 }
 
-int Cvgd_print_desc(TVGrid *self, int *sout, int *convip) {
+int Cvgd_print_desc(vgrid_descriptor *self, int *sout, int *convip) {
   int k, ip1, kind;
   if(! self ) {
     printf("In Cvgd_print_desc: vgrid structure not constructed\n");
@@ -688,17 +688,17 @@ int Cvgd_print_vcode_description(int vcode){
 
 }
 
-static int C_compute_pressure_1001_1002_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log) {
+static int C_compute_pressure_1001_1002_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log) {
   char proc_name[] = "C_compute_pressure_1001_1002_8";
 #include "BODY_C_compute_pressure_1001_1002.hc"
 }
 
-static int C_compute_pressure_1001_1002(TVGrid *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log) {
+static int C_compute_pressure_1001_1002(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log) {
   char proc_name[] = "C_compute_pressure_1001_1002";
 #include "BODY_C_compute_pressure_1001_1002.hc"
 }
 
-static int C_compute_pressure_2001_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double *levels, int in_log) {
+static int C_compute_pressure_2001_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, int in_log) {
   
   int k,*ind,ij,ijk;
   double lvl;
@@ -727,40 +727,40 @@ static int C_compute_pressure_2001_8(TVGrid *self, int ni, int nj, int nk, int *
 
 }
 
-static int C_compute_pressure_1003_5001_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log, int dpidpis ){
+static int C_compute_pressure_1003_5001_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log, int dpidpis ){
   char proc_name[] = "C_compute_pressure_1003_5001_8";
 #include "BODY_C_compute_pressure_1003_5001.hc"
 }
 
-static int C_compute_pressure_1003_5001(TVGrid *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log, int dpidpis ){
+static int C_compute_pressure_1003_5001(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log, int dpidpis ){
   char proc_name[] = "C_compute_pressure_1003_5001";
 #include "BODY_C_compute_pressure_1003_5001.hc"
 }
 
 
-static int C_compute_pressure_5002_5003_5004_5005_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int *in_log, int *dpidpis) {
+static int C_compute_pressure_5002_5003_5004_5005_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int *in_log, int *dpidpis) {
   char proc_name[] = "C_compute_pressure_5002_5003_5004_5005_8";
 #include "BODY_C_compute_pressure_5002_5003_5004_5005.hc"
 }
 
-static int C_compute_pressure_5002_5003_5004_5005(TVGrid *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int *in_log, int *dpidpis) {
+static int C_compute_pressure_5002_5003_5004_5005(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int *in_log, int *dpidpis) {
   char proc_name[] = "C_compute_pressure_5002_5003_5004_5005";
 #include "BODY_C_compute_pressure_5002_5003_5004_5005.hc"
 }
 
-int Cvgd_levels_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8, int *in_log) {
+int Cvgd_levels_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8, int *in_log) {
   if(Cvgd_diag_withref_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log, NULL) == VGD_ERROR )
     return(VGD_ERROR);
   return(VGD_OK);
 }
 
-int Cvgd_levels(TVGrid *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int *in_log) {
+int Cvgd_levels(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int *in_log) {
   if(Cvgd_diag_withref(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log, NULL) == VGD_ERROR )
     return(VGD_ERROR);
   return(VGD_OK);
 }
 
-int Cvgd_diag_withref_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8, int *in_log, int *dpidpis) {
+int Cvgd_diag_withref_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8, int *in_log, int *dpidpis) {
   char proc_name[] = "Cvgd_diag_withref_8";
   char double_interface = 1;
   // The following pointers will never be used but they are needed to compile
@@ -768,7 +768,7 @@ int Cvgd_diag_withref_8(TVGrid *self, int ni, int nj, int nk, int *ip1_list, dou
 #include "BODY_Cvgd_diag_withref.hc"
 }
 
-int Cvgd_diag_withref(TVGrid *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int *in_log, int *dpidpis) {
+int Cvgd_diag_withref(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int *in_log, int *dpidpis) {
   char proc_name[] = "Cvgd_diag_withref";
   char double_interface = 0;
   // The following pointers will never be used but they are needed to compile
@@ -780,19 +780,19 @@ int Cvgd_diag_withref(TVGrid *self, int ni, int nj, int nk, int *ip1_list, float
  * Nom      : <c_vgd_construct>
  * Creation : Avril 2015 - E. Legault-Ouellet - CMC/CMOE
  *
- * But      : Initialise et retourne une structure de type TVGrid
+ * But      : Initialise et retourne une structure de type vgrid_descriptor
  *
  * Parametres :
  *
- * Retour   : Une structure initialisée de type TVGrid
+ * Retour   : Une structure initialisée de type vgrid_descriptor
  *
  * Remarques :
  *
  *----------------------------------------------------------------------------
  */
-TVGrid* c_vgd_construct() {
+vgrid_descriptor* c_vgd_construct() {
 
-   TVGrid *vgrid = malloc(sizeof(TVGrid));
+   vgrid_descriptor *vgrid = malloc(sizeof(vgrid_descriptor));
 
    if( vgrid ) {
       vgrid->ptop_8        = VGD_MISSING;
@@ -847,7 +847,7 @@ TVGrid* c_vgd_construct() {
    return(vgrid);
 }
 
-void c_vgd_free_abi(TVGrid **self) {
+void c_vgd_free_abi(vgrid_descriptor **self) {
   if( *self ) {
     // Thermo pointers may be pointing to momentum for certain Vcode, only nullify them if this is the case.
     if( (*self)->a_t_8 == (*self)->a_m_8 ) {
@@ -871,7 +871,7 @@ void c_vgd_free_abi(TVGrid **self) {
   }
 }
 
-void Cvgd_vgd_free(TVGrid **self) {
+void Cvgd_vgd_free(vgrid_descriptor **self) {
    if( *self ) {
       FREE((*self)->table);
       c_vgd_free_abi(self);
@@ -898,7 +898,7 @@ void Cvgd_vgd_free(TVGrid **self) {
  *
  *----------------------------------------------------------------------------
  */
-int Cvgd_set_vcode_i(TVGrid *VGrid,int Kind,int Version) {
+int Cvgd_set_vcode_i(vgrid_descriptor *VGrid,int Kind,int Version) {
 
    if( Kind>MAX_VKIND || Kind<0 || Version>999 || Version<0 ) {
       fprintf(stderr,"(Cvgd) ERROR in Cvgd_set_vcode_i, invalid kind or version kind=%d, version=%d\n",Kind,Version);
@@ -923,7 +923,7 @@ int Cvgd_set_vcode_i(TVGrid *VGrid,int Kind,int Version) {
  *
  *----------------------------------------------------------------------------
  */
-int Cvgd_set_vcode(TVGrid *VGrid) {
+int Cvgd_set_vcode(vgrid_descriptor *VGrid) {
    int err,kind,version;
 
    if( !VGrid->table ) {
@@ -949,7 +949,7 @@ int Cvgd_set_vcode(TVGrid *VGrid) {
  *
  *----------------------------------------------------------------------------
  */
-int fstd_init(TVGrid *VGrid) {
+int fstd_init(vgrid_descriptor *VGrid) {
    TFSTD *h = &VGrid->rec;
    int err;
 
@@ -1016,7 +1016,7 @@ int fstd_init(TVGrid *VGrid) {
    return(VGD_OK);
 }
 
-int Cvgd_new_build_vert(TVGrid **self, int kind, int version, int nk, int ip1, int ip2, double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2, 
+int Cvgd_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, int ip1, int ip2, double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2, 
 		     double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int nl_m, int nl_t)
 {
   char cvcode[5];
@@ -1239,7 +1239,7 @@ int Cvgd_new_build_vert(TVGrid **self, int kind, int version, int nk, int ip1, i
 
 }
 
-int c_encode_vert_1001(TVGrid **self,int nk){
+int c_encode_vert_1001(vgrid_descriptor **self,int nk){
   
   int skip = 2, table_size;
 
@@ -1276,7 +1276,7 @@ int c_encode_vert_1001(TVGrid **self,int nk){
   return(VGD_OK);
 }
 
-int c_encode_vert_1002(TVGrid **self,int nk){
+int c_encode_vert_1002(vgrid_descriptor **self,int nk){
   
   int skip = 2, table_size;
   
@@ -1313,7 +1313,7 @@ int c_encode_vert_1002(TVGrid **self,int nk){
   return(VGD_OK);
 }
 
-int c_encode_vert_2001(TVGrid **self,int nk){
+int c_encode_vert_2001(vgrid_descriptor **self,int nk){
   
   int skip = 1, table_size;
   
@@ -1348,7 +1348,7 @@ int c_encode_vert_2001(TVGrid **self,int nk){
   return(VGD_OK);
 }
 
-int c_encode_vert_5001(TVGrid **self,int nk){
+int c_encode_vert_5001(vgrid_descriptor **self,int nk){
   int skip = 3, table_size;
 
   if( (*self)->table )
@@ -1390,7 +1390,7 @@ int c_encode_vert_5001(TVGrid **self,int nk){
   return(VGD_OK);
 }
 
-int c_encode_vert_5002_5003_5004_5005(TVGrid **self, char update){
+int c_encode_vert_5002_5003_5004_5005(vgrid_descriptor **self, char update){
   int skip = 3, table_size;
   if(! *self ) {
     printf("(Cvgd) ERROR in c_encode_vert_5002_5003_5004_5005, vgrid descriptor not constructed\n");
@@ -1440,7 +1440,7 @@ int c_encode_vert_5002_5003_5004_5005(TVGrid **self, char update){
   return(VGD_OK);
 }
 
-int c_decode_vert_1001(TVGrid **self) {
+int c_decode_vert_1001(vgrid_descriptor **self) {
   int skip, nk, k, ind;
   (*self)->kind    = (*self)->table[0];
   (*self)->version = (*self)->table[1];
@@ -1474,7 +1474,7 @@ int c_decode_vert_1001(TVGrid **self) {
   return(VGD_OK);
 }
 
-int c_decode_vert_1002(TVGrid **self) {
+int c_decode_vert_1002(vgrid_descriptor **self) {
   int skip, nk, k, ind;
   (*self)->kind    = (*self)->table[0];
   (*self)->version = (*self)->table[1];
@@ -1509,7 +1509,7 @@ int c_decode_vert_1002(TVGrid **self) {
   return(VGD_OK);
 }
 
-int c_decode_vert_2001(TVGrid **self) {
+int c_decode_vert_2001(vgrid_descriptor **self) {
   int skip, nk, k, ind;
   (*self)->kind    = (*self)->table[0];
   (*self)->version = (*self)->table[1];
@@ -1542,7 +1542,7 @@ int c_decode_vert_2001(TVGrid **self) {
   return(VGD_OK);
 }
 
-int c_decode_vert_1003_5001(TVGrid **self) {
+int c_decode_vert_1003_5001(vgrid_descriptor **self) {
   int skip, k, ind, nk, nb, kind;
   
   (*self)->kind    = (*self)->table[0];
@@ -1583,7 +1583,7 @@ int c_decode_vert_1003_5001(TVGrid **self) {
   return(VGD_OK);
 }
 
-int c_decode_vert_5002_5003_5004_5005(TVGrid **self) {
+int c_decode_vert_5002_5003_5004_5005(vgrid_descriptor **self) {
   int skip, k, ind, k_plus_top, k_plus_diag, nk, nb, kind;
   
   k_plus_top = 1;
@@ -1714,7 +1714,7 @@ static int C_genab_1001(float *hyb, int nk, double **a_m_8, double **b_m_8, int 
   
 }
 
-int Cvgd_new_from_table(TVGrid **self, double *table, int ni, int nj, int nk) {
+int Cvgd_new_from_table(vgrid_descriptor **self, double *table, int ni, int nj, int nk) {
   int table_size, istat, i;
   double *ltable;
 
@@ -2409,7 +2409,7 @@ int c_vgrid_genab_5005(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef
 
 }
 
-int Cvgd_get_int(TVGrid *self, char *key, int *value, int *quiet)
+int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int *quiet)
 {  
   int lquiet = 0; // Not quiet by default
   if(quiet) lquiet = *quiet;
@@ -2464,7 +2464,7 @@ int Cvgd_get_int(TVGrid *self, char *key, int *value, int *quiet)
 
 }
 
-int Cvgd_get_int_1d(TVGrid *self, char *key, int **value, int *nk, int *quiet)
+int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk, int *quiet)
 {
   int OK = 1,i;
   int lquiet = 0; // Not quiet by default
@@ -2525,7 +2525,7 @@ int Cvgd_get_int_1d(TVGrid *self, char *key, int **value, int *nk, int *quiet)
 
 }
 
-int Cvgd_get_real(TVGrid *self, char *key, float *value, int *quiet) {
+int Cvgd_get_real(vgrid_descriptor *self, char *key, float *value, int *quiet) {
   int lquiet = 0; // Not quiet by default
   if(quiet) lquiet = *quiet;   
 
@@ -2573,7 +2573,7 @@ int Cvgd_get_real(TVGrid *self, char *key, float *value, int *quiet) {
 
 }
 
-int Cvgd_get_real_1d(TVGrid *self, char *key, float **value, int *nk, int *quiet)
+int Cvgd_get_real_1d(vgrid_descriptor *self, char *key, float **value, int *nk, int *quiet)
 {
   char key2[5];
   int *vip1=NULL, kind, k, OK = 1;
@@ -2635,7 +2635,7 @@ int Cvgd_get_real_1d(TVGrid *self, char *key, float **value, int *nk, int *quiet
   return(VGD_OK);
 }
 
-static int c_get_put_real8(TVGrid **self, char *key, double *value_get, double value_put, int quiet, char *action) {
+static int c_get_put_real8(vgrid_descriptor **self, char *key, double *value_get, double value_put, int quiet, char *action) {
   int get, OK = 1;
   if(! Cvgd_is_valid(*self,"SELF")){
     printf("(Cvgd) ERROR in c_get_real8, invalid vgrid.\n");
@@ -2698,13 +2698,13 @@ static int c_get_put_real8(TVGrid **self, char *key, double *value_get, double v
 
 }
 
-int Cvgd_put_real8(TVGrid **self, char *key, double value_put) {
+int Cvgd_put_real8(vgrid_descriptor **self, char *key, double value_put) {
   double *value_get; // Will not be used
   int quiet = 0; //not quiet
   return(c_get_put_real8(self, key, value_get, value_put, quiet, "PUT"));
 }
 
-int Cvgd_get_real8(TVGrid *self, char *key, double *value_get, int *quiet)
+int Cvgd_get_real8(vgrid_descriptor *self, char *key, double *value_get, int *quiet)
 {
   double value_put; //Will not be used
   int lquiet = 0; // Not quiet by default
@@ -2712,7 +2712,7 @@ int Cvgd_get_real8(TVGrid *self, char *key, double *value_get, int *quiet)
   return(c_get_put_real8(&self, key, value_get, value_put, lquiet, "GET"));
 }
 
-int Cvgd_get_real8_1d(TVGrid *self, char *key, double **value, int *nk, int *quiet)
+int Cvgd_get_real8_1d(vgrid_descriptor *self, char *key, double **value, int *nk, int *quiet)
 {
   int OK = 1;
   int lquiet = 0; // Not quiet by default
@@ -2793,7 +2793,7 @@ int Cvgd_get_real8_1d(TVGrid *self, char *key, double **value, int *nk, int *qui
 
 }
 
-int Cvgd_get_real8_3d(TVGrid *self, char *key, double **value, int *ni, int *nj, int *nk, int *quiet)
+int Cvgd_get_real8_3d(vgrid_descriptor *self, char *key, double **value, int *ni, int *nj, int *nk, int *quiet)
 {
   int lquiet = 0; // Not quiet by default
   if(quiet) lquiet = *quiet;   
@@ -2828,7 +2828,7 @@ int Cvgd_get_real8_3d(TVGrid *self, char *key, double **value, int *ni, int *nj,
   return(VGD_OK);
 }
 
-int Cvgd_get_char(TVGrid *self, char *key, char out[], int *quiet) {
+int Cvgd_get_char(vgrid_descriptor *self, char *key, char out[], int *quiet) {
   int lquiet = 0; // Not quiet by default
   if(quiet) lquiet = *quiet;   
   if(! Cvgd_is_valid(self,"SELF")){
@@ -2850,7 +2850,7 @@ int Cvgd_get_char(TVGrid *self, char *key, char out[], int *quiet) {
   return(VGD_OK);
 }
 
-int Cvgd_put_char(TVGrid **self, char *key, char *value) {
+int Cvgd_put_char(vgrid_descriptor **self, char *key, char *value) {
   if(! Cvgd_is_valid(*self,"SELF")){
     printf("(Cvgd) ERROR in Cvgd_put_char, invalid vgrid.\n");
     return(VGD_ERROR);
@@ -2868,7 +2868,7 @@ int Cvgd_put_char(TVGrid **self, char *key, char *value) {
   return(VGD_OK);
 }
 
-int Cvgd_put_int(TVGrid **self, char *key, int value) {
+int Cvgd_put_int(vgrid_descriptor **self, char *key, int value) {
   
   if(! self) {
     printf("(Cvgd) ERROR in Cvgd_put_int, vgrid is a null pointer.\n");
@@ -2926,7 +2926,7 @@ int Cvgd_put_int(TVGrid **self, char *key, int value) {
   return(VGD_OK);
 }
 
-int Cvgd_new_gen(TVGrid **self, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2,
+int Cvgd_new_gen(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2,
 	      double *ptop_8, double *pref_8, double *ptop_out_8,
 	      int ip1, int ip2, int *stdout_unit, float *dhm, float *dht)
 {
@@ -3177,7 +3177,7 @@ static int C_get_consistent_hy(int iun, TFSTD_ext var, TFSTD_ext *va2, char *nom
   return(VGD_OK);
 }
 
-static int C_gen_legacy_desc(TVGrid **self, int unit, int *ip1list, int *keylist , int nb ){
+static int C_gen_legacy_desc(vgrid_descriptor **self, int unit, int *ip1list, int *keylist , int nb ){
   
   int *ip1 = NULL;
   int kind, origkind, kind2, k, ni, nj, nk, hy_key, pt_key, e1_key;
@@ -3328,7 +3328,7 @@ static int C_gen_legacy_desc(TVGrid **self, int unit, int *ip1list, int *keylist
 
 }
 
-int c_legacy(TVGrid **self, int unit, int F_kind) {
+int c_legacy(vgrid_descriptor **self, int unit, int F_kind) {
   // Construct vertical structure from legacy encoding (PT,HY...)
 
   int error, ni, nj, nk, nip1, i, j, k, kind, nb_kind=100, aa, nb;
@@ -3447,7 +3447,7 @@ int c_legacy(TVGrid **self, int unit, int F_kind) {
   return(VGD_OK);
 }
 
-int Cvgd_new_read(TVGrid **self, int unit, int *ip1, int *ip2, int *kind, int *version) {
+int Cvgd_new_read(vgrid_descriptor **self, int unit, int *ip1, int *ip2, int *kind, int *version) {
 
   int l_ip1 = -1, l_ip2 = -1, l_kind = -1, l_version = -1, error;
   int i, ni, nj, nk, match_ipig;
@@ -3455,7 +3455,7 @@ int Cvgd_new_read(TVGrid **self, int unit, int *ip1, int *ip2, int *kind, int *v
   int toc_found = 0, count, nkeyList = MAX_DESC_REC;
   int keyList[nkeyList], status;
   TFSTD_ext var;
-  TVGrid *self2;
+  vgrid_descriptor *self2;
 
   if(*self){
     Cvgd_vgd_free(self);
@@ -3570,7 +3570,7 @@ int Cvgd_new_read(TVGrid **self, int unit, int *ip1, int *ip2, int *kind, int *v
   return(VGD_OK);
 }
 
-int Cvgd_write_desc (TVGrid *self, int unit) {
+int Cvgd_write_desc (vgrid_descriptor *self, int unit) {
   int ip1, ip2;
   float work[1];
 

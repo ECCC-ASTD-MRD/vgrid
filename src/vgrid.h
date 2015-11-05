@@ -48,7 +48,7 @@ typedef struct TFSTD_ext {
    char  grtyp[MAXSTR_GRTYP];   // type de grilles
 } TFSTD_ext;
 
-typedef struct TVGrid {
+typedef struct vgrid_descriptor {
   TFSTD    rec;           // RPN standard file header
   double   ptop_8;        // Top level pressure (Pa)
   double   pref_8;        // Reference pressure (Pa)
@@ -78,6 +78,6 @@ typedef struct TVGrid {
   int      version;       // Vertical coordinate code
   char     match_ipig;    // do ip/ig matching for records
   char     valid;         // Validity of structure
-} TVGrid;
+} vgrid_descriptor;
 
 #endif // VGRID_H
