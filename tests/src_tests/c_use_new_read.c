@@ -175,8 +175,8 @@ void c_use_new_read() {
     return;
   }
 
-  Cvgd_vgd_free(&vgd);
-  Cvgd_vgd_free(&vgd2);
+  Cvgd_free(&vgd);
+  Cvgd_free(&vgd2);
   free(table);
   free(i_val);
   free(f_val);
