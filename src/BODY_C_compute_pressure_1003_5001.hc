@@ -11,9 +11,6 @@
   
   // Find ip1 indexes
   for( k = 0; k < nk; ++k ){
-    printf("ANDRE\n");
-    printf("ANDRE self->nl_t = %d\n",self->nl_t);
-    printf("ANDRE self->nl_m = %d\n",self->nl_m);
     if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],self->ip1_m,self->nl_m)) == -1 ) {
       printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n",proc_name, ip1_list[k]);
       free(ind);
