@@ -5,7 +5,7 @@ MY_CFLAGS = -O2
 
 HPCS_BASE = hpcs/201402/02/base/
 RPN_LIB=rpn/libs/15.2
-BH_PULL_SOURCE_GIT_BRANCH=0.0.0-a1
+BH_PULL_SOURCE_GIT_BRANCH=release_6.0.0-a3
 
 ifeq ($(ORDENV_PLAT),ubuntu-12.04-amd64-64)
    BH_HOST=pollux
