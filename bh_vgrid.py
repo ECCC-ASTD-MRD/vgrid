@@ -8,7 +8,6 @@ from bh import bhlib, actions
 def _init(b):
    
    environ["BH_PROJECT_NAME"] = "vgriddescriptors"
-   environ["BH_PULL_SOURCE"] = "%(BH_HERE_DIR)s/.." % environ
 
    if b.mode == "intel":
        environ["BH_MAKE"] = 'make'
@@ -17,7 +16,6 @@ def _init(b):
 
    environ["BH_PACKAGE_NAME"]  = "%(BH_PROJECT_NAME)s" % environ
    environ["BH_PACKAGE_NAMES"] = "%(BH_PROJECT_NAME)s" % environ
-   environ["BH_PACKAGE_VERSION"] = "%(BH_PULL_SOURCE_GIT_BRANCH)s-%(COMP_ARCH)s" % environ
    environ["BH_PACKAGE_CONTROL_DIR"] = "%(BH_HERE_DIR)s" % environ
    environ["SCRIPT_NAME"] = __file__+" -m "+b.mode+" -p "+b.platform % environ
 
@@ -37,9 +35,10 @@ def _make(b):
              echo \"Platform: x\"                                                                                 >> ${CONTROL_FILE}
              echo \"Maintainer: cmdn (A. Plante)\"                                                                >> ${CONTROL_FILE}
              echo \"BuildInfo: git clone ${REMOTE}\"                                                              >> ${CONTROL_FILE}
-             echo \"           cd in new directory\"                                                              >> ${CONTROL_FILE}
+             echo \"           cd in new directory created\"                                                      >> ${CONTROL_FILE}
              echo \"           git checkout ${BH_PULL_SOURCE_GIT_BRANCH}"\                                        >> ${CONTROL_FILE}
-             echo \"           ${SCRIPT_NAME##*/}\"                                                               >> ${CONTROL_FILE}
+             echo \"           cd src\"                                                                           >> ${CONTROL_FILE}
+             echo \"           make\"                                                                             >> ${CONTROL_FILE}
              echo \"Vertical grid descriptors package\"                                                           >> ${CONTROL_FILE}
              cd ${BH_BUILD_DIR}/src
              ${BH_MAKE}
@@ -76,7 +75,7 @@ if __name__ == "__main__":
    dr, b = bhlib.init(sys.argv, bhlib.PackageBuilder)
    b.actions.set("init", _init)
    b.actions.set("pull", [actions.pull.git_archive])
-   b.actions.set("clean", ["""(cd ${BH_BUILD_DIR}/lib; ./make_dependencies.ksh; ${BH_MAKE} clean)"""])
+   b.actions.set("clean", ["""(cd ${BH_BUILD_DIR}/src; ${BH_MAKE} clean)"""])
    b.actions.set("make", _make)
    #b.actions.set("test",_test)
    b.actions.set("install", _install)
