@@ -7,21 +7,14 @@ from bh import bhlib, actions
 
 def _init(b):
    
-   # Adjust the folowing
    environ["BH_PROJECT_NAME"] = "vgriddescriptors"
-   environ["BH_PULL_SOURCE"] = "%(BH_HERE_DIR)s" % environ
-   environ["BH_PULL_SOURCE_GIT_BRANCH"] = "5.4.0"
+   environ["BH_PULL_SOURCE"] = "%(BH_HERE_DIR)s/.." % environ
 
-   # Add compiler if needed, select rmn lib version
    if b.mode == "intel":
-       b.shell(""". ssmuse-sh -d hpcs/201402/02/base -d hpcs/201402/02/intel13sp1u2 -d rpn/libs/15.2 """, environ)
-       b.shell("""export FFLAGS_INTEL='-fp-model source'""", environ)
        environ["BH_MAKE"] = 'make'
    elif b.mode == "xlf13":
-       b.shell(""". ssmuse-sh -d hpcs/201402/02/base -d hpcs/ext/xlf_13.1.0.10      -d rpn/libs/15.2""", environ)
        environ["BH_MAKE"] = 'gmake' 
 
-   # Noting to change below this line
    environ["BH_PACKAGE_NAME"]  = "%(BH_PROJECT_NAME)s" % environ
    environ["BH_PACKAGE_NAMES"] = "%(BH_PROJECT_NAME)s" % environ
    environ["BH_PACKAGE_VERSION"] = "%(BH_PULL_SOURCE_GIT_BRANCH)s-%(COMP_ARCH)s" % environ
@@ -48,7 +41,7 @@ def _make(b):
              echo \"           git checkout ${BH_PULL_SOURCE_GIT_BRANCH}"\                                        >> ${CONTROL_FILE}
              echo \"           ${SCRIPT_NAME##*/}\"                                                               >> ${CONTROL_FILE}
              echo \"Vertical grid descriptors package\"                                                           >> ${CONTROL_FILE}
-             cd ${BH_BUILD_DIR}/lib
+             cd ${BH_BUILD_DIR}/src
              ${BH_MAKE}
             )""",environ)
    
@@ -66,15 +59,15 @@ def _install(b):
          set -e        
          mkdir -p ${BH_INSTALL_DIR}/lib
          cd ${BH_INSTALL_DIR}/lib
-         cp ${BH_TOP_BUILD_DIR}/lib/libdescrip.a libdescrip_${BH_PULL_SOURCE_GIT_BRANCH}.a
+         cp ${BH_TOP_BUILD_DIR}/src/libdescrip.a libdescrip_${BH_PULL_SOURCE_GIT_BRANCH}.a
          ln -s libdescrip_${BH_PULL_SOURCE_GIT_BRANCH}.a libdescrip.a
          mkdir -p ${BH_INSTALL_DIR}/include
          cd ${BH_INSTALL_DIR}/include
-         cp ${BH_TOP_BUILD_DIR}/lib/*.mod .
+         cp ${BH_TOP_BUILD_DIR}/src/*.mod .
          echo "write(6,'(\\\"   *          VGRID ${BH_PULL_SOURCE_GIT_BRANCH} ${COMP_ARCH} ${ORDENV_PLAT} $(date)\\\")')" > vgrid_version.cdk
          echo "write(6,'(\\\"   ********************************************************************************************\\\")')" >> vgrid_version.cdk
          mkdir -p ${BH_INSTALL_DIR}/src
-         cd ${BH_TOP_BUILD_DIR}/lib
+         cd ${BH_TOP_BUILD_DIR}/src
          ${BH_MAKE} clean
          cp * ${BH_INSTALL_DIR}/src
         )""")
@@ -90,7 +83,6 @@ if __name__ == "__main__":
    b.actions.set("package", actions.package.to_ssm)
 
    b.supported_platforms = [
-      "ubuntu-10.04-amd64-64",
       "ubuntu-12.04-amd64-64",
       "ubuntu-14.04-amd64-64",
       "aix-7.1-ppc7-64",

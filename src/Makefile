@@ -22,9 +22,14 @@ libdescrip.a: $(OBJECTS) dependencies.mk
 	cp libdescrip.a ../lib ;\
 	cp *.mod *.h ../include ;\
 
+build_helper:
+	. ssmuse-sh -d $(HPCS_BASE) -d $(HPCS_COMP) -d $(RPN_LIB) ;\
+	../bh_vgrid.py --host $(BH_HOST) -p $(ORDENV_PLAT) -m $(BH_MODE) -v BH_PACKAGE_VERSION=$(BH_PULL_SOURCE_GIT_BRANCH)-$${COMP_ARCH};\
+
 clean:
 	rm -f *.f90 *.o *.mod dependencies.mk ;\
 	rm -f ../include/*.mod ../include/*.h
 
-distclean: clean
+distclean: cleanxlf13
 	rm -f libdescrip.a ../lib/libdescrip.a ;\
+
