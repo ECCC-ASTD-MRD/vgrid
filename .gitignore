@@ -23,6 +23,8 @@ vgriddescriptors/
 README_COMMIT
 libc/Makefile.dep
 src/dependencies.mk
+src/vgrid_version.hc
+src/vgrid_version.hf
 tests/*.out
 tests/WORK
 tests/compile_INFO
