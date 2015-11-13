@@ -14,6 +14,9 @@ int c_use_new_read () {
   float *f_val = NULL;
   double *a_8_t = NULL, *b_8_t = NULL, *table = NULL;
   TVGrid *vgd = NULL, *vgd2 = NULL;
+#include "vgrid_version.hc"
+  
+  printf("%s\n", vgrid_descriptors_version);
 
   printf("c_use_new_read\n");
 
