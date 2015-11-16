@@ -530,7 +530,7 @@ void VGD_MemInit(double *Arr,double Val,int Size) {
       *Arr++ = Val;
 }
 
-int Cvgd_print_desc(vgrid_descriptor *self, int *sout, int *convip) {
+int Cvgd_print_desc(vgrid_descriptor *self, int *sout, int convip) {
   int k, ip1, kind;
   if(! self ) {
     printf("In Cvgd_print_desc: vgrid structure not constructed\n");
@@ -2409,11 +2409,8 @@ int c_vgrid_genab_5005(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef
 
 }
 
-int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int *quiet)
+int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet)
 {  
-  int lquiet = 0; // Not quiet by default
-  if(quiet) lquiet = *quiet;
-
   if(! Cvgd_is_valid(self,"SELF")){
     printf("(Cvgd) ERROR in Cvgd_get_int, invalid vgrid.\n");
     return(VGD_ERROR);
@@ -2453,7 +2450,7 @@ int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int *quiet)
   } else if (strcmp(key, "LOGP") == 0){
     *value = is_valid(self,is_in_logp);
   } else {
-    if(! lquiet) {
+    if(! quiet) {
       printf("(Cvgd) ERROR in Cvgd_get_int, invalid key %s\n",key);
       fflush(stdout);
     }
@@ -2464,11 +2461,9 @@ int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int *quiet)
 
 }
 
-int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk, int *quiet)
+int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk, int quiet)
 {
   int OK = 1,i;
-  int lquiet = 0; // Not quiet by default
-  if(quiet) lquiet = *quiet;
   if(nk) *nk = -1;
   if(! Cvgd_is_valid(self,"SELF")){
     printf("(Cvgd) ERROR in Cvgd_get_int_1d, invalid vgrid.\n");
@@ -2515,7 +2510,7 @@ int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk, int
     OK = 0;
   }
   if(! OK) {
-    if(! lquiet) {
+    if(! quiet) {
       printf("(Cvgd) ERROR in Cvgd_get_int_1d, invalid key '%s' for Vcode %d\n",key, self->vcode);
       fflush(stdout);
     }
@@ -2525,9 +2520,7 @@ int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk, int
 
 }
 
-int Cvgd_get_float(vgrid_descriptor *self, char *key, float *value, int *quiet) {
-  int lquiet = 0; // Not quiet by default
-  if(quiet) lquiet = *quiet;   
+int Cvgd_get_float(vgrid_descriptor *self, char *key, float *value, int quiet) {
 
   if(! Cvgd_is_valid(self,"SELF")){
     printf("(Cvgd) ERROR in Cvgd_get_float, invalid vgrid.\n");
@@ -2563,7 +2556,7 @@ int Cvgd_get_float(vgrid_descriptor *self, char *key, float *value, int *quiet) 
       *value = (float) c_get_error(key);
     }
   } else {
-    if(! lquiet) {
+    if(! quiet) {
       printf("(Cvgd) ERROR in Cvgd_get_float, invalid key '%s'\n",key);
       fflush(stdout);
     }
@@ -2573,12 +2566,10 @@ int Cvgd_get_float(vgrid_descriptor *self, char *key, float *value, int *quiet) 
 
 }
 
-int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk, int *quiet)
+int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk, int quiet)
 {
   char key2[5];
   int *vip1=NULL, kind, k, OK = 1;
-  int lquiet = 0; // Not quiet by default
-  if(quiet) lquiet = *quiet;   
   if(nk) *nk = -1;
   if(! Cvgd_is_valid(self,"SELF")){
     printf("(Cvgd) ERROR in Cvgd_get_float_1d, invalid vgrid.\n");
@@ -2626,7 +2617,7 @@ int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk,
     OK = 0;
   }
   if(! OK){
-    if(! lquiet) {
+    if(! quiet) {
       printf("(Cvgd) ERROR in Cvgd_get_float_1d, invalid key '%s' for vcode %d.\n",key, self->vcode);
       fflush(stdout);
     }
@@ -2704,19 +2695,15 @@ int Cvgd_put_double(vgrid_descriptor **self, char *key, double value_put) {
   return(c_get_put_double(self, key, value_get, value_put, quiet, "PUT"));
 }
 
-int Cvgd_get_double(vgrid_descriptor *self, char *key, double *value_get, int *quiet)
+int Cvgd_get_double(vgrid_descriptor *self, char *key, double *value_get, int quiet)
 {
   double value_put; //Will not be used
-  int lquiet = 0; // Not quiet by default
-  if(quiet) lquiet = *quiet;
-  return(c_get_put_double(&self, key, value_get, value_put, lquiet, "GET"));
+  return(c_get_put_double(&self, key, value_get, value_put, quiet, "GET"));
 }
 
-int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *nk, int *quiet)
+int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *nk, int quiet)
 {
   int OK = 1;
-  int lquiet = 0; // Not quiet by default
-  if(quiet) lquiet = *quiet;   
   if(nk) *nk = -1;
   if(! Cvgd_is_valid(self,"SELF")){
     printf("(Cvgd) ERROR in Cvgd_get_double_1d, invalid vgrid.\n");
@@ -2782,7 +2769,7 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     OK = 0;
   }    
   if( ! OK) {
-    if(! lquiet) {
+    if(! quiet) {
       printf("(Cvgd) ERROR in Cvgd_get_double_1d, invalid key '%s' for vcode %d\n", key, self->vcode);
       fflush(stdout);
     }
@@ -2793,10 +2780,8 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
 
 }
 
-int Cvgd_get_double_3d(vgrid_descriptor *self, char *key, double **value, int *ni, int *nj, int *nk, int *quiet)
+int Cvgd_get_double_3d(vgrid_descriptor *self, char *key, double **value, int *ni, int *nj, int *nk, int quiet)
 {
-  int lquiet = 0; // Not quiet by default
-  if(quiet) lquiet = *quiet;   
   if(ni) *ni = -1;
   if(nj) *nj = -1;
   if(nk) *nk = -1;    
@@ -2818,7 +2803,7 @@ int Cvgd_get_double_3d(vgrid_descriptor *self, char *key, double **value, int *n
     if(nj) *nj = self->table_nj;
     if(nk) *nk = self->table_nk;
   } else {
-    if(! lquiet) {
+    if(! quiet) {
       printf("(Cvgd) ERROR in Cvgd_get_double_3d, invalid key '%s'\n",key);
       fflush(stdout);
     }
@@ -2828,9 +2813,7 @@ int Cvgd_get_double_3d(vgrid_descriptor *self, char *key, double **value, int *n
   return(VGD_OK);
 }
 
-int Cvgd_get_char(vgrid_descriptor *self, char *key, char out[], int *quiet) {
-  int lquiet = 0; // Not quiet by default
-  if(quiet) lquiet = *quiet;   
+int Cvgd_get_char(vgrid_descriptor *self, char *key, char out[], int quiet) {
   if(! Cvgd_is_valid(self,"SELF")){
     printf("(Cvgd) ERROR in Cvgd_get_char, invalid vgrid structure.\n");
     return(VGD_ERROR);
@@ -2842,7 +2825,7 @@ int Cvgd_get_char(vgrid_descriptor *self, char *key, char out[], int *quiet) {
   } else if( strcmp(key, "RFLD") == 0 ){
     strcpy(out,self->ref_name);
   } else {
-    if(! lquiet){
+    if(! quiet){
       printf("(Cvgd) ERROR in Cvgd_get_char, invalid key -> '%s'\n",key);
     }
     return(VGD_ERROR);
@@ -3465,8 +3448,6 @@ int Cvgd_new_read(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind,
     return (VGD_ERROR);
   }
   
-  printf("ip1 = %d, ip2 = %d\n", ip1, ip2);
-
   if(ip1 >= 0 && ip2 < 0) {
     printf("(Cvgd) ERROR in Cvgd_new_read, expecting optional value ip2\n");      
     return (VGD_ERROR);

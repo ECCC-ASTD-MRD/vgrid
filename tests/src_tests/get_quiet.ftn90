@@ -5,7 +5,7 @@ program tests
   implicit none
 
   type(vgrid_descriptor) :: vgd
-  integer :: stat,lu=0,fnom,fstouv,fstfrm,fclos,lutxt=69,ip1,ip2
+  integer :: stat,lu=0,fnom,fstouv,fstfrm,fclos
 
   integer :: my_int,my_int2
   integer, dimension(:), pointer :: my_int_1d,my_int2_1d
