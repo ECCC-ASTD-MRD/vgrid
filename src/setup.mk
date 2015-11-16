@@ -1,7 +1,7 @@
-MY_FFLAGS = -O2
-#MY_FFLAGS = -C -g -O0
-MY_CFLAGS = -O2
-#MY_CFLAGS =    -g -O0
+#MY_FFLAGS = -O2
+MY_FFLAGS = -C -g -O0
+#MY_CFLAGS = -O2
+MY_CFLAGS =    -g -O0
 
 HPCS_BASE = hpcs/201402/02/base/
 RPN_LIB=rpn/libs/15.2
