@@ -185,11 +185,10 @@ module vGrid_Descriptors
          type(c_ptr), value :: vgd1_CP, vgd2_CP
       end function f_vgdcmp
 
-      integer function f_new_read(vgd,unit,ip1_CP,ip2_CP,kind_CP,version_CP) bind(c, name='Cvgd_new_read')
+      integer function f_new_read(vgd,unit,ip1,ip2,kind,version) bind(c, name='Cvgd_new_read')
          use iso_c_binding, only : c_ptr, c_int, c_char
          type(c_ptr) :: vgd
-         integer (c_int), value :: unit
-         type(c_ptr), value :: ip1_CP,ip2_CP,kind_CP,version_CP
+         integer (c_int), value :: unit, ip1, ip2, kind, version
       end function f_new_read
       
       integer function f_new_from_table(vgd, table_CP, ni, nj, nk) bind(c, name='Cvgd_new_from_table')
@@ -322,10 +321,9 @@ contains
       integer, target,optional, intent(in) :: version     ! Level version requested by user.
       
       ! Local variables
-      integer :: ni,nj,nk, istat, error
+      integer :: ni,nj,nk, istat, error, l_ip1, l_ip2, l_kind, l_version
       character(len=100) :: myformat
       real*8, dimension(:,:,:), pointer :: table_8
-      type(c_ptr) :: ip1_CP, ip2_CP, kind_CP, version_CP
 
       status = VGD_ERROR
 
@@ -334,27 +332,27 @@ contains
       select case (trim(up(myformat)))
       case ('FST')      
          if(present(ip1))then
-            ip1_CP = c_loc(ip1)
+            l_ip1 = ip1
          else
-            ip1_CP = C_NULL_PTR
+            l_ip1 = -1
          endif
          if(present(ip2))then
-            ip2_CP = c_loc(ip2)
+            l_ip2 = ip2
          else
-            ip2_CP = C_NULL_PTR
+            l_ip2 = -1
          endif
          if(present(kind))then
-            kind_CP = c_loc(kind)
+            l_kind = kind
          else
-            kind_CP = C_NULL_PTR
+            l_kind = -1
          endif
          if(present(version))then
-            version_CP = c_loc(version)
+            l_version = version
          else
-            version_CP = C_NULL_PTR
+            l_version = -1
          endif
          
-         if( f_new_read(self%cptr, unit, ip1_CP, ip2_CP, kind_CP, version_CP) == VGD_ERROR )then
+         if( f_new_read(self%cptr, unit, l_ip1, l_ip2, l_kind, l_version) == VGD_ERROR )then
             print*,'(F_vgd) ERROR: In new_read, problem with f_new_read'
             return
          endif

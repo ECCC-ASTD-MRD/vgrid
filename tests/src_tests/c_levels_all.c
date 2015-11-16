@@ -15,7 +15,7 @@ char *filenames[] = {
 int test_it(char *filename) {
 
   int ier, iun = 10;
-  int *ip1 = NULL, *ip2 = NULL, *kind = NULL, *version = NULL, *quiet = NULL, *i_val = NULL, *in_log = NULL, *dpidpis = NULL;
+  int *quiet = NULL, *i_val = NULL, *in_log = NULL, *dpidpis = NULL;
   int nl_t, ni, nj, nk, ni2, nj2, nk2, k, key, ij, ijk;
   char mode[]="RND";
   char format[] = "FST";
@@ -35,7 +35,7 @@ int test_it(char *filename) {
     return(VGD_ERROR);
   }
 
-  if( Cvgd_new_read(&vgd, iun, ip1, ip2, kind, version) == VGD_ERROR ) {
+  if( Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
     return(VGD_ERROR);
   }

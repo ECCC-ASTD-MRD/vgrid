@@ -3447,10 +3447,9 @@ int c_legacy(vgrid_descriptor **self, int unit, int F_kind) {
   return(VGD_OK);
 }
 
-int Cvgd_new_read(vgrid_descriptor **self, int unit, int *ip1, int *ip2, int *kind, int *version) {
+int Cvgd_new_read(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind, int version) {
 
-  int l_ip1 = -1, l_ip2 = -1, l_kind = -1, l_version = -1, error;
-  int i, ni, nj, nk, match_ipig;
+  int error, i, ni, nj, nk, match_ipig;
   int fstinl;
   int toc_found = 0, count, nkeyList = MAX_DESC_REC;
   int keyList[nkeyList], status;
@@ -3466,45 +3465,39 @@ int Cvgd_new_read(vgrid_descriptor **self, int unit, int *ip1, int *ip2, int *ki
     return (VGD_ERROR);
   }
   
-  if(ip1) {
-    l_ip1     = *ip1;
-    if(ip2) {
-      l_ip2     = *ip2;
-    } else {
-      printf("(Cvgd) ERROR in Cvgd_new_read, expecting optional value ip2\n");      
-      return (VGD_ERROR);
-    }
+  printf("ip1 = %d, ip2 = %d\n", ip1, ip2);
+
+  if(ip1 >= 0 && ip2 < 0) {
+    printf("(Cvgd) ERROR in Cvgd_new_read, expecting optional value ip2\n");      
+    return (VGD_ERROR);
   }
-  if(ip2 && !ip1){
+  
+  if(ip2 >= 0 && ip1 < 0){
     printf("(Cvgd) ERROR in Cvgd_new_read, expecting optional value ip1\n");      
     return (VGD_ERROR);
   }
-  match_ipig = 0;  
-  if(l_ip1 > 0){
+  match_ipig = 0;
+  if(ip1 >= 0){
     match_ipig = 1;
   }
-  if(kind) l_kind = *kind;
-  if(version) {    
-    l_version = *version;
-    if(l_kind == -1 && l_version != -1) {
-      printf("(Cvgd) ERROR in Cvgd_new_read, option kind must be used with option version\n");
-      return (VGD_ERROR);
-    }
+  if(kind == -1 && version != -1) {
+    printf("(Cvgd) ERROR in Cvgd_new_read, option kind must be used with option version\n");
+    return (VGD_ERROR);
   }
-
-  error = c_fstinl(unit, &ni, &nj, &nk, -1, " ", l_ip1, l_ip2, -1, " ", ZNAME, keyList, &count, nkeyList);
+  
+  error = c_fstinl(unit, &ni, &nj, &nk, -1, " ", ip1, ip2, -1, " ", ZNAME, keyList, &count, nkeyList);
   if (error < 0) {
     printf("(Cvgd) ERROR in Cvgd_new_read, with fstinl on nomvar !!\n");
     return(VGD_ERROR);
   }
   if(count == 0){
-    printf("(Cvgd) Cannot find %s with the following ips: ip1=%d, ip2=%d\n", ZNAME, l_ip1, l_ip2);
+    printf("(Cvgd) Cannot find %s with the following ips: ip1=%d, ip2=%d\n", ZNAME, ip1, ip2);
     if(match_ipig) {
       (*self)->vcode = -1;
       return(VGD_ERROR);
     }
     printf("(Cvgd) Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)\n");
-    if(c_legacy(self,unit,l_kind) == VGD_ERROR){
+    if(c_legacy(self,unit,kind) == VGD_ERROR){
       printf("(Cvgd) ERROR: failed to construct vgrid descriptor from legacy encoding\n");
       return(VGD_ERROR);
     }
@@ -3516,7 +3509,7 @@ int Cvgd_new_read(vgrid_descriptor **self, int unit, int *ip1, int *ip2, int *ki
     // Loop on all !! found
     for( i=0; i < count; i++) {     
       // Check if kind and version match, skip the !! if not.
-      if( correct_kind_and_version(keyList[i], l_kind, l_version, &var, &status) == VGD_ERROR) {
+      if( correct_kind_and_version(keyList[i], kind, version, &var, &status) == VGD_ERROR) {
 	(*self)->valid = 0;
 	return(VGD_ERROR);
       }
@@ -3548,7 +3541,7 @@ int Cvgd_new_read(vgrid_descriptor **self, int unit, int *ip1, int *ip2, int *ki
       }
       status = Cvgd_vgdcmp(*self,self2);
       if ( status != 0 ){
-	printf("(Cvgd) ERROR in Cvgd_new_read, found different entries in vertical descriptors after search on ip1 = %d, ip2 = %d, kind = %d, version = %d, status code is %d\n",l_ip1,l_ip2,l_kind,l_version,status);
+	printf("(Cvgd) ERROR in Cvgd_new_read, found different entries in vertical descriptors after search on ip1 = %d, ip2 = %d, kind = %d, version = %d, status code is %d\n",ip1,ip2,kind,version,status);
 	return(VGD_ERROR);
       }
       // TODO verifier si ce Cvgd_free est correct 
