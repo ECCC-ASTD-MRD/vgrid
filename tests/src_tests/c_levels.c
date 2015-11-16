@@ -5,7 +5,7 @@
 void c_levels() {
 
   int ier, iun = 10;
-  int *ip1 = NULL, *ip2 = NULL, *kind = NULL, *version = NULL, *quiet = NULL, *i_val = NULL, *in_log = NULL, *dpidpis = NULL;
+  int *quiet = NULL, *i_val = NULL, *in_log = NULL, *dpidpis = NULL;
   int nl_t, ni, nj, nk, ni2, nj2, nk2, k, key, ij, ijk, status;
   char filename[]="/users/dor/afsg/apm/ords/cmdn/vgrid/tests/data/dm_5001_from_model_run";
   char mode[]="RND";
@@ -28,7 +28,7 @@ void c_levels() {
     return;
   }
   
-  if( Cvgd_new_read(&vgd, iun, ip1, ip2, kind, version) == VGD_ERROR ) {
+  if( Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
     return;
   }
