@@ -738,29 +738,29 @@ static int C_compute_pressure_1003_5001(vgrid_descriptor *self, int ni, int nj, 
 }
 
 
-static int C_compute_pressure_5002_5003_5004_5005_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int *in_log, int *dpidpis) {
+static int C_compute_pressure_5002_5003_5004_5005_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log, int dpidpis) {
   char proc_name[] = "C_compute_pressure_5002_5003_5004_5005_8";
 #include "BODY_C_compute_pressure_5002_5003_5004_5005.hc"
 }
 
-static int C_compute_pressure_5002_5003_5004_5005(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int *in_log, int *dpidpis) {
+static int C_compute_pressure_5002_5003_5004_5005(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log, int dpidpis) {
   char proc_name[] = "C_compute_pressure_5002_5003_5004_5005";
 #include "BODY_C_compute_pressure_5002_5003_5004_5005.hc"
 }
 
-int Cvgd_levels_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8, int *in_log) {
+int Cvgd_levels_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8, int in_log) {
   if(Cvgd_diag_withref_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log, NULL) == VGD_ERROR )
     return(VGD_ERROR);
   return(VGD_OK);
 }
 
-int Cvgd_levels(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int *in_log) {
-  if(Cvgd_diag_withref(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log, NULL) == VGD_ERROR )
+int Cvgd_levels(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log) {
+  if(Cvgd_diag_withref(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log, 0) == VGD_ERROR )
     return(VGD_ERROR);
   return(VGD_OK);
 }
 
-int Cvgd_diag_withref_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8, int *in_log, int *dpidpis) {
+int Cvgd_diag_withref_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8, int in_log, int dpidpis) {
   char proc_name[] = "Cvgd_diag_withref_8";
   char double_interface = 1;
   // The following pointers will never be used but they are needed to compile
@@ -768,7 +768,7 @@ int Cvgd_diag_withref_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1
 #include "BODY_Cvgd_diag_withref.hc"
 }
 
-int Cvgd_diag_withref(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int *in_log, int *dpidpis) {
+int Cvgd_diag_withref(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log, int dpidpis) {
   char proc_name[] = "Cvgd_diag_withref";
   char double_interface = 0;
   // The following pointers will never be used but they are needed to compile

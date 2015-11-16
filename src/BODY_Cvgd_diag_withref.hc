@@ -1,50 +1,41 @@
 
-  int l_in_log, l_dpidpis, error,k,ijk,ij;
+  int error,k,ijk,ij;
   
   if(! Cvgd_is_valid(self,"SELF")){
     printf("(Cvgd) ERROR in %s, invalid vgrid.\n",proc_name);
     return(VGD_ERROR);
   }
   
-  l_in_log=0;
-  if(in_log){
-    l_in_log = *in_log;
-  }
-  l_dpidpis=0;
-  if(dpidpis){
-    l_dpidpis = *dpidpis;
-  }
-  
   switch(self->vcode) {
   case 1001:
     if(double_interface){
-      if( C_compute_pressure_1001_1002_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, l_in_log) == VGD_ERROR)
+      if( C_compute_pressure_1001_1002_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log) == VGD_ERROR)
 	return(VGD_ERROR);
     } else {
-      if( C_compute_pressure_1001_1002(self, ni, nj, nk, ip1_list, levels, sfc_field, l_in_log) == VGD_ERROR)
+      if( C_compute_pressure_1001_1002(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log) == VGD_ERROR)
 	return(VGD_ERROR);
     }
     break;
   case 1002:
-    if( l_dpidpis ){
+    if( dpidpis ){
       printf("(Cvgd) ERROR: dpidpis not implemented for vertical coordinate 1002\n");
       return(VGD_ERROR);
     }
     if(double_interface){
-      if( C_compute_pressure_1001_1002_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, l_in_log) == VGD_ERROR)
+      if( C_compute_pressure_1001_1002_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log) == VGD_ERROR)
 	return(VGD_ERROR);
     } else {
-      if( C_compute_pressure_1001_1002(self, ni, nj, nk, ip1_list, levels, sfc_field, l_in_log) == VGD_ERROR)
+      if( C_compute_pressure_1001_1002(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log) == VGD_ERROR)
 	return(VGD_ERROR);
     }
     break;
   case 2001:
-    if( l_dpidpis ){
+    if( dpidpis ){
       printf("(Cvgd) ERROR: dpidpis not implemented for vertical coordinate 2001\n");
       return(VGD_ERROR);
     }
     if(double_interface){
-      if( C_compute_pressure_2001_8(self, ni, nj, nk, ip1_list, levels_8, l_in_log) == VGD_ERROR)
+      if( C_compute_pressure_2001_8(self, ni, nj, nk, ip1_list, levels_8, in_log) == VGD_ERROR)
 	return(VGD_ERROR);
     } else {
       printf("TODO 2001");
@@ -54,10 +45,10 @@
   case 1003:
   case 5001:
     if(double_interface){
-      if( C_compute_pressure_1003_5001_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, l_in_log, l_dpidpis) == VGD_ERROR )
+      if( C_compute_pressure_1003_5001_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log, dpidpis) == VGD_ERROR )
 	return(VGD_ERROR);
     } else {
-      if( C_compute_pressure_1003_5001(self, ni, nj, nk, ip1_list, levels, sfc_field, l_in_log, l_dpidpis) == VGD_ERROR )
+      if( C_compute_pressure_1003_5001(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log, dpidpis) == VGD_ERROR )
 	return(VGD_ERROR);
     }
     break;
