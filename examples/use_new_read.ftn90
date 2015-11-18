@@ -16,6 +16,6 @@ program use_new_read
       call exit(1)
    endif
 
-   status = vgd_print(vgd,6)
+   status = vgd_print(vgd)
 
 end program use_new_read

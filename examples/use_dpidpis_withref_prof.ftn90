@@ -3,13 +3,15 @@ program tests
 
   implicit none
 
-  integer :: stat,lu=0,ni,nj,nk,fnom,fstouv,fstfrm,fclos
+  integer :: stat,lu=0,fnom,fstouv,fstfrm
   integer, dimension(:), pointer :: ip1_list
   real, dimension(:), pointer :: dpidpis_profil
   real :: sfc_field
   type(vgrid_descriptor) :: vgd
   
-  stat=fnom(lu,"/users/dor/afsg/apm/vcoord/trunk/tests/data/dm_5002_from_model_run","RND",0)
+  nullify(ip1_list, dpidpis_profil)
+
+  stat=fnom(lu,"../tests/data/dm_5002_from_model_run","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
      call abort

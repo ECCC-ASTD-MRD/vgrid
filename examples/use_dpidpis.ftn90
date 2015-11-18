@@ -8,7 +8,10 @@ program tests
   real, dimension(:,:), pointer :: sfc_field_2d
   real :: sfc_field
   type(vgrid_descriptor) :: vgd
-  stat=fnom(lu,"/users/dor/afsg/apm/vcoord/trunk/tests/data/dm_5002_from_model_run","RND",0)
+
+  nullify(ip1_list,dpidpis_profil,dpidpis_cube,sfc_field_2d)
+
+  stat=fnom(lu,"../tests/data/dm_5002_from_model_run","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
      call abort
