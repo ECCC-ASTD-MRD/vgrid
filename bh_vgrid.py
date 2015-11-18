@@ -42,7 +42,7 @@ def _make(b):
              echo \"Vertical grid descriptors package\"                                                           >> ${CONTROL_FILE}
              cd ${BH_BUILD_DIR}/src
              ${BH_MAKE} vgrid_version
-             ${BH_MAKE}
+             ${BH_MAKE} shared
             )""",environ)
    
 def _test(b):
@@ -59,8 +59,10 @@ def _install(b):
          set -e        
          mkdir -p ${BH_INSTALL_DIR}/lib
          cd ${BH_INSTALL_DIR}/lib
-         cp ${BH_TOP_BUILD_DIR}/src/libdescrip.a libdescrip_${BH_PULL_SOURCE_GIT_BRANCH}.a
+         cp ${BH_TOP_BUILD_DIR}/src/libdescrip.a  libdescrip_${BH_PULL_SOURCE_GIT_BRANCH}.a
+         cp ${BH_TOP_BUILD_DIR}/src/libdescrip.so libdescrip_${BH_PULL_SOURCE_GIT_BRANCH}.so
          ln -s libdescrip_${BH_PULL_SOURCE_GIT_BRANCH}.a libdescrip.a
+         ln -s libdescrip_${BH_PULL_SOURCE_GIT_BRANCH}.so libdescrip.so
          mkdir -p ${BH_INSTALL_DIR}/include
          cd ${BH_INSTALL_DIR}/include
          cp ${BH_TOP_BUILD_DIR}/src/*.mod .

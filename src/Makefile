@@ -18,7 +18,14 @@ include dependencies.mk
 
 libdescrip.a: $(OBJECTS) dependencies.mk
 	rm -f libdescrip.a && ar scru libdescrip.a *.o ;\
+
+shared: libdescrip.a
 	. ssmuse-sh -d $(HPCS_BASE) -d $(HPCS_COMP) -d $(RPN_LIB);\
+	if [ $$ORDENV_PLAT = ubuntu-12.04-amd64-64 ]; then \
+	   s.f90 -shared -o libdescrip.so *.o -Wl,-rpath,/ssm/net/hpcs/201311/master/intelcomp_2013sp1_multi/composer_xe_2013_sp1.0.080/mkl/lib/intel64 -Wl,-rpath,/ssm/net/hpcs/201311/master/intelcomp_2013sp1_multi/composer_xe_2013_sp1.0.080/compiler/lib/intel64 ;\
+	elif [ $$ORDENV_PLAT = aix-7.1-ppc7-64 ]; then \
+	   s.f90 -openmp -o libdescrip.so -qmkshrobj *.o ;\
+	fi
 
 vgrid_version:
 	echo "character(len=128) :: vgrid_descriptors_version = \"VGRID $(BH_PULL_SOURCE_GIT_BRANCH) $${COMP_ARCH} $${ORDENV_PLAT} $(shell date)\"" > vgrid_version.hf ;\
@@ -30,8 +37,7 @@ ssm:
 
 clean:
 	rm -f *.f90 *.o *.mod dependencies.mk ;\
-	rm -f ../include/*.mod ../include/*.h
 
-distclean: cleanxlf13
-	rm -f libdescrip.a ../lib/libdescrip.a ;\
+distclean: clean
+	rm -f libdescrip.a libdescrip.so ;\
 
