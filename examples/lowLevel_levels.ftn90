@@ -13,6 +13,8 @@ program tests
   ! External functions
   integer, external :: fstinf,fnom,fstouv,fstfrm,fclos
 
+  nullify(lev)
+
    ! Open file and get FST key for field of interest (in this case TT)
    status = fnom(iun,'../tests/data_Linux/dm_5002_from_model_run','STD',0)
    status = fstouv(iun,'RND+R/O')

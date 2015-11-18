@@ -20,16 +20,16 @@ int c_simple_pressure() {
   ier = c_fstouv(iun, "RND");  
 
   // Construct a new Vgrid descriptor
-  if( Cvgd_new_read(&vgd, iun, NULL, NULL, NULL, NULL) == VGD_ERROR ) {
+  if( Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
     return(1);
   }
 
   // Print info of this descriptor
-  Cvgd_print_desc(vgd, NULL, NULL);
+  Cvgd_print_desc(vgd, -1, -1);
 
   // Get ip1 list of all Thermo levels, list will be malloc in function, size of list will be returned in nl_t
-  ier = Cvgd_get_int_1d(vgd, "VIPT", &i_val, &nl_t, NULL);
+  ier = Cvgd_get_int_1d(vgd, "VIPT", &i_val, &nl_t, -1);
 
   // Get surface pressure
   key = c_fstinf(iun, &ni, &nj, &nk, -1," ", -1, -1, -1," ","P0");
@@ -45,12 +45,12 @@ int c_simple_pressure() {
   pres = malloc( ni*nj*nl_t * sizeof(float) );
 
   // Compute pressure for all thermo levels
-  ier = Cvgd_levels(vgd, ni, nj, nl_t, i_val, pres, p0, NULL);
+  ier = Cvgd_levels(vgd, ni, nj, nl_t, i_val, pres, p0, -1);
 
   // Compute pressure for a single profile with surface pressure at 1013 hPa
   prof = malloc( nl_t * sizeof(float) );
   p0_stn = 1013. * 100.;
-  ier = Cvgd_levels(vgd, 1, 1, nl_t, i_val, prof, &p0_stn, NULL);
+  ier = Cvgd_levels(vgd, 1, 1, nl_t, i_val, prof, &p0_stn, -1);
   for( k = 0; k < nl_t; k++){
     printf("k = %d, prof[k] = %f\n", k, prof[k]);
   }

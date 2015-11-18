@@ -41,6 +41,7 @@ def _make(b):
              echo \"           make\"                                                                             >> ${CONTROL_FILE}
              echo \"Vertical grid descriptors package\"                                                           >> ${CONTROL_FILE}
              cd ${BH_BUILD_DIR}/src
+             ${BH_MAKE} vgrid_version
              ${BH_MAKE}
             )""",environ)
    
