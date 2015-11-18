@@ -11,8 +11,8 @@
    type(vgrid_descriptor) :: vgd
    ! For fstprm
    integer :: ig1,ig2,ig3,ig4,dateo,deet,npas,datyp,nbits
-   integer :: ni,nj,nk,ni2,nj2,nk2,nit,njt,nkt,nkmod
-   integer :: ip1,ip2,ip3,swa,lng,dltf,ubc,extra1,extra2,extra3,datev
+   integer :: ni,nj,nk
+   integer :: ip1,ip2,ip3,swa,lng,dltf,ubc,extra1,extra2,extra3
    character(len=1) :: grtyp
    character(len=2) :: typvar
    character(len=4) :: nomvar

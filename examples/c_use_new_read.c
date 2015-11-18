@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "../libc/vgrid.h"
+#include "vgrid.h"
 
 int c_use_new_read () {
 
   int ier, iun = 10, iun2 = 11;
-  int *ip1 = NULL, *ip2 = NULL, *kind = NULL, *version = NULL, *quiet = NULL, *i_val = NULL;
+  int *i_val = NULL;
   int nl_t, nt, ni, nj, nk, k;
   char filename[]="../tests/data/dm_5005_from_model_run";
   char mode[]="RND";
@@ -13,7 +13,7 @@ int c_use_new_read () {
   char name[5];
   float *f_val = NULL;
   double *a_8_t = NULL, *b_8_t = NULL, *table = NULL;
-  TVGrid *vgd = NULL, *vgd2 = NULL;
+  vgrid_descriptor *vgd = NULL, *vgd2 = NULL;
 #include "vgrid_version.hc"
   
   printf("%s\n", vgrid_descriptors_version);
@@ -31,29 +31,29 @@ int c_use_new_read () {
     return 1;
   }
   
-  if( Cvgd_new_read(&vgd, iun, format, ip1, ip2, kind, version) == VGD_ERROR ) {
+  if( Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
     return 1;
   }
-  if( Cvgd_get_int_1d(vgd, "VIPT", &i_val, NULL, quiet) ==  VGD_ERROR ) {
+  if( Cvgd_get_int_1d(vgd, "VIPT", &i_val, &nt, -1) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_int for VIPT\n");
     return 1;
   }
-  if( Cvgd_get_real_1d(vgd, "VCDT", &f_val, NULL , quiet) ==  VGD_ERROR ) {
-    printf("ERROR with Cvgd_get_real_1d for VCDT\n");
+  if( Cvgd_get_float_1d(vgd, "VCDT", &f_val, &nt, -1) ==  VGD_ERROR ) {
+    printf("ERROR with Cvgd_get_float_1d for VCDT\n");
     return 1;
   }
-  if( Cvgd_get_real8_1d(vgd, "CA_T", &a_8_t, NULL, quiet) ==  VGD_ERROR ) {
-    printf("ERROR with Cvgd_get_real8_1d for CA_T\n");
+  if( Cvgd_get_double_1d(vgd, "CA_T", &a_8_t, &nt, -1) ==  VGD_ERROR ) {
+    printf("ERROR with Cvgd_get_double_1d for CA_T\n");
     return 1;
   }
-  if( Cvgd_get_real8_1d(vgd, "CB_T", &b_8_t, &nt, quiet) ==  VGD_ERROR ) {
-    printf("ERROR with Cvgd_get_real8_1d for CB_T\n");
+  if( Cvgd_get_double_1d(vgd, "CB_T", &b_8_t, &nt, -1) ==  VGD_ERROR ) {
+    printf("ERROR with Cvgd_get_double_1d for CB_T\n");
     return 1;
   }
 
   // Size of thermo may also be obtained by this:
-  ier = Cvgd_get_int(vgd, "NL_T", &nl_t, quiet);
+  ier = Cvgd_get_int(vgd, "NL_T", &nl_t, -1);
   if(nl_t != nt ) {
     printf("ERROR: nt and nl_t should be equal, got %d, %d\n",nt, nl_t);
     return(-1);
@@ -67,8 +67,8 @@ int c_use_new_read () {
 
   // Load table (this is the actual data in fst record !! which may also be
   // obtained with fstlir, but why do it id vgd already contains it!)
-  if ( Cvgd_get_real8_3d(vgd, "VTBL", &table, &ni, &nj, &nk, quiet) ==  VGD_ERROR ) {
-    printf("ERROR with Cvgd_get_real8_3d for VTBL\n");
+  if ( Cvgd_get_double_3d(vgd, "VTBL", &table, &ni, &nj, &nk, -1) ==  VGD_ERROR ) {
+    printf("ERROR with Cvgd_double_3d for VTBL\n");
     return 1;
   }
   
@@ -113,7 +113,7 @@ int c_use_new_read () {
     printf("ERROR with c_fstouv on iun2\n");
     return 1;
   }
-  if( Cvgd_new_read(&vgd2, iun, format, ip1, ip2, kind, version) == VGD_ERROR ) {
+  if( Cvgd_new_read(&vgd2, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read vgd2\n");
     return 1;
   }
@@ -122,8 +122,8 @@ int c_use_new_read () {
     return(1);
   }
 
-  Cvgd_vgd_free(&vgd);
-  Cvgd_vgd_free(&vgd2);
+  Cvgd_free(&vgd);
+  Cvgd_free(&vgd2);
   free(table);
   free(i_val);
   free(f_val);

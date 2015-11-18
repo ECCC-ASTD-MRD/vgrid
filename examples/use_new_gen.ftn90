@@ -1,4 +1,4 @@
-program use_vgd_gen
+program use_new_gen
 
   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_print,VGD_OK
 
@@ -28,6 +28,6 @@ program use_vgd_gen
      call exit(1)
   endif
 
-  stat = vgd_print(vgd,6)
+  stat = vgd_print(vgd)
 
-end program use_vgd_gen
+end program use_new_gen

@@ -530,8 +530,8 @@ void VGD_MemInit(double *Arr,double Val,int Size) {
       *Arr++ = Val;
 }
 
-int Cvgd_print_desc(vgrid_descriptor *self, int *sout, int convip) {
-  int k, ip1, kind;
+int Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip) {
+  int k, ip1, kind, toto;
   if(! self ) {
     printf("In Cvgd_print_desc: vgrid structure not constructed\n");
     return(VGD_ERROR);
@@ -540,13 +540,13 @@ int Cvgd_print_desc(vgrid_descriptor *self, int *sout, int convip) {
       printf("In Cvgd_print_desc: vgrid structure is not valid\n");
       return(VGD_ERROR);
     }
-    if(sout && *sout != 6){
-      printf("In Cvgd_print_desc : please implement stdout option %d\n",*sout);
+    if(sout != -1){
+      printf("In Cvgd_print_desc : please implement sout option = %d\n",sout);
       return(VGD_ERROR);
     }
-    if(convip){
+    if(convip != -1){
       //TODO
-      printf("In Cvgd_print_desc : please implement convip option %d in Cvgd_print_desc\n",*sout);
+      printf("In Cvgd_print_desc : please implement convip option %d in Cvgd_print_desc\n",sout);
       return(VGD_ERROR);
     }
     
@@ -612,7 +612,7 @@ int Cvgd_print_desc(vgrid_descriptor *self, int *sout, int convip) {
       return(VGD_ERROR);
     }
 
-    if(convip){
+    if(convip != -1){
       printf("Cvgd_print_desc TODO!!!!!!!!! ");
       return(VGD_ERROR); 
     }
@@ -2911,7 +2911,7 @@ int Cvgd_put_int(vgrid_descriptor **self, char *key, int value) {
 
 int Cvgd_new_gen(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2,
 	      double *ptop_8, double *pref_8, double *ptop_out_8,
-	      int ip1, int ip2, int *stdout_unit, float *dhm, float *dht)
+	      int ip1, int ip2, float *dhm, float *dht)
 {
 
   float *hybm = NULL;

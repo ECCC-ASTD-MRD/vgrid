@@ -15,8 +15,6 @@ module vGrid_Descriptors
    implicit none
    private
 
-   integer, target :: zero=0, one=1
-   
    ! Public methods
    public :: vgrid_descriptor                    !vertical grid descriptor structure
    public :: vgd_free                            !class destructor
@@ -172,10 +170,10 @@ module vGrid_Descriptors
          character(kind=c_char) :: valid_table_name(*)
       end function f_is_valid
 
-      integer function f_print_desc(vgd_CP, stdout_CP, convip) bind(c, name='Cvgd_print_desc')
+      integer function f_print_desc(vgd_CP, stdout, convip) bind(c, name='Cvgd_print_desc')
          use iso_c_binding, only : c_ptr, c_int
-         type(c_ptr), value :: vgd_CP, stdout_CP
-          integer (c_int), value :: convip
+         type(c_ptr), value :: vgd_CP
+         integer (c_int), value :: stdout, convip
       end function f_print_desc
 
       integer function f_print_vcode_description(vcode) bind(c, name='Cvgd_print_vcode_description')
@@ -208,12 +206,12 @@ module vGrid_Descriptors
       end function f_new_from_table
 
       integer function f_new_gen(vgd,kind,version,hyb_CP,size_hyb,rcoef1_CP,rcoef2_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP, &
-           ip1,ip2,stdout_unit_CP,dhm_CP,dht_CP) bind(c, name='Cvgd_new_gen')
+           ip1,ip2,dhm_CP,dht_CP) bind(c, name='Cvgd_new_gen')
          use iso_c_binding, only : c_ptr, c_int
          type(c_ptr) :: vgd
          integer (c_int), value :: kind, version, size_hyb
          type(c_ptr), value :: hyb_CP,rcoef1_CP,rcoef2_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP
-         type(c_ptr), value :: stdout_unit_CP,dhm_CP,dht_CP
+         type(c_ptr), value :: dhm_CP,dht_CP
          integer (c_int), value :: ip1,ip2
       end function f_new_gen
       
@@ -474,6 +472,8 @@ contains
          my_ip2 = -1
       endif
       if(present(stdout_unit))then
+         write(for_msg,*) 'ERROR: in new_gen, implement option stdout_unit'
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
          stdout_unit_CP = c_loc(stdout_unit)
       else
          stdout_unit_CP = C_NULL_PTR
@@ -493,7 +493,7 @@ contains
          self%cptr = C_NULL_PTR
       endif
 
-      if(f_new_gen(self%cptr,kind,version,hyb_CP,size(hyb),rcoef1_CP,rcoef2_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP,my_ip1,my_ip2,stdout_unit_CP,dhm_CP,dht_CP) == VGD_ERROR)then
+      if(f_new_gen(self%cptr,kind,version,hyb_CP,size(hyb),rcoef1_CP,rcoef2_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP,my_ip1,my_ip2,dhm_CP,dht_CP) == VGD_ERROR)then
          print*,'(F_vgd) ERROR in new_gen, problem with f_new_gen'
          return
       endif
@@ -682,12 +682,11 @@ contains
 
    integer function print_desc(self,stdout,convip_L) result(istat)      
       type(vgrid_descriptor) :: self
-      integer, target, intent(in), optional :: stdout     !Output unit to write to [6]
+      integer, intent(in), optional :: stdout     !Output unit to write to [6]
       logical, intent(in), optional :: convip_L
 
       ! Internal variables
-      type(c_ptr) :: stdout_CP
-      integer :: l_convip
+      integer :: l_stdout, l_convip
 
       istat = VGD_ERROR
       if(.not.c_associated(self%cptr))then
@@ -695,14 +694,13 @@ contains
          return
       endif
 
-      stdout_CP = C_NULL_PTR
-      l_convip = 0
-      if(present(stdout)) stdout_CP = c_loc(stdout)
+      l_stdout = -1
+      l_convip = -1
+      if(present(stdout)) l_stdout = stdout
       if(present(convip_L))then
          if(convip_L) l_convip = 1
       endif
-
-      istat = f_print_desc(self%cptr,stdout_CP, l_convip)
+      istat = f_print_desc(self%cptr,l_stdout, l_convip)
    end function print_desc
 
    integer function print_vcode_description(vcode) result(status)
