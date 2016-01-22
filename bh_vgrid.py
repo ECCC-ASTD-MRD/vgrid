@@ -60,9 +60,11 @@ def _install(b):
          mkdir -p ${BH_INSTALL_DIR}/lib
          cd ${BH_INSTALL_DIR}/lib
          cp ${BH_TOP_BUILD_DIR}/src/libdescrip.a  libdescrip_${BH_PULL_SOURCE_GIT_BRANCH}.a
-         cp ${BH_TOP_BUILD_DIR}/src/libdescripshared.so libdescripshared_${BH_PULL_SOURCE_GIT_BRANCH}.so
          ln -s libdescrip_${BH_PULL_SOURCE_GIT_BRANCH}.a libdescrip.a
-         ln -s libdescripshared_${BH_PULL_SOURCE_GIT_BRANCH}.so libdescripshared.so
+         if [ -f ${BH_TOP_BUILD_DIR}/src/libdescripshared.so ];then
+            cp ${BH_TOP_BUILD_DIR}/src/libdescripshared.so libdescripshared_${BH_PULL_SOURCE_GIT_BRANCH}.so
+            ln -s libdescripshared_${BH_PULL_SOURCE_GIT_BRANCH}.so libdescripshared.so
+         fi
          mkdir -p ${BH_INSTALL_DIR}/include
          cd ${BH_INSTALL_DIR}/include
          cp ${BH_TOP_BUILD_DIR}/src/*.mod .

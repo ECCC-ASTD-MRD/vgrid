@@ -7,7 +7,7 @@ void c_use_new_read() {
   int ier, iun = 10, iun2 = 11;
   int *quiet = NULL, *i_val = NULL, *in_log = NULL, *dpidpis = NULL;
   int nl_t, nt, ni, nj, nk, ni2, nj2, nk2, k, key, ij, ijk, status;
-  char filename[]="/users/dor/afsg/apm/ords/cmdn/vgrid/tests/data/dm_5005_from_model_run";
+  char filename[]="data/dm_5005_from_model_run";
   char mode[]="RND";
   char format[] = "FST";
   char name[5];

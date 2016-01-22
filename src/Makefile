@@ -23,8 +23,6 @@ shared: libdescrip.a
 	. ssmuse-sh -d $(HPCS_BASE) -d $(HPCS_COMP) -d $(RPN_LIB);\
 	if [ $$ORDENV_PLAT = ubuntu-12.04-amd64-64 ]; then \
 	   s.f90 -shared -o libdescripshared.so *.o -lrmnshared_015.2 -Wl,-rpath,/ssm/net/hpcs/201311/master/intelcomp_2013sp1_multi/composer_xe_2013_sp1.0.080/mkl/lib/intel64 -Wl,-rpath,/ssm/net/hpcs/201311/master/intelcomp_2013sp1_multi/composer_xe_2013_sp1.0.080/compiler/lib/intel64 -Wl,-rpath,/ssm/net/$(RPN_LIB)/$(ORDENV_PLAT)/lib/$(BASE_ARCH)/$(COMPILER);\
-	elif [ $$ORDENV_PLAT = aix-7.1-ppc7-64 ]; then \
-	   s.f90 -openmp -o libdescripshared.so -qmkshrobj *.o;\
 	fi
 
 vgrid_version:
