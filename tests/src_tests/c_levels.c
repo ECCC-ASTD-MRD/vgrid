@@ -7,7 +7,7 @@ void c_levels() {
   int ier, iun = 10;
   int *quiet = NULL, *i_val = NULL, *in_log = NULL, *dpidpis = NULL;
   int nl_t, ni, nj, nk, ni2, nj2, nk2, k, key, ij, ijk, status;
-  char filename[]="/users/dor/afsg/apm/ords/cmdn/vgrid/tests/data/dm_5001_from_model_run";
+  char filename[]="data/dm_5001_from_model_run";
   char mode[]="RND";
   char format[] = "FST";
   char name[5];
