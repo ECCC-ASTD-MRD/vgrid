@@ -6,6 +6,7 @@ tests/test*.txt
 tests/test*.out
 tests/data/
 tests/compile.log
+tests/WORK
 Makefile.test
 examples/lowLevel_levels
 examples/topLevel_levels
