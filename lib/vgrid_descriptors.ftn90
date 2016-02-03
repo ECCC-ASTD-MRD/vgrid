@@ -34,6 +34,10 @@ module vGrid_Descriptors
   integer, parameter :: MAX_DESC_REC=10000      !maximum number of descriptor records in a single file
   character(len=1), dimension(3), parameter :: MATCH_GRTYP=(/'X','Y','Z'/) !grid types with ip1,2 to ig1,2 mapping
   logical :: ALLOW_RESHAPE=.false.              ! Allow reshape of class pointer members
+  logical :: ALLOW_SIGMA=.false.                ! Allow legacy construction of sigma levels, it is false by default in
+                                                !    order to prevent errors that araise often for cases that users only 
+                                                !    copy P0 and forget to carry HY or PT along. If the user knows what
+                                                !    he/she is doing, then he/she ca set ALLOW_SIGMA to true.
 
   ! Validity table for self
   integer, dimension(2), parameter :: ptop_out_8_valid=                                  (/5004,5005/)
@@ -1790,6 +1794,8 @@ contains
      select case(trim(key))
      case ('ALLOW_RESHAPE')
         value=ALLOW_RESHAPE
+     case ('ALLOW_SIGMA')
+        value=ALLOW_SIGMA
      case DEFAULT
         write(for_msg,*) 'invalid key in call to getopt_logical: ',trim(key)
         call msg(level_msg,VGD_PRFX//for_msg)
@@ -2214,6 +2220,8 @@ contains
      select case(trim(key))
      case ('ALLOW_RESHAPE')
         ALLOW_RESHAPE=value
+     case ('ALLOW_SIGMA')
+        ALLOW_SIGMA=value
      case DEFAULT
         write(for_msg,*) 'invalid key in call to putopt_logical: ',trim(key)
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
@@ -4905,13 +4913,19 @@ contains
                ip2=ig2a,          &
                ptop_8=ptop*100d0, &
                pref_8=pref*100d0, &
-               rcoef1=rcoef, &
+               rcoef1=rcoef,      &
                a_m_8=a_m_8,       &
                b_m_8=b_m_8,       &
                ip1_m=ip1s)          
           goto 999
        else 
           write(for_msg,*)' sigma coordinate found'
+          if(.not.ALLOW_SIGMA)then
+             call msg(MSG_ERROR,VGD_PRFX//for_msg)
+             write(for_msg,*) 'gen_legacy_desc error: sigma coordinate construction is not ALLOWED. If your are certain that you want this sigma coordinate, set ALLOW_RESHAPE to true e.g. stat = vgd_putopt("ALLOW_RESHAPE",.true.)'
+             call msg(MSG_ERROR,VGD_PRFX//for_msg)
+             goto 999
+          endif
           call msg(MSG_INFO,VGD_PRFX//for_msg)
           call vgrid_genab_1001(hyb,hybm,a_m_8,b_m_8,ip1,error)
           if (error /= VGD_OK)goto 999

@@ -1,0 +1,62 @@
+program test_allow_sigma
+
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_putopt,vgd_getopt,VGD_ERROR
+  use Unit_Testing, only: ut_report
+
+  implicit none
+
+  type(vgrid_descriptor) :: d
+  integer :: lu=0
+  integer :: stat
+  integer :: fnom,fstouv,fstfrm
+  logical :: ok=.true., my_bol_value
+
+  stat=fnom(lu,"data/dm_1001_from_model_run","RND",0)
+  if(stat.lt.0)then
+     print*,'ERROR with fnom'
+     call abort
+  endif
+  stat=fstouv(lu,'RND')
+  if(stat.le.0)then
+     print*,'No record in RPN file'
+     call abort
+  endif
+
+  ! Try to get the value of ALLOW_SIGMA. it should be .false. by default
+  stat = vgd_getopt("ALLOW_SIGMA",my_bol_value)
+  print*,'==========================================================================='
+  if(stat == VGD_ERROR)then
+     print*, "ERROR in test, cannot get ALLOW_RESHAPE value"
+     stop
+  endif
+  print*,'my_bol_value=',my_bol_value
+  if(my_bol_value)then
+      print*, "ERROR in test, ALLOW_SIGMA should be .false."
+     stop
+  endif
+
+  ! Construct a new set of 3D coordinate descriptors
+  print*,'==========================================================================='
+  print*,'The following error message telling that "sigma coordinate construction is not ALLOWED" is normal'
+  stat = vgd_new(d,unit=lu,format="fst")
+  if(stat/=VGD_ERROR)then
+     print*,'ERROR in test, should not be allowed to construct a new sigma coordinate since ALLOW_SIGMA should be false by default'
+     ok=.false.
+  endif
+  print*,'============================================================================'
+  stat = vgd_putopt("ALLOW_SIGMA",.true.)
+  if(stat == VGD_ERROR)then
+     print*, "ERROR in test, cannot put option ALLOW_SIGMA"
+     stop
+  endif
+  stat = vgd_new(d,unit=lu,format="fst")
+  if(stat==VGD_ERROR)then
+     print*,'ERROR in test, with vgd_new. Constructing sigma should be possible.'
+     ok=.false.
+  endif
+  
+  call ut_report(stat,'Grid_Descriptors, vgd_new, on 1001')
+
+  stat=fstfrm(lu)
+
+end program test_allow_sigma

@@ -1,12 +1,14 @@
 program levels_withref_profile_all
 
-  use vGrid_Descriptors, only: VGD_OK,VGD_ERROR
+  use vGrid_Descriptors, only: vgd_putopt,VGD_OK,VGD_ERROR
   use Unit_Testing, only: ut_report
   
   implicit none
   integer :: stat,ier,chek_levels_withref
 
   stat=VGD_OK
+
+  ier = vgd_putopt("ALLOW_SIGMA",.true.)
   
   ier=chek_levels_withref('data/dm_1001_from_model_run','','TT')
   if(ier==VGD_ERROR)stat=VGD_ERROR

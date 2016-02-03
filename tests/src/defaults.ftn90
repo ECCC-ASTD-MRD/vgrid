@@ -1,6 +1,6 @@
 program defaults
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,VGD_MISSING
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_putopt,VGD_MISSING
   use Unit_Testing, only: ut_report
 
   implicit none
@@ -24,6 +24,7 @@ program defaults
   endif
 
   ! Construct a new set of 3D coordinate descriptors
+  stat = vgd_putopt("ALLOW_SIGMA",.true.)
   stat = vgd_new(vgrid,unit=lu,format="fst")
   stat = vgd_get(vgrid,'PTOP',ptop)
   if (abs(ptop-dble(VGD_MISSING))<10.*epsilon(ptop)) then
