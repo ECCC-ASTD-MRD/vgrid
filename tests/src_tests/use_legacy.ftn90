@@ -1,13 +1,15 @@
 program use_legacy
    use Unit_Testing, only: ut_report
-   use vGrid_Descriptors, only:VGD_ERROR
+   use vGrid_Descriptors, only:vgd_putopt,VGD_ERROR
    implicit none
    integer :: istat,test_it
    logical :: OK=.true.
 
+   istat =  vgd_putopt("ALLOW_SIGMA",.true.)
    istat=test_it("data/dm_1001_from_model_run")
    if(istat.eq.VGD_ERROR)stop
-
+   istat =  vgd_putopt("ALLOW_SIGMA",.false.)
+   
    istat=test_it("data/dm_1002_from_model_run_multi_pt")
    if(istat.eq.VGD_ERROR)stop
 

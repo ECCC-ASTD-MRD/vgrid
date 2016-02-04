@@ -34,9 +34,8 @@ end module mod_constructor_table
 !================================================================================================
 program tests
 #include <msg.h>
-  use vGrid_Descriptors, only: vgd_levels,VGD_ERROR
+  use vGrid_Descriptors, only: vgd_levels,vgd_putopt,VGD_ERROR
   use Unit_Testing, only: ut_report
-
 
   implicit none
 
@@ -55,6 +54,8 @@ program tests
        /)
   
   call msg_verbosity(MSG_DEBUG)
+
+  stat =  vgd_putopt("ALLOW_SIGMA",.true.)
 
   do i=1,nfiles
      stat = do_it(lu,files(i))

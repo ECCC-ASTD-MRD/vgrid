@@ -14,6 +14,9 @@
 // Macros
 #define FREE(x) if(x) { free(x); x=NULL; }
 
+// Options
+static int ALLOW_SIGMA = 0;
+
 // Validity table for self
 #define VALID_TABLE_SIZE 9
 
@@ -2409,6 +2412,25 @@ int c_vgrid_genab_5005(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef
 
 }
 
+int Cvgd_getopt_int(char *key, int *value, int quiet)
+{
+  if(! value){
+    printf("(Cvgd) ERROR in Cvgd_getopt_int, value is a NULL pointer\n");
+    return(VGD_ERROR);
+  }
+  if (strcmp(key, "ALLOW_SIGMA") == 0){
+      *value = ALLOW_SIGMA;
+  } else {
+    if(! quiet) {
+      printf("(Cvgd) ERROR in Cvgd_getopt_int, invalid key %s\n",key);
+      fflush(stdout);
+    }
+    return(VGD_ERROR);
+  }  
+  
+  return(VGD_OK);
+}
+
 int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet)
 {  
   if(! Cvgd_is_valid(self,"SELF")){
@@ -2851,6 +2873,16 @@ int Cvgd_put_char(vgrid_descriptor **self, char *key, char *value) {
   return(VGD_OK);
 }
 
+int Cvgd_putopt_int(char *key, int value) {
+  if( strcmp(key, "ALLOW_SIGMA") == 0 ) {
+    ALLOW_SIGMA = value;
+  } else {
+    printf("(Cvgd) ERROR in Cvgd_putopt_int, invalid key %s\n", key);
+    return(VGD_ERROR);
+  }
+  return(VGD_OK);
+}
+    
 int Cvgd_put_int(vgrid_descriptor **self, char *key, int value) {
   
   if(! self) {
@@ -3260,7 +3292,11 @@ static int C_gen_legacy_desc(vgrid_descriptor **self, int unit, int *ip1list, in
       printf("C_gen_legacy_desc TO CONTINUE hybrid (normalized) coordinate with HY and no PT\n");
       return(VGD_ERROR);
     } else {
-      // SIGMA SIGMA SIGMASIGMA SIGMA SIGMASIGMA SIGMA
+      // SIGMA SIGMA SIGMA SIGMA SIGMA SIGMA SIGMA SIGMA
+      if( ! ALLOW_SIGMA ){
+	printf("(Cvgd)   C_gen_legacy_desc error: sigma coordinate construction is not ALLOWED.\n(Cvgd)       If your are certain that you want this sigma coordinate, set ALLOW_SIGMA to true e.g.\n(Cvgd)          in fortran stat =  vgd_putopt(\"ALLOW_SIGMA\",.true.)\n(Cvgd)          in C       stat = Cvgd_putopt_int(\"ALLOW_SIGMA\",1)\n");
+	goto bomb;
+      }
       if( C_genab_1001(hyb, nb, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ){
 	goto bomb;
       }

@@ -25,6 +25,14 @@ program tests
      ok=.false.
   endif
 
+  stat=vgd_getopt('ALLOW_SIGMA',key_value_L)
+  if(stat==VGD_ERROR)ok=.false.
+  print*,'ALLOW_SIGMA=',key_value_L
+  if(key_value_L)then
+     print*,'Default ALLOW_SIGMA must by false it is ',key_value_L
+     ok=.false.
+  endif
+
   !=======
   ! putopt
   !-------
@@ -39,10 +47,21 @@ program tests
   endif
   stat=vgd_getopt('ALLOW_RESHAPE',key_value_L)
   if(.not.key_value_L)then
-     print*,'This key should be .true. and it is not'
+     print*,'Key ALLOW_RESHAPE should be .true. and it is not'
      ok=.false.
   endif
 
+  stat=vgd_putopt('ALLOW_SIGMA',.true.)
+  if(stat==VGD_ERROR)then
+     print*,'This should not happend please fixit 2'
+     call exit(1)
+  endif
+  stat=vgd_getopt('ALLOW_SIGMA',key_value_L)
+  if(.not.key_value_L)then
+     print*,'Key ALLOW_SIGMA should be .true. and it is not'
+     ok=.false.
+  endif
+  
   call ut_report(ok,message='Grid_Descriptors:: vgd_getopt vgd_putopt')
 
 end program tests
