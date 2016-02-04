@@ -1,6 +1,6 @@
 program level_withref_5001
 
-  use vGrid_Descriptors, only: VGD_OK,VGD_ERROR
+  use vGrid_Descriptors, only: vgd_putopt,VGD_OK,VGD_ERROR
   use Unit_Testing, only: ut_report
   
   implicit none
@@ -8,8 +8,10 @@ program level_withref_5001
 
   stat=VGD_OK
 
+  ier=vgd_putopt('ALLOW_SIGMA',.true.)
   ier=chek_levels_withref('data/dm_1001_from_model_run','')
   if(ier==VGD_ERROR)stat=VGD_ERROR
+  ier=vgd_putopt('ALLOW_SIGMA',.false.)
 
   ier=chek_levels_withref('data/dm_1002_from_model_run','')
   if(ier==VGD_ERROR)stat=VGD_ERROR

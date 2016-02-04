@@ -144,6 +144,9 @@ int test_it(char *filename) {
 void c_levels_all() {
   
   int i, ier, status = VGD_OK;
+
+  ier = Cvgd_putopt_int("ALLOW_SIGMA",1);
+
   for (i = 0; i < n_file; i++) {
     printf ("Testing %s\n", filenames[i]);
     if(test_it(filenames[i]) == VGD_ERROR)

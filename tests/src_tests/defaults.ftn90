@@ -1,17 +1,16 @@
 program defaults
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,VGD_MISSING
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_putopt,VGD_MISSING,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
 
   type(vgrid_descriptor) :: vgrid
-  integer :: lu=0,lutxt=69
+  integer :: lu=0
   integer :: stat
   integer :: fnom,fstouv,fstfrm
-  logical :: ok
   real(kind=8) :: ptop
-
+  
   stat=fnom(lu,"data/dm_1001_from_model_run","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
@@ -24,7 +23,13 @@ program defaults
   endif
 
   ! Construct a new set of 3D coordinate descriptors
+  stat = vgd_putopt("ALLOW_SIGMA",.true.)
   stat = vgd_new(vgrid,unit=lu,format="fst")
+  if(stat.eq.VGD_ERROR)then
+     print*,'In test error with vgd_new'
+     stop
+  endif
+
   stat = vgd_get(vgrid,'PTOP',ptop)
   if (abs(ptop-dble(VGD_MISSING))<10.*epsilon(ptop)) then
      stat = 0

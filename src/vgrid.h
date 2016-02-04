@@ -10,8 +10,6 @@
 #define VGD_MAXSTR_ETIKET 13
 #define VGD_MAXSTR_GRTYP  2
 
-#define VGRID_ALLOW_RESHAPE 0
-
 typedef struct VGD_TFSTD {
    int   dateo;                 // date d'origine du champs
    int   deet;                  // duree d'un pas de temps
