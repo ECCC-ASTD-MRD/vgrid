@@ -11,6 +11,7 @@ int c_simple_pressure() {
   int *i_val = NULL, nl_t, iun=10, ier, key, ni, nj, nk, ij, k;
   float *p0 = NULL, p0_stn, *pres = NULL, *prof = NULL;
   vgrid_descriptor *vgd = NULL;
+
 #include "vgrid_version.hc"
   
   printf("%s\n", vgrid_descriptors_version);

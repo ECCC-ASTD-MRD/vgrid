@@ -579,10 +579,10 @@ int Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip) {
       printf("  Equation to compute hydrostatic pressure (pi): pi = B * P0*100\n");
       break;
     case 1002:
-      printf("  Number of pressure levels %d\n", self->nl_m );
+      printf("  Number of eta levels %d\n", self->nl_m );
       break;
     case 2001:
-      printf("  Number of eta levels %d\n", self->nl_m );
+      printf("  Number of pressure levels %d\n", self->nl_m );
       printf("  Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100\n");
       break;
     case 1003:
