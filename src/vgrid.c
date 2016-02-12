@@ -215,8 +215,10 @@ int max_int(int *vec, int ni) {
   return(vec[ind]);
 }
 
-double c_get_error(char *key) {
-  printf("(Cvgd) ERROR in c_get_error, attempt to retrieve invalid key %s\n",key);
+double c_get_error(char *key, int quiet) {
+  if (! quiet) {
+    printf("(Cvgd) ERROR in c_get_error, attempt to retrieve invalid key %s\n",key);
+  }
   return(VGD_MISSING);
 }
 
@@ -2557,25 +2559,25 @@ int Cvgd_get_float(vgrid_descriptor *self, char *key, float *value, int quiet) {
     if( is_valid(self,rcoef1_valid) ){
       *value = self->rcoef1;
     } else {
-      *value = (float) c_get_error(key);
+      *value = (float) c_get_error(key,quiet);
     }
   } else  if( strcmp(key, "RC_2" ) == 0 ){
     if( is_valid(self,rcoef2_valid) ){
       *value = self->rcoef2;
     } else {
-      *value = (float) c_get_error(key);
+      *value = (float) c_get_error(key,quiet);
     }
   } else  if( strcmp(key, "DHM " ) == 0 ){
     if( is_valid(self,dhm_valid) ){
       *value = self->dhm;
     } else {
-      *value = (float) c_get_error(key);
+      *value = (float) c_get_error(key,quiet);
     }
   } else  if( strcmp(key, "DHT " ) == 0 ){
     if( is_valid(self,dht_valid) ){
       *value = self->dht;
     } else {
-      *value = (float) c_get_error(key);
+      *value = (float) c_get_error(key,quiet);
     }
   } else {
     if(! quiet) {
