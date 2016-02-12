@@ -1260,14 +1260,14 @@ contains
           value=self%ip1_m(size(self%ip1_m))
           
        else
-          value = get_error(key)
+          value = get_error(key,my_quiet)
           return
        endif
     case ('DIPT')
        if (is_valid(self,dht_valid)) then
           value=self%ip1_t(size(self%ip1_t))
        else
-          value = get_error(key)
+          value = get_error(key,my_quiet)
           return
        endif
     case DEFAULT
@@ -1325,7 +1325,7 @@ contains
           if (istat /= 0) return
           value = self%ip1_m
        else
-          error = int(get_error(key))
+          error = int(get_error(key,my_quiet))
           return
        endif
     case ('VIPT')
@@ -1340,7 +1340,7 @@ contains
              value = self%ip1_m
           endif
        else
-          error = int(get_error(key))
+          error = int(get_error(key,my_quiet))
           return
        endif
     case DEFAULT
@@ -1387,14 +1387,14 @@ contains
        if (is_valid(self,rcoef1_valid)) then
           value = self%rcoef1
        else
-          value = get_error(key)
+          value = get_error(key,my_quiet)
           return
        endif
     case ('RC_2')
        if (is_valid(self,rcoef2_valid)) then
           value = self%rcoef2
        else
-          value = get_error(key)
+          value = get_error(key,my_quiet)
           return
        endif
     case ('DHM ')
@@ -1403,7 +1403,7 @@ contains
           call convip(iwork,work,kind,-1,dum_S,.false.)
           value=work
        else
-          value = get_error(key)
+          value = get_error(key,my_quiet)
           return
        endif
     case ('DHT ')       
@@ -1413,7 +1413,7 @@ contains
           call convip(iwork,work,kind,-1,dum_S,.false.)
           value=work
        else
-          value = get_error(key)
+          value = get_error(key,my_quiet)
           return
        endif
     case DEFAULT
@@ -1467,7 +1467,7 @@ contains
              call convip(self%ip1_m(k),value(k),kind,-1,'',.false.)
           enddo
        else
-          error = int(get_error(key))
+          error = int(get_error(key,my_quiet))
           return
        endif
     case ('VCDT')
@@ -1489,7 +1489,7 @@ contains
           enddo
           deallocate(vipt)
        else
-          error = int(get_error(key))
+          error = int(get_error(key,my_quiet))
           return
        endif
     case ('VCRD')
@@ -1498,7 +1498,7 @@ contains
           call msg(level_msg,VGD_PRFX//for_msg)
           return
        else
-          error = int(get_error(key))
+          error = int(get_error(key,my_quiet))
           return
        endif
     case DEFAULT
@@ -1543,28 +1543,28 @@ contains
        if (is_valid(self,ptop_8_valid)) then
           value = self%ptop_8
        else
-          value = dble(get_error(key))
+          value = dble(get_error(key,my_quiet))
           return
        endif
     case ('PREF')
        if (is_valid(self,pref_8_valid)) then
           value = self%pref_8
        else
-          value = dble(get_error(key))
+          value = dble(get_error(key,my_quiet))
           return
        endif
     case ('RC_1')
        if (is_valid(self,rcoef1_valid)) then
           value = self%rcoef1
        else
-          value = dble(get_error(key))
+          value = dble(get_error(key,my_quiet))
           return
        endif
     case ('RC_2')
        if (is_valid(self,rcoef2_valid)) then
           value = self%rcoef2
        else
-          value = dble(get_error(key))
+          value = dble(get_error(key,my_quiet))
           return
        endif
     case DEFAULT
@@ -1611,7 +1611,7 @@ contains
           if (istat /= 0) return
           value = self%a_m_8
        else
-          error = int(get_error(key))
+          error = int(get_error(key,my_quiet))
           return
        endif
     case ('CB_M')
@@ -1620,7 +1620,7 @@ contains
           if (istat /= 0) return
           value = self%b_m_8
        else
-          error = int(get_error(key))
+          error = int(get_error(key,my_quiet))
           return
        endif
     case ('CA_T')
@@ -1635,7 +1635,7 @@ contains
              value = self%a_m_8
           endif
        else
-          error = int(get_error(key))
+          error = int(get_error(key,my_quiet))
           return
        endif
     case ('CB_T')
@@ -1650,7 +1650,7 @@ contains
              value = self%b_m_8
           endif
        else
-          error = int(get_error(key))
+          error = int(get_error(key,my_quiet))
           return
        endif
     case ('COFA')
@@ -1659,7 +1659,7 @@ contains
           if (istat /= 0) return
           value = self%a_m_8
        else
-          error = int(get_error(key))
+          error = int(get_error(key,my_quiet))
           return
        endif
     case ('COFB')
@@ -1668,7 +1668,7 @@ contains
           if (istat /= 0) return
           value = self%b_m_8
        else
-          error = int(get_error(key))
+          error = int(get_error(key,my_quiet))
           return
        endif
     case DEFAULT
@@ -1759,7 +1759,7 @@ contains
        if (is_valid(self,ref_name_valid)) then
           value = printingCharacters(self%ref_name)
        else
-          write(for_msg,'(i8)') get_error(key)
+          write(for_msg,'(i8)') get_error(key,my_quiet)
           call msg(level_msg,VGD_PRFX//for_msg)
           return
        endif
@@ -2885,7 +2885,7 @@ contains
   end function levels_withref_prof_8
 
   integer function dpidpis_withref_prof(self,ip1_list,dpidpis,sfc_field) result(status)
-     use utils, only: get_allocate,up,get_error
+     use utils, only: get_allocate,up
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
      real, dimension(:), pointer :: dpidpis                      !Derivative values
@@ -2929,7 +2929,7 @@ contains
   end function dpidpis_withref_prof
 
   integer function dpidpis_withref_prof_8(self,ip1_list,dpidpis,sfc_field) result(status)
-     use utils, only: get_allocate,up,get_error
+     use utils, only: get_allocate,up
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
      real*8, dimension(:), pointer :: dpidpis                      !Derivative values
@@ -4922,7 +4922,7 @@ contains
           write(for_msg,*)' sigma coordinate found'
           if(.not.ALLOW_SIGMA)then
              call msg(MSG_ERROR,VGD_PRFX//for_msg)
-             write(for_msg,*) 'gen_legacy_desc error: sigma coordinate construction is not ALLOWED. If your are certain that you want this sigma coordinate, set ALLOW_RESHAPE to true e.g. stat = vgd_putopt("ALLOW_RESHAPE",.true.)'
+             write(for_msg,*) 'gen_legacy_desc error: sigma coordinate construction is not ALLOWED. If your are certain that you want this sigma coordinate, set ALLOW_SIGMA to true e.g. stat = vgd_putopt("ALLOW_SIGMA",.true.)'
              call msg(MSG_ERROR,VGD_PRFX//for_msg)
              goto 999
           endif
