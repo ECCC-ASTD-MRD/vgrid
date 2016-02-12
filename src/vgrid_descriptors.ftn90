@@ -1071,7 +1071,7 @@ contains
   end function levels_withref_prof_8
 
   integer function dpidpis_withref_prof(self,ip1_list,dpidpis,sfc_field) result(status)
-     use utils, only: get_allocate,up,get_error
+     use utils, only: get_allocate,up
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
      real, dimension(:), pointer :: dpidpis                      !Derivative values
@@ -1115,7 +1115,7 @@ contains
   end function dpidpis_withref_prof
 
   integer function dpidpis_withref_prof_8(self,ip1_list,dpidpis,sfc_field) result(status)
-     use utils, only: up,get_error
+     use utils, only: up
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
      real*8, dimension(:), pointer :: dpidpis                      !Derivative values
@@ -1609,6 +1609,7 @@ contains
       type(c_ptr) :: value_CP, nk_CP
       character(len=KEY_LENGTH) :: my_key
       integer, target :: nk
+      logical :: my_quiet
 
       nk_CP = c_loc(nk)
 
@@ -1623,10 +1624,12 @@ contains
       endif
 
       l_quiet = 0
+      my_quiet = .false.
       if (present(quiet))then
+         my_quiet = quiet
          if(quiet) then
             level_msg=MSG_QUIET
-            l_quiet = 1
+            l_quiet = 1            
          else
             l_quiet = 0
          endif         
@@ -1644,7 +1647,7 @@ contains
             value_CP = c_loc(value(1))            
             status = f_get_int_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,nk_CP,l_quiet)
          else
-            error = int(get_error(key))
+            error = int(get_error(key,my_quiet))
             return
          endif
       case ('VIPT')
@@ -1655,7 +1658,7 @@ contains
             value_CP = c_loc(value(1))
             status = f_get_int_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,nk_CP,l_quiet)
          else
-            error = int(get_error(key))
+            error = int(get_error(key,my_quiet))
             return
          endif
       case DEFAULT
@@ -1714,6 +1717,7 @@ contains
       integer :: l_quiet
       type(c_ptr) :: value_CP
       character(len=KEY_LENGTH) :: my_key
+      logical :: my_quiet
 
       ! Set error status
       status = VGD_ERROR
@@ -1727,8 +1731,10 @@ contains
          return
       endif
       l_quiet = 0
+      my_quiet = .false.
       if (present(quiet))then
-         if(quiet) then
+         my_quiet = quiet
+         if(quiet) then            
             level_msg=MSG_QUIET
             l_quiet = 1
          else
@@ -1749,7 +1755,7 @@ contains
             istat = f_get_real_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
             if (istat == VGD_ERROR) return
          else
-            error = int(get_error(key))
+            error = int(get_error(key,my_quiet))
             return
          endif
       case ('VCDT')
@@ -1761,7 +1767,7 @@ contains
             istat = f_get_real_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
             if (istat == VGD_ERROR) return
          else
-            error = int(get_error(key))
+            error = int(get_error(key,my_quiet))
             return
          endif
       case ('VCRD')
@@ -1770,7 +1776,7 @@ contains
             call msg(level_msg,VGD_PRFX//for_msg)
             return
          else
-            error = int(get_error(key))
+            error = int(get_error(key,my_quiet))
             return
          endif
       case DEFAULT
@@ -1828,6 +1834,7 @@ contains
       integer :: nl_, istat, level_msg, error, l_quiet
       type(c_ptr) :: value_CP
       character(len=KEY_LENGTH) :: my_key
+      logical :: my_quiet
 
       status = VGD_ERROR
 
@@ -1838,7 +1845,9 @@ contains
          return
       endif
       l_quiet = 0
+      my_quiet = .false.
       if (present(quiet))then
+         my_quiet = quiet 
          if(quiet) then
             level_msg=MSG_QUIET
             l_quiet = 1
@@ -1858,7 +1867,7 @@ contains
             value_CP = c_loc(value(1))
             status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
          else
-            error = int(get_error(key))
+            error = int(get_error(key,my_quiet))
             return
          endif
       case ('CB_M','COFB')
@@ -1869,7 +1878,7 @@ contains
             value_CP = c_loc(value(1))
             status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
          else
-            error = int(get_error(key))
+            error = int(get_error(key,my_quiet))
             return
          endif
       case ('CA_T')
@@ -1880,7 +1889,7 @@ contains
             value_CP = c_loc(value(1))
             status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)            
          else
-            error = int(get_error(key))
+            error = int(get_error(key,my_quiet))
             return
          endif
       case ('CB_T')
@@ -1891,7 +1900,7 @@ contains
             value_CP = c_loc(value(1))
             status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
          else
-            error = int(get_error(key))
+            error = int(get_error(key,my_quiet))
             return
          endif
       case DEFAULT

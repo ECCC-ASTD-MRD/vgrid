@@ -367,12 +367,19 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Get/Put support functions
   
-  real function get_error(key) result(value)
+  real function get_error(key,quiet) result(value)
     ! Write error message and return a missing value     
     implicit none
     character(len=*), intent(in) :: key
+    logical, optional, intent(in) :: quiet      !Do not print massages
+    ! Local variables
+    integer :: level_msg
+    level_msg=MSG_CRITICAL
+    if (present(quiet)) then
+       if(quiet)level_msg=MSG_QUIET    
+    endif
     write(for_msg,*) 'Attempt to retrieve invalid key '//trim(key)//' returns VGD_MISSING'
-    call msg(MSG_CRITICAL,for_msg)
+    call msg(level_msg,for_msg)
     value = dble(VGD_MISSING)
     return
   end function get_error
