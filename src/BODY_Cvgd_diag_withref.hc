@@ -38,8 +38,8 @@
       if( C_compute_pressure_2001_8(self, ni, nj, nk, ip1_list, levels_8, in_log) == VGD_ERROR)
 	return(VGD_ERROR);
     } else {
-      printf("TODO 2001");
-      return(VGD_ERROR);
+      if( C_compute_pressure_2001(self, ni, nj, nk, ip1_list, levels, in_log) == VGD_ERROR)
+	return(VGD_ERROR);
     }
     break;
   case 1003:

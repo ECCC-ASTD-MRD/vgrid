@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "vgrid.h"
 
 char *filenames[] = {
     "data/dm_1001_from_model_run",
     "data/dm_1002_from_model_run",
+    "data/2001_from_model_run",
     "data/dm_5001_from_model_run",
     "data/dm_5002_from_model_run",
     "data/dm_5005_from_model_run",
@@ -16,10 +18,10 @@ int test_it(char *filename) {
 
   int ier, iun = 10;
   int *quiet = NULL, *i_val = NULL, *in_log = NULL, *dpidpis = NULL;
-  int nl_t, ni, nj, nk, ni2, nj2, nk2, k, key, ij, ijk;
+  int nl_t, ni, nj, nk, ni2, nj2, nk2, k, key, ij, ijk, kind;
   char mode[]="RND";
   char format[] = "FST";
-  char name[5];
+  char nomvar[5];
   float *f_val = NULL, *p0 = NULL, *px = NULL, *levels = NULL;
   double *p0_8 = NULL, *levels_8 = NULL;
   vgrid_descriptor *vgd = NULL;
@@ -50,12 +52,32 @@ int test_it(char *filename) {
   if(ier == VGD_ERROR){
     return(VGD_ERROR);
   }
-      
+  
   // Compute 3D pressure levels
-  // First get P0 (the reference field)
-  key = c_fstinf( iun, &ni2, &nj2, &nk2, -1, " ", -1, -1, -1, " ", "P0");
+  // First get P0 (the reference field) is any
+  ier = Cvgd_get_char(vgd, "RFLD", nomvar, 0);
+  if(ier == VGD_ERROR){
+    return(VGD_ERROR);
+  }
+  printf("RFLD='%s'",nomvar);
+  if ( !strcmp(nomvar,"P0") || !strcmp(nomvar,"P0  ") ){
+    strcpy(nomvar,"P0  ");
+  } else {
+    // Is nomvar is not P0 test if it kind == 2 (pressure level)
+    // If is is then put nomvar to TT to get problem size. but the actual TT value will not be used
+    ier = Cvgd_get_int(vgd, "KIND", &kind, 0);
+    if(ier == VGD_ERROR){
+      return(VGD_ERROR);
+    }
+    if( kind != 2 ){
+      printf("ERROR in test: Expecting kind = 2 (pressure) since RFLD name is blanck but got kind = %d\n",kind);
+      return(VGD_ERROR);
+    }
+    strcpy(nomvar,"TT  ");
+  }
+  key = c_fstinf( iun, &ni2, &nj2, &nk2, -1, " ", -1, -1, -1, " ", nomvar);
   if(key < 0){
-    printf("Problem getting info for P0\n");
+    printf("Problem getting info for %s", nomvar);
     return(VGD_ERROR);
   }
   p0 = malloc(ni2*nj2 * sizeof(float));
