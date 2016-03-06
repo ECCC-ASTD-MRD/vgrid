@@ -342,7 +342,7 @@ void decode_HY(VGD_TFSTD_ext var, double *ptop_8, double *pref_8, float *rcoef){
   *rcoef = var.ig2/1000.;
 }
 
-int my_fstprm(int key,VGD_TFSTD_ext *ff) {
+static int my_fstprm(int key,VGD_TFSTD_ext *ff) {
   int fstprm;
   //var->ip1 = 62;
   STR_INIT(ff->typvar,VGD_MAXSTR_TYPVAR);
