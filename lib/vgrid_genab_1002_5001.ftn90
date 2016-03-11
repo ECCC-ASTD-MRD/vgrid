@@ -85,11 +85,24 @@ contains
       !
       ! Code from gemdm_config.ftn
       !
-      if(F_hybuser(nk).ne.1.d0)then
-         wronghyb = .true.
-         write(for_msg,'(" ===> WRONG SPECIFICATION OF HYB VERTICAL LEVELS: HYB(NK) MUST BE 1.0")')
-         call msg(MSG_ERROR,VGD_PRFX//for_msg)
-         return
+      if ( F_vcode == 1002 )then
+         ! For eta, relax the test on F_hybuser(nk).ne.1.d0 to allow legacy construction of
+         ! partial atmospheric levels. Some users just wanted the top halp of the atmosphere and
+         ! this test was making thier call to vgrid to bomb. Since there is no more model
+         ! using eta this is safe.
+         if(F_hybuser(nk).gt.1.d0)then
+            wronghyb = .true.
+            write(for_msg,'(" ===> WRONG SPECIFICATION OF ETA VERTICAL LEVELS: ETA(NK) MUST BE LESS OR EQUAL TO 1.0")')
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            return
+         endif
+      else
+         if(F_hybuser(nk).ne.1.d0)then
+            wronghyb = .true.
+            write(for_msg,'(" ===> WRONG SPECIFICATION OF HYB VERTICAL LEVELS: HYB(NK) MUST BE 1.0")')
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            return
+         endif
       endif
       do k=2, nk
          if (F_hybuser(k).le.F_hybuser(k-1))then

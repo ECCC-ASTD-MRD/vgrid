@@ -3,13 +3,16 @@ FFLAGS="$(FFLAGS_INTEL) -C -g"
 DESCRIP_PATH = ../lib
 DATA_ARCH=`uname -s`
 
+include ../lib/setup.mk
+
 # Override incorrect implicits
 %.o : %.mod
 
 # Define suffix rules
 .SUFFIXES: .ftn90 .o
 .ftn90.o:
-	s.compile -libpath $(MY_LIBPATH) $(LIBRARY_PATH) -optf =$(FFLAGS) -includes $(MY_INCLUDE_PATH) $(DESCRIP_PATH) -src $<
+	. ssmuse-sh -d $(HPCS_BASE) -d $(HPCS_COMP) -d $(RPN_LIB);\
+	s.compile -optf =$(FFLAGS) -includes $(DESCRIP_PATH) -src $<
 
 OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/utils.o unit_testing.o
 
@@ -27,13 +30,26 @@ $(DESCRIP_PATH)/utils.o: $(DESCRIP_PATH)/utils.ftn90
 	(cd $(DESCRIP_PATH) && $(MAKE) $(MAKEFLAGS) utils.o)
 
 tests:
-	rm -rf data/* 2>/dev/null; \
-	cd data ; \
-	rm -rf WORK ; \
-	mkdir -p WORK ; \
-        ln -s ../data_$(DATA_ARCH)/* . ; \
-	cd .. ; \
+	. ssmuse-sh -d $(HPCS_BASE) -d $(HPCS_COMP) -d $(RPN_LIB);\
+	export BH_MAKE=${BH_MAKE} ;\
+	rm -rf data/* 2>/dev/null ;\
+	cd data ;\
+	rm -rf WORK ;\
+	mkdir -p WORK ;\
+        ln -s ../data_$(DATA_ARCH)/* . ;\
+	cd .. ;\
 	./run_tests.ksh $(ONLY)
+
+tests_par:
+	. ssmuse-sh -d $(HPCS_BASE) -d $(HPCS_COMP) -d $(RPN_LIB);\
+	export BH_MAKE=${BH_MAKE} ;\
+	rm -rf data/* 2>/dev/null ;\
+	cd data ;\
+	rm -rf WORK ;\
+	mkdir -p WORK ;\
+        ln -s ../data_$(DATA_ARCH)/* . ;\
+	cd .. ;\
+	./run_tests_in_parallel.ksh
 
 clean:
 	rm -f *.f90 *.o *.mod *.out

@@ -1,5 +1,11 @@
 #!/bin/ksh
 
+if [ "${BH_MAKE}" = "" ];then
+   echo "Run this script from make:"
+   echo "make tests_par"
+   exit 1
+fi
+
 eval `cclargs \
  -MAX_CPUS 12  12  "[Number of cpus to run tests]"\
  ++ $*`
@@ -46,7 +52,7 @@ for test in ${tests[*]} ; do
    mkdir data
 
    echo "   test ${test}"
-   gmake tests ONLY=${test} > ../log_${test} 2>&1 &
+   ${BH_MAKE} tests ONLY=${test} > ../log_${test} 2>&1 &
    ((NCPUS=NCPUS+1))
    if [[ ${NCPUS} -gt ${MAX_CPUS} ]];then
       NCPUS=1

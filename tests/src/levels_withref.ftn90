@@ -9,16 +9,19 @@ program level_withref_5001
   stat=VGD_OK
   
   ier = vgd_putopt("ALLOW_SIGMA",.true.)
-  
+
   ier=chek_levels_withref('data/dm_1001_from_model_run','')
   if(ier==VGD_ERROR)stat=VGD_ERROR
 
   ier=chek_levels_withref('data/dm_1002_from_model_run','')
   if(ier==VGD_ERROR)stat=VGD_ERROR
 
+  ier=chek_levels_withref('data/dm_1002_from_model_run_above_0.5','')
+  if(ier==VGD_ERROR)stat=VGD_ERROR
+
   ier=chek_levels_withref('data/dm_5001_from_model_run','')
   if(ier==VGD_ERROR)stat=VGD_ERROR
-  
+
   ier=chek_levels_withref('data/dm_5002_from_model_run','data/dm_5002_ips.txt')
   if(ier==VGD_ERROR)stat=VGD_ERROR
   
@@ -68,6 +71,8 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
    logical :: rewrit
    
    status=VGD_ERROR   
+
+   nullify(pres, pres_8, p0, px, p0_8 ,ip1s)
 
    ier=vgd_putopt('ALLOW_RESHAPE',.true.)
 
@@ -166,7 +171,7 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
          enddo
       enddo
    enddo
-   
+
    ! Test 64 bits interface
    ier = vgd_levels(d,ip1s,pres_8,p0_8)
    if(ier == VGD_ERROR )then
@@ -212,9 +217,12 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
          enddo
       enddo
    enddo
+
    deallocate(ip1s,px,p0,p0_8,pres,pres_8)
-   
+
    ier=fstfrm(lu)
+
+   print*,trim(F_fst),' is OK'
 
    status=VGD_OK   
    
