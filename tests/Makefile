@@ -49,7 +49,7 @@ tests_par:
 	mkdir -p WORK ;\
         ln -s ../data_$(DATA_ARCH)/* . ;\
 	cd .. ;\
-	./run_tests_in_parallel.ksh
+	./run_tests_in_parallel.ksh -MAX_CPUS $(TESTS_MAX_CPUS)
 
 clean:
 	rm -f *.f90 *.o *.mod *.out
