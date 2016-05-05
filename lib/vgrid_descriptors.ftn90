@@ -1755,7 +1755,8 @@ contains
        if (is_valid(self,ref_name_valid)) then
           value = printingCharacters(self%ref_name)
        else
-          write(for_msg,'(i8)') get_error(key)
+          error = get_error(key)
+          write(for_msg,'(i8)') error
           call msg(level_msg,VGD_PRFX//for_msg)
           return
        endif
