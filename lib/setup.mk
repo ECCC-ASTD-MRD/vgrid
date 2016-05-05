@@ -5,11 +5,21 @@
 
 HPCS_BASE=hpcs/201402/02/base/
 RPN_LIB=rpn/libs/15.2
-BH_PULL_SOURCE_GIT_BRANCH=5.6.0
+BH_PULL_SOURCE_GIT_BRANCH=5.6.1
 
 ifeq ($(ORDENV_PLAT),ubuntu-12.04-amd64-64)
    BH_MAKE=make
    BH_HOST=pollux
+   BH_MODE=intel
+   COMPILER=intel13sp1u2
+   HPCS_COMP = hpcs/201402/02/$(COMPILER)
+   FFLAGS = '$(MY_FFLAGS) -openmp -fp-model source  -warn all'
+   CFLAGS = '$(MY_CFLAGS) -openmp -fp-model precise -Wall'
+endif
+
+ifeq ($(ORDENV_PLAT),ubuntu-14.04-amd64-64)
+   BH_MAKE=make
+   BH_HOST=einstein
    BH_MODE=intel
    COMPILER=intel13sp1u2
    HPCS_COMP = hpcs/201402/02/$(COMPILER)
