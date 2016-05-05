@@ -10,7 +10,7 @@ def _init(b):
    # Adjust the folowing
    environ["BH_PROJECT_NAME"] = "vgriddescriptors"
    environ["BH_PULL_SOURCE"] = "%(BH_HERE_DIR)s" % environ
-   environ["BH_PULL_SOURCE_GIT_BRANCH"] = "5.5.1"
+   environ["BH_PULL_SOURCE_GIT_BRANCH"] = "5.5.2"
 
    # Add compiler if needed, select rmn lib version
    if b.mode == "intel":
