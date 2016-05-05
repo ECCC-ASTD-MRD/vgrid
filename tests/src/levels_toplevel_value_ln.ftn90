@@ -9,6 +9,8 @@ program tests
   real, dimension(:,:), allocatable :: px
   real, dimension(:,:,:), pointer :: lev
 
+  nullify(lev)
+
   stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'

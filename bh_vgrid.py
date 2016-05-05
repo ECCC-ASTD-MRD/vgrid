@@ -7,26 +7,16 @@ from bh import bhlib, actions
 
 def _init(b):
    
-   # Adjust the folowing
    environ["BH_PROJECT_NAME"] = "vgriddescriptors"
-   environ["BH_PULL_SOURCE"] = "%(BH_HERE_DIR)s" % environ
-   environ["BH_PULL_SOURCE_GIT_BRANCH"] = "5.4.1"
-
-   # Add compiler if needed, select rmn lib version
-   if b.mode == "intel":
-       b.shell(""". ssmuse-sh -d hpcs/201402/02/base -d hpcs/201402/02/intel13sp1u2 -d rpn/libs/15.2 """, environ)
-       b.shell("""export FFLAGS_INTEL='-fp-model source'""", environ)
-       environ["BH_MAKE"] = 'make'
-   elif b.mode == "xlf13":
-       b.shell(""". ssmuse-sh -d hpcs/201402/02/base -d hpcs/ext/xlf_13.1.0.10      -d rpn/libs/15.2""", environ)
-       environ["BH_MAKE"] = 'gmake' 
-
-   # Noting to change below this line
    environ["BH_PACKAGE_NAME"]  = "%(BH_PROJECT_NAME)s" % environ
    environ["BH_PACKAGE_NAMES"] = "%(BH_PROJECT_NAME)s" % environ
-   environ["BH_PACKAGE_VERSION"] = "%(BH_PULL_SOURCE_GIT_BRANCH)s-%(COMP_ARCH)s" % environ
    environ["BH_PACKAGE_CONTROL_DIR"] = "%(BH_HERE_DIR)s" % environ
-   environ["SCRIPT_NAME"] = __file__+" -m "+b.mode+" -p "+b.platform % environ
+   environ["SCRIPT_NAME"] = __file__+" -m "+b.mode+" -p "+b.platform % environ   
+
+   if b.mode == "intel":
+      environ["BH_MAKE"] = 'make'
+   elif b.mode == "xlf13":
+      environ["BH_MAKE"] = 'gmake' 
 
 def _make(b):
    
@@ -44,9 +34,10 @@ def _make(b):
              echo \"Platform: x\"                                                                                 >> ${CONTROL_FILE}
              echo \"Maintainer: cmdn (A. Plante)\"                                                                >> ${CONTROL_FILE}
              echo \"BuildInfo: git clone ${REMOTE}\"                                                              >> ${CONTROL_FILE}
-             echo \"           cd in new directory\"                                                              >> ${CONTROL_FILE}
+             echo \"           cd in new directory created\"                                                      >> ${CONTROL_FILE}
              echo \"           git checkout ${BH_PULL_SOURCE_GIT_BRANCH}"\                                        >> ${CONTROL_FILE}
-             echo \"           ${SCRIPT_NAME##*/}\"                                                               >> ${CONTROL_FILE}
+             echo \"           cd lib\"                                                                           >> ${CONTROL_FILE}
+             echo \"           make\"                                                                             >> ${CONTROL_FILE}
              echo \"Vertical grid descriptors package\"                                                           >> ${CONTROL_FILE}
              cd ${BH_BUILD_DIR}/lib
              ${BH_MAKE}
@@ -83,14 +74,13 @@ if __name__ == "__main__":
    dr, b = bhlib.init(sys.argv, bhlib.PackageBuilder)
    b.actions.set("init", _init)
    b.actions.set("pull", [actions.pull.git_archive])
-   b.actions.set("clean", ["""(cd ${BH_BUILD_DIR}/lib; ./make_dependencies.ksh; ${BH_MAKE} clean)"""])
+   b.actions.set("clean", ["""(cd ${BH_BUILD_DIR}/lib; ./make_dependencies.ksh; echo BH_MAKE=${BH_MAKE}; ${BH_MAKE} clean)"""])
    b.actions.set("make", _make)
    #b.actions.set("test",_test)
    b.actions.set("install", _install)
    b.actions.set("package", actions.package.to_ssm)
 
    b.supported_platforms = [
-      "ubuntu-10.04-amd64-64",
       "ubuntu-12.04-amd64-64",
       "ubuntu-14.04-amd64-64",
       "aix-7.1-ppc7-64",
