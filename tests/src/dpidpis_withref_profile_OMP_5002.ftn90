@@ -23,7 +23,7 @@ program tests
   logical :: ok
   real*8, dimension(:), pointer :: coef_b
   
-  nullify(ip1_list,dpidpis_3d,dpidpis_3d_from_prof,dpidpis_3d_from_prof_8,p0,px,p0_8,p00,p00_8,coef_b)
+  nullify(ip1_list,dpidpis_3d,dpidpis_3d_from_prof,dpidpis_3d_8,dpidpis_3d_from_prof_8,p0,px,p0_8,p00,p00_8,coef_b)
 
   stat=fnom(lu,"data/dm_5002_from_model_run","RND+R/O",0)
   if(stat.lt.0)then
