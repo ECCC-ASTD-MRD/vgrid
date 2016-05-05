@@ -13,6 +13,8 @@ program constructor
   real*8, dimension(:), pointer :: cam,cbm
   real, dimension(:), pointer :: vcrd
 
+  nullify(vip1,cam,cbm,vcrd)
+
   stat=fnom(lu,"data/dm_5001_from_model_run_plus_toc","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
