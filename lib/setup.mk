@@ -3,7 +3,7 @@
 #MY_CFLAGS = -O2
 #MY_CFLAGS =    -g -O0
 
-BH_PULL_SOURCE_GIT_BRANCH=5.4.2
+BH_PULL_SOURCE_GIT_BRANCH=5.4.0.1
 TESTS_MAX_CPUS=12
 
 DOMAIN=$(shell hostname -f | cut -d. -f2-)
