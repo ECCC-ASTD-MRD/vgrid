@@ -11,6 +11,8 @@ else
   set -A tests ${ONLY}
 fi
 
+which gmake && MAKE=gmake || MAKE=make
+
 #==============
 function Other_Tests {
    result_o=' ok'
@@ -52,13 +54,13 @@ for test in ${tests[*]} ; do
       perl -p -e "s/UNIT_TEST_F/${test}/g" ${template} >Makefile.test
   fi
   echo "Compiling ${test}" >>${compile_log} 2>&1
-  gmake -f Makefile.test ${test} OPENMP=${OPENMP} >>${compile_log} 2>&1
+  ${MAKE} -f Makefile.test ${test} OPENMP=${OPENMP} >>${compile_log} 2>&1
   if [ ! $? -eq 0 ] ; then
-    printf "\n ERROR compiling test ${test} ... aborting (try 'gmake -f Makefile.test ${test} ${OPENMP_MESSAGE}' for details)\n"
+    printf "\n ERROR compiling test ${test} ... aborting (try '${MAKE} -f Makefile.test ${test} ${OPENMP_MESSAGE}' for details)\n"
     exit 1
   fi
   rm -f ${test}${EXT}
-  gmake -f Makefile.test clean >/dev/null 2>&1
+  ${MAKE} -f Makefile.test clean >/dev/null 2>&1
   printf " ok\n"
 done
 printf " * All Builds Succeeded\n"

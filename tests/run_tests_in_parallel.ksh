@@ -13,6 +13,8 @@ else
   set -A tests $*
 fi
 
+which gmake && MAKE=gmake || MAKE=make
+
 MASTER=$PWD
 
 rm -rf WORK/$EC_ARCH
@@ -47,7 +49,7 @@ for test in ${tests[*]} ; do
    mkdir data
 
    echo "   test ${test}"
-   gmake tests ONLY=${test} > ../log_${test} 2>&1 &
+   ${MAKE} tests ONLY=${test} > ../log_${test} 2>&1 &
    ((NCPUS=NCPUS+1))
    if [[ ${NCPUS} -gt ${MAX_CPUS} ]];then
       NCPUS=1

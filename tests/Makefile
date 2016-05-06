@@ -1,10 +1,11 @@
 DATA_ARCH=`uname -s`
 
 alltests:
-	gmake tests DATA_ARCH=Linux; \
-        gmake tests DATA_ARCH=AIX
+	$(BH_MAKE) tests DATA_ARCH=Linux; \
+        $(BH_MAKE) tests DATA_ARCH=AIX
 
 tests:
+	mkdir -p data;\
 	rm -rf data/* 2>/dev/null; \
 	cd data ; \
 	rm -rf WORK ; \

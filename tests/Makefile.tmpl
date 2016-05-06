@@ -2,31 +2,33 @@ DESCRIP_PATH = ../src
 
 include $(DESCRIP_PATH)/setup.mk
 
-ALL_SSM = -d $(HPCS_BASE) -d $(HPCS_COMP) -d $(RPN_LIB)
-
 %.o: %.ftn90
-	. ssmuse-sh $(ALL_SSM) ;\
+	. ssmuse-sh -d $(HPCS_BASE) -d $(HPCS_COMP) $(CODE_TOOLS);\
+        . ssmuse-sh -d $(RPN_LIB);\
 	s.compile -src $< -optf =$(FFLAGS) -libpath $(DESCRIP_PATH) -includes $(DESCRIP_PATH)
 
 %.o: %.c
-	. ssmuse-sh $(ALL_SSM) ;\
+	. ssmuse-sh -d $(HPCS_BASE) -d $(HPCS_COMP) $(CODE_TOOLS);\
+        . ssmuse-sh -d $(RPN_LIB);\
 	s.compile -src $< -optc =$(CFLAGS) -libpath $(DESCRIP_PATH) -includes $(DESCRIP_PATH)
 
 OBJECTS = unit_testing.o c_ut_report.o
 
 UNIT_TEST_F: $(OBJECTS) UNIT_TEST_F.ftn90 $(DESCRIP_PATH)/libdescrip.a
-	. ssmuse-sh $(ALL_SSM) ;\
+	. ssmuse-sh -d $(HPCS_BASE) -d $(HPCS_COMP) $(CODE_TOOLS);\
+        . ssmuse-sh -d $(RPN_LIB);\
 	echo COMPILER=$(COMPILER) > compile_INFO ;\
 	s.compile $(OPENMP) -optf =$(FFLAGS) -includes $(DESCRIP_PATH) -src UNIT_TEST_F.ftn90 -o UNIT_TEST_F -obj $(OBJECTS) -libpath $(DESCRIP_PATH) -librmn -libappl descrip
 
 UNIT_TEST_C: $(OBJECTS) UNIT_TEST_C.c $(DESCRIP_PATH)/libdescrip.a
-	. ssmuse-sh $(ALL_SSM) ;\
+	. ssmuse-sh -d $(HPCS_BASE) -d $(HPCS_COMP) $(CODE_TOOLS);\
+        . ssmuse-sh -d $(RPN_LIB);\
 	echo COMPILER=$(COMPILER) > compile_INFO ;\
 	s.compile $(OPENMP) -optc =$(CFLAGS) -includes $(DESCRIP_PATH) -src UNIT_TEST_C.c -o UNIT_TEST_C -bidon c -main UNIT_TEST_C -obj $(OBJECTS) -libpath $(DESCRIP_PATH) -librmn -libappl descrip
 
 $(DESCRIP_PATH)/libdescrip.a: $(DESCRIP_PATH)/*.c $(DESCRIP_PATH)/*.ftn90 $(DESCRIP_PATH)/*.h $(DESCRIP_PATH)/*.hc
 	cd ../src ;\
-	gmake;\
+	$(BH_MAKE);\
 
 clean:
 	rm -f *.f90 *.o *.mod
