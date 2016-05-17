@@ -58,6 +58,16 @@ static int ref_name_valid   [VALID_TABLE_SIZE] = { 1001, 1002, 1003,    0, 5001,
 static int dhm_valid        [VALID_TABLE_SIZE] = {    0,    0,    0,    0,    0,    0,    0,    0, 5005};
 static int dht_valid        [VALID_TABLE_SIZE] = {    0,    0,    0,    0,    0,    0,    0,    0, 5005};
 static int is_in_logp       [VALID_TABLE_SIZE] = {    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005};
+
+static int c_encode_vert_5002_5003_5004_5005(vgrid_descriptor **self, char update);
+static int fstd_init(vgrid_descriptor *VGrid);
+static vgrid_descriptor* c_vgd_construct();
+static int c_encode_vert_1001(vgrid_descriptor **self,int nk);
+static int c_encode_vert_1002(vgrid_descriptor **self,int nk);
+static int c_encode_vert_2001(vgrid_descriptor **self,int nk);
+static int c_encode_vert_5001(vgrid_descriptor **self,int nk);
+static int c_encode_vert_5002_5003_5004_5005(vgrid_descriptor **self, char update);
+
 static int is_valid(vgrid_descriptor *self, int *table_valid)
 {
   int k;
@@ -532,28 +542,6 @@ static int VGD_FindIp1Idx(int Ip1,int *Lst,int Size) {
    return(-1);
 }
 
-/*----------------------------------------------------------------------------
- * Nom      : <MemInit>
- * Creation : Avril 2015 - E. Legault-Ouellet - CMC/CMOE
- *
- * But      : Initialise un array de double à une valeur donnée
- *
- * Parametres :
- *  <Arr>   : L'array à initialiser
- *  <Val>   : La valeur à laquelle initialiser l'array
- *  <Size>  : La taille de l'array
- *
- * Retour   : 
- *
- * Remarques :
- *
- *----------------------------------------------------------------------------
- */
-void VGD_MemInit(double *Arr,double Val,int Size) {
-   while( Size-- )
-      *Arr++ = Val;
-}
-
 int Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip) {
   int k, ip1, kind;
   if(! self ) {
@@ -790,7 +778,7 @@ int Cvgd_diag_withref(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_l
  *
  *----------------------------------------------------------------------------
  */
-vgrid_descriptor* c_vgd_construct() {
+static vgrid_descriptor* c_vgd_construct() {
 
    vgrid_descriptor *vgrid = malloc(sizeof(vgrid_descriptor));
 
@@ -949,8 +937,9 @@ int Cvgd_set_vcode(vgrid_descriptor *VGrid) {
  *----------------------------------------------------------------------------
  */
 static int fstd_init(vgrid_descriptor *VGrid) {
-   VGD_TFSTD *h = &VGrid->rec;
    int err;
+
+   VGD_TFSTD *h = &VGrid->rec;
 
    if( h->fstd_initialized )
       return(VGD_OK);
@@ -1019,7 +1008,7 @@ int Cvgd_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, 
 		     double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int nl_m, int nl_t)
 {
   char cvcode[5];
-  int errorInput = 0, ier;
+  int errorInput = 0, ier, missingInput;
   
   if(*self){
     Cvgd_free(self);
@@ -1049,7 +1038,6 @@ int Cvgd_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, 
   (*self)->rec.ig1   = (*self)->vcode;
 
   // Check for required inputs
-  int missingInput = 0;
   if( is_valid( *self, ptop_8_valid) ) {
     if(ptop_8) {
       (*self)->ptop_8 = *ptop_8;

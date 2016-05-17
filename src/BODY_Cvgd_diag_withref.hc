@@ -1,6 +1,4 @@
 
-  int error,k,ijk,ij;
-  
   if(! Cvgd_is_valid(self,"SELF")){
     printf("(Cvgd) ERROR in %s, invalid vgrid.\n",proc_name);
     return(VGD_ERROR);
