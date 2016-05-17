@@ -24,7 +24,7 @@ program constructor
   !
   type(vgrid_descriptor) :: d,d2
   integer :: stat,i,nl_m,nl_t,k,nk,test_2001
-  integer, dimension(:), allocatable :: ip1s
+  integer, dimension(:), pointer :: ip1s
   integer, dimension(:), pointer :: vipm,vipt,work_i
   real(kind=8), dimension(4) :: pres=(/700.,850.,925.,1000./),b=(/0.,0.,0.,0./)
   real*8, dimension(:,:,:), pointer :: tbl
@@ -35,6 +35,8 @@ program constructor
   character(len=1) :: dum_S
   logical, parameter :: write_control_L=.false.
   character (len=256) :: file
+  !  
+  nullify(ip1s,vipm,vipt,work_i,tbl,a_m_8,a_t_8,b_m_8,b_t_8,work_8,hyb)
   !
   ! Construct a new set of 3D coordinate descriptors
   pres = pres*100. !convert mb to Pa

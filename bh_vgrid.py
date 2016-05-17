@@ -13,11 +13,6 @@ def _init(b):
    environ["BH_PACKAGE_CONTROL_DIR"] = "%(BH_HERE_DIR)s" % environ
    environ["SCRIPT_NAME"] = __file__+" -m "+b.mode+" -p "+b.platform % environ   
 
-   if b.mode == "intel":
-      environ["BH_MAKE"] = 'make'
-   elif b.mode == "xlf13":
-      environ["BH_MAKE"] = 'gmake' 
-
 def _make(b):
    
     b.shell("""
