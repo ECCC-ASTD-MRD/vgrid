@@ -24,7 +24,7 @@
 void c_use_new_read() {
 
   int ier, iun = 10, iun2 = 11;
-  int *quiet = NULL, *i_val = NULL, *in_log = NULL, *dpidpis = NULL;
+  int quiet = 0, *i_val = NULL, in_log = 0, dpidpis = 0;
   int nl_t, nt, ni, nj, nk, ni2, nj2, nk2, k, key, ij, ijk, status;
   char filename[]="data/dm_5005_from_model_run";
   char mode[]="RND";
@@ -111,7 +111,7 @@ void c_use_new_read() {
     printf("ERROR with c_fstouv on iun2\n");
     return;
   }
-  if( Cvgd_write_desc(vgd, iun2, "FST") == VGD_ERROR ){
+  if( Cvgd_write_desc(vgd, iun2) == VGD_ERROR ){
     printf("ERROR with Cvgd_write_desc on iun2\n");
     return;
   }

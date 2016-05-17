@@ -19,14 +19,14 @@ ifeq ($(ORDENV_PLAT),ubuntu-12.04-amd64-64)
    BH_PACKAGE=hpcs/tools/master/bh_0.17_all
    RPN_LIB=rpn/libs/15.2
    FFLAGS = '$(MY_FFLAGS) -openmp -fp-model source  -warn all'
-   CFLAGS = '$(MY_CFLAGS) -openmp -fp-model precise -Wall'
+   CFLAGS = '$(MY_CFLAGS) -openmp -fp-model precise -w3'
 endif
 
 ifeq ($(ORDENV_PLAT),ubuntu-14.04-amd64-64)
    BH_MAKE=make
    BH_MODE=intel
    FFLAGS = '$(MY_FFLAGS) -openmp -fp-model source  -warn all'
-   CFLAGS = '$(MY_CFLAGS) -openmp -fp-model precise -Wall'
+   CFLAGS = '$(MY_CFLAGS) -openmp -fp-model precise -w2'
    ifeq ($(DOMAIN),science.gc.ca)
      BH_HOST=gpsc-in-cont076
      COMPILER=intel13sp1u2

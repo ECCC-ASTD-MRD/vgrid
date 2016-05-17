@@ -78,4 +78,39 @@ typedef struct vgrid_descriptor {
   char     valid;         // Validity of structure
 } vgrid_descriptor;
 
+int Cvgd_is_valid(vgrid_descriptor *self, char *valid_table_name);
+void Cvgd_table_shape(vgrid_descriptor *self, int **tshape);
+void Cvgd_table_shape(vgrid_descriptor *self, int **tshape);
+int Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip);
+int Cvgd_print_vcode_description(int vcode);
+int Cvgd_levels_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8, int in_log);
+int Cvgd_levels(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log);
+int Cvgd_diag_withref_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8, int in_log, int dpidpis);
+int Cvgd_diag_withref(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log, int dpidpis);
+int Cvgd_set_vcode_i(vgrid_descriptor *VGrid,int Kind,int Version);
+int Cvgd_set_vcode(vgrid_descriptor *VGrid);
+int Cvgd_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, int ip1, int ip2, double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2, 
+			double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int nl_m, int nl_t);
+int Cvgd_vgdcmp(vgrid_descriptor *vgd1, vgrid_descriptor *vgd2);
+void Cvgd_free(vgrid_descriptor **self);
+int Cvgd_getopt_int(char *key, int *value, int quiet);
+int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet);
+int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk, int quiet);
+int Cvgd_get_float(vgrid_descriptor *self, char *key, float *value, int quiet);
+int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk, int quiet);
+int Cvgd_put_double(vgrid_descriptor **self, char *key, double value_put);
+int Cvgd_get_double(vgrid_descriptor *self, char *key, double *value_get, int quiet);
+int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *nk, int quiet);
+int Cvgd_get_double_3d(vgrid_descriptor *self, char *key, double **value, int *ni, int *nj, int *nk, int quiet);
+int Cvgd_get_char(vgrid_descriptor *self, char *key, char out[], int quiet);
+int Cvgd_put_char(vgrid_descriptor **self, char *key, char *value);
+int Cvgd_putopt_int(char *key, int value);
+int Cvgd_put_int(vgrid_descriptor **self, char *key, int value);
+int Cvgd_new_gen(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2,
+	      double *ptop_8, double *pref_8, double *ptop_out_8,
+		 int ip1, int ip2, float *dhm, float *dht);
+int Cvgd_new_read(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind, int version);
+int Cvgd_write_desc (vgrid_descriptor *self, int unit);
+
+
 #endif // VGRID_H
