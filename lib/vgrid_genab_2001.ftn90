@@ -63,7 +63,7 @@ contains
       integer, dimension(:), pointer, optional :: ip1 ! ip1 value
 
       ! Local variables
-      integer :: k,i, status, nk
+      integer :: k, status, nk
       logical :: monotone=.true.,wrongsig=.false.
       character*16 dumc_S
 

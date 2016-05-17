@@ -74,8 +74,7 @@ contains
       ! Local variables
       integer :: k,i, status, nk, kind
       logical :: monotone,wronghyb
-      real    :: rcoef,pres,pr1,hybtop
-      real*8  :: ztop_8, zsrf_8, eta_8, zeta_8
+      real    :: pres,pr1,hybtop
       real, parameter :: epsilon=1.0e-6
       Logical :: complet_L
 

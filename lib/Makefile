@@ -1,5 +1,3 @@
-include setup.mk
-
 # Set default target
 default: lib
 

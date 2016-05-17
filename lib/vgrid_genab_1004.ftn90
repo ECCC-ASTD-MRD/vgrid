@@ -64,7 +64,7 @@ contains
       
       ! Local variables
       real    :: eta1
-      integer :: k,i, status, nk
+      integer :: k, status, nk
       logical :: monotone=.true.,wrongsig=.false.
 
       !     __________________________________________________________________
