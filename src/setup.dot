@@ -12,9 +12,9 @@ BH_PULL_SOURCE_GIT_BRANCH=5.6.2
 case "${ORDENV_PLAT}" in
 
    ubuntu-12.04-amd64-64)
-      BH_MAKE=make
-      BH_HOST=pollux
-      BH_MODE=intel
+      export BH_MAKE=make
+      export BH_HOST=pollux
+      export BH_MODE=intel
       HPCS_BASE=hpcs/201402/02/base
       HPCS_COMP=hpcs/201402/02/intel13sp1u2
       RPN_LIB=rpn/libs/15.2
@@ -24,9 +24,9 @@ case "${ORDENV_PLAT}" in
       :;;
 
    ubuntu-14.04-amd64-64)
-      BH_MAKE=make
-      BH_HOST=einstein
-      BH_MODE=intel
+      export BH_MAKE=make
+      export BH_HOST=einstein
+      export BH_MODE=intel
       HPCS_BASE=hpcs/201402/02/base
       HPCS_COMP=hpcs/201402/02/intel13sp1u2
       RPN_LIB=rpn/libs/15.2
@@ -36,10 +36,10 @@ case "${ORDENV_PLAT}" in
       :;;
 
    aix-7.1-ppc7-64)
-      BH_MAKE=gmake
+      export BH_MAKE=gmake
       r.use gmake as make
-      BH_HOST=hadar
-      BH_MODE=xlf13
+      export BH_HOST=hadar
+      export BH_MODE=xlf13
       HPCS_BASE=hpcs/201402/02/base
       HPCS_COMP=hpcs/ext/xlf_13.1.0.10
       RPN_LIB=rpn/libs/15.2
