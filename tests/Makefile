@@ -1,3 +1,10 @@
+
+ifeq ($(BASE_ARCH),$(EC_ARCH))
+   $(info ERROR: please setup the compilation environment by typing the folowing:)
+   $(info . setup.dot)
+   $(error )
+endif
+
 DATA_ARCH=`uname -s`
 
 alltests:

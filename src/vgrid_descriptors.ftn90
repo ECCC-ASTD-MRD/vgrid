@@ -1161,7 +1161,6 @@ contains
         write(for_msg,*) 'ERROR with diag_withref_prof_8 in dpidpis_withref_prof_8'
         return
      endif
-     !write(6,'("ANDRE DANS dpidpis_withref_prof_8",z16)')c_loc(dpidpis)
      status = VGD_OK
      return
   end function dpidpis_withref_prof_8
@@ -1224,7 +1223,6 @@ contains
      error = get_allocate('levels',levels,nk,ALLOW_RESHAPE,'(in diag_withref_prof_8)')
      if(error/=0)return
      levels=levels_3d(1,1,1:nk)
-     !write(6,'("ANDRE DANS diag_withref_prof_8",z16," mis dans "z16)')c_loc(levels_3d),c_loc(levels)
      deallocate(sfc_field_2d,levels_3d)
      ! Set status and return
      status = VGD_OK
@@ -1446,7 +1444,6 @@ contains
       endif
       ! Wrap call to level calculator
       stat=diag_withref_8(self,ip1_list,dpidpis,sfc_field=my_sfc_field_8,dpidpis=.true.)
-      !write(6,'("ANDRE DANS dpidpis_withref_8",z16)')c_loc(dpidpis)
       if(stat==VGD_ERROR)then
          deallocate(my_sfc_field_8)
          return
