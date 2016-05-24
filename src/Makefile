@@ -12,11 +12,12 @@ dependencies.mk: *.c *.ftn90 *.h *.hc
 
 include dependencies.mk
 
+
 %.o: %.ftn90
-	s.compile -src $< -optf =$(FFLAGS) -libappl rmn
+	s.compile -src $< -optf =$(MY_FFLAGS) -libappl rmn
 
 %.o: %.c
-	s.compile -src $< -optc =$(CFLAGS) -libappl rmn
+	s.compile -src $< -optc =$(MY_CFLAGS) -libappl rmn
 
 libdescrip.a: $(OBJECTS) dependencies.mk
 	rm -f libdescrip.a && ar scru libdescrip.a *.o ;\
@@ -31,7 +32,7 @@ vgrid_version:
 	echo                "char vgrid_descriptors_version[] = \"VGRID $(BH_PULL_SOURCE_GIT_BRANCH) $(COMP_ARCH) $(ORDENV_PLAT) $(shell date)\";" > vgrid_version.hc ;\
 
 ssm:
-	../bh_vgrid.py --host ${BH_HOST} -p $(ORDENV_PLAT) -m $(BH_MODE) -v BH_PULL_SOURCE=$(PWD)/.. -v BH_PULL_SOURCE_GIT_BRANCH=$(BH_PULL_SOURCE_GIT_BRANCH) -v BH_PACKAGE_VERSION=$(BH_PULL_SOURCE_GIT_BRANCH)-$${COMP_ARCH} --local ;\
+	../bh_vgrid.py -p $(ORDENV_PLAT) -m $(BH_MODE) -v BH_PULL_SOURCE=$(PWD)/.. -v BH_PULL_SOURCE_GIT_BRANCH=$(BH_PULL_SOURCE_GIT_BRANCH) -v BH_PACKAGE_VERSION=$(BH_PULL_SOURCE_GIT_BRANCH)-$(COMP_ARCH) --local ;\
 
 clean:
 	rm -f *.f90 *.o *.mod dependencies.mk ;\
