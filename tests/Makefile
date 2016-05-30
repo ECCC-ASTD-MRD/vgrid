@@ -22,7 +22,7 @@ tests:
 	./run_tests.ksh -ONLY $(ONLY)
 
 clean:
-	rm -f *.f90 *.o *.mod *.out
+	rm -f *.o *.mod *.out
 
 distclean: clean
 	rm -rf data/*

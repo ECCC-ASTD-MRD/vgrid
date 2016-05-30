@@ -7,17 +7,16 @@ endif
 
 default: libdescrip.a
 
-dependencies.mk: *.c *.ftn90 *.h *.hc
-	ls *.c *.ftn90 | ./s.dependencies.pl > dependencies.mk ;\
+dependencies.mk: *.c *.F90 *.h *.hc
+	ls *.c *.F90 | ./s.dependencies.pl > dependencies.mk ;\
 
 include dependencies.mk
 
-
-%.o: %.ftn90
-	s.compile -src $< -optf =$(MY_FFLAGS) -libappl rmn
+%.o: %.F90
+	s.f90 -c $(MY_FFLAGS) -lrmn $<
 
 %.o: %.c
-	s.compile -src $< -optc =$(MY_CFLAGS) -libappl rmn
+	s.cc -c $(MY_CFLAGS) $<
 
 libdescrip.a: $(OBJECTS) dependencies.mk
 	rm -f libdescrip.a && ar scru libdescrip.a *.o ;\
@@ -35,7 +34,7 @@ ssm:
 	../bh_vgrid.py -p $(ORDENV_PLAT) -m $(BH_MODE) -v BH_PULL_SOURCE=$(PWD)/.. -v BH_PULL_SOURCE_GIT_BRANCH=$(BH_PULL_SOURCE_GIT_BRANCH) -v BH_PACKAGE_VERSION=$(BH_PULL_SOURCE_GIT_BRANCH)-$(COMP_ARCH) --local ;\
 
 clean:
-	rm -f *.f90 *.o *.mod dependencies.mk ;\
+	rm -f *.o *.mod ;\
 
 distclean: clean
 	rm -f libdescrip.a libdescripshared.so ;\

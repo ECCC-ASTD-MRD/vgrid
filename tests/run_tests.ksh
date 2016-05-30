@@ -6,7 +6,7 @@ eval `cclargs \
 
 # Get list of tests
 if [ "${ONLY}" = "" ] ; then
-  set -A tests $(ls -1 src_tests/*.ftn90 | perl -p -e 's|src_tests/(.+)\.ftn90|$1|g') $(ls -1 src_tests/*.c | perl -p -e 's|src_tests/(.+)\.c|$1|g')
+  set -A tests $(ls -1 src_tests/*.F90 | perl -p -e 's|src_tests/(.+)\.F90|$1|g') $(ls -1 src_tests/*.c | perl -p -e 's|src_tests/(.+)\.c|$1|g')
 else
   set -A tests ${ONLY}
 fi
@@ -44,7 +44,7 @@ for test in ${tests[*]} ; do
      EXT=.c
   else
      IS_C=no
-     EXT=.ftn90
+     EXT=.F90
   fi
   printf "Building ${test} ${OPENMP} ..."
   ln -sf src_tests/${test}${EXT} .
