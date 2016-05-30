@@ -7,21 +7,21 @@ endif
 
 DESCRIP_PATH = ../src
 
-%.o: %.ftn90
-	s.compile -src $< -optf =$(FFLAGS) -libpath $(DESCRIP_PATH) -includes $(DESCRIP_PATH)
+%.o: %.F90
+	s.f90 -c $(MY_FFLAGS) -libpath $(DESCRIP_PATH) -I$(DESCRIP_PATH) $<
 
 %.o: %.c
-	s.compile -src $< -optc =$(CFLAGS) -libpath $(DESCRIP_PATH) -includes $(DESCRIP_PATH)
+	s.cc -c  $(MY_CFLAGS) -libpath $(DESCRIP_PATH) -I$(DESCRIP_PATH) $<
 
 OBJECTS = unit_testing.o c_ut_report.o
 
-UNIT_TEST_F: $(OBJECTS) UNIT_TEST_F.ftn90 $(DESCRIP_PATH)/libdescrip.a
-	s.compile $(OPENMP) -optf =$(FFLAGS) -includes $(DESCRIP_PATH) -src UNIT_TEST_F.ftn90 -o UNIT_TEST_F -obj $(OBJECTS) -libpath $(DESCRIP_PATH) -librmn -libappl descrip
+UNIT_TEST_F: $(OBJECTS) UNIT_TEST_F.F90 $(DESCRIP_PATH)/libdescrip.a
+	s.compile $(OPENMP) -optf =$(FFLAGS) -includes $(DESCRIP_PATH) -src UNIT_TEST_F.F90 -o UNIT_TEST_F -obj $(OBJECTS) -libpath $(DESCRIP_PATH) -librmn -libappl descrip
 
 UNIT_TEST_C: $(OBJECTS) UNIT_TEST_C.c $(DESCRIP_PATH)/libdescrip.a
 	s.compile $(OPENMP) -optc =$(CFLAGS) -includes $(DESCRIP_PATH) -src UNIT_TEST_C.c -o UNIT_TEST_C -bidon c -main UNIT_TEST_C -obj $(OBJECTS) -libpath $(DESCRIP_PATH) -librmn -libappl descrip
 
-$(DESCRIP_PATH)/libdescrip.a: $(DESCRIP_PATH)/*.c $(DESCRIP_PATH)/*.ftn90 $(DESCRIP_PATH)/*.h $(DESCRIP_PATH)/*.hc
+$(DESCRIP_PATH)/libdescrip.a: $(DESCRIP_PATH)/*.c $(DESCRIP_PATH)/*.F90 $(DESCRIP_PATH)/*.h $(DESCRIP_PATH)/*.hc
 	cd ../src ;\
 	$(BH_MAKE);\
 
