@@ -1,4 +1,4 @@
-!/* libdescrip - Vertical grid descriptor library for FORTRAN programming
+! * libdescrip - Vertical grid descriptor library for FORTRAN programming
 ! * Copyright (C) 2016  Direction du developpement des previsions nationales
 ! *                     Centre meteorologique canadien
 ! *
