@@ -45,7 +45,11 @@
   for(k=0, ijk=0; k < nk; k++) {
     for(ij=0; ij < ni*nj; ij++, ijk++) {
       lvl = aa_8[k] + bb_8[k]*s_8[ij];
+#if defined(REAL_8)
       levels[ijk] = in_log ? lvl : exp(lvl);
+#else
+      levels[ijk] = (float) (in_log ? lvl : exp(lvl));
+#endif
     }
   }
   //Force surface pressure to be equal to sfc_field
@@ -72,7 +76,11 @@
     }
     for(k=0, ijk=0; k < nk; k++) {
       for(ij=0; ij < ni*nj; ij++, ijk++) {
+#if defined(REAL_8)
   	levels[ijk] = bb_8[k]*levels[ijk]/sfc_field[ij];
+#else
+	levels[ijk] = (float) bb_8[k]*levels[ijk]/sfc_field[ij];
+#endif	
       }
     }
   }

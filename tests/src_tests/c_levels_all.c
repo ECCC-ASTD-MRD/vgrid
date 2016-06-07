@@ -60,7 +60,7 @@ int test_it(char *filename) {
     printf("ERROR with Cvgd_new_read on iun\n");
     return(VGD_ERROR);
   }
-  //ier = Cvgd_print_desc(vgd, NULL, NULL);
+  //ier = Cvgd_print_desc(vgd, -1, -1);
 
   if( Cvgd_get_int_1d(vgd, "VIPT", &i_val, NULL, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_int for VIPT\n");

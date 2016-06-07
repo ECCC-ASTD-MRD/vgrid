@@ -23,7 +23,11 @@ if( my_alloc_int(&ind, nk, message) == VGD_ERROR )
   for( k = 0, ijk=0; k < nk; ++k ){
     for( ij = 0; ij < ni*nj; ++ij, ++ijk ){
       lvl = self->a_m_8[ind[k]];
+#if defined(REAL_8)
       levels[ijk] = in_log ? log(lvl) : lvl;
+#else
+      levels[ijk] = (float) (in_log ? log(lvl) : lvl);
+#endif
     }
   }
   free(ind);
