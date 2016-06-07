@@ -3137,7 +3137,7 @@ static int C_get_consistent_pt_e1(int iun, float *val, char *nomvar ){
     }
     if( k == 0 ){
       *val = work[0];
-    } Else {
+    } else {
       if( memcmp( &(work[0]), val, sizeof(float)/sizeof(char)) ){
 	printf("(Cvgd) ERROR: in C_get_consistent_pt_e1, inconsistent %s, %f v %f\n", nomvar, work[0], *val);
 	goto bomb;
