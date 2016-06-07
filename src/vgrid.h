@@ -111,6 +111,6 @@ int Cvgd_new_gen(vgrid_descriptor **self, int kind, int version, float *hyb, int
 		 int ip1, int ip2, float *dhm, float *dht);
 int Cvgd_new_read(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind, int version);
 int Cvgd_write_desc (vgrid_descriptor *self, int unit);
-
+int Cvgd_new_from_table(vgrid_descriptor **self, double *table, int ni, int nj, int nk);
 
 #endif // VGRID_H

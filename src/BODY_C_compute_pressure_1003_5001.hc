@@ -24,7 +24,11 @@
     }
     for( k = 0, ijk=0; k < nk; ++k ){
       for( ij = 0; ij < ni*nj; ++ij, ++ijk ){
+#if defined(REAL_8)
 	levels[ijk] = self->b_m_8[ind[k]];
+#else
+	levels[ijk] = (float) self->b_m_8[ind[k]];
+#endif	
       }
     }    
     free(ind);
@@ -34,7 +38,11 @@
   for( k = 0, ijk=0; k < nk; ++k ){
     for( ij = 0; ij < ni*nj; ++ij, ++ijk ){
       lvl = self->a_m_8[ind[k]] + self->b_m_8[ind[k]] * sfc_field[ij];
+#if defined(REAL_8)
       levels[ijk] = in_log ? log(lvl) : lvl;
+#else
+      levels[ijk] = (float) (in_log ? log(lvl) : lvl);
+#endif
     }
   }
   free(ind);
