@@ -2,7 +2,7 @@
 
 # Get list of tests
 if [ -z "$*" ] ; then
-  set -A tests `ls -1 src/*.ftn90 | perl -p -e 's|src/(.+)\.ftn90|$1|g'`
+  set -A tests `ls -1 src/*.F90 | perl -p -e 's|src/(.+)\.F90|$1|g'`
 else
   set -A tests $*
 fi
@@ -29,7 +29,7 @@ for test in ${tests[*]} ; do
       OPENMP=''
   fi  
   printf "Building ${test} ${OPENMP} ..."
-  ln -sf src/${test}.ftn90 .
+  ln -sf src/${test}.F90 .
   perl -p -e "s/UNIT_TEST/${test}/g" ${template} >Makefile.test
   echo "Compiling ${test}" >>${compile_log} 2>&1
   ${BH_MAKE} -f Makefile.test ${test} OPENMP=${OPENMP} >>${compile_log} 2>&1
@@ -37,7 +37,7 @@ for test in ${tests[*]} ; do
     printf "\n ERROR compiling test ${test} ... aborting (try '${BH_MAKE} -f Makefile.test ${test}' for details)\n"
     exit 1
   fi
-  rm -f ${test}.ftn90
+  rm -f ${test}.F90
   ${BH_MAKE} -f Makefile.test clean >/dev/null 2>&1
   printf " ok\n"
 done

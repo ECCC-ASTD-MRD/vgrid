@@ -14,7 +14,7 @@ set -e
 
 # Get list of tests
 if [ -z "$*" ] ; then
-  set -A tests $(ls -1 src/*.ftn90 | perl -p -e 's|src/(.+)\.ftn90|$1|g') 
+  set -A tests $(ls -1 src/*.F90 | perl -p -e 's|src/(.+)\.F90|$1|g') 
 else
   set -A tests $*
 fi
@@ -47,7 +47,7 @@ for test in ${tests[*]} ; do
    ln -s ${MASTER}/Makefile.tmpl
    ln -s ${MASTER}/Makefile
    ln -s ${MASTER}/run_tests.ksh
-   ln -s ${MASTER}/unit_testing.ftn90
+   ln -s ${MASTER}/unit_testing.F90
    ln -s ${MASTER}/ksh .
    mkdir data
 

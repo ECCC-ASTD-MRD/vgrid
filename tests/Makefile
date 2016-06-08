@@ -10,23 +10,24 @@ include ../lib/setup.mk
 %.o : %.mod
 
 # Define suffix rules
-.SUFFIXES: .ftn90 .o
-.ftn90.o:
-	s.compile -optf =$(FFLAGS) -includes $(DESCRIP_PATH) -src $<
+.SUFFIXES: .F90 .o
+.F90.o:
+	s.f90 -c $(MY_FFLAGS) -libpath $(DESCRIP_PATH) -I$(DESCRIP_PATH) $<
+
 
 OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/utils.o unit_testing.o
 
-unit_testing.o: unit_testing.ftn90 $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/utils.o
+unit_testing.o: unit_testing.F90 $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/utils.o
 
 alltests:
 	make tests DATA_ARCH=Linux; \
         make tests DATA_ARCH=AIX
 
 
-$(DESCRIP_PATH)/vgrid_descriptors.o: $(DESCRIP_PATH)/vgrid_descriptors.ftn90
+$(DESCRIP_PATH)/vgrid_descriptors.o: $(DESCRIP_PATH)/vgrid_descriptors.F90
 	(cd $(DESCRIP_PATH) && $(MAKE) $(MAKEFLAGS) vgrid_descriptors.o)
 
-$(DESCRIP_PATH)/utils.o: $(DESCRIP_PATH)/utils.ftn90
+$(DESCRIP_PATH)/utils.o: $(DESCRIP_PATH)/utils.F90
 	(cd $(DESCRIP_PATH) && $(MAKE) $(MAKEFLAGS) utils.o)
 
 tests:

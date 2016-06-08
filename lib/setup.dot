@@ -2,6 +2,11 @@ echo "Acquiring compilation tools"
 
 . version.dot
 
+unset MY_FFLAGS MY_CFLAGS
+
+MY_FFLAGS="-O2"
+#MY_FFLAGS="-C -g -O0"
+
 case "${ORDENV_PLAT}" in
 
    ubuntu-12.04-amd64-64)
@@ -12,8 +17,7 @@ case "${ORDENV_PLAT}" in
       HPCS_BASE=hpcs/201402/02/base
       HPCS_COMP=hpcs/201402/02/${VGRID_COMPILER}
       RPN_LIB=rpn/libs/15.2
-      VGRID_FFLAGS='-openmp -fp-model source  -warn all'
-      VGRID_CFLAGS='-openmp -fp-model precise -w3'
+      MY_FFLAGS="-openmp -fp-model source  -warn all ${MY_FFLAGS}"
       . ssmuse-sh -d ${HPCS_BASE} -d ${HPCS_COMP} -d ${RPN_LIB}
       :;;
 
@@ -25,8 +29,7 @@ case "${ORDENV_PLAT}" in
       HPCS_BASE=hpcs/201402/02/base
       HPCS_COMP=hpcs/201402/02/${VGRID_COMPILER}
       RPN_LIB=rpn/libs/15.2
-      VGRID_FFLAGS='-openmp -fp-model source  -warn all'
-      VGRID_CFLAGS='-openmp -fp-model precise -w3'
+      MY_FFLAGS="-openmp -fp-model source  -warn all ${MY_FFLAGS}"
       . ssmuse-sh -d ${HPCS_BASE} -d ${HPCS_COMP} -d ${RPN_LIB}
       :;;
 
@@ -39,8 +42,7 @@ case "${ORDENV_PLAT}" in
       HPCS_BASE=hpcs/201402/02/base
       HPCS_COMP=hpcs/ext/${COMPILER}
       RPN_LIB=rpn/libs/15.2
-      VGRID_FFLAGS=''
-      VGRID_CFLAGS=''
+      MY_FFLAGS="${MY_FFLAGS}"
       . ssmuse-sh -d ${HPCS_BASE} -d ${HPCS_COMP} -d ${RPN_LIB}
       :;;
 
@@ -51,3 +53,6 @@ case "${ORDENV_PLAT}" in
     *) echo platform ${ORDENV_PLAT} not suported, please review setup.dot
        :;;
 esac
+
+export MY_FFLAGS
+

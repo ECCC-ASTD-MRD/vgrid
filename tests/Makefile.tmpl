@@ -1,43 +1,43 @@
-# User options
-FFLAGS="$(FFLAGS_INTEL) -C -g"
-DESCRIP_PATH = ../lib
-# Use the setup* dot files in ../ to set the following variables 
+ifeq ($(BASE_ARCH),$(EC_ARCH))
+   $(info ERROR: please setup the compilation environment by typing the folowing:)
+   $(info . ../lib/setup.dot or . ../lib/setup_gpsc.dot)
+   $(error )
+endif
 
-include ../lib/setup.mk
+DESCRIP_PATH = ../lib
 
 # Override incorrect implicits
 %.o : %.mod
 
 # Define suffix rules
-.SUFFIXES: .ftn90 .o
-.ftn90.o:
-	echo $(DESCRIP_PATH)
-	s.compile -libpath $(MY_LIBPATH) $(LIBRARY_PATH) -optf =$(FFLAGS) -includes $(DESCRIP_PATH) -src $<
+.SUFFIXES: .F90 .o
+%.o: %.F90    
+	s.f90 -c $(MY_FFLAGS) -libpath $(DESCRIP_PATH) -I$(DESCRIP_PATH) $<
 
-OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/vgrid_genab_5002.o $(DESCRIP_PATH)/vgrid_genab_1002_5001.o $(DESCRIP_PATH)/vgrid_genab_1001.o $(DESCRIP_PATH)/vgrid_genab_1004.o $(DESCRIP_PATH)/vgrid_genab_2001.o $(DESCRIP_PATH)/utils.o unit_testing.o
+OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/vgrid_genab_5002.o $(DESCRIP_PATH)/vgrid_genab_1002_5001.o $(DESCRIP_PATH)/vgrid_genab_1001.o $(DESCRIP_PATH)/vgrid_genab_1004.o $(DESCRIP_PATH)/vgrid_genab_2001.o $(DESCRIP_PATH)/utils.o unit_testing.o UNIT_TEST.o
 
-UNIT_TEST: UNIT_TEST.ftn90 $(OBJECTS)
-	s.compile $(OPENMP) -optf =$(FFLAGS) -includes $(MY_INCLUDE_PATH) $(DESCRIP_PATH) $(INCLUDE_PATH) -obj $(OBJECTS) -src UNIT_TEST.ftn90 -o UNIT_TEST  -libpath $(MY_LIBPATH) $(LIBRARY_PATH) -libappl $(MODELUTILS) rmn
+UNIT_TEST: $(OBJECTS)
+	s.f90 $(OBJECTS) -o UNIT_TEST $(MY_FFLAGS) -lrmn -L$(DESCRIP_PATH) -I$(DESCRIP_PATH)
 
-unit_testing.o: unit_testing.ftn90
+unit_testing.o: unit_testing.F90
 
-$(DESCRIP_PATH)/vgrid_descriptors.o: $(DESCRIP_PATH)/vgrid_descriptors.ftn90
+$(DESCRIP_PATH)/vgrid_descriptors.o: $(DESCRIP_PATH)/vgrid_descriptors.F90
 	(cd $(DESCRIP_PATH) && $(MAKE) vgrid_descriptors.o)
 
-$(DESCRIP_PATH)/vgrid_genab_5002.o: $(DESCRIP_PATH)/vgrid_genab_5002.ftn90
+$(DESCRIP_PATH)/vgrid_genab_5002.o: $(DESCRIP_PATH)/vgrid_genab_5002.F90
 	(cd $(DESCRIP_PATH) && $(MAKE) vgrid_genab_5002.o)
 
-$(DESCRIP_PATH)/vgrid_genab_1002_5001.o: $(DESCRIP_PATH)/vgrid_genab_1002_5001.ftn90
+$(DESCRIP_PATH)/vgrid_genab_1002_5001.o: $(DESCRIP_PATH)/vgrid_genab_1002_5001.F90
 	(cd $(DESCRIP_PATH) && $(MAKE) vgrid_genab_1002_5001.o)
 
-$(DESCRIP_PATH)/vgrid_genab_1001.o: $(DESCRIP_PATH)/vgrid_genab_1001.ftn90
+$(DESCRIP_PATH)/vgrid_genab_1001.o: $(DESCRIP_PATH)/vgrid_genab_1001.F90
 	(cd $(DESCRIP_PATH) && $(MAKE) vgrid_genab_1001.o)
 
-$(DESCRIP_PATH)/vgrid_genab_1004.o: $(DESCRIP_PATH)/vgrid_genab_1004.ftn90
+$(DESCRIP_PATH)/vgrid_genab_1004.o: $(DESCRIP_PATH)/vgrid_genab_1004.F90
 	(cd $(DESCRIP_PATH) && $(MAKE) vgrid_genab_1004.o)
 
-$(DESCRIP_PATH)/utils.o: $(DESCRIP_PATH)/utils.ftn90
+$(DESCRIP_PATH)/utils.o: $(DESCRIP_PATH)/utils.F90
 	(cd $(DESCRIP_PATH) && $(MAKE) utils.o)
 
 clean:
-	rm -f *.f90 *.o *.mod
+	rm -f *.o *.mod
