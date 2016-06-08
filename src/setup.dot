@@ -1,13 +1,13 @@
 echo "Acquiring compilation tools"
 
+. version.dot
+
 unset MY_FFLAGS MY_CFLAGS
 
 MY_FFLAGS="-O2"
 #MY_FFLAGS="-C -g -O0"
 MY_CFLAGS="-O2"
 #MY_CFLAGS="-g -O0"
-
-export BH_PULL_SOURCE_GIT_BRANCH=6.1.1
 
 case "${ORDENV_PLAT}" in
 
