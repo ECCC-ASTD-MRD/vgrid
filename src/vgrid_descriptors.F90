@@ -364,6 +364,8 @@ contains
       character(len=100) :: myformat
       real*8, dimension(:,:,:), pointer :: table_8
 
+      nullify(table_8)
+
       status = VGD_ERROR
 
       myformat='FST'
@@ -1307,6 +1309,8 @@ contains
       real*8, dimension(:,:), pointer :: my_sfc_field
       logical :: my_in_log
       
+      nullify(my_sfc_field)
+
       ! Set return value
       status = VGD_ERROR
       
@@ -1544,6 +1548,8 @@ contains
       real*8, dimension(:,:,:), pointer :: table_8
       type(c_ptr) :: tshape_CP      
       character(len=100) :: myformat
+
+      nullify(table_8)
 
       ! Set error status
       status = VGD_ERROR
