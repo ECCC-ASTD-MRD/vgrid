@@ -1,10 +1,12 @@
-# User options
-FFLAGS="$(FFLAGS_INTEL) -C -g"
+ifeq ($(BASE_ARCH),$(EC_ARCH))
+   $(info ERROR: please setup the compilation environment by typing the folowing:)
+   $(info . setup.dot or . setup_gpsc.dot)
+   $(error )
+endif
+
 DESCRIP_PATH = ../lib
 DATA_ARCH=`uname -s`
 MAX_CPUS=12
-
-include ../lib/setup.mk
 
 # Override incorrect implicits
 %.o : %.mod

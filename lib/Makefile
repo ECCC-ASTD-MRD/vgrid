@@ -1,3 +1,9 @@
+ifeq ($(BASE_ARCH),$(EC_ARCH))
+   $(info ERROR: please setup the compilation environment by typing the folowing:)
+   $(info . setup.dot or . setup_gpsc.dot)
+   $(error )
+endif                                                                                                                                                           
+
 # Set default target
 default: lib
 
