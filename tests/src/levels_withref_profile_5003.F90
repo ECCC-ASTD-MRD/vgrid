@@ -27,11 +27,13 @@ program tests
   integer, dimension(:), pointer :: ip1_list
   real, dimension(:), pointer :: pres_profil
   real :: epsilon=0.01
-  real, dimension(:,:), allocatable :: p0,px
+  real, dimension(:,:), pointer :: p0,px
   real, dimension(:,:,:), pointer :: lev
   real :: local_pres
   type(vgrid_descriptor) :: d
   logical :: ok
+
+  nullify(ip1_list,pres_profil,p0,px,lev)
 
   stat=fnom(lu,"data/dm_5003_from_model_run","RND",0)
   if(stat.lt.0)then
