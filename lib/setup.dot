@@ -4,7 +4,7 @@ echo "Acquiring compilation tools"
 
 unset MY_FFLAGS
 
-MY_FFLAGS="-O2"
+MY_FFLAGS=""
 #MY_FFLAGS="-C -g -O0"
 
 case "${ORDENV_PLAT}" in
