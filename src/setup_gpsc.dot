@@ -9,8 +9,6 @@ MY_FFLAGS="-O1"
 MY_CFLAGS="-O1"
 #MY_CFLAGS="-g -O0"
 
-export BH_PULL_SOURCE_GIT_BRANCH=6.1.1
-
 case "${ORDENV_PLAT}" in
 
    ubuntu-14.04-amd64-64)
