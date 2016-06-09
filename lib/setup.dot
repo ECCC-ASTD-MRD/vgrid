@@ -54,5 +54,5 @@ case "${ORDENV_PLAT}" in
        :;;
 esac
 
-export MY_FFLAGS
+export MY_FFLAGS BH_MAKE BH_HOST BH_MODE
 

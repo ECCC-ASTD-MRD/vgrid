@@ -33,7 +33,6 @@ $(DESCRIP_PATH)/utils.o: $(DESCRIP_PATH)/utils.F90
 	(cd $(DESCRIP_PATH) && $(MAKE) $(MAKEFLAGS) utils.o)
 
 tests:
-	export BH_MAKE=${BH_MAKE} ;\
 	rm -rf data/* 2>/dev/null ;\
 	cd data ;\
 	rm -rf WORK ;\
@@ -43,7 +42,6 @@ tests:
 	./run_tests.ksh $(ONLY)
 
 tests_par:
-	export BH_MAKE=${BH_MAKE} ;\
 	rm -rf data/* 2>/dev/null ;\
 	cd data ;\
 	rm -rf WORK ;\
