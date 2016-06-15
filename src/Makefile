@@ -1,9 +1,9 @@
 
-ifeq ($(BASE_ARCH),$(EC_ARCH))
-   $(info ERROR: please setup the compilation environment by typing the folowing:)
-   $(info . setup.dot or . setup_gpsc.dot)
-   $(error )
-endif
+#ifeq ($(BASE_ARCH),$(EC_ARCH))
+#   $(info ERROR: please setup the compilation environment by typing the folowing:)
+#   $(info . setup.dot or . setup_gpsc.dot)
+#   $(error )
+#endif
 
 default: libdescrip.a
 
@@ -13,10 +13,10 @@ dependencies.mk: *.c *.F90 *.h *.hc
 include dependencies.mk
 
 %.o: %.F90
-	s.f90 -c $(MY_FFLAGS) -lrmn $<
+	gfortran -c  $(MY_FFLAGS) -I$(RPN_INCLUDE_MACRO) -I$(RPN_INCLUDE) $<
 
 %.o: %.c
-	s.cc -c $(MY_CFLAGS) $<
+	gcc -c $(MY_CFLAGS) -I$(RPN_INCLUDE_MACRO) -I$(RPN_INCLUDE_MACRO_ARCH) -I$(RPN_INCLUDE) $<
 
 libdescrip.a: $(OBJECTS) dependencies.mk
 	rm -f libdescrip.a && ar scru libdescrip.a *.o ;\
