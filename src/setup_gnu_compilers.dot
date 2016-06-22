@@ -13,8 +13,8 @@ case "${ORDENV_PLAT}" in
 
    ubuntu-12.04-amd64-64)
       HPCS_BASE=hpcs/201402/02/base
-      export MY_FFLAGS="-openmp ${MY_FFLAGS}"
-      export MY_CFLAGS="-openmp ${MY_CFLAGS}"
+      export MY_FFLAGS="${MY_FFLAGS}"
+      export MY_CFLAGS="${MY_CFLAGS}"
       . ssmuse-sh -d ${HPCS_BASE}
       :;;
 
