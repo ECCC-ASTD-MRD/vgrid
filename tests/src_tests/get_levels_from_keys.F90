@@ -42,6 +42,8 @@ program get_levels_from_keys
   logical :: rewrit
   real :: hyb
 
+  nullify(pres,ff)
+
   stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
