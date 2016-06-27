@@ -23,7 +23,7 @@ def _make(b):
     b.shell("""
             set -e
             cd ${BH_PULL_SOURCE}
-            REMOTE=$(git remote -v | grep fetch | awk '{print $2}')
+            REMOTE=$(git remote -v | grep fetch | gitlab.com | awk '{print $2}')
             (
              CONTROL_DIR=${BH_PACKAGE_CONTROL_DIR}/${BH_PROJECT_NAME}/.ssm.d
              mkdir -p ${CONTROL_DIR}
