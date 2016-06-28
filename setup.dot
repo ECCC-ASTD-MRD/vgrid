@@ -1,3 +1,6 @@
+echo "Acquiring compilation tools"
+
+. version.dot
 
 #LINUX_COMP=intel13sp1u2
 LINUX_COMP=pgi1401

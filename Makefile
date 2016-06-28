@@ -7,17 +7,17 @@ SUBDIRS = lib examples tests
 
 all:
 	for dir in $(SUBDIRS) ; do\
-	  (cd $$dir && $(MAKE) $(MAKEFLAGS) RMN=$(RMN)) ;\
+	  (cd $$dir && $(MAKE) $(MY_FFLAGS) RMN=$(RMN)) ;\
 	done;
 
 clean:
 	for dir in $(SUBDIRS); do \
-	  (cd $$dir && $(MAKE) $@ $(MAKEFLAGS)) ;\
+	  (cd $$dir && $(MAKE) $@ $(MY_FFLAGS)) ;\
 	done;
 
 distclean:
 	for dir in $(SUBDIRS) ssm ; do \
-	  (cd $$dir && $(MAKE) $@ $(MAKEFLAGS)) ;\
+	  (cd $$dir && $(MAKE) $@ $(MY_FFLAGS)) ;\
 	done;
 
 release: all
