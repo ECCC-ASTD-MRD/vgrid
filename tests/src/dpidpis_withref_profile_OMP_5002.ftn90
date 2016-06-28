@@ -114,7 +114,7 @@ program tests
 !$omp enddo
 !$omp end parallel
 
-if(associated(dpidpis_profil))deallocate(dpidpis_profil)
+nullify(dpidpis_profil)
 stat = vgd_dpidpis(d,sfc_field=p0(i0,j0),ip1_list=ip1_list,dpidpis=dpidpis_profil)
 if(stat.ne.VGD_OK)then
    print*,'ERROR: problem with vgd_dpidpis'
@@ -122,7 +122,7 @@ if(stat.ne.VGD_OK)then
    call abort
 endif
 
-if(associated(dpidpis_profil_8))deallocate(dpidpis_profil_8)
+nullify(dpidpis_profil_8)
 stat = vgd_dpidpis(d,sfc_field=p0_8(i0,j0),ip1_list=ip1_list,dpidpis=dpidpis_profil_8)
 if(stat.ne.VGD_OK)then
    print*,'ERROR: problem with vgd_dpidpis real*8'
