@@ -8,7 +8,7 @@ endif
 default: libdescrip.a
 
 dependencies.mk: *.c *.F90 *.h *.hc
-	ls *.c *.F90 | ./s.dependencies.pl > dependencies.mk ;\
+	ls *.hc *.c *.F90 | ./s.dependencies.pl > dependencies.mk ;\
 
 include dependencies.mk
 
