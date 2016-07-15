@@ -24,6 +24,10 @@ case "${ORDENV_PLAT}" in
       . ssmuse-sh -d ${HPCS_BASE} -d ${HPCS_COMP} -p ${HPCS_CODE_TOOL}
       . ssmuse-sh -d ${RPN_LIB}
       . ssmuse-sh -p ${BH_PACKAGE}
+      # For shared librairy creation
+      export RPN_LIB
+      export SHARED_RNM_EXT=_Alpha-016
+      export SHARED_COMP_rpath=/fs/ssm/hpco/exp/intel-2016.1.156/intelcomp_2016.1.156-01_multi/compilers_and_libraries_2016.1.150/linux/compiler/lib/intel64
       :;;
 
    "") echo "ERROR: variable ORDENV_PLAT not set"

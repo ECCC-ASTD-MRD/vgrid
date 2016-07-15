@@ -22,9 +22,7 @@ libdescrip.a: $(OBJECTS) dependencies.mk
 	rm -f libdescrip.a && ar scru libdescrip.a *.o ;\
 
 shared: libdescrip.a
-	if [ $$ORDENV_PLAT = ubuntu-12.04-amd64-64 ]; then \
-	   s.f90 -shared -o libdescripshared.so *.o -lrmnshared_015.2 -Wl,-rpath,/ssm/net/hpcs/201311/master/intelcomp_2013sp1_multi/composer_xe_2013_sp1.0.080/mkl/lib/intel64 -Wl,-rpath,/ssm/net/hpcs/201311/master/intelcomp_2013sp1_multi/composer_xe_2013_sp1.0.080/compiler/lib/intel64 -Wl,-rpath,/ssm/net/$(RPN_LIB)/$(ORDENV_PLAT)/lib/$(BASE_ARCH)/$(COMP_ARCH);\
-	fi
+	s.f90 -shared -o libdescripshared.so *.o -lrmnshared$(SHARED_RNM_EXT) -Wl,-rpath,$(RPN_LIB)/$(ORDENV_PLAT)/lib/$(BASE_ARCH)/$(COMP_ARCH) -Wl,-rpath,$(SHARED_COMP_rpath);\
 
 vgrid_version:
 	echo "character(len=128) :: vgrid_descriptors_version = \"VGRID $(BH_PULL_SOURCE_GIT_BRANCH) $(COMP_ARCH) $(ORDENV_PLAT) $(shell date)\"" > vgrid_version.hf ;\
@@ -36,5 +34,16 @@ ssm:
 clean:
 	rm -f *.o *.mod ;\
 
+clean_ssm: clean_bh
+	rm -f *.ssm ;\
+
+clean_bh:
+	rm -rf vgriddescriptors vgriddescriptors_*  log-*-*-*-*-* report-*-*-*-*-* work-*-*-*-*-* ;\
+
 distclean: clean
 	rm -f libdescrip.a libdescripshared.so ;\
+
+clean_tilde:
+	rm -f *~ ;\
+
+clean_all: distclean clean_ssm clean_bh clean_tilde
