@@ -1,6 +1,6 @@
 echo "Acquiring compilation tools"
 
-. version.dot
+. ./version.dot
 
 unset MY_FFLAGS MY_CFLAGS
 
