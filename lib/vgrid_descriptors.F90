@@ -1204,7 +1204,7 @@ contains
        select case (self%vcode)
        case (1001,1002,5001)
           value=.false.
-       case (5002)
+       case (5002,5003,5004,5005)
           value=.true.
        case DEFAULT
           write(for_msg,*) 'unsupported vcode for LOGP: ',self%vcode
