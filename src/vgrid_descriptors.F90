@@ -87,7 +87,8 @@ module vGrid_Descriptors
    
    interface
 
-      integer function f_diag_withref_8(vgd_CP, ni, nj, nk, ip1_list_CP, levels_CP,sfc_field_CP, in_log, dpidpis) bind(c, name='Cvgd_diag_withref_8')
+      integer function f_diag_withref_8(vgd_CP, ni, nj, nk, ip1_list_CP, levels_CP,sfc_field_CP, in_log, dpidpis) &
+           bind(c, name='Cvgd_diag_withref_8')
          use iso_c_binding, only: c_ptr, c_int
          type(c_ptr), value :: vgd_CP, ip1_list_CP, sfc_field_CP
          integer (c_int), value :: in_log, dpidpis
@@ -127,7 +128,8 @@ module vGrid_Descriptors
          character(kind=c_char) :: key(*)
       end function f_get_real
       
-      integer function f_get_real_1d(vgd_CP, key, value_CP, nk_CP, quiet) bind(c, name='Cvgd_get_float_1d')
+      integer function f_get_real_1d(vgd_CP, key, value_CP, nk_CP, quiet) &
+           bind(c, name='Cvgd_get_float_1d')
          use iso_c_binding, only: c_ptr, c_char, c_int
          type(c_ptr), value :: vgd_CP
          integer (c_int), value :: quiet
@@ -347,6 +349,10 @@ module vGrid_Descriptors
       module procedure test_equality
    end interface operator (==)
    
+   !interface fptr
+   !   module procedure ptr_int_1d
+   !end interface fptr
+   
 contains
    
    integer function new_read(self,unit,format,ip1,ip2,kind,version) result(status)
@@ -466,7 +472,7 @@ contains
       type(c_ptr) :: stdout_unit_CP, dhm_CP, dht_CP
       integer :: my_ip1, my_ip2
 
-      hyb_CP = c_loc(hyb)
+      hyb_CP = c_loc(fptr_real_1d(hyb))
 
       status = VGD_ERROR;
       ! Assign optional argument to C_NULL_PTR
@@ -527,7 +533,8 @@ contains
          self%cptr = C_NULL_PTR
       endif
 
-      if(f_new_gen(self%cptr,kind,version,hyb_CP,size(hyb),rcoef1_CP,rcoef2_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP,my_ip1,my_ip2,dhm_CP,dht_CP) == VGD_ERROR)then
+      if(f_new_gen(self%cptr,kind,version,hyb_CP,size(hyb),rcoef1_CP,rcoef2_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP, &
+           my_ip1,my_ip2,dhm_CP,dht_CP) == VGD_ERROR)then
          print*,'(F_vgd) ERROR in new_gen, problem with f_new_gen'
          return
       endif
@@ -592,34 +599,34 @@ contains
          rcoef2_CP = C_NULL_PTR
       endif
       if(present(a_m_8))then
-         a_m_8_CP = c_loc(a_m_8)
+         a_m_8_CP = c_loc(fptr_real8_1d(a_m_8))
          nl_m = size(a_m_8)
       else
          a_m_8_CP = C_NULL_PTR
       endif
       if(present(b_m_8))then
-         b_m_8_CP = c_loc(b_m_8)
+         b_m_8_CP = c_loc(fptr_real8_1d(b_m_8))
       else
          b_m_8_CP = C_NULL_PTR
       endif
       if(present(a_t_8))then
-         a_t_8_CP = c_loc(a_t_8)
+         a_t_8_CP = c_loc(fptr_real8_1d(a_t_8))
          nl_t = size(a_t_8)
       else
          a_t_8_CP = C_NULL_PTR
       endif
       if(present(b_t_8))then
-         b_t_8_CP = c_loc(b_t_8)
+         b_t_8_CP = c_loc(fptr_real8_1d(b_t_8))
       else
          b_t_8_CP = C_NULL_PTR
       endif
       if(present(ip1_m))then
-         ip1_m_CP = c_loc(ip1_m)
+         ip1_m_CP = c_loc(fptr_int_1d(ip1_m))
       else
          ip1_m_CP = C_NULL_PTR
       endif
       if(present(ip1_t))then
-         ip1_t_CP = c_loc(ip1_t)
+         ip1_t_CP = c_loc(fptr_int_1d(ip1_t))
       else
          ip1_t_CP = C_NULL_PTR
       endif
@@ -828,7 +835,8 @@ contains
     if (any(MATCH_GRTYP == grtyp)) then
        error = new_read(gd,unit=unit,format='fst',ip1=ig1,ip2=ig2,kind=kind)
        if(error==VGD_ERROR)then
-          write(for_msg,*) 'The above error was produce with call to new_read with specific ip1 and 1p2, trying with wild card -1, if there is no error below, disregard the above error.'
+          write(for_msg,*) 'The above error was produce with call to new_read with specific ip1 and 1p2,'// &
+               ' trying with wild card -1, if there is no error below, disregard the above error.'
           call msg(MSG_WARNING,VGD_PRFX//for_msg)
           error = new_read(gd,unit=unit,format='fst',                kind=kind)
        endif
@@ -1511,7 +1519,7 @@ contains
          return
       endif
 
-      ip1_list_CP  = c_loc(ip1_list)
+      ip1_list_CP  = c_loc(fptr_int_1d(ip1_list))
       levels_CP    = c_loc(levels(1,1,1))
       sfc_field_CP = c_loc(sfc_field(1,1))
       
@@ -2175,6 +2183,24 @@ contains
       endif
       status = VGD_OK
    end function my_fstprm
+   
+   pure function fptr_int_1d ( v ) result ( p )
+     integer, dimension(:), target, intent(in) :: v
+     integer, target :: p
+     p = v(1)
+   end function fptr_int_1d
+
+   pure function fptr_real_1d ( v ) result ( p )
+     real, dimension(:), target, intent(in) :: v
+     real, target :: p
+     p = v(1)
+   end function fptr_real_1d
+
+   pure function fptr_real8_1d ( v ) result ( p )
+     real*8, dimension(:), target, intent(in) :: v
+     real*8, target :: p
+     p = v(1)
+   end function fptr_real8_1d
    
 end module vGrid_Descriptors
 
