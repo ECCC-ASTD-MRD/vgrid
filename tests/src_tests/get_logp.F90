@@ -50,6 +50,10 @@ program constructor
   endif
   !stat = vgd_print(d)
   stat = vgd_get(d,key='LOGP',value=logp_L)
+  if(stat /= VGD_OK )then
+     print*,'Error with vgd_get on LOGP'
+     call abort
+  endif
   ok=.not.logp_L
   print*,'1002 is in log',logp_L    
   
@@ -84,6 +88,10 @@ program constructor
   endif
   !stat = vgd_print(d)
   stat = vgd_get(d,key='LOGP',value=logp_L)
+  if(stat /= VGD_OK )then
+     print*,'Error with vgd_get on LOGP'
+     call abort
+  endif
   ok=.not.logp_L
   print*,'5001 is in log',logp_L    
   
@@ -119,8 +127,52 @@ program constructor
   !stat = vgd_print(d)
 
   stat = vgd_get(d,key='LOGP',value=logp_L)
+  if(stat /= VGD_OK )then
+     print*,'Error with vgd_get on LOGP'
+     call abort
+ endif
   ok=logp_L
   print*,'5002 is in log',logp_L
+ 
+  stat=fstfrm(lu)  
+  stat=fclos(lu)
+
+  print*,'======================================================'
+  print*,' 5005'
+  stat=fnom(lu,"data/dm_5005_from_model_run","RND",0)
+  if(stat.lt.0)then
+     print*,'ERROR with fnom'
+     call abort
+  endif
+  stat=fstouv(lu,'RND')
+  if(stat.le.0)then
+     print*,'No record in RPN file'
+     call abort
+  endif
+
+  ! Construct a new set of 3D coordinate descriptors
+  stat = vgd_free(d)
+  if(stat.ne.VGD_OK)then
+     print*,'ERROR: problem with vgd_free'
+     stat=fstfrm(lu)
+     call abort
+  endif
+  stat = vgd_new(d,unit=lu,format="fst",ip1=-1,ip2=-1)
+  if(stat.ne.VGD_OK)then
+     print*,'ERROR: problem with vgd_new'
+     stat=fstfrm(lu)
+     call abort
+  endif
+  !stat = vgd_print(d)
+
+  stat = vgd_get(d,key='LOGP',value=logp_L)
+  if(stat /= VGD_OK )then
+     print*,'Error with vgd_get on LOGP'
+     call abort
+  endif
+  print*,'stat=',stat
+  ok=logp_L
+  print*,'5005 is in log',logp_L
  
   stat=fstfrm(lu)  
   stat=fclos(lu)
