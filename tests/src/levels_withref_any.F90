@@ -33,6 +33,8 @@ program tests
   character(len=12) :: typvar,nomvar,etiket,grtyp
   type(vgrid_descriptor) :: d
 
+  nullify(lev)
+
   stat=fnom(lu,"data/dm_5002_from_model_run-interp","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
