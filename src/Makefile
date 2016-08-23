@@ -22,7 +22,7 @@ libdescrip.a: $(OBJECTS) dependencies.mk
 	rm -f libdescrip.a && ar scru libdescrip.a *.o ;\
 
 shared: libdescrip.a
-	s.f90 -shared -o libdescripshared.so *.o -lrmnshared$(SHARED_RNM_EXT) -Wl,-rpath,$(RPN_LIB)/$(ORDENV_PLAT)/lib/$(BASE_ARCH)/$(COMP_ARCH) -Wl,-rpath,$(SHARED_COMP_rpath);\
+	s.f90 -shared -o libdescripshared.so *.o -lrmnshared$(SHARED_RNM_EXT) -Wl,-rpath,$(SHARED_RNM_SSM_PREF)$(RPN_LIB)/$(ORDENV_PLAT)/lib/$(BASE_ARCH)/$(COMP_ARCH) -Wl,-rpath,$(SHARED_COMP_rpath);\
 
 vgrid_version:
 	echo "character(len=128) :: vgrid_descriptors_version = \"VGRID $(BH_PULL_SOURCE_GIT_BRANCH) $(COMP_ARCH) $(ORDENV_PLAT) $(shell date)\"" > vgrid_version.hf ;\
