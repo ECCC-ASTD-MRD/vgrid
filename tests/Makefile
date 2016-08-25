@@ -3,16 +3,12 @@ FFLAGS="$(FFLAGS_INTEL) -C -g"
 DESCRIP_PATH = ../lib
 DATA_ARCH=`uname -s`
 
-include ../lib/setup.mk
-
 # Override incorrect implicits
 %.o : %.mod
 
 # Define suffix rules
 .SUFFIXES: .ftn90 .o
 .ftn90.o:
-	. ssmuse-sh -d $(HPCS_BASE) -d $(HPCS_COMP) $(CODE_TOOLS);\
-	. ssmuse-sh -d $(RPN_LIB);\
 	s.compile -optf =$(FFLAGS) -includes $(DESCRIP_PATH) -src $<
 
 OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/utils.o unit_testing.o
@@ -31,7 +27,6 @@ $(DESCRIP_PATH)/utils.o: $(DESCRIP_PATH)/utils.ftn90
 	(cd $(DESCRIP_PATH) && $(MAKE) $(MAKEFLAGS) utils.o)
 
 tests:
-	. ssmuse-sh -d $(HPCS_BASE) -d $(HPCS_COMP) -d $(RPN_LIB);\
 	export BH_MAKE=${BH_MAKE} ;\
 	rm -rf data/* 2>/dev/null ;\
 	cd data ;\
@@ -42,7 +37,6 @@ tests:
 	./run_tests.ksh $(ONLY)
 
 tests_par:
-	. ssmuse-sh -d $(HPCS_BASE) -d $(HPCS_COMP) -d $(RPN_LIB);\
 	export BH_MAKE=${BH_MAKE} ;\
 	rm -rf data/* 2>/dev/null ;\
 	cd data ;\

@@ -1,0 +1,51 @@
+echo "Acquiring compilation tools"
+
+. version.dot
+
+unset MY_FFLAGS
+
+MY_FFLAGS=""
+#MY_FFLAGS="-C -g -O0"
+
+COMPILER=intel-2016.1.156
+COMPILER=intel13sp1u2
+
+case "${ORDENV_PLAT}" in
+
+   ubuntu-14.04-amd64-64)
+      BH_MAKE=make
+      BH_HOST=gpsc-in
+      BH_MODE=intel
+      if [ ${COMPILER} = intel-2016.1.156 ];then
+         RPN_LIB=/fs/ssm/eccc/mrd/rpn/libs/16.0-beta
+         HPCS_BASE=/fs/ssm/hpco/tmp/eccc/201402/03/base
+         HPCS_COMP=/fs/ssm/hpco/exp/intel-2016.1.156
+	 HPCS_CODE_TOOL=/fs/ssm/hpco/exp/jdm536/code-tools/code-tools_2.0_all
+         . ssmuse-sh -d ${HPCS_BASE} -d ${HPCS_COMP} -p ${HPCS_CODE_TOOL}
+      elif [ ${COMPILER} = intel13sp1u2 ];then
+         RPN_LIB=/fs/ssm/eccc/mrd/rpn/libs/15.2
+         . ssmuse-sh -d /fs/ssm/hpco/tmp/eccc/201402/03/intel13sp1u2 -d /fs/ssm/hpco/compilers/intel-2013sp1u2
+	 export  __INTEL_COMPILER=' '
+	 . ssmuse-sh -p /fs/ssm/hpco/exp/jdm536/code-tools/code-tools_2.0_all      	      
+      else
+         echo "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR"
+         echo "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR"
+         echo "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR"
+         echo "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR"
+	 echo "Compiler not suported: "${COMPILER}
+      fi
+      MY_FFLAGS="-openmp -fp-model source -warn all ${MY_FFLAGS}"
+      BH_PACKAGE=/fs/ssm/hpco/exp/bh/bh_0.17_all
+      . ssmuse-sh -d ${RPN_LIB}
+      . ssmuse-sh -p ${BH_PACKAGE}
+      :;;
+
+   "") echo "ERROR: variable ORDENV_PLAT not set"
+       echo "       Please review setup.dot for your platform"
+       :;;
+
+    *) echo platform ${ORDENV_PLAT} not suported, please review setup.dot
+       :;;
+esac
+
+export MY_FFLAGS BH_MAKE BH_HOST BH_MODE
