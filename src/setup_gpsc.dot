@@ -32,6 +32,22 @@ case "${ORDENV_PLAT}" in
       export SHARED_COMP_rpath=${INTELCOMP_HOME}/lib/intel64
       :;;
 
+    sles-11-amd64-64)
+      export BH_MAKE=make
+      export BH_MODE=intel
+      RPN_LIB=/fs/ssm/eccc/mrd/rpn/libs/16.0-alpha
+      BH_PACKAGE=/fs/ssm/hpco/exp/bh/bh_0.17_all
+      export MY_FFLAGS="-openmp -fp-model source -warn all ${MY_FFLAGS}"
+      export MY_CFLAGS="-openmp -fp-model precise -w3 ${MY_CFLAGS}"
+      . ssmuse-sh -d ${RPN_LIB}
+      . ssmuse-sh -p ${BH_PACKAGE}
+      # For shared librairy creation
+      export RPN_LIB
+      export SHARED_RNM_SSM_PREF=''
+      #export SHARED_RNM_EXT=_Alpha-016
+      #export SHARED_COMP_rpath=${INTELCOMP_HOME}/lib/intel64
+      :;;     
+
    "") echo "ERROR: variable ORDENV_PLAT not set"
        echo "       Please review setup.dot for your platform"
        :;;
