@@ -87,7 +87,7 @@ program constructor
   print*,'Reading B'
   read(10,*)work_8
   do k=1,nk
-     if(abs(work_8(k)-b_m_8(k))/b_m_8(k)>10.*epsilon(b_m_8(k)))then
+     if(abs(work_8(k)-b_m_8(k))/b_m_8(k)>my_epsilon)then
         OK=.false.
         print*,'Probleme avec B, pas dans les limites tollerees'
         print*,work_8(k),'vs',b_m_8(k)
@@ -124,7 +124,7 @@ program constructor
   print*,'Reading VCDM'
   read(10,*)work
   do k=1,nk
-     if(abs(work(k)-vcdm(k))/vcdm(k)>10.*epsilon(vcdm(k)))then
+     if(abs(work(k)-vcdm(k))/vcdm(k)>my_epsilon)then
         OK=.false.
         print*,'Probleme avec vcdm, pas dans les limites tollerees'
         print*,work(k),'vs',vcdm(k)
