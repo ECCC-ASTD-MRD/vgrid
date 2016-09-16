@@ -1,14 +1,3 @@
-echo "Acquiring compilation tools"
-
-. ./version.dot
-
-unset MY_FFLAGS MY_CFLAGS
-
-MY_FFLAGS="-O1"
-#MY_FFLAGS="-C -g -O0"
-MY_CFLAGS="-O1"
-#MY_CFLAGS="-g -O0"
-
 case "${ORDENV_PLAT}" in
 
    ubuntu-14.04-amd64-64)
@@ -17,7 +6,7 @@ case "${ORDENV_PLAT}" in
       HPCS_BASE=/fs/ssm/hpco/tmp/eccc/201402/03/base
       HPCS_COMP=/fs/ssm/hpco/exp/intel-2016.1.156
       HPCS_CODE_TOOL=/fs/ssm/hpco/exp/jdm536/code-tools/code-tools_2.0_all
-      RPN_LIB=/fs/ssm/eccc/mrd/rpn/libs/16.0-alpha
+      RPN_LIB=/fs/ssm/eccc/mrd/rpn/libs/16.0-beta
       BH_PACKAGE=/fs/ssm/hpco/exp/bh/bh_0.17_all
       export MY_FFLAGS="-openmp -fp-model source -warn all ${MY_FFLAGS}"
       export MY_CFLAGS="-openmp -fp-model precise -w3 ${MY_CFLAGS}"
@@ -27,7 +16,7 @@ case "${ORDENV_PLAT}" in
       # For shared librairy creation
       export RPN_LIB
       export SHARED_RNM_SSM_PREF=''
-      export SHARED_RNM_EXT=_Alpha-016
+      export SHARED_RNM_EXT=
       #export SHARED_COMP_rpath=/fs/ssm/hpco/exp/intel-2016.1.156/intelcomp_2016.1.156-01_multi/compilers_and_libraries_2016.1.150/linux/compiler/lib/intel64
       export SHARED_COMP_rpath=${INTELCOMP_HOME}/lib/intel64
       :;;
@@ -35,7 +24,7 @@ case "${ORDENV_PLAT}" in
     sles-11-amd64-64)
       export BH_MAKE=make
       export BH_MODE=intel
-      RPN_LIB=/fs/ssm/eccc/mrd/rpn/libs/16.0-alpha
+      RPN_LIB=/fs/ssm/eccc/mrd/rpn/libs/16.0-beta
       BH_PACKAGE=/fs/ssm/hpco/exp/bh/bh_0.17_all
       export MY_FFLAGS="-openmp -fp-model source -warn all ${MY_FFLAGS}"
       export MY_CFLAGS="-openmp -fp-model precise -w3 ${MY_CFLAGS}"
@@ -44,8 +33,7 @@ case "${ORDENV_PLAT}" in
       # For shared librairy creation
       export RPN_LIB
       export SHARED_RNM_SSM_PREF=''
-      #export SHARED_RNM_EXT=_Alpha-016
-      #export SHARED_COMP_rpath=${INTELCOMP_HOME}/lib/intel64
+      export SHARED_RNM_EXT=
       :;;     
 
    "") echo "ERROR: variable ORDENV_PLAT not set"
