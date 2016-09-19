@@ -33,7 +33,8 @@ case "${ORDENV_PLAT}" in
 
    sles-11-amd64-64)
       export BH_MAKE=make
-      export BH_MODE=intel
+      BH_HOST=hare
+      BH_MODE=intel
       RPN_LIB=/fs/ssm/eccc/mrd/rpn/libs/16.0-beta
       BH_PACKAGE=/fs/ssm/hpco/exp/bh/bh_0.17_all
       export MY_FFLAGS="-openmp -fp-model source -warn all ${MY_FFLAGS}"
@@ -49,5 +50,3 @@ case "${ORDENV_PLAT}" in
     *) echo platform ${ORDENV_PLAT} not suported, please review setup.dot
        :;;
 esac
-
-export MY_FFLAGS BH_MAKE BH_HOST BH_MODE
