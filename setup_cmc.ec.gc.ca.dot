@@ -1,0 +1,32 @@
+#LINUX_COMP=intel13sp1u2
+LINUX_COMP=pgi1401
+
+if [ ${BASE_ARCH} = AIX-powerpc7 ];then
+
+   . ssmuse-sh \
+      -d hpcs/201402/00/base\
+      -d hpcs/ext/xlf_13.1.0.10\
+      -d rpn/libs/15.0
+   export RMN=rmn_015
+
+else
+
+   r.use make as gmake
+
+   case ${LINUX_COMP} in
+      intel13sp1u2). ssmuse-sh \
+                    -d hpcs/201402/01/base\
+                    -d hpcs/201402/01/intel13sp1u2\
+                    -d rpn/libs/15.0
+                 export RMN=rmn_015
+		 :;;
+         pgi1401). ssmuse-sh \
+	            -d hpcs/201402/01/base\
+                    -d hpcs/201402/01/pgi1401\
+                    -d rpn/libs/15.0
+                 export RMN=rmn_015
+		 :;;
+              *) echo "Add compiler ${LINUX_COMP} in case ";;
+   esac
+
+fi

@@ -1,11 +1,3 @@
-echo "Acquiring compilation tools"
-
-. version.dot
-
-unset MY_FFLAGS
-
-MY_FFLAGS=""
-#MY_FFLAGS="-C -g -O0"
 
 case "${ORDENV_PLAT}" in
 
@@ -16,17 +8,26 @@ case "${ORDENV_PLAT}" in
       HPCS_COMP=/fs/ssm/hpco/exp/intel-2016.1.156
       HPCS_CODE_TOOL=/fs/ssm/hpco/exp/jdm536/code-tools/code-tools_2.0_all
       RPN_LIB=/fs/ssm/eccc/mrd/rpn/libs/16.0-alpha
+      BH_PACKAGE=/fs/ssm/hpco/exp/bh/bh_0.17_all
       export MY_FFLAGS="-openmp -fp-model source -warn all ${MY_FFLAGS}"
       . ssmuse-sh -d ${HPCS_BASE} -d ${HPCS_COMP} -p ${HPCS_CODE_TOOL}
       . ssmuse-sh -d ${RPN_LIB}
+      . ssmuse-sh -p ${BH_PACKAGE}
       :;;
+
+    sles-11-amd64-64)
+      export BH_MAKE=make
+      export BH_MODE=intel
+      RPN_LIB=/fs/ssm/eccc/mrd/rpn/libs/16.0-beta
+      BH_PACKAGE=/fs/ssm/hpco/exp/bh/bh_0.17_all
+      export MY_FFLAGS="-openmp -fp-model source -warn all ${MY_FFLAGS}"
+      . ssmuse-sh -d ${RPN_LIB}
+      . ssmuse-sh -p ${BH_PACKAGE}
+      :;;     
+
 
    "") echo "ERROR: variable ORDENV_PLAT not set"
        echo "       Please review setup.dot for your platform"
        :;;
 
-    *) echo platform ${ORDENV_PLAT} not suported, please review setup.dot
-       :;;
 esac
-
-. ssmuse-sh -p /fs/ssm/hpco/exp/bh/bh_0.17_all
