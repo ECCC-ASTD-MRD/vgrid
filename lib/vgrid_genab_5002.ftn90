@@ -181,7 +181,7 @@ contains
     !     Check range
     !
     if (F_hybuser(NK).ge.1..or.F_hybuser(1).le.hybm(0))then
-       write(for_msg,'("hyb must be < 1.0 and > ",es10.4)') hybm(0)
+       write(for_msg,'("hyb must be < 1.0 and > ",es15.4)') hybm(0)
        call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
