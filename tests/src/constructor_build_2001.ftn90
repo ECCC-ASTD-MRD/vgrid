@@ -18,6 +18,8 @@ program constructor
   logical, parameter :: write_control_L=.false.
   character (len=256) :: file
   !
+  nullify(vipm,vipt,work_i,tbl,a_m_8,a_t_8,b_m_8,b_t_8,work_8,hyb)
+  !
   ! Construct a new set of 3D coordinate descriptors
   pres = pres*100. !convert mb to Pa
   allocate(ip1s(size(pres)))

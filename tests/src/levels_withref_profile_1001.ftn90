@@ -10,12 +10,14 @@ program tests
   real, dimension(:), pointer :: pres_profil
   real*8, dimension(:), pointer :: pres_profil_8
   real :: epsilon=0.01
-  real, dimension(:,:), allocatable :: p0,px
+  real, dimension(:,:), pointer :: p0,px
   real, dimension(:,:,:), pointer :: lev
   real :: local_pres
   real*8 :: local_pres_8
   type(vgrid_descriptor) :: d
   logical :: ok
+
+  nullify(ip1_list,pres_profil,pres_profil_8,p0,px,lev)
 
   stat=fnom(lu,"data/dm_1001_from_model_run_plus_toc","RND",0)
   if(stat.lt.0)then
