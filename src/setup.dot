@@ -1,6 +1,6 @@
 echo "Acquiring compilation tools"
 
-. version.dot
+. ./version.dot
 
 unset MY_FFLAGS MY_CFLAGS
 
@@ -8,7 +8,7 @@ unset MY_FFLAGS MY_CFLAGS
 # constructor_build_all constructor_gen_5002_5003_5005 get_set_diag_height read_write_read_all
 # set_write_5002 test_allow_reshape test_vgd_free write_5002
 
-# Le 18 sep 2016 sur gpsc-in les tests suivants plantent avec -O2 (OK avec -O1, OK avec -O3)
+# Le 18 sep 2016 sur gpsc-in les tests suivants plantent avec -O2 (OK avec -O0, OK avec -O1, OK avec -O3)
 #constructor_gen_1002_5001   ligne 1232
 #levels_toplevel_value
 #levels_withref
@@ -24,9 +24,9 @@ MY_CFLAGS="-O1"
 #MY_CFLAGS="-g -O0 -lefence"
 
 if   [ $(hostname -d) = cmc.ec.gc.ca ];then
-   . setup_cmc.ec.gc.ca.dot
+   . ./setup_cmc.ec.gc.ca.dot
 elif [ $(hostname -d) = science.gc.ca ];then
-   . setup_science.gc.ca.dot
+   . ./setup_science.gc.ca.dot
 else
    echo "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR"
    echo "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR"
