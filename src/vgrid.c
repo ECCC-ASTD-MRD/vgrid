@@ -1126,6 +1126,7 @@ int Cvgd_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, 
       errorInput = 1;
     }
   } else if ( is_valid( *self, a_t_8_valid_get) ) {
+    // a_t_8 is not a valid component put may be get in which case we return the momentum values
     (*self)->a_t_8 = (*self)->a_m_8;
     (*self)->nl_t = (*self)->nl_m;
   }
@@ -1143,7 +1144,7 @@ int Cvgd_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, 
       errorInput = 1;
     }
   } else if ( is_valid( *self, b_t_8_valid_get) ) {
-    // a_t_8 is not a valid component put may be get in which case we return the momentum values
+    // b_t_8 is not a valid component put may be get in which case we return the momentum values
     (*self)->b_t_8 = (*self)->b_m_8;
     (*self)->nl_t = (*self)->nl_m;
   }
