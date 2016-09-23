@@ -793,6 +793,10 @@ int Cvgd_diag_withref(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_l
 static vgrid_descriptor* c_vgd_construct() {
 
    vgrid_descriptor *vgrid = malloc(sizeof(vgrid_descriptor));
+   if( !vgrid ){
+     printf("(Cvgd) ERROR in c_vgd_construct, cannot allocate vgrid\n");
+     return NULL;
+   }
 
    if( vgrid ) {
       vgrid->ptop_8        = VGD_MISSING;
@@ -829,7 +833,6 @@ static vgrid_descriptor* c_vgd_construct() {
       vgrid->rec.deet = 0;
       vgrid->rec.npas = 0;
       vgrid->rec.nbits = -64;
-      vgrid->rec.datyp = 0;
       vgrid->rec.datyp = 0;
       vgrid->rec.ip1 = 0;
       vgrid->rec.ip2 = 0;
