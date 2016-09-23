@@ -21,7 +21,7 @@ case "${ORDENV_PLAT}" in
       export SHARED_COMP_rpath=${INTELCOMP_HOME}/lib/intel64
       :;;
 
-    sles-11-amd64-64)
+    sles-11-amd64-64|sles-11-broadwell-64-xc40)
       export BH_MAKE=make
       export BH_MODE=intel
       RPN_LIB=/fs/ssm/eccc/mrd/rpn/libs/16.0-beta
