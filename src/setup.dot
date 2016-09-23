@@ -3,12 +3,17 @@ echo "Acquiring compilation tools"
 . ./version.dot
 
 unset MY_FFLAGS MY_CFLAGS
+# Les erreurs semblent lier a c_vgd_construct, apres le malloc sur la structure vgrid le yabbe est aux vaches pour certaines optoimisations,
 
-# Note avec -O1 sur ubuntu-12.04-amd64-64 intel13sp1u2 les tests suivants donnent un SIGSEGV (OK avec -O3)
-# constructor_build_all constructor_gen_5002_5003_5005 get_set_diag_height read_write_read_all
-# set_write_5002 test_allow_reshape test_vgd_free write_5002
+# Note avec -O1 sur ubuntu-12.04-amd64-64 intel13sp1u2 les tests suivants donnent un SIGSEGV a la ligne entre () (OK avec -O2 (defaul) OK avec -O3)
+# constructor_build_all(1422) constructor_gen_5002_5003_5005(1422) get_set_diag_height(1424) read_write_read_all(1422)
+# set_write_5002(1424) test_allow_reshape(1424) test_vgd_free(1424) write_5002(1424)
+# Pour write_5002, dans Cvgd_new_build_vert, l<initialisations de (*self)->valid  et autre ne fonctionne pas!
+# les parametres de Cvgd_new_build_vert sot change par le call a *self = c_vgd_construct(); ligne 1028
+#    Je recompile en sortant de c_vgd_construct sans rien y faire et les parametres sont ok
+#    Je recompile en ne faisant que l<allocation de vgrid et ca change les parametres! (kind, version, nk, ip1 ip2)
 
-# Le 18 sep 2016 sur gpsc-in les tests suivants plantent avec -O2 (OK avec -O0, OK avec -O1, OK avec -O3)
+# Le 18 sep 2016 sur gpsc-in avec intel16 ubuntu-14.04-amd64-64 les tests suivants plantent avec -O2 (OK avec -O0, OK avec -O1, OK avec -O3)
 #constructor_gen_1002_5001   ligne 1232
 #levels_toplevel_value
 #levels_withref
@@ -17,10 +22,9 @@ unset MY_FFLAGS MY_CFLAGS
 #c_levels
 #c_use_new_read
 
-
-MY_FFLAGS="-O1"
+MY_FFLAGS=""
 #MY_FFLAGS="-C -g -O0 -lefence"
-MY_CFLAGS="-O1"
+MY_CFLAGS=""
 #MY_CFLAGS="-g -O0 -lefence"
 
 if   [ $(hostname -d) = cmc.ec.gc.ca ];then
