@@ -58,23 +58,26 @@ module vGrid_Descriptors
                                                 !    he/she is doing, then he/she ca set ALLOW_SIGMA to true.
 
   ! Validity table for self
-  integer, dimension(2), parameter :: ptop_out_8_valid=                                  (/5004,5005/)
+  integer, dimension(3), parameter :: ptop_out_8_valid=                                  (/5004,5005,5100/)
   integer, dimension(6), parameter :: ptop_8_valid=             (/1002,1003,5001,5002,5003,5004/)
-  integer, dimension(6), parameter :: pref_8_valid=                  (/1003,5001,5002,5003,5004,5005/)
-  integer, dimension(6), parameter :: rcoef1_valid=                  (/1003,5001,5002,5003,5004,5005/)
-  integer, dimension(4), parameter :: rcoef2_valid=                            (/5002,5003,5004,5005/)
-  integer, dimension(9), parameter :: a_m_8_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004,5005/)
-  integer, dimension(9), parameter :: b_m_8_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004,5005/)
-  integer, dimension(4), parameter :: a_t_8_valid=                             (/5002,5003,5004,5005/)
-  integer, dimension(8), parameter :: a_t_8_valid_get=(/1001,1002,     2001,5001,5002,5003,5004,5005/)
-  integer, dimension(4), parameter :: b_t_8_valid=                             (/5002,5003,5004,5005/)
-  integer, dimension(8), parameter :: b_t_8_valid_get=(/1001,1002,     2001,5001,5002,5003,5004,5005/)
-  integer, dimension(9), parameter :: ip1_m_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004,5005/)
-  integer, dimension(4), parameter :: ip1_t_valid=                             (/5002,5003,5004,5005/)
-  integer, dimension(8), parameter :: ip1_t_valid_get=(/1001,1002,     2001,5001,5002,5003,5004,5005/)
-  integer, dimension(8), parameter :: ref_name_valid= (/1001,1002,1003     ,5001,5002,5003,5004,5005/)
-  integer, dimension(1), parameter :: dhm_valid=                                              (/5005/)
-  integer, dimension(1), parameter :: dht_valid=                                              (/5005/)
+  integer, dimension(7), parameter :: pref_8_valid=                  (/1003,5001,5002,5003,5004,5005,5100/)
+  integer, dimension(7), parameter :: rcoef1_valid=                  (/1003,5001,5002,5003,5004,5005,5100/)
+  integer, dimension(5), parameter :: rcoef2_valid=                            (/5002,5003,5004,5005,5100/)
+  integer, dimension(10),parameter :: a_m_8_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004,5005,5100/)
+  integer, dimension(1), parameter :: bs_m_8_valid=                                                (/5100/)
+  integer, dimension(10),parameter :: b_m_8_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004,5005,5100/)
+  integer, dimension(5), parameter :: a_t_8_valid=                             (/5002,5003,5004,5005,5100/)
+  integer, dimension(9), parameter :: a_t_8_valid_get=(/1001,1002,     2001,5001,5002,5003,5004,5005,5100/)
+  integer, dimension(5), parameter :: b_t_8_valid=                             (/5002,5003,5004,5005,5100/)
+  integer, dimension(9), parameter :: b_t_8_valid_get=(/1001,1002,     2001,5001,5002,5003,5004,5005,5100/)
+  integer, dimension(1), parameter :: bs_t_8_valid=                                                (/5100/)
+  integer, dimension(1), parameter :: bs_t_8_valid_get=                                            (/5100/)
+  integer, dimension(10),parameter :: ip1_m_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004,5005,5100/)
+  integer, dimension(5), parameter :: ip1_t_valid=                             (/5002,5003,5004,5005,5100/)
+  integer, dimension(9), parameter :: ip1_t_valid_get=(/1001,1002,     2001,5001,5002,5003,5004,5005,5100/)
+  integer, dimension(9), parameter :: ref_name_valid= (/1001,1002,1003     ,5001,5002,5003,5004,5005,5100/)
+  integer, dimension(2), parameter :: dhm_valid=                                              (/5005,5100/)
+  integer, dimension(2), parameter :: dht_valid=                                              (/5005,5100/)
 
   ! FST file record structure
   type FSTD
@@ -107,8 +110,10 @@ module vGrid_Descriptors
      real(kind=8), dimension(:,:,:), pointer :: table=>null()!complete grid descriptor record
      real(kind=8), dimension(:), pointer :: a_m_8=>null()!A-coefficients for momentum levels
      real(kind=8), dimension(:), pointer :: b_m_8=>null()!B-coefficients for momentum levels
+     real(kind=8), dimension(:), pointer :: bs_m_8=>null()!Bs-coefficients for momentum levels
      real(kind=8), dimension(:), pointer :: a_t_8=>null()!A-coefficients for thermodynamic levels
      real(kind=8), dimension(:), pointer :: b_t_8=>null()!B-coefficients for thermodynamic levels
+     real(kind=8), dimension(:), pointer :: bs_t_8=>null()!Bs-coefficients for thermodynamic levels
      real :: dhm                                        ! Diag level Height (m) for Momentum variables UU,VV
      real :: dht                                        ! Diag level Height (m) for Thermo variables TT,HU, etc
      integer, dimension(:), pointer :: ip1_m=>null()    !ip1 values for momentum levels
@@ -597,7 +602,7 @@ contains
 
    integer function new_build_vert(self,kind,version,nk,ip1,ip2, &
         ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8, &
-        ip1_m,ip1_t) result(status)
+        ip1_m,ip1_t,bs_m_8,bs_t_8) result(status)
       ! Coordinate constructor - build vertical descriptor from arguments
       type(vgrid_descriptor) :: self                    !Vertical descriptor instance    
       integer, intent(in) :: kind,version               !Kind,version to create
@@ -608,6 +613,7 @@ contains
       real*8, optional, intent(in) :: pref_8            !Reference-level pressure (Pa)
       real*8, optional, dimension(:) :: a_m_8,a_t_8     !A-coefficients for momentum(m),thermo(t) levels
       real*8, optional, dimension(:) :: b_m_8,b_t_8     !B-coefficients for momentum(m),thermo(t) levels
+      real*8, optional, dimension(:) :: bs_m_8,bs_t_8   !Bs-coefficients for momentum(m),thermo(t) levels (large scale)
       integer, optional, dimension(:) :: ip1_m,ip1_t    !Level ID (IP1) for momentum(m),thermo(t) levels
 
       ! Local variables
@@ -696,6 +702,22 @@ contains
             missingInput = .true.
          endif
       endif
+      if(is_valid(self,bs_m_8_valid)) then
+         if(present(bs_m_8))then
+            if (associated(self%bs_m_8)) deallocate(self%bs_m_8)
+            allocate(self%bs_m_8(size(bs_m_8)),stat=error)
+            if(error < 0)then
+               write(for_msg,*) 'problem allocating bs_m_8 in new_build_vert'
+               call msg(MSG_ERROR,VGD_PRFX//for_msg)
+               return
+            endif
+            self%bs_m_8 = bs_m_8
+         else
+            write(for_msg,*) 'b_m_8 is a required constructor entry'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            missingInput = .true.
+         endif
+      endif
       if(is_valid(self,a_t_8_valid)) then
          if(present(a_t_8))then
             if (associated(self%a_t_8)) deallocate(self%a_t_8)
@@ -724,6 +746,22 @@ contains
             self%b_t_8 = b_t_8
          else
             write(for_msg,*) 'b_t_8 is a required constructor entry'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            missingInput = .true.
+         endif
+      endif
+      if(is_valid(self,bs_t_8_valid)) then
+         if(present(bs_t_8))then
+            if (associated(self%bs_t_8)) deallocate(self%bs_t_8)
+            allocate(self%bs_t_8(size(bs_t_8)),stat=error)
+            if(error < 0)then
+               write(for_msg,*) 'problem allocating bs_t_8 in new_build_vert'
+               call msg(MSG_ERROR,VGD_PRFX//for_msg)
+               return
+            endif
+            self%bs_t_8 = bs_t_8
+         else
+            write(for_msg,*) 'bs_t_8 is a required constructor entry'
             call msg(MSG_ERROR,VGD_PRFX//for_msg)
             missingInput = .true.
          endif
@@ -783,7 +821,10 @@ contains
       case (5002,5003,5004,5005)
          cvcode="5002"
          error = encode_vert_5002(self,nk)
-      case DEFAULT
+      case (5100)
+         cvcode="5100"
+         error = encode_vert_5100(self,nk)
+       case DEFAULT
          write(for_msg,*) 'unsupported kind and version : ',kind,version,' (vcode) ',self%vcode
          call msg(MSG_ERROR,VGD_PRFX//for_msg)
          return
@@ -3799,6 +3840,152 @@ contains
      ! Set status and return
      status = VGD_OK
   end function encode_vert_5002
+
+  Integer function encode_vert_5100(self,F_nk,update_L) result(status)
+     use utils, only: flip_transfer
+     type(vgrid_descriptor), intent(inout) :: self      !Vertical descriptor instance
+     integer, intent(in), optional :: F_nk              !Number of levels
+     logical, intent(in), optional :: update_L          !Update table
+
+     ! Local variables
+     integer :: nn,error,k,ind,nb,nk
+     integer, parameter :: skip=3
+     real*8 :: for_char_8
+     character(len=8) :: ref_name
+     logical :: my_update_L
+
+     ! Set error status
+     status = VGD_ERROR
+
+     my_update_L=.false.
+     if(present(update_L))my_update_L=update_L
+     if(my_update_L.and.present(F_nk))then
+        write(for_msg,*) 'Error in encode_vert_5100, optional parameter F_nk must not be used with option update_L set to .true.'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     end if
+
+     !=============================================================================
+     ! Nk is the number of dynamic momentum levels without hyb = 1.0 and diag level
+     ! Therefore, the number of lines in table is nj =
+     !   nk + 1 for hyb=1 + 1 for diag   -> momentum
+     ! + nk + 1 for hyb=1 + 1 for diag   -> thermo  
+     ! + skip
+     ! = 
+     ! nj = 2 * ( nk + 2 ) + skip
+     !
+     ! ->  nk = ( nj - skip ) / 2 - 2
+     !
+     !==========================================================================================
+     if(my_update_L)then
+        nk = ( size(self%table,2) - skip ) / 2 - 2
+     else
+        if(.not.present(F_nk))then
+           write(for_msg,*) 'Error in encode_vert_5100, internal error with F_nk and update_L'
+           call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        endif
+        nk = F_nk
+     endif
+
+     nb=nk+2
+        
+     ! Allocate table space
+     if(.not.my_update_L)then
+        if (associated(self%table)) deallocate(self%table)         
+        allocate(self%table(3,2*nb+skip,2),stat=error)
+        if(error < 0)then
+           write(for_msg,*) 'cannot allocate self%table in encode_vert_5100'
+           call msg(MSG_ERROR,VGD_PRFX//for_msg)
+           return
+        endif
+     endif
+     
+     ! Associate reference field name
+     self%ref_name='P0'
+
+     ! Vector size checks
+     nn=size(self%ip1_m)
+     if(nn.ne.nb)then
+        write(for_msg,*) 'wrong size for ip1_m, is ',nn,'should be ',nb
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
+     nn=size(self%a_m_8)
+     if(nn.ne.nb)then
+        write(for_msg,*) 'wrong size for a_m_8, is ',nn,'should be ',nb
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
+     nn=size(self%b_m_8)
+     if(nn.ne.nb)then
+        write(for_msg,*) 'wrong size for b_m_8, is ',nn,'should be ',nb
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
+     nn=size(self%bs_m_8)
+     if(nn.ne.nb)then
+        write(for_msg,*) 'wrong size for bs_m_8, is ',nn,'should be ',nb
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
+     nn=size(self%ip1_t)
+     if(nn.ne.nb)then
+        write(for_msg,*) 'wrong size for ip1_t, is ',nn,'should be ',nb
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
+     nn=size(self%a_t_8)
+     if(nn.ne.nb)then
+        write(for_msg,*) 'wrong size for a_t_8, is ',nn,'should be ',nb
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
+     nn=size(self%b_t_8)
+     if(nn.ne.nb)then
+        write(for_msg,*) 'wrong size for b_t_8, is ',nn,'should be ',nb
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
+     nn=size(self%bs_t_8)
+     if(nn.ne.nb)then
+        write(for_msg,*) 'wrong size for bs_t_8, is ',nn,'should be ',nb
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
+     if (len_trim(self%ref_name) > len(ref_name)) then
+        write(for_msg,*) 'reference field name '//trim(self%ref_name)//' longer than limit: ',len(ref_name)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
+     error = flip_transfer(self%ref_name,for_char_8)
+     if (error /= VGD_OK) then
+        write(for_msg,*) 'flip_transfer function returned error code from encode ',error
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
+
+     ! Fill header
+     self%table(1:3,1,1)=(/dble(self%kind)  ,dble(self%version),dble(skip)/)
+     self%table(1:3,2,1)=(/self%ptop_8      ,self%pref_8       ,dble(self%rcoef1)/)     
+     self%table(1:3,3,1)=(/dble(self%rcoef2),for_char_8           ,0.d0/)
+
+     ! Fill momentum level data
+     do k=1,nb
+        ind=k+skip
+        self%table(1:3,ind,1)=(/dble(self%ip1_m(k)),self%a_m_8(k),self%b_m_8(k)/)
+        self%table(1  ,ind,2)=self%bs_m_8(k)
+     enddo     
+
+     ! Fill thermodynamic level data
+     do k=1,nb
+        ind=k+skip+nb
+        self%table(1:3,ind,1)=(/dble(self%ip1_t(k)),self%a_t_8(k),self%b_t_8(k)/)
+        self%table(1  ,ind,2)=self%bs_t_8(k)
+     enddo
+     
+     ! Set status and return
+     status = VGD_OK
+  end function encode_vert_5100
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! (PRIVATE) Decoding functions
