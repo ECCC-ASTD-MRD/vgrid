@@ -80,7 +80,6 @@ typedef struct vgrid_descriptor {
 
 int Cvgd_is_valid(vgrid_descriptor *self, char *valid_table_name);
 void Cvgd_table_shape(vgrid_descriptor *self, int **tshape);
-void Cvgd_table_shape(vgrid_descriptor *self, int **tshape);
 int Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip);
 int Cvgd_print_vcode_description(int vcode);
 int Cvgd_levels_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8, int in_log);
