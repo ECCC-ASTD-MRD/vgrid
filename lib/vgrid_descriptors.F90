@@ -64,18 +64,19 @@ module vGrid_Descriptors
   integer, dimension(7), parameter :: rcoef1_valid=                  (/1003,5001,5002,5003,5004,5005,5100/)
   integer, dimension(5), parameter :: rcoef2_valid=                            (/5002,5003,5004,5005,5100/)
   integer, dimension(10),parameter :: a_m_8_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004,5005,5100/)
-  integer, dimension(1), parameter :: bs_m_8_valid=                                                (/5100/)
+  integer, dimension(1), parameter :: bl_m_8_valid=                                                (/5100/)
   integer, dimension(10),parameter :: b_m_8_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004,5005,5100/)
   integer, dimension(5), parameter :: a_t_8_valid=                             (/5002,5003,5004,5005,5100/)
   integer, dimension(9), parameter :: a_t_8_valid_get=(/1001,1002,     2001,5001,5002,5003,5004,5005,5100/)
   integer, dimension(5), parameter :: b_t_8_valid=                             (/5002,5003,5004,5005,5100/)
   integer, dimension(9), parameter :: b_t_8_valid_get=(/1001,1002,     2001,5001,5002,5003,5004,5005,5100/)
-  integer, dimension(1), parameter :: bs_t_8_valid=                                                (/5100/)
-  integer, dimension(1), parameter :: bs_t_8_valid_get=                                            (/5100/)
+  integer, dimension(1), parameter :: bl_t_8_valid=                                                (/5100/)
+  integer, dimension(1), parameter :: bl_t_8_valid_get=                                            (/5100/)
   integer, dimension(10),parameter :: ip1_m_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004,5005,5100/)
   integer, dimension(5), parameter :: ip1_t_valid=                             (/5002,5003,5004,5005,5100/)
   integer, dimension(9), parameter :: ip1_t_valid_get=(/1001,1002,     2001,5001,5002,5003,5004,5005,5100/)
   integer, dimension(9), parameter :: ref_name_valid= (/1001,1002,1003     ,5001,5002,5003,5004,5005,5100/)
+  integer, dimension(1), parameter :: ref_namel_valid=                                             (/5100/)
   integer, dimension(2), parameter :: dhm_valid=                                              (/5005,5100/)
   integer, dimension(2), parameter :: dht_valid=                                              (/5005,5100/)
 
@@ -110,10 +111,10 @@ module vGrid_Descriptors
      real(kind=8), dimension(:,:,:), pointer :: table=>null()!complete grid descriptor record
      real(kind=8), dimension(:), pointer :: a_m_8=>null()!A-coefficients for momentum levels
      real(kind=8), dimension(:), pointer :: b_m_8=>null()!B-coefficients for momentum levels
-     real(kind=8), dimension(:), pointer :: bs_m_8=>null()!Bs-coefficients for momentum levels
+     real(kind=8), dimension(:), pointer :: bl_m_8=>null()!Bs-coefficients for momentum levels
      real(kind=8), dimension(:), pointer :: a_t_8=>null()!A-coefficients for thermodynamic levels
      real(kind=8), dimension(:), pointer :: b_t_8=>null()!B-coefficients for thermodynamic levels
-     real(kind=8), dimension(:), pointer :: bs_t_8=>null()!Bs-coefficients for thermodynamic levels
+     real(kind=8), dimension(:), pointer :: bl_t_8=>null()!Bs-coefficients for thermodynamic levels
      real :: dhm                                        ! Diag level Height (m) for Momentum variables UU,VV
      real :: dht                                        ! Diag level Height (m) for Thermo variables TT,HU, etc
      integer, dimension(:), pointer :: ip1_m=>null()    !ip1 values for momentum levels
@@ -126,6 +127,7 @@ module vGrid_Descriptors
      integer :: unit                                    !file unit associated with this 3D descriptor
      integer :: vcode,kind,version                      !Vertical coordinate codes
      character(len=VGD_LEN_NAME) :: ref_name='None'     !reference field name
+     character(len=VGD_LEN_NAME) :: ref_namel='None'    !reference field name large scale
      type(FSTD) :: rec                                  !FST file record structure for descriptor
   end type vgrid_descriptor
 
@@ -579,6 +581,13 @@ contains
            call msg(MSG_ERROR,VGD_PRFX//for_msg)
            return
         endif
+     case (5100)
+        istat=decode_vert_5100(self)
+        if(istat < 0)then
+           write(for_msg,*) 'problem decoding table with vcode 5100'
+           call msg(MSG_ERROR,VGD_PRFX//for_msg)
+           return
+        endif
      case DEFAULT
         istat = get_version_info(self,kind,version)
         write(for_msg,*) 'invalid kind or version in new_from_table:',kind,version
@@ -602,7 +611,7 @@ contains
 
    integer function new_build_vert(self,kind,version,nk,ip1,ip2, &
         ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8, &
-        ip1_m,ip1_t,bs_m_8,bs_t_8) result(status)
+        ip1_m,ip1_t,bl_m_8,bl_t_8) result(status)
       ! Coordinate constructor - build vertical descriptor from arguments
       type(vgrid_descriptor) :: self                    !Vertical descriptor instance    
       integer, intent(in) :: kind,version               !Kind,version to create
@@ -613,7 +622,7 @@ contains
       real*8, optional, intent(in) :: pref_8            !Reference-level pressure (Pa)
       real*8, optional, dimension(:) :: a_m_8,a_t_8     !A-coefficients for momentum(m),thermo(t) levels
       real*8, optional, dimension(:) :: b_m_8,b_t_8     !B-coefficients for momentum(m),thermo(t) levels
-      real*8, optional, dimension(:) :: bs_m_8,bs_t_8   !Bs-coefficients for momentum(m),thermo(t) levels (large scale)
+      real*8, optional, dimension(:) :: bl_m_8,bl_t_8   !Bs-coefficients for momentum(m),thermo(t) levels (large scale)
       integer, optional, dimension(:) :: ip1_m,ip1_t    !Level ID (IP1) for momentum(m),thermo(t) levels
 
       ! Local variables
@@ -702,16 +711,16 @@ contains
             missingInput = .true.
          endif
       endif
-      if(is_valid(self,bs_m_8_valid)) then
-         if(present(bs_m_8))then
-            if (associated(self%bs_m_8)) deallocate(self%bs_m_8)
-            allocate(self%bs_m_8(size(bs_m_8)),stat=error)
+      if(is_valid(self,bl_m_8_valid)) then
+         if(present(bl_m_8))then
+            if (associated(self%bl_m_8)) deallocate(self%bl_m_8)
+            allocate(self%bl_m_8(size(bl_m_8)),stat=error)
             if(error < 0)then
-               write(for_msg,*) 'problem allocating bs_m_8 in new_build_vert'
+               write(for_msg,*) 'problem allocating bl_m_8 in new_build_vert'
                call msg(MSG_ERROR,VGD_PRFX//for_msg)
                return
             endif
-            self%bs_m_8 = bs_m_8
+            self%bl_m_8 = bl_m_8
          else
             write(for_msg,*) 'b_m_8 is a required constructor entry'
             call msg(MSG_ERROR,VGD_PRFX//for_msg)
@@ -750,18 +759,18 @@ contains
             missingInput = .true.
          endif
       endif
-      if(is_valid(self,bs_t_8_valid)) then
-         if(present(bs_t_8))then
-            if (associated(self%bs_t_8)) deallocate(self%bs_t_8)
-            allocate(self%bs_t_8(size(bs_t_8)),stat=error)
+      if(is_valid(self,bl_t_8_valid)) then
+         if(present(bl_t_8))then
+            if (associated(self%bl_t_8)) deallocate(self%bl_t_8)
+            allocate(self%bl_t_8(size(bl_t_8)),stat=error)
             if(error < 0)then
-               write(for_msg,*) 'problem allocating bs_t_8 in new_build_vert'
+               write(for_msg,*) 'problem allocating bl_t_8 in new_build_vert'
                call msg(MSG_ERROR,VGD_PRFX//for_msg)
                return
             endif
-            self%bs_t_8 = bs_t_8
+            self%bl_t_8 = bl_t_8
          else
-            write(for_msg,*) 'bs_t_8 is a required constructor entry'
+            write(for_msg,*) 'bl_t_8 is a required constructor entry'
             call msg(MSG_ERROR,VGD_PRFX//for_msg)
             missingInput = .true.
          endif
@@ -864,6 +873,7 @@ contains
       use vdescript_1002_5001, only: vgrid_genab_1002_5001
       use vdescript_2001,      only: vgrid_genab_2001
       use vdescript_5002,      only: vgrid_genab_5002
+      use vdescript_5100,      only: vgrid_genab_5100
       ! Coordinate constructor - build vertical descriptor from hybrid coordinate entries
       type(vgrid_descriptor),intent(inout) :: self      !Vertical descriptor instance    
       integer, intent(in) :: kind,version               !Kind,version to create
@@ -880,10 +890,10 @@ contains
       integer :: myip1,myip2,mystdout_unit,error
       integer, dimension(:), pointer :: ip1_m,ip1_t
       real, dimension(:), pointer :: hybm,hybt
-      real*8, dimension(:), pointer :: a_m_8,b_m_8,a_t_8,b_t_8
+      real*8, dimension(:), pointer :: a_m_8,b_m_8,bl_m_8,a_t_8,b_t_8,bl_t_8
       logical :: errorInput=.false.
 
-      nullify(ip1_m,ip1_t,hybm,hybt,a_m_8,b_m_8,a_t_8,b_t_8)
+      nullify(ip1_m,ip1_t,hybm,hybt,a_m_8,b_m_8,bl_m_8,a_t_8,b_t_8,bl_t_8)
 
       self%valid=.false.
       ! Set error status
@@ -1164,8 +1174,39 @@ contains
               ip1_m=ip1_m,         &
               ip1_t=ip1_t)
          if (error /= VGD_OK) return
+      case (5100)  
+         call vgrid_genab_5100(hyb,(/rcoef1,rcoef2/),pref_8, &
+              a_m_8,b_m_8,bl_m_8,a_t_8,b_t_8,bl_t_8,ip1_m,ip1_t,error,ptop_out_8=ptop_out_8, &
+              dhm=dhm,dht=dht)
+         if (error /= VGD_OK)then
+            if(associated(a_m_8))deallocate(a_m_8)
+            if(associated(b_m_8))deallocate(b_m_8)
+            if(associated(bl_m_8))deallocate(bl_m_8)
+            if(associated(a_t_8))deallocate(a_t_8)
+            if(associated(b_t_8))deallocate(b_t_8)
+            if(associated(bl_t_8))deallocate(bl_t_8)
+            if(associated(ip1_m))deallocate(ip1_m)
+            if(associated(ip1_t))deallocate(ip1_t)
+            return
+         endif
+         error = new_build_vert(self,kind,version,size(hyb), &
+              ip1=myip1,           &
+              ip2=myip2,           &
+              ptop_8=ptop_out_8,   &
+              pref_8=pref_8,       &
+              rcoef1=rcoef1,       &
+              rcoef2=rcoef2,       &
+              a_m_8=a_m_8,         &
+              b_m_8=b_m_8,         &
+              bl_m_8=bl_m_8,       &
+              a_t_8=a_t_8,         &
+              b_t_8=b_t_8,         &
+              bl_t_8=bl_t_8,       &
+              ip1_m=ip1_m,         &
+              ip1_t=ip1_t)
+         if (error /= VGD_OK) return
       case DEFAULT
-         write(for_msg,*)'unsuported IP1 kind = ',kind,', AND/OR version = ',version
+         write(for_msg,*)'unsupported IP1 kind = ',kind,', AND/OR version = ',version
          call msg(MSG_ERROR,VGD_PRFX//for_msg)
          return
       end select
@@ -1210,6 +1251,7 @@ contains
      self%kind=-1
      self%version=-1
      self%ref_name='None'
+     self%ref_namel='None'
      !
      self%rec%initialized=.false.
      ! Set error status
@@ -1245,7 +1287,7 @@ contains
        select case (self%vcode)
        case (1001,1002,5001)
           value=.false.
-       case (5002,5003,5004,5005)
+       case (5002,5003,5004,5005,5100)
           value=.true.
        case DEFAULT
           write(for_msg,*) 'unsupported vcode for LOGP: ',self%vcode
@@ -1696,6 +1738,15 @@ contains
           error = int(get_error(key,my_quiet))
           return
        endif
+    case ('CBLM')
+       if (is_valid(self,bl_m_8_valid)) then
+          istat = get_allocate(key,value,size(self%bl_m_8),ALLOW_RESHAPE,'(CBLM in get_real8_1d)')
+          if (istat /= 0) return
+          value = self%bl_m_8
+       else
+          error = int(get_error(key,my_quiet))
+          return
+       endif
     case ('CA_T')
        if (is_valid(self,a_t_8_valid_get)) then
           if(is_valid(self,a_t_8_valid)) then
@@ -1721,6 +1772,21 @@ contains
              istat = get_allocate(key,value,size(self%b_m_8),ALLOW_RESHAPE,'(CB_T (m) in get_real8_1d)')
              if (istat /= 0) return
              value = self%b_m_8
+          endif
+       else
+          error = int(get_error(key,my_quiet))
+          return
+       endif
+    case ('CBLT')
+       if (is_valid(self,bl_t_8_valid_get)) then
+          if (is_valid(self,bl_t_8_valid)) then
+             istat = get_allocate(key,value,size(self%bl_t_8),ALLOW_RESHAPE,'(CBLT in get_real8_1d)')
+             if (istat /= 0) return
+             value = self%bl_t_8
+          else
+             istat = get_allocate(key,value,size(self%bl_m_8),ALLOW_RESHAPE,'(CBLT (m) in get_real8_1d)')
+             if (istat /= 0) return
+             value = self%bl_m_8
           endif
        else
           error = int(get_error(key,my_quiet))
@@ -1831,6 +1897,15 @@ contains
     case ('RFLD')
        if (is_valid(self,ref_name_valid)) then
           value = printingCharacters(self%ref_name)
+       else
+          error = get_error(key,my_quiet)
+          write(for_msg,'(i8)') error
+          call msg(level_msg,VGD_PRFX//for_msg)
+          return
+       endif
+    case ('RFLS')
+       if (is_valid(self,ref_namel_valid)) then
+          value = printingCharacters(self%ref_namel)
        else
           error = get_error(key,my_quiet)
           write(for_msg,'(i8)') error
@@ -2268,6 +2343,9 @@ contains
     case ('RFLD')
        self%ref_name = value
        if (.not.is_valid(self,ref_name_valid)) error = put_error(key)
+    case ('RFLS')
+       self%ref_namel = value
+       if (.not.is_valid(self,ref_namel_valid)) error = put_error(key)
     case DEFAULT
        write(for_msg,*) 'invalid key '//trim(key)//' given to gd_put (char)'
        call msg(MSG_ERROR,VGD_PRFX//for_msg)
@@ -2377,6 +2455,10 @@ contains
           write(for_msg,*)'  Surface field nomvar ',self%ref_name
           call msg(MSG_VERBATIM,trim(for_msg))
        endif
+       if (is_valid(self,ref_namel_valid))then
+          write(for_msg,*)'  Surface field nomvar large scale ',self%ref_namel
+          call msg(MSG_VERBATIM,trim(for_msg))
+       endif
        select case (self%vcode)
        case (1001)
           nk=size(self%ip1_m)
@@ -2432,46 +2514,80 @@ contains
           call msg(MSG_VERBATIM,trim(for_msg))
           write(for_msg,*)'  Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref)'
           call msg(MSG_VERBATIM,trim(for_msg))
+       case (5100)
+          nk=size(self%ip1_m)
+          write(for_msg,*)'  Number of hybrid levels (SLEVE-like) (momentum/thermo levels)',nk-2          
+          call msg(MSG_VERBATIM,trim(for_msg))
+          call convip(self%ip1_m(nk),height,kind,-1,"",.false.)
+          write(for_msg,*)'  Diagnostic momentum level (ip1=',self%ip1_m(nk),') at ',height,' m Above Ground Level'
+          call msg(MSG_VERBATIM,trim(for_msg))
+          call convip(self%ip1_t(nk),height,kind,-1,"",.false.)
+          write(for_msg,*)'  Diagnostic thermo   level (ip1=',self%ip1_t(nk),') at ',height,' m Above Ground Level'          
+          call msg(MSG_VERBATIM,trim(for_msg))
+          write(for_msg,*)"  Equation to compute hydrostatic pressure (pi): ln(pi) = A + (Bl-B)*ln(P0LS*100/pref) + B*ln(P0*100/pref)"
+          call msg(MSG_VERBATIM,trim(for_msg))
+       case DEFAULT
+          write(for_msg,*) 'invalid kind or version in : print_desc',self%kind,self%version
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return
        end select
-
+       
+       if(is_valid(self,bl_m_8_valid) .or. is_valid(self,bl_t_8_valid) )then
+          write(for_msg2,*)'  Momentum levels ip1, p, A, B, Bl (B large scale):'
+       else
+          write(for_msg2,*)'  Momentum levels ip1, p, A, B:'          
+       endif
+       
        if(my_convip_L)then
           if (is_valid(self,ip1_m_valid))then
              nk=size(self%ip1_m)
-             write(for_msg,*)'  Momentum levels ip1, p, A, B:'
-             call msg(MSG_VERBATIM,trim(for_msg))
+             call msg(MSG_VERBATIM,trim(for_msg2))
              null_S=''
              do k=1,nk                
                 call convip(self%ip1_m(k),pres,kind,-1,null_S,.false.)
-                write(for_msg,*)self%ip1_m(k),pres,self%a_m_8(k),self%b_m_8(k)
+                if(is_valid(self,bl_m_8_valid))then
+                   write(for_msg,*)self%ip1_m(k),pres,self%a_m_8(k),self%b_m_8(k),self%bl_m_8(k)
+                else
+                   write(for_msg,*)self%ip1_m(k),pres,self%a_m_8(k),self%b_m_8(k)
+                endif
                 call msg(MSG_VERBATIM,trim(for_msg))
              enddo
           endif
           if (is_valid(self,ip1_t_valid))then
              nk=size(self%ip1_t)
-             write(for_msg,*)'  Thermodynamic levels ip1, p, A, B:'
-             call msg(MSG_VERBATIM,trim(for_msg))
+             call msg(MSG_VERBATIM,trim(for_msg2))
              do k=1,nk
                 call convip(self%ip1_t(k),pres,kind,-1,null_S,.false.)
-                write(for_msg,*)self%ip1_t(k),pres,self%a_t_8(k),self%b_t_8(k)
+                if(is_valid(self,bl_m_8_valid))then
+                   write(for_msg,*)self%ip1_t(k),pres,self%a_t_8(k),self%b_t_8(k),self%bl_t_8(k)
+                else
+                   write(for_msg,*)self%ip1_t(k),pres,self%a_t_8(k),self%b_t_8(k)
+                endif
                 call msg(MSG_VERBATIM,trim(for_msg))
              enddo
           endif
        else
           if (is_valid(self,ip1_m_valid))then
              nk=size(self%ip1_m)
-             write(for_msg,*)'  Momentum levels ip1, A, B:'
-             call msg(MSG_VERBATIM,trim(for_msg))
+             call msg(MSG_VERBATIM,trim(for_msg2))
              do k=1,nk
-                write(for_msg,*)self%ip1_m(k),self%a_m_8(k),self%b_m_8(k)
+                if(is_valid(self,bl_m_8_valid))then
+                   write(for_msg,*)self%ip1_m(k),self%a_m_8(k),self%b_m_8(k),self%bl_m_8(k)
+                else
+                   write(for_msg,*)self%ip1_m(k),self%a_m_8(k),self%b_m_8(k)
+                endif
                 call msg(MSG_VERBATIM,trim(for_msg))
              enddo
           endif
           if (is_valid(self,ip1_t_valid))then
              nk=size(self%ip1_t)
-             write(for_msg,*)'  Thermodynamic levels ip1, A, B:'
-             call msg(MSG_VERBATIM,trim(for_msg))
+             call msg(MSG_VERBATIM,trim(for_msg2))
              do k=1,nk
-                write(for_msg,*)self%ip1_t(k),self%a_t_8(k),self%b_t_8(k)
+                if(is_valid(self,bl_t_8_valid))then
+                   write(for_msg,*)self%ip1_t(k),self%a_t_8(k),self%b_t_8(k),self%bl_t_8(k)
+                else
+                   write(for_msg,*)self%ip1_t(k),self%a_t_8(k),self%b_t_8(k)
+                endif
                 call msg(MSG_VERBATIM,trim(for_msg))
              enddo
           endif
@@ -2807,6 +2923,11 @@ contains
     endif
 
     ! Check surface field if needed
+    sfc_large_scale_valid: if (is_valid(self,ref_namel_valid)) then
+       print*,'TODO levels_readref P0LS'
+       return
+    end if sfc_large_scale_valid
+       
     sfc_valid: if (is_valid(self,ref_name_valid)) then
        sfc_key = fstinf(unit,ni,nj,nk,prmk%datev,prmk%etiket,-1,prmk%ip2,prmk%ip3,' ',self%ref_name)
        if(sfc_key < 0)then
@@ -2872,16 +2993,17 @@ contains
     return
   end function levels_readref
 
-  integer function levels_withref_prof(self,ip1_list,levels,sfc_field,in_log) result(status)
+  integer function levels_withref_prof(self,ip1_list,levels,sfc_field,in_log,sfc_field_ls) result(status)
      use utils, only: get_allocate
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
      real, dimension(:), pointer :: levels                       !Physical level values
      real, optional, intent(in) :: sfc_field                     !Surface field reference for coordinate [none]
+     real, optional, intent(in) :: sfc_field_ls                  !Surface large scale field reference for coordinate [none]
      logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]          
 
      ! Local variables
-     real*8 :: my_sfc_field_8
+     real*8 :: my_sfc_field_8, my_sfc_field_ls_8
      real*8, dimension(:), pointer :: levels_8
      integer :: error,stat
      logical :: my_in_log
@@ -2900,11 +3022,17 @@ contains
      ! Set default values
      my_sfc_field_8 = VGD_MISSING
      if (present(sfc_field)) my_sfc_field_8 = sfc_field
+     my_sfc_field_ls_8 = VGD_MISSING
+     if (present(sfc_field_ls)) my_sfc_field_ls_8 = sfc_field_ls
      my_in_log = .false.
      if (present(in_log)) my_in_log = in_log
 
      ! Wrap call to level calculation
-     stat = diag_withref_prof_8(self,ip1_list,levels_8,sfc_field=my_sfc_field_8,in_log=my_in_log)
+     if(present(sfc_field_ls))then
+        stat = diag_withref_prof_8(self,ip1_list,levels_8,sfc_field=my_sfc_field_8,sfc_field_ls=my_sfc_field_ls_8,in_log=my_in_log)
+     else
+        stat = diag_withref_prof_8(self,ip1_list,levels_8,sfc_field=my_sfc_field_8,in_log=my_in_log)
+     end if
      if(stat==VGD_ERROR)then
         if(associated(levels_8))deallocate(levels_8)
         return
@@ -3027,27 +3155,28 @@ contains
      return
   end function dpidpis_withref_prof_8
 
-  integer function diag_withref_prof_8(self,ip1_list,levels,sfc_field,in_log,dpidpis) result(status)
+  integer function diag_withref_prof_8(self,ip1_list,levels,sfc_field,in_log,dpidpis,sfc_field_ls) result(status)
      use utils, only: get_allocate
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
      real*8, dimension(:), pointer :: levels                       !Physical level values
      real*8, optional, intent(in) :: sfc_field                     !Surface field reference for coordinate [none]
+     real*8, optional, intent(in) :: sfc_field_ls                  !Surface large scale field reference for coordinate [none]
      logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]          
      logical, optional, intent(in) :: dpidpis                    !Compute partial derivative of hydrostatic pressure (pi) with
                                                                  !   respect to surface hydrostatic pressure(pis) [.false.]
      
      ! Local variables
      integer :: error,nk
-     real*8 :: my_sfc_field
-     real*8, dimension(:,:), pointer :: sfc_field_2d
+     real*8 :: my_sfc_field, my_sfc_field_ls
+     real*8, dimension(:,:), pointer :: sfc_field_2d, sfc_field_ls_2d
      real*8, dimension(:,:,:), pointer :: levels_3d
      logical :: my_in_log,my_dpidpis
 
      ! Set error status
      status = VGD_ERROR
 
-     nullify(sfc_field_2d,levels_3d)
+     nullify(sfc_field_2d,sfc_field_ls_2d,levels_3d)
 
      if(.not.self%valid)then
         write(for_msg,*) 'vgrid structure is not valid in diag_withref_prof_8'
@@ -3058,6 +3187,8 @@ contains
      ! Set default values
      my_sfc_field = VGD_MISSING
      if (present(sfc_field)) my_sfc_field = sfc_field
+     my_sfc_field_ls = VGD_MISSING
+     if (present(sfc_field_ls)) my_sfc_field_ls = sfc_field_ls
      my_in_log = .false.
      if (present(in_log)) my_in_log = in_log
      my_dpidpis = .false.
@@ -3065,17 +3196,20 @@ contains
 
      nk=size(ip1_list)
 
-     allocate(sfc_field_2d(1,1),levels_3d(1,1,nk),stat=error)
+     allocate(sfc_field_2d(1,1),sfc_field_ls_2d(1,1),levels_3d(1,1,nk),stat=error)
      if (error /= 0) then
         if(associated(sfc_field_2d))deallocate(sfc_field_2d)
+        if(associated(sfc_field_ls_2d))deallocate(sfc_field_ls_2d)
         if(associated(levels_3d))deallocate(levels_3d)
         write(for_msg,*) 'cannot allocate space for p0/levels in diag_withref_prof_8'
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
      sfc_field_2d=my_sfc_field
-     ! Wrap call to level calculator    
-     error = diag_withref_8(self,sfc_field=sfc_field_2d,ip1_list=ip1_list,levels=levels_3d,in_log=my_in_log,dpidpis=my_dpidpis)    
+     sfc_field_ls_2d=my_sfc_field_ls
+     ! Wrap call to level calculator
+
+     error = diag_withref_8(self,ip1_list,levels_3d,sfc_field=sfc_field_2d,sfc_field_ls=sfc_field_ls_2d,in_log=my_in_log,dpidpis=my_dpidpis)    
      if (error /= 0) then
         deallocate(sfc_field_2d,levels_3d)
         write(for_msg,*) 'problem with diag_withref in diag_withref_prof_8'
@@ -3316,12 +3450,13 @@ contains
      return
   end function dpidpis_withref_8
 
- integer function diag_withref_8(self,ip1_list,levels,sfc_field,in_log,dpidpis) result(status)
+ integer function diag_withref_8(self,ip1_list,levels,sfc_field,in_log,dpidpis,sfc_field_ls) result(status)
     ! Given referent, compute physical levelling information from the vertical description
     type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
     integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
     real*8, dimension(:,:,:), pointer :: levels                   !Physical level values
     real*8, dimension(:,:), optional, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
+    real*8, dimension(:,:), optional, intent(in) :: sfc_field_ls  !Surface field large scale reference for coordinate [none]
     logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]
     logical, optional, intent(in) :: dpidpis                    !Compute partial derivative of hydrostatic pressure (pi) with
                                                                 !   respect to surface hydrostatic pressure(pis) [.false.]
@@ -3357,18 +3492,48 @@ contains
          ni = 1; nj = 1; nk = size(ip1_list)
       endif
     endif
+
+    if (present(sfc_field_ls)) then
+       print*,'diag_withref_8 sfc_field_ls present'
+    else
+       print*,'diag_withref_8 sfc_field_ls absent'
+    endif
+
+
+    if (present(sfc_field_ls)) then
+       if(  ni /= size(sfc_field_ls,dim=1) .or. &
+            nj /= size(sfc_field_ls,dim=2) )then
+          write(for_msg,*) 'reference large scale field is not of same size has reference field'
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return
+       endif
+    else
+      if (is_valid(self,ref_namel_valid)) then
+         write(for_msg,*) 'reference large scale field must be provided to diag_withref_8'
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         return
+      endif
+    endif
     if (associated(levels)) then
        if (size(levels,dim=1) /= ni .or. size(levels,dim=2) /= nj .or. size(levels,dim=3) /= nk) then
-          write(for_msg,*) 'Levels array size error - will be reallocated'
-          call msg(MSG_WARNING,VGD_PRFX//for_msg)
+          if(ALLOW_RESHAPE)then
+             write(for_msg,*) 'Levels array size error - will be reallocated'
+             call msg(MSG_WARNING,VGD_PRFX//for_msg)
+             deallocate(levels)
+          else
+             write(for_msg,*) 'Levels array size error - will not reallocate since ALLOW_RESHAPE is set to false'
+             call msg(MSG_ERROR,VGD_PRFX//for_msg)
+             return
+          endif
        endif
-       deallocate(levels)
     endif
-    allocate(levels(ni,nj,nk),stat=error)
-    if (error /= 0) then
-       write(for_msg,*) 'cannot allocate space for levels in diag_withref_8'
-       call msg(MSG_ERROR,VGD_PRFX//for_msg)
-       return
+    if(.not. associated(levels) )then
+       allocate(levels(ni,nj,nk),stat=error)
+       if (error /= 0) then
+          write(for_msg,*) 'cannot allocate space for levels in diag_withref_8'
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return
+       endif
     endif
     ! Compute levels for known vertical coordinates
     select case (self%vcode)
@@ -3397,6 +3562,8 @@ contains
        istat = compute_pressure_5001_8(self,sfc_field,ip1_list,levels,my_in_log,my_dpidpis)
     case (5002,5003,5004,5005)
        istat = compute_pressure_5002_8(self,sfc_field,ip1_list,levels,my_in_log,my_dpidpis)
+    case (5100)
+       istat = compute_pressure_5100_8(self,sfc_field,sfc_field_ls,ip1_list,levels,my_in_log,my_dpidpis)
     case DEFAULT
        istat = get_version_info(self,kind,version)
        write(for_msg,*) 'kind or version invalid in diag_withref_8:',kind,version
@@ -3437,6 +3604,7 @@ contains
    if (vgd1%kind /= vgd2%kind) return
    if (vgd1%version /= vgd2%version) return
    if (vgd1%ref_name /= vgd2%ref_name) return
+   if (vgd1%ref_namel /= vgd2%ref_namel) return
    if (vgd1%ptop_8 /= vgd2%ptop_8) return
    if (vgd1%pref_8 /= vgd2%pref_8) return
    if (vgd1%rcoef1 /= vgd2%rcoef1) return
@@ -3850,7 +4018,7 @@ contains
      ! Local variables
      integer :: nn,error,k,ind,nb,nk
      integer, parameter :: skip=3
-     real*8 :: for_char_8
+     real*8 :: for_char_8_P0, for_char_8_P0LS
      character(len=8) :: ref_name
      logical :: my_update_L
 
@@ -3902,6 +4070,7 @@ contains
      
      ! Associate reference field name
      self%ref_name='P0'
+     self%ref_namel='P0LS'
 
      ! Vector size checks
      nn=size(self%ip1_m)
@@ -3922,9 +4091,9 @@ contains
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
-     nn=size(self%bs_m_8)
+     nn=size(self%bl_m_8)
      if(nn.ne.nb)then
-        write(for_msg,*) 'wrong size for bs_m_8, is ',nn,'should be ',nb
+        write(for_msg,*) 'wrong size for bl_m_8, is ',nn,'should be ',nb
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
@@ -3946,9 +4115,9 @@ contains
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
-     nn=size(self%bs_t_8)
+     nn=size(self%bl_t_8)
      if(nn.ne.nb)then
-        write(for_msg,*) 'wrong size for bs_t_8, is ',nn,'should be ',nb
+        write(for_msg,*) 'wrong size for bl_t_8, is ',nn,'should be ',nb
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
@@ -3957,9 +4126,20 @@ contains
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
-     error = flip_transfer(self%ref_name,for_char_8)
+     error = flip_transfer(self%ref_name,for_char_8_P0)
      if (error /= VGD_OK) then
-        write(for_msg,*) 'flip_transfer function returned error code from encode ',error
+        write(for_msg,*) 'flip_transfer function returned error code from encode on self%ref_name',error
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
+     if (len_trim(self%ref_namel) > len(ref_name)) then
+        write(for_msg,*) 'reference field name '//trim(self%ref_namel)//' longer than limit: ',len(ref_name)
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
+     error = flip_transfer(self%ref_namel,for_char_8_P0LS)
+     if (error /= VGD_OK) then
+        write(for_msg,*) 'flip_transfer function returned error code from encode on self%ref_namel',error
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
@@ -3967,20 +4147,20 @@ contains
      ! Fill header
      self%table(1:3,1,1)=(/dble(self%kind)  ,dble(self%version),dble(skip)/)
      self%table(1:3,2,1)=(/self%ptop_8      ,self%pref_8       ,dble(self%rcoef1)/)     
-     self%table(1:3,3,1)=(/dble(self%rcoef2),for_char_8           ,0.d0/)
+     self%table(1:3,3,1)=(/dble(self%rcoef2),for_char_8_P0     ,for_char_8_P0LS/)
 
      ! Fill momentum level data
      do k=1,nb
         ind=k+skip
         self%table(1:3,ind,1)=(/dble(self%ip1_m(k)),self%a_m_8(k),self%b_m_8(k)/)
-        self%table(1  ,ind,2)=self%bs_m_8(k)
+        self%table(1  ,ind,2)=self%bl_m_8(k)
      enddo     
 
      ! Fill thermodynamic level data
      do k=1,nb
         ind=k+skip+nb
         self%table(1:3,ind,1)=(/dble(self%ip1_t(k)),self%a_t_8(k),self%b_t_8(k)/)
-        self%table(1  ,ind,2)=self%bs_t_8(k)
+        self%table(1  ,ind,2)=self%bl_t_8(k)
      enddo
      
      ! Set status and return
@@ -4330,6 +4510,127 @@ contains
 
   end function decode_vert_5002
 
+  integer function decode_vert_5100(self) result(status)
+     use utils, only: flip_transfer
+     type(vgrid_descriptor), intent(inout) :: self  !Vertical descriptor instance
+     
+     ! Local variables
+     integer :: skip,nj,nk,k,ind,error,istat,nb
+
+     ! Set error status
+     status = VGD_ERROR
+
+     ! Read header line 1
+     self%kind     = nint(self%table(1,1,1))
+     self%version  = nint(self%table(2,1,1))
+     skip          = nint(self%table(3,1,1))
+
+     ! Read header line 2
+     self%ptop_8   = self%table(1,2,1)
+     self%pref_8   = self%table(2,2,1)
+     self%rcoef1   = real(self%table(3,2,1))
+
+     ! Read header line 3
+     self%rcoef2   = real(self%table(1,3,1))
+     error = flip_transfer(self%table(2,3,1),self%ref_name)
+     if (error /= VGD_OK) then
+        write(for_msg,*) 'flip_transfer function returned an error code from decode for self%ref_name',error
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
+     error = flip_transfer(self%table(3,3,1),self%ref_namel)
+     if (error /= VGD_OK) then
+        write(for_msg,*) 'flip_transfer function returned an error code from decode for self%ref_namel',error
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
+      nj=size(self%table,dim=2)
+
+     nk=(nj-skip)/2-2
+     nb=nk+2
+
+     ! Allocate and assign momentum level data
+     if (associated(self%ip1_m)) deallocate(self%ip1_m)
+     
+     allocate(self%ip1_m(nb),stat=istat)
+     if (istat /= 0) then
+        write(for_msg,*) 'unable to allocate self%ip1_m(nb) in decode_vert_5100'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
+     if (associated(self%a_m_8)) deallocate(self%a_m_8)
+     allocate(self%a_m_8(nb),stat=istat)
+     if (istat /= 0) then
+        write(for_msg,*) 'unable to allocate self%a_m_8(nb) in decode_vert_5100'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
+     if (associated(self%b_m_8)) deallocate(self%b_m_8)
+     allocate(self%b_m_8(nb),stat=istat)
+     if (istat /= 0) then
+        write(for_msg,*) 'unable to allocate self%b_m_8(nb) in decode_vert_5100'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
+     if (associated(self%bl_m_8)) deallocate(self%bl_m_8)
+     allocate(self%bl_m_8(nb),stat=istat)
+     if (istat /= 0) then
+        write(for_msg,*) 'unable to allocate self%bl_m_8(nb) in decode_vert_5100'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
+
+     do k=1,nb
+        ind=k+skip
+        self%ip1_m(k) = nint(self%table(1,ind,1))
+        self%a_m_8(k) =      self%table(2,ind,1)
+        self%b_m_8(k) =      self%table(3,ind,1)
+        self%bl_m_8(k)=      self%table(1,ind,2)
+     enddo
+
+     ! Allocate and assign thermodynamic level data
+     if (associated(self%ip1_t)) deallocate(self%ip1_t)
+     allocate(self%ip1_t(nb),stat=istat)
+     if (istat /= 0) then
+        write(for_msg,*) 'unable to allocate self%ip1_t in decode_vert_5100'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
+     if (associated(self%a_t_8)) deallocate(self%a_t_8)
+     allocate(self%a_t_8(nb),stat=istat)
+     if (istat /= 0) then
+        write(for_msg,*) 'unable to allocate self%a_t_8 in decode_vert_5100'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
+     if (associated(self%b_t_8)) deallocate(self%b_t_8)
+     allocate(self%b_t_8(nb),stat=istat)
+     if (istat /= 0) then
+        write(for_msg,*) 'unable to allocate self%b_t_8 in decode_vert_5100'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
+     if (associated(self%bl_t_8)) deallocate(self%bl_t_8)
+     allocate(self%bl_t_8(nb),stat=istat)
+     if (istat /= 0) then
+        write(for_msg,*) 'unable to allocate self%bl_t_8 in decode_vert_5100'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
+
+     do k=1,nb
+        ind=k+skip+nb
+        self%ip1_t(k) = nint(self%table(1,ind,1))
+        self%a_t_8(k) =      self%table(2,ind,1)
+        self%b_t_8(k) =      self%table(3,ind,1)
+        self%bl_t_8(k)=      self%table(1,ind,2)
+     enddo     
+
+     ! Set status and return
+     status = VGD_OK
+
+  end function decode_vert_5100
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! (PRIVATE) Set and check the vertical code
   
@@ -4470,6 +4771,11 @@ contains
        ig3=nint(self%rcoef1*100.)
        ig4=nint(self%rcoef2*100.)
     case (5005)
+       etiket='STG_CP_GEMV4'
+       ig2=0
+       ig3=nint(self%rcoef1*100.)
+       ig4=nint(self%rcoef2*100.)
+    case (5100)
        etiket='STG_CP_GEMV4'
        ig2=0
        ig3=nint(self%rcoef1*100.)
@@ -4817,6 +5123,89 @@ contains
     status = VGD_OK
     return
  end function compute_pressure_5002_8
+
+  integer function compute_pressure_5100_8(self,sfc_field,sfc_field_ls,ip1_list,levels,in_log,dpidpis) result(status)
+    ! Compute pressure for all levels specified in ip1_list
+    type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
+    real*8, dimension(:,:), intent(in) :: sfc_field       !Surface field reference for coordinate
+    real*8, dimension(:,:), intent(in) :: sfc_field_ls    !Surface field large scale reference for coordinate
+    integer, dimension(:), intent(in) :: ip1_list       !List of IP1 levels to calculate on
+    real*8, dimension(:,:,:), pointer  :: levels          !Physical level values
+    logical, intent(in) :: in_log                       !Compute level values in ln()
+    logical, intent(in) :: dpidpis                      !Compute partial derivative of hydrostatic pressure (pi) with
+                                                        !   respect to surface hydrostatic pressure(pis)
+
+    ! Internal variables
+    integer :: i,j,nk,kind
+    real*8, dimension(size(sfc_field,dim=1),size(sfc_field,dim=2)) :: s_8, sl_8
+    real*8, dimension(size(ip1_list)) :: aa_8,bb_8,bbl_8
+    real :: pppp
+    logical :: found
+    character(len=1)  :: dummy_S
+
+    ! Set error status
+    status = VGD_ERROR
+
+    ! Set size of output
+    nk = size(ip1_list)
+    
+    ! Find ip1 values
+    do i=1,nk
+       found = .false.
+       do j=1,size(self%ip1_m)
+          if (self%ip1_m(j) == ip1_list(i)) then
+             found = .true.
+             aa_8(i)  = self%a_m_8(j)
+             bb_8(i)  = self%b_m_8(j)
+             bbl_8(i) = self%bl_m_8(j)
+             exit
+          endif
+       enddo
+       if (.not.found) then
+          do j=1,size(self%ip1_t)
+             if (self%ip1_t(j) == ip1_list(i)) then
+                found = .true.
+                aa_8(i)  = self%a_t_8(j)
+                bb_8(i)  = self%b_t_8(j)
+                bbl_8(i) = self%bl_t_8(j)
+                exit
+             endif
+          enddo
+       endif
+       if (.not.found) then
+          write(for_msg,*) 'cannot find ip1 ',ip1_list(i),' in compute_pressure_5100_8'
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return
+       endif
+    enddo
+
+    ! Compute pressure
+    !s_8 = log(dble(sfc_field)/self%pref_8)
+    s_8  = log(sfc_field/self%pref_8)
+    sl_8 = log(sfc_field_ls/self%pref_8)
+    do i=1,nk
+       levels(:,:,i) = aa_8(i) + (bbl_8(i)-bb_8(i))*sl_8 + bb_8(i)*s_8
+    enddo
+    if (.not.in_log)then
+       levels = exp(levels)
+    endif
+    if(dpidpis)then
+       print*,'TOTO for SLEVE in compute_pressure_5100_8'
+       stop
+       if(in_log)then
+          write(for_msg,*) 'in compute_pressure_5100_8, cannot get dpidpis in log'
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return
+       endif
+       !do i=1,nk
+       !   levels(:,:,i) = bb_8(i)*levels(:,:,i)/sfc_field
+       !enddo
+    endif
+
+    ! Set status and return
+    status = VGD_OK
+    return
+ end function compute_pressure_5100_8
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! (PRIVATE) Construct vertical structure from legacy encoding (PT,HY...)
