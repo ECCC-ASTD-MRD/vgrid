@@ -37,15 +37,11 @@ program constructor
        0.7299818, 0.7591944, 0.7866292, 0.8123021, 0.8362498, 0.8585219, &
        0.8791828, 0.8983018, 0.9159565, 0.9322280, 0.9471967, 0.9609448, &
        0.9735557, 0.9851275, 0.9950425/)
-  real, dimension(1) :: hyb_wrong1= &
-       (/1.1/)
-  real, dimension(1) :: hyb_wrong2= &
-       (/1.e-6/)
-  real, dimension(3) :: hyb_wrong3= &
-       (/.9,.5,.1/)
+  real, dimension(2,1) :: p0=(/100000.,50000./), p0l=(/100000.,90000./)
   real :: rcoef1=0.01,rcoef2=30.
   
   real, pointer, dimension(:) :: levels
+  real, pointer, dimension(:,:,:) :: levels_3d
 
   real*8 :: ptop=805d0,pref=100000d0
   logical :: OK=.true.
@@ -53,7 +49,7 @@ program constructor
   logical, parameter :: write_control_L=.false.
   character (len=256) :: file
   
-  nullify(ip1s,levels)
+  nullify(ip1s,levels,levels_3d)
 
   ! Construct a new set of vertical coordinate descriptors 5100
   stat = vgd_new(vgd,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop)
@@ -73,6 +69,9 @@ program constructor
   print*,'ip1s=',ip1s
   stat = vgd_levels(vgd,ip1s,levels,sfc_field=100000.,in_log=.false.,sfc_field_ls=100000.)
   print*,'levels=',levels
+  stat = vgd_levels(vgd,ip1s,levels_3d,sfc_field=p0,in_log=.false.,sfc_field_ls=p0l)
+  print*,'levels_3d(1,1,1:size(levels_3d,dim=3))=',levels_3d(1,1,1:size(levels_3d,dim=3))
+  print*,'levels_3d(2,1,1:size(levels_3d,dim=3))=',levels_3d(2,1,1:size(levels_3d,dim=3))
   stop
 
   call ut_report(OK,'Grid_Descriptors::vgd_new vertical generate initializer (5100) value')
@@ -95,7 +94,7 @@ integer function test_5100(F_d,F_file,F_write_control_L,F_stat) result(istat)
    real, dimension(:), pointer :: vcdm,vcdt,work
    real*8, dimension(:), pointer :: b_m_8,bl_m_8,a_m_8,b_t_8,bl_t_8,a_t_8,work_8
    integer, dimension(:), pointer :: vipm,vipt,work_i
-   integer :: nl_m,nl_t,k,nk,stat,kind,vers,vcode,ip1,my_ip1
+   integer :: nl_m,nl_t,k,nk,kind,vers,ip1,my_ip1
 
    istat=VGD_OK
 

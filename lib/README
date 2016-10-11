@@ -18,6 +18,7 @@ Here is the time to make a first test like constructor_gen_...
 11- Add a level calculator (e.g. compute_pressure_5002)
 12- Add a branch for your new vcoord in the printer (print_desc and print_vcode_description)
 13- Add case statement in get_logical LOGP for new vcode
+14- Add elements to test_equality if any
 
 While doing the above, write tests cases to tests the added feature. Leave tests in tests/src directory.
 

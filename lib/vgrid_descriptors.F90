@@ -126,8 +126,8 @@ module vGrid_Descriptors
      integer :: ip1=0,ip2=0                             !ip1,2 values given to the 3D descriptor
      integer :: unit                                    !file unit associated with this 3D descriptor
      integer :: vcode,kind,version                      !Vertical coordinate codes
-     character(len=VGD_LEN_NAME) :: ref_name='None'     !reference field name
-     character(len=VGD_LEN_NAME) :: ref_namel='None'    !reference field name large scale
+     character(len=VGD_LEN_NAME) :: ref_name=VGD_UNDEF_NAME !reference field name
+     character(len=VGD_LEN_NAME) :: ref_namel=VGD_UNDEF_NAME !reference field name large scale
      type(FSTD) :: rec                                  !FST file record structure for descriptor
   end type vgrid_descriptor
 
@@ -1250,8 +1250,8 @@ contains
      self%vcode=-1
      self%kind=-1
      self%version=-1
-     self%ref_name='None'
-     self%ref_namel='None'
+     self%ref_name=VGD_UNDEF_NAME
+     self%ref_namel=VGD_UNDEF_NAME
      !
      self%rec%initialized=.false.
      ! Set error status
@@ -1909,6 +1909,9 @@ contains
        else
           error = get_error(key,my_quiet)
           write(for_msg,'(i8)') error
+          ! If my_quiet then we return the default ref_namel so user can know
+          ! if RFLS is a valid member of its vcode.
+          if(my_quiet)value = printingCharacters(self%ref_namel)
           call msg(level_msg,VGD_PRFX//for_msg)
           return
        endif
@@ -3226,22 +3229,23 @@ contains
 
   end function diag_withref_prof_8
 
-  integer function levels_withref(self,ip1_list,levels,sfc_field,in_log) result(status)
+  integer function levels_withref(self,ip1_list,levels,sfc_field,in_log,sfc_field_ls) result(status)
      use utils, only: get_allocate
      ! Given referent, compute physical levelling information from the vertical description
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
      real, dimension(:,:,:), pointer :: levels                   !Physical level values
      real, dimension(:,:), optional, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
+     real, dimension(:,:), optional, intent(in) :: sfc_field_ls  !Surface field large scale reference for coordinate [none]
      logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]
 
      ! Local variables
      integer :: error,ni,nj,stat
      real*8, dimension(:,:,:), pointer :: levels_8
-     real*8, dimension(:,:), pointer :: my_sfc_field
+     real*8, dimension(:,:), pointer :: my_sfc_field, my_sfc_field_ls
      logical :: my_in_log
 
-     nullify(levels_8,my_sfc_field)
+     nullify(levels_8,my_sfc_field, my_sfc_field_ls)
 
      ! Set return value
      status = VGD_ERROR
@@ -3269,14 +3273,34 @@ contains
      else
         my_sfc_field = VGD_MISSING
      endif
+     if (present(sfc_field_ls)) then
+        if( size(sfc_field_ls,dim=1) /= ni .or. size(sfc_field_ls,dim=2) /= nj )then
+           write(for_msg,*) 'in levels_withref, size of sfc_field_ls not the same as sfc_field'
+           call msg(MSG_ERROR,VGD_PRFX//for_msg)
+           return
+        endif
+     endif
      my_in_log = .false.
      if (present(in_log)) my_in_log = in_log
 
      ! Wrap call to level calculator at 64 bits
-     stat=diag_withref_8(self,ip1_list,levels_8,sfc_field=my_sfc_field,in_log=my_in_log)
+     if (present(sfc_field_ls)) then
+        allocate(my_sfc_field_ls(ni,nj),stat=error)
+        if (error /= 0) then
+           write(for_msg,*) 'cannot allocate space for my_sfc_field_ls in levels_withref'
+           call msg(MSG_ERROR,VGD_PRFX//for_msg)
+           return
+        endif
+        my_sfc_field_ls=my_sfc_field
+        stat=diag_withref_8(self,ip1_list,levels_8,sfc_field=my_sfc_field,in_log=my_in_log,sfc_field_ls=my_sfc_field_ls)
+        deallocate(my_sfc_field_ls)
+     else
+        stat=diag_withref_8(self,ip1_list,levels_8,sfc_field=my_sfc_field,in_log=my_in_log)
+     endif
      if(stat==VGD_ERROR)then
         if(associated(levels_8))deallocate(levels_8)
         deallocate(my_sfc_field)
+        if(associated(my_sfc_field_ls))deallocate(my_sfc_field_ls)
         return
      endif
      ! Write results back to 32 bits
@@ -3494,13 +3518,6 @@ contains
     endif
 
     if (present(sfc_field_ls)) then
-       print*,'diag_withref_8 sfc_field_ls present'
-    else
-       print*,'diag_withref_8 sfc_field_ls absent'
-    endif
-
-
-    if (present(sfc_field_ls)) then
        if(  ni /= size(sfc_field_ls,dim=1) .or. &
             nj /= size(sfc_field_ls,dim=2) )then
           write(for_msg,*) 'reference large scale field is not of same size has reference field'
@@ -3615,8 +3632,10 @@ contains
    if (.not.same_vec(vgd1%ip1_t,vgd2%ip1_t)) return
    if (.not.same_vec(vgd1%a_m_8,vgd2%a_m_8)) return
    if (.not.same_vec(vgd1%b_m_8,vgd2%b_m_8)) return
+   if ( is_valid(vgd1,bl_m_8_valid) .and. (.not.same_vec(vgd1%bl_m_8,vgd2%bl_m_8)) ) return
    if (.not.same_vec(vgd1%a_t_8,vgd2%a_t_8)) return
    if (.not.same_vec(vgd1%b_t_8,vgd2%b_t_8)) return
+   if ( is_valid(vgd1,bl_t_8_valid) .and. (.not.same_vec(vgd1%bl_t_8,vgd2%bl_t_8)) ) return
    if (.not.same_vec(vgd1%table,vgd2%table)) return
 
    ! The full structure is equivalent
@@ -5136,12 +5155,10 @@ contains
                                                         !   respect to surface hydrostatic pressure(pis)
 
     ! Internal variables
-    integer :: i,j,nk,kind
+    integer :: i,j,nk
     real*8, dimension(size(sfc_field,dim=1),size(sfc_field,dim=2)) :: s_8, sl_8
     real*8, dimension(size(ip1_list)) :: aa_8,bb_8,bbl_8
-    real :: pppp
     logical :: found
-    character(len=1)  :: dummy_S
 
     ! Set error status
     status = VGD_ERROR
