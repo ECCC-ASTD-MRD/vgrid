@@ -21,7 +21,16 @@ case "${ORDENV_PLAT}" in
       export SHARED_COMP_rpath=${INTELCOMP_HOME}/lib/intel64
       :;;
 
-    sles-11-amd64-64|sles-11-broadwell-64-xc40)
+   sles-11-haswell-64-xc40)
+      echo "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR"
+      echo "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR"
+      echo "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR"
+      echo "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR"
+      echo "platform sles-11-haswell-64-xc40 not supported you may want to run the following and dot again:"
+      echo ". /home/one234/public/r.env.dot --arch sles-11-broadwell-64-xc40"
+      :;;
+
+    sles-11-broadwell-64-xc40)
       export BH_MAKE=make
       export BH_MODE=intel
       RPN_LIB=/fs/ssm/eccc/mrd/rpn/libs/16.0-beta
