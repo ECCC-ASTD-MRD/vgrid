@@ -22,9 +22,9 @@ unset MY_FFLAGS MY_CFLAGS
 #c_levels
 #c_use_new_read
 
-MY_FFLAGS=""
+MY_FFLAGS="-O1"
 #MY_FFLAGS="-C -g -O0 -lefence"
-MY_CFLAGS=""
+MY_CFLAGS="-O1"
 #MY_CFLAGS="-g -O0 -lefence"
 
 if   [ $(hostname -d) = cmc.ec.gc.ca ];then
