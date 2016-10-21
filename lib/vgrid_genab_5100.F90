@@ -77,9 +77,10 @@ contains
       ! Local variables
       integer :: k, status, nk
       logical :: wronghyb
-      real*8  :: pr1, ztop_8, zsrf_8, lamba_8,zeta_8, zeta1_8,zeta2_8, l_ptop_8, alpha1_8, alpha2_8
+      real*8  :: pr1, ztop_8, zsrf_8, lamba_8,zeta_8, zeta1_8,zeta2_8, l_ptop_8
       real, dimension(:), pointer :: hybm, hybt             ! model hyb values
       real*8, dimension(:), pointer :: at_8, bt_8
+      real :: rcoef
       integer, dimension(:), pointer :: ip1_t
       character(len=100) :: func_name
       real, parameter :: RGASD       =    0.287050000000E+03
@@ -97,17 +98,6 @@ contains
       nk = size(F_hybuser)
       if (size(F_rcoef) /= 2) then
          write(for_msg,*) 'In '//trim(func_name)//' Size of F_rcoef should be 2, it is ',size(F_rcoef)
-         call msg(MSG_ERROR,VGD_PRFX//for_msg)
-         return
-      endif
-
-      if( F_rcoef(1) < 0.01 )then
-         write(for_msg,*)'rcoef1 must be greather or equal to 0.01'
-         call msg(MSG_ERROR,VGD_PRFX//for_msg)
-         return
-      endif
-      if( F_rcoef(2) < 0.01 )then
-         write(for_msg,*)'rcoef2 must be greather or equal to 0.01'
          call msg(MSG_ERROR,VGD_PRFX//for_msg)
          return
       endif
@@ -171,15 +161,14 @@ contains
       !
       !     Momentum levels
       !
-      alpha1_8=1.d0/(2.d0*sinh(F_rcoef(1)))
-      alpha2_8=1.d0/(2.d0*sinh(F_rcoef(2)))
       pr1 = 1.0d0/(zsrf_8 - zeta1_8)
       do k = 1, Nk
          zeta_8  = zsrf_8+log(F_hybuser(k)*1.d0)
          lamba_8  = (zeta_8- zeta1_8)*pr1
+         rcoef   = F_rcoef(2)-(F_rcoef(2)-F_rcoef(1))*lamba_8
          F_am_8(k) = zeta_8
-         F_bml_8(k) = alpha1_8*exp( lamba_8*F_rcoef(1) ) - alpha1_8*exp( -lamba_8*F_rcoef(1) )
-         F_bm_8(k)  = alpha2_8*exp( lamba_8*F_rcoef(2) ) - alpha2_8*exp( -lamba_8*F_rcoef(2) )
+         F_bml_8(k) = lamba_8
+         F_bm_8(k)  = lamba_8 ** rcoef
       enddo
       
       F_am_8(Nk+1) = zsrf_8
