@@ -167,6 +167,7 @@ contains
          lamba_8  = (zeta_8- zeta1_8)*pr1
          rcoef   = F_rcoef(2)-(F_rcoef(2)-F_rcoef(1))*lamba_8
          F_am_8(k) = zeta_8
+         !F_bml_8(k) = sin(sqrt(lamba_8)*3.141593/2.)
          F_bml_8(k) = lamba_8
          F_bm_8(k)  = lamba_8 ** rcoef
       enddo
@@ -207,6 +208,8 @@ contains
       hybt(NK) = sqrt(hybm(NK))
       
       hybt(NK+1) = 1.0
+      hybt(NK+2) = 1.0
+      hybm(NK+1) = 1.0
       hybm(NK+2) = 1.0
       
       ! Compute ip1 values
