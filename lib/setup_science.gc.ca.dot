@@ -15,19 +15,21 @@ case "${ORDENV_PLAT}" in
       . ssmuse-sh -p ${BH_PACKAGE}
       :;;
    sles-11-haswell-64-xc40)
-      echo "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR"
-      echo "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR"
-      echo "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR"
-      echo "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR"
-      echo "platform sles-11-haswell-64-xc40 not supported you may want to run the following and dot again:"
-      echo ". /home/one234/public/r.env.dot --arch sles-11-broadwell-64-xc40"
+      BH_MAKE=make
+      BH_HOST=hare
+      BH_MODE=intel
+      BH_PACKAGE=/fs/ssm/hpco/exp/bh/bh_0.17_all
+      RPN_LIB=/fs/ssm/eccc/mrd/rpn/libs/16.0-beta-2
+      MY_FFLAGS="-openmp -fp-model source -warn all ${MY_FFLAGS}"
+      . ssmuse-sh -d ${RPN_LIB}
+      . ssmuse-sh -p ${BH_PACKAGE}
       :;;
    sles-11-broadwell-64-xc40)
       BH_MAKE=make
       BH_HOST=hare
       BH_MODE=intel
       BH_PACKAGE=/fs/ssm/hpco/exp/bh/bh_0.17_all
-      RPN_LIB=/fs/ssm/eccc/mrd/rpn/libs/16.0-beta
+      RPN_LIB=/fs/ssm/eccc/mrd/rpn/libs/16.0-beta-2
       MY_FFLAGS="-openmp -fp-model source -warn all ${MY_FFLAGS}"
       . ssmuse-sh -d ${RPN_LIB}
       . ssmuse-sh -p ${BH_PACKAGE}
