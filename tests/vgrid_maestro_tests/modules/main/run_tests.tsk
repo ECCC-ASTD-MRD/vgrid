@@ -1,0 +1,19 @@
+echo ANDRE
+
+#. ssmuse-sh -p /fs/ssm/hpco/priv/eccc/ssm/ssm_10.12_all -p /fs/ssm/main/env/master/ssmuse_1.1_all
+. ssmuse-sh -d /fs/ssm/eccc/mrd/rpn/utils/16.0-beta
+
+cat > la_job<<EOF
+   echo "Message from MP_CHILD=\${MP_CHILD}: OMP_NUM_THREADS=${OMP_NUM_THREADS}"
+   #cd ${TASK_INPUT}/tests
+   #. /home/one234/public/r.env.dot --arch sles-11-broadwell-64-xc40
+   #cd ../lib
+   #. ./setup.dot
+   #cd -
+   #./run_tests_in_parallel.ksh -MAX_CPUS ${OMP_NUM_THREADS}
+EOF
+
+#chmod +x la_job
+cat la_job
+
+r.run_in_parallel -pgm ${TASK_WORK}/la_job -npex ${BATCH_MPI_CPUS} -npey 1

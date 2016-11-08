@@ -1,0 +1,3 @@
+FRONTEND=eccc-gpsc1
+SEQ_DEFAULT_MACHINE=eccc-gpsc1
+BACKEND=hare

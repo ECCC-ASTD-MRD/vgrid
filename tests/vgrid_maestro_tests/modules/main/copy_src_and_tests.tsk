@@ -1,0 +1,3 @@
+#for item in src tests;do
+#   cp -r ${TASK_INPUT}/${item} ${TASK_OUTPUT}
+#done

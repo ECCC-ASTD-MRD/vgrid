@@ -1,0 +1,7 @@
+<MODULE name="main">
+  <SUBMITS sub_name="copy_src_and_tests"/>
+  <TASK  name="copy_src_and_tests">
+    <SUBMITS sub_name="run_tests"/>
+  </TASK>
+  <TASK  name="run_tests"/>
+</MODULE>
