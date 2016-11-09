@@ -3,6 +3,7 @@ echo "Acquiring compilation tools"
 . ./version.dot
 
 unset MY_FFLAGS MY_CFLAGS
+
 # Les erreurs semblent lier a c_vgd_construct, apres le malloc sur la structure vgrid le yabbe est aux vaches pour certaines optoimisations,
 
 # Note avec -O1 sur ubuntu-12.04-amd64-64 intel13sp1u2 les tests suivants donnent un SIGSEGV a la ligne entre () (OK avec -O2 (defaul) OK avec -O3)
@@ -27,9 +28,9 @@ MY_FFLAGS="-O1"
 MY_CFLAGS="-O1"
 #MY_CFLAGS="-g -O0 -lefence"
 
-if   [ $(hostname -d) = cmc.ec.gc.ca ];then
+if   [ "$(hostname -d)" = cmc.ec.gc.ca ];then
    . ./setup_cmc.ec.gc.ca.dot
-elif [ $(hostname -d) = science.gc.ca ];then
+elif [ "$(hostname -d)" = science.gc.ca -o $ORDENV_PLAT = sles-11-haswell-64-xc40 -o $ORDENV_PLAT = sles-11-broadwell-64-xc40 ];then
    . ./setup_science.gc.ca.dot
 else
    echo "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR"
