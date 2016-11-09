@@ -1,8 +1,15 @@
+if [ "${BATCH_MPI_CPUS}" -ne 1 ];then
+   echo 'This job must run with one MPI rank and one or more OpenMP: cpu="1x1xN"'
+   exit 1
+fi
+
 HERE_DIR=${VGRID_WORKDIR}/${VGRID_GIT_REPOSITORY##*/}
 
 cd ${HERE_DIR}
 
 . ssmuse-sh ${VGRID_SSM_RPN_UTILS}
+
+rm -f la_job
 
 cat > la_job<<EOF
    echo "Message from MP_CHILD=\${MP_CHILD}: OMP_NUM_THREADS=${OMP_NUM_THREADS}"
@@ -13,7 +20,9 @@ cat > la_job<<EOF
    make
    cd ${HERE_DIR}/tests
    #make tests ONLY=constructor
-   ./run_tests_in_parallel.ksh -MAX_CPUS ${OMP_NUM_THREADS}
+   date
+   time ./run_tests_in_parallel.ksh -MAX_CPUS ${OMP_NUM_THREADS}
+   date
 EOF
 
 chmod +x la_job
