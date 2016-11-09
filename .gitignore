@@ -29,3 +29,8 @@ tests/WORK
 tests/compile_INFO
 control
 dependencies.mk
+tests/vgrid_maestro_tests/flow.xml
+tests/vgrid_maestro_tests/hub
+tests/vgrid_maestro_tests/listings
+tests/vgrid_maestro_tests/logs
+tests/vgrid_maestro_tests/sequencing

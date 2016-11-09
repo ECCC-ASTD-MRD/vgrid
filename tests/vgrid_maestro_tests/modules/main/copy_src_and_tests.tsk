@@ -1,3 +1,8 @@
-#for item in src tests;do
-#   cp -r ${TASK_INPUT}/${item} ${TASK_OUTPUT}
-#done
+if [ -d "${VGRID_WORKDIR}" ];then
+  rm -rf ${VGRID_WORKDIR}
+fi
+
+for item in src tests;do
+   mkdir -p $(readlink ${TASK_OUTPUT}/${item})
+   cp -r ${TASK_INPUT}/${item}/* ${TASK_OUTPUT}/${item}
+done
