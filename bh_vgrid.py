@@ -23,6 +23,7 @@ def _make(b):
              CONTROL_DIR=${BH_PACKAGE_CONTROL_DIR}/${BH_PROJECT_NAME}/.ssm.d
              mkdir -p ${CONTROL_DIR}
              cp ${BH_TOP_BUILD_DIR}/post-install ${CONTROL_DIR}
+             chmod +x ${CONTROL_DIR}/post-install
              CONTROL_FILE=${CONTROL_DIR}/control.template
              echo \"Package: ${BH_PACKAGE_NAME}\"                                                                  > ${CONTROL_FILE}
              echo \"Version: ${BH_PULL_SOURCE_GIT_BRANCH}\"                                                       >> ${CONTROL_FILE}
