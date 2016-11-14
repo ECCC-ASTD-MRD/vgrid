@@ -5,12 +5,13 @@ case "${ORDENV_PLAT}" in
       BH_HOST=gpsc-in
       BH_MODE=intel
       BH_PACKAGE=/fs/ssm/hpco/exp/bh/bh_0.17_all
-      HPCS_BASE=/fs/ssm/hpco/tmp/eccc/201402/03/base
+      HPCS_BASE=/fs/ssm/hpco/tmp/eccc/201402/05/base
       HPCS_COMP=/fs/ssm/hpco/exp/intel-2016.1.156
       HPCS_CODE_TOOL=/fs/ssm/hpco/exp/jdm536/code-tools/code-tools_2.0_all
-      RPN_LIB=/fs/ssm/eccc/mrd/rpn/libs/16.0-beta
+      RPN_LIB=/fs/ssm/eccc/mrd/rpn/libs/16.0-beta-2
       MY_FFLAGS="-openmp -fp-model source -warn all ${MY_FFLAGS}"
-      . ssmuse-sh -d ${HPCS_BASE} -d ${HPCS_COMP} -p ${HPCS_CODE_TOOL}
+      . ssmuse-sh -x ${HPCS_BASE} -d ${HPCS_COMP} 
+      . ssmuse-sh -p ${HPCS_CODE_TOOL}
       . ssmuse-sh -d ${RPN_LIB}
       . ssmuse-sh -p ${BH_PACKAGE}
       :;;
