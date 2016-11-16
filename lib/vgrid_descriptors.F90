@@ -1439,7 +1439,6 @@ contains
           return
        endif
     case ('DHT ')       
-       iwork=vgd_print(self)
        if (is_valid(self,dht_valid)) then
           iwork=self%ip1_t(size(self%ip1_t))
           call convip(iwork,work,kind,-1,dum_S,.false.)
