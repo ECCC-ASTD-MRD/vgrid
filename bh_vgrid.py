@@ -17,7 +17,12 @@ def _make(b):
     b.shell("""
             set -e
             cd ${BH_PULL_SOURCE}
-            REMOTE=$(git remote -v | grep fetch | grep gitlab.com | awk '{print $2}')
+            REMOTE_NAME=gitlab_com
+            REMOTE=$(git remote -v | grep fetch | grep ${REMOTE_NAME} | awk '{print $2}')
+            if [ "${REMOTE}" = "" ];then
+               echo "ERROR git remote ${REMOTE_NAME} not found"
+               exit 1
+            fi
             (
              CONTROL_DIR=${BH_PACKAGE_CONTROL_DIR}/${BH_PROJECT_NAME}/.ssm.d
              mkdir -p ${CONTROL_DIR}
