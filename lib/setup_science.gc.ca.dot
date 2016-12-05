@@ -26,6 +26,8 @@ case "${ORDENV_PLAT}" in
       . ssmuse-sh -p ${BH_PACKAGE}
       :;;
    sles-11-broadwell-64-xc40)
+      # Pour obtenir l'architecture broadwell faire :
+      # . r.env.dot --arch sles-11-broadwell-64-xc40
       BH_MAKE=make
       BH_HOST=hare
       BH_MODE=intel
