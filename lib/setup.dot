@@ -7,16 +7,22 @@ unset MY_FFLAGS
 MY_FFLAGS=""
 #MY_FFLAGS="-C -g -O0"
 
-if   [ "$(hostname -d)" = cmc.ec.gc.ca ];then
+if [ "${BASE_ARCH}" = AIX-powerpc7 ];then
+   DOMAIN=cmc.ec.gc.ca
+else
+   DOMAIN=$(hostname -d)
+fi
+
+if   [ "${DOMAIN}" = cmc.ec.gc.ca ];then
    . ./setup_cmc.ec.gc.ca.dot
-elif [ "$(hostname -d)" = science.gc.ca -o $ORDENV_PLAT = sles-11-haswell-64-xc40 -o $ORDENV_PLAT = sles-11-broadwell-64-xc40 ];then
+elif [ "${DOMAIN}" = science.gc.ca -o $ORDENV_PLAT = sles-11-haswell-64-xc40 -o $ORDENV_PLAT = sles-11-broadwell-64-xc40 ];then
    . ./setup_science.gc.ca.dot
 else
    echo "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR"
    echo "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR"
    echo "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR"
    echo "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR"
-   echo Domain $(hostname -d) not supported
+   echo Domain "${DOMAIN}" not supported
 fi
 
 export MY_FFLAGS BH_MAKE BH_HOST BH_MODE
