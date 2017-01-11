@@ -68,11 +68,9 @@ program constructor
 
   stat = vgd_get(d,key='VIPM - level ip1 list (m)',value=ip1_list)
   print*,'ip1_list M',ip1_list
-  print*,'ANDRE'
 
   stat = vgd_get(d,key='VIPT - level ip1 list (m)',value=ip1_list)
   print*,'ip1_list T',ip1_list
-  print*,'ANDRE'
  
   stat = vgd_put(d,key='DIPM Diag level ip1 for Momentum variables',value=99)
   if(stat==VGD_ERROR)OK=.false.
