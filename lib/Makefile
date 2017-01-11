@@ -16,7 +16,7 @@ default: lib
 %.o: %.F90
 	s.f90 -c $(MY_FFLAGS) -lrmn $<
 
-OBJECTS = vgrid_descriptors.o vgrid_genab_1001.o vgrid_genab_1002_5001.o vgrid_genab_1004.o vgrid_genab_2001.o vgrid_genab_5002.o utils.o
+OBJECTS = vgrid_genab_1001.o vgrid_genab_1002_5001.o vgrid_genab_1004.o vgrid_genab_2001.o vgrid_genab_5002.o utils.o vgrid_descriptors.o
 
 all: Makefile.dep.mk $(OBJECTS) vgrid_version
 
