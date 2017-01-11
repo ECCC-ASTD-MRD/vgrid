@@ -2869,10 +2869,10 @@ contains
     integer :: fstinf,ni,nj,nk,sfc_key,istat,error,fstluk,i
     integer, dimension(size(fstkeys)) :: ip1_list
     type(FSTD_ext) prmk,prm_p0,prm_check
-    real, dimension(:,:), pointer :: p0
+    real, dimension(:,:), pointer :: p0, p0ls
     logical :: my_in_log, relax_ipig_match_L
 
-    nullify(p0)
+    nullify(p0,p0ls)
     
     relax_ipig_match_L=.false.
 
@@ -2927,50 +2927,21 @@ contains
 
     ! Check surface field if needed
     sfc_large_scale_valid: if (is_valid(self,ref_namel_valid)) then
-       print*,'TODO levels_readref P0LS'
-       return
+       istat=get_ref(p0ls,self,self%ref_namel,unit,prmk)
+       if(istat == VGD_ERROR)then
+          write(for_msg,*) 'Problem getting reference field ',trim(self%ref_namel)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return
+       endif
     end if sfc_large_scale_valid
        
     sfc_valid: if (is_valid(self,ref_name_valid)) then
-       sfc_key = fstinf(unit,ni,nj,nk,prmk%datev,prmk%etiket,-1,prmk%ip2,prmk%ip3,' ',self%ref_name)
-       if(sfc_key < 0)then
-          write(for_msg,*) 'cannot find ',self%ref_name,' for :'
-          call msg(MSG_ERROR,VGD_PRFX//for_msg)
-          write(for_msg,*) 'datev=',prmk%datev,' etiket=',prmk%etiket,' ip2=',prmk%ip2,' ip3=',prmk%ip3
-          call msg(MSG_ERROR,VGD_PRFX//for_msg)
-          return   
-       endif
-       istat=my_fstprm(sfc_key,prm_p0)
-       if(prm_p0%ni.ne.prmk%ni.or.prm_p0%nj.ne.prmk%nj)then
-          write(for_msg,*) 'horizontal grid mismatch for '//trim(self%ref_name),ni,nj,' vs',prmk%ni,prmk%nj
+       istat=get_ref(p0,self,self%ref_name,unit,prmk)
+       if(istat == VGD_ERROR)then
+          write(for_msg,*) 'Problem getting reference field ',trim(self%ref_namel)
           call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
-       if (self%match_ipig) then
-          if (prm_p0%ig1 /= self%rec%ip1 .or. prm_p0%ig2 /= self%rec%ip2) then
-             write(for_msg,*) 'sfc_field ig1 ig2 do not correspond to the correct grid descriptor'
-             call msg(MSG_ERROR,VGD_PRFX//for_msg)
-             write(for_msg,'("   expecting (ip1,ip2)->(",i8,",",i8,"), got (ig1,ig2)->(",i8,",",i8,")")')&
-                  self%rec%ip1,self%rec%ip2,prm_p0%ig1,prm_p0%ig2
-             call msg(MSG_ERROR,VGD_PRFX//for_msg)                            
-             return
-          endif
-       endif
-       allocate(p0(ni,nj),stat=error)
-       if (error /= 0) then
-          nullify(p0)
-          write(for_msg,*) 'cannot allocate space for p0 in levels_readref'
-          call msg(MSG_ERROR,VGD_PRFX//for_msg)
-          return
-       endif
-       error = fstluk(p0,sfc_key,ni,nj,nk)
-       if(error < 0 )then
-          write(for_msg,*) 'problem with fstluk '//trim(self%ref_name)//' in levels_readref'
-          call msg(MSG_ERROR,VGD_PRFX//for_msg)
-          deallocate(p0)
-          return
-       endif
-       if (trim(self%ref_name) == 'P0') p0 = p0*100. !convert mb to Pa
     else
        allocate(p0(1,1),stat=error)
        if (error /= 0) then
@@ -2981,10 +2952,15 @@ contains
        endif
        p0 = VGD_MISSING
     endif sfc_valid
-   
+    
     ! Wrap call to level calculator
-    error = levels_withref(self,sfc_field=p0,ip1_list=ip1_list,levels=levels,in_log=my_in_log)
+    if (is_valid(self,ref_namel_valid)) then
+       error = levels_withref(self,sfc_field=p0,sfc_field_ls=p0ls,ip1_list=ip1_list,levels=levels,in_log=my_in_log)
+    else
+       error = levels_withref(self,sfc_field=p0,ip1_list=ip1_list,levels=levels,in_log=my_in_log)
+    endif
     deallocate(p0)
+    if(associated(p0ls))deallocate(p0ls)
     if (error /= VGD_OK) then
        write(for_msg,*) 'got error return from levels_withref in levels_readref'
        call msg(MSG_ERROR,VGD_PRFX//for_msg)
@@ -3291,7 +3267,7 @@ contains
            call msg(MSG_ERROR,VGD_PRFX//for_msg)
            return
         endif
-        my_sfc_field_ls=my_sfc_field
+        my_sfc_field_ls=sfc_field_ls
         stat=diag_withref_8(self,ip1_list,levels_8,sfc_field=my_sfc_field,in_log=my_in_log,sfc_field_ls=my_sfc_field_ls)
         deallocate(my_sfc_field_ls)
      else
@@ -5200,9 +5176,10 @@ contains
     !s_8 = log(dble(sfc_field)/self%pref_8)
     s_8  = log(sfc_field/self%pref_8)
     sl_8 = log(sfc_field_ls/self%pref_8)
-    do i=1,nk
+    do i=1,nk       
+       print*,'i,aa_8(i),bbl_8(i),bb_8(i),sl_8(10,10),s_8(10,10)',i,aa_8(i),bbl_8(i),bb_8(i),sl_8(10,10),s_8(10,10)
        levels(:,:,i) = aa_8(i) + (bbl_8(i)-bb_8(i))*sl_8 + bb_8(i)*s_8
-    enddo
+    enddo    
     if (.not.in_log)then
        levels = exp(levels)
     endif
@@ -5784,6 +5761,9 @@ contains
     case (5002,5003,5004,5005)
        cvcode="5002"
        error = encode_vert_5002(self,update_L=.true.)
+    !case (5100)
+    !   cvcode="5100"
+    !   error = encode_vert_5100(self,update_L=.true.)
     case DEFAULT
        write(for_msg,*) 'table_update unsupported kind and version: ',kind,version,' (vcode) ',self%vcode
        call msg(MSG_ERROR,VGD_PRFX//for_msg)
@@ -5802,4 +5782,69 @@ contains
     
  end function table_update
 
-end module vGrid_Descriptors
+ integer function get_ref (F_f,self,F_name_S,F_unit,prm) result(status)
+    
+    implicit none
+    
+    real, dimension(:,:), pointer, intent(inout) :: F_f
+    type(vgrid_descriptor), intent(in) :: self !Vertical descriptor instance
+    character(len=VGD_LEN_NAME) :: F_name_S
+    integer, intent(in) :: F_unit
+    type(FSTD_ext), intent(in) :: prm
+    
+    ! Local variables
+    integer :: sfc_key,fstinf,fstluk,ni,nj,nk,istat
+    type(FSTD_ext) :: prm_p0
+
+    ! Set error status
+    status = VGD_ERROR
+    
+    sfc_key = fstinf(F_unit,ni,nj,nk,prm%datev,prm%etiket,-1,prm%ip2,prm%ip3,' ',F_name_S)
+    if(sfc_key < 0)then
+       write(for_msg,*) 'cannot find ',F_name_S,' for :'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       write(for_msg,*) 'datev=',prm%datev,' etiket=',prm%etiket,' ip2=',prm%ip2,' ip3=',prm%ip3
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return
+    endif
+    istat=my_fstprm(sfc_key,prm_p0)
+    if(prm_p0%ni.ne.prm%ni.or.prm_p0%nj.ne.prm%nj)then
+       write(for_msg,*) 'horizontal grid mismatch for '//trim(F_name_S),ni,nj,' vs',prm%ni,prm%nj
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return
+    endif
+    if (self%match_ipig) then
+       if (prm_p0%ig1 /= self%rec%ip1 .or. prm_p0%ig2 /= self%rec%ip2) then
+          write(for_msg,*) 'sfc_field ig1 ig2 do not correspond to the correct grid descriptor'
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          write(for_msg,'("   expecting (ip1,ip2)->(",i8,",",i8,"), got (ig1,ig2)->(",i8,",",i8,")")')&
+               self%rec%ip1,self%rec%ip2,prm_p0%ig1,prm_p0%ig2
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)                            
+          return
+       endif
+    endif
+    if(associated(F_f))deallocate(F_f)
+    allocate(F_f(ni,nj),stat=istat)
+    if (istat /= 0) then
+       nullify(F_f)
+       write(for_msg,*) 'cannot allocate space in get_ref for ',trim(F_name_S) 
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return
+    endif
+    istat = fstluk(F_f,sfc_key,ni,nj,nk)
+    if(istat < 0 )then
+       write(for_msg,*) 'problem with fstluk '//trim(F_name_S)//' in get_ref'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       deallocate(F_f)
+       return
+    endif
+    if ( trim(F_name_S) == 'P0' .or. &
+         trim(F_name_S) == 'P0LS') F_f = F_f*100. !convert mb to Pa
+    
+    ! Set error status
+    status = VGD_OK
+
+ end function get_ref
+    
+ end module vGrid_Descriptors
+ 
