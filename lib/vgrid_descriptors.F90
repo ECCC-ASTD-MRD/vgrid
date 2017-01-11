@@ -5177,7 +5177,6 @@ contains
     s_8  = log(sfc_field/self%pref_8)
     sl_8 = log(sfc_field_ls/self%pref_8)
     do i=1,nk       
-       print*,'i,aa_8(i),bbl_8(i),bb_8(i),sl_8(10,10),s_8(10,10)',i,aa_8(i),bbl_8(i),bb_8(i),sl_8(10,10),s_8(10,10)
        levels(:,:,i) = aa_8(i) + (bbl_8(i)-bb_8(i))*sl_8 + bb_8(i)*s_8
     enddo    
     if (.not.in_log)then
@@ -5761,9 +5760,9 @@ contains
     case (5002,5003,5004,5005)
        cvcode="5002"
        error = encode_vert_5002(self,update_L=.true.)
-    !case (5100)
-    !   cvcode="5100"
-    !   error = encode_vert_5100(self,update_L=.true.)
+    case (5100)
+       cvcode="5100"
+       error = encode_vert_5100(self,update_L=.true.)
     case DEFAULT
        write(for_msg,*) 'table_update unsupported kind and version: ',kind,version,' (vcode) ',self%vcode
        call msg(MSG_ERROR,VGD_PRFX//for_msg)
