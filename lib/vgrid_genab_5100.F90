@@ -80,7 +80,7 @@ contains
       real*8  :: pr1, ztop_8, zsrf_8, lamba_8,zeta_8, zeta1_8,zeta2_8, l_ptop_8
       real, dimension(:), pointer :: hybm, hybt             ! model hyb values
       real*8, dimension(:), pointer :: at_8, bt_8
-      real :: rcoef
+      real :: rcoefL, rcoef
       integer, dimension(:), pointer :: ip1_t
       character(len=100) :: func_name
       real, parameter :: RGASD       =    0.287050000000E+03
@@ -164,18 +164,18 @@ contains
       pr1 = 1.0d0/(zsrf_8 - zeta1_8)
       do k = 1, Nk
          zeta_8  = zsrf_8+log(F_hybuser(k)*1.d0)
-         lamba_8  = (zeta_8- zeta1_8)*pr1
-         rcoef   = F_rcoef(2)-(F_rcoef(2)-F_rcoef(1))*lamba_8
-         F_am_8(k) = zeta_8
-         !F_bml_8(k) = sin(sqrt(lamba_8)*3.141593/2.)
-         F_bml_8(k) = lamba_8
+         lamba_8 = (zeta_8- zeta1_8)*pr1
+         rcoefL  = F_rcoef(1) * ( 1.d0 - lamba_8 )
+         rcoef   = F_rcoef(2) * ( 1.d0 - lamba_8 )
+         F_am_8(k)  = zeta_8
          F_bm_8(k)  = lamba_8 ** rcoef
+         F_bml_8(k) = lamba_8 ** rcoefL - F_bm_8(k)
       enddo
       
       F_am_8(Nk+1) = zsrf_8
       F_bm_8(Nk+1) = 1.d0 
-      F_bml_8(Nk+1) = 1.d0 
-      
+      F_bml_8(Nk+1) = 0.d0 
+ 
       ! Integrating the hydrostatic eq with T=0C
       ! ln[p(z=dhm)] = ln(ps) - g/(Rd*T)*dhm
       ! s = ln(ps) - ln(pref)
@@ -183,23 +183,27 @@ contains
       ! => B=1, A = ln(pref) - g/(Rd*T)*dhm
       ! We take T at 0C
       !F_am_8(Nk+2) = log(F_pref_8) - GRAV*dhm/(RGASD*TCDK)
-      F_am_8(Nk+2) = comp_diag_a(F_pref_8,dhm)
-      F_bm_8(Nk+2) = 1.d0 
-      F_bml_8(Nk+2) = 1.d0 
+      F_am_8(Nk+2)  = comp_diag_a(F_pref_8,dhm)
+      F_bm_8(Nk+2)  = 1.d0 
+      F_bml_8(Nk+2) = 0.d0 
       
       !     Thermodynamic levels
       
       do k = 1, Nk
-         F_bt_8(k)  = 0.5d0*( F_bm_8(k)  + F_bm_8(k+1)  ) 
          F_at_8(k)  = 0.5d0*( F_am_8(k)  + F_am_8(k+1)  ) 
-         F_btl_8(k) = 0.5d0*( F_bml_8(k) + F_bml_8(k+1) ) 
+         zeta_8  = F_at_8(k)
+         lamba_8 = (zeta_8- zeta1_8)*pr1
+         rcoefL  = F_rcoef(1) * ( 1.d0 - lamba_8 )
+         rcoef   = F_rcoef(2) * ( 1.d0 - lamba_8 )
+         F_bt_8(k)  = lamba_8 ** rcoef
+         F_btl_8(k) = lamba_8 ** rcoefL - F_bt_8(k)
       enddo
-      F_bt_8(Nk+1)  = 1.d0
       F_at_8(Nk+1)  = zsrf_8
+      F_bt_8(Nk+1)  = 1.d0
+      F_btl_8(Nk+1) = 0.d0
       F_at_8(Nk+2)  = comp_diag_a(F_pref_8,dht)
       F_bt_8(Nk+2)  = 1.d0
-      F_btl_8(Nk+1) = F_bt_8(Nk+1)
-      F_btl_8(Nk+2) = F_bt_8(Nk+2)
+      F_btl_8(Nk+2) = 0.d0
       
       hybm(1:NK) = F_hybuser(1:NK)
       do k = 1, NK-1

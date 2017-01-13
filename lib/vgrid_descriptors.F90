@@ -2527,7 +2527,7 @@ contains
           call convip(self%ip1_t(nk),height,kind,-1,"",.false.)
           write(for_msg,*)'  Diagnostic thermo   level (ip1=',self%ip1_t(nk),') at ',height,' m Above Ground Level'          
           call msg(MSG_VERBATIM,trim(for_msg))
-          write(for_msg,*)"  Equation to compute hydrostatic pressure (pi): ln(pi) = A + (Bl-B)*ln(P0LS*100/pref) + B*ln(P0*100/pref)"
+          write(for_msg,*)"  Equation to compute hydrostatic pressure (pi): ln(pi) = A + Bl*ln(P0LS*100/pref) + B*ln(P0*100/pref)"
           call msg(MSG_VERBATIM,trim(for_msg))
        case DEFAULT
           write(for_msg,*) 'invalid kind or version in : print_desc',self%kind,self%version
@@ -5177,22 +5177,20 @@ contains
     s_8  = log(sfc_field/self%pref_8)
     sl_8 = log(sfc_field_ls/self%pref_8)
     do i=1,nk       
-       levels(:,:,i) = aa_8(i) + (bbl_8(i)-bb_8(i))*sl_8 + bb_8(i)*s_8
+       levels(:,:,i) = aa_8(i) + bbl_8(i)*sl_8 + bb_8(i)*s_8
     enddo    
     if (.not.in_log)then
        levels = exp(levels)
     endif
     if(dpidpis)then
-       print*,'TOTO for SLEVE in compute_pressure_5100_8'
-       stop
        if(in_log)then
           write(for_msg,*) 'in compute_pressure_5100_8, cannot get dpidpis in log'
           call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
-       !do i=1,nk
-       !   levels(:,:,i) = bb_8(i)*levels(:,:,i)/sfc_field
-       !enddo
+       do i=1,nk
+          levels(:,:,i) = bb_8(i)*levels(:,:,i)/sfc_field
+       enddo
     endif
 
     ! Set status and return
