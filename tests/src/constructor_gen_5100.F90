@@ -38,7 +38,7 @@ program constructor
        0.8791828, 0.8983018, 0.9159565, 0.9322280, 0.9471967, 0.9609448, &
        0.9735557, 0.9851275, 0.9950425/)
   real, dimension(2,1) :: p0=(/100000.,50000./), p0l=(/100000.,90000./)
-  real :: rcoef1=0.01,rcoef2=30.
+  real :: rcoef1=4.,rcoef2=200.
   
   real, pointer, dimension(:) :: levels
   real, pointer, dimension(:,:,:) :: levels_3d
@@ -57,7 +57,7 @@ program constructor
   stat = vgd_print(vgd)
 
   file='data/data_constructor_gen_5100.txt'
-  !stat = test_5100(vgd,file,write_control_L,stat)
+  stat = test_5100(vgd,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
 
   stat = vgd_get(vgd,'VIPM',ip1s)
@@ -72,7 +72,6 @@ program constructor
   stat = vgd_levels(vgd,ip1s,levels_3d,sfc_field=p0,in_log=.false.,sfc_field_ls=p0l)
   print*,'levels_3d(1,1,1:size(levels_3d,dim=3))=',levels_3d(1,1,1:size(levels_3d,dim=3))
   print*,'levels_3d(2,1,1:size(levels_3d,dim=3))=',levels_3d(2,1,1:size(levels_3d,dim=3))
-  stop
 
   call ut_report(OK,'Grid_Descriptors::vgd_new vertical generate initializer (5100) value')
 end program constructor
@@ -92,7 +91,7 @@ integer function test_5100(F_d,F_file,F_write_control_L,F_stat) result(istat)
    ! Local variable
    !
    real, dimension(:), pointer :: vcdm,vcdt,work
-   real*8, dimension(:), pointer :: b_m_8,bl_m_8,a_m_8,b_t_8,bl_t_8,a_t_8,work_8
+   real*8, dimension(:), pointer :: b_m_8,c_m_8,a_m_8,b_t_8,c_t_8,a_t_8,work_8
    integer, dimension(:), pointer :: vipm,vipt,work_i
    integer :: nl_m,nl_t,k,nk,kind,vers,ip1,my_ip1
 
@@ -106,16 +105,16 @@ integer function test_5100(F_d,F_file,F_write_control_L,F_stat) result(istat)
       return
    endif
 
-   nullify(vcdm,vcdt,work,b_m_8,bl_m_8,a_m_8,b_t_8,bl_t_8,a_t_8,work_8,vipm,vipt,work_i)
+   nullify(vcdm,vcdt,work,b_m_8,c_m_8,a_m_8,b_t_8,c_t_8,a_t_8,work_8,vipm,vipt,work_i)
 
    if( vgd_get(F_d,key='KIND - vertical coordinate ip1 kind' ,value=kind)   == VGD_ERROR) return
    if( vgd_get(F_d,key='VERS - vertical coordinate version'  ,value=vers)   == VGD_ERROR) return
    if( vgd_get(F_d,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8)  == VGD_ERROR) return
    if( vgd_get(F_d,key='CA_T - vertical A coefficient (t)'   ,value=a_t_8)  == VGD_ERROR) return
    if( vgd_get(F_d,key='CB_M - vertical B coefficient (m)'   ,value=b_m_8)  == VGD_ERROR) return
-   if( vgd_get(F_d,key='CBLM - vertical Bl coefficient (m)'  ,value=bl_m_8) == VGD_ERROR) return
+   if( vgd_get(F_d,key='CC_M - vertical C coefficient (m)'   ,value=c_m_8)  == VGD_ERROR) return
    if( vgd_get(F_d,key='CB_T - vertical B coefficient (t)'   ,value=b_t_8)  == VGD_ERROR) return
-   if( vgd_get(F_d,key='CBLT - vertical Bl coefficient (t)'  ,value=bl_t_8) == VGD_ERROR) return
+   if( vgd_get(F_d,key='CC_T - vertical C coefficient (t)'   ,value=c_t_8)  == VGD_ERROR) return
    if( vgd_get(F_d,key='VIPM - level ip1 list (m)'           ,value=vipm)   == VGD_ERROR) return
    if( vgd_get(F_d,key='VIPT - level ip1 list (t)'           ,value=vipt)   == VGD_ERROR) return
    if( vgd_get(F_d,key='VCDM - vertical coordinate (m)'      ,value=vcdm)   == VGD_ERROR) return
@@ -131,8 +130,8 @@ integer function test_5100(F_d,F_file,F_write_control_L,F_stat) result(istat)
      write(10,*)a_t_8
      write(10,*)b_m_8
      write(10,*)b_t_8
-     write(10,*)bl_m_8
-     write(10,*)bl_t_8
+     write(10,*)c_m_8
+     write(10,*)c_t_8
      write(10,*)vipm
      write(10,*)vipt
      write(10,*)vcdm
@@ -184,6 +183,7 @@ integer function test_5100(F_d,F_file,F_write_control_L,F_stat) result(istat)
   do k=1,nk
      if(b_m_8(k).eq.0.)then
         if(work_8(k).ne.0.)then
+           istat=VGD_ERROR
            print*,'Probleme avec B M, pas egal a zero'
         endif
      else
@@ -206,31 +206,39 @@ integer function test_5100(F_d,F_file,F_write_control_L,F_stat) result(istat)
      endif
   enddo
 
-  ! Check Bl
-  print*,'Reading Bl M'
+  ! Check C
+  print*,'Reading C M'
   read(10,*)work_8
   do k=1,nk
-     if(bl_m_8(k).eq.0.)then
+     if(c_m_8(k).eq.0.)then
         if(work_8(k).ne.0.)then
-           print*,'Probleme avec Bl M, pas egal a zero'
+           istat=VGD_ERROR
+           print*,'Probleme avec C M, pas egal a zero'
         endif
      else
-        if(abs(work_8(k)-bl_m_8(k))/bl_m_8(k)>100.*epsilon(1.))then
+        if(abs(work_8(k)-c_m_8(k))/c_m_8(k)>100.*epsilon(1.))then
            istat=VGD_ERROR
-           print*,'Probleme avec Bl M, pas dans les limites tollerees'
+           print*,'Probleme avec C M, pas dans les limites tollerees'
            print*,work_8(k),'vs'
-           print*,bl_m_8(k)
+           print*,c_m_8(k)
         endif
      endif
   enddo
-  print*,'Reading Bl T'
+  print*,'Reading C T'
   read(10,*)work_8
   do k=1,nk
-     if(abs(work_8(k)-bl_t_8(k))/bl_t_8(k)>100.*epsilon(1.))then
-        istat=VGD_ERROR
-        print*,'Probleme avec Bl T, pas dans les limites tollerees'
-        print*,work_8(k),'vs'
-        print*,bl_t_8(k)
+     if(c_t_8(k).eq.0.)then
+        if(work_8(k).ne.0.)then
+           istat=VGD_ERROR
+           print*,'Probleme avec C t, pas egal a zero'
+        endif
+     else 
+        if(abs(work_8(k)-c_t_8(k))/c_t_8(k)>100.*epsilon(1.))then
+           istat=VGD_ERROR
+           print*,'Probleme avec C T, pas dans les limites tollerees'
+           print*,work_8(k),'vs'
+           print*,c_t_8(k)
+        endif
      endif
   enddo
 
