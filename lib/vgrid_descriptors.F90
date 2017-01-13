@@ -64,14 +64,14 @@ module vGrid_Descriptors
   integer, dimension(7), parameter :: rcoef1_valid=                  (/1003,5001,5002,5003,5004,5005,5100/)
   integer, dimension(5), parameter :: rcoef2_valid=                            (/5002,5003,5004,5005,5100/)
   integer, dimension(10),parameter :: a_m_8_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004,5005,5100/)
-  integer, dimension(1), parameter :: bl_m_8_valid=                                                (/5100/)
   integer, dimension(10),parameter :: b_m_8_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004,5005,5100/)
+  integer, dimension(1), parameter :: c_m_8_valid=                                                 (/5100/)
   integer, dimension(5), parameter :: a_t_8_valid=                             (/5002,5003,5004,5005,5100/)
   integer, dimension(9), parameter :: a_t_8_valid_get=(/1001,1002,     2001,5001,5002,5003,5004,5005,5100/)
   integer, dimension(5), parameter :: b_t_8_valid=                             (/5002,5003,5004,5005,5100/)
   integer, dimension(9), parameter :: b_t_8_valid_get=(/1001,1002,     2001,5001,5002,5003,5004,5005,5100/)
-  integer, dimension(1), parameter :: bl_t_8_valid=                                                (/5100/)
-  integer, dimension(1), parameter :: bl_t_8_valid_get=                                            (/5100/)
+  integer, dimension(1), parameter :: c_t_8_valid=                                                 (/5100/)
+  integer, dimension(1), parameter :: c_t_8_valid_get=                                             (/5100/)
   integer, dimension(10),parameter :: ip1_m_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004,5005,5100/)
   integer, dimension(5), parameter :: ip1_t_valid=                             (/5002,5003,5004,5005,5100/)
   integer, dimension(9), parameter :: ip1_t_valid_get=(/1001,1002,     2001,5001,5002,5003,5004,5005,5100/)
@@ -111,10 +111,10 @@ module vGrid_Descriptors
      real(kind=8), dimension(:,:,:), pointer :: table=>null()!complete grid descriptor record
      real(kind=8), dimension(:), pointer :: a_m_8=>null()!A-coefficients for momentum levels
      real(kind=8), dimension(:), pointer :: b_m_8=>null()!B-coefficients for momentum levels
-     real(kind=8), dimension(:), pointer :: bl_m_8=>null()!Bs-coefficients for momentum levels
+     real(kind=8), dimension(:), pointer :: c_m_8=>null()!C-coefficients for momentum levels
      real(kind=8), dimension(:), pointer :: a_t_8=>null()!A-coefficients for thermodynamic levels
      real(kind=8), dimension(:), pointer :: b_t_8=>null()!B-coefficients for thermodynamic levels
-     real(kind=8), dimension(:), pointer :: bl_t_8=>null()!Bs-coefficients for thermodynamic levels
+     real(kind=8), dimension(:), pointer :: c_t_8=>null()!C-coefficients for thermodynamic levels
      real :: dhm                                        ! Diag level Height (m) for Momentum variables UU,VV
      real :: dht                                        ! Diag level Height (m) for Thermo variables TT,HU, etc
      integer, dimension(:), pointer :: ip1_m=>null()    !ip1 values for momentum levels
@@ -611,7 +611,7 @@ contains
 
    integer function new_build_vert(self,kind,version,nk,ip1,ip2, &
         ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8, &
-        ip1_m,ip1_t,bl_m_8,bl_t_8) result(status)
+        ip1_m,ip1_t,c_m_8,c_t_8) result(status)
       ! Coordinate constructor - build vertical descriptor from arguments
       type(vgrid_descriptor) :: self                    !Vertical descriptor instance    
       integer, intent(in) :: kind,version               !Kind,version to create
@@ -622,7 +622,7 @@ contains
       real*8, optional, intent(in) :: pref_8            !Reference-level pressure (Pa)
       real*8, optional, dimension(:) :: a_m_8,a_t_8     !A-coefficients for momentum(m),thermo(t) levels
       real*8, optional, dimension(:) :: b_m_8,b_t_8     !B-coefficients for momentum(m),thermo(t) levels
-      real*8, optional, dimension(:) :: bl_m_8,bl_t_8   !Bs-coefficients for momentum(m),thermo(t) levels (large scale)
+      real*8, optional, dimension(:) :: c_m_8,c_t_8     !C-coefficients for momentum(m),thermo(t) levels (large scale)
       integer, optional, dimension(:) :: ip1_m,ip1_t    !Level ID (IP1) for momentum(m),thermo(t) levels
 
       ! Local variables
@@ -711,16 +711,16 @@ contains
             missingInput = .true.
          endif
       endif
-      if(is_valid(self,bl_m_8_valid)) then
-         if(present(bl_m_8))then
-            if (associated(self%bl_m_8)) deallocate(self%bl_m_8)
-            allocate(self%bl_m_8(size(bl_m_8)),stat=error)
+      if(is_valid(self,c_m_8_valid)) then
+         if(present(c_m_8))then
+            if (associated(self%c_m_8)) deallocate(self%c_m_8)
+            allocate(self%c_m_8(size(c_m_8)),stat=error)
             if(error < 0)then
-               write(for_msg,*) 'problem allocating bl_m_8 in new_build_vert'
+               write(for_msg,*) 'problem allocating c_m_8 in new_build_vert'
                call msg(MSG_ERROR,VGD_PRFX//for_msg)
                return
             endif
-            self%bl_m_8 = bl_m_8
+            self%c_m_8 = c_m_8
          else
             write(for_msg,*) 'b_m_8 is a required constructor entry'
             call msg(MSG_ERROR,VGD_PRFX//for_msg)
@@ -759,18 +759,18 @@ contains
             missingInput = .true.
          endif
       endif
-      if(is_valid(self,bl_t_8_valid)) then
-         if(present(bl_t_8))then
-            if (associated(self%bl_t_8)) deallocate(self%bl_t_8)
-            allocate(self%bl_t_8(size(bl_t_8)),stat=error)
+      if(is_valid(self,c_t_8_valid)) then
+         if(present(c_t_8))then
+            if (associated(self%c_t_8)) deallocate(self%c_t_8)
+            allocate(self%c_t_8(size(c_t_8)),stat=error)
             if(error < 0)then
-               write(for_msg,*) 'problem allocating bl_t_8 in new_build_vert'
+               write(for_msg,*) 'problem allocating c_t_8 in new_build_vert'
                call msg(MSG_ERROR,VGD_PRFX//for_msg)
                return
             endif
-            self%bl_t_8 = bl_t_8
+            self%c_t_8 = c_t_8
          else
-            write(for_msg,*) 'bl_t_8 is a required constructor entry'
+            write(for_msg,*) 'c_t_8 is a required constructor entry'
             call msg(MSG_ERROR,VGD_PRFX//for_msg)
             missingInput = .true.
          endif
@@ -890,10 +890,10 @@ contains
       integer :: myip1,myip2,mystdout_unit,error
       integer, dimension(:), pointer :: ip1_m,ip1_t
       real, dimension(:), pointer :: hybm,hybt
-      real*8, dimension(:), pointer :: a_m_8,b_m_8,bl_m_8,a_t_8,b_t_8,bl_t_8
+      real*8, dimension(:), pointer :: a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8
       logical :: errorInput=.false.
 
-      nullify(ip1_m,ip1_t,hybm,hybt,a_m_8,b_m_8,bl_m_8,a_t_8,b_t_8,bl_t_8)
+      nullify(ip1_m,ip1_t,hybm,hybt,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8)
 
       self%valid=.false.
       ! Set error status
@@ -1176,15 +1176,15 @@ contains
          if (error /= VGD_OK) return
       case (5100)  
          call vgrid_genab_5100(hyb,(/rcoef1,rcoef2/),pref_8, &
-              a_m_8,b_m_8,bl_m_8,a_t_8,b_t_8,bl_t_8,ip1_m,ip1_t,error,ptop_out_8=ptop_out_8, &
+              a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,ip1_m,ip1_t,error,ptop_out_8=ptop_out_8, &
               dhm=dhm,dht=dht)
          if (error /= VGD_OK)then
             if(associated(a_m_8))deallocate(a_m_8)
             if(associated(b_m_8))deallocate(b_m_8)
-            if(associated(bl_m_8))deallocate(bl_m_8)
+            if(associated(c_m_8))deallocate(c_m_8)
             if(associated(a_t_8))deallocate(a_t_8)
             if(associated(b_t_8))deallocate(b_t_8)
-            if(associated(bl_t_8))deallocate(bl_t_8)
+            if(associated(c_t_8))deallocate(c_t_8)
             if(associated(ip1_m))deallocate(ip1_m)
             if(associated(ip1_t))deallocate(ip1_t)
             return
@@ -1198,10 +1198,10 @@ contains
               rcoef2=rcoef2,       &
               a_m_8=a_m_8,         &
               b_m_8=b_m_8,         &
-              bl_m_8=bl_m_8,       &
+              c_m_8=c_m_8,       &
               a_t_8=a_t_8,         &
               b_t_8=b_t_8,         &
-              bl_t_8=bl_t_8,       &
+              c_t_8=c_t_8,       &
               ip1_m=ip1_m,         &
               ip1_t=ip1_t)
          if (error /= VGD_OK) return
@@ -1738,11 +1738,11 @@ contains
           error = int(get_error(key,my_quiet))
           return
        endif
-    case ('CBLM')
-       if (is_valid(self,bl_m_8_valid)) then
-          istat = get_allocate(key,value,size(self%bl_m_8),ALLOW_RESHAPE,'(CBLM in get_real8_1d)')
+    case ('CC_M')
+       if (is_valid(self,c_m_8_valid)) then
+          istat = get_allocate(key,value,size(self%c_m_8),ALLOW_RESHAPE,'(CC_M in get_real8_1d)')
           if (istat /= 0) return
-          value = self%bl_m_8
+          value = self%c_m_8
        else
           error = int(get_error(key,my_quiet))
           return
@@ -1777,16 +1777,16 @@ contains
           error = int(get_error(key,my_quiet))
           return
        endif
-    case ('CBLT')
-       if (is_valid(self,bl_t_8_valid_get)) then
-          if (is_valid(self,bl_t_8_valid)) then
-             istat = get_allocate(key,value,size(self%bl_t_8),ALLOW_RESHAPE,'(CBLT in get_real8_1d)')
+    case ('CC_T')
+       if (is_valid(self,c_t_8_valid_get)) then
+          if (is_valid(self,c_t_8_valid)) then
+             istat = get_allocate(key,value,size(self%c_t_8),ALLOW_RESHAPE,'(CC_T in get_real8_1d)')
              if (istat /= 0) return
-             value = self%bl_t_8
+             value = self%c_t_8
           else
-             istat = get_allocate(key,value,size(self%bl_m_8),ALLOW_RESHAPE,'(CBLT (m) in get_real8_1d)')
+             istat = get_allocate(key,value,size(self%c_m_8),ALLOW_RESHAPE,'(CC_T (m) in get_real8_1d)')
              if (istat /= 0) return
-             value = self%bl_m_8
+             value = self%c_m_8
           endif
        else
           error = int(get_error(key,my_quiet))
@@ -2527,7 +2527,7 @@ contains
           call convip(self%ip1_t(nk),height,kind,-1,"",.false.)
           write(for_msg,*)'  Diagnostic thermo   level (ip1=',self%ip1_t(nk),') at ',height,' m Above Ground Level'          
           call msg(MSG_VERBATIM,trim(for_msg))
-          write(for_msg,*)"  Equation to compute hydrostatic pressure (pi): ln(pi) = A + Bl*ln(P0LS*100/pref) + B*ln(P0*100/pref)"
+          write(for_msg,*)"  Equation to compute hydrostatic pressure (pi): ln(pi) = A + B*ln(P0*100/pref) + C*ln(P0LS*100/pref)"
           call msg(MSG_VERBATIM,trim(for_msg))
        case DEFAULT
           write(for_msg,*) 'invalid kind or version in : print_desc',self%kind,self%version
@@ -2535,8 +2535,8 @@ contains
           return
        end select
        
-       if(is_valid(self,bl_m_8_valid) .or. is_valid(self,bl_t_8_valid) )then
-          write(for_msg2,*)'  Momentum levels ip1, p, A, B, Bl (B large scale):'
+       if(is_valid(self,c_m_8_valid) .or. is_valid(self,c_t_8_valid) )then
+          write(for_msg2,*)'  Momentum levels ip1, p, A, B, C'
        else
           write(for_msg2,*)'  Momentum levels ip1, p, A, B:'          
        endif
@@ -2548,8 +2548,8 @@ contains
              null_S=''
              do k=1,nk                
                 call convip(self%ip1_m(k),pres,kind,-1,null_S,.false.)
-                if(is_valid(self,bl_m_8_valid))then
-                   write(for_msg,*)self%ip1_m(k),pres,self%a_m_8(k),self%b_m_8(k),self%bl_m_8(k)
+                if(is_valid(self,c_m_8_valid))then
+                   write(for_msg,*)self%ip1_m(k),pres,self%a_m_8(k),self%b_m_8(k),self%c_m_8(k)
                 else
                    write(for_msg,*)self%ip1_m(k),pres,self%a_m_8(k),self%b_m_8(k)
                 endif
@@ -2561,8 +2561,8 @@ contains
              call msg(MSG_VERBATIM,trim(for_msg2))
              do k=1,nk
                 call convip(self%ip1_t(k),pres,kind,-1,null_S,.false.)
-                if(is_valid(self,bl_m_8_valid))then
-                   write(for_msg,*)self%ip1_t(k),pres,self%a_t_8(k),self%b_t_8(k),self%bl_t_8(k)
+                if(is_valid(self,c_m_8_valid))then
+                   write(for_msg,*)self%ip1_t(k),pres,self%a_t_8(k),self%b_t_8(k),self%c_t_8(k)
                 else
                    write(for_msg,*)self%ip1_t(k),pres,self%a_t_8(k),self%b_t_8(k)
                 endif
@@ -2574,8 +2574,8 @@ contains
              nk=size(self%ip1_m)
              call msg(MSG_VERBATIM,trim(for_msg2))
              do k=1,nk
-                if(is_valid(self,bl_m_8_valid))then
-                   write(for_msg,*)self%ip1_m(k),self%a_m_8(k),self%b_m_8(k),self%bl_m_8(k)
+                if(is_valid(self,c_m_8_valid))then
+                   write(for_msg,*)self%ip1_m(k),self%a_m_8(k),self%b_m_8(k),self%c_m_8(k)
                 else
                    write(for_msg,*)self%ip1_m(k),self%a_m_8(k),self%b_m_8(k)
                 endif
@@ -2586,8 +2586,8 @@ contains
              nk=size(self%ip1_t)
              call msg(MSG_VERBATIM,trim(for_msg2))
              do k=1,nk
-                if(is_valid(self,bl_t_8_valid))then
-                   write(for_msg,*)self%ip1_t(k),self%a_t_8(k),self%b_t_8(k),self%bl_t_8(k)
+                if(is_valid(self,c_t_8_valid))then
+                   write(for_msg,*)self%ip1_t(k),self%a_t_8(k),self%b_t_8(k),self%c_t_8(k)
                 else
                    write(for_msg,*)self%ip1_t(k),self%a_t_8(k),self%b_t_8(k)
                 endif
@@ -3608,10 +3608,10 @@ contains
    if (.not.same_vec(vgd1%ip1_t,vgd2%ip1_t)) return
    if (.not.same_vec(vgd1%a_m_8,vgd2%a_m_8)) return
    if (.not.same_vec(vgd1%b_m_8,vgd2%b_m_8)) return
-   if ( is_valid(vgd1,bl_m_8_valid) .and. (.not.same_vec(vgd1%bl_m_8,vgd2%bl_m_8)) ) return
+   if ( is_valid(vgd1,c_m_8_valid) .and. (.not.same_vec(vgd1%c_m_8,vgd2%c_m_8)) ) return
    if (.not.same_vec(vgd1%a_t_8,vgd2%a_t_8)) return
    if (.not.same_vec(vgd1%b_t_8,vgd2%b_t_8)) return
-   if ( is_valid(vgd1,bl_t_8_valid) .and. (.not.same_vec(vgd1%bl_t_8,vgd2%bl_t_8)) ) return
+   if ( is_valid(vgd1,c_t_8_valid) .and. (.not.same_vec(vgd1%c_t_8,vgd2%c_t_8)) ) return
    if (.not.same_vec(vgd1%table,vgd2%table)) return
 
    ! The full structure is equivalent
@@ -4055,7 +4055,7 @@ contains
      ! Allocate table space
      if(.not.my_update_L)then
         if (associated(self%table)) deallocate(self%table)         
-        allocate(self%table(3,2*nb+skip,2),stat=error)
+        allocate(self%table(4,2*nb+skip,1),stat=error)
         if(error < 0)then
            write(for_msg,*) 'cannot allocate self%table in encode_vert_5100'
            call msg(MSG_ERROR,VGD_PRFX//for_msg)
@@ -4086,9 +4086,9 @@ contains
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
-     nn=size(self%bl_m_8)
+     nn=size(self%c_m_8)
      if(nn.ne.nb)then
-        write(for_msg,*) 'wrong size for bl_m_8, is ',nn,'should be ',nb
+        write(for_msg,*) 'wrong size for c_m_8, is ',nn,'should be ',nb
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
@@ -4110,9 +4110,9 @@ contains
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
-     nn=size(self%bl_t_8)
+     nn=size(self%c_t_8)
      if(nn.ne.nb)then
-        write(for_msg,*) 'wrong size for bl_t_8, is ',nn,'should be ',nb
+        write(for_msg,*) 'wrong size for c_t_8, is ',nn,'should be ',nb
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
@@ -4140,22 +4140,20 @@ contains
      endif
 
      ! Fill header
-     self%table(1:3,1,1)=(/dble(self%kind)  ,dble(self%version),dble(skip)/)
-     self%table(1:3,2,1)=(/self%ptop_8      ,self%pref_8       ,dble(self%rcoef1)/)     
-     self%table(1:3,3,1)=(/dble(self%rcoef2),for_char_8_P0     ,for_char_8_P0LS/)
+     self%table(1:4,1,1)=(/dble(self%kind),dble(self%version),dble(skip)       ,self%ptop_8/)
+     self%table(1:4,2,1)=(/self%pref_8    ,dble(self%rcoef1) ,dble(self%rcoef2),for_char_8_P0/)     
+     self%table(1  ,3,1)=for_char_8_P0LS
 
      ! Fill momentum level data
      do k=1,nb
         ind=k+skip
-        self%table(1:3,ind,1)=(/dble(self%ip1_m(k)),self%a_m_8(k),self%b_m_8(k)/)
-        self%table(1  ,ind,2)=self%bl_m_8(k)
+        self%table(1:4,ind,1)=(/dble(self%ip1_m(k)),self%a_m_8(k),self%b_m_8(k),self%c_m_8(k)/)
      enddo     
 
      ! Fill thermodynamic level data
      do k=1,nb
         ind=k+skip+nb
-        self%table(1:3,ind,1)=(/dble(self%ip1_t(k)),self%a_t_8(k),self%b_t_8(k)/)
-        self%table(1  ,ind,2)=self%bl_t_8(k)
+        self%table(1:4,ind,1)=(/dble(self%ip1_t(k)),self%a_t_8(k),self%b_t_8(k),self%c_t_8(k)/)
      enddo
      
      ! Set status and return
@@ -4519,27 +4517,25 @@ contains
      self%kind     = nint(self%table(1,1,1))
      self%version  = nint(self%table(2,1,1))
      skip          = nint(self%table(3,1,1))
-
+     self%ptop_8   =      self%table(4,1,1)
      ! Read header line 2
-     self%ptop_8   = self%table(1,2,1)
-     self%pref_8   = self%table(2,2,1)
-     self%rcoef1   = real(self%table(3,2,1))
-
-     ! Read header line 3
-     self%rcoef2   = real(self%table(1,3,1))
-     error = flip_transfer(self%table(2,3,1),self%ref_name)
+     self%pref_8   =       self%table(1,2,1)
+     self%rcoef1   =  real(self%table(2,2,1))
+     self%rcoef2   =  real(self%table(3,2,1))
+     error = flip_transfer(self%table(4,2,1),self%ref_name)
      if (error /= VGD_OK) then
         write(for_msg,*) 'flip_transfer function returned an error code from decode for self%ref_name',error
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
-     error = flip_transfer(self%table(3,3,1),self%ref_namel)
+     ! Read header line 3
+     error = flip_transfer(self%table(1,3,1),self%ref_namel)
      if (error /= VGD_OK) then
         write(for_msg,*) 'flip_transfer function returned an error code from decode for self%ref_namel',error
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
-      nj=size(self%table,dim=2)
+     nj=size(self%table,dim=2)
 
      nk=(nj-skip)/2-2
      nb=nk+2
@@ -4567,10 +4563,10 @@ contains
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
-     if (associated(self%bl_m_8)) deallocate(self%bl_m_8)
-     allocate(self%bl_m_8(nb),stat=istat)
+     if (associated(self%c_m_8)) deallocate(self%c_m_8)
+     allocate(self%c_m_8(nb),stat=istat)
      if (istat /= 0) then
-        write(for_msg,*) 'unable to allocate self%bl_m_8(nb) in decode_vert_5100'
+        write(for_msg,*) 'unable to allocate self%c_m_8(nb) in decode_vert_5100'
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
@@ -4580,7 +4576,7 @@ contains
         self%ip1_m(k) = nint(self%table(1,ind,1))
         self%a_m_8(k) =      self%table(2,ind,1)
         self%b_m_8(k) =      self%table(3,ind,1)
-        self%bl_m_8(k)=      self%table(1,ind,2)
+        self%c_m_8(k)=      self%table(4,ind,1)
      enddo
 
      ! Allocate and assign thermodynamic level data
@@ -4605,10 +4601,10 @@ contains
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
-     if (associated(self%bl_t_8)) deallocate(self%bl_t_8)
-     allocate(self%bl_t_8(nb),stat=istat)
+     if (associated(self%c_t_8)) deallocate(self%c_t_8)
+     allocate(self%c_t_8(nb),stat=istat)
      if (istat /= 0) then
-        write(for_msg,*) 'unable to allocate self%bl_t_8 in decode_vert_5100'
+        write(for_msg,*) 'unable to allocate self%c_t_8 in decode_vert_5100'
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
@@ -4618,7 +4614,7 @@ contains
         self%ip1_t(k) = nint(self%table(1,ind,1))
         self%a_t_8(k) =      self%table(2,ind,1)
         self%b_t_8(k) =      self%table(3,ind,1)
-        self%bl_t_8(k)=      self%table(1,ind,2)
+        self%c_t_8(k) =      self%table(4,ind,1)
      enddo     
 
      ! Set status and return
@@ -5133,7 +5129,7 @@ contains
     ! Internal variables
     integer :: i,j,nk
     real*8, dimension(size(sfc_field,dim=1),size(sfc_field,dim=2)) :: s_8, sl_8
-    real*8, dimension(size(ip1_list)) :: aa_8,bb_8,bbl_8
+    real*8, dimension(size(ip1_list)) :: aa_8,bb_8,cc_8
     logical :: found
 
     ! Set error status
@@ -5148,9 +5144,9 @@ contains
        do j=1,size(self%ip1_m)
           if (self%ip1_m(j) == ip1_list(i)) then
              found = .true.
-             aa_8(i)  = self%a_m_8(j)
-             bb_8(i)  = self%b_m_8(j)
-             bbl_8(i) = self%bl_m_8(j)
+             aa_8(i) = self%a_m_8(j)
+             bb_8(i) = self%b_m_8(j)
+             cc_8(i) = self%c_m_8(j)
              exit
           endif
        enddo
@@ -5158,9 +5154,9 @@ contains
           do j=1,size(self%ip1_t)
              if (self%ip1_t(j) == ip1_list(i)) then
                 found = .true.
-                aa_8(i)  = self%a_t_8(j)
-                bb_8(i)  = self%b_t_8(j)
-                bbl_8(i) = self%bl_t_8(j)
+                aa_8(i) = self%a_t_8(j)
+                bb_8(i) = self%b_t_8(j)
+                cc_8(i) = self%c_t_8(j)
                 exit
              endif
           enddo
@@ -5177,7 +5173,7 @@ contains
     s_8  = log(sfc_field/self%pref_8)
     sl_8 = log(sfc_field_ls/self%pref_8)
     do i=1,nk       
-       levels(:,:,i) = aa_8(i) + bbl_8(i)*sl_8 + bb_8(i)*s_8
+       levels(:,:,i) = aa_8(i) + bb_8(i)*s_8 + cc_8(i)*sl_8
     enddo    
     if (.not.in_log)then
        levels = exp(levels)
