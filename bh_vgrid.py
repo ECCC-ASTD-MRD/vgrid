@@ -64,8 +64,7 @@ def _install(b):
          mkdir -p ${BH_INSTALL_DIR}/include
          cd ${BH_INSTALL_DIR}/include
          cp ${BH_TOP_BUILD_DIR}/lib/*.mod .
-         echo "write(6,'(\\\"   *          VGRID ${BH_PULL_SOURCE_GIT_BRANCH} ${COMP_ARCH} ${ORDENV_PLAT} $(date)\\\")')" > vgrid_version.cdk
-         echo "write(6,'(\\\"   ********************************************************************************************\\\")')" >> vgrid_version.cdk
+         cp ${BH_TOP_BUILD_DIR}/lib/vgrid_version.cdk .
          mkdir -p ${BH_INSTALL_DIR}/src
          cd ${BH_TOP_BUILD_DIR}/lib
          ${BH_MAKE} clean
