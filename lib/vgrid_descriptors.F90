@@ -1285,7 +1285,7 @@ contains
     select case (up(key(1:KEY_LENGTH)))
     case ('LOGP')
        select case (self%vcode)
-       case (1001,1002,5001)
+       case (1001,1002,1003,2001,5001)
           value=.false.
        case (5002,5003,5004,5005,5100)
           value=.true.
@@ -1522,7 +1522,6 @@ contains
           return
        endif
     case ('DHT ')       
-       iwork=vgd_print(self)
        if (is_valid(self,dht_valid)) then
           iwork=self%ip1_t(size(self%ip1_t))
           call convip(iwork,work,kind,-1,dum_S,.false.)
