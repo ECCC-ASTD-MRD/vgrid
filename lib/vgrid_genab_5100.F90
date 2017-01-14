@@ -53,7 +53,7 @@ contains
    !                      for momentun and thermodymic levels
    !
    subroutine vgrid_genab_5100 (F_hybuser, F_rcoef, F_pref_8, &
-        F_am_8, F_bm_8, F_bml_8, F_at_8, F_bt_8, F_btl_8,&
+        F_am_8, F_bm_8, F_cm_8, F_at_8, F_bt_8, F_ct_8,&
         F_ip1_m, F_ip1_t, F_err, ptop_out_8, dhm, dht)
       
       ! Modifs 
@@ -69,8 +69,8 @@ contains
       real*8 , optional, intent(out):: ptop_out_8                ! computed ptop if F_ptop_8 < 0
       real*8 , intent(in) :: F_pref_8                            ! user specification for reference pressure
       
-      real*8, dimension(:), pointer :: F_am_8, F_bm_8, F_bml_8   ! model As and Bs on momentum levels
-      real*8, dimension(:), pointer :: F_at_8, F_bt_8, F_btl_8   ! model As and Bs on thermodynamic levels
+      real*8, dimension(:), pointer :: F_am_8, F_bm_8, F_cm_8   ! model As and Bs on momentum levels
+      real*8, dimension(:), pointer :: F_at_8, F_bt_8, F_ct_8   ! model As and Bs on thermodynamic levels
       integer, dimension(:), pointer :: F_ip1_m,F_ip1_t          ! ip1 values for momentum and thermodynamic levels
       real, intent(in) :: dhm, dht                               ! Diag levels Height (m) for Momentum/Thermo levels
       
@@ -127,13 +127,13 @@ contains
       if (status /= VGD_OK) return
       status = reallocate(F_bm_8,1,nk+2)
       if (status /= VGD_OK) return
-      status = reallocate(F_bml_8,1,nk+2)
+      status = reallocate(F_cm_8,1,nk+2)
       if (status /= VGD_OK) return
       status = reallocate(F_at_8,1,nk+2)
       if (status /= VGD_OK) return
       status = reallocate(F_bt_8,1,nk+2)
       if (status /= VGD_OK) return
-      status = reallocate(F_btl_8,1,nk+2)
+      status = reallocate(F_ct_8,1,nk+2)
       if (status /= VGD_OK) return
       status = reallocate(F_ip1_m,1,nk+2)
       if (status /= VGD_OK) return
@@ -164,17 +164,21 @@ contains
       pr1 = 1.0d0/(zsrf_8 - zeta1_8)
       do k = 1, Nk
          zeta_8  = zsrf_8+log(F_hybuser(k)*1.d0)
-         lamba_8 = (zeta_8- zeta1_8)*pr1
+         ! Since rcoef may be big we limit lamba_8 to avoid floating point overflow
+         lamba_8 = max(1.0e-6,(zeta_8- zeta1_8)*pr1)
          rcoefL  = F_rcoef(1) * ( 1.d0 - lamba_8 )
          rcoef   = F_rcoef(2) * ( 1.d0 - lamba_8 )
-         F_am_8(k)  = zeta_8
-         F_bm_8(k)  = lamba_8 ** rcoef
-         F_bml_8(k) = lamba_8 ** rcoefL - F_bm_8(k)
+         F_am_8(k) = zeta_8
+         F_bm_8(k) = lamba_8 ** rcoef
+         F_cm_8(k) = lamba_8 ** rcoefL - F_bm_8(k)
+         ! Since rcoef* may be big we limit B and C to avoid floating point overflow
+         if(F_bm_8(k) < 1.e-16)F_bm_8(k) = 0.d0
+         if(F_cm_8(k) < 1.e-16)F_cm_8(k) = 0.d0
       enddo
       
       F_am_8(Nk+1) = zsrf_8
       F_bm_8(Nk+1) = 1.d0 
-      F_bml_8(Nk+1) = 0.d0 
+      F_cm_8(Nk+1) = 0.d0 
  
       ! Integrating the hydrostatic eq with T=0C
       ! ln[p(z=dhm)] = ln(ps) - g/(Rd*T)*dhm
@@ -185,25 +189,29 @@ contains
       !F_am_8(Nk+2) = log(F_pref_8) - GRAV*dhm/(RGASD*TCDK)
       F_am_8(Nk+2)  = comp_diag_a(F_pref_8,dhm)
       F_bm_8(Nk+2)  = 1.d0 
-      F_bml_8(Nk+2) = 0.d0 
+      F_cm_8(Nk+2) = 0.d0 
       
       !     Thermodynamic levels
       
       do k = 1, Nk
          F_at_8(k)  = 0.5d0*( F_am_8(k)  + F_am_8(k+1)  ) 
          zeta_8  = F_at_8(k)
-         lamba_8 = (zeta_8- zeta1_8)*pr1
+         ! Since rcoef may be big we limit lamba_8 to avoid floating point overflow
+         lamba_8 = max(1.0e-6,(zeta_8- zeta1_8)*pr1)
          rcoefL  = F_rcoef(1) * ( 1.d0 - lamba_8 )
          rcoef   = F_rcoef(2) * ( 1.d0 - lamba_8 )
-         F_bt_8(k)  = lamba_8 ** rcoef
-         F_btl_8(k) = lamba_8 ** rcoefL - F_bt_8(k)
+         F_bt_8(k) = lamba_8 ** rcoef
+         F_ct_8(k) = lamba_8 ** rcoefL - F_bt_8(k)
+         ! Since rcoef* may be big we limit B and C to avoid floating point overflow         
+         if(F_bt_8(k) < 1.e-16)F_bt_8(k) = 0.d0
+         if(F_ct_8(k) < 1.e-16)F_ct_8(k) = 0.d0
       enddo
-      F_at_8(Nk+1)  = zsrf_8
-      F_bt_8(Nk+1)  = 1.d0
-      F_btl_8(Nk+1) = 0.d0
-      F_at_8(Nk+2)  = comp_diag_a(F_pref_8,dht)
-      F_bt_8(Nk+2)  = 1.d0
-      F_btl_8(Nk+2) = 0.d0
+      F_at_8(Nk+1) = zsrf_8
+      F_bt_8(Nk+1) = 1.d0
+      F_ct_8(Nk+1) = 0.d0
+      F_at_8(Nk+2) = comp_diag_a(F_pref_8,dht)
+      F_bt_8(Nk+2) = 1.d0
+      F_ct_8(Nk+2) = 0.d0
       
       hybm(1:NK) = F_hybuser(1:NK)
       do k = 1, NK-1

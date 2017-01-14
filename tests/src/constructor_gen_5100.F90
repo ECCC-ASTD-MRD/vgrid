@@ -184,7 +184,7 @@ integer function test_5100(F_d,F_file,F_write_control_L,F_stat) result(istat)
      if(b_m_8(k).eq.0.)then
         if(work_8(k).ne.0.)then
            istat=VGD_ERROR
-           print*,'Probleme avec B M, pas egal a zero'
+           print*,'Probleme avec B M, pas egal a zero ',work_8(k)
         endif
      else
         if(abs(work_8(k)-b_m_8(k))/b_m_8(k)>100.*epsilon(1.))then
@@ -198,14 +198,21 @@ integer function test_5100(F_d,F_file,F_write_control_L,F_stat) result(istat)
   print*,'Reading B T'
   read(10,*)work_8
   do k=1,nk
-     if(abs(work_8(k)-b_t_8(k))/b_t_8(k)>100.*epsilon(1.))then
-        istat=VGD_ERROR
-        print*,'Probleme avec B T, pas dans les limites tollerees'
-        print*,work_8(k),'vs'
-        print*,b_t_8(k)
+     if(b_t_8(k).eq.0.)then
+        if(work_8(k).ne.0.)then
+           istat=VGD_ERROR
+           print*,'Probleme avec B T, pas egal a zero ',work_8(k)
+        endif
+     else
+        if(abs(work_8(k)-b_t_8(k))/b_t_8(k)>100.*epsilon(1.))then
+           istat=VGD_ERROR
+           print*,'Probleme avec B T, pas dans les limites tollerees'
+           print*,work_8(k),'vs'
+           print*,b_t_8(k)
+        endif
      endif
   enddo
-
+  
   ! Check C
   print*,'Reading C M'
   read(10,*)work_8
@@ -213,7 +220,7 @@ integer function test_5100(F_d,F_file,F_write_control_L,F_stat) result(istat)
      if(c_m_8(k).eq.0.)then
         if(work_8(k).ne.0.)then
            istat=VGD_ERROR
-           print*,'Probleme avec C M, pas egal a zero'
+           print*,'Probleme avec C M, pas egal a zero ',work_8(k)
         endif
      else
         if(abs(work_8(k)-c_m_8(k))/c_m_8(k)>100.*epsilon(1.))then
@@ -230,7 +237,7 @@ integer function test_5100(F_d,F_file,F_write_control_L,F_stat) result(istat)
      if(c_t_8(k).eq.0.)then
         if(work_8(k).ne.0.)then
            istat=VGD_ERROR
-           print*,'Probleme avec C t, pas egal a zero'
+           print*,'Probleme avec C t, pas egal a zero ',work_8(k)
         endif
      else 
         if(abs(work_8(k)-c_t_8(k))/c_t_8(k)>100.*epsilon(1.))then
