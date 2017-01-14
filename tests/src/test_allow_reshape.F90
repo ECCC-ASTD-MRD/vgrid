@@ -33,6 +33,8 @@ program tests
   real :: rcoef1=0.,rcoef2=1.
   real*8 :: ptop=1000d0,pref=100000d0
     
+  nullify(p0)
+
   !===================================
   !===================================
   ! Reshaping structure
