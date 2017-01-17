@@ -60,7 +60,7 @@ program tests
 
   integer :: stat,lu=10,do_it,fstfrm,fclos,i,ier
   logical :: ok=.true.
-  integer, parameter :: nfiles=8
+  integer, parameter :: nfiles=9
   character(len=200), dimension(nfiles) :: files=(/&
        "data/dm_1001_from_model_run",&
        "data/dm_1002_from_model_run",&
@@ -69,7 +69,8 @@ program tests
        "data/dm_5002_from_model_run",&
        "data/dm_5003_from_model_run",&
        "data/dm_5004_from_model_run",&
-       "data/dm_5005_from_model_run"&
+       "data/dm_5005_from_model_run",&
+       "data/dm_5999_from_model_run"&
        /)
   
   call msg_verbosity(MSG_DEBUG)
@@ -166,6 +167,19 @@ integer function do_it(lu,file) result(status)
      print*,'Difference in pressure are OK',lev(10,10,1)/100.,' VS',px(10,10)
   endif
 
+  ! Test log option
+  ier = vgd_levels(unit=lu,fstkeys=(/fstkey/),levels=lev,in_log=.true.)
+  if(ier==VGD_ERROR)then
+     print*,'Problem with vgd_levels in_log=.true.'
+     return
+  endif
+  if(abs(lev(10,10,1)-log(px(10,10)*100.))>epsilon)then
+     print*,'ERROR difference in log pressure to high ',lev(10,10,1),' VS',log(px(10,10)*100.)
+     return
+  else
+     print*,'Difference in log pressure are OK ',lev(10,10,1),' VS',log(px(10,10)*100.)
+  endif
+  
   deallocate(px,lev)
 
   status=VGD_OK
