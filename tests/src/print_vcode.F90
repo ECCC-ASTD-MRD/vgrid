@@ -45,6 +45,10 @@ program print_vcode
 
    if(vgd_print(5004).eq.VGD_ERROR)ok=.false.
 
+   if(vgd_print(5005).eq.VGD_ERROR)ok=.false.
+
+   if(vgd_print(5999).eq.VGD_ERROR)ok=.false.
+
    call ut_report(ok,'print_vcode')
 
 end program print_vcode

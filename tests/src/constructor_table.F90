@@ -54,10 +54,10 @@ program constructor
    use vGrid_Descriptors, only:VGD_OK
    use Unit_Testing, only: ut_report
    implicit none
-   integer, parameter :: nversion=4
+   integer, parameter :: nversion=5
    integer stat,i,test_it
    logical :: OK=.true.
-   character(len=4), dimension(nversion) :: vcode_S=(/"5002","5003","5004","5005"/)
+   character(len=4), dimension(nversion) :: vcode_S=(/"5002","5003","5004","5005","5999"/)
 
    do i=1,nversion
       

@@ -68,7 +68,6 @@ program constructor
   stat = vgd_get(vgd,key='DIPT Diag level ip1 for Thermo variables',value=ip1)
   if(stat==VGD_ERROR)OK=.false.
   print*,'Diag level ip1 for Thermo variables =',ip1
-
   !
   call ut_report(OK,'Grid_Descriptors:: vgd_new new_gen')
   !

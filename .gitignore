@@ -17,3 +17,5 @@ log-*-*-*-*-*
 report-*-*-*-*-*
 vgriddescriptors_*
 vgriddescriptors/
+lib/vgrid_version.cdk
+lib/libdescrip.a
