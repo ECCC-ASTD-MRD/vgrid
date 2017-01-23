@@ -54,7 +54,7 @@ contains
    !
    subroutine vgrid_genab_5100 (F_hybuser, F_rcoef, F_pref_8, &
         F_am_8, F_bm_8, F_cm_8, F_at_8, F_bt_8, F_ct_8,&
-        F_ip1_m, F_ip1_t, F_err, ptop_out_8, dhm, dht)
+        F_ip1_m, F_ip1_t, F_err, ptop_out_8, dhm, dht, avg_L)
       
       ! Modifs 
       
@@ -71,13 +71,15 @@ contains
       
       real*8, dimension(:), pointer :: F_am_8, F_bm_8, F_cm_8   ! model As and Bs on momentum levels
       real*8, dimension(:), pointer :: F_at_8, F_bt_8, F_ct_8   ! model As and Bs on thermodynamic levels
-      integer, dimension(:), pointer :: F_ip1_m,F_ip1_t          ! ip1 values for momentum and thermodynamic levels
-      real, intent(in) :: dhm, dht                               ! Diag levels Height (m) for Momentum/Thermo levels
+      integer, dimension(:), pointer :: F_ip1_m,F_ip1_t         ! ip1 values for momentum and thermodynamic levels
+      real, intent(in) :: dhm, dht                              ! Diag levels Height (m) for Momentum/Thermo levels
+      logical, optional :: avg_L                                ! Take thermo parameters as averge of momentum ones.
       
       ! Local variables
       integer :: k, status, nk
-      logical :: wronghyb
+      logical :: wronghyb, my_avg_L
       real*8  :: pr1, ztop_8, zsrf_8, lamba_8,zeta_8, zeta1_8,zeta2_8, l_ptop_8
+      real*8, parameter  :: lamba_8_ep = 1.e-6
       real, dimension(:), pointer :: hybm, hybt             ! model hyb values
       real*8, dimension(:), pointer :: at_8, bt_8
       real :: rcoefL, rcoef
@@ -94,6 +96,9 @@ contains
       
       nullify(hybm,hybt,at_8,bt_8,ip1_t)
       
+      my_avg_L=.true.
+      if(present(avg_L))my_avg_L=avg_L
+
       ! Set size of the problem
       nk = size(F_hybuser)
       if (size(F_rcoef) /= 2) then
@@ -165,7 +170,7 @@ contains
       do k = 1, Nk
          zeta_8  = zsrf_8+log(F_hybuser(k)*1.d0)
          ! Since rcoef may be big we limit lamba_8 to avoid floating point overflow
-         lamba_8 = max(1.0e-6,(zeta_8- zeta1_8)*pr1)
+         lamba_8 = max(lamba_8_ep,(zeta_8- zeta1_8)*pr1)
          rcoefL  = F_rcoef(1) * ( 1.d0 - lamba_8 )
          rcoef   = F_rcoef(2) * ( 1.d0 - lamba_8 )
          F_am_8(k) = zeta_8
@@ -197,11 +202,16 @@ contains
          F_at_8(k)  = 0.5d0*( F_am_8(k)  + F_am_8(k+1)  ) 
          zeta_8  = F_at_8(k)
          ! Since rcoef may be big we limit lamba_8 to avoid floating point overflow
-         lamba_8 = max(1.0e-6,(zeta_8- zeta1_8)*pr1)
-         rcoefL  = F_rcoef(1) * ( 1.d0 - lamba_8 )
-         rcoef   = F_rcoef(2) * ( 1.d0 - lamba_8 )
-         F_bt_8(k) = lamba_8 ** rcoef
-         F_ct_8(k) = lamba_8 ** rcoefL - F_bt_8(k)
+         if(my_avg_L)then
+            F_bt_8(k) = 0.5d0*( F_bm_8(k) + F_bm_8(k+1) ) 
+            F_ct_8(k) = 0.5d0*( F_cm_8(k) + F_cm_8(k+1) ) 
+         else
+            lamba_8 = max(lamba_8_ep,(zeta_8- zeta1_8)*pr1)
+            rcoefL  = F_rcoef(1) * ( 1.d0 - lamba_8 )
+            rcoef   = F_rcoef(2) * ( 1.d0 - lamba_8 )
+            F_bt_8(k) = lamba_8 ** rcoef
+            F_ct_8(k) = lamba_8 ** rcoefL - F_bt_8(k)
+         endif
          ! Since rcoef* may be big we limit B and C to avoid floating point overflow         
          if(F_bt_8(k) < 1.e-16)F_bt_8(k) = 0.d0
          if(F_ct_8(k) < 1.e-16)F_ct_8(k) = 0.d0

@@ -868,7 +868,7 @@ contains
       return
    end function new_build_vert
 
-   integer function new_gen(self,kind,version,hyb,rcoef1,rcoef2,ptop_8,pref_8,ptop_out_8,ip1,ip2,stdout_unit,dhm,dht) result(status)
+   integer function new_gen(self,kind,version,hyb,rcoef1,rcoef2,ptop_8,pref_8,ptop_out_8,ip1,ip2,stdout_unit,dhm,dht,avg_L) result(status)
       use vdescript_1001,      only: vgrid_genab_1001
       use vdescript_1002_5001, only: vgrid_genab_1002_5001
       use vdescript_2001,      only: vgrid_genab_2001
@@ -885,13 +885,16 @@ contains
       integer, optional, intent(in) :: ip1,ip2          !IP1,2 values for FST file record [0,0]
       integer, optional, intent(in) :: stdout_unit      !Unit number for verbose output [STDERR]
       real, optional, intent(in) :: dhm,dht             !Diag levels Height for Momentum/Thermo vaiables
+      logical, optional :: avg_L                        !Obtain thermo A, B and C by averaging momentum ones (Temporary for Vcode 5100)
+                                                        !   If this option becoms permenant, some code will have to be added
+                                                        !   to check this option for vcode 5100 only.
 
       ! Internal variables
       integer :: myip1,myip2,mystdout_unit,error
       integer, dimension(:), pointer :: ip1_m,ip1_t
       real, dimension(:), pointer :: hybm,hybt
       real*8, dimension(:), pointer :: a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8
-      logical :: errorInput=.false.
+      logical :: errorInput=.false., my_avg_L      
 
       nullify(ip1_m,ip1_t,hybm,hybt,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8)
 
@@ -1174,10 +1177,12 @@ contains
               ip1_m=ip1_m,         &
               ip1_t=ip1_t)
          if (error /= VGD_OK) return
-      case (5100)  
+      case (5100)
+         my_avg_L=.true.
+         if(present(avg_L))my_avg_L=avg_L
          call vgrid_genab_5100(hyb,(/rcoef1,rcoef2/),pref_8, &
               a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,ip1_m,ip1_t,error,ptop_out_8=ptop_out_8, &
-              dhm=dhm,dht=dht)
+              dhm=dhm,dht=dht,avg_L=avg_L)
          if (error /= VGD_OK)then
             if(associated(a_m_8))deallocate(a_m_8)
             if(associated(b_m_8))deallocate(b_m_8)
