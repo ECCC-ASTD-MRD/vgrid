@@ -1,0 +1,6 @@
+For more examples see
+ ../tests/src
+
+These are a bit more complicated and criptic as they are used to test the
+different feature of vgrid. However, all possible applications of vgrid are
+illustrated there in principal.
