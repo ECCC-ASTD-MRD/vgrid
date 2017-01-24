@@ -2414,6 +2414,7 @@ contains
     logical :: my_convip_L
     real :: pres,height
     character(len=1) :: null_S
+    character(len=100) :: momentum_S, thermo_S
 
     ! Set error status
     status = VGD_ERROR
@@ -2555,16 +2556,22 @@ contains
           return
        end select
 
-       if(is_valid(self,c_m_8_valid) .or. is_valid(self,c_t_8_valid) )then
-          write(for_msg2,*)'  Momentum levels ip1, p, A, B, C'
-       else
-          write(for_msg2,*)'  Momentum levels ip1, p, A, B:'          
-       endif
+       momentum_S='   Momentum levels ip1,'
+       if(my_convip_L)momentum_S=trim(momentum_S)//' p,'
+       momentum_S=trim(momentum_S)//' A, B'
+       if(is_valid(self,c_m_8_valid))momentum_S=trim(momentum_S)//', C'
+       momentum_S=trim(momentum_S)//':'
+       
+       thermo_S='   Thermodynamic levels ip1,'
+       if(my_convip_L)thermo_S=trim(thermo_S)//' p,'
+       thermo_S=trim(thermo_S)//' A, B'
+       if(is_valid(self,c_t_8_valid))thermo_S=trim(thermo_S)//', C'       
+       thermo_S=trim(thermo_S)//':'
        
        if(my_convip_L)then
           if (is_valid(self,ip1_m_valid))then
              nk=size(self%ip1_m)
-             call msg(MSG_VERBATIM,trim(for_msg2))
+             call msg(MSG_VERBATIM,trim(momentum_S))
              null_S=''
              do k=1,nk                
                 call convip(self%ip1_m(k),pres,kind,-1,null_S,.false.)
@@ -2578,7 +2585,7 @@ contains
           endif
           if (is_valid(self,ip1_t_valid))then
              nk=size(self%ip1_t)
-             call msg(MSG_VERBATIM,trim(for_msg2))
+             call msg(MSG_VERBATIM,trim(thermo_S))
              do k=1,nk
                 call convip(self%ip1_t(k),pres,kind,-1,null_S,.false.)
                 if(is_valid(self,c_m_8_valid))then
@@ -2592,7 +2599,7 @@ contains
        else
           if (is_valid(self,ip1_m_valid))then
              nk=size(self%ip1_m)
-             call msg(MSG_VERBATIM,trim(for_msg2))
+             call msg(MSG_VERBATIM,trim(momentum_S))
              do k=1,nk
                 if(is_valid(self,c_m_8_valid))then
                    write(for_msg,*)self%ip1_m(k),self%a_m_8(k),self%b_m_8(k),self%c_m_8(k)
@@ -2604,7 +2611,7 @@ contains
           endif
           if (is_valid(self,ip1_t_valid))then
              nk=size(self%ip1_t)
-             call msg(MSG_VERBATIM,trim(for_msg2))
+             call msg(MSG_VERBATIM,trim(thermo_S))
              do k=1,nk
                 if(is_valid(self,c_t_8_valid))then
                    write(for_msg,*)self%ip1_t(k),self%a_t_8(k),self%b_t_8(k),self%c_t_8(k)
