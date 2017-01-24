@@ -54,8 +54,10 @@ program levels_withref_profile_all
 
   ier=chek_levels_withref('data/dm_5005_from_model_run','data/dm_5005_ips.txt','TT')
   if(ier==VGD_ERROR)stat=VGD_ERROR
-
   ier=chek_levels_withref('data/dm_5005_from_model_run','data/dm_5005_ips.txt','UU')
+  if(ier==VGD_ERROR)stat=VGD_ERROR
+
+  ier=chek_levels_withref('data/dm_5999_from_model_run','data/dm_5999_ips.txt','TT')
   if(ier==VGD_ERROR)stat=VGD_ERROR
   
   call ut_report(stat,'Grid_Descriptors, vgd_new')
