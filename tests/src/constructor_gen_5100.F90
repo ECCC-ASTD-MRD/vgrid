@@ -37,7 +37,7 @@ program constructor
        0.7299818, 0.7591944, 0.7866292, 0.8123021, 0.8362498, 0.8585219, &
        0.8791828, 0.8983018, 0.9159565, 0.9322280, 0.9471967, 0.9609448, &
        0.9735557, 0.9851275, 0.9950425/)
-  real, dimension(2,1) :: p0=(/100000.,50000./), p0l=(/100000.,90000./)
+  real, dimension(2,1) :: p0, p0l
   real :: rcoef1=4.,rcoef2=200.
   
   real, pointer, dimension(:) :: levels
@@ -50,6 +50,9 @@ program constructor
   character (len=256) :: file
   
   nullify(ip1s,levels,levels_3d)
+
+  p0(:,1) =(/100000.,50000./)
+  p0l(:,1)=(/100000.,90000./)
 
   ! Construct a new set of vertical coordinate descriptors 5100
   stat = vgd_new(vgd,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,avg_L=.false.)
