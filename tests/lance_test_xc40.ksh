@@ -4,7 +4,7 @@ cd $TMPDIR
 cat > vgrid_tests_${BH_PULL_SOURCE_GIT_BRANCH} <<EOF
 . ssmuse-sh -d /fs/ssm/eccc/mrd/rpn/utils/16.1
 cd ${MASTER}
-./run_test_mpi.ksh
+./run_mpi.ksh
 EOF
 
 cat vgrid_tests_${BH_PULL_SOURCE_GIT_BRANCH}
