@@ -29,6 +29,8 @@ program tests
 
   integer, external :: fnom,fstouv,fclos,fstfrm
 
+  nullify(hybm)
+
   ! Open test file
   stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
   if(stat.lt.0)then
