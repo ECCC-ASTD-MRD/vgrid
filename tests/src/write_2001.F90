@@ -29,6 +29,8 @@ program constructor
   real(kind=8), dimension(LEVS) :: pres=(/1000.,925.,850.,700./),b=(/0.,0.,0.,0./)
   real*8, dimension(:), pointer :: pres_rtn
 
+  nullify(pres_rtn)
+
   call system('rm -f test.fst')
   stat=fnom(lu,"test.fst","RND",0)
   if(stat.lt.0)then

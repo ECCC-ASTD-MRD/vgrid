@@ -26,6 +26,8 @@ program constructor
   integer :: stat
   real(kind=8), dimension(:,:,:), pointer :: tbl
 
+  nullify(tbl)
+
   ! Construct a new set of 3D coordinate descriptors
   stat = vgd_new(d,unit=10,format='fst',ip1=100,ip2=200)
   stat = vgd_put(d,key='VT - vertical coordinate table',value=tbl)
