@@ -52,7 +52,7 @@ program constructor
   nullify(ip1s,levels,levels_3d)
 
   ! Construct a new set of vertical coordinate descriptors 5100
-  stat = vgd_new(vgd,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop)
+  stat = vgd_new(vgd,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,avg_L=.false.)
 
   stat = vgd_print(vgd)
 

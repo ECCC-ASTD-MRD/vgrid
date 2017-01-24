@@ -1,3 +1,7 @@
+# For XC40
+# Logon mom node than lanch tha script
+# qsub -I -lselect=1:vntype=cray_compute -l place=scatter
+
 rm -f la_job
 
 cat > la_job<<EOF

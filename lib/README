@@ -8,18 +8,18 @@ To add a new vertical coordinate type:
 5- Write the encoder for your new vcoord (e.g. encode_vert_5002)
 6- Add support to your vcode in 
       fstd_init, new_from_table
-
-Here is the time to make a first test like constructor_gen_...
-
+      TESTS: constructor_table, constructor_gen_...
 7- Add get/put entries if the structure has been modified (step 3 above)
 8- Generate a file that contains your new coordinate record
 9- Add a branch to your new vcoord in the read constructor (new_read)
 10- Write a decoder for your new vcoord (e.g. decode_vert_5002)
 11- Add a level calculator (e.g. compute_pressure_5002)
+       TESTS: levels_withref_profile_all, levels_toplevel_value
 12- Add a branch for your new vcoord in the printer (print_desc and print_vcode_description)
+      TEST: print_vcode
 13- Add case statement in get_logical LOGP for new vcode
+      TESTL get_logp
 14- Add elements to test_equality if any
 15- Add code in case statement of function table_update for new Vcode
 
 While doing the above, write tests cases to tests the added feature. Leave tests in tests/src directory.
-
