@@ -2555,10 +2555,18 @@ contains
           return
        end select
 
-       if(is_valid(self,c_m_8_valid) .or. is_valid(self,c_t_8_valid) )then
-          write(for_msg2,*)'  Momentum levels ip1, p, A, B, C'
+       if(my_convip_L)then
+          if(is_valid(self,c_m_8_valid) .or. is_valid(self,c_t_8_valid) )then
+             write(for_msg2,*)'  Momentum levels ip1, p, A, B, C'
+          else
+             write(for_msg2,*)'  Momentum levels ip1, p, A, B:'
+          endif
        else
-          write(for_msg2,*)'  Momentum levels ip1, p, A, B:'          
+          if(is_valid(self,c_m_8_valid) .or. is_valid(self,c_t_8_valid) )then
+             write(for_msg2,*)'  Momentum levels ip1, A, B, C'
+          else
+             write(for_msg2,*)'  Momentum levels ip1, A, B:'
+          endif
        endif
        
        if(my_convip_L)then
