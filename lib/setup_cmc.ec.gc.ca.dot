@@ -26,7 +26,7 @@ case "${ORDENV_PLAT}" in
       elif [ ${VGRID_COMPILER} == intel2016 ];then
          HPCS_BASE=/ssm/net/hpcs/201402/02/base
 	 HPCS_COMP=/ssm/net/hpcs/exp/intel2016/01
-         RPN_LIB=rpn/libs/16.0
+         RPN_LIB=rpn/libs/16.1
       else
          echo "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR"
          echo "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR"
