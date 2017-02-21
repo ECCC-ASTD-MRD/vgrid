@@ -18,42 +18,67 @@
 ! * Boston, MA 02111-1307, USA.
 program constructor
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,operator(==),VGD_OK,VGD_ERROR
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_free,operator(==),vgd_putopt,VGD_OK,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
 
   type(vgrid_descriptor) :: vgrid,vgrid_rebuilt
-  integer :: lu=0,lutxt=69
-  integer :: stat,ip1,ip2
+  integer :: lu=10,i,ier
+  integer :: stat
   integer :: fnom,fstouv,fstfrm
-  logical :: ok
 
-  stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
-  if(stat.lt.0)then
-     print*,'ERROR with fnom'
-     call abort
-  endif
-  stat=fstouv(lu,'RND')
-  if(stat.le.0)then
-     print*,'No record in RPN file'
-     call abort
-  endif
-  open(unit=lutxt,file='data/dm_5002_ips.txt',status='OLD')
-  read(lutxt,*) ip1,ip2
-  close(lutxt)
+  integer, parameter :: nfiles=8
+  character(len=200), dimension(nfiles) :: files=(/&
+       "data/dm_1001_from_model_run",&
+       "data/dm_1002_from_model_run",&
+       "data/dm_5001_from_model_run",&
+       "data/dm_5002_from_model_run",&
+       "data/dm_5002_from_model_run",&
+       "data/dm_5003_from_model_run",&
+       "data/dm_5004_from_model_run",&
+       "data/dm_5005_from_model_run"&
+       /)
 
-  ! Construct a new set of 3D coordinate descriptors
-  stat = vgd_new(vgrid,unit=lu,format="fst",ip1=ip1,ip2=ip2)
-  vgrid_rebuilt = vgrid
-  if (vgrid == vgrid_rebuilt) then
-     stat = VGD_OK
+  stat = VGD_OK
+
+  ier = vgd_putopt("ALLOW_SIGMA",.true.)
+
+  do i=1,nfiles
+     print*,'==============================================='
+     print*,'FILE = ',trim(files(i))
+     ier=fnom(lu+i,files(i),"RND",0)     
+     if(ier.lt.0)then
+        print*,'ERROR with fnom on file ',files(i)
+        call abort
+     endif
+     ier=fstouv(lu+i,'RND')
+     if(ier.le.0)then
+        print*,'No record in RPN file'
+        call abort
+     endif
+     ! Construct a new set of 3D coordinate descriptors
+     ier = vgd_new(vgrid        ,unit=lu+i,format="fst")
+     ier = vgd_new(vgrid_rebuilt,unit=lu+i,format="fst")
+     if (.not. vgrid == vgrid_rebuilt) then
+        stat = VGD_ERROR
+     endif
+     ier = vgd_free(vgrid)
+     ier = vgd_free(vgrid_rebuilt)
+     ier = fstfrm(lu+i)
+
+  enddo
+
+  print*,'**********************************************************'
+  if(stat == VGD_OK)then
+     print*,'ALL TESTS ON EQUALITY PASSED'
   else
-     stat = VGD_ERROR
+     print*,'SOME OR ALL TESTS ON EQUALITY FAILED'
   endif
+  print*,'**********************************************************'
 
+
+stop
   call ut_report(stat,'Grid_Descriptors, equality')
-
-  stat=fstfrm(lu)
 
 end program constructor
