@@ -34,3 +34,7 @@ tests/vgrid_maestro_tests/hub
 tests/vgrid_maestro_tests/listings
 tests/vgrid_maestro_tests/logs
 tests/vgrid_maestro_tests/sequencing
+tests/.suites/vgrid_maestro_tests/hub/
+tests/.suites/vgrid_maestro_tests/listings/
+tests/.suites/vgrid_maestro_tests/sequencing/
+
