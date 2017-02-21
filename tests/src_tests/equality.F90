@@ -77,8 +77,6 @@ program constructor
   endif
   print*,'**********************************************************'
 
-
-stop
   call ut_report(stat,'Grid_Descriptors, equality')
 
 end program constructor
