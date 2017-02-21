@@ -1,3 +1,6 @@
+#MY_FFLAGS="-C -g -O0 -lefence"
+#MY_CFLAGS="-g -O0 -lefence"
+
 case "${ORDENV_PLAT}" in
 
    ubuntu-12.04-amd64-64)
