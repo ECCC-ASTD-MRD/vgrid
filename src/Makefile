@@ -13,7 +13,7 @@ dependencies.mk: *.c *.F90 *.h *.hc
 include dependencies.mk
 
 %.o: %.F90
-	s.f90 -c $(MY_FFLAGS) -lrmn $<
+	s.f90 -c $(MY_FFLAGS) $<
 
 %.o: %.c
 	s.cc -c $(MY_CFLAGS) $<
