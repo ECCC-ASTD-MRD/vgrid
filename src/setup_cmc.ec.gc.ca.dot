@@ -1,3 +1,5 @@
+. ssmuse-sh -p hpcs/tools/master/bh_0.17_all
+
 case "${ORDENV_PLAT}" in
 
    ubuntu-12.04-amd64-64)
