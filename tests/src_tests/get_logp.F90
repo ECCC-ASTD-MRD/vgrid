@@ -17,165 +17,83 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program constructor
-  use Vgrid_Descriptors, only: Vgrid_descriptor,Vgd_free,Vgd_new,Vgd_get,Vgd_print,VGD_OK
+  use Vgrid_Descriptors, only: Vgrid_descriptor,Vgd_free,Vgd_new,Vgd_get,Vgd_print,VGD_OK,vgd_putopt
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: d,d2
+  type(vgrid_descriptor) :: d
   integer, parameter :: lu=10
-  integer :: stat
+  integer :: stat,i
   integer :: fnom,fstouv,fstfrm,fclos
   logical :: ok,logp_L
 
-  print*,'======================================================'
-  print*,'Vcode 1002'
-  stat=fnom(lu,"data/dm_1002_from_model_run_plus_toc","RND",0)
-  if(stat.lt.0)then
-     print*,'ERROR with fnom'
-     call abort
-  endif
-  stat=fstouv(lu,'RND')
-  if(stat.le.0)then
-     print*,'No record in RPN file'
-     call abort
-  endif
+  integer, parameter :: nfiles=8
+  character(len=200), dimension(nfiles) :: files=(/&
+       "data/dm_1001_from_model_run",&
+       "data/dm_1002_from_model_run",&
+       "data/dm_2001_from_editfst",&
+       "data/dm_5001_from_model_run",&
+       "data/dm_5002_from_model_run",&
+       "data/dm_5003_from_model_run",&
+       "data/dm_5004_from_model_run",&
+       "data/dm_5005_from_model_run"&
+       /)
 
-  stat = vgd_new(d,unit=lu,format="fst",ip1=-1,ip2=-1)
+  logical, dimension(nfiles) :: is_in_log =(/&
+       .false., &
+       .false., &
+       .false., &
+       .false., &
+       .true., &
+       .true., &
+       .true., &
+       .true. &
+       /)
 
-  if(stat.ne.VGD_OK)then
-     print*,'ERROR: problem with vgd_new'
-     stat=fstfrm(lu)
-     call abort
-  endif
-  !stat = vgd_print(d)
-  stat = vgd_get(d,key='LOGP',value=logp_L)
-  if(stat /= VGD_OK )then
-     print*,'Error with vgd_get on LOGP'
-     call abort
-  endif
-  ok=.not.logp_L
-  print*,'1002 is in log',logp_L    
-  
-  stat=fstfrm(lu)  
-  stat=fclos(lu)
+  stat = vgd_putopt("ALLOW_SIGMA",.true.)
 
-  print*,'======================================================'
-  print*,'Vcode 5001'
-  stat=fnom(lu,"data/dm_5001_from_model_run_plus_toc","RND",0)
-  if(stat.lt.0)then
-     print*,'ERROR with fnom'
-     call abort
-  endif
-  stat=fstouv(lu,'RND')
-  if(stat.le.0)then
-     print*,'No record in RPN file'
-     call abort
-  endif
+  ok=.true.
 
-  ! Construct a new set of 3D coordinate descriptors
-  stat = vgd_free(d)
-  if(stat.ne.VGD_OK)then
-     print*,'ERROR: problem with vgd_free'
-     stat=fstfrm(lu)
-     call abort
-  endif
-  stat = vgd_new(d,unit=lu,format="fst",ip1=-1,ip2=-1)
-  if(stat.ne.VGD_OK)then
-     print*,'ERROR: problem with vgd_new'
-     stat=fstfrm(lu)
-     call abort
-  endif
-  !stat = vgd_print(d)
-  stat = vgd_get(d,key='LOGP',value=logp_L)
-  if(stat /= VGD_OK )then
-     print*,'Error with vgd_get on LOGP'
-     call abort
-  endif
-  ok=.not.logp_L
-  print*,'5001 is in log',logp_L    
-  
-  stat=fstfrm(lu)  
-  stat=fclos(lu)
+  do i=1,nfiles
+     print*,'======================================================'
+     print*,'file = ',trim(files(i))
+     stat=fnom(lu+i,files(i),"RND+R/O",0)
+     if(stat.lt.0)then
+        print*,'ERROR with fnom on file ',trim(files(i))
+        call abort
+     endif
+     stat=fstouv(lu+i,'RND')
+     if(stat.le.0)then
+        print*,'No record in RPN file ',trim(files(i))
+        call abort
+     endif     
+     stat = vgd_new(d,unit=lu+i,format="fst",ip1=-1,ip2=-1)
+     if(stat.ne.VGD_OK)then
+        print*,'ERROR: problem with vgd_new on file ',trim(files(i))
+        stat=fstfrm(lu+i)
+        call abort
+     endif
+     stat = vgd_get(d,key='LOGP',value=logp_L)
+     if(stat /= VGD_OK )then
+        print*,'Error with vgd_get on LOGP on file ',trim(files(i))
+        ok=.false.
+     endif
+     if(logp_L)then
+        if(.not.is_in_log(i))then
+           print*,'ERROR file ',trim(files(i))," is in log but vgd_get on 'LOGP' returned .false."
+           ok=.false.
+        endif
+     else
+        if(is_in_log(i))then
+           print*,'ERROR file ',trim(files(i))," is not in log but vgd_get on 'LOGP' returned .true."
+           ok=.false.
+        endif
+     endif
+     stat=fstfrm(lu+i)  
+     stat=fclos(lu+i)
 
-  print*,'======================================================'
-  print*,' 5002'
-  stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
-  if(stat.lt.0)then
-     print*,'ERROR with fnom'
-     call abort
-  endif
-  stat=fstouv(lu,'RND')
-  if(stat.le.0)then
-     print*,'No record in RPN file'
-     call abort
-  endif
-
-  ! Construct a new set of 3D coordinate descriptors
-  stat = vgd_free(d)
-  if(stat.ne.VGD_OK)then
-     print*,'ERROR: problem with vgd_free'
-     stat=fstfrm(lu)
-     call abort
-  endif
-  stat = vgd_new(d,unit=lu,format="fst",ip1=-1,ip2=-1)
-  if(stat.ne.VGD_OK)then
-     print*,'ERROR: problem with vgd_new'
-     stat=fstfrm(lu)
-     call abort
-  endif
-  !stat = vgd_print(d)
-
-  stat = vgd_get(d,key='LOGP',value=logp_L)
-  if(stat /= VGD_OK )then
-     print*,'Error with vgd_get on LOGP'
-     call abort
- endif
-  ok=logp_L
-  print*,'5002 is in log',logp_L
- 
-  stat=fstfrm(lu)  
-  stat=fclos(lu)
-
-  print*,'======================================================'
-  print*,' 5005'
-  stat=fnom(lu,"data/dm_5005_from_model_run","RND",0)
-  if(stat.lt.0)then
-     print*,'ERROR with fnom'
-     call abort
-  endif
-  stat=fstouv(lu,'RND')
-  if(stat.le.0)then
-     print*,'No record in RPN file'
-     call abort
-  endif
-
-  ! Construct a new set of 3D coordinate descriptors
-  stat = vgd_free(d)
-  if(stat.ne.VGD_OK)then
-     print*,'ERROR: problem with vgd_free'
-     stat=fstfrm(lu)
-     call abort
-  endif
-  stat = vgd_new(d,unit=lu,format="fst",ip1=-1,ip2=-1)
-  if(stat.ne.VGD_OK)then
-     print*,'ERROR: problem with vgd_new'
-     stat=fstfrm(lu)
-     call abort
-  endif
-  !stat = vgd_print(d)
-
-  stat = vgd_get(d,key='LOGP',value=logp_L)
-  if(stat /= VGD_OK )then
-     print*,'Error with vgd_get on LOGP'
-     call abort
-  endif
-  print*,'stat=',stat
-  ok=logp_L
-  print*,'5005 is in log',logp_L
- 
-  stat=fstfrm(lu)  
-  stat=fclos(lu)
+  end do
 
   call ut_report(ok,'Grid_Descriptors, vgd_get, LOGP 5002')  
 
