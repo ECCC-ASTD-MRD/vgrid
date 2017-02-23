@@ -22,7 +22,11 @@ libdescrip.a: $(OBJECTS) dependencies.mk
 	rm -f libdescrip.a && ar scru libdescrip.a *.o ;\
 
 shared: libdescrip.a
-	s.f90 -shared -openmp -static -static-intel -o libdescripshared.so *.o -lrmnshared$(SHARED_RNM_EXT) -Wl,-rpath,$(SHARED_RNM_SSM_PREF)$(RPN_LIB)/$(ORDENV_PLAT)/lib/$(BASE_ARCH)/$(COMP_ARCH) -Wl,-rpath,$(SHARED_COMP_rpath);\
+	if [ $$ORDENV_PLAT != ubuntu-12.04-amd64-64 -a $$ORDENV_PLAT != aix-7.1-ppc7-64 ]; then \
+	   s.f90 -shared -openmp -static -static-intel -o libdescripshared.so *.o -lrmnshared$(SHARED_RNM_EXT) -Wl,-rpath,$(SHARED_RNM_SSM_PREF)$(RPN_LIB)/$(ORDENV_PLAT)/lib/$(BASE_ARCH)/$(COMP_ARCH) -Wl,-rpath,$(SHARED_COMP_rpath);\
+	else \
+	   echo "No shared library on $$ORDENV_PLAT anymore due to new incompatible flag -static-intel";\
+	fi
 
 vgrid_version:
 	echo "character(len=128) :: vgrid_descriptors_version = \"VGRID $(BH_PULL_SOURCE_GIT_BRANCH) $(COMP_ARCH) $(ORDENV_PLAT) $(shell date)\"" > vgrid_version.hf ;\
