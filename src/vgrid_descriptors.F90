@@ -730,7 +730,6 @@ contains
       
       ier = f_vgdcmp(vgd1%cptr, vgd2%cptr)
       if( ier /= 0 )then
-         print*,'(F_vgd) Descriptor not equal, ier=',ier
          return
       end if
 
