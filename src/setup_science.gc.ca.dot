@@ -20,8 +20,6 @@ case "${ORDENV_PLAT}" in
       . ssmuse-sh -p ${BH_PACKAGE}
       # For shared librairy creation
       export RPN_LIB
-      export SHARED_RNM_SSM_PREF=''
-      export SHARED_RNM_EXT=
       #export SHARED_COMP_rpath=/fs/ssm/hpco/exp/intel-2016.1.156/intelcomp_2016.1.156-01_multi/compilers_and_libraries_2016.1.150/linux/compiler/lib/intel64
       export SHARED_COMP_rpath=${INTELCOMP_HOME}/lib/intel64
       :;;
@@ -35,6 +33,7 @@ case "${ORDENV_PLAT}" in
       MY_FFLAGS="-openmp -fp-model source -warn all ${MY_FFLAGS}"
       . ssmuse-sh -d ${RPN_LIB}
       . ssmuse-sh -p ${BH_PACKAGE}
+      export SHARED_COMP_rpath=/fs/ssm/hpco/exp/intel-2016.1.156/intelcomp_2016.1.156-01_multi/compilers_and_libraries_2016.1.150/linux/compiler/lib/intel64
       :;;
    sles-11-broadwell-64-xc40)
       # Pour obtenir l'architecture broadwell faire :
@@ -47,6 +46,7 @@ case "${ORDENV_PLAT}" in
       MY_FFLAGS="-openmp -fp-model source -warn all ${MY_FFLAGS}"
       . ssmuse-sh -d ${RPN_LIB}
       . ssmuse-sh -p ${BH_PACKAGE}
+      export SHARED_COMP_rpath=/fs/ssm/hpco/exp/intel-2016.1.156/intelcomp_2016.1.156-01_multi/compilers_and_libraries_2016.1.150/linux/compiler/lib/intel64
       :;;
 
    "") echo "ERROR: variable ORDENV_PLAT not set"
