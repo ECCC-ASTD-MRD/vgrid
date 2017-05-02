@@ -5,6 +5,8 @@ ifeq ($(BASE_ARCH),$(EC_ARCH))
    $(error )
 endif
 
+include version.dot
+
 default: libdescrip.a
 
 dependencies.mk: *.c *.F90 *.h *.hc
