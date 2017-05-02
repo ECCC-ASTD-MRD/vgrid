@@ -2,7 +2,6 @@ case "${ORDENV_PLAT}" in
 
    ubuntu-14.04-amd64-64)
       BH_MAKE=make
-      BH_HOST=gpsc-in
       BH_MODE=intel
       BH_PACKAGE=/fs/ssm/hpco/exp/bh/bh_0.17_all
       HPCS_BASE=/fs/ssm/hpco/tmp/eccc/201402/05/base
@@ -17,7 +16,6 @@ case "${ORDENV_PLAT}" in
       :;;
    sles-11-haswell-64-xc40)
       BH_MAKE=make
-      BH_HOST=hare
       BH_MODE=intel
       BH_PACKAGE=/fs/ssm/hpco/exp/bh/bh_0.17_all
       RPN_LIB=/fs/ssm/eccc/mrd/rpn/libs/16.1
@@ -29,7 +27,6 @@ case "${ORDENV_PLAT}" in
       # Pour obtenir l'architecture broadwell faire :
       # . r.env.dot --arch sles-11-broadwell-64-xc40
       BH_MAKE=make
-      BH_HOST=hare
       BH_MODE=intel
       BH_PACKAGE=/fs/ssm/hpco/exp/bh/bh_0.17_all
       RPN_LIB=/fs/ssm/eccc/mrd/rpn/libs/16.1
