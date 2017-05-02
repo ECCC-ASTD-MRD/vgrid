@@ -78,8 +78,7 @@ contains
       ! Local variables
       integer :: k, status, nk
       logical :: wronghyb, my_avg_L
-      real*8  :: pr1, ztop_8, zsrf_8, lamba_8,zeta_8, zeta1_8,zeta2_8, l_ptop_8
-      real*8, parameter  :: lamba_8_ep = 1.e-6
+      real*8  :: pr1, ztop_8, zsrf_8, lamba_8,zeta_8, zeta1_8,zeta2_8,zetaN_8, l_ptop_8
       real, dimension(:), pointer :: hybm, hybt             ! model hyb values
       real*8, dimension(:), pointer :: at_8, bt_8
       real :: rcoefL, rcoef
@@ -161,16 +160,20 @@ contains
       ! Compute ptop
       zeta1_8 = zsrf_8+log(F_hybuser(1)*1.d0)
       zeta2_8 = zsrf_8+log(F_hybuser(2)*1.d0)
+      zetaN_8 = zsrf_8+log(F_hybuser(NK)*1.d0)
       ztop_8=0.5d0*(3.d0*zeta1_8-zeta2_8)
       l_ptop_8=exp(ztop_8)
       !
       !     Momentum levels
       !
-      pr1 = 1.0d0/(zsrf_8 - zeta1_8)
+      if(my_avg_L) then
+         pr1 = 1.0d0/(zsrf_8 - zeta1_8)
+      else
+         pr1 = 1.0d0/(zetaN_8 - zeta1_8)
+      endif
       do k = 1, Nk
          zeta_8  = zsrf_8+log(F_hybuser(k)*1.d0)
-         ! Since rcoef may be big we limit lamba_8 to avoid floating point overflow
-         lamba_8 = max(lamba_8_ep,(zeta_8- zeta1_8)*pr1)
+         lamba_8 = min(1.d0,max(0.d0,(zeta_8- zeta1_8)*pr1))
          rcoefL  = F_rcoef(1) * ( 1.d0 - lamba_8 )
          rcoef   = F_rcoef(2) * ( 1.d0 - lamba_8 )
          F_am_8(k) = zeta_8
@@ -201,12 +204,11 @@ contains
       do k = 1, Nk
          F_at_8(k)  = 0.5d0*( F_am_8(k)  + F_am_8(k+1)  ) 
          zeta_8  = F_at_8(k)
-         ! Since rcoef may be big we limit lamba_8 to avoid floating point overflow
          if(my_avg_L)then
             F_bt_8(k) = 0.5d0*( F_bm_8(k) + F_bm_8(k+1) ) 
             F_ct_8(k) = 0.5d0*( F_cm_8(k) + F_cm_8(k+1) ) 
          else
-            lamba_8 = max(lamba_8_ep,(zeta_8- zeta1_8)*pr1)
+            lamba_8 = min(1.d0,max(0.d0,(zeta_8- zeta1_8)*pr1))
             rcoefL  = F_rcoef(1) * ( 1.d0 - lamba_8 )
             rcoef   = F_rcoef(2) * ( 1.d0 - lamba_8 )
             F_bt_8(k) = lamba_8 ** rcoef

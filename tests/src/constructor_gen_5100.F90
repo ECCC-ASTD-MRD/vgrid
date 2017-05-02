@@ -55,26 +55,32 @@ program constructor
   p0l(:,1)=(/100000.,90000./)
 
   ! Construct a new set of vertical coordinate descriptors 5100
-  stat = vgd_new(vgd,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,avg_L=.false.)
-
+  stat = vgd_new(vgd,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,avg_L=.true.)
   stat = vgd_print(vgd)
+  file='data/data_constructor_gen_5100_avg.txt'
+  stat = test_5100(vgd,file,write_control_L,stat)
+  if(stat.eq.VGD_ERROR)OK=.false.  
 
+  stat = vgd_new(vgd,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,avg_L=.false.)
+  stat = vgd_print(vgd)
   file='data/data_constructor_gen_5100.txt'
   stat = test_5100(vgd,file,write_control_L,stat)
-  if(stat.eq.VGD_ERROR)OK=.false.
+  if(stat.eq.VGD_ERROR)OK=.false.  
 
-  stat = vgd_get(vgd,'VIPM',ip1s)
-  print*,'ip1s=',ip1s
-  stat = vgd_levels(vgd,ip1s,levels,sfc_field=100000.,in_log=.false.,sfc_field_ls=100000.)
-  print*,'levels=',levels
-
-  stat = vgd_get(vgd,'VIPT',ip1s)
-  print*,'ip1s=',ip1s
-  stat = vgd_levels(vgd,ip1s,levels,sfc_field=100000.,in_log=.false.,sfc_field_ls=100000.)
-  print*,'levels=',levels
-  stat = vgd_levels(vgd,ip1s,levels_3d,sfc_field=p0,in_log=.false.,sfc_field_ls=p0l)
-  print*,'levels_3d(1,1,1:size(levels_3d,dim=3))=',levels_3d(1,1,1:size(levels_3d,dim=3))
-  print*,'levels_3d(2,1,1:size(levels_3d,dim=3))=',levels_3d(2,1,1:size(levels_3d,dim=3))
+  if(.false.)then
+     stat = vgd_get(vgd,'VIPM',ip1s)
+     print*,'ip1s=',ip1s
+     stat = vgd_levels(vgd,ip1s,levels,sfc_field=100000.,in_log=.false.,sfc_field_ls=100000.)
+     print*,'levels=',levels
+     
+     stat = vgd_get(vgd,'VIPT',ip1s)
+     print*,'ip1s=',ip1s
+     stat = vgd_levels(vgd,ip1s,levels,sfc_field=100000.,in_log=.false.,sfc_field_ls=100000.)
+     print*,'levels=',levels
+     stat = vgd_levels(vgd,ip1s,levels_3d,sfc_field=p0,in_log=.false.,sfc_field_ls=p0l)
+     print*,'levels_3d(1,1,1:size(levels_3d,dim=3))=',levels_3d(1,1,1:size(levels_3d,dim=3))
+     print*,'levels_3d(2,1,1:size(levels_3d,dim=3))=',levels_3d(2,1,1:size(levels_3d,dim=3))
+  endif
 
   call ut_report(OK,'Grid_Descriptors::vgd_new vertical generate initializer (5100) value')
 end program constructor
