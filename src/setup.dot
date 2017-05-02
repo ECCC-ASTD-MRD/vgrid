@@ -1,6 +1,7 @@
 echo "Acquiring compilation tools"
 
 . ./version.dot
+export BH_PULL_SOURCE_GIT_BRANCH
 
 unset MY_FFLAGS MY_CFLAGS
 
