@@ -32,6 +32,9 @@ lowLevel_levels: lowLevel_levels.F90 $(OBJECTS)
 use_dpidpis:	use_dpidpis.F90 $(OBJECTS)
 	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.F90 -o $@ -librmn $(RMN) -libappl ${MODELUTILS}
 
+gen_5001:	gen_5001.F90 $(OBJECTS)
+	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.F90 -o $@ -librmn $(RMN) -libappl ${MODELUTILS}
+
 gen_5999:	gen_5999.F90 $(OBJECTS)
 	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.F90 -o $@ -librmn $(RMN) -libappl ${MODELUTILS}
 
