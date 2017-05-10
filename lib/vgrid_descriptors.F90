@@ -633,7 +633,7 @@ contains
       self%match_ipig=.true.
 
       ! Check for required inputs
-      error = set_vcode(self,kind,version)
+      if( set_vcode(self,kind,version) == VGD_ERROR)return
       missingInput = .false.
       if(is_valid(self,ptop_8_valid)) then
          if(present(ptop_8))then
@@ -869,7 +869,7 @@ contains
       error = VGD_ERROR
       ! Check for required inputs
 
-      error = set_vcode(self,kind,version)
+      if( set_vcode(self,kind,version) == VGD_ERROR )return
       errorInput = .false.
       if(is_valid(self,ptop_8_valid)) then
          if(.not.present(ptop_8))then
