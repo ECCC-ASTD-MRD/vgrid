@@ -20,7 +20,7 @@ program constructor
 
   ! Revision : Andre Plante test on B instead of A since A not sensitive to rcoefs
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,VGD_ERROR
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_print,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
@@ -39,6 +39,18 @@ program constructor
        0.7299818, 0.7591944, 0.7866292, 0.8123021, 0.8362498, 0.8585219, &
        0.8791828, 0.8983018, 0.9159565, 0.9322280, 0.9471967, 0.9609448, &
        0.9735557, 0.9851275, 0.9950425/)
+  real, dimension(100) :: hgts= &
+   (/995., 985., 975., 965., 955., 945., 935., 925., 915., 905.,&
+     895., 885., 875., 865., 855., 845., 835., 825., 815., 805.,&
+     795., 785., 775., 765., 755., 745., 735., 725., 715., 705.,&
+     695., 685., 675., 665., 655., 645., 635., 625., 615., 605.,&
+     595., 585., 575., 565., 555., 545., 535., 525., 515., 505.,&
+     495., 485., 475., 465., 455., 445., 435., 425., 415., 405.,&
+     395., 385., 375., 365., 355., 345., 335., 325., 315., 305.,&
+     295., 285., 275., 265., 255., 245., 235., 225., 215., 205.,&
+     195., 185., 175., 165., 155., 145., 135., 125., 115., 105.,&
+      95.,  85.,  75.,  65.,  55.,  45.,  35.,  25.,  15.,   5./)
+
   real, dimension(1) :: hyb_wrong1= &
        (/1.1/)
   real, dimension(1) :: hyb_wrong2= &
@@ -52,6 +64,18 @@ program constructor
   integer :: test_5002
   logical, parameter :: write_control_L=.false.
   character (len=256) :: file
+
+  ! Construct a new set of vertical coordinate descriptors 5200 Gal-Chen
+  if( vgd_new(d,kind=3,version=1,hyb=hgts,rcoef1=4.,rcoef2=100.,dhm=10.0,dht=1.5) == VGD_ERROR )OK=.false.
+  if( vgd_print(d,convip_L=.true.) == VGD_ERROR )then
+     print*,'ERROR'
+     stop
+  endif
+  if( vgd_print(3001) == VGD_ERROR )then
+     print*,'ERROR'
+     stop
+  endif
+  stop
 
   !Use wrong top pressure
   print*,'================== EXPECTED ERROR SECTION BEGINGS================='
