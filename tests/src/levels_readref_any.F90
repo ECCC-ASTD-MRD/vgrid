@@ -25,8 +25,7 @@ program tests
   integer :: stat,lu=0,i,ni,nj,nk,fnom,fstouv,fstfrm,fclos,fstlir,fstinl,count,fstprm, &
        dateo,deet,npas,nbits,datyp,ip2,ip3,ig1,ig2,ig3,ig4,swa,lng,dltf,ubc,ex1,ex2,ex3
   integer :: testLev=10
-  integer, dimension(100) :: fstkeys
-  integer, dimension(:), allocatable :: ip1s
+  integer, dimension(:), allocatable :: ip1s, fstkeys
   real :: epsilon=0.01
   real, dimension(:,:), allocatable :: p0,px
   real, dimension(:,:,:), pointer :: lev
@@ -40,11 +39,12 @@ program tests
      print*,'ERROR with fnom'
      call abort
   endif
-  stat=fstouv(lu,'RND')
+  stat = fstouv(lu,'RND')
   if(stat.lt.0)then
      print*,'No record in RPN file'
      call abort
   endif
+  allocate(fstkeys(stat))
 
   ! Get physical levelling information
   stat = vgd_new(d,unit=lu,format="fst",ip1=-1,ip2=-1)

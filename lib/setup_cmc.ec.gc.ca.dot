@@ -6,8 +6,10 @@ case "${ORDENV_PLAT}" in
       HPCS_BASE=hpcs/201402/02/base
       HPCS_COMP=hpcs/201402/02/intel13sp1u2
       RPN_LIB=rpn/libs/15.2
+      MODELUTILS=/users/dor/armn/env/SsmBundles/ENV/d/modelutils/modelutils_1.4.4/modelutils_1.4.4_all
       MY_FFLAGS="-openmp -fp-model source  -warn all ${MY_FFLAGS}"
       . ssmuse-sh -d ${HPCS_BASE} -d ${HPCS_COMP} -d ${RPN_LIB}
+      . ssmuse-sh -x ${MODELUTILS}
       :;;
 
     ubuntu-14.04-amd64-64)      

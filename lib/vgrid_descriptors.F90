@@ -36,8 +36,9 @@ module vGrid_Descriptors
   public :: vgd_putopt                          !set class variable value
   public :: vgd_print                           !dump plain-text contents of instance
   public :: vgd_write                           !write coordinates to a file
-  public :: vgd_levels                          !compute physical level information
+  public :: vgd_levels                          !compute physical pressure level information
   public :: vgd_dpidpis                         !compute pressure derivative with respesct the sfc pressure
+  public :: vgd_heights                         !compute physical heights
   public :: operator(==)                        !overload equivalence operator
 
   ! Public class constants
@@ -189,6 +190,11 @@ module vGrid_Descriptors
      module procedure levels_withref_prof
      module procedure levels_withref_prof_8
   end interface
+
+  interface vgd_heights
+     module procedure heights_readref
+     module procedure heights_withref_pressure_based
+  end interface vgd_heights
 
   interface operator (==)
      module procedure test_equality
@@ -3655,8 +3661,169 @@ contains
     ! Set status and return
     status = VGD_OK
     return
- end function diag_withref_8
+  end function diag_withref_8
+  
+  integer function heights_readref(self,unit,ip1s,heights) result(status)
+    ! Reading referent, compute heights from the vertical description
+    ! for all level in ip1s list
+    type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
+    integer, intent(in) :: unit                 !File unit associated with the key
+    integer, dimension(:) , intent(in) :: ip1s     !ip1 list of levels to compute heights
+    real, dimension(:,:,:), pointer ::  heights !Heights values
+    
+    ! Local variables
+    integer :: fstinf
+    integer :: key
+    real, dimension(:,:), pointer :: sfc, sfc_ls    
+    type(FSTD_ext) :: prmk
 
+    status = VGD_ERROR
+    
+    nullify(sfc, sfc_ls)
+
+    ! get fst info of the first record having ip1s(1)
+    ! TODO, check if more than one date
+    key = fstinf (unit, prmk%ni, prmk%nj, prmk%nk,-1,' ',ip1s(1),  -1,  -1,' ',' ')
+    if ( key < 0 )then
+       write(for_msg,*) 'ERROR in heights_readref, no record with ip1 = ',ip1s(1)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+    endif    
+    if( my_fstprm(key,prmk) < 0)then
+       write(for_msg,*) 'problem with my_fstprm in heights_readref'
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+    endif
+    
+    ! Get surface fields
+    sfc_large_scale_valid: if (is_valid(self,ref_namel_valid)) then
+       if( get_ref(sfc_ls,self,self%ref_namel,unit,prmk) == VGD_ERROR)then
+          write(for_msg,*) 'Problem getting reference field ',trim(self%ref_namel)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return
+       endif
+    end if sfc_large_scale_valid
+    
+    sfc_valid: if (is_valid(self,ref_name_valid)) then
+       if( get_ref(sfc,self,self%ref_name,unit,prmk) == VGD_ERROR)then
+          write(for_msg,*) 'Problem getting reference field ',trim(self%ref_namel)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return
+       endif
+    else
+       write(for_msg,*) 'Heights cannot be computed for vcode ',self%vcode
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return
+    endif sfc_valid
+
+    ! Wrap call to height calculator
+    select case (self%vcode)
+    case (5005)
+       if( compute_heights_5005(self,unit,prmk,ip1s,sfc,heights) == VGD_ERROR )then
+          write(for_msg,*) 'ERROR with compute_heights_5005 in heights_readref'
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return 
+       endif
+    case DEFAULT
+       write(for_msg,*) 'kind or version invalid in heights_readref ',self%vcode
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return 
+    end select
+
+    deallocate(sfc)
+    if(associated(sfc_ls)) deallocate(sfc_ls)
+
+    ! Set status and return
+    status = VGD_OK
+    return
+  end function heights_readref
+
+integer function heights_withref_pressure_based(self,ip1_list,heights,Psfc,Hsfc,temp,hum) result(status)
+  use vgrid_utils, only: size_ok
+  ! Given surface pressure, surface height, temperature and specific humidity
+  !    compute heights from the vertical description.
+  type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
+  integer, dimension(:), intent(in) :: ip1_list       !Ip1s for which to compute heights
+  real, dimension(:,:,:), pointer :: heights          !Heights values in m
+  real, dimension(:,:), intent(in) :: Psfc            !Surface pressure in Pa
+  real, dimension(:,:), intent(in) :: Hsfc            !Height of the terrain in m
+  real, dimension(:,:,:), pointer, intent(in) :: temp !Temperature in kelvin
+  real, dimension(:,:,:), pointer, intent(in) :: hum  !Specific humidity kg/kg
+  
+  ! Local variables
+  integer kind,version,istat,ni,nj,nk,error
+  
+  ! Set error status
+  status = VGD_ERROR
+  
+  if(.not.self%valid)then
+     write(for_msg,*) 'vgrid structure is not valid in heights_withref_pressure_based'
+     call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+     return
+  endif
+  
+  ni = size(Psfc,dim=1); nj = size(Psfc,dim=2); nk = size(ip1_list)
+  
+  if (associated(heights)) then
+     if (size(heights,dim=1) /= ni .or. size(heights,dim=2) /= nj .or. size(heights,dim=3) /= nk) then
+        if(ALLOW_RESHAPE)then
+           write(for_msg,*) 'Heights array size error - will be reallocated'
+           call msg(MSG_WARNING,VGD_PRFX//for_msg)
+           deallocate(heights)
+        else
+           write(for_msg,*) 'Heights array size error - will not reallocate since ALLOW_RESHAPE is set to false'
+           call msg(MSG_ERROR,VGD_PRFX//for_msg)
+           return
+        endif
+     endif
+  endif
+  if(.not. associated(heights) )then
+     allocate(heights(ni,nj,nk),stat=error)
+     if (error /= 0) then
+        write(for_msg,*) 'cannot allocate space for heights in heights_withref_pressure_based'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
+  endif
+  
+  if(.not.size_ok(heights,temp))then
+     write(for_msg,*) 'Array temp not of the expected size:'
+     call msg(MSG_ERROR,VGD_PRFX//for_msg)
+     write(for_msg,*) '   Expected size:',ni,' x',nj,' x',nk
+     call msg(MSG_ERROR,VGD_PRFX//for_msg)
+     write(for_msg,*) '   got          :',size(temp,dim=1),' x',size(temp,dim=2),' x',size(temp,dim=3)
+     call msg(MSG_ERROR,VGD_PRFX//for_msg)
+     return
+  endif
+  
+  if(.not.size_ok(heights,hum))then
+     write(for_msg,*) 'Array hum not of the expected size:'
+     call msg(MSG_ERROR,VGD_PRFX//for_msg)
+     write(for_msg,*) '   Expected size:',ni,' x',nj,' x',nk
+     call msg(MSG_ERROR,VGD_PRFX//for_msg)
+     write(for_msg,*) '   got          :',size(hum,dim=1),' x',size(hum,dim=2),' x',size(hum,dim=3)
+     call msg(MSG_ERROR,VGD_PRFX//for_msg)
+     return
+  endif
+  
+  ! Compute heights for known vertical coordinates
+  select case (self%vcode)
+  case (5002,5003,5004,5005)
+     istat = compute_heights_5002_5003_5004_5005(self,ip1_list,heights,Psfc,Hsfc,temp,hum)      
+  case DEFAULT
+     istat = get_version_info(self,kind,version)
+     write(for_msg,*) 'kind or version invalid in heights_withref_pressure_based:',kind,version
+     call msg(MSG_ERROR,VGD_PRFX//for_msg)
+     return 
+  end select
+  if (istat /= VGD_OK) then
+     write(for_msg,*) 'error computing pressure in height_withref_pressure_based'
+     call msg(MSG_ERROR,VGD_PRFX//for_msg)
+     return
+  endif
+  
+  ! Set status and return
+  status = VGD_OK
+  return
+end function heights_withref_pressure_based
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Test vgrid_descriptor type for equality
 
@@ -5359,6 +5526,7 @@ contains
     return
  end function compute_pressure_5002_8
   integer function compute_pressure_3001_8(self,sfc_field,sfc_field_ls,ip1_list,levels,in_log,dpidpis) result(status)
+    implicit none
     ! Compute pressure for all levels specified in ip1_list
     type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
     real*8, dimension(:,:), intent(in) :: sfc_field       !Surface field reference for coordinate
@@ -5438,54 +5606,223 @@ contains
  end function compute_pressure_3001_8
 
 
-  integer function compute_pressure_5999_8(self,sfc_field,ip1_list,levels,in_log) result(status)
-    ! Compute pressure for all levels specified in ip1_list
-    type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
-    real*8, dimension(:,:), intent(in) :: sfc_field       !Surface field reference for coordinate
-    integer, dimension(:), intent(in) :: ip1_list       !List of IP1 levels to calculate on
-    real*8, dimension(:,:,:), pointer  :: levels          !Physical level values
-    logical, intent(in) :: in_log                       !Compute level values in ln()
+ integer function compute_pressure_5999_8(self,sfc_field,ip1_list,levels,in_log) result(status)
+   ! Compute pressure for all levels specified in ip1_list
+   type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
+   real*8, dimension(:,:), intent(in) :: sfc_field       !Surface field reference for coordinate
+   integer, dimension(:), intent(in) :: ip1_list       !List of IP1 levels to calculate on
+   real*8, dimension(:,:,:), pointer  :: levels          !Physical level values
+   logical, intent(in) :: in_log                       !Compute level values in ln()
+   
+   ! Internal variables
+   integer :: i,j,nk
+   real*8, dimension(size(ip1_list)) :: aa_8,bb_8
+   logical :: found
+   
+   ! Set error status
+   status = VGD_ERROR
+   
+   ! Set size of output
+   nk = size(ip1_list)
+   
+   ! Find ip1 values
+   do i=1,nk
+      found = .false.
+      do j=1,size(self%ip1_m)
+         if (self%ip1_m(j) == ip1_list(i)) then
+            found = .true.
+            aa_8(i) = self%a_m_8(j)
+            bb_8(i) = self%b_m_8(j)
+            exit
+         endif
+      enddo
+      if (.not.found) then
+         write(for_msg,*) 'cannot find ip1 ',ip1_list(i),' in compute_pressure_5999'
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         return
+      endif
+   enddo
+   
+   ! Compute pressure
+   do i=1,nk
+      levels(:,:,i) = aa_8(i) + bb_8(i)*sfc_field
+   enddo
+   if (in_log) levels = log(levels)
+   
+   ! Set status and return
+   status = VGD_OK
+   return
+ end function compute_pressure_5999_8
+ 
+ integer function compute_heights_5002_5003_5004_5005(self,ip1_list,heights,Psfc,Hsfc,temp,hum) result(status)
+   implicit none
+   type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
+   ! Given surface pressure, surface height, temperature and specific humidity
+   !    compute heights from the vertical description.
+   integer, dimension(:), intent(in) :: ip1_list       !Ip1s for which to compute heights
+   real, dimension(:,:,:), pointer :: heights          !Heights values in m
+   real, dimension(:,:), intent(in) :: Psfc            !Surface pressure in Pa
+   real, dimension(:,:), intent(in) :: Hsfc            !Height of the terrain in m
+   real, dimension(:,:,:), pointer, intent(in) :: temp !Temperature in kelvin
+   real, dimension(:,:,:), pointer, intent(in) :: hum  !Specific humidity kg/kg
+   
+   ! Not easy to do properly, since user must provide TT and HU for all levels
+   ! but not the diag one. This is tricky. This is why only the top level height
+   ! interface that read the necessary fields but itself is provided yet.
+   
+   ! Get ip1 list from self 
+   status = VGD_ERROR
+   write(for_msg,*) 'TODO compute_heights_5002_5003_5004_5005'
+   call msg(MSG_ERROR,VGD_PRFX//for_msg)
+   return
 
-    ! Internal variables
-    integer :: i,j,nk
-    real*8, dimension(size(ip1_list)) :: aa_8,bb_8
-    logical :: found
+ end function compute_heights_5002_5003_5004_5005
+ 
+ integer function compute_heights_5005(self,unit,prmk,ip1s,sfc,heights) result(status)
+   implicit none
+   type(vgrid_descriptor), intent(in) :: self       ! Vertical descriptor instance
+   integer, intent(in) :: unit                      ! Unit number of rpn file
+   type(FSTD_ext), intent(in) :: prmk               ! Fst info of a prototype record
+   integer, dimension(:), intent(in) :: ip1s        ! ip1 list for which to compute the heights
+   real, dimension(:,:), pointer, intent(in) :: sfc ! Surfce field associated with prototype record
+   real, dimension(:,:,:), intent(out) :: heights   ! heights for all levels on which prototype record lies
 
-    ! Set error status
-    status = VGD_ERROR
+   ! Local variables   
+   integer, parameter :: nmax = 1000
+   integer, dimension(nmax) :: keyList
+   integer, dimension(:), pointer :: ip1m, ip1t, ip1_one
+   integer :: fstinf, fstinl, fstluk
+   integer :: i, j, k, ni, nj, nk, key, count, G_nk, ier
+   real, dimension(:,:), pointer :: tvdata, work2d, hgts2d
+   real, dimension(:,:,:), pointer :: p1, p2, pm, pp, p_
+   logical :: is_momentum_L, read_tv_L
+   type(FSTD_ext) :: tv
+include "thermoconsts.inc"
+   status = VGD_ERROR
 
-    ! Set size of output
-    nk = size(ip1_list)
-    
-    ! Find ip1 values
-    do i=1,nk
-       found = .false.
-       do j=1,size(self%ip1_m)
-          if (self%ip1_m(j) == ip1_list(i)) then
-             found = .true.
-             aa_8(i) = self%a_m_8(j)
-             bb_8(i) = self%b_m_8(j)
-             exit
-          endif
-       enddo
-       if (.not.found) then
-          write(for_msg,*) 'cannot find ip1 ',ip1_list(i),' in compute_pressure_5999'
-          call msg(MSG_ERROR,VGD_PRFX//for_msg)
-          return
-       endif
-    enddo
+   nullify(ip1m, ip1t, tvdata, work2d, hgts2d, p1, p2, pm, pp, p_, ip1_one)
+   
+   if( vgd_get(self, "VIPM - level ip1 list (m)", ip1m) == VGD_ERROR )then
+      write(for_msg,*) 'ERROR in compute_heights_5005 with vgd_get on VIPM'
+      call msg(MSG_ERROR,VGD_PRFX//for_msg)
+      return
+   endif
+   if( vgd_get(self, "VIPT - level ip1 list (t)", ip1t) == VGD_ERROR )then
+      write(for_msg,*) 'ERROR in compute_heights_5005 with vgd_get on VIPT'
+      call msg(MSG_ERROR,VGD_PRFX//for_msg)
+      return
+   endif
 
-    ! Compute pressure
-    do i=1,nk
-       levels(:,:,i) = aa_8(i) + bb_8(i)*sfc_field
-    enddo
-    if (in_log) levels = log(levels)
+   ! In Vcode 5005 there is no temperature at hyb = 1.0, so we remove it from the list.
+   ! Also the diag temperature must not be used to compute the geopotential since
+   ! it doesn't represente the average temperature in the layer but the last thermo level
+   ! temperature does so we remove it from the list.
+   !
+   !  ip1t :                             ip1m
+   !        
+   !        ///////////////////      ////////////////////  Model top
+   !                                 First momentum level
+   !        First  thermo level
+   !                                 ...
+   !        ...
+   !                                 Last momentum level
+   !        Last thermo level
+   !        diag (not used)
+   !        hyb= 1.0 (not available)
+   !
+      
+   allocate(tvdata(prmk%ni,prmk%nj), work2d(prmk%ni,prmk%nj), hgts2d(prmk%ni,prmk%nj), p1(prmk%ni,prmk%nj,1), p2(prmk%ni,prmk%nj,1), ip1_one(1), stat = ier)
+   if(ier /= 0)then
+      write(for_msg,*) 'ERROR in compute_heights_5005 cannot allocate size ',ni,' x',nj
+      call msg(MSG_ERROR,VGD_PRFX//for_msg)
+      return
+   endif
 
-    ! Set status and return
-    status = VGD_OK
-    return
-  end function compute_pressure_5999_8
+   G_nk = size(ip1t) - 2
+   read_tv_L = fstinf(unit,tv%ni,tv%nj,tv%nk,prmk%datev,prmk%etiket,ip1t(k),-1,-1," ","TV") >= 0
 
+   p1(:,:,1) = log(sfc(:,:))
+   pm => p1
+   pp => p2
+   if ( get_rec(hgts2d,prmk,unit,"GZ",93423264) == VGD_ERROR )then
+      write(for_msg,*) 'ERROR in compute_heights_5005 problem reading GZ fo hyb = 1.0, ip1 = 934223264'
+      call msg(MSG_ERROR,VGD_PRFX//for_msg)
+      return
+   endif
+   LOOP_ON_TT: do k = G_nk, 1, -1
+      ! Get TV
+      if(read_tv_L)then
+         !key = fstinf(unit,tv%ni,tv%nj,tv%nk,prmk%datev,prmk%etiket,ip1t(k),-1,-1," ","TV")
+         print*,'TODO in compute_heights_5005 read TV'
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         return
+      else
+         if ( get_rec(tvdata,prmk,unit,"TT",ip1t(k)) == VGD_ERROR )then
+            write(for_msg,*) 'ERROR in compute_heights_5005 problem reading TT'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            return
+         endif
+         if ( get_rec(work2d,prmk,unit,"HU",ip1t(k)) == VGD_ERROR )then
+            write(for_msg,*) 'ERROR in compute_heights_5005 problem reading HU'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            return
+         endif
+         do j=1,prmk%nj
+            do i=1,prmk%ni
+               tvdata(i,j) = (tvdata(i,j) + tcdk) * ( 1. + delta * work2d(i,j) )
+            enddo
+         enddo
+      endif
+      ip1_one=ip1m(k)
+      if( vgd_levels(self,ip1_one,pp,sfc,in_log=.true.) == VGD_ERROR )then
+         write(for_msg,*) 'ERROR in compute_heights_5005 problem computing pressure for ip1=',ip1_one
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         return
+      endif
+      do j=1,prmk%nj
+         do i=1,prmk%ni
+            hgts2d(i,j) = hgts2d(i,j) - rgasd*tvdata(i,j)/grav * (pp(i,j,1)-pm(i,j,1))
+         enddo
+      enddo      
+      
+      ! Swap pointers
+      p_ => pp
+      pp => pm
+      pm => p_
+   end do LOOP_ON_TT
+
+stop
+
+   is_momentum_L = any(ip1m == ip1s(1))
+   if ( is_momentum_L .and. any(ip1t == ip1s(1) ) )then
+      write(for_msg,*) 'ERROR in compute_heights_5005 wrong ip1 list, first level is on thermo and momentum levels'
+      call msg(MSG_ERROR,VGD_PRFX//for_msg)
+      return
+   endif
+   
+   ! Get all (not just ip1s list which may be inclomplete) TV or TT and HU to integrate heights
+   ! TODO, stop integral above top ip1 in ip1s
+   if( fstinl(unit,tv%ni,tv%nj,tv%nk,prmk%datev,prmk%etiket,-1,-1,-1," ","TT",keyList,count,nmax) < 0 )then
+      write(for_msg,*) 'ERROR in compute_heights_5005 with fstinl on TT'
+      call msg(MSG_ERROR,VGD_PRFX//for_msg)
+      return
+   endif
+   if ( count == 0 )then
+      write(for_msg,*) 'ERROR in compute_heights_5005 cannot find TT'
+      call msg(MSG_ERROR,VGD_PRFX//for_msg)
+      return
+   endif
+   
+stop
+
+   !ni = size(sfc_field, dim=1); nj = size(sfc_field, dim=2) 
+   ! There size(ip1m) - 1 
+   
+   !deallocate(ip1m, ip1t, tvdata, work2d, hgts2d, p1, p2)
+
+   status = VGD_OK
+
+ end function compute_heights_5005
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! (PRIVATE) Construct vertical structure from legacy encoding (PT,HY...)
  
@@ -6066,6 +6403,32 @@ contains
     return
     
  end function table_update
+
+ integer function get_rec (F_f,F_prm,F_lu,F_nomvar,F_ip1) result(status)
+   implicit none
+   real, dimension(:,:), pointer, intent(out) :: F_f
+   type(FSTD_ext), intent(in) :: F_prm
+   integer, intent(in) :: F_lu
+   character(len=*), intent(in) :: F_nomvar
+   integer, intent(in) :: F_ip1
+   ! Local variables
+   integer :: key, fstinf, fstluk, ni, nj, nk
+   status = VGD_OK
+   key = fstinf(F_lu,ni,nj,nk,F_prm%datev,F_prm%etiket,F_ip1,-1,-1," ",F_nomvar)
+   if( ni /= F_prm%ni .or. nj /= F_prm%nj .or. nk /= 1 )then
+      write(for_msg,*) 'ERROR: in get_rec, size of ',F_nomvar,' for ip1=',F_ip1,' is not consistent'
+      call msg(MSG_ERROR,VGD_PRFX//for_msg)
+      write(for_msg,*) '       expected ',F_prm%ni, F_prm%nj, 1, 'got ',ni,nj,nk
+      call msg(MSG_ERROR,VGD_PRFX//for_msg)
+      return
+   endif
+   if ( fstluk(F_f,key,ni,nj,nk) < 0 )then
+      write(for_msg,*) 'ERROR in get_rec cannot find ',F_nomvar,' for ip1=',F_ip1
+      call msg(MSG_ERROR,VGD_PRFX//for_msg)
+      return
+   endif
+   status = VGD_OK
+ end function get_rec
 
  integer function get_ref (F_f,self,F_name_S,F_unit,prm) result(status)
     

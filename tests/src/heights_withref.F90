@@ -1,0 +1,180 @@
+! * libdescrip - Vertical grid descriptor library for FORTRAN programming
+! * Copyright (C) 2016  Direction du developpement des previsions nationales
+! *                     Centre meteorologique canadien
+! *
+! * This library is free software; you can redistribute it and/or
+! * modify it under the terms of the GNU Lesser General Public
+! * License as published by the Free Software Foundation,
+! * version 2.1 of the License.
+! *
+! * This library is distributed in the hope that it will be useful,
+! * but WITHOUT ANY WARRANTY; without even the implied warranty of
+! * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+! * Lesser General Public License for more details.
+! *
+! * You should have received a copy of the GNU Lesser General Public
+! * License along with this library; if not, write to the
+! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+! * Boston, MA 02111-1307, USA.
+program heights_withref
+
+  use vGrid_Descriptors, only: vgd_putopt,VGD_OK,VGD_ERROR
+  use Unit_Testing, only: ut_report
+  
+  implicit none
+  integer :: stat,ier,chek_heights_withref
+
+  stat=VGD_OK
+  
+  ier = vgd_putopt("ALLOW_SIGMA",.true.)
+
+  ier=chek_heights_withref('data/dm_5005_from_model_run_with_GZ','')
+  if(ier==VGD_ERROR)stat=VGD_ERROR
+
+  call ut_report(stat,'Grid_Descriptors, vgd_new')
+
+end program heights_withref
+!====================================================================
+!====================================================================
+!====================================================================
+
+integer function chek_heights_withref(F_fst,F_ips) result(status)
+
+   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_heights,vgd_putopt,VGD_ERROR,VGD_OK
+
+   implicit none  
+
+   character(len=*) :: F_fst,F_ips
+
+   ! Local variables
+   integer, save :: lu=10   
+   integer :: fnom,fstouv,fstfrm,lutxt=69,kind
+   type(vgrid_descriptor) :: d
+   integer, parameter :: nmax=1000
+   integer, dimension(nmax) :: liste
+   integer :: ier,fstinl,fstprm,fstinf,fstluk,infon,i,j,k
+   real, dimension(:,:,:), pointer :: heights
+   real :: epsilon=5.0e-6,pppp
+   integer, dimension(:), pointer :: ip1s
+   logical :: ok
+   ! Variable for fstprm, sorry...
+   integer ::dateo, datev, datyp, deet, dltf, extra1, extra2, extra3, ig1,&
+        ig2, ig3, ig4, ip1, ip2, ip3, iun, key, lng, nbits,&
+        ni,  nj, nk, npak, npas, swa, ubc
+   character(len=12) :: etiket
+   character(len=4)  :: nomvar
+   character(len=2)  :: typvar
+   character(len=1)  :: grtyp, ctype, dummy_S
+   logical :: rewrit
+   
+   status=VGD_ERROR   
+
+   nullify(heights ,ip1s)
+
+   ier=vgd_putopt('ALLOW_RESHAPE',.true.)
+
+   lu=lu+1
+
+   ier=fnom(lu,F_fst,"RND+R/O",0)
+   if(ier.lt.0)then
+      print*,'ERROR with fnom on ',trim(F_fst)
+      return
+   endif
+   ier=fstouv(lu,'RND')
+   if(ier.le.0)then
+      print*,'No record in RPN file ',trim(F_fst),ier
+      return
+   endif
+   if(trim(F_ips).eq.'')then
+      ip1=-1; ip2=-1     
+   else
+      open(unit=lutxt,file=F_ips,status='OLD')
+      read(lutxt,*) ip1,ip2
+      close(lutxt)
+   endif
+
+   ! Get vertical grid descriptor
+   ier = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
+   if(ier == VGD_ERROR )then
+      print*,'Problem getting vertical grid descriptor'
+      return
+   endif
+   
+!!$   ier = fstinl(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ','TT',liste,infon,nmax)
+!!$   if(infon == 0 )then
+!!$      print*,'pas de record de TT'      
+!!$      return
+!!$   endif
+!!$   allocate(ip1s(infon))
+!!$   do k=1,infon
+!!$      ier = fstprm(liste(k),dateo,deet,npas,ni,nj,nk,nbits,datyp, &
+!!$           ip1,ip2,ip3,typvar,nomvar,etiket,grtyp,ig1,ig2,ig3,ig4,swa,lng, &
+!!$           dltf,ubc,extra1,extra2,extra3)
+!!$      ip1s(k)=ip1
+!!$   end do
+!!$   
+!!$   key = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ','P0')
+!!$   allocate(p0(ni,nj),px(ni,nj))
+!!$   ier = fstluk(p0,key,ni,nj,nk)
+!!$   if(ier.lt.0)then
+!!$      print*,'Problem with fstluk on P0'
+!!$      return
+!!$   endif
+!!$   p0=p0*100.
+!!$   allocate(p0_8(ni,nj))
+!!$   p0_8=p0
+
+   ! Test 32 bits interface
+!!$   ier = vgd_levels(d,ip1s,pres,p0)
+!!$   if(ier == VGD_ERROR )then
+!!$      print*,'Problem with vgd_levels 32 bits'
+!!$      return
+!!$   endif
+!!$   do k=1,infon
+!!$      ier = fstprm(liste(k),dateo,deet,npas,ni,nj,nk,nbits,datyp, &
+!!$           ip1,ip2,ip3,typvar,nomvar,etiket,grtyp,ig1,ig2,ig3,ig4,swa,lng, &
+!!$           dltf,ubc,extra1,extra2,extra3)
+!!$      if(ier.lt.0)then
+!!$         print*,'Problem with fstprm on TT, ip1=',ip1
+!!$         return
+!!$      endif
+!!$      ! Surface pressure must be equal to P0 for surface levels
+!!$      call convip(ip1,pppp,kind,-1,dummy_S,.false.)
+!!$      if(abs(pppp-1.).lt.epsilon)then
+!!$         do j=1,nj
+!!$            do i=1,ni
+!!$               if(pres(i,j,k).ne.p0(i,j))then
+!!$                  print*,'Surface pressure must be exacly equal to p0'
+!!$                  print*,'i,j,k,pres(i,j,k),p0(i,j)',i,j,k,pres(i,j,k),p0(i,j)
+!!$                  return
+!!$               endif
+!!$            enddo
+!!$         enddo
+!!$      endif
+!!$      call incdatr(datev,dateo,deet*npas/3600.d0)
+!!$      key=fstinf(lu,ni,nj,nk,datev,' ',ip1,ip2,-1,typvar,'PX')     
+!!$      ier = fstluk(px,key,ni,nj,nk)
+!!$      if(ier.lt.0)then
+!!$         print*,'Problem with fstinf on PX, ip1=',ip1
+!!$         return
+!!$      endif
+!!$      do j=1,nj
+!!$         do i=1,ni
+!!$            if(abs((px(i,j)-pres(i,j,k)/100.)/px(i,j))>epsilon)then
+!!$               print*,'32 bits: Difference in pressure is too large at'
+!!$               print*,'i,j,k,px(i,j),pres(i,j,k)/100.',i,j,k,px(i,j),pres(i,j,k)/100.
+!!$               return
+!!$            endif
+!!$         enddo
+!!$      enddo
+!!$   enddo
+!!$
+!!$   deallocate(heights,ip1s)
+
+   ier=fstfrm(lu)
+
+   print*,trim(F_fst),' is OK'
+
+   status=VGD_OK   
+   
+end function chek_heights_withref

@@ -46,6 +46,7 @@ module vgrid_utils
 
   interface size_ok
      module procedure size_ok_i1d
+     module procedure size_ok_r3d
      module procedure size_ok_r81d
      module procedure size_ok_r83d
   end interface
@@ -146,7 +147,24 @@ contains
          size(p1,dim=3) == size(p2,dim=3)) ok = .true.
     return
   end function size_ok_r83d
-
+  
+  logical function size_ok_r3d(p1,p2) result(ok)
+    ! Check size matching for 3d real arrays
+    implicit none
+    real, dimension(:,:,:), pointer :: p1 !Input pointer 1
+    real, dimension(:,:,:), pointer :: p2 !Input pointer 2
+    ok = .false.
+    if (.not.associated(p1) .or. .not.associated(p2)) then
+       write(for_msg,*) 'unallocated pointer to check in size_ok'
+       call msg(MSG_CRITICAL,for_msg)
+       return
+    endif
+    if ( size(p1,dim=1) == size(p2,dim=1) .and. &
+         size(p1,dim=2) == size(p2,dim=2) .and. &
+         size(p1,dim=3) == size(p2,dim=3)) ok = .true.
+    return
+  end function size_ok_r3d
+  
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Allocate space for pointer returns
 
