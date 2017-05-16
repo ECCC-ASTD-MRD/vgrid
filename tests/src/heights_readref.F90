@@ -28,9 +28,11 @@ program heights_readref
   
   ier = vgd_putopt("ALLOW_SIGMA", .true.)
 
-  ier = chek_heights_readref('data/dm_5005_from_model_run_with_GZ', "", "UU")
+  ier = chek_heights_readref('data/dm_5005_from_model_run_with_GZ_VT', "", "UU")
   if( ier == VGD_ERROR ) stat = VGD_ERROR
   
+stop
+
   call ut_report(stat,'Grid_Descriptors, vgd_new')
   
 end program heights_readref
@@ -48,10 +50,13 @@ integer function chek_heights_readref(F_fst_S, F_ips_S, F_nomvar_S) result(statu
 
    ! Local variables
    integer, save :: lu=10   
-   integer :: ier, fnom, fstouv, fstfrm, fstinl, fstprm, lutxt=69, count, i
+   integer :: ier, fnom, fstouv, fstfrm, fstinf, fstinl, fstprm, fstluk, lutxt=69, count, i, j, k, key, kind
    integer, dimension(:), pointer :: ip1s, fstkeys
    type(vgrid_descriptor) :: vgd
-   real, dimension(:,:,:), pointer :: heights
+   real, dimension(:,:), pointer :: work
+   real, dimension(:,:,:), pointer :: heights   
+   real :: val
+   character(len=0) :: blk_S
    ! Variable for fstprm, sorry...
    integer ::dateo, datyp, deet, dltf, extra1, extra2, extra3, ig1,&
         ig2, ig3, ig4, ip1, ip2, ip3, lng, nbits,&
@@ -99,7 +104,7 @@ integer function chek_heights_readref(F_fst_S, F_ips_S, F_nomvar_S) result(statu
    ! Get variable ip1 list
    ier = fstinl(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',F_nomvar_S, fstkeys, count, size(fstkeys))
    if ( count <= 0 )then
-      print*,'ERROR: cannot find any ',trim(F_nomvar_S)
+      print*,'ERROR: in test heights_readref cannot find any ',trim(F_nomvar_S)
       return
    endif
 
@@ -110,13 +115,38 @@ integer function chek_heights_readref(F_fst_S, F_ips_S, F_nomvar_S) result(statu
            ip2,ip3,typvar,nomvar,etiket,grtyp,ig1,ig2,ig3,ig4,swa,lng,dltf,  &
            ubc,extra1,extra2,extra3)
    enddo   
-   print*,'ip1s',ip1s
 
    if ( vgd_heights(vgd,lu,ip1s,heights) == VGD_ERROR )then
-      print*,'ERROR with vgd_heights'
+      print*,'ERROR in test heights_readref with vgd_heights'
       return
    endif
 
+   allocate( work( size(heights,dim=1), size(heights,dim=2) ) )
+
+   ! Read GZ to compare
+   do k=1, size(ip1s)
+      call convip(ip1s(k),val,kind,-1,blk_S,.false.)
+      if( kind == 4) then
+         print*,heights(1,1,k),val
+      else
+         key = fstinf(lu,ni,nj,nk,-1,' ',ip1s(k),ip2,-1,' ',"GZ")
+         if ( ni /= size(heights,dim=1) .or. nj /= size(heights,dim=2) .or. nk /= 1)then
+            print*,'ERROR: in test heights_readref size error on GZ for ip1, ip2=',ip1s(k),ip2
+            return
+         endif
+         if ( key < 0 )then         
+            print*,'ERROR: in test heights_readref cannot find any GZ for ip1, ip2=',ip1s(k),ip2
+            return
+         endif
+         if( fstluk(work, key, ni, nj, nk) < 0 )then
+            print*,'ERROR: in test heights_readref with fstluk on GZ'
+            return
+         endif         
+         print*,heights(1,1,k),work(1,1)*10.        
+      endif
+      
+   end do
+   
    deallocate(ip1s, fstkeys, heights)
    
    ier=fstfrm(lu)
