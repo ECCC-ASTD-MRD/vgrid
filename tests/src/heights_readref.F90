@@ -28,10 +28,12 @@ program heights_readref
   
   ier = vgd_putopt("ALLOW_SIGMA", .true.)
   
-  ier = check_heights_readref('data/dm_5005_from_model_run_with_GZ_VT', "THERMO")
-  ier = check_heights_readref('data/dm_5005_from_model_run_with_GZ_VT', "MOMENTUM")
-  !ier = check_heights_readref('data/dm_5005_from_model_run_with_GZ_VT', "THERMO-AND-MOMENTUM")
-  if( ier == VGD_ERROR ) stat = VGD_ERROR
+  if( check_heights_readref('data/dm_5005_from_model_run_with_GZ_VT', "THERMO")              == VGD_ERROR ) stat = VGD_ERROR
+  if( check_heights_readref('data/dm_5005_from_model_run_with_GZ_VT', "MOMENTUM")            == VGD_ERROR ) stat = VGD_ERROR
+  if( check_heights_readref('data/dm_5005_from_model_run_with_GZ_VT', "THERMO-AND-MOMENTUM") == VGD_ERROR ) stat = VGD_ERROR
+  if( check_heights_readref('data/dm_5005_from_model_run_with_GZ'   , "THERMO")              == VGD_ERROR ) stat = VGD_ERROR
+  if( check_heights_readref('data/dm_5005_from_model_run_with_GZ'   , "MOMENTUM")            == VGD_ERROR ) stat = VGD_ERROR
+  if( check_heights_readref('data/dm_5005_from_model_run_with_GZ'   , "THERMO-AND-MOMENTUM") == VGD_ERROR ) stat = VGD_ERROR
   
   call ut_report(stat,'Grid_Descriptors, vgd_new')
   
@@ -126,6 +128,8 @@ integer function check_heights_readref(F_fst_S, F_type_S) result(status)
   
   print*,trim(F_fst_S),' is OK'
   
+  deallocate(ip1s,ip1sub,fstkeys)
+
   status=VGD_OK
   
 end function check_heights_readref
@@ -135,7 +139,7 @@ end function check_heights_readref
 !====================================================================
 
 integer function read_and_compare(lu,ip1s,ip2) result(status)
-  use vGrid_Descriptors, only: vgrid_descriptor, vgd_new, vgd_heights, vgd_putopt, VGD_ERROR, VGD_OK
+  use vGrid_Descriptors, only: vgrid_descriptor, vgd_new, vgd_free, vgd_heights, vgd_putopt, VGD_ERROR, VGD_OK
   
   implicit none
   
@@ -205,14 +209,19 @@ integer function read_and_compare(lu,ip1s,ip2) result(status)
               return
            endif
            if(abs(work(i,j)-heights(i,j,k)) > tol )then
-              print*,'Probleme avec heights, pas dans les limites tollerees'
-              print*,work(i,j),'vs',heights(i,j,k),i,j,k
+              print*,'Probleme avec heights, pas dans les limites tollerees pour ip1=',ip1s(k)
+              print*,work(i,j),'vs',heights(i,j,k)
               return
            endif
         end do
      end do
   end do
   
+  if( vgd_free(vgd) == VGD_ERROR)then
+     print*,'ERRRO: in test heights_readref s/r read_and_compare with vgd_free(vgd)'
+     return
+  endif
+
   deallocate(work, heights)
   
   status = VGD_OK

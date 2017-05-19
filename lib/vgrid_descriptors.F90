@@ -5770,6 +5770,11 @@ include "thermoconsts.inc"
    hgtsm => hgts1
    hgtsp => hgts2
    
+   ! Height hgts1 is at ip1 = 93423264, check if it is requested by user
+   do l=1,size(ip1s)
+      if(ip1s(l) == 93423264) heights(:,:,l) =  hgts1(:,:)
+   end do
+   
    LOOP_ON_TT: do k = G_nk, 1, -1
       ! Get TV
       if(read_tv_L)then
@@ -5843,7 +5848,7 @@ include "thermoconsts.inc"
       endif
    end do
    
-   deallocate(ip1m, ip1t, tvdata, work2d, hgts1, hgts2, p1, p2, ip1_one)
+   deallocate(ip1m, ip1t, ip1_one, tvdata, work2d, hgts1, hgts2, p1, p2)
 
    status = VGD_OK
 
