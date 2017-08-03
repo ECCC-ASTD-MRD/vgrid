@@ -316,6 +316,10 @@ contains
           else
              write(for_msg,*) '3D pointer already allocated with a different length, will not reallocate '//trim(msg_S)
              call msg(MSG_ERROR,VGD_PRFX//for_msg)
+             write(for_msg,*) '                         Expecting size:',len(1),' x ',len(2),' x ',len(3)
+             call msg(MSG_ERROR,VGD_PRFX//for_msg)
+             write(for_msg,*) 'But vector alreaddy allocated with size:',size(value,1),' x ',size(value,2),' x ',size(value,3)
+             call msg(MSG_ERROR,VGD_PRFX//for_msg)
              return
           endif
        endif
@@ -361,6 +365,10 @@ contains
              alloc_lev_L=.true.
           else
              write(for_msg,*) '3D pointer already allocated with a different length, will not reallocate '//trim(msg_S)
+             call msg(MSG_ERROR,VGD_PRFX//for_msg)
+             write(for_msg,*) '                         Expecting size:',len(1),' x ',len(2),' x ',len(3)
+             call msg(MSG_ERROR,VGD_PRFX//for_msg)
+             write(for_msg,*) 'But vector alreaddy allocated with size:',size(value,1),' x ',size(value,2),' x ',size(value,3)
              call msg(MSG_ERROR,VGD_PRFX//for_msg)
              return
           endif
