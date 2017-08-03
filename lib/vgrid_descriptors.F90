@@ -73,11 +73,14 @@ module vGrid_Descriptors
   integer, dimension(9), parameter :: b_t_8_valid_get=(/1001,1002,     2001,5001,5002,5003,5004,5005,3001/)
   integer, dimension(1), parameter :: c_t_8_valid=                                                 (/3001/)
   integer, dimension(1), parameter :: c_t_8_valid_get=                                             (/3001/)
+  integer, dimension(1), parameter :: a_zd_8_valid=                                                (/3001/)
+  integer, dimension(1), parameter :: b_zd_8_valid=                                                (/3001/)
+  integer, dimension(1), parameter :: c_zd_8_valid=                                                (/3001/)
   integer, dimension(11),parameter :: ip1_m_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004,5005,3001,5999/)
   integer, dimension(5), parameter :: ip1_t_valid=                             (/5002,5003,5004,5005,3001/)
   integer, dimension(10),parameter :: ip1_t_valid_get=(/1001,1002,     2001,5001,5002,5003,5004,5005,3001,5999/)
   integer, dimension(10),parameter :: ref_name_valid= (/1001,1002,1003     ,5001,5002,5003,5004,5005,3001,5999/)
-  integer, dimension(1), parameter :: ref_namel_valid=                                             (/3001/)
+  integer, dimension(1), parameter :: ref_namel_valid=                                             (/3002/)
   integer, dimension(2), parameter :: dhm_valid=                                              (/5005,3001/)
   integer, dimension(2), parameter :: dht_valid=                                              (/5005,3001/)
 
@@ -1204,7 +1207,6 @@ contains
          if (error /= VGD_OK) return
       case (3001)
          if (errorInput) return
-         print*,'hyb',hyb
          call vgrid_genab_3001(hyb,(/rcoef1,rcoef2/), &
               a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,ip1_m,ip1_t,error,my_dhm,my_dht)
          if (error /= VGD_OK)then
@@ -3633,7 +3635,8 @@ contains
     case (5002,5003,5004,5005)
        istat = compute_pressure_5002_8(self,sfc_field,ip1_list,levels,my_in_log,my_dpidpis)
     case (3001)
-       istat = compute_pressure_3001_8(self,sfc_field,sfc_field_ls,ip1_list,levels,my_in_log,my_dpidpis)
+       istat = compute_heights_3001_8(self,sfc_field,ip1_list,levels)
+       print*,'levels(1,1,:)',levels
     case (5999)
        if(my_dpidpis)then
           write(for_msg,*) 'dpidpis is not availabe for Vcode 5999'
@@ -5528,21 +5531,16 @@ end function heights_withref_pressure_based
     status = VGD_OK
     return
  end function compute_pressure_5002_8
-  integer function compute_pressure_3001_8(self,sfc_field,sfc_field_ls,ip1_list,levels,in_log,dpidpis) result(status)
+  integer function compute_heights_3001_8(self,sfc_field,ip1_list,levels) result(status)
     implicit none
     ! Compute pressure for all levels specified in ip1_list
     type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
     real*8, dimension(:,:), intent(in) :: sfc_field       !Surface field reference for coordinate
-    real*8, dimension(:,:), intent(in) :: sfc_field_ls    !Surface field large scale reference for coordinate
     integer, dimension(:), intent(in) :: ip1_list       !List of IP1 levels to calculate on
     real*8, dimension(:,:,:), pointer  :: levels          !Physical level values
-    logical, intent(in) :: in_log                       !Compute level values in ln()
-    logical, intent(in) :: dpidpis                      !Compute partial derivative of hydrostatic pressure (pi) with
-                                                        !   respect to surface hydrostatic pressure(pis)
 
     ! Internal variables
     integer :: i,j,nk
-    real*8, dimension(size(sfc_field,dim=1),size(sfc_field,dim=2)) :: s_8, sl_8
     real*8, dimension(size(ip1_list)) :: aa_8,bb_8,cc_8
     logical :: found
 
@@ -5582,32 +5580,15 @@ end function heights_withref_pressure_based
        endif
     enddo
 
-    ! Compute pressure
-    !s_8 = log(dble(sfc_field)/self%pref_8)
-    s_8  = log(sfc_field/self%pref_8)
-    sl_8 = log(sfc_field_ls/self%pref_8)
+    ! Compute heights
     do i=1,nk       
-       levels(:,:,i) = aa_8(i) + bb_8(i)*s_8 + cc_8(i)*sl_8
-    enddo    
-    if (.not.in_log)then
-       levels = exp(levels)
-    endif
-    if(dpidpis)then
-       if(in_log)then
-          write(for_msg,*) 'in compute_pressure_3001_8, cannot get dpidpis in log'
-          call msg(MSG_ERROR,VGD_PRFX//for_msg)
-          return
-       endif
-       do i=1,nk
-          levels(:,:,i) = bb_8(i)*levels(:,:,i)/sfc_field
-       enddo
-    endif
+       levels(:,:,i) = aa_8(i) + bb_8(i)*sfc_field
+    enddo
 
     ! Set status and return
     status = VGD_OK
     return
- end function compute_pressure_3001_8
-
+  end function compute_heights_3001_8
 
  integer function compute_pressure_5999_8(self,sfc_field,ip1_list,levels,in_log) result(status)
    ! Compute pressure for all levels specified in ip1_list

@@ -102,8 +102,11 @@ contains
       enddo
       if (wronghyb) then
          write(for_msg,*)'WRONG SPECIFICATION OF HYBRID HEIGHT VERTICAL LEVELS'
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
          write(for_msg,*)'LEVELS MUST BE MONOTONICALLY DECREASING'
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
          write(for_msg,*)'      FROM HYB(1) ---- ERROR ----'
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
          write(for_msg,*)'      Current choice:'
          call msg(MSG_ERROR,VGD_PRFX//for_msg)
          write(for_msg,*)'MOMENTUM LEVELS'
@@ -229,14 +232,14 @@ contains
     if (associated(v)) then
        deallocate(v,stat=check)
        if (check /= 0) then
-          write(for_msg,*) 'in deallocate() from vdescript_5002::reallocate()'
+          write(for_msg,*) 'in deallocate() from vdescript_3001::reallocate()'
           call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
     endif
     allocate(v(low:high),stat=check)
     if (check /= 0) then
-       write(for_msg,*) 'in allocate() from vdescript_5002::reallocate()'
+       write(for_msg,*) 'in allocate() from vdescript_3001::reallocate()'
        call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
@@ -258,14 +261,14 @@ contains
     if (associated(v)) then
        deallocate(v,stat=check)
        if (check /= 0) then
-          write(for_msg,*) 'in deallocate() from vgrid_genab_5002::reallocate()'
+          write(for_msg,*) 'in deallocate() from vgrid_genab_3001::reallocate()'
           call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
     endif
     allocate(v(low:high),stat=check)
     if (check /= 0) then
-       write(for_msg,*) 'in allocate() from vgrid_genab_5002::reallocate()'
+       write(for_msg,*) 'in allocate() from vgrid_genab_3001::reallocate()'
        call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
@@ -289,14 +292,14 @@ contains
     if (associated(v)) then
        deallocate(v,stat=check)
        if (check /= 0) then
-          write(for_msg,*) 'in deallocate() from vdescript_5002::reallocate()'
+          write(for_msg,*) 'in deallocate() from vdescript_3001::reallocate()'
           call msg(MSG_ERROR,VGD_PRFX//for_msg)
           return
        endif
     endif
     allocate(v(low:high),stat=check)
     if (check /= 0) then
-       write(for_msg,*) 'in allocate() from vdescript_5002::reallocate()'
+       write(for_msg,*) 'in allocate() from vdescript_3001::reallocate()'
        call msg(MSG_ERROR,VGD_PRFX//for_msg)
        return
     endif
