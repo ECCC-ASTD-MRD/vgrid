@@ -130,6 +130,8 @@ integer function test_functions(lu,p0,ni,nj,reshape_L) result(status)
    real*8, dimension(:,:,:), pointer :: table_8
    type(vgrid_descriptor) :: vgd
 
+   nullify(ip1_list,i1d,lev,lev_1d,r1d,r81d,table_8)
+
    ! Allocate so they can be dealloca below
    allocate(ip1_list(1),lev(1,1,1),lev_1d(1),r1d(1),r81d(1),table_8(1,1,1))
 
@@ -157,7 +159,7 @@ integer function test_functions(lu,p0,ni,nj,reshape_L) result(status)
    call check_status2(stat_not_alloc,stat_alloc_correct_size,stat_alloc_wrong_size,reshape_L)
 
    print*,'-----------------------------';call flush(6)
-   print*,'Testig dpidpis_withref';call flush(6)
+   print*,'Testing dpidpis_withref';call flush(6)
    deallocate(lev)
    stat_not_alloc=vgd_dpidpis(vgd,ip1_list,lev,p0)
    stat_alloc_correct_size=vgd_dpidpis(vgd,ip1_list,lev,p0)
@@ -166,7 +168,7 @@ integer function test_functions(lu,p0,ni,nj,reshape_L) result(status)
    call check_status2(stat_not_alloc,stat_alloc_correct_size,stat_alloc_wrong_size,reshape_L)
    
    print*,'----------------------------------';call flush(6)
-   print*,'Testig dpidpis_withref_prof';call flush(6)
+   print*,'Testing dpidpis_withref_prof';call flush(6)
    deallocate(lev_1d)
    stat_not_alloc=vgd_dpidpis(vgd,ip1_list,lev_1d,100000.)
    stat_alloc_correct_size=vgd_dpidpis(vgd,ip1_list,lev_1d,100000.)
@@ -175,7 +177,7 @@ integer function test_functions(lu,p0,ni,nj,reshape_L) result(status)
    call check_status2(stat_not_alloc,stat_alloc_correct_size,stat_alloc_wrong_size,reshape_L)
    
    print*,'----------------------------------';call flush(6)
-   print*,'Testig get_allocate_i1d ip1m';call flush(6)
+   print*,'Testing get_allocate_i1d ip1m';call flush(6)
    stat_not_alloc=vgd_get(vgd,'VIPM - level ip1 list (m)',i1d)
    stat_alloc_correct_size=vgd_get(vgd,'VIPM - level ip1 list (m)',i1d)
    deallocate(i1d);allocate(i1d(1))
@@ -183,7 +185,7 @@ integer function test_functions(lu,p0,ni,nj,reshape_L) result(status)
    call check_status2(stat_not_alloc,stat_alloc_correct_size,stat_alloc_wrong_size,reshape_L)
    
    print*,'----------------------------------';call flush(6)
-   print*,'Testig get_allocate_r1d VCDM';call flush(6)
+   print*,'Testing get_allocate_r1d VCDM';call flush(6)
    deallocate(r1d)
    stat_not_alloc=vgd_get(vgd,'VCDM - vertical coordinate (m)',r1d)
    stat_alloc_correct_size=vgd_get(vgd,'VCDM - vertical coordinate (m)',r1d)
@@ -192,7 +194,7 @@ integer function test_functions(lu,p0,ni,nj,reshape_L) result(status)
    call check_status2(stat_not_alloc,stat_alloc_correct_size,stat_alloc_wrong_size,reshape_L)
 
    print*,'----------------------------------';call flush(6)
-   print*,'Testig get_allocate_r81d VCDM';call flush(6)
+   print*,'Testing get_allocate_r81d VCDM';call flush(6)
    deallocate(r81d)
    stat_not_alloc=vgd_get(vgd,'CA_M - vertical A coefficient (m)',r81d)
    stat_alloc_correct_size=vgd_get(vgd,'CA_M - vertical A coefficient (m)',r81d)
@@ -201,7 +203,7 @@ integer function test_functions(lu,p0,ni,nj,reshape_L) result(status)
    call check_status2(stat_not_alloc,stat_alloc_correct_size,stat_alloc_wrong_size,reshape_L)
 
    print*,'----------------------------------';call flush(6)
-   print*,'Testig get_allocate_r83d VTBL';call flush(6)
+   print*,'Testing get_allocate_r83d VTBL';call flush(6)
    deallocate(table_8)
    stat_not_alloc=vgd_get(vgd,'VTBL - vgrid_descriptor table',table_8)
    stat_alloc_correct_size=vgd_get(vgd,'VTBL - vgrid_descriptor table',table_8)

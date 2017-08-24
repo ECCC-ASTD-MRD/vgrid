@@ -1,3 +1,5 @@
+BH_PACKAGE=hpcs/tools/master/bh_0.17_all
+
 case "${ORDENV_PLAT}" in
 
    ubuntu-12.04-amd64-64)
@@ -10,6 +12,7 @@ case "${ORDENV_PLAT}" in
       MY_FFLAGS="-openmp -fp-model source  -warn all ${MY_FFLAGS}"
       . ssmuse-sh -d ${HPCS_BASE} -d ${HPCS_COMP} -d ${RPN_LIB}
       . ssmuse-sh -x ${MODELUTILS}
+      . ssmuse-sh -p ${BH_PACKAGE}
       :;;
 
     ubuntu-14.04-amd64-64)      
@@ -18,9 +21,12 @@ case "${ORDENV_PLAT}" in
       HPCS_BASE=/ssm/net/hpcs/201402/04/base
       HPCS_COMP=/ssm/net/hpcs/exp/intel2016/01
       RPN_LIB=rpn/libs/16.2
+      MODELUTILS=/users/dor/armn/env/SsmBundles/ENV/d/modelutils/modelutils_1.4.4/modelutils_1.4.4_all	
       MY_FFLAGS="-openmp -fp-model source  -warn all ${MY_FFLAGS}"
       . ssmuse-sh -d ${HPCS_BASE} -d ${HPCS_COMP}
       . r.load.dot ${RPN_LIB}
+      . ssmuse-sh -x ${MODELUTILS}
+      . ssmuse-sh -p ${BH_PACKAGE}
       :;;
 
    aix-7.1-ppc7-64)
@@ -33,6 +39,7 @@ case "${ORDENV_PLAT}" in
       RPN_LIB=rpn/libs/15.2
       MY_FFLAGS="${MY_FFLAGS}"
       . ssmuse-sh -d ${HPCS_BASE} -d ${HPCS_COMP} -d ${RPN_LIB}
+      . ssmuse-sh -p ${BH_PACKAGE}
       :;;
 
    "") echo "ERROR: variable ORDENV_PLAT not set"
@@ -42,3 +49,5 @@ case "${ORDENV_PLAT}" in
     *) echo platform ${ORDENV_PLAT} not suported, please review setup.dot
        :;;
 esac
+
+

@@ -60,7 +60,7 @@ program tests
 
   integer :: stat,lu=10,do_it,fstfrm,fclos,i,ier
   logical :: ok=.true.
-  integer, parameter :: nfiles=9
+  integer, parameter :: nfiles=10
   character(len=200), dimension(nfiles) :: files=(/&
        "data/dm_1001_from_model_run",&
        "data/dm_1002_from_model_run",&
@@ -70,6 +70,7 @@ program tests
        "data/dm_5003_from_model_run",&
        "data/dm_5004_from_model_run",&
        "data/dm_5005_from_model_run",&
+       "data/dm_5100_from_model_run",&
        "data/dm_5999_from_model_run"&
        /)
   

@@ -75,7 +75,6 @@ program constructor
      print*,'ERROR'
      stop
   endif
-  stop
 
   !Use wrong top pressure
   print*,'================== EXPECTED ERROR SECTION BEGINGS================='

@@ -16,7 +16,7 @@
 ! * License along with this library; if not, write to the
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
-program constructor
+program get_logp
   use Vgrid_Descriptors, only: Vgrid_descriptor,Vgd_free,Vgd_new,Vgd_get,Vgd_print,VGD_OK,vgd_putopt
   use Unit_Testing, only: ut_report
 
@@ -28,7 +28,7 @@ program constructor
   integer :: fnom,fstouv,fstfrm,fclos
   logical :: ok,logp_L
 
-  integer, parameter :: nfiles=9
+  integer, parameter :: nfiles=10
   character(len=200), dimension(nfiles) :: files=(/&
        "data/dm_1001_from_model_run",&
        "data/dm_1002_from_model_run",&
@@ -38,6 +38,7 @@ program constructor
        "data/dm_5003_from_model_run",&
        "data/dm_5004_from_model_run",&
        "data/dm_5005_from_model_run",&
+       "data/dm_5100_from_model_run",&
        "data/dm_5999_from_model_run"&
        /)
 
@@ -46,6 +47,7 @@ program constructor
        .false., &
        .false., &
        .false., &
+       .true., &
        .true., &
        .true., &
        .true., &
@@ -99,4 +101,4 @@ program constructor
 
   call ut_report(ok,'Grid_Descriptors, vgd_get, LOGP 5002')  
 
-end program constructor
+end program get_logp

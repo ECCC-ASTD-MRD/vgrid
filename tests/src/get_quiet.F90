@@ -18,7 +18,7 @@
 ! * Boston, MA 02111-1307, USA.
 program tests
   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_putopt,VGD_LEN_NAME,VGD_ERROR,VGD_OK
-  use utils, only: same_vec
+  use vgrid_utils, only: same_vec
   use Unit_Testing, only: ut_report
   implicit none
 

@@ -3,11 +3,12 @@ To add a new vertical coordinate type:
 1- Design the new table (on paper)
 2- Modify the validity tables to include your new vcoord (e.g. ptop_8_valid)
 3- Add elements to the structure (type grid_descriptor) if necessary
-4- Add a branch to your new vcoord in the build constructor (new_build_vert)
+4- Add a branch to your new vcoord in the build constructor, add new required inputs if any (new_build_vert)
+4.1- Add a branch to your new vcoord in the (new_gen), add new required inputs if any
 5- Write the encoder for your new vcoord (e.g. encode_vert_5002)
 6- Add support to your vcode in 
       fstd_init, new_from_table
-      TESTS: constructor_table
+      TESTS: constructor_table, constructor_gen_...
 7- Add get/put entries if the structure has been modified (step 3 above)
 8- Generate a file that contains your new coordinate record
 9- Add a branch to your new vcoord in the read constructor (new_read)

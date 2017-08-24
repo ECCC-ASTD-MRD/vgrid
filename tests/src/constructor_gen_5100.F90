@@ -18,60 +18,76 @@
 ! * Boston, MA 02111-1307, USA.
 program constructor
 
-  ! Revision : Andre Plante test on B instead of A since A not sensitive to rcoefs
-
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_print,VGD_ERROR
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_levels,vgd_get,vgd_print,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: d
-  integer :: stat,test_sleve
-  real, dimension(100) :: hgts= &
-   (/995., 985., 975., 965., 955., 945., 935., 925., 915., 905.,&
-     895., 885., 875., 865., 855., 845., 835., 825., 815., 805.,&
-     795., 785., 775., 765., 755., 745., 735., 725., 715., 705.,&
-     695., 685., 675., 665., 655., 645., 635., 625., 615., 605.,&
-     595., 585., 575., 565., 555., 545., 535., 525., 515., 505.,&
-     495., 485., 475., 465., 455., 445., 435., 425., 415., 405.,&
-     395., 385., 375., 365., 355., 345., 335., 325., 315., 305.,&
-     295., 285., 275., 265., 255., 245., 235., 225., 215., 205.,&
-     195., 185., 175., 165., 155., 145., 135., 125., 115., 105.,&
-      95.,  85.,  75.,  65.,  55.,  45.,  35.,  25.,  15.,   5./)
-
-  real, dimension(1) :: hyb_wrong1= &
-       (/1.1/)
-  real, dimension(1) :: hyb_wrong2= &
-       (/1.e-6/)
-  real, dimension(3) :: hyb_wrong3= &
-       (/.9,.5,.1/)
-  real :: rcoef1=4.,rcoef2=100.
+  type(vgrid_descriptor) :: vgd
+  integer, pointer, dimension(:) :: ip1s
+  integer :: stat
+  real, dimension(57) :: hyb= &
+     (/0.0134575, 0.0203980, 0.0333528, 0.0472815, 0.0605295, 0.0720790, &
+       0.0815451, 0.0889716, 0.0946203, 0.0990605, 0.1033873, 0.1081924, &
+       0.1135445, 0.1195212, 0.1262188, 0.1337473, 0.1422414, 0.1518590, &
+       0.1627942, 0.1752782, 0.1895965, 0.2058610, 0.2229843, 0.2409671, &
+       0.2598105, 0.2795097, 0.3000605, 0.3214531, 0.3436766, 0.3667171, &
+       0.3905587, 0.4151826, 0.4405679, 0.4666930, 0.4935319, 0.5210579, &
+       0.5492443, 0.5780612, 0.6074771, 0.6374610, 0.6679783, 0.6989974, &
+       0.7299818, 0.7591944, 0.7866292, 0.8123021, 0.8362498, 0.8585219, &
+       0.8791828, 0.8983018, 0.9159565, 0.9322280, 0.9471967, 0.9609448, &
+       0.9735557, 0.9851275, 0.9950425/)
+  real, dimension(2,1) :: p0, p0l
+  real :: rcoef1=4.,rcoef2=200.
   
+  real, pointer, dimension(:) :: levels
+  real, pointer, dimension(:,:,:) :: levels_3d
+
+  real*8 :: ptop=805d0,pref=100000d0
   logical :: OK=.true.
-  logical, parameter :: write_control_L=.true.
+  integer :: test_5100
+  logical, parameter :: write_control_L=.false.
   character (len=256) :: file
-
-  ! Construct a new set of vertical coordinate descriptors 3001 Gal-Chen
-  if( vgd_new(d,kind=3,version=1,hyb=hgts,rcoef1=rcoef1,rcoef2=rcoef2,dhm=10.0,dht=1.5) == VGD_ERROR )OK=.false.
-  if( vgd_print(d,convip_L=.true.) == VGD_ERROR )then
-     print*,'ERROR'
-     stop
-  endif
-  if( vgd_print(3001) == VGD_ERROR )then
-     print*,'ERROR'
-     stop
-  endif
-
-  file='data/data_constructor_gen_3001.txt'
-  stat = test_sleve(d,file,write_control_L,stat)
-  if(stat.eq.VGD_ERROR)OK=.false.
   
-  call ut_report(OK,'Grid_Descriptors::vgd_new vertical generate initializer SLEVE like coordinate')
+  nullify(ip1s,levels,levels_3d)
+
+  p0(:,1) =(/100000.,50000./)
+  p0l(:,1)=(/100000.,90000./)
+
+  ! Construct a new set of vertical coordinate descriptors 5100
+  stat = vgd_new(vgd,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,avg_L=.true.)
+  stat = vgd_print(vgd)
+  file='data/data_constructor_gen_5100_avg.txt'
+  stat = test_5100(vgd,file,write_control_L,stat)
+  if(stat.eq.VGD_ERROR)OK=.false.  
+
+  stat = vgd_new(vgd,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,avg_L=.false.)
+  stat = vgd_print(vgd)
+  file='data/data_constructor_gen_5100.txt'
+  stat = test_5100(vgd,file,write_control_L,stat)
+  if(stat.eq.VGD_ERROR)OK=.false.  
+
+  if(.false.)then
+     stat = vgd_get(vgd,'VIPM',ip1s)
+     print*,'ip1s=',ip1s
+     stat = vgd_levels(vgd,ip1s,levels,sfc_field=100000.,in_log=.false.,sfc_field_ls=100000.)
+     print*,'levels=',levels
+     
+     stat = vgd_get(vgd,'VIPT',ip1s)
+     print*,'ip1s=',ip1s
+     stat = vgd_levels(vgd,ip1s,levels,sfc_field=100000.,in_log=.false.,sfc_field_ls=100000.)
+     print*,'levels=',levels
+     stat = vgd_levels(vgd,ip1s,levels_3d,sfc_field=p0,in_log=.false.,sfc_field_ls=p0l)
+     print*,'levels_3d(1,1,1:size(levels_3d,dim=3))=',levels_3d(1,1,1:size(levels_3d,dim=3))
+     print*,'levels_3d(2,1,1:size(levels_3d,dim=3))=',levels_3d(2,1,1:size(levels_3d,dim=3))
+  endif
+
+  call ut_report(OK,'Grid_Descriptors::vgd_new vertical generate initializer (5100) value')
 end program constructor
 !==============================================================================
 !===============================================================================
 !===============================================================================
-integer function test_sleve(F_d,F_file,F_write_control_L,F_stat) result(istat)
+integer function test_5100(F_d,F_file,F_write_control_L,F_stat) result(istat)
    !
    use vGrid_Descriptors, only: vgrid_descriptor,vgd_get,VGD_ERROR,VGD_OK
    implicit none
@@ -86,19 +102,19 @@ integer function test_sleve(F_d,F_file,F_write_control_L,F_stat) result(istat)
    real, dimension(:), pointer :: vcdm,vcdt,work
    real*8, dimension(:), pointer :: b_m_8,c_m_8,a_m_8,b_t_8,c_t_8,a_t_8,work_8
    integer, dimension(:), pointer :: vipm,vipt,work_i
-   integer :: nl_m,nl_t,k,nk,stat,kind,vers,vcode,ip1,my_ip1
-
-   nullify(vcdm,vcdt,work,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,work_8,vipm,vipt,work_i)
+   integer :: nl_m,nl_t,k,nk,kind,vers,ip1,my_ip1
 
    istat=VGD_OK
 
    call flush(6)
 
    if(F_stat.eq.VGD_ERROR)then
-      print*,'In test_5002: test not performed, since previous command failed'
+      print*,'In test_5100: test not performed, since previous command failed'
       istat=VGD_ERROR
       return
    endif
+
+   nullify(vcdm,vcdt,work,b_m_8,c_m_8,a_m_8,b_t_8,c_t_8,a_t_8,work_8,vipm,vipt,work_i)
 
    if( vgd_get(F_d,key='KIND - vertical coordinate ip1 kind' ,value=kind)   == VGD_ERROR) return
    if( vgd_get(F_d,key='VERS - vertical coordinate version'  ,value=vers)   == VGD_ERROR) return
@@ -151,40 +167,22 @@ integer function test_sleve(F_d,F_file,F_write_control_L,F_stat) result(istat)
   read(10,*)work_8
 
   do k=1,nk
-     if(a_m_8(k).eq.0.)then
-        if(abs(work_8(k)-a_m_8(k))>100.*epsilon(a_m_8(k)))then
-           istat=VGD_ERROR
-           print*,'Probleme avec A M, pas dans les limites tollerees'
-           print*,work_8(k),'vs'
-           print*,a_m_8(k)
-        endif
-     else
-        if(abs(work_8(k)-a_m_8(k))/a_m_8(k)>100.*epsilon(a_m_8(k)))then
-           istat=VGD_ERROR
-           print*,'Probleme avec A M, pas dans les limites tollerees'
-           print*,work_8(k),'vs'
-           print*,a_m_8(k)
-        endif
+     if(abs(work_8(k)-a_m_8(k))/a_m_8(k)>100.*epsilon(a_m_8(k)))then
+        istat=VGD_ERROR
+        print*,'Probleme avec A M, pas dans les limites tollerees'
+        print*,work_8(k),'vs'
+        print*,a_m_8(k)
      endif
   enddo
 
   print*,'Reading A T'
   read(10,*)work_8
   do k=1,nk
-     if(a_t_8(k).eq.0.)then
-        if(abs(work_8(k)-a_t_8(k))>100.*epsilon(1.))then
-           istat=VGD_ERROR
-           print*,'Probleme avec A T, pas dans les limites tollerees'
-           print*,work_8(k),'vs'
-           print*,a_t_8(k)
-        endif
-     else
-        if(abs(work_8(k)-a_t_8(k))/a_t_8(k)>100.*epsilon(1.))then
-           istat=VGD_ERROR
-           print*,'Probleme avec A T, pas dans les limites tollerees'
-           print*,work_8(k),'vs'
-           print*,a_t_8(k)
-        endif
+     if(abs(work_8(k)-a_t_8(k))/a_t_8(k)>100.*epsilon(1.))then
+        istat=VGD_ERROR
+        print*,'Probleme avec A T, pas dans les limites tollerees'
+        print*,work_8(k),'vs'
+        print*,a_t_8(k)
      endif
   enddo
  
@@ -334,6 +332,6 @@ integer function test_sleve(F_d,F_file,F_write_control_L,F_stat) result(istat)
 
   close(10)
 
-  deallocate(vcdm,vcdt,work,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,work_8,vipm,vipt,work_i)
+  deallocate(vcdm,vcdt,work,b_m_8,a_m_8,b_t_8,a_t_8,work_8,vipm,vipt,work_i)
 
-end function test_sleve
+end function test_5100

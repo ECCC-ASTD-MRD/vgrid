@@ -64,6 +64,9 @@ for test in ${tests[*]} ; do
   fi      
   printf "Testing ${test} ${MESSAGE}..."
   ./${test} >${test}.out 2>&1
+  #d.valgrind --suppressions=$HOME/fst.sup ./${test} >${test}.out 2>&1
+  #more ${test}.out
+
   result=`cat ${report_file}`
   Other_Tests
   if [[ ${result} == ' ok' && ${result_o} == ' ok' ]] ; then
