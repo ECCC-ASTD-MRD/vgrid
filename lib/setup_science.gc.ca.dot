@@ -1,3 +1,5 @@
+MODELUTILS=/fs/ssm/eccc/mrd/rpn/MIG/ENV/d/modelutils/modelutils_1.4-LTS.4
+
 case "${ORDENV_PLAT}" in
 
    ubuntu-14.04-amd64-64)
@@ -12,7 +14,7 @@ case "${ORDENV_PLAT}" in
       . ssmuse-sh -x ${HPCS_BASE} -d ${HPCS_COMP} 
       . ssmuse-sh -p ${HPCS_CODE_TOOL}
       . ssmuse-sh -d ${RPN_LIB}
-      . ssmuse-sh -p ${BH_PACKAGE}
+      . ssmuse-sh -p ${BH_PACKAGE} -d ${MODELUTILS}
       :;;
    sles-11-haswell-64-xc40)
       BH_MAKE=make
@@ -22,7 +24,11 @@ case "${ORDENV_PLAT}" in
       MY_FFLAGS="-openmp -fp-model source -warn all ${MY_FFLAGS}"
       . ssmuse-sh -d ${RPN_LIB}
       . ssmuse-sh -p ${BH_PACKAGE}
-      :;;
+       # There are no modelutils for haswell we take it from broadwell
+      . ssmuse-sh -p ${BH_PACKAGE} -d ${MODELUTILS}
+      MU_LIB=$(echo ${MODELUTILS}/${ORDENV_PLAT}/lib/${COMP_ARCH} | sed 's/sles-11-haswell-64-xc40/sles-11-broadwell-64-xc40/')
+      export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${MU_LIB}"
+     :;;
    sles-11-broadwell-64-xc40)
       # Pour obtenir l'architecture broadwell faire :
       # . r.env.dot --arch sles-11-broadwell-64-xc40
@@ -32,7 +38,7 @@ case "${ORDENV_PLAT}" in
       RPN_LIB=/fs/ssm/eccc/mrd/rpn/libs/16.2
       MY_FFLAGS="-openmp -fp-model source -warn all ${MY_FFLAGS}"
       . ssmuse-sh -d ${RPN_LIB}
-      . ssmuse-sh -p ${BH_PACKAGE}
+      . ssmuse-sh -p ${BH_PACKAGE} -d ${MODELUTILS}
       :;;
 
    "") echo "ERROR: variable ORDENV_PLAT not set"
