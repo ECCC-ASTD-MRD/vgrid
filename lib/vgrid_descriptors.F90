@@ -64,8 +64,10 @@ module vGrid_Descriptors
   integer, dimension(7), parameter :: pref_8_valid=                  (/1003,5001,5002,5003,5004,5005,5100/)
   integer, dimension(8), parameter :: rcoef1_valid=                  (/1003,5001,5002,5003,5004,5005,5100,3001/)
   integer, dimension(6), parameter :: rcoef2_valid=                            (/5002,5003,5004,5005,5100,3001/)
-  integer, dimension(12),parameter :: a_m_8_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004,5005,5100,3001,5999/)
-  integer, dimension(12),parameter :: b_m_8_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004,5005,5100,3001,5999/)
+  integer, dimension(2), parameter :: rcoef3_valid=                                                (/5100,     3002/)
+  integer, dimension(2), parameter :: rcoef4_valid=                                                (/5100,     3002/)
+  integer, dimension(12),parameter :: a_m_8_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004,5005,5100,3001,     5999/)
+  integer, dimension(12),parameter :: b_m_8_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004,5005,5100,3001,     5999/)
   integer, dimension(2), parameter :: c_m_8_valid=                                                 (/5100,3001/)
   integer, dimension(6), parameter :: a_t_8_valid=                             (/5002,5003,5004,5005,5100,3001/)
   integer, dimension(10),parameter :: a_t_8_valid_get=(/1001,1002,     2001,5001,5002,5003,5004,5005,5100,3001/)
@@ -76,11 +78,11 @@ module vGrid_Descriptors
   integer, dimension(1), parameter :: a_zd_8_valid=                                                     (/3001/)
   integer, dimension(1), parameter :: b_zd_8_valid=                                                     (/3001/)
   integer, dimension(1), parameter :: c_zd_8_valid=                                                     (/3001/)
-  integer, dimension(12),parameter :: ip1_m_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004,5005,5100,3001,5999/)
+  integer, dimension(12),parameter :: ip1_m_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004,5005,5100,3001,     5999/)
   integer, dimension(6), parameter :: ip1_t_valid=                             (/5002,5003,5004,5005,5100,3001/)
-  integer, dimension(11),parameter :: ip1_t_valid_get=(/1001,1002,     2001,5001,5002,5003,5004,5005,5100,3001,5999/)
-  integer, dimension(11),parameter :: ref_name_valid= (/1001,1002,1003     ,5001,5002,5003,5004,5005,5100,3001,5999/)
-  integer, dimension(2), parameter :: ref_namel_valid=                                             (/5100,3002/)
+  integer, dimension(11),parameter :: ip1_t_valid_get=(/1001,1002,     2001,5001,5002,5003,5004,5005,5100,3001,     5999/)
+  integer, dimension(11),parameter :: ref_name_valid= (/1001,1002,1003     ,5001,5002,5003,5004,5005,5100,3001,     5999/)
+  integer, dimension(2), parameter :: ref_namel_valid=                                             (/5100,     3002/)
   integer, dimension(3), parameter :: dhm_valid=                                              (/5005,5100,3001/)
   integer, dimension(3), parameter :: dht_valid=                                              (/5005,5100,3001/)
 
@@ -124,6 +126,7 @@ module vGrid_Descriptors
      integer, dimension(:), pointer :: ip1_m=>null()    !ip1 values for momentum levels
      integer, dimension(:), pointer :: ip1_t=>null()    !ip1 values for thermodynamic levels
      real :: rcoef1=VGD_MISSING,rcoef2=VGD_MISSING      !Rectification coefficients
+     real :: rcoef3=VGD_MISSING,rcoef4=VGD_MISSING      !Rectification coefficients large scale
      logical :: initialized=.false.                     !initialization status of the structure
      logical :: match_ipig                              !do ip/ig matching for records
      logical :: valid=.false.                           !Validity of structure
@@ -633,14 +636,14 @@ contains
    end function new_from_table
 
    integer function new_build_vert(self,kind,version,nk,ip1,ip2, &
-        ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8, &
+        ptop_8,pref_8,rcoef1,rcoef2,rcoef3,rcoef4,a_m_8,b_m_8,a_t_8,b_t_8, &
         ip1_m,ip1_t,c_m_8,c_t_8) result(status)
       ! Coordinate constructor - build vertical descriptor from arguments
       type(vgrid_descriptor) :: self                    !Vertical descriptor instance    
       integer, intent(in) :: kind,version               !Kind,version to create
       integer, intent(in) :: nk                         !Number of levels
       integer, optional, intent(in) :: ip1,ip2          !IP1,2 values for FST file record [0,0]
-      real, optional, intent(in) :: rcoef1,rcoef2       !R-coefficient values for rectification
+      real, optional, intent(in) :: rcoef1,rcoef2,rcoef3,rcoef4 !R-coefficient values for rectification
       real*8, optional, intent(in) :: ptop_8            !Top-level pressure (Pa)
       real*8, optional, intent(in) :: pref_8            !Reference-level pressure (Pa)
       real*8, optional, dimension(:) :: a_m_8,a_t_8     !A-coefficients for momentum(m),thermo(t) levels
@@ -698,6 +701,24 @@ contains
             self%rcoef2 = rcoef2
          else
             write(for_msg,*) 'rcoef2 is a required constructor entry'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            missingInput = .true.
+         endif
+      endif
+      if(is_valid(self,rcoef3_valid)) then
+         if(present(rcoef3))then
+            self%rcoef3 = rcoef3
+         else
+            write(for_msg,*) 'rcoef3 is a required constructor entry'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            missingInput = .true.
+         endif
+      endif
+      if(is_valid(self,rcoef4_valid)) then
+         if(present(rcoef4))then
+            self%rcoef4 = rcoef4
+         else
+            write(for_msg,*) 'rcoef4 is a required constructor entry'
             call msg(MSG_ERROR,VGD_PRFX//for_msg)
             missingInput = .true.
          endif
@@ -897,7 +918,7 @@ contains
       return
    end function new_build_vert
 
-   integer function new_gen(self,kind,version,hyb,rcoef1,rcoef2,ptop_8,pref_8,ptop_out_8,ip1,ip2,stdout_unit,dhm,dht,avg_L) result(status)
+   integer function new_gen(self,kind,version,hyb,rcoef1,rcoef2,rcoef3,rcoef4,ptop_8,pref_8,ptop_out_8,ip1,ip2,stdout_unit,dhm,dht,avg_L) result(status)
       use vdescript_1001,      only: vgrid_genab_1001
       use vdescript_1002_5001, only: vgrid_genab_1002_5001
       use vdescript_2001,      only: vgrid_genab_2001
@@ -908,7 +929,7 @@ contains
       type(vgrid_descriptor),intent(inout) :: self      !Vertical descriptor instance    
       integer, intent(in) :: kind,version               !Kind,version to create
       real, dimension(:),intent(in) :: hyb              !List of hybrid levels
-      real, optional, intent(in) :: rcoef1,rcoef2       !R-coefficient values for rectification
+      real, optional, intent(in) :: rcoef1,rcoef2,rcoef3,rcoef4 !R-coefficient values for rectification
       real*8, optional, intent(in) :: ptop_8            !Top-level pressure (Pa) inout
       real*8, optional, intent(out):: ptop_out_8        !Top-level pressure (Pa) output if ptop_8 < 0
       real*8, optional, intent(in) :: pref_8            !Reference-level pressure (Pa)
@@ -983,6 +1004,20 @@ contains
             errorInput = .true.
          endif
       endif
+      if(is_valid(self,rcoef3_valid)) then
+         if(.not.present(rcoef3))then
+            write(for_msg,*) 'rcoef3 is a required constructor entry'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            errorInput = .true.
+         endif
+      endif
+      if(is_valid(self,rcoef4_valid)) then
+         if(.not.present(rcoef4))then
+            write(for_msg,*) 'rcoef4 is a required constructor entry'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            errorInput = .true.
+         endif
+      endif      
       if(is_valid(self,dhm_valid)) then
          if(.not.present(dhm))then
             write(for_msg,*) 'dhm is a required constructor entry'
@@ -1021,6 +1056,16 @@ contains
       endif
       if(present(rcoef2).and.(.not.is_valid(self,rcoef2_valid)))then
          write(for_msg,*) 'rcoef2 is not a required constructor entry'
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         errorInput = .true.
+      endif
+      if(present(rcoef3).and.(.not.is_valid(self,rcoef3_valid)))then
+         write(for_msg,*) 'rcoef3 is not a required constructor entry'
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         errorInput = .true.
+      endif
+      if(present(rcoef4).and.(.not.is_valid(self,rcoef4_valid)))then
+         write(for_msg,*) 'rcoef4 is not a required constructor entry'
          call msg(MSG_ERROR,VGD_PRFX//for_msg)
          errorInput = .true.
       endif
@@ -1252,7 +1297,7 @@ contains
          if (errorInput) return
          my_avg_L=.true.
          if(present(avg_L))my_avg_L=avg_L
-         call vgrid_genab_5100(hyb,(/rcoef1,rcoef2/),pref_8, &
+         call vgrid_genab_5100(hyb,(/rcoef1,rcoef2,rcoef3,rcoef4/),pref_8, &
               a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,ip1_m,ip1_t,error,ptop_out_8=ptop_out_8, &
               dhm=dhm,dht=dht,avg_L=avg_L)
          if (error /= VGD_OK)then
@@ -1273,6 +1318,8 @@ contains
               pref_8=pref_8,       &
               rcoef1=rcoef1,       &
               rcoef2=rcoef2,       &
+              rcoef3=rcoef3,       &
+              rcoef4=rcoef4,       &
               a_m_8=a_m_8,         &
               b_m_8=b_m_8,         &
               c_m_8=c_m_8,       &
@@ -1321,6 +1368,8 @@ contains
      if(associated(self%ip1_t))deallocate(self%ip1_t)
      self%rcoef1=VGD_MISSING
      self%rcoef2=VGD_MISSING
+     self%rcoef3=VGD_MISSING
+     self%rcoef4=VGD_MISSING
      self%initialized=.false.
      self%valid=.false.
      self%ip1=0
@@ -1590,7 +1639,21 @@ contains
           value = get_error(key,my_quiet)
           return
        endif
-    case ('DHM ')
+    case ('RC_3')
+       if (is_valid(self,rcoef3_valid)) then
+          value = self%rcoef3
+       else
+          value = get_error(key,my_quiet)
+          return
+       endif
+    case ('RC_4')
+       if (is_valid(self,rcoef4_valid)) then
+          value = self%rcoef4
+       else
+          value = get_error(key,my_quiet)
+          return
+       endif
+     case ('DHM ')
        if (is_valid(self,dhm_valid)) then
           iwork=self%ip1_m(size(self%ip1_m))          
           call convip(iwork,work,kind,-1,dum_S,.false.)
@@ -1755,6 +1818,20 @@ contains
     case ('RC_2')
        if (is_valid(self,rcoef2_valid)) then
           value = self%rcoef2
+       else
+          value = dble(get_error(key,my_quiet))
+          return
+       endif
+    case ('RC_3')
+       if (is_valid(self,rcoef3_valid)) then
+          value = self%rcoef3
+       else
+          value = dble(get_error(key,my_quiet))
+          return
+       endif
+    case ('RC_4')
+       if (is_valid(self,rcoef4_valid)) then
+          value = self%rcoef4
        else
           value = dble(get_error(key,my_quiet))
           return
@@ -2250,6 +2327,12 @@ contains
     case ('RC_2')
        self%rcoef2 = value
        if (.not.is_valid(self,rcoef2_valid)) error = put_error(key)
+    case ('RC_3')
+       self%rcoef3 = value
+       if (.not.is_valid(self,rcoef3_valid)) error = put_error(key)
+    case ('RC_4')
+       self%rcoef4 = value
+       if (.not.is_valid(self,rcoef4_valid)) error = put_error(key)
     case DEFAULT
        write(for_msg,*) 'invalid key '//trim(key)//' given to gd_put (real8)'
        call msg(MSG_ERROR,VGD_PRFX//for_msg)
@@ -2530,6 +2613,14 @@ contains
        endif
        if (is_valid(self,rcoef2_valid))then
           write(for_msg,*)'  rcoef2=',self%rcoef2
+          call msg(MSG_VERBATIM,trim(for_msg))
+       endif
+       if (is_valid(self,rcoef3_valid))then
+          write(for_msg,*)'  rcoef3=',self%rcoef3
+          call msg(MSG_VERBATIM,trim(for_msg))
+       endif
+       if (is_valid(self,rcoef4_valid))then
+          write(for_msg,*)'  rcoef4=',self%rcoef4
           call msg(MSG_VERBATIM,trim(for_msg))
        endif
        if (is_valid(self,ref_name_valid))then
@@ -3916,6 +4007,8 @@ end function heights_withref_pressure_based
    if (vgd1%pref_8 /= vgd2%pref_8) return
    if (vgd1%rcoef1 /= vgd2%rcoef1) return
    if (vgd1%rcoef2 /= vgd2%rcoef2) return
+   if (vgd1%rcoef3 /= vgd2%rcoef3) return
+   if (vgd1%rcoef4 /= vgd2%rcoef4) return
 
    ! Check pointer associations and values
    if (.not.same_vec(vgd1%ip1_m,vgd2%ip1_m)) return
@@ -4608,9 +4701,9 @@ end function heights_withref_pressure_based
      endif
 
      ! Fill header
-     self%table(1:4,1,1)=(/dble(self%kind),dble(self%version),dble(skip)       ,self%ptop_8/)
-     self%table(1:4,2,1)=(/self%pref_8    ,dble(self%rcoef1) ,dble(self%rcoef2),for_char_8_P0/)     
-     self%table(1  ,3,1)=for_char_8_P0LS
+     self%table(1:4,1,1)=(/dble(self%kind)  ,dble(self%version),dble(skip)       ,self%ptop_8/)
+     self%table(1:4,2,1)=(/self%pref_8      ,dble(self%rcoef1) ,dble(self%rcoef2),dble(self%rcoef3)/)
+     self%table(1:3,3,1)=(/dble(self%rcoef4),for_char_8_P0     ,for_char_8_P0LS/)
 
      ! Fill momentum level data
      do k=1,nb
@@ -5213,14 +5306,16 @@ end function heights_withref_pressure_based
      self%pref_8   =       self%table(1,2,1)
      self%rcoef1   =  real(self%table(2,2,1))
      self%rcoef2   =  real(self%table(3,2,1))
-     error = flip_transfer(self%table(4,2,1),self%ref_name)
+     self%rcoef3   =  real(self%table(4,2,1))
+     ! Read header line 3
+     self%rcoef4   =  real(self%table(1,3,1))
+     error = flip_transfer(self%table(2,3,1),self%ref_name)
      if (error /= VGD_OK) then
         write(for_msg,*) 'flip_transfer function returned an error code from decode for self%ref_name',error
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
-     ! Read header line 3
-     error = flip_transfer(self%table(1,3,1),self%ref_namel)
+     error = flip_transfer(self%table(3,3,1),self%ref_namel)
      if (error /= VGD_OK) then
         write(for_msg,*) 'flip_transfer function returned an error code from decode for self%ref_namel',error
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
@@ -5526,8 +5621,8 @@ end function heights_withref_pressure_based
     case (5100)
        etiket='STG_CP_GEMV4'
        ig2=0
-       ig3=nint(self%rcoef1*100.)
-       ig4=nint(self%rcoef2*100.)        
+       ig3=0
+       ig4=0
     case (5999)
        etiket='UNSTAG_OTHER'
     case DEFAULT

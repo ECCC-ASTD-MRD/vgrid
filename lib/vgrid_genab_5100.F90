@@ -100,8 +100,8 @@ contains
 
       ! Set size of the problem
       nk = size(F_hybuser)
-      if (size(F_rcoef) /= 2) then
-         write(for_msg,*) 'In '//trim(func_name)//' Size of F_rcoef should be 2, it is ',size(F_rcoef)
+      if (size(F_rcoef) /= 4) then
+         write(for_msg,*) 'In '//trim(func_name)//' Size of F_rcoef should be 4, it is ',size(F_rcoef)
          call msg(MSG_ERROR,VGD_PRFX//for_msg)
          return
       endif
@@ -174,8 +174,8 @@ contains
       do k = 1, Nk
          zeta_8  = zsrf_8+log(F_hybuser(k)*1.d0)
          lamba_8 = min(1.d0,max(0.d0,(zeta_8- zeta1_8)*pr1))
-         rcoefL  = F_rcoef(1) * ( 1.d0 - lamba_8 )
-         rcoef   = F_rcoef(2) * ( 1.d0 - lamba_8 )
+         rcoefL  = F_rcoef(2)-(F_rcoef(2)-F_rcoef(1))*lamba_8
+         rcoef   = F_rcoef(4)-(F_rcoef(4)-F_rcoef(3))*lamba_8
          F_am_8(k) = zeta_8
          F_bm_8(k) = lamba_8 ** rcoef
          F_cm_8(k) = lamba_8 ** rcoefL - F_bm_8(k)
@@ -209,8 +209,8 @@ contains
             F_ct_8(k) = 0.5d0*( F_cm_8(k) + F_cm_8(k+1) ) 
          else
             lamba_8 = min(1.d0,max(0.d0,(zeta_8- zeta1_8)*pr1))
-            rcoefL  = F_rcoef(1) * ( 1.d0 - lamba_8 )
-            rcoef   = F_rcoef(2) * ( 1.d0 - lamba_8 )
+            rcoefL  = F_rcoef(2)-(F_rcoef(2)-F_rcoef(1))*lamba_8
+            rcoef   = F_rcoef(4)-(F_rcoef(4)-F_rcoef(3))*lamba_8
             F_bt_8(k) = lamba_8 ** rcoef
             F_ct_8(k) = lamba_8 ** rcoefL - F_bt_8(k)
          endif
