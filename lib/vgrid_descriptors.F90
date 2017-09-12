@@ -126,7 +126,7 @@ module vGrid_Descriptors
      integer, dimension(:), pointer :: ip1_m=>null()    !ip1 values for momentum levels
      integer, dimension(:), pointer :: ip1_t=>null()    !ip1 values for thermodynamic levels
      real :: rcoef1=VGD_MISSING,rcoef2=VGD_MISSING      !Rectification coefficients
-     real :: rcoef3=VGD_MISSING,rcoef4=VGD_MISSING      !Rectification coefficients large scale
+     real :: rcoef3=VGD_MISSING,rcoef4=VGD_MISSING      !Rectification coefficients
      logical :: initialized=.false.                     !initialization status of the structure
      logical :: match_ipig                              !do ip/ig matching for records
      logical :: valid=.false.                           !Validity of structure
@@ -1483,6 +1483,8 @@ contains
        value = self%kind
     case ('VERS')
        value = self%version
+    case ('VCOD')
+       value = self%vcode
     case ('NL_M')
        istat=vgd_get(self,key='VIPM - level ip1 list (m)',value=vip)
        if(istat /= VGD_OK)then
@@ -1653,7 +1655,7 @@ contains
           value = get_error(key,my_quiet)
           return
        endif
-     case ('DHM ')
+    case ('DHM ')
        if (is_valid(self,dhm_valid)) then
           iwork=self%ip1_m(size(self%ip1_m))          
           call convip(iwork,work,kind,-1,dum_S,.false.)
@@ -2709,7 +2711,7 @@ contains
           write(for_msg,*)'  Diagnostic thermo   level (ip1=',self%ip1_t(nk),') at ',height,' m Above Ground Level'          
           call msg(MSG_VERBATIM,trim(for_msg))
           write(for_msg,*)"  Equation to compute hydrostatic pressure (pi): ln(pi) = A + B*ln(P0*100/pref) + C*ln(P0LS*100/pref)"
-          call msg(MSG_VERBATIM,trim(for_msg))        
+          call msg(MSG_VERBATIM,trim(for_msg))
        case(5999)
           nk=size(self%ip1_m)
           write(for_msg,*)'  Number of hybrid unstaggered levels of unknown origin',nk
@@ -3790,7 +3792,6 @@ contains
        istat = compute_heights_3001_8(self,sfc_field,ip1_list,levels)
     case (5100)
        istat = compute_pressure_5100_8(self,sfc_field,sfc_field_ls,ip1_list,levels,my_in_log,my_dpidpis)
-       print*,'levels(1,1,:)',levels
     case (5999)
        if(my_dpidpis)then
           write(for_msg,*) 'dpidpis is not availabe for Vcode 5999'
@@ -4009,6 +4010,8 @@ end function heights_withref_pressure_based
    if (vgd1%rcoef2 /= vgd2%rcoef2) return
    if (vgd1%rcoef3 /= vgd2%rcoef3) return
    if (vgd1%rcoef4 /= vgd2%rcoef4) return
+   if (vgd1%dhm /= vgd2%dhm) return
+   if (vgd1%dht /= vgd2%dht) return
 
    ! Check pointer associations and values
    if (.not.same_vec(vgd1%ip1_m,vgd2%ip1_m)) return
@@ -4019,7 +4022,10 @@ end function heights_withref_pressure_based
    if (.not.same_vec(vgd1%a_t_8,vgd2%a_t_8)) return
    if (.not.same_vec(vgd1%b_t_8,vgd2%b_t_8)) return
    if ( is_valid(vgd1,c_t_8_valid) .and. (.not.same_vec(vgd1%c_t_8,vgd2%c_t_8)) ) return
-   if (.not.same_vec(vgd1%table,vgd2%table)) return
+   ! Do not check table since all above parameters consist in a full check
+   ! Also, the transfer from char to real*8 do not always give same real8 value which
+   ! made equality to be false even if above parameters are equal.
+   !if (.not.same_vec(vgd1%table,vgd2%table)) return
 
    ! The full structure is equivalent
    equal = .true.
@@ -4703,7 +4709,7 @@ end function heights_withref_pressure_based
      ! Fill header
      self%table(1:4,1,1)=(/dble(self%kind)  ,dble(self%version),dble(skip)       ,self%ptop_8/)
      self%table(1:4,2,1)=(/self%pref_8      ,dble(self%rcoef1) ,dble(self%rcoef2),dble(self%rcoef3)/)
-     self%table(1:3,3,1)=(/dble(self%rcoef4),for_char_8_P0     ,for_char_8_P0LS/)
+     self%table(1:4,3,1)=(/dble(self%rcoef4),for_char_8_P0     ,for_char_8_P0LS  ,0.d0/)
 
      ! Fill momentum level data
      do k=1,nb
@@ -4814,7 +4820,7 @@ end function heights_withref_pressure_based
 
      ! Fill header
      self%table(1:3,1,1)=(/dble(self%kind)  ,dble(self%version),dble(skip)/)
-     self%table(1  ,2,1)=for_char_8
+     self%table(1:3,2,1)=(/for_char_8       ,0.d0              ,0.d0      /)
 
      ! Fill momentum level data
      do k=1,F_nk
