@@ -21,5 +21,6 @@ To add a new vertical coordinate type:
       TESTL get_logp
 14- Add elements to test_equality if any
 15- Add code in case statement of function table_update for new Vcode
+16- Add new elements to the structure in the garbage_collection function
 
 While doing the above, write tests cases to tests the added feature. Leave tests in tests/src directory.

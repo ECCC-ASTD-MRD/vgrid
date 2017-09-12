@@ -17,9 +17,9 @@ MAX_CPUS=12
 	s.f90 -c $(MY_FFLAGS) -libpath $(DESCRIP_PATH) -I$(DESCRIP_PATH) $<
 
 
-OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/utils.o unit_testing.o
+OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/vgrid_utils.o unit_testing.o
 
-unit_testing.o: unit_testing.F90 $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/utils.o
+unit_testing.o: unit_testing.F90 $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/vgrid_utils.o
 
 alltests:
 	make tests DATA_ARCH=Linux; \
@@ -29,8 +29,8 @@ alltests:
 $(DESCRIP_PATH)/vgrid_descriptors.o: $(DESCRIP_PATH)/vgrid_descriptors.F90
 	(cd $(DESCRIP_PATH) && $(MAKE) $(MAKEFLAGS) vgrid_descriptors.o)
 
-$(DESCRIP_PATH)/utils.o: $(DESCRIP_PATH)/utils.F90
-	(cd $(DESCRIP_PATH) && $(MAKE) $(MAKEFLAGS) utils.o)
+$(DESCRIP_PATH)/vgrid_utils.o: $(DESCRIP_PATH)/vgrid_utils.F90
+	(cd $(DESCRIP_PATH) && $(MAKE) $(MAKEFLAGS) vgrid_utils.o)
 
 tests:
 	rm -rf data/* 2>/dev/null ;\

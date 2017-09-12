@@ -14,7 +14,7 @@ DESCRIP_PATH = ../lib
 %.o: %.F90    
 	s.f90 -c $(MY_FFLAGS) -libpath $(DESCRIP_PATH) -I$(DESCRIP_PATH) $<
 
-OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/vgrid_genab_5100.o $(DESCRIP_PATH)/vgrid_genab_5002.o $(DESCRIP_PATH)/vgrid_genab_1002_5001.o $(DESCRIP_PATH)/vgrid_genab_1001.o $(DESCRIP_PATH)/vgrid_genab_1004.o $(DESCRIP_PATH)/vgrid_genab_2001.o $(DESCRIP_PATH)/utils.o unit_testing.o
+OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/vgrid_genab_5100.o $(DESCRIP_PATH)/vgrid_genab_5002.o $(DESCRIP_PATH)/vgrid_genab_1002_5001.o $(DESCRIP_PATH)/vgrid_genab_1001.o $(DESCRIP_PATH)/vgrid_genab_1004.o $(DESCRIP_PATH)/vgrid_genab_2001.o $(DESCRIP_PATH)/vgrid_utils.o unit_testing.o
 
 UNIT_TEST: $(OBJECTS) UNIT_TEST.F90
 	s.compile -src UNIT_TEST.F90 -obj $(OBJECTS) -o UNIT_TEST -optf "=$(MY_FFLAGS)" -librmn -includes $(DESCRIP_PATH)
@@ -39,8 +39,8 @@ $(DESCRIP_PATH)/vgrid_genab_1001.o: $(DESCRIP_PATH)/vgrid_genab_1001.F90
 $(DESCRIP_PATH)/vgrid_genab_1004.o: $(DESCRIP_PATH)/vgrid_genab_1004.F90
 	(cd $(DESCRIP_PATH) && $(MAKE) vgrid_genab_1004.o)
 
-$(DESCRIP_PATH)/utils.o: $(DESCRIP_PATH)/utils.F90
-	(cd $(DESCRIP_PATH) && $(MAKE) utils.o)
+$(DESCRIP_PATH)/vgrid_utils.o: $(DESCRIP_PATH)/vgrid_utils.F90
+	(cd $(DESCRIP_PATH) && $(MAKE) vgrid_utils.o)
 
 clean:
 	rm -f *.o *.mod

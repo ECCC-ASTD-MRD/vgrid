@@ -77,7 +77,7 @@ contains
     ! Modifs 
     ! Andre Plante June 2012 : force real*8 in compuation of log(F_hybuser(k)*1.d0) in
       
-    use utils, only: comp_diag_a
+    use vgrid_utils, only: comp_diag_a
 
     implicit none
     !      

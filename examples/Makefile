@@ -13,7 +13,7 @@ DIST=use_new_read use_new_gen topLevel_levels lowLevel_levels use_dpidpis gen_59
 .F90.o:
 	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -src $<
 
-OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/vgrid_genab_5002.o $(DESCRIP_PATH)/vgrid_genab_1002_5001.o $(DESCRIP_PATH)/vgrid_genab_1001.o  $(DESCRIP_PATH)/vgrid_genab_2001.o $(DESCRIP_PATH)/vgrid_genab_1004.o $(DESCRIP_PATH)/utils.o $(DESCRIP_PATH)/vgrid_genab_5100.o
+OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/vgrid_genab_5002.o $(DESCRIP_PATH)/vgrid_genab_1002_5001.o $(DESCRIP_PATH)/vgrid_genab_1001.o  $(DESCRIP_PATH)/vgrid_genab_2001.o $(DESCRIP_PATH)/vgrid_genab_1004.o $(DESCRIP_PATH)/vgrid_utils.o $(DESCRIP_PATH)/vgrid_genab_5100.o
 
 all: $(DIST)
 
@@ -59,8 +59,8 @@ $(DESCRIP_PATH)/vgrid_genab_1002_5001.o: $(DESCRIP_PATH)/vgrid_genab_1002_5001.F
 $(DESCRIP_PATH)/vgrid_genab_5100.o: $(DESCRIP_PATH)/vgrid_genab_5100.F90
 	(cd $(DESCRIP_PATH) && $(MAKE) $(MAKEFLAGS) vgrid_genab_5100.o)
 
-$(DESCRIP_PATH)/utils.o: $(DESCRIP_PATH)/utils.F90
-	(cd $(DESCRIP_PATH) && $(MAKE) $(MAKEFLAGS) utils.o)
+$(DESCRIP_PATH)/vgrid_utils.o: $(DESCRIP_PATH)/vgrid_utils.F90
+	(cd $(DESCRIP_PATH) && $(MAKE) $(MAKEFLAGS) vgrid_utils.o)
 
 clean:
 	rm -f *.o *.mod test_output.fst

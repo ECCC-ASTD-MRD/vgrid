@@ -38,7 +38,7 @@ program constructor
        0.8791828, 0.8983018, 0.9159565, 0.9322280, 0.9471967, 0.9609448, &
        0.9735557, 0.9851275, 0.9950425/)
   real, dimension(2,1) :: p0, p0l
-  real :: rcoef1=4.,rcoef2=200.
+  real :: rcoef1=0.,rcoef2=4.,rcoef3=0.,rcoef4=200.
   
   real, pointer, dimension(:) :: levels
   real, pointer, dimension(:,:,:) :: levels_3d
@@ -55,13 +55,13 @@ program constructor
   p0l(:,1)=(/100000.,90000./)
 
   ! Construct a new set of vertical coordinate descriptors 5100
-  stat = vgd_new(vgd,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,avg_L=.true.)
+  stat = vgd_new(vgd,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,rcoef3=rcoef3,rcoef4=rcoef4,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,avg_L=.true.)
   stat = vgd_print(vgd)
   file='data/data_constructor_gen_5100_avg.txt'
   stat = test_5100(vgd,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.  
 
-  stat = vgd_new(vgd,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,avg_L=.false.)
+  stat = vgd_new(vgd,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,rcoef3=rcoef3,rcoef4=rcoef4,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,avg_L=.false.)
   stat = vgd_print(vgd)
   file='data/data_constructor_gen_5100.txt'
   stat = test_5100(vgd,file,write_control_L,stat)

@@ -63,6 +63,8 @@ module vGrid_Descriptors
   integer, dimension(7), parameter :: pref_8_valid=                  (/1003,5001,5002,5003,5004,5005,5100/)
   integer, dimension(7), parameter :: rcoef1_valid=                  (/1003,5001,5002,5003,5004,5005,5100/)
   integer, dimension(5), parameter :: rcoef2_valid=                            (/5002,5003,5004,5005,5100/)
+  integer, dimension(1), parameter :: rcoef3_valid=                                                (/5100/)
+  integer, dimension(1), parameter :: rcoef4_valid=                                                (/5100/)
   integer, dimension(11),parameter :: a_m_8_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004,5005,5100,5999/)
   integer, dimension(11),parameter :: b_m_8_valid=    (/1001,1002,1003,2001,5001,5002,5003,5004,5005,5100,5999/)
   integer, dimension(1), parameter :: c_m_8_valid=                                                 (/5100/)
@@ -120,6 +122,7 @@ module vGrid_Descriptors
      integer, dimension(:), pointer :: ip1_m=>null()    !ip1 values for momentum levels
      integer, dimension(:), pointer :: ip1_t=>null()    !ip1 values for thermodynamic levels
      real :: rcoef1=VGD_MISSING,rcoef2=VGD_MISSING      !Rectification coefficients
+     real :: rcoef3=VGD_MISSING,rcoef4=VGD_MISSING      !Rectification coefficients
      logical :: initialized=.false.                     !initialization status of the structure
      logical :: match_ipig                              !do ip/ig matching for records
      logical :: valid=.false.                           !Validity of structure
@@ -261,7 +264,7 @@ contains
 
 
    integer function new_read(self,unit,format,ip1,ip2,kind,version) result(status)
-      use utils, only: up
+      use vgrid_utils, only: up
       ! Coordinate constructor - read from a file and initialize instance
       type(vgrid_descriptor), intent(inout) :: self !Vertical descriptor instance
       integer, intent(in) :: unit                 !File unit to read descriptor information from
@@ -617,14 +620,14 @@ contains
    end function new_from_table
 
    integer function new_build_vert(self,kind,version,nk,ip1,ip2, &
-        ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8, &
+        ptop_8,pref_8,rcoef1,rcoef2,rcoef3,rcoef4,a_m_8,b_m_8,a_t_8,b_t_8, &
         ip1_m,ip1_t,c_m_8,c_t_8) result(status)
       ! Coordinate constructor - build vertical descriptor from arguments
       type(vgrid_descriptor) :: self                    !Vertical descriptor instance    
       integer, intent(in) :: kind,version               !Kind,version to create
       integer, intent(in) :: nk                         !Number of levels
       integer, optional, intent(in) :: ip1,ip2          !IP1,2 values for FST file record [0,0]
-      real, optional, intent(in) :: rcoef1,rcoef2       !R-coefficient values for rectification
+      real, optional, intent(in) :: rcoef1,rcoef2,rcoef3,rcoef4 !R-coefficient values for rectification
       real*8, optional, intent(in) :: ptop_8            !Top-level pressure (Pa)
       real*8, optional, intent(in) :: pref_8            !Reference-level pressure (Pa)
       real*8, optional, dimension(:) :: a_m_8,a_t_8     !A-coefficients for momentum(m),thermo(t) levels
@@ -648,7 +651,7 @@ contains
       self%match_ipig=.true.
 
       ! Check for required inputs
-      error = set_vcode(self,kind,version)
+      if( set_vcode(self,kind,version) == VGD_ERROR)return
       missingInput = .false.
       if(is_valid(self,ptop_8_valid)) then
          if(present(ptop_8))then
@@ -682,6 +685,24 @@ contains
             self%rcoef2 = rcoef2
          else
             write(for_msg,*) 'rcoef2 is a required constructor entry'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            missingInput = .true.
+         endif
+      endif
+      if(is_valid(self,rcoef3_valid)) then
+         if(present(rcoef3))then
+            self%rcoef3 = rcoef3
+         else
+            write(for_msg,*) 'rcoef3 is a required constructor entry'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            missingInput = .true.
+         endif
+      endif
+      if(is_valid(self,rcoef4_valid)) then
+         if(present(rcoef4))then
+            self%rcoef4 = rcoef4
+         else
+            write(for_msg,*) 'rcoef4 is a required constructor entry'
             call msg(MSG_ERROR,VGD_PRFX//for_msg)
             missingInput = .true.
          endif
@@ -878,7 +899,7 @@ contains
       return
    end function new_build_vert
 
-   integer function new_gen(self,kind,version,hyb,rcoef1,rcoef2,ptop_8,pref_8,ptop_out_8,ip1,ip2,stdout_unit,dhm,dht,avg_L) result(status)
+   integer function new_gen(self,kind,version,hyb,rcoef1,rcoef2,rcoef3,rcoef4,ptop_8,pref_8,ptop_out_8,ip1,ip2,stdout_unit,dhm,dht,avg_L) result(status)
       use vdescript_1001,      only: vgrid_genab_1001
       use vdescript_1002_5001, only: vgrid_genab_1002_5001
       use vdescript_2001,      only: vgrid_genab_2001
@@ -888,7 +909,7 @@ contains
       type(vgrid_descriptor),intent(inout) :: self      !Vertical descriptor instance    
       integer, intent(in) :: kind,version               !Kind,version to create
       real, dimension(:),intent(in) :: hyb              !List of hybrid levels
-      real, optional, intent(in) :: rcoef1,rcoef2       !R-coefficient values for rectification
+      real, optional, intent(in) :: rcoef1,rcoef2,rcoef3,rcoef4 !R-coefficient values for rectification
       real*8, optional, intent(in) :: ptop_8            !Top-level pressure (Pa) inout
       real*8, optional, intent(out):: ptop_out_8        !Top-level pressure (Pa) output if ptop_8 < 0
       real*8, optional, intent(in) :: pref_8            !Reference-level pressure (Pa)
@@ -904,7 +925,7 @@ contains
       integer, dimension(:), pointer :: ip1_m,ip1_t
       real, dimension(:), pointer :: hybm,hybt
       real*8, dimension(:), pointer :: a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8
-      logical :: errorInput=.false., my_avg_L      
+      logical :: errorInput, my_avg_L
 
       nullify(ip1_m,ip1_t,hybm,hybt,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8)
 
@@ -960,6 +981,20 @@ contains
             errorInput = .true.
          endif
       endif
+      if(is_valid(self,rcoef3_valid)) then
+         if(.not.present(rcoef3))then
+            write(for_msg,*) 'rcoef3 is a required constructor entry'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            errorInput = .true.
+         endif
+      endif
+      if(is_valid(self,rcoef4_valid)) then
+         if(.not.present(rcoef4))then
+            write(for_msg,*) 'rcoef4 is a required constructor entry'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            errorInput = .true.
+         endif
+      endif      
       if(is_valid(self,dhm_valid)) then
          if(.not.present(dhm))then
             write(for_msg,*) 'dhm is a required constructor entry'
@@ -999,6 +1034,16 @@ contains
          call msg(MSG_ERROR,VGD_PRFX//for_msg)
          errorInput = .true.
       endif
+      if(present(rcoef3).and.(.not.is_valid(self,rcoef3_valid)))then
+         write(for_msg,*) 'rcoef3 is not a required constructor entry'
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         errorInput = .true.
+      endif
+      if(present(rcoef4).and.(.not.is_valid(self,rcoef4_valid)))then
+         write(for_msg,*) 'rcoef4 is not a required constructor entry'
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         errorInput = .true.
+      endif
       if(present(dhm).and.(.not.is_valid(self,dhm_valid)))then
          write(for_msg,*) 'dhm is not a required constructor entry'
          call msg(MSG_ERROR,VGD_PRFX//for_msg)
@@ -1009,11 +1054,11 @@ contains
          call msg(MSG_ERROR,VGD_PRFX//for_msg)
          errorInput = .true.
       endif
-      if (errorInput) return
 
       ! Call appropriate support module to compute required values
       select case (self%vcode)
       case(1001)
+         if (errorInput) return
          call vgrid_genab_1001(hyb,hybm,a_m_8,b_m_8,ip1_m,error)
          if (error /= VGD_OK)then
             if(associated(hybm))deallocate(hybm)
@@ -1030,6 +1075,7 @@ contains
               ip1_m=ip1_m)
          if (error /= VGD_OK) return        
       case (1002)
+         if (errorInput) return
          call vgrid_genab_1002_5001(self%vcode,hyb,1.,ptop_8,80000.d0, &
               hybm,a_m_8,b_m_8,ip1_m,error)
          if (error /= VGD_OK)then
@@ -1048,6 +1094,7 @@ contains
               ip1_m=ip1_m)
          if (error /= VGD_OK) return
       case(2001)
+         if (errorInput) return
          call vgrid_genab_2001(hyb,a_m_8,b_m_8,error,ip1=ip1_m)
          if (error /= VGD_OK)then
             if(associated(a_m_8))deallocate(a_m_8)
@@ -1063,6 +1110,7 @@ contains
               ip1_m=ip1_m)
          if (error /= VGD_OK) return
       case (5001)
+         if (errorInput) return
          call vgrid_genab_1002_5001(self%vcode,hyb,rcoef1,ptop_8,pref_8, &
               hybm,a_m_8,b_m_8,ip1_m,error)
          if (error /= VGD_OK)then
@@ -1083,6 +1131,7 @@ contains
               ip1_m=ip1_m)
          if (error /= VGD_OK) return
       case (5002)
+         if (errorInput) return
          call vgrid_genab_5002(version,hyb,(/rcoef1,rcoef2/),ptop_8,pref_8, &
               a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,error)
          if (error /= VGD_OK)then
@@ -1109,6 +1158,7 @@ contains
               ip1_t=ip1_t)
          if (error /= VGD_OK) return
       case (5003)
+         if (errorInput) return
          call vgrid_genab_5002(version,hyb,(/rcoef1,rcoef2/),ptop_8,pref_8, &
               a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,error,lastTatU_L=.true.)
          if (error /= VGD_OK)then
@@ -1134,7 +1184,8 @@ contains
               ip1_m=ip1_m,         &
               ip1_t=ip1_t)
          if (error /= VGD_OK) return
-      case (5004)  
+      case (5004) 
+         if (errorInput) return
          call vgrid_genab_5002(version,hyb,(/rcoef1,rcoef2/),ptop_8,pref_8, &
               a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,error,notop_L=.true.,ptop_out_8=ptop_out_8)
          if (error /= VGD_OK)then
@@ -1161,6 +1212,7 @@ contains
               ip1_t=ip1_t)
          if (error /= VGD_OK) return
       case (5005)  
+         if (errorInput) return
          call vgrid_genab_5002(version,hyb,(/rcoef1,rcoef2/),-2.d0,pref_8, &
               a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,error,notop_L=.true.,ptop_out_8=ptop_out_8, &
               dhm=dhm,dht=dht)
@@ -1188,9 +1240,10 @@ contains
               ip1_t=ip1_t)
          if (error /= VGD_OK) return
       case (5100)
+         if (errorInput) return
          my_avg_L=.true.
          if(present(avg_L))my_avg_L=avg_L
-         call vgrid_genab_5100(hyb,(/rcoef1,rcoef2/),pref_8, &
+         call vgrid_genab_5100(hyb,(/rcoef1,rcoef2,rcoef3,rcoef4/),pref_8, &
               a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,ip1_m,ip1_t,error,ptop_out_8=ptop_out_8, &
               dhm=dhm,dht=dht,avg_L=avg_L)
          if (error /= VGD_OK)then
@@ -1211,6 +1264,8 @@ contains
               pref_8=pref_8,       &
               rcoef1=rcoef1,       &
               rcoef2=rcoef2,       &
+              rcoef3=rcoef3,       &
+              rcoef4=rcoef4,       &
               a_m_8=a_m_8,         &
               b_m_8=b_m_8,         &
               c_m_8=c_m_8,       &
@@ -1258,6 +1313,8 @@ contains
      if(associated(self%ip1_t))deallocate(self%ip1_t)
      self%rcoef1=VGD_MISSING
      self%rcoef2=VGD_MISSING
+     self%rcoef3=VGD_MISSING
+     self%rcoef4=VGD_MISSING
      self%initialized=.false.
      self%valid=.false.
      self%ip1=0
@@ -1277,7 +1334,7 @@ contains
 !!! Get methods
 
   integer function get_logical(self,key,value,quiet) result(status)
-    use utils, only: up
+    use vgrid_utils, only: up
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
     character(len=*), intent(in) :: key                 !Descriptor key to retrieve
@@ -1321,7 +1378,7 @@ contains
  end function get_logical
 
   integer function get_int(self,key,value,quiet) result(status)
-    use utils, only: up,get_error
+    use vgrid_utils, only: up,get_error
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
     character(len=*), intent(in) :: key                 !Descriptor key to retrieve
@@ -1371,6 +1428,8 @@ contains
        value = self%kind
     case ('VERS')
        value = self%version
+    case ('VCOD')
+       value = self%vcode
     case ('NL_M')
        istat=vgd_get(self,key='VIPM - level ip1 list (m)',value=vip)
        if(istat /= VGD_OK)then
@@ -1412,7 +1471,7 @@ contains
   end function get_int
 
   integer function get_int_1d(self,key,value,quiet) result(status)
-    use utils, only: get_allocate,up,get_error
+    use vgrid_utils, only: get_allocate,up,get_error
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
     character(len=*), intent(in) :: key                 !Descriptor key to retrieve
@@ -1485,7 +1544,7 @@ contains
   end function get_int_1d
 
   integer function get_real(self,key,value,quiet) result(status)
-    use utils, only: up,get_error
+    use vgrid_utils, only: up,get_error
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self   !Vertical descriptor instance
     character(len=*), intent(in) :: key          !Descriptor key to retrieve
@@ -1527,6 +1586,20 @@ contains
           value = get_error(key,my_quiet)
           return
        endif
+    case ('RC_3')
+       if (is_valid(self,rcoef3_valid)) then
+          value = self%rcoef3
+       else
+          value = get_error(key,my_quiet)
+          return
+       endif
+    case ('RC_4')
+       if (is_valid(self,rcoef4_valid)) then
+          value = self%rcoef4
+       else
+          value = get_error(key,my_quiet)
+          return
+       endif
     case ('DHM ')
        if (is_valid(self,dhm_valid)) then
           iwork=self%ip1_m(size(self%ip1_m))          
@@ -1557,7 +1630,7 @@ contains
   end function get_real
 
   integer function get_real_1d(self,key,value,quiet) result(status)
-    use utils, only: get_allocate,up,get_error
+    use vgrid_utils, only: get_allocate,up,get_error
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to retrieve
@@ -1642,7 +1715,7 @@ contains
   end function get_real_1d
 
   integer function get_real8(self,key,value,quiet) result(status)
-    use utils, only: up,get_error
+    use vgrid_utils, only: up,get_error
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to retrieve
@@ -1696,6 +1769,20 @@ contains
           value = dble(get_error(key,my_quiet))
           return
        endif
+    case ('RC_3')
+       if (is_valid(self,rcoef3_valid)) then
+          value = self%rcoef3
+       else
+          value = dble(get_error(key,my_quiet))
+          return
+       endif
+    case ('RC_4')
+       if (is_valid(self,rcoef4_valid)) then
+          value = self%rcoef4
+       else
+          value = dble(get_error(key,my_quiet))
+          return
+       endif
     case DEFAULT
        write(for_msg,*) 'invalid key '//trim(key)//' given to gd_get (real8)'
        call msg(level_msg,VGD_PRFX//for_msg)
@@ -1708,7 +1795,7 @@ contains
   end function get_real8
 
   integer function get_real8_1d(self,key,value,quiet) result(status)
-    use utils, only: get_allocate,up,get_error
+    use vgrid_utils, only: get_allocate,up,get_error
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to retrieve
@@ -1836,7 +1923,7 @@ contains
   end function get_real8_1d
 
   integer function get_real8_3d(self,key,value,quiet) result(status)
-    use utils, only: get_allocate,up
+    use vgrid_utils, only: get_allocate,up
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to retrieve
@@ -1878,7 +1965,7 @@ contains
   end function get_real8_3d
 
   integer function get_char(self,key,value,quiet) result(status)
-    use utils, only: up,get_error,printingCharacters
+    use vgrid_utils, only: up,get_error,printingCharacters
     ! Retrieve the value of the requested instance variable
     type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to retrieve
@@ -1976,7 +2063,7 @@ contains
 !!! Put methods
 
   integer function put_int(self,key,value) result(status)
-    use utils, only: up,comp_diag_a
+    use vgrid_utils, only: up,comp_diag_a
     ! Set the value of the requested instance variable
     type(vgrid_descriptor), intent(inout) :: self !Vertical descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to set
@@ -2050,7 +2137,7 @@ contains
   end function put_int
 
   integer function put_int_1d(self,key,value) result(status)
-    use utils, only: size_ok,up,put_error
+    use vgrid_utils, only: size_ok,up,put_error
     ! Set the value of the requested instance variable
     type(vgrid_descriptor), intent(inout) :: self       !Vertical descriptor instance
     character(len=*), intent(in) :: key                 !Descriptor key to set
@@ -2104,7 +2191,7 @@ contains
   end function put_int_1d
 
   integer function put_real_1d(self,key,value) result(status)
-    use utils, only: up
+    use vgrid_utils, only: up
     ! Set the value of the requested instance variable
     type(vgrid_descriptor), intent(inout) :: self!Descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to set
@@ -2154,7 +2241,7 @@ contains
   end function put_real_1d
 
   integer function put_real8(self,key,value) result(status)
-    use utils, only: up,put_error
+    use vgrid_utils, only: up,put_error
     ! Set the value of the requested instance variable
     type(vgrid_descriptor), intent(inout) :: self!Descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to set
@@ -2187,6 +2274,12 @@ contains
     case ('RC_2')
        self%rcoef2 = value
        if (.not.is_valid(self,rcoef2_valid)) error = put_error(key)
+    case ('RC_3')
+       self%rcoef3 = value
+       if (.not.is_valid(self,rcoef3_valid)) error = put_error(key)
+    case ('RC_4')
+       self%rcoef4 = value
+       if (.not.is_valid(self,rcoef4_valid)) error = put_error(key)
     case DEFAULT
        write(for_msg,*) 'invalid key '//trim(key)//' given to gd_put (real8)'
        call msg(MSG_ERROR,VGD_PRFX//for_msg)
@@ -2202,7 +2295,7 @@ contains
   end function put_real8
 
   integer function put_real8_1d(self,key,value) result(status)
-    use utils, only: size_ok,up,put_error
+    use vgrid_utils, only: size_ok,up,put_error
     ! Set the value of the requested instance variable
     type(vgrid_descriptor), intent(inout) :: self!Descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to set
@@ -2288,7 +2381,7 @@ contains
   end function put_real8_1d
 
   integer function put_real8_3d(self,key,value) result(status)
-    use utils, only: size_ok, up
+    use vgrid_utils, only: size_ok, up
     ! Set the value of the requested instance variable
     type(vgrid_descriptor), intent(inout) :: self!Descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to set
@@ -2333,7 +2426,7 @@ contains
   end function put_real8_3d
 
   integer function put_char(self,key,value) result(status)
-    use utils, only: up,put_error
+    use vgrid_utils, only: up,put_error
     ! Set the value of the requested instance variable
     type(vgrid_descriptor), intent(inout) :: self!Descriptor instance
     character(len=*), intent(in) :: key         !Descriptor key to set
@@ -2467,6 +2560,14 @@ contains
        endif
        if (is_valid(self,rcoef2_valid))then
           write(for_msg,*)'  rcoef2=',self%rcoef2
+          call msg(MSG_VERBATIM,trim(for_msg))
+       endif
+       if (is_valid(self,rcoef3_valid))then
+          write(for_msg,*)'  rcoef3=',self%rcoef3
+          call msg(MSG_VERBATIM,trim(for_msg))
+       endif
+       if (is_valid(self,rcoef4_valid))then
+          write(for_msg,*)'  rcoef4=',self%rcoef4
           call msg(MSG_VERBATIM,trim(for_msg))
        endif
        if (is_valid(self,ref_name_valid))then
@@ -2770,7 +2871,7 @@ contains
 !!! Write descriptors
   
   integer function write_desc(self,unit,format) result(status)     
-    use utils, only: up
+    use vgrid_utils, only: up
     ! Write descriptors to the requested file
     type(vgrid_descriptor), intent(in) :: self       !Vertical descriptor instance
     integer, intent(in) :: unit                      !File unit to write to
@@ -3027,7 +3128,7 @@ contains
   end function levels_readref
 
   integer function levels_withref_prof(self,ip1_list,levels,sfc_field,in_log,sfc_field_ls) result(status)
-     use utils, only: get_allocate
+     use vgrid_utils, only: get_allocate
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
      real, dimension(:), pointer :: levels                       !Physical level values
@@ -3114,7 +3215,7 @@ contains
   end function levels_withref_prof_8
 
   integer function dpidpis_withref_prof(self,ip1_list,dpidpis,sfc_field) result(status)
-     use utils, only: get_allocate,up
+     use vgrid_utils, only: get_allocate,up
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
      real, dimension(:), pointer :: dpidpis                      !Derivative values
@@ -3158,7 +3259,7 @@ contains
   end function dpidpis_withref_prof
 
   integer function dpidpis_withref_prof_8(self,ip1_list,dpidpis,sfc_field) result(status)
-     use utils, only: get_allocate,up
+     use vgrid_utils, only: get_allocate,up
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
      real*8, dimension(:), pointer :: dpidpis                      !Derivative values
@@ -3189,7 +3290,7 @@ contains
   end function dpidpis_withref_prof_8
 
   integer function diag_withref_prof_8(self,ip1_list,levels,sfc_field,in_log,dpidpis,sfc_field_ls) result(status)
-     use utils, only: get_allocate
+     use vgrid_utils, only: get_allocate
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
      real*8, dimension(:), pointer :: levels                       !Physical level values
@@ -3260,7 +3361,7 @@ contains
   end function diag_withref_prof_8
 
   integer function levels_withref(self,ip1_list,levels,sfc_field,in_log,sfc_field_ls) result(status)
-     use utils, only: get_allocate
+     use vgrid_utils, only: get_allocate
      ! Given referent, compute physical levelling information from the vertical description
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
@@ -3393,7 +3494,7 @@ contains
   end function levels_withref_8
 
   integer function dpidpis_withref(self,ip1_list,dpidpis,sfc_field) result(status)
-     use utils, only: get_allocate
+     use vgrid_utils, only: get_allocate
      ! Given referent, compute physical levelling information from the vertical description
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
@@ -3453,7 +3554,7 @@ contains
   end function dpidpis_withref
 
   integer function dpidpis_withref_8(self,ip1_list,dpidpis,sfc_field) result(status)
-     use utils, only: get_allocate
+     use vgrid_utils, only: get_allocate
      ! Given referent, compute physical levelling information from the vertical description
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
@@ -3644,7 +3745,7 @@ contains
 !!! Test vgrid_descriptor type for equality
 
  logical function test_equality(vgd1,vgd2) result(equal)
-   use utils, only: same_vec
+   use vgrid_utils, only: same_vec
    ! Determine whether a given pair of vgrid_descriptor structures are identical
    type(vgrid_descriptor), intent(in) :: vgd1,vgd2      !vertical grid descriptors to compare
 
@@ -3663,6 +3764,10 @@ contains
    if (vgd1%pref_8 /= vgd2%pref_8) return
    if (vgd1%rcoef1 /= vgd2%rcoef1) return
    if (vgd1%rcoef2 /= vgd2%rcoef2) return
+   if (vgd1%rcoef3 /= vgd2%rcoef3) return
+   if (vgd1%rcoef4 /= vgd2%rcoef4) return
+   if (vgd1%dhm /= vgd2%dhm) return
+   if (vgd1%dht /= vgd2%dht) return
 
    ! Check pointer associations and values
    if (.not.same_vec(vgd1%ip1_m,vgd2%ip1_m)) return
@@ -3673,7 +3778,10 @@ contains
    if (.not.same_vec(vgd1%a_t_8,vgd2%a_t_8)) return
    if (.not.same_vec(vgd1%b_t_8,vgd2%b_t_8)) return
    if ( is_valid(vgd1,c_t_8_valid) .and. (.not.same_vec(vgd1%c_t_8,vgd2%c_t_8)) ) return
-   if (.not.same_vec(vgd1%table,vgd2%table)) return
+   ! Do not check table since all above parameters consist in a full check
+   ! Also, the transfer from char to real*8 do not always give same real8 value which
+   ! made equality to be false even if above parameters are equal.
+   !if (.not.same_vec(vgd1%table,vgd2%table)) return
 
    ! The full structure is equivalent
    equal = .true.
@@ -3684,7 +3792,7 @@ contains
 !!! (PRIVATE) Encoding functions
 
   integer function encode_vert_1001(self,nk) result(status)
-     use utils, only: flip_transfer
+     use vgrid_utils, only: flip_transfer
      type(vgrid_descriptor), intent(inout) :: self      !Vertical descriptor instance
      integer, intent(in) :: nk                          !Number of levels
 
@@ -3749,7 +3857,7 @@ contains
   end function encode_vert_1001
 
   integer function encode_vert_1002(self,nk) result(status)
-     use utils, only: flip_transfer
+     use vgrid_utils, only: flip_transfer
      type(vgrid_descriptor), intent(inout) :: self      !Vertical descriptor instance
      integer, intent(in) :: nk                          !Number of levels
 
@@ -3856,7 +3964,7 @@ contains
    end function encode_vert_2001
 
   integer function encode_vert_5001(self,nk) result(status)
-     use utils, only: flip_transfer
+     use vgrid_utils, only: flip_transfer
      type(vgrid_descriptor), intent(inout) :: self      !Vertical descriptor instance
      integer, intent(in) :: nk                          !Number of levels
 
@@ -3916,13 +4024,12 @@ contains
         ind=k+skip
         self%table(1:3,ind,1)=(/dble(self%ip1_m(k)),self%a_m_8(k),self%b_m_8(k)/)
      enddo     
-
      ! Set status and return
      status = VGD_OK
   end function encode_vert_5001
 
   Integer function encode_vert_5002(self,F_nk,update_L) result(status)
-     use utils, only: flip_transfer
+     use vgrid_utils, only: flip_transfer
      type(vgrid_descriptor), intent(inout) :: self      !Vertical descriptor instance
      integer, intent(in), optional :: F_nk              !Number of levels
      logical, intent(in), optional :: update_L          !Update table
@@ -4048,7 +4155,6 @@ contains
      self%table(1:3,1,1)=(/dble(self%kind)  ,dble(self%version),dble(skip)/)
      self%table(1:3,2,1)=(/self%ptop_8      ,self%pref_8       ,dble(self%rcoef1)/)     
      self%table(1:3,3,1)=(/dble(self%rcoef2),for_char_8           ,0.d0/)
-
      ! Fill momentum level data
      do k=1,nb
         ind=k+skip
@@ -4060,12 +4166,11 @@ contains
         ind=k+skip+nb
         self%table(1:3,ind,1)=(/dble(self%ip1_t(k)),self%a_t_8(k),self%b_t_8(k)/)
      enddo
-     
      ! Set status and return
      status = VGD_OK
   end function encode_vert_5002
   Integer function encode_vert_5100(self,F_nk,update_L) result(status)
-     use utils, only: flip_transfer
+     use vgrid_utils, only: flip_transfer
      type(vgrid_descriptor), intent(inout) :: self      !Vertical descriptor instance
      integer, intent(in), optional :: F_nk              !Number of levels
      logical, intent(in), optional :: update_L          !Update table
@@ -4200,9 +4305,9 @@ contains
      endif
 
      ! Fill header
-     self%table(1:4,1,1)=(/dble(self%kind),dble(self%version),dble(skip)       ,self%ptop_8/)
-     self%table(1:4,2,1)=(/self%pref_8    ,dble(self%rcoef1) ,dble(self%rcoef2),for_char_8_P0/)     
-     self%table(1  ,3,1)=for_char_8_P0LS
+     self%table(1:4,1,1)=(/dble(self%kind)  ,dble(self%version),dble(skip)       ,self%ptop_8/)
+     self%table(1:4,2,1)=(/self%pref_8      ,dble(self%rcoef1) ,dble(self%rcoef2),dble(self%rcoef3)/)
+     self%table(1:4,3,1)=(/dble(self%rcoef4),for_char_8_P0     ,for_char_8_P0LS  ,0.d0/)
 
      ! Fill momentum level data
      do k=1,nb
@@ -4221,7 +4326,7 @@ contains
   end function encode_vert_5100
 
   Integer function encode_vert_5999(self,F_nk,update_L) result(status)
-     use utils, only: flip_transfer
+     use vgrid_utils, only: flip_transfer
      type(vgrid_descriptor), intent(inout) :: self      !Vertical descriptor instance
      integer, intent(in), optional :: F_nk              !Number of levels
      logical, intent(in), optional :: update_L          !Update table
@@ -4312,7 +4417,7 @@ contains
 
      ! Fill header
      self%table(1:3,1,1)=(/dble(self%kind)  ,dble(self%version),dble(skip)/)
-     self%table(1  ,2,1)=for_char_8
+     self%table(1:3,2,1)=(/for_char_8       ,0.d0              ,0.d0      /)
 
      ! Fill momentum level data
      do k=1,F_nk
@@ -4329,7 +4434,7 @@ contains
 !!! (PRIVATE) Decoding functions
 
   integer function decode_vert_1001(self) result(status)
-     use utils, only: flip_transfer
+     use vgrid_utils, only: flip_transfer
      type(vgrid_descriptor), intent(inout) :: self  !Vertical descriptor instance
      
      ! Local variables
@@ -4389,7 +4494,7 @@ contains
   end function decode_vert_1001
 
   integer function decode_vert_1002(self) result(status)
-     use utils, only: flip_transfer
+     use vgrid_utils, only: flip_transfer
      type(vgrid_descriptor), intent(inout) :: self  !Vertical descriptor instance
      
      ! Local variables
@@ -4501,7 +4606,7 @@ contains
   end function decode_vert_2001
        
   integer function decode_vert_5001(self) result(status)
-     use utils, only: flip_transfer
+     use vgrid_utils, only: flip_transfer
      type(vgrid_descriptor), intent(inout) :: self  !Vertical descriptor instance
      
      ! Local variables
@@ -4566,7 +4671,7 @@ contains
   end function decode_vert_5001
 
   integer function decode_vert_5002(self) result(status)
-     use utils, only: flip_transfer
+     use vgrid_utils, only: flip_transfer
      type(vgrid_descriptor), intent(inout) :: self  !Vertical descriptor instance
      
      ! Local variables
@@ -4669,7 +4774,7 @@ contains
   end function decode_vert_5002
 
   integer function decode_vert_5100(self) result(status)
-     use utils, only: flip_transfer
+     use vgrid_utils, only: flip_transfer
      type(vgrid_descriptor), intent(inout) :: self  !Vertical descriptor instance
      
      ! Local variables
@@ -4687,14 +4792,16 @@ contains
      self%pref_8   =       self%table(1,2,1)
      self%rcoef1   =  real(self%table(2,2,1))
      self%rcoef2   =  real(self%table(3,2,1))
-     error = flip_transfer(self%table(4,2,1),self%ref_name)
+     self%rcoef3   =  real(self%table(4,2,1))
+     ! Read header line 3
+     self%rcoef4   =  real(self%table(1,3,1))
+     error = flip_transfer(self%table(2,3,1),self%ref_name)
      if (error /= VGD_OK) then
         write(for_msg,*) 'flip_transfer function returned an error code from decode for self%ref_name',error
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
         return
      endif
-     ! Read header line 3
-     error = flip_transfer(self%table(1,3,1),self%ref_namel)
+     error = flip_transfer(self%table(3,3,1),self%ref_namel)
      if (error /= VGD_OK) then
         write(for_msg,*) 'flip_transfer function returned an error code from decode for self%ref_namel',error
         call msg(MSG_ERROR,VGD_PRFX//for_msg)
@@ -4788,7 +4895,7 @@ contains
   end function decode_vert_5100
 
   integer function decode_vert_5999(self) result(status)
-     use utils, only: flip_transfer
+     use vgrid_utils, only: flip_transfer
      type(vgrid_descriptor), intent(inout) :: self  !Vertical descriptor instance
      
      ! Local variables
@@ -4994,8 +5101,8 @@ contains
     case (5100)
        etiket='STG_CP_GEMV4'
        ig2=0
-       ig3=nint(self%rcoef1*100.)
-       ig4=nint(self%rcoef2*100.)
+       ig3=0
+       ig4=0
     case (5999)
        etiket='UNSTAG_OTHER'
     case DEFAULT
