@@ -237,24 +237,24 @@ module vGrid_Descriptors
          integer (c_int), value :: ni, nj, nk
       end function f_new_from_table
 
-      integer function f_new_gen(vgd,kind,version,hyb_CP,size_hyb,rcoef1_CP,rcoef2_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP, &
-           ip1,ip2,dhm_CP,dht_CP) bind(c, name='Cvgd_new_gen')
+      integer function f_new_gen(vgd,kind,version,hyb_CP,size_hyb,rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP, &
+           ip1,ip2,dhm_CP,dht_CP,avg) bind(c, name='Cvgd_new_gen')
          use iso_c_binding, only : c_ptr, c_int
          type(c_ptr) :: vgd
          integer (c_int), value :: kind, version, size_hyb
-         type(c_ptr), value :: hyb_CP,rcoef1_CP,rcoef2_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP
+         type(c_ptr), value :: hyb_CP,rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP
          type(c_ptr), value :: dhm_CP,dht_CP
-         integer (c_int), value :: ip1,ip2
+         integer (c_int), value :: ip1,ip2,avg
       end function f_new_gen
       
       integer function f_new_build_vert(vgd,kind,version,nk,ip1,ip2, &
-           ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, &
-           a_m_8_CP, b_m_8_CP, a_t_8_CP, b_t_8_CP, ip1_m_CP, ip1_t_CP, nl_m, nl_t) bind(c, name='Cvgd_new_build_vert')         
+           ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, &
+           a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, ip1_m_CP, ip1_t_CP, nl_m, nl_t) bind(c, name='Cvgd_new_build_vert')         
          use iso_c_binding, only : c_ptr, c_int
          type(c_ptr) :: vgd
          integer (c_int), value :: kind,version,nk,ip1,ip2
-         type(c_ptr), value :: ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP
-         type(c_ptr), value :: a_m_8_CP, b_m_8_CP, a_t_8_CP, b_t_8_CP, ip1_m_CP, ip1_t_CP
+         type(c_ptr), value :: ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP
+         type(c_ptr), value :: a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, ip1_m_CP, ip1_t_CP
          integer (c_int), value :: nl_m, nl_t
       end function f_new_build_vert
 
@@ -446,25 +446,27 @@ contains
       
     end function new_from_table
 
-   integer function new_gen(self,kind,version,hyb,rcoef1,rcoef2,ptop_8,pref_8,ptop_out_8,ip1,ip2,stdout_unit,dhm,dht) result(status)
+   integer function new_gen(self,kind,version,hyb,rcoef1,rcoef2,rcoef3,rcoef4,ptop_8,pref_8,ptop_out_8,ip1,ip2,stdout_unit,dhm,dht,avg_L) result(status)
       implicit none
 
       ! Coordinate constructor - build vertical descriptor from hybrid coordinate entries
       type(vgrid_descriptor),target,intent(inout) :: self         !Vertical descriptor instance    
       integer, intent(in) :: kind,version                  !Kind,version to create
       real, target, dimension(:),intent(in) :: hyb         !List of hybrid levels
-      real, target, optional, intent(in) :: rcoef1,rcoef2  !R-coefficient values for rectification
+      real, target, optional, intent(in) :: rcoef1,rcoef2,rcoef3,rcoef4 !R-coefficient values for rectification
       real*8, target, optional, intent(in) :: ptop_8       !Top-level pressure (Pa) inout
       real*8, target, optional, intent(out):: ptop_out_8   !Top-level pressure (Pa) output if ptop_8 < 0
       real*8, target, optional, intent(in) :: pref_8       !Reference-level pressure (Pa)
       integer, target, optional, intent(in) :: ip1,ip2     !IP1,2 values for FST file record [0,0]
       integer, target, optional, intent(in) :: stdout_unit !Unit number for verbose output [STDERR]
       real, target, optional, intent(in) :: dhm,dht        !Diag levels Height for Momentum/Thermo vaiables
-      
+      logical, optional :: avg_L                           !Obtain thermo A, B and C by averaging momentum ones (Temporary for Vcode 5100)
+                                                           !   If this option becoms permenant, some code will have to be added
+                                                           !   to check this option for vcode 5100 only.
       ! Local variables
-      type(c_ptr) :: hyb_CP, rcoef1_CP, rcoef2_CP, ptop_8_CP, ptop_out_8_CP, pref_8_CP
+      type(c_ptr) :: hyb_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, ptop_8_CP, ptop_out_8_CP, pref_8_CP
       type(c_ptr) :: stdout_unit_CP, dhm_CP, dht_CP
-      integer :: my_ip1, my_ip2
+      integer :: my_ip1, my_ip2, my_avg
 
       hyb_CP = c_loc(hyb)
 
@@ -479,6 +481,16 @@ contains
          rcoef2_CP = c_loc(rcoef2)
       else
          rcoef2_CP = C_NULL_PTR
+      endif
+      if(present(rcoef3))then
+         rcoef3_CP = c_loc(rcoef3)
+      else
+         rcoef3_CP = C_NULL_PTR
+      endif
+      if(present(rcoef4))then
+         rcoef4_CP = c_loc(rcoef4)
+      else
+         rcoef4_CP = C_NULL_PTR
       endif
       if(present(ptop_8))then
          ptop_8_CP = c_loc(ptop_8)
@@ -522,12 +534,20 @@ contains
       else
          dht_CP = C_NULL_PTR
       endif
+      my_avg=1
+      if(present(avg_L))then
+         if(avg_L)then
+            my_avg=1
+         else
+            my_avg=0
+         endif
+      endif
       
       if(.not.c_associated(self%cptr))then
          self%cptr = C_NULL_PTR
       endif
 
-      if(f_new_gen(self%cptr,kind,version,hyb_CP,size(hyb),rcoef1_CP,rcoef2_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP,my_ip1,my_ip2,dhm_CP,dht_CP) == VGD_ERROR)then
+      if(f_new_gen(self%cptr,kind,version,hyb_CP,size(hyb),rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP,my_ip1,my_ip2,dhm_CP,dht_CP,my_avg) == VGD_ERROR)then
          print*,'(F_vgd) ERROR in new_gen, problem with f_new_gen'
          return
       endif
@@ -535,25 +555,26 @@ contains
    end function new_gen
 
    integer function new_build_vert(self,kind,version,nk,ip1,ip2, &
-        ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8, &
-        ip1_m,ip1_t) result(status)
+        ptop_8,pref_8,rcoef1,rcoef2,rcoef3,rcoef4,a_m_8,b_m_8,a_t_8,b_t_8, &
+        ip1_m,ip1_t,c_m_8,c_t_8) result(status)
       ! Coordinate constructor - build vertical descriptor from arguments
       type(vgrid_descriptor) :: self                    !Vertical descriptor instance    
       integer, intent(in) :: kind,version               !Kind,version to create
       integer, intent(in) :: nk                         !Number of levels
       integer,target , optional, intent(in) :: ip1,ip2          !IP1,2 values for FST file record [0,0]
-      real,target , optional, intent(in) :: rcoef1,rcoef2       !R-coefficient values for rectification
+      real,target , optional, intent(in) :: rcoef1,rcoef2,rcoef3,rcoef4 !R-coefficient values for rectification
       real*8,target , optional, intent(in) :: ptop_8            !Top-level pressure (Pa)
       real*8,target , optional, intent(in) :: pref_8            !Reference-level pressure (Pa)
       real*8,target , optional, dimension(:) :: a_m_8,a_t_8     !A-coefficients for momentum(m),thermo(t) levels
       real*8,target , optional, dimension(:) :: b_m_8,b_t_8     !B-coefficients for momentum(m),thermo(t) levels
+      real*8,target , optional, dimension(:) :: c_m_8,c_t_8     !C-coefficients for momentum(m),thermo(t) levels
       integer,target , optional, dimension(:) :: ip1_m,ip1_t    !Level ID (IP1) for momentum(m),thermo(t) levels
 
       ! Assign optional argument to C_NULL_PTR    
 
       ! Local variables
-      type(c_ptr) :: rcoef1_CP, rcoef2_CP, ptop_8_CP, pref_8_CP
-      type(c_ptr) :: a_m_8_CP, b_m_8_CP, a_t_8_CP, b_t_8_CP, ip1_m_CP, ip1_t_CP
+      type(c_ptr) :: rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, ptop_8_CP, pref_8_CP
+      type(c_ptr) :: a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, ip1_m_CP, ip1_t_CP
       integer l_ip1,l_ip2,nl_m, nl_t
 
       status = VGD_ERROR
@@ -591,6 +612,16 @@ contains
       else
          rcoef2_CP = C_NULL_PTR
       endif
+      if(present(rcoef3))then
+         rcoef3_CP = c_loc(rcoef3)
+      else
+         rcoef3_CP = C_NULL_PTR
+      endif
+      if(present(rcoef4))then
+         rcoef4_CP = c_loc(rcoef4)
+      else
+         rcoef4_CP = C_NULL_PTR
+      endif
       if(present(a_m_8))then
          a_m_8_CP = c_loc(a_m_8)
          nl_m = size(a_m_8)
@@ -601,6 +632,11 @@ contains
          b_m_8_CP = c_loc(b_m_8)
       else
          b_m_8_CP = C_NULL_PTR
+      endif
+      if(present(c_m_8))then
+         c_m_8_CP = c_loc(c_m_8)
+      else
+         c_m_8_CP = C_NULL_PTR
       endif
       if(present(a_t_8))then
          a_t_8_CP = c_loc(a_t_8)
@@ -613,6 +649,11 @@ contains
       else
          b_t_8_CP = C_NULL_PTR
       endif
+      if(present(c_t_8))then
+         c_t_8_CP = c_loc(c_t_8)
+      else
+         c_t_8_CP = C_NULL_PTR
+      endif
       if(present(ip1_m))then
          ip1_m_CP = c_loc(ip1_m)
       else
@@ -624,8 +665,8 @@ contains
          ip1_t_CP = C_NULL_PTR
       endif
       if( f_new_build_vert(self%cptr,kind,version,nk,l_ip1,l_ip2, &
-           ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, &
-           a_m_8_CP, b_m_8_CP, a_t_8_CP, b_t_8_CP, ip1_m_CP, ip1_t_CP, nl_m, nl_t) == VGD_ERROR )then
+           ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, &
+           a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, ip1_m_CP, ip1_t_CP, nl_m, nl_t) == VGD_ERROR )then
          print*,'(F_vgd) ERROR in new_build_vert, problem with c_new_build_vert',VGD_ERROR
          return
       endif
@@ -1902,6 +1943,17 @@ contains
             error = int(get_error(key,my_quiet))
             return
          endif
+      case ('CC_M')
+         if (is_valid(self,"c_m_8_valid")) then
+            istat = get_int(self,'NL_M',nl_)
+            istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CC_M in get_real8_1d)')         
+            if (istat /= 0) return
+            value_CP = c_loc(value(1))
+            status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
+         else
+            error = int(get_error(key,my_quiet))
+            return
+         endif
       case ('CA_T')
          if (is_valid(self,"a_t_8_valid_get")) then
             istat = get_int(self,'NL_T',nl_)
@@ -1909,6 +1961,17 @@ contains
             if (istat /= 0) return
             value_CP = c_loc(value(1))
             status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)            
+         else
+            error = int(get_error(key,my_quiet))
+            return
+         endif
+      case ('CC_T')
+         if (is_valid(self,"c_t_8_valid")) then
+            istat = get_int(self,'NL_T',nl_)
+            istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CC_T in get_real8_1d)')         
+            if (istat /= 0) return
+            value_CP = c_loc(value(1))
+            status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
          else
             error = int(get_error(key,my_quiet))
             return
