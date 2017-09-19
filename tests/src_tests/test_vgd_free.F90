@@ -17,7 +17,7 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program tests
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_print,vgd_free,vgd_get,VGD_ERROR,VGD_OK
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_getopt,vgd_putopt,vgd_print,vgd_free,vgd_get,VGD_ERROR,VGD_OK
   use Unit_Testing, only: ut_report
 
   implicit none
@@ -31,14 +31,13 @@ program tests
   real, dimension(4) :: hyb2=(/0.1,0.33, 0.66, 0.9/)
   real :: rcoef1=0.,rcoef2=1.  
   real*8 :: ptop_8=1000d0,pref_8=100000d0,value_8
-
+  
   print*,'First build';call flush(6)
   stat = vgd_new(vgd,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop_8,pref_8=pref_8)
   if(stat==VGD_ERROR)then
      print*,'This vgd_new error should not happen, please fixit'
      call exit(1)
   end if  
-
   stat = vgd_get(vgd,'PREF - reference pressure',value_8)
   if(stat==VGD_ERROR)then
      print*,'This vgd_get error should not happen, please fixit'

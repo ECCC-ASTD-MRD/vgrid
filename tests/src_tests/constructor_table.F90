@@ -54,12 +54,13 @@ program constructor
    use vGrid_Descriptors, only:VGD_OK
    use Unit_Testing, only: ut_report
    implicit none
-   integer, parameter :: nversion=4
+   integer, parameter :: nversion=5
    integer stat,i,test_it
    logical :: OK=.true.
-   character(len=4), dimension(nversion) :: vcode_S=(/"5002","5003","5004","5005"/)
+   character(len=4), dimension(nversion) :: vcode_S=(/"5002","5003","5004","5005","5999"/)
 
    do i=1,nversion
+      
       print*,"============="//vcode_S(i)//"=============="
       stat=test_it("data/dm_"//vcode_S(i)//"_from_model_run","data/dm_"//vcode_S(i)//"_ips.txt")
       if(stat.ne.VGD_OK)then
@@ -146,6 +147,7 @@ integer function test_it(F_file_from_model_run,F_file_with_ips) result(status)
       print*, 'ERROR with vgd_write'
       return
    endif
+
    ! Get parameters of original !!
    key = fstinf(lu ,ni,nj,nk,-1,' ',-1,-1,-1,' ','!!')
    ier = my_fstprm(key,prm_orig)

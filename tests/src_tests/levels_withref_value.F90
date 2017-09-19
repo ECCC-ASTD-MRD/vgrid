@@ -53,7 +53,6 @@ program tests
   allocate(px(ni,nj))
   stat = fstlir(px,lu,ni,nj,nk,-1,'',93423264,-1,-1,'','PX')
   stat = vgd_levels(d,sfc_field=p0,ip1_list=(/93423264/),levels=lev)
-
   call ut_report(abs(lev(11,2,1)/100.-px(11,2))<epsilon,message='Grid_Descriptors::vgd_levels level calculation status')
 
   stat=fstfrm(lu)

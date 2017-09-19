@@ -16,67 +16,524 @@
 ! * License along with this library; if not, write to the
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
-program constructor
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_print, vgd_free, VGD_ERROR
+program constructor_build_all
+  use Vgrid_Descriptors, only: Vgrid_descriptor,Vgd_free,Vgd_new,VGD_ERROR,vgd_putopt
   use Unit_Testing, only: ut_report
-  !
+
   implicit none
-  !
+
   type(vgrid_descriptor) :: vgd
-  integer, parameter :: nk=9 ! including diag level
-  integer :: stat,ip1
-  integer, dimension(:), pointer :: ip1_m,ip1_t
-  real*8, dimension(:), pointer :: a_m_8,b_m_8,a_t_8,b_t_8
-  real :: height=-1
-  logical :: OK=.true.
+  integer, parameter :: lu=10
+  integer :: stat,i,check_build
+  integer :: fnom,fstouv,fstfrm,fclos
+  logical :: ok
 
-  nullify(ip1_m,ip1_t,a_m_8,b_m_8,a_t_8,b_t_8)
+  integer, parameter :: nfiles=10
+  character(len=200), dimension(nfiles) :: files=(/&
+       "data/dm_1001_from_model_run",&
+       "data/dm_1002_from_model_run",&
+       "data/dm_2001_from_editfst",&
+       "data/dm_5001_from_model_run",&
+       "data/dm_5002_from_model_run",&
+       "data/dm_5003_from_model_run",&
+       "data/dm_5004_from_model_run",&
+       "data/dm_5005_from_model_run",&
+       "data/dm_5100_from_model_run",&
+       "data/dm_5999_from_model_run"&
+       /)
 
-  allocate(ip1_m(nk),ip1_t(nk),a_m_8(nk),b_m_8(nk),a_t_8(nk),b_t_8(nk))
+  stat = vgd_putopt("ALLOW_SIGMA",.true.)
 
-  ip1_m=(/97618238,96758972,95798406,94560550,94831790,95102940,95299540,93423264,75597472/)
-  a_m_8=(/2.30926271551059,5.66981194184163,8.23745285281583,9.84538165280926,10.7362879740149,11.1997204664634,11.4378785724517,11.51293,11.5116748020711/)
-  b_m_8=(/0.000000000000000E+000,1.154429569962798E-003,0.157422392639441,0.591052504380263,0.856321652104870,0.955780377300956,0.991250207889939,1.00000000000000,1.00000000000000/)
+  ok=.true.
 
-  ip1_t=(/97698159,96939212,95939513,94597899,94877531,95139482,95323042,93423264,76746048/)
-  a_t_8=(/2.89364884405945,6.15320066567627,8.55467550398551,10.0259661797048,10.8310952652232,11.2484934057893,11.4628969443959,11.51293,11.5126753323904/)
-  b_t_8=(/5.767296480554498E-009,7.010292926951782E-003,0.227561997481228,0.648350006620964,0.878891216792279,0.963738779730914,0.994233214440677,1.00000000000000,1.00000000000000/)
+  do i=10,10
+     print*,'======================================================'
+     print*,'file = ',trim(files(i))
+     stat=fnom(lu+i,files(i),"RND+R/O",0)
+     if(stat.lt.0)then
+        print*,'ERROR with fnom on file ',trim(files(i))
+        call exit(1)
+     endif
+     stat=fstouv(lu+i,'RND')
+     if(stat.le.0)then
+        print*,'No record in RPN file ',trim(files(i))
+        call exit(1)
+     endif     
+     if( vgd_new(vgd,unit=lu+i,format="fst",ip1=-1,ip2=-1) == VGD_ERROR)then
+        print*,'ERROR: problem with vgd_new on file ',trim(files(i))
+        stat=fstfrm(lu+i)
+        call exit(1)
+     endif
+     stat=fstfrm(lu+i)  
+     stat=fclos(lu+i)
+     if( check_build(vgd) == VGD_ERROR) ok=.false.     
+     if( vgd_free(vgd) == VGD_ERROR)then
+        print*,'Error with vgd_free(vgd) on file ',trim(files(i))
+        call exit(1)
+     endif
 
-  !print*,"The following error 'vgrid structure is not valid' is normal"
-  !stat = vgd_get(vgd,key='DHM Diag level Height for Momentum variables',value=height)
-  !if(stat/=VGD_ERROR)OK=.false.
+  end do
+stop
+  call ut_report(ok,'Grid_Descriptors, vgd_get, LOGP 5002')  
 
-  !call flush(6)
+end program constructor_build_all
 
-  stat=vgd_new(vgd,kind=5,version=5,nk=nk-2,ip1=1,ip2=2,&
-       pref_8=100000.d0,&
-       rcoef1=1.,rcoef2=10.,&
-       a_m_8=a_m_8,b_m_8=b_m_8,&
-       a_t_8=a_t_8,b_t_8=b_t_8, &
-       ip1_m=ip1_m,ip1_t=ip1_t)
-  if(stat==VGD_ERROR)OK=.false.
+!=============================================================
+!=============================================================
+!=============================================================
+!=============================================================
 
-  stat=vgd_print(vgd)
-  if(stat==VGD_ERROR)OK=.false.
+integer function check_build(F_vgd) result(istat)
 
-  stat = vgd_get(vgd,key='DHM Diag level Height for Momentum variables',value=height)
-  if(stat==VGD_ERROR)OK=.false.
-  print*,'Diag level Height for Momentum variables =',height
+  use Vgrid_Descriptors, only: Vgrid_descriptor, vgd_get, VGD_ERROR, VGD_OK
+  
+  implicit none
+  type(vgrid_descriptor), intent(in) :: F_vgd
+  
+  ! Local varibales
+  integer :: check_build_1001_2001_5999, check_build_1002, check_build_5001, check_build_5002, check_build_5005, check_build_5100
+  integer :: vcode
 
-  stat = vgd_get(vgd,key='DHT Diag level Height for Thermo variables',value=height)
-  if(stat==VGD_ERROR)OK=.false.
-  print*,'Diag level Height for Thermo variables =',height
-   
-  stat = vgd_get(vgd,key='DIPM Diag level ip1 for Momentum variables',value=ip1)
-  if(stat==VGD_ERROR)OK=.false.
-  print*,'Diag level ip1 for Momentum variables =',ip1
+  istat = VGD_ERROR
 
-  stat = vgd_get(vgd,key='DIPT Diag level ip1 for Thermo variables',value=ip1)
-  if(stat==VGD_ERROR)OK=.false.
-  print*,'Diag level ip1 for Thermo variables =',ip1
+  ! Get Vcode
+  if( vgd_get(F_vgd,'vcode',vcode) )return
+  print*,'Testing build for Vcode ', vcode
 
-  stat = vgd_free(vgd)
-  !
-  call ut_report(OK,'Grid_Descriptors:: vgd_new new_gen')
-  !
-end program constructor
+  select case (vcode)
+  case (1001,2001)
+     if(check_build_1001_2001_5999(F_vgd) == VGD_ERROR) return
+  case (1002)
+     if(check_build_1002(F_vgd) == VGD_ERROR) return
+  case (5001)
+     if(check_build_5001(F_vgd) == VGD_ERROR) return
+  case (5002)
+     if(check_build_5002(F_vgd) == VGD_ERROR) return
+  case (5003)
+     if(check_build_5002(F_vgd) == VGD_ERROR) return
+  case (5004)
+     if(check_build_5002(F_vgd) == VGD_ERROR) return
+  case (5005)
+     if(check_build_5005(F_vgd) == VGD_ERROR) return
+  case (5100)
+     if(check_build_5100(F_vgd) == VGD_ERROR) return
+  case (5999)
+     if(check_build_1001_2001_5999(F_vgd) == VGD_ERROR) return
+  case DEFAULT
+     print*,'Add function for checking Vcode ',vcode
+     return
+  end select
+
+  istat = VGD_OK
+
+  return
+  
+end function check_build
+
+!=============================================================
+!=============================================================
+!=============================================================
+!=============================================================
+
+integer function get_hyb_from_ip1(F_hyb,F_ip1,F_kind) result(istat)
+
+  use Vgrid_Descriptors, only: VGD_OK
+
+  implicit none
+  
+  integer, intent(in) :: F_kind
+  integer, dimension(:), intent(in) :: F_ip1
+  real, dimension(:),intent(inout) :: F_hyb
+  
+  ! Local varibales
+  integer :: k
+  
+  do k=1,size(F_ip1)
+     call CONVIP( F_ip1(k), F_hyb(k), F_kind, -1, "", .false.)
+  enddo
+
+  istat = VGD_OK
+
+  return
+
+end function get_hyb_from_ip1
+!=============================================================
+!=============================================================
+!=============================================================
+!=============================================================
+
+integer function check_build_1001_2001_5999(F_vgd) result(istat)
+
+  use Vgrid_Descriptors, only: Vgrid_descriptor,vgd_new, vgd_get, vgd_print, operator(==), VGD_ERROR, VGD_OK
+  
+  implicit none
+  type(vgrid_descriptor), intent(in) :: F_vgd
+  
+  ! Local varibales
+  integer :: kind, version, ier
+  integer, dimension(:), pointer :: ip1_m
+  real*8, dimension(:), pointer :: a_m_8, b_m_8
+  type(vgrid_descriptor) :: vgd
+  
+  nullify(ip1_m, a_m_8, b_m_8)
+  
+  istat = VGD_ERROR
+  
+  if( vgd_get(F_vgd,"KIND", kind) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"VERS", version) ) return  
+  if( vgd_get(F_vgd,"CA_M - vertical A coefficient (m)", a_m_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"CB_M - vertical B coefficient (m)", b_m_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"VIPM - level ip1 list (m)"        , ip1_m) == VGD_ERROR ) return
+
+  if( vgd_new(vgd,kind,version,size(ip1_m), &
+       ip1=-1,           &
+       ip2=-1,           &
+       a_m_8=a_m_8,         &
+       b_m_8=b_m_8,         &
+       ip1_m=ip1_m)         &
+       == VGD_ERROR) return
+
+  if(.not. vgd == F_vgd)then
+     print*,'ERROR : build descriptor not equal has the one read from the file see vgd_print output below'
+     ier = vgd_print(F_vgd)
+     ier = vgd_print(vgd)
+     return
+  endif
+
+  deallocate(ip1_m, a_m_8, b_m_8)
+
+  istat = VGD_OK
+
+  return
+
+end function check_build_1001_2001_5999
+
+!=============================================================
+!=============================================================
+!=============================================================
+!=============================================================
+
+integer function check_build_1002(F_vgd) result(istat)
+
+  use Vgrid_Descriptors, only: Vgrid_descriptor,vgd_new, vgd_get, vgd_print, operator(==), VGD_ERROR, VGD_OK
+  
+  implicit none
+  type(vgrid_descriptor), intent(in) :: F_vgd
+  
+  ! Local varibales
+  integer :: kind, version, ier
+  integer, dimension(:), pointer :: ip1_m
+  real*8 :: ptop_8
+  real*8, dimension(:), pointer :: a_m_8, b_m_8
+  type(vgrid_descriptor) :: vgd
+  
+  nullify(ip1_m, a_m_8, b_m_8)
+  
+  istat = VGD_ERROR
+  
+  if( vgd_get(F_vgd,"KIND", kind) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"VERS", version) ) return  
+  if( vgd_get(F_vgd,"CA_M - vertical A coefficient (m)", a_m_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"CB_M - vertical B coefficient (m)", b_m_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"VIPM - level ip1 list (m)"        , ip1_m) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"PTOP - top level pressure"        , ptop_8) == VGD_ERROR ) return
+
+  if( vgd_new(vgd,kind,version,size(ip1_m), &
+              ip1=-1,           &
+              ip2=-1,           &
+              ptop_8=ptop_8,     &
+              a_m_8=a_m_8,       &
+              b_m_8=b_m_8,       &
+              ip1_m=ip1_m)       &
+              == VGD_ERROR) return
+  
+  if(.not. vgd == F_vgd)then
+     print*,'ERROR : build descriptor not equal has the one read from the file see vgd_print output below'
+     ier = vgd_print(F_vgd)
+     ier = vgd_print(vgd)
+     return
+  endif
+  
+  deallocate(ip1_m, a_m_8, b_m_8)
+  
+  istat = VGD_OK
+  
+  return
+  
+end function check_build_1002
+
+!=============================================================
+!=============================================================
+!=============================================================
+!=============================================================
+
+integer function check_build_5001(F_vgd) result(istat)
+
+  use Vgrid_Descriptors, only: Vgrid_descriptor,vgd_new, vgd_get, vgd_print, operator(==), VGD_ERROR, VGD_OK
+  
+  implicit none
+  type(vgrid_descriptor), intent(in) :: F_vgd
+  
+  ! Local varibales
+  integer :: kind, version, ier
+  integer, dimension(:), pointer :: ip1_m
+  real :: rcoef1
+  real*8 :: ptop_8, pref_8
+  real*8, dimension(:), pointer :: a_m_8, b_m_8
+  type(vgrid_descriptor) :: vgd
+  
+  nullify(ip1_m, a_m_8, b_m_8)
+  
+  istat = VGD_ERROR
+  
+  if( vgd_get(F_vgd,"KIND", kind) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"VERS", version) ) return  
+  if( vgd_get(F_vgd,"CA_M - vertical A coefficient (m)", a_m_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"CB_M - vertical B coefficient (m)", b_m_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"VIPM - level ip1 list (m)"        , ip1_m) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"PTOP"                             , ptop_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"PREF"                             , pref_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"RC_1"                             , rcoef1) == VGD_ERROR ) return
+
+  if( vgd_new(vgd,kind,version,size(ip1_m), &
+              ip1=-1,           &
+              ip2=-1,           &
+              ptop_8=ptop_8,     &
+              pref_8=pref_8,       &
+              rcoef1=rcoef1,       &
+              a_m_8=a_m_8,       &
+              b_m_8=b_m_8,       &
+              ip1_m=ip1_m)       &
+              == VGD_ERROR) return
+  
+  if(.not. vgd == F_vgd)then
+     print*,'ERROR : build descriptor not equal has the one read from the file see vgd_print output below'
+     ier = vgd_print(F_vgd)
+     ier = vgd_print(vgd)
+     return
+  endif
+  
+  deallocate(ip1_m, a_m_8, b_m_8)
+  
+  istat = VGD_OK
+  
+  return
+  
+end function check_build_5001
+
+!=============================================================
+!=============================================================
+!=============================================================
+!=============================================================
+
+integer function check_build_5002(F_vgd) result(istat)
+
+  use Vgrid_Descriptors, only: Vgrid_descriptor,vgd_new, vgd_get, vgd_print, operator(==),VGD_LEN_NAME, VGD_ERROR, VGD_OK
+  
+  implicit none
+  type(vgrid_descriptor), intent(in) :: F_vgd
+  
+  ! Local varibales
+  integer :: kind, version, ier
+  integer, dimension(:), pointer :: ip1_m, ip1_t
+  real :: rcoef1, rcoef2
+  real*8 :: ptop_8, pref_8
+  real*8, dimension(:), pointer :: a_m_8, b_m_8, a_t_8, b_t_8
+  real*8, dimension(:,:,:), pointer :: table
+  type(vgrid_descriptor) :: vgd
+  character(len=VGD_LEN_NAME) :: rfld_S
+
+  nullify(ip1_m, ip1_t, a_m_8, b_m_8, a_t_8, b_t_8, table)
+  
+  istat = VGD_ERROR
+  
+  if( vgd_get(F_vgd,"KIND", kind) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"VERS", version) ) return  
+  if( vgd_get(F_vgd,"CA_M - vertical A coefficient (m)", a_m_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"CB_M - vertical B coefficient (m)", b_m_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"CA_T - vertical A coefficient (t)", a_t_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"CB_T - vertical B coefficient (t)", b_t_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"VIPM - level ip1 list (m)"        , ip1_m) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"VIPT - level ip1 list (t)"        , ip1_t) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"PTOP"                             , ptop_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"PREF"                             , pref_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"RC_1"                             , rcoef1) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"RC_2"                             , rcoef2) == VGD_ERROR ) return
+
+  if( vgd_new(vgd,kind,version,size(ip1_m)-1, &
+              ip1=-1,            &
+              ip2=-1,            &
+              ptop_8=ptop_8,     &
+              pref_8=pref_8,     &
+              rcoef1=rcoef1,     &
+              rcoef2=rcoef2,     &
+              a_m_8=a_m_8,       &
+              b_m_8=b_m_8,       &
+              a_t_8=a_t_8,       &
+              b_t_8=b_t_8,       &
+              ip1_m=ip1_m,       &
+              ip1_t=ip1_t)       &
+              == VGD_ERROR) return
+
+  if( vgd_get(F_vgd,"VTBL", table) == VGD_ERROR ) return
+  print*,'table(2,3,1)',table(2,3,1)
+  deallocate(table)
+  if( vgd_get(vgd,"VTBL", table) == VGD_ERROR ) return
+  print*,'table(2,3,1)',table(2,3,1)
+
+  if( vgd_get(F_vgd,"RFLD",rfld_S ) == VGD_ERROR ) return
+  print*,'rfld_S<',rfld_S,'>'
+  if( vgd_get(vgd,"RFLD",rfld_S ) == VGD_ERROR ) return
+  print*,'rfld_S<',rfld_S,'>'
+
+  if(.not. vgd == F_vgd)then
+     print*,'ERROR : build descriptor not equal has the one read from the file see vgd_print output below'
+     !ier = vgd_print(F_vgd)
+     !ier = vgd_print(vgd)
+     return
+  endif
+  
+  deallocate(ip1_m, ip1_t, a_m_8, b_m_8, a_t_8, b_t_8, table)
+  
+  istat = VGD_OK
+  
+  return
+  
+end function check_build_5002
+!=============================================================
+!=============================================================
+!=============================================================
+!=============================================================
+
+integer function check_build_5005(F_vgd) result(istat)
+
+  use Vgrid_Descriptors, only: Vgrid_descriptor,vgd_new, vgd_get, vgd_print, operator(==), VGD_ERROR, VGD_OK
+  
+  implicit none
+  type(vgrid_descriptor), intent(in) :: F_vgd
+  
+  ! Local varibales
+  integer :: kind, version, ier
+  integer, dimension(:), pointer :: ip1_m, ip1_t
+  real :: rcoef1, rcoef2
+  real*8 :: pref_8
+  real*8, dimension(:), pointer :: a_m_8, b_m_8, a_t_8, b_t_8
+  type(vgrid_descriptor) :: vgd
+  
+  nullify(ip1_m, ip1_t, a_m_8, b_m_8, a_t_8, b_t_8)
+  
+  istat = VGD_ERROR
+  
+  if( vgd_get(F_vgd,"KIND", kind) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"VERS", version) ) return  
+  if( vgd_get(F_vgd,"CA_M - vertical A coefficient (m)", a_m_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"CB_M - vertical B coefficient (m)", b_m_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"CA_T - vertical A coefficient (t)", a_t_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"CB_T - vertical B coefficient (t)", b_t_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"VIPM - level ip1 list (m)"        , ip1_m) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"VIPT - level ip1 list (t)"        , ip1_t) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"PREF"                             , pref_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"RC_1"                             , rcoef1) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"RC_2"                             , rcoef2) == VGD_ERROR ) return
+
+  if( vgd_new(vgd,kind,version,size(ip1_m)-2, &
+              ip1=-1,            &
+              ip2=-1,            &
+              pref_8=pref_8,     &
+              rcoef1=rcoef1,     &
+              rcoef2=rcoef2,     &
+              a_m_8=a_m_8,       &
+              b_m_8=b_m_8,       &
+              a_t_8=a_t_8,       &
+              b_t_8=b_t_8,       &
+              ip1_m=ip1_m,       &
+              ip1_t=ip1_t)       &
+              == VGD_ERROR) return
+  
+  if(.not. vgd == F_vgd)then
+     print*,'ERROR : build descriptor not equal has the one read from the file see vgd_print output below'
+     ier = vgd_print(F_vgd)
+     ier = vgd_print(vgd)
+     return
+  endif
+  
+  deallocate(ip1_m, ip1_t, a_m_8, b_m_8, a_t_8, b_t_8)
+  
+  istat = VGD_OK
+  
+  return
+  
+end function check_build_5005
+
+!=============================================================
+!=============================================================
+!=============================================================
+!=============================================================
+
+integer function check_build_5100(F_vgd) result(istat)
+
+  use Vgrid_Descriptors, only: Vgrid_descriptor,vgd_new, vgd_get, vgd_print, operator(==), VGD_ERROR, VGD_OK
+  
+  implicit none
+  type(vgrid_descriptor), intent(in) :: F_vgd
+  
+  ! Local varibales
+  integer :: kind, version, ier
+  integer, dimension(:), pointer :: ip1_m, ip1_t
+  real :: rcoef1, rcoef2, rcoef3, rcoef4
+  real*8 :: pref_8
+  real*8, dimension(:), pointer :: a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8
+  type(vgrid_descriptor) :: vgd
+  
+  nullify(ip1_m, ip1_t, a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8)
+  
+  istat = VGD_ERROR
+  
+  if( vgd_get(F_vgd,"KIND", kind) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"VERS", version) ) return  
+  if( vgd_get(F_vgd,"CA_M - vertical A coefficient (m)", a_m_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"CB_M - vertical B coefficient (m)", b_m_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"CC_M - vertical C coefficient (m)", c_m_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"CA_T - vertical A coefficient (t)", a_t_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"CB_T - vertical B coefficient (t)", b_t_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"CC_T - vertical C coefficient (t)", c_t_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"VIPM - level ip1 list (m)"        , ip1_m) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"VIPT - level ip1 list (t)"        , ip1_t) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"PREF"                             , pref_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"RC_1"                             , rcoef1) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"RC_2"                             , rcoef2) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"RC_3"                             , rcoef3) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"RC_4"                             , rcoef4) == VGD_ERROR ) return
+
+  if( vgd_new(vgd,kind,version,size(ip1_m)-2, &
+              ip1=-1,            &
+              ip2=-1,            &
+              pref_8=pref_8,     &
+              rcoef1=rcoef1,     &
+              rcoef2=rcoef2,     &
+              rcoef3=rcoef3,     &
+              rcoef4=rcoef4,     &
+              a_m_8=a_m_8,       &
+              b_m_8=b_m_8,       &
+              c_m_8=c_m_8,       &
+              a_t_8=a_t_8,       &
+              b_t_8=b_t_8,       &
+              c_t_8=c_t_8,       &
+              ip1_m=ip1_m,       &
+              ip1_t=ip1_t)       &
+              == VGD_ERROR) return
+
+  if(.not. vgd == F_vgd)then
+     print*,'ERROR : build descriptor not equal has the one read from the file see vgd_print output below'
+     !ier = vgd_print(F_vgd)
+     !ier = vgd_print(vgd)
+     return
+  endif
+  
+  deallocate(ip1_m, ip1_t, a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8)
+  
+  istat = VGD_OK
+  
+  return
+  
+end function check_build_5100

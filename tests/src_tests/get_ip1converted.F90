@@ -25,7 +25,7 @@ program tests
   type(vgrid_descriptor) :: d
   integer :: stat,lu=10,lutxt=69,ip1,ip2
   real :: epsilon=0.0001
-  real, dimension(:), pointer :: hybm  
+  real, dimension(:), pointer :: hybm
 
   integer, external :: fnom,fstouv,fclos,fstfrm
 

@@ -33,7 +33,7 @@ program tests
   type(vgrid_descriptor) :: d
   logical :: ok
 
-  nullify(ip1_list, pres_profil, p0, px, lev)
+  nullify(ip1_list,pres_profil,p0,px,lev)
 
   stat=fnom(lu,"data/gg_5001_from_model_run_plus_toc","RND",0)
   if(stat.lt.0)then
@@ -82,6 +82,7 @@ program tests
         OK=.false.
      endif
   enddo
+
 
   call ut_report(ok,message='Grid_Descriptors::vgd_levels level calculation status')
 

@@ -96,6 +96,48 @@ program tests
    stat = fstfrm(lu)
    stat = fclos(lu)
 
+   stat=fnom(lu,"data/dm_5100_from_model_run","RND",0)
+   if(stat.lt.0)then
+      print*,'ERROR with fnom'
+      call abort()
+   endif
+   stat=fstouv(lu,'RND')
+   if(stat.le.0)then
+      print*,'No record in RPN file'
+      call abort()
+   endif
+   open(unit=lutxt,file='data/dm_5002_ips.txt',status='OLD')
+   read(lutxt,*) ip1,ip2
+   close(lutxt)
+   
+   ! Construct a new set of 3D coordinate descriptors
+   stat = vgd_new(vgd,unit=lu,format="fst")
+   if(stat /= VGD_OK) OK=.false.
+
+   stat = vgd_get(vgd,'RC_3',value=v1_8)
+   v1_8=v1_8+1
+   stat = vgd_put(vgd,'RC_3',value=v1_8)
+   stat = vgd_get(vgd,'RC_3',value=v2_8)
+   print*,'RC_3',v1_8, v2_8
+   if(v2_8 /= v1_8)then
+      print*,'OUPS RC_3 v1_8 not equal to v2_8 -> ', v1_8, v2_8
+      OK=.false.
+   endif
+
+   stat = vgd_get(vgd,'RC_4',value=v1_8)
+   v1_8=v1_8+1
+   stat = vgd_put(vgd,'RC_4',value=v1_8)
+   stat = vgd_get(vgd,'RC_4',value=v2_8)
+   print*,'RC_4',v1_8, v2_8
+   if(v2_8 /= v1_8)then
+      print*,'OUPS RC_4 v1_8 not equal to v2_8 -> ', v1_8, v2_8
+      OK=.false.
+   endif
+
+   ! Close files
+   stat = fstfrm(lu)
+   stat = fclos(lu)
+
    call ut_report(OK,message='Grid_Descriptors::vgd_get get valid value')
       
 end program tests

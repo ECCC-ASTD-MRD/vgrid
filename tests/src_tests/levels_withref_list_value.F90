@@ -27,14 +27,14 @@ program tests
        lutxt=69,ip1,ip2
   integer :: testLev=10
   integer, dimension(100) :: fstkeys
-  integer, dimension(:), allocatable :: ip1s
+  integer, dimension(:), pointer :: ip1s
   real :: epsilon=0.01
-  real, dimension(:,:), allocatable :: p0,px
+  real, dimension(:,:), pointer :: p0,px
   real, dimension(:,:,:), pointer :: lev
   character(len=12) :: typvar,nomvar,etiket,grtyp
   type(vgrid_descriptor) :: d
 
-  nullify(lev)
+  nullify(ip1s, p0, px, lev)
 
   stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
   if(stat.lt.0)then
@@ -65,7 +65,6 @@ program tests
   allocate(px(ni,nj))
   stat = fstlir(px,lu,ni,nj,nk,-1,'',ip1s(testLev),-1,-1,'','PX')
   stat = vgd_levels(d,sfc_field=p0,ip1_list=ip1s,levels=lev)
-
   call ut_report(abs(lev(4,8,testLev)/100.-px(4,8))<epsilon,message='Grid_Descriptors::vgd_levels level calculation status')
 
   stat=fstfrm(lu)

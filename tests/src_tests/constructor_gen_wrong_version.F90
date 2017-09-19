@@ -79,6 +79,7 @@ program constructor
   else
      print*,'Test on missing rcoef2 OK'
   endif
+  
   call ut_report(test_OK,'Grid_Descriptors::vgd_new vertical generate initializer')
   
   
