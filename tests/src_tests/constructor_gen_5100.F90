@@ -59,7 +59,7 @@ program constructor
   stat = vgd_print(vgd)
   file='data/data_constructor_gen_5100_avg.txt'
   stat = test_5100(vgd,file,write_control_L,stat)
-  if(stat.eq.VGD_ERROR)OK=.false.  
+  if(stat.eq.VGD_ERROR)OK=.false.
 
   stat = vgd_new(vgd,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,rcoef3=rcoef3,rcoef4=rcoef4,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,avg_L=.false.)
   stat = vgd_print(vgd)
@@ -169,7 +169,7 @@ integer function test_5100(F_d,F_file,F_write_control_L,F_stat) result(istat)
   do k=1,nk
      if(abs(work_8(k)-a_m_8(k))/a_m_8(k)>100.*epsilon(a_m_8(k)))then
         istat=VGD_ERROR
-        print*,'Probleme avec A M, pas dans les limites tollerees'
+        print*,'Probleme avec A M, pas dans les limites tollerees, k=',k
         print*,work_8(k),'vs'
         print*,a_m_8(k)
      endif
@@ -180,7 +180,7 @@ integer function test_5100(F_d,F_file,F_write_control_L,F_stat) result(istat)
   do k=1,nk
      if(abs(work_8(k)-a_t_8(k))/a_t_8(k)>100.*epsilon(1.))then
         istat=VGD_ERROR
-        print*,'Probleme avec A T, pas dans les limites tollerees'
+        print*,'Probleme avec A T, pas dans les limites tollerees, k=',k
         print*,work_8(k),'vs'
         print*,a_t_8(k)
      endif
@@ -193,12 +193,12 @@ integer function test_5100(F_d,F_file,F_write_control_L,F_stat) result(istat)
      if(b_m_8(k).eq.0.)then
         if(work_8(k).ne.0.)then
            istat=VGD_ERROR
-           print*,'Probleme avec B M, pas egal a zero ',work_8(k)
+           print*,'Probleme avec B M, pas egal a zero ',work_8(k),' pour k=',k
         endif
      else
         if(abs(work_8(k)-b_m_8(k))/b_m_8(k)>100.*epsilon(1.))then
            istat=VGD_ERROR
-           print*,'Probleme avec B M, pas dans les limites tollerees'
+           print*,'Probleme avec B M, pas dans les limites tollerees, k=',k
            print*,work_8(k),'vs'
            print*,b_m_8(k)
         endif
@@ -210,12 +210,12 @@ integer function test_5100(F_d,F_file,F_write_control_L,F_stat) result(istat)
      if(b_t_8(k).eq.0.)then
         if(work_8(k).ne.0.)then
            istat=VGD_ERROR
-           print*,'Probleme avec B T, pas egal a zero ',work_8(k)
+           print*,'Probleme avec B T, pas egal a zero ',work_8(k),' pour k=',k
         endif
      else
         if(abs(work_8(k)-b_t_8(k))/b_t_8(k)>100.*epsilon(1.))then
            istat=VGD_ERROR
-           print*,'Probleme avec B T, pas dans les limites tollerees'
+           print*,'Probleme avec B T, pas dans les limites tollerees, k=',k
            print*,work_8(k),'vs'
            print*,b_t_8(k)
         endif
@@ -229,12 +229,12 @@ integer function test_5100(F_d,F_file,F_write_control_L,F_stat) result(istat)
      if(c_m_8(k).eq.0.)then
         if(work_8(k).ne.0.)then
            istat=VGD_ERROR
-           print*,'Probleme avec C M, pas egal a zero ',work_8(k)
+           print*,'Probleme avec C M, pas egal a zero ',work_8(k),' pour k=',k
         endif
      else
         if(abs(work_8(k)-c_m_8(k))/c_m_8(k)>100.*epsilon(1.))then
            istat=VGD_ERROR
-           print*,'Probleme avec C M, pas dans les limites tollerees'
+           print*,'Probleme avec C M, pas dans les limites tollerees, k=',k
            print*,work_8(k),'vs'
            print*,c_m_8(k)
         endif
@@ -246,12 +246,12 @@ integer function test_5100(F_d,F_file,F_write_control_L,F_stat) result(istat)
      if(c_t_8(k).eq.0.)then
         if(work_8(k).ne.0.)then
            istat=VGD_ERROR
-           print*,'Probleme avec C t, pas egal a zero ',work_8(k)
+           print*,'Probleme avec C t, pas egal a zero ',work_8(k),' pour k=',k
         endif
      else 
         if(abs(work_8(k)-c_t_8(k))/c_t_8(k)>100.*epsilon(1.))then
            istat=VGD_ERROR
-           print*,'Probleme avec C T, pas dans les limites tollerees'
+           print*,'Probleme avec C T, pas dans les limites tollerees, k=',k
            print*,work_8(k),'vs'
            print*,c_t_8(k)
         endif
@@ -265,7 +265,7 @@ integer function test_5100(F_d,F_file,F_write_control_L,F_stat) result(istat)
   do k=1,nk
      if(work_i(k).ne.vipm(k))then
         istat=VGD_ERROR
-        print*,'Probleme avec IP:'
+        print*,'Probleme avec IP pour k=',k,' :'
         print*,work_i(k),'vs'
         print*,vipm(k)
      endif
@@ -275,7 +275,7 @@ integer function test_5100(F_d,F_file,F_write_control_L,F_stat) result(istat)
   do k=1,nk
      if(work_i(k).ne.vipt(k))then
         istat=VGD_ERROR
-        print*,'Probleme avec IP:'
+        print*,'Probleme avec IP pour k=',k,' :'
         print*,work_i(k),'vs'
         print*,vipt(k)
      endif
@@ -289,14 +289,14 @@ integer function test_5100(F_d,F_file,F_write_control_L,F_stat) result(istat)
      if(vcdm(k).eq.0.)then
         if(abs(work(k)-vcdm(k))>100.*epsilon(vcdm(k)))then
            istat=VGD_ERROR
-           print*,'Probleme avec vcdm, pas dans les limites tollerees'
+           print*,'Probleme avec vcdm, pas dans les limites tollerees, k=',k
            print*,work(k),'vs'
            print*,vcdm(k)
         endif
      else
         if(abs(work(k)-vcdm(k))/vcdm(k)>100.*epsilon(vcdm(k)))then
            istat=VGD_ERROR
-           print*,'Probleme avec vcdm, pas dans les limites tollerees'
+           print*,'Probleme avec vcdm, pas dans les limites tollerees, k=',k
            print*,work(k),'vs'
            print*,vcdm(k)
         endif
@@ -309,14 +309,14 @@ integer function test_5100(F_d,F_file,F_write_control_L,F_stat) result(istat)
      if(vcdt(k).eq.0.)then
         if(abs(work(k)-vcdt(k))>100.*epsilon(vcdt(k)))then
            istat=VGD_ERROR
-           print*,'Probleme avec vcdm, pas dans les limites tollerees'
+           print*,'Probleme avec vcdm, pas dans les limites tollerees, k=',k
            print*,work(k),'vs'
            print*,vcdt(k)
         endif
      else
         if(abs(work(k)-vcdt(k))/vcdt(k)>100.*epsilon(vcdt(k)))then
            istat=VGD_ERROR
-           print*,'Probleme avec vcdt, pas dans les limites tollerees'
+           print*,'Probleme avec vcdt, pas dans les limites tollerees, k=',k
            print*,work(k),'vs'
            print*,vcdt(k)
         endif
@@ -327,7 +327,7 @@ integer function test_5100(F_d,F_file,F_write_control_L,F_stat) result(istat)
   read(10,*)my_ip1
   if(my_ip1.ne.ip1)then
       istat=VGD_ERROR
-     print*,'Probleme avec ip1, expected ',ip1,' got',my_ip1     
+     print*,'Probleme avec ip1, expected ',my_ip1,' got',ip1
   endif
 
   close(10)
