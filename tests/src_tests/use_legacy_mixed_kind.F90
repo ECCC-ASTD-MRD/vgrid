@@ -54,7 +54,7 @@ program constructor
   enddo
 
   stat=fstlnk(iun,nfiles)
-  
+
   stat=vgd_new(d,iun(1))
   OK=stat.eq.VGD_ERROR
 

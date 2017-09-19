@@ -24,7 +24,7 @@ program constructor
   !
   type(vgrid_descriptor) :: d,d2
   integer :: stat,i,nl_m,nl_t,k,nk,test_2001
-  integer, dimension(:), allocatable :: ip1s
+  integer, dimension(:), pointer :: ip1s
   integer, dimension(:), pointer :: vipm,vipt,work_i
   real(kind=8), dimension(4) :: pres=(/700.,850.,925.,1000./),b=(/0.,0.,0.,0./)
   real*8, dimension(:,:,:), pointer :: tbl
@@ -35,11 +35,8 @@ program constructor
   character(len=1) :: dum_S
   logical, parameter :: write_control_L=.false.
   character (len=256) :: file
-  !
-  nullify(vipm,vipt,work_i,tbl,a_m_8,a_t_8,b_m_8,b_t_8,work_8,hyb)
-  !
-  allocate(hyb(size(pres)))
-  hyb=pres/100.
+  !  
+  nullify(ip1s,vipm,vipt,work_i,tbl,a_m_8,a_t_8,b_m_8,b_t_8,work_8,hyb)
   !
   ! Construct a new set of 3D coordinate descriptors
   pres = pres*100. !convert mb to Pa
@@ -57,6 +54,9 @@ program constructor
   stat = test_2001(d,file,write_control_L)
   if(stat.eq.VGD_ERROR)OK=.false.
   !
+  allocate(hyb(size(pres)))
+  hyb=pres/100.
+  !
   stat = vgd_new(d2,kind=2,version=1,hyb=hyb)
   !
   if(stat == VGD_ERROR)then
@@ -66,7 +66,6 @@ program constructor
   !
   file='data_Linux/data_constructor_build_2001.txt'
   stat = test_2001(d,file,.false.)
-
   if(stat.eq.VGD_ERROR)OK=.false.  
   !
   call ut_report(OK,'Grid_Descriptors::vgd_new vertical build initializer (2001) value')
@@ -115,6 +114,10 @@ integer function test_2001(F_d,F_file,F_write_control_L) result(istat)
    !
    if(nl_m.ne.size(b_m_8))then
       print*,'Problem with NL_M should be',size(b_m_8),' got',nl_m
+      return
+   endif
+   if(nl_t.ne.size(b_m_8))then
+      print*,'Problem with NL_T should be',size(b_m_8),' got',nl_t
       return
    endif
    !

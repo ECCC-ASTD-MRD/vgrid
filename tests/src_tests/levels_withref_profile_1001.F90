@@ -22,7 +22,7 @@ program tests
 
   implicit none
 
-  integer :: stat,lu=0,ni,nj,fnom,fstouv,fstfrm,fclos,fstlir,fstinf,k,lutxt=69,ip1,ip2,nk
+  integer :: stat,lu=0,ni,nj,fnom,fstouv,fstfrm,fstlir,fstinf,k,lutxt=69,ip1,ip2,nk
   integer, parameter :: i0=20,j0=10
   integer, dimension(:), pointer :: ip1_list
   real, dimension(:), pointer :: pres_profil
@@ -35,7 +35,7 @@ program tests
   type(vgrid_descriptor) :: d
   logical :: ok
 
-  nullify(ip1_list, pres_profil, pres_profil_8, p0, px, lev)
+  nullify(ip1_list,pres_profil,pres_profil_8,p0,px,lev)
 
   stat=fnom(lu,"data/dm_1001_from_model_run_plus_toc","RND",0)
   if(stat.lt.0)then

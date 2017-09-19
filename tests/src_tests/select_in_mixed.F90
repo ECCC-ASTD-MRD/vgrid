@@ -30,7 +30,7 @@ contains
       ! Use fstprm function to get information about the record
       integer, intent(in) :: fstkey               !Key from FST file record
       type(FSTD_ext) :: record                    !Record information
-      integer :: error
+      integer :: error,ni,nj,nk
       integer, external :: fstprm,fstinf
       real*8 :: nhours
       status = -1
@@ -59,15 +59,16 @@ program constructor
   !
   type(vgrid_descriptor) :: d
   type(FSTD_ext) :: prm
-  integer, parameter :: nliste=2
-  integer,dimension(nliste) :: lu=(/10,11/), &
-       ip1,ip2,vcode=(/5001,5003/)
+  integer, parameter :: nliste=3
+  integer,dimension(nliste) :: lu=(/10,11,12/), &
+       ip1,ip2,vcode=(/5001,5003,5002/)
   integer :: stat,i,vers,key,ni,nj,nk
-  integer :: fnom,fstouv,fstinf,fstfrm,fclos,kind,fstlnk
+  integer :: fnom,fstouv,fstinf,fstfrm,fclos,kind,version,fstlnk
   logical :: ok=.true.
   character(len=1000),dimension(nliste) :: files=(/ &
        "data/dm_5001_from_model_run_plus_toc    ", &
-       "data/dm_5003_from_model_run             "&
+       "data/dm_5003_from_model_run             ", &
+       "data/dm_5002_from_model_run_ig4_ip1_link" &
        /)
   !
   do i=1,nliste
@@ -87,9 +88,15 @@ program constructor
         call abort
      endif
      stat=my_fstprm(key,prm)
-     ! (ig1,ig2) -> (ip1,ip2) link
-     ip1(i)=prm%ig1
-     ip2(i)=prm%ig2
+     if(i.eq.3)then
+        ! ig4 -> ip1 link
+        ip1(i)=prm%ig4
+        ip2(i)=-1
+     else
+        ! (ig1,ig2) -> (ip1,ip2) link
+        ip1(i)=prm%ig1
+        ip2(i)=prm%ig2
+     endif
   enddo
   !
   stat = fstlnk(lu,nliste)
@@ -111,9 +118,6 @@ program constructor
   !
   do i=1,nliste
      ! Construct a new set of 3D coordinate descriptors
-
-print*,'i, ip1(i), ip2(i) = ',i, ip1(i), ip2(i)
-
      stat = vgd_new(d,unit=lu(1),format="fst",ip1=ip1(i),ip2=ip2(i))
      if(stat.ne.VGD_OK)then
         print*,'ERROR: problem with vgd_new'

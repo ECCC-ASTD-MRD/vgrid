@@ -50,7 +50,6 @@ program tests
 
   ! Get information about the coordinate
   stat = vgd_get(d,key='CA_M - vertical A coefficient (M)',value=coef_a_m_8)
-
   call ut_report(stat,message='Grid_Descriptors::vgd_get non-alphanumeric entry')
 
   ! Close files

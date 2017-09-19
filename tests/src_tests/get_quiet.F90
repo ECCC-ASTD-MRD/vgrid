@@ -18,12 +18,12 @@
 ! * Boston, MA 02111-1307, USA.
 program tests
   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_putopt,VGD_LEN_NAME,VGD_ERROR,VGD_OK
-  use utils, only: same_vec
+  use vgrid_utils, only: same_vec
   use Unit_Testing, only: ut_report
   implicit none
 
   type(vgrid_descriptor) :: vgd
-  integer :: stat,lu=0,fnom,fstouv,fstfrm,fclos
+  integer :: stat,lu=0,fnom,fstouv,fstfrm,fclos,lutxt=69,ip1,ip2
 
   integer :: my_int,my_int2
   integer, dimension(:), pointer :: my_int_1d,my_int2_1d
@@ -112,7 +112,7 @@ program tests
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_char,quiet=.true.)
   if(stat==VGD_ERROR)print*,'Error with get_char detected but message not printed above'
   call flush(6)  
-
+  
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_logical)
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_logical,quiet=.false.)
   if(stat==VGD_ERROR)print*,'Error with get_logical detected and message printed above'

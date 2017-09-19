@@ -47,7 +47,7 @@ program constructor
      call abort
   endif
   stat = vgd_print(d)
-
+ 
   call ut_report(stat,'Grid_Descriptors, vgd_new, vgd_print 5001')
 
   stat=fstfrm(lu)

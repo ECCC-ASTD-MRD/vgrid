@@ -48,7 +48,6 @@ program tests
 
   ! Get information about the coordinate
   stat = vgd_get(d,key='PTOP - top level pressure',value=ptop_8)
-
   call ut_report(stat,message='Grid_Descriptors::vgd_get get valid value')
 
   ! Close files

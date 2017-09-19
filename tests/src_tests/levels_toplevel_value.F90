@@ -55,11 +55,12 @@ program tests
   use vGrid_Descriptors, only: vgd_levels,vgd_putopt,VGD_ERROR
   use Unit_Testing, only: ut_report
 
+
   implicit none
 
   integer :: stat,lu=10,do_it,fstfrm,fclos,i,ier
   logical :: ok=.true.
-  integer, parameter :: nfiles=8
+  integer, parameter :: nfiles=10
   character(len=200), dimension(nfiles) :: files=(/&
        "data/dm_1001_from_model_run",&
        "data/dm_1002_from_model_run",&
@@ -68,12 +69,14 @@ program tests
        "data/dm_5002_from_model_run",&
        "data/dm_5003_from_model_run",&
        "data/dm_5004_from_model_run",&
-       "data/dm_5005_from_model_run"&
+       "data/dm_5005_from_model_run",&
+       "data/dm_5100_from_model_run",&
+       "data/dm_5999_from_model_run"&
        /)
   
   call msg_verbosity(MSG_DEBUG)
 
-  stat =  vgd_putopt("ALLOW_SIGMA",.true.)
+  stat = vgd_putopt("ALLOW_SIGMA",.true.)
 
   do i=1,nfiles
      stat = do_it(lu,files(i))
@@ -112,9 +115,9 @@ integer function do_it(lu,file) result(status)
   real, dimension(:,:,:), pointer :: lev
   character(len=1) :: string
 
-  status=VGD_ERROR
+  nullify(lev,px)
 
-  nullify(px,lev)
+  status=VGD_ERROR
 
   print*,'===================================================='
   print*,trim(file)
@@ -166,6 +169,19 @@ integer function do_it(lu,file) result(status)
      print*,'(Test) Difference in pressure are OK',lev(10,10,1)/100.,' VS',px(10,10)
   endif
 
+  ! Test log option
+  ier = vgd_levels(unit=lu,fstkeys=(/fstkey/),levels=lev,in_log=.true.)
+  if(ier==VGD_ERROR)then
+     print*,'(Test) Problem with vgd_levels in_log=.true.'
+     return
+  endif
+  if(abs(lev(10,10,1)-log(px(10,10)*100.))>epsilon)then
+     print*,'(Test) ERROR difference in log pressure to high ',lev(10,10,1),' VS',log(px(10,10)*100.)
+     return
+  else
+     print*,'(Test) Difference in log pressure are OK ',lev(10,10,1),' VS',log(px(10,10)*100.)
+  endif
+  
   deallocate(px,lev)
 
   status=VGD_OK

@@ -18,26 +18,26 @@
 ! * Boston, MA 02111-1307, USA.
 program use_legacy
    use Unit_Testing, only: ut_report
-   use vGrid_Descriptors, only:vgd_putopt,VGD_ERROR
+   use vGrid_Descriptors, only : vgd_putopt, VGD_ERROR
    implicit none
    integer :: istat,test_it
    logical :: OK=.true.
 
-   istat =  vgd_putopt("ALLOW_SIGMA",.true.)
+   istat = vgd_putopt("ALLOW_SIGMA",.true.)
+
    istat=test_it("data/dm_1001_from_model_run")
    if(istat.eq.VGD_ERROR)stop
-   istat =  vgd_putopt("ALLOW_SIGMA",.false.)
-   
+
    istat=test_it("data/dm_1002_from_model_run_multi_pt")
    if(istat.eq.VGD_ERROR)stop
 
-   !istat=test_it("data/dm_1003_from_pgsm_lam_east_ops")
-   !if(istat.eq.VGD_ERROR)stop
+   istat=test_it("data/dm_1003_from_pgsm_lam_east_ops")
+   if(istat.eq.VGD_ERROR)stop
 
    istat=test_it("data/dm_5001_from_model_run")
    if(istat.eq.VGD_ERROR)stop
 
-   call ut_report(OK,'Grid_Descriptors::vgd_legacy (1001 sigma)')   
+   call ut_report(OK,'Grid_Descriptors::vgd_vintage (1001 sigma)')   
 end program use_legacy
 !=========================================================================
 !=========================================================================
@@ -86,7 +86,7 @@ integer function test_it(F_file) result(istat)
    stat=vgd_new(vgd,lu)
    if(stat.eq.VGD_ERROR)return
   
-   stat=vgd_print(vgd)  
+   stat=vgd_print(vgd,6)  
    if(stat.eq.VGD_ERROR)return
 
    stat=fstinl(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ','PX',liste,infon,nmax)

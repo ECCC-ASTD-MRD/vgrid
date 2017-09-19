@@ -26,7 +26,8 @@ program levels_withref_profile_all
 
   stat=VGD_OK
 
-  ier =  vgd_putopt("ALLOW_SIGMA",.true.)
+  ier = vgd_putopt("ALLOW_SIGMA",.true.)
+  
   ier=chek_levels_withref('data/dm_1001_from_model_run','','TT')
   if(ier==VGD_ERROR)stat=VGD_ERROR
   ier =  vgd_putopt("ALLOW_SIGMA",.false.)
