@@ -805,12 +805,12 @@ static int C_compute_pressure_5002_5003_5004_5005(vgrid_descriptor *self, int ni
 #include "BODY_C_compute_pressure_5002_5003_5004_5005.hc"
 }
 
-static int C_compute_pressure_5100_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log, int dpidpis) {
+static int C_compute_pressure_5100_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, double *sfc_field_ls, int in_log, int dpidpis) {
   char proc_name[] = "C_compute_pressure_5100_8";
 #include "BODY_C_compute_pressure_5100.hc"
 }
 
-static int C_compute_pressure_5100(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log, int dpidpis) {
+static int C_compute_pressure_5100(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, float *sfc_field_ls, int in_log, int dpidpis) {
   char proc_name[] = "C_compute_pressure_5100";
 #include "BODY_C_compute_pressure_5100.hc"
 }
@@ -827,11 +827,12 @@ int Cvgd_levels(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, f
   return(VGD_OK);
 }
 
-int Cvgd_diag_withref_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8, int in_log, int dpidpis) {
+int Cvgd_diag_withref_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8,int in_log, int dpidpis) {
   char proc_name[] = "Cvgd_diag_withref_8";
   char double_interface = 1;
   // The following pointers will never be used but they are needed to compile
-  float *levels = NULL, *sfc_field = NULL;
+  float *levels = NULL, *sfc_field = NULL, *sfc_field_ls = NULL;
+  double *sfc_field_ls_8 = NULL;
 #define REAL_8 1
 #include "BODY_Cvgd_diag_withref.hc"
 #undef REAL_8
@@ -841,7 +842,27 @@ int Cvgd_diag_withref(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_l
   char proc_name[] = "Cvgd_diag_withref";
   char double_interface = 0;
   // The following pointers will never be used but they are needed to compile
-  double *levels_8 = NULL, *sfc_field_8 = NULL;
+  float *sfc_field_ls = NULL;
+  double *levels_8 = NULL, *sfc_field_8 = NULL, *sfc_field_ls_8 = NULL;
+#undef REAL_8
+#include "BODY_Cvgd_diag_withref.hc"
+}
+
+int Cvgd_diag_withref2_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8, double *sfc_field_ls_8, int in_log, int dpidpis) {
+  char proc_name[] = "Cvgd_diag_withref2_8";
+  char double_interface = 1;
+  // The following pointers will never be used but they are needed to compile
+  float *levels = NULL, *sfc_field = NULL, *sfc_field_ls = NULL;
+#define REAL_8 1
+#include "BODY_Cvgd_diag_withref.hc"
+#undef REAL_8
+}
+
+int Cvgd_diag_withref2(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, float *sfc_field_ls, int in_log, int dpidpis) {
+  char proc_name[] = "Cvgd_diag_withref2";
+  char double_interface = 0;
+  // The following pointers will never be used but they are needed to compile
+  double *levels_8 = NULL, *sfc_field_8 = NULL, *sfc_field_ls_8 = NULL;
 #undef REAL_8
 #include "BODY_Cvgd_diag_withref.hc"
 }
@@ -1134,8 +1155,8 @@ int Cvgd_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, 
   (*self)->nk         = nk;
   (*self)->nl_m       = nl_m;
   (*self)->nl_t       = nl_t;
-  (*self)->rec.ip1    = ip1;
-  (*self)->rec.ip2    = ip2;
+  (*self)->rec.ip1    = fmax(0,ip1);
+  (*self)->rec.ip2    = fmax(0,ip2);
   strcpy((*self)->rec.nomvar,"!!  ");
   if(Cvgd_set_vcode_i(*self, kind, version) == VGD_ERROR)  {
     printf("(Cvgd) ERROR in Cvgd_new_build_vert, problem with Cvgd_set_vcode_i");
@@ -2816,7 +2837,7 @@ static int c_vgrid_genab_5100(float *hybuser, int nk, int *nl_m, int *nl_t, floa
   }
   a_m_8[nk] = zsrf_8;
   b_m_8[nk] = 1.;
-  c_m_8[nk] = 1.;
+  c_m_8[nk] = 0.;
   // Integrating the hydrostatic eq with T=0C
   // ln[p(z=dhm)] = ln(ps) - g/(Rd*T)*dhm
   // s = ln(ps) - ln(pref)
@@ -2830,6 +2851,7 @@ static int c_vgrid_genab_5100(float *hybuser, int nk, int *nl_m, int *nl_t, floa
   // Thermodynamic levels    
   for( k = 0; k < nk; k++ ) {
     a_t_8[k] = 0.5 * ( a_m_8[k+1] + a_m_8[k] );
+    zeta_8  = a_t_8[k];
     if(avg){
       b_t_8[k] = 0.5 * ( b_m_8[k+1] + b_m_8[k] );
       c_t_8[k] = 0.5 * ( c_m_8[k+1] + c_m_8[k] );      
@@ -3601,6 +3623,7 @@ int Cvgd_new_gen(vgrid_descriptor **self, int kind, int version, float *hyb, int
       return(VGD_ERROR);
 
     }
+    break;
   case 5005:
     nk   = size_hyb;
     if(c_vgrid_genab_5005(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, &ptop_out_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t, *dhm, *dht) == VGD_ERROR ) {
@@ -3618,8 +3641,7 @@ int Cvgd_new_gen(vgrid_descriptor **self, int kind, int version, float *hyb, int
     printf("(Cvgd) ERROR in Cvgd_new_gen, invalid kind or version, kind = %d, version = %d\n",kind,version);
     return(VGD_ERROR);
   }
-
-  if( VGD_ERROR == Cvgd_new_build_vert(self,kind,version,nk,ip1,ip2,ptop_8,pref_8,rcoef1,rcoef2,rcoef3,rcoef4,a_m_8,b_m_8,NULL,a_t_8,b_t_8,NULL,ip1_m,ip1_t,nl_m,nl_t) ) {
+  if( VGD_ERROR == Cvgd_new_build_vert(self,kind,version,nk,ip1,ip2,ptop_8,pref_8,rcoef1,rcoef2,rcoef3,rcoef4,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,ip1_m,ip1_t,nl_m,nl_t) ) {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_new_gen, problem with new_build_vert for kind = %d, version = %d\n",kind,version);
     return(VGD_ERROR);
   }

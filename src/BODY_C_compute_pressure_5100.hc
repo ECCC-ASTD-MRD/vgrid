@@ -1,5 +1,5 @@
 
-  double *aa_8, *bb_8, *cc_8, *s_8, lvl;
+  double *aa_8, *bb_8, *cc_8, *s_8, *sl_8, lvl;
   int ij, k, ijk, ind, kind;
   float hyb;
 
@@ -48,13 +48,23 @@
     free(cc_8);
     return(VGD_ERROR);
   }
+  sl_8 = malloc(ni*nj*sizeof(double));
+  if(! sl_8 ) {
+    printf("(Cvgd) ERROR in %s, cannot allocate sl_8 of bouble of size %dx%d\n", proc_name, ni,nj);
+    free(aa_8);
+    free(bb_8);
+    free(cc_8);
+    free(s_8);
+    return(VGD_ERROR);
+  }
   for(ij=0; ij < ni*nj; ij++) {
     s_8[ij] = log(sfc_field[ij]/self->pref_8);
+    sl_8[ij] = log(sfc_field_ls[ij]/self->pref_8);
   }
 
   for(k=0, ijk=0; k < nk; k++) {
     for(ij=0; ij < ni*nj; ij++, ijk++) {
-      lvl = aa_8[k] + bb_8[k]*s_8[ij];
+      lvl = aa_8[k] + bb_8[k]*s_8[ij] + cc_8[k]*sl_8[ij];
 #if defined(REAL_8)
       levels[ijk] = in_log ? lvl : exp(lvl);
 #else
@@ -96,6 +106,7 @@
   }
   
   free(s_8);
+  free(sl_8);
   free(aa_8);
   free(bb_8);
 

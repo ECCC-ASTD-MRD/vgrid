@@ -64,10 +64,10 @@
     break;
   case 5100:
     if(double_interface){
-      if( C_compute_pressure_5100_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log, dpidpis) == VGD_ERROR)
+      if( C_compute_pressure_5100_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, sfc_field_ls_8, in_log, dpidpis) == VGD_ERROR)
 	return(VGD_ERROR);
     } else {
-      if( C_compute_pressure_5100(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log, dpidpis) == VGD_ERROR)
+      if( C_compute_pressure_5100(self, ni, nj, nk, ip1_list, levels, sfc_field, sfc_field_ls, in_log, dpidpis) == VGD_ERROR)
 	return(VGD_ERROR);
     }
   default:

@@ -91,6 +91,8 @@ int Cvgd_levels_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list,
 int Cvgd_levels(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log);
 int Cvgd_diag_withref_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8, int in_log, int dpidpis);
 int Cvgd_diag_withref(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log, int dpidpis);
+int Cvgd_diag_withref2_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8, double *sfc_field_ls_8, int in_log, int dpidpis);
+int Cvgd_diag_withref2(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, float *sfc_field_ls, int in_log, int dpidpis);
 int Cvgd_set_vcode_i(vgrid_descriptor *VGrid,int Kind,int Version);
 int Cvgd_set_vcode(vgrid_descriptor *VGrid);
 int Cvgd_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, int ip1, int ip2, double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4, 
@@ -112,7 +114,7 @@ int Cvgd_putopt_int(char *key, int value);
 int Cvgd_put_int(vgrid_descriptor **self, char *key, int value);
 int Cvgd_new_gen(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
 	      double *ptop_8, double *pref_8, double *ptop_out_8,
-		 int ip1, int ip2, float *dhm, float *dht);
+		 int ip1, int ip2, float *dhm, float *dht, int avg);
 int Cvgd_new_read(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind, int version);
 int Cvgd_write_desc (vgrid_descriptor *self, int unit);
 int Cvgd_new_from_table(vgrid_descriptor **self, double *table, int ni, int nj, int nk);
