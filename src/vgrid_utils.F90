@@ -17,7 +17,7 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 
-module utils
+module vgrid_utils
    
    implicit none
    private
@@ -410,4 +410,4 @@ contains
     return
   end function put_error
 
-end module utils
+end module vgrid_utils
