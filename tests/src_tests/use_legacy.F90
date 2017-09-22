@@ -86,7 +86,7 @@ integer function test_it(F_file) result(istat)
    stat=vgd_new(vgd,lu)
    if(stat.eq.VGD_ERROR)return
   
-   stat=vgd_print(vgd,6)  
+   stat=vgd_print(vgd,-1)  
    if(stat.eq.VGD_ERROR)return
 
    stat=fstinl(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ','PX',liste,infon,nmax)
@@ -105,7 +105,7 @@ integer function test_it(F_file) result(istat)
       ff=abs(px(1,1,k)-levels(1,1,k)/100.)/px(1,1,k)
       if(ff.gt.epsilon)then        
          print*,'OUPS, these should be equal within epsilon',px(1,1,k),levels(1,1,k)/100.
-         print*,'But found difference of',ff
+         print*,'But found difference of',ff,' for k =',k
          return
       endif
    enddo

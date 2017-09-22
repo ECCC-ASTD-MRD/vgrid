@@ -70,6 +70,16 @@
       if( C_compute_pressure_5100(self, ni, nj, nk, ip1_list, levels, sfc_field, sfc_field_ls, in_log, dpidpis) == VGD_ERROR)
 	return(VGD_ERROR);
     }
+    break;
+  case 5999:
+    if(double_interface){
+      if( C_compute_pressure_1001_1002_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log) == VGD_ERROR)
+	return(VGD_ERROR);
+    } else {
+      if( C_compute_pressure_1001_1002(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log) == VGD_ERROR)
+	return(VGD_ERROR);
+    }
+    break;
   default:
     printf("(Cvgd) ERROR in %s, invalid kind or version: kind = %d, version = %d\n", proc_name, self->kind, self->version);
     return(VGD_ERROR);

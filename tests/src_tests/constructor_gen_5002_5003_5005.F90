@@ -20,12 +20,12 @@ program constructor
 
   ! Revision : Andre Plante test on B instead of A since A not sensitive to rcoefs
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,VGD_ERROR
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_free,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  type(vgrid_descriptor) :: vgd
   integer :: stat,nl_m,nl_t
   real :: epsilon=1.e-6
   real, dimension(57) :: hyb= &
@@ -49,70 +49,78 @@ program constructor
   
   real*8 :: ptop=805d0,pref=100000d0
   logical :: OK=.true.
-  integer :: test_5002
+  integer :: test_5002, ier
   logical, parameter :: write_control_L=.false.
   character (len=256) :: file
 
+  print*,'DEBUG'
+
+  ier = vgd_free(vgd)
+
   !Use wrong top pressure
 
+if(.false.)then
   print*,'================== EXPECTED ERROR SECTION BEGINGS================='
   print*,'================== EXPECTED ERROR SECTION BEGINGS================='
   print*,'================== EXPECTED ERROR SECTION BEGINGS================='
   print*,'The following 3 error messages on F_ptop_8 less than zero are normal'
   call flush(6)
-  stat = vgd_new(d,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=0.d0,pref_8=pref)
+  stat = vgd_new(vgd,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=0.d0,pref_8=pref)
   if(stat.ne.VGD_ERROR)OK=.false.  
-  stat = vgd_new(d,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-1.d0,pref_8=pref)
+  stat = vgd_new(vgd,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-1.d0,pref_8=pref)
   if(stat.ne.VGD_ERROR)OK=.false.  
-  stat = vgd_new(d,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-2.d0,pref_8=pref)
+  stat = vgd_new(vgd,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-2.d0,pref_8=pref)
   if(stat.ne.VGD_ERROR)OK=.false.  
   print*,'The following 3 errors on hyb values are normal'
   call flush(6)
-  stat = vgd_new(d,kind=5,version=2,hyb=hyb_wrong1,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
-  stat = vgd_new(d,kind=5,version=2,hyb=hyb_wrong2,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
-  stat = vgd_new(d,kind=5,version=2,hyb=hyb_wrong3,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
+  stat = vgd_new(vgd,kind=5,version=2,hyb=hyb_wrong1,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
+  stat = vgd_new(vgd,kind=5,version=2,hyb=hyb_wrong2,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
+  stat = vgd_new(vgd,kind=5,version=2,hyb=hyb_wrong3,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
   print*,'The following error on hyb values order is normal'
   hyb_wrong3=(/.1,.9,.5/)
-  stat = vgd_new(d,kind=5,version=2,hyb=hyb_wrong3,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
+  stat = vgd_new(vgd,kind=5,version=2,hyb=hyb_wrong3,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
   print*,'================== EXPECTED ERROR SECTION ENDS  ================='
   print*,'================== EXPECTED ERROR SECTION ENDS  ================='
   print*,'================== EXPECTED ERROR SECTION ENDS  ================='
   call flush(6)
-
+endif
   ! Construct a new set of vertical coordinate descriptors 5002
-  stat = vgd_new(d,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref,ip1=0)
+print*,'ANDRE debut'
+  stat = vgd_new(vgd,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref,ip1=0)
+print*,'ANDRE fin'
+
   file='data/data_constructor_gen_5002.txt'
-  stat = test_5002(d,file,write_control_L,stat)
+  stat = test_5002(vgd,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
 
   ! Construct a new set of vertical coordinate descriptors 5003
-  stat = vgd_new(d,kind=5,version=3,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref,ip1=0)
+  stat = vgd_new(vgd,kind=5,version=3,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref,ip1=0)
   file='data/data_constructor_gen_5003.txt'
-  stat = test_5002(d,file,write_control_L,stat)
+  stat = test_5002(vgd,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
 
   ! Construct a new set of vertical coordinate descriptors 5004
   !
-  stat = vgd_new(d,kind=5,version=4,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-1.d0,pref_8=pref,ptop_out_8=ptop,ip1=0)
+  stat = vgd_new(vgd,kind=5,version=4,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-1.d0,pref_8=pref,ptop_out_8=ptop,ip1=0)
   
   file='data/data_constructor_gen_5004.txt'
-  stat = test_5002(d,file,write_control_L,stat)
+  stat = test_5002(vgd,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
   print*,'ptop',ptop
 
   ! Construct a new set of vertical coordinate descriptors 5004 with flat Momentum(1) level B(1)=0.
   ! 
-  stat = vgd_new(d,kind=5,version=4,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-2.d0,pref_8=pref,ptop_out_8=ptop,ip1=0)
+  stat = vgd_new(vgd,kind=5,version=4,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-2.d0,pref_8=pref,ptop_out_8=ptop,ip1=0)
   file='data/data_constructor_gen_5004_B_0.txt'
-  stat = test_5002(d,file,write_control_L,stat)
+  stat = test_5002(vgd,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
   print*,'ptop',ptop
  
   ! Construct a new set of vertical coordinate descriptors 5005
   !
-  stat = vgd_new(d,kind=5,version=5,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,ip1=0)
+  stat = vgd_new(vgd,kind=5,version=5,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,ip1=0)
   file='data/data_constructor_gen_5005.txt'
-  stat = test_5002(d,file,write_control_L,stat)
+  stat = test_5002(vgd,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
   print*,'ptop',ptop
  

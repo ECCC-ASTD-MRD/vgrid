@@ -59,16 +59,15 @@ program constructor
   !
   type(vgrid_descriptor) :: d
   type(FSTD_ext) :: prm
-  integer, parameter :: nliste=3
-  integer,dimension(nliste) :: lu=(/10,11,12/), &
-       ip1,ip2,vcode=(/5001,5003,5002/)
+  integer, parameter :: nliste=2
+  integer,dimension(nliste) :: lu=(/10,11/), &
+       ip1,ip2,vcode=(/5001,5003/)
   integer :: stat,i,vers,key,ni,nj,nk
   integer :: fnom,fstouv,fstinf,fstfrm,fclos,kind,version,fstlnk
   logical :: ok=.true.
   character(len=1000),dimension(nliste) :: files=(/ &
        "data/dm_5001_from_model_run_plus_toc    ", &
-       "data/dm_5003_from_model_run             ", &
-       "data/dm_5002_from_model_run_ig4_ip1_link" &
+       "data/dm_5003_from_model_run             "&
        /)
   !
   do i=1,nliste
@@ -102,22 +101,23 @@ program constructor
   stat = fstlnk(lu,nliste)
   !
   ! Test that an error is return if no !! are found with ips
-  stat = vgd_new(d,unit=lu(1),format="fst",ip1=1234,ip2=5678)
-  print*,'The above error is normal since there is not !! with these ips'
-  if(stat/=VGD_ERROR)ok=.false.
+  !stat = vgd_new(d,unit=lu(1),format="fst",ip1=1234,ip2=5678)
+  !print*,'The above error is normal since there is not !! with these ips'
+  !if(stat/=VGD_ERROR)ok=.false.
   !
   ! Test that an error is return if wild card are passed and there are more than on !! 
-  stat = vgd_new(d,unit=lu(1),format="fst",ip1=-1,ip2=-1)
-  print*,'The above error is normal with ips=-1 since there are 2 differents !! in linked files'
-  if(stat/=VGD_ERROR)ok=.false.
+  !stat = vgd_new(d,unit=lu(1),format="fst",ip1=-1,ip2=-1)
+  !print*,'The above error is normal with ips=-1 since there are 2 differents !! in linked files'
+  !if(stat/=VGD_ERROR)ok=.false.
   !
   ! Test that an error is return if no ips is passed and there are more than on !!
-  stat = vgd_new(d,unit=lu(1),format="fst")
-  print*,'The above error is normal with no ips passed since there are 2 differents !! in linked files'
-  if(stat/=VGD_ERROR)ok=.false.
+  !stat = vgd_new(d,unit=lu(1),format="fst")
+  !print*,'The above error is normal with no ips passed since there are 2 differents !! in linked files'
+  !if(stat/=VGD_ERROR)ok=.false.
   !
   do i=1,nliste
      ! Construct a new set of 3D coordinate descriptors
+     print*,'i, ip1(i),ip2(i)',i, ip1(i),ip2(i)
      stat = vgd_new(d,unit=lu(1),format="fst",ip1=ip1(i),ip2=ip2(i))
      if(stat.ne.VGD_OK)then
         print*,'ERROR: problem with vgd_new'
