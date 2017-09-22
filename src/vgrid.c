@@ -55,9 +55,9 @@ static int a_t_8_valid_get  [VALID_TABLE_SIZE] = { 1001, 1002,    0, 2001, 5001,
 static int b_t_8_valid      [VALID_TABLE_SIZE] = {    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005, 5100,    0};
 static int b_t_8_valid_get  [VALID_TABLE_SIZE] = { 1001, 1002,    0, 2001, 5001, 5002, 5003, 5004, 5005, 5100,    0};
 static int c_t_8_valid      [VALID_TABLE_SIZE] = {    0,    0,    0,    0,    0,    0,    0,    0,    0, 5100,    0};
-static int ip1_m_valid      [VALID_TABLE_SIZE] = { 1001, 1002, 1003, 2001, 5001, 5002, 5003, 5004, 5005, 5100,    0};
+static int ip1_m_valid      [VALID_TABLE_SIZE] = { 1001, 1002, 1003, 2001, 5001, 5002, 5003, 5004, 5005, 5100, 5999};
 static int ip1_t_valid      [VALID_TABLE_SIZE] = {    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005, 5100,    0};
-static int ip1_t_valid_get  [VALID_TABLE_SIZE] = { 1001, 1002,    0, 2001, 5001, 5002, 5003, 5004, 5005, 5100,    0};
+static int ip1_t_valid_get  [VALID_TABLE_SIZE] = { 1001, 1002,    0, 2001, 5001, 5002, 5003, 5004, 5005, 5100, 5999};
 static int ref_name_valid   [VALID_TABLE_SIZE] = { 1001, 1002, 1003,    0, 5001, 5002, 5003, 5004, 5005, 5100, 5999};
 static int ref_namel_valid  [VALID_TABLE_SIZE] = {    0,    0,    0,    0,    0,    0,    0,    0,    0, 5100,    0};
 static int dhm_valid        [VALID_TABLE_SIZE] = {    0,    0,    0,    0,    0,    0,    0,    0, 5005, 5100,    0};
@@ -73,6 +73,7 @@ static int c_encode_vert_2001(vgrid_descriptor **self,int nk);
 static int c_encode_vert_5001(vgrid_descriptor **self,int nk);
 static int c_encode_vert_5002_5003_5004_5005(vgrid_descriptor **self, char update);
 static int c_encode_vert_5100(vgrid_descriptor **self, char update);
+static int c_encode_vert_5999(vgrid_descriptor **self,int nk);
 
 static int is_valid(vgrid_descriptor *self, int *table_valid)
 {
@@ -1383,9 +1384,7 @@ int Cvgd_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, 
     break;
   case 5999:
     strcpy(cvcode,"5999");
-    printf("TODO c_encode_vert_5999\n");
-    exit(1);
-    //ier = c_encode_vert_5999(self, 0);
+    ier = c_encode_vert_5999(self, nk);
     break;
   default:
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_new_build_vert, invalid kind or version : kind=%d, version=%d\n",kind,version);
@@ -1655,6 +1654,68 @@ static int c_encode_vert_5100(vgrid_descriptor **self, char update){
     (*self)->table[ind+2] = (*self)->b_t_8[k];
     (*self)->table[ind+3] = (*self)->c_t_8[k];
     ind = ind + 4;
+  }
+
+  (*self)->valid = 1;
+
+  return(VGD_OK);
+}
+
+static int c_encode_vert_5999(vgrid_descriptor **self,int nk){
+  int i, k, kind, skip = 2, table_size;
+  float hyb;
+
+  // Note, original Fortran version has the extra argument char update but was never used.
+  // Therefore with remove it here.
+
+  // Check ip1 validity
+  for( k=0; k < nk; k++){
+    hyb = c_convip_IP2Level((*self)->ip1_m[k],&kind);
+    // Even if hyb is kind 5, kind 4 may be present due to diag level in m AGL
+    if( kind != 5 && kind != 4 ) {
+      printf("Error in encode_vert_5999, ip1 kind must be 5 or 4 but got %d, for ip1 = &d\n", kind, (*self)->ip1_m[k]);
+      return(VGD_ERROR);
+    }
+    for( i=k+1; i < nk; i++) {
+      if( (*self)->ip1_m[i] == (*self)->ip1_m[k]) {
+	printf("Error in encode_vert_5999, repetition present in ip1 list for at least ip1 = %d\n", (*self)->ip1_m[i]);
+	return(VGD_ERROR);
+      }
+    }
+  }
+  
+  if( (*self)->table )
+    free( (*self)->table );
+  (*self)->table_ni = 3;
+  (*self)->table_nj = nk+skip;
+  (*self)->table_nk = 1;
+  table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
+  (*self)->table = malloc ( table_size * sizeof(double) );
+  if(! (*self)->table ) {
+    printf("(Cvgd) ERROR in c_encode_vert_5999, cannot allocate table of bouble of size %d\n",table_size );
+    return(VGD_ERROR);
+  }
+  strcpy((*self)->ref_name,"P0  ");
+
+  //Fill header
+  (*self)->table[0] = (*self)->kind;
+  (*self)->table[1] = (*self)->version;
+  (*self)->table[2] = skip;
+
+  (*self)->table[3] = (*self)->ptop_8;
+  (*self)->table[4] = 0.;
+  (*self)->table[5] = 0.;
+  
+  flip_transfer_c2d((*self)->ref_name, &((*self)->table[6]));
+  (*self)->table[7] = 0.;
+  (*self)->table[8] = 0.;
+
+  int ind = 6;
+  for ( k = 0; k < nk; k++){
+    (*self)->table[ind  ] = (*self)->ip1_m[k];
+    (*self)->table[ind+1] = (*self)->a_m_8[k];
+    (*self)->table[ind+2] = (*self)->b_m_8[k];
+    ind = ind + 3;
   }
 
   (*self)->valid = 1;
@@ -1959,6 +2020,44 @@ static int c_decode_vert_5002_5003_5004_5005(vgrid_descriptor **self) {
 
 }
 
+static int c_decode_vert_5999(vgrid_descriptor **self) {
+  int skip, k, ind, nk;
+  
+  (*self)->kind    = (int) (*self)->table[0];
+  (*self)->version = (int) (*self)->table[1];
+  skip             = (int) (*self)->table[2];
+  flip_transfer_d2c((*self)->ref_name,(*self)->table[3]);
+
+  // The next two values in table are not used, so we continue with ind = 6
+  ind = 6;
+  nk = (*self)->table_nj - skip;
+
+  // Free A, B and Ip1 vectors for momentum and thermo.
+  c_vgd_free_abci(self);
+
+  // Allocate and assign momentum level data, there are nk of them
+  (*self)->nl_m = nk;
+  (*self)->nl_t = nk;
+  (*self)->ip1_m = malloc( nk * sizeof(int) );
+  (*self)->a_m_8 = malloc( nk * sizeof(double) );
+  (*self)->b_m_8 = malloc( nk * sizeof(double) );
+  if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 ){
+    printf("(Cvgd) ERROR in c_decode_vert_1003_5001, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nk);
+    return(VGD_ERROR);
+  }
+  for ( k = 0; k < nk; k++){    
+    (*self)->ip1_m[k] = (int) (*self)->table[ind  ];
+    (*self)->a_m_8[k] =       (*self)->table[ind+1];
+    (*self)->b_m_8[k] =       (*self)->table[ind+2];
+    ind = ind + 3;
+  }
+  (*self)->ip1_t = (*self)->ip1_m;
+  (*self)->a_t_8 = (*self)->a_m_8;
+  (*self)->b_t_8 = (*self)->b_m_8;
+  
+  return(VGD_OK);
+}
+
 static int C_genab_1001(float *hyb, int nk, double **a_m_8, double **b_m_8, int **ip1_m)
 {
 
@@ -2088,6 +2187,12 @@ int Cvgd_new_from_table(vgrid_descriptor **self, double *table, int ni, int nj, 
   case 5100:
     if( c_decode_vert_5100(self) == VGD_ERROR ) {
       printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 5100\n");
+      return(VGD_ERROR);
+    }
+    break;    
+  case 5999:
+    if( c_decode_vert_5999(self) == VGD_ERROR ) {
+      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 5999\n");
       return(VGD_ERROR);
     }
     break;    
@@ -3609,6 +3714,19 @@ int Cvgd_new_gen(vgrid_descriptor **self, int kind, int version, float *hyb, int
       return(VGD_ERROR);
     }    
      break;
+  case 5005:
+    nk   = size_hyb;
+    if(c_vgrid_genab_5005(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, &ptop_out_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t, *dhm, *dht) == VGD_ERROR ) {
+      free(a_m_8);
+      free(b_m_8);
+      free(ip1_m);
+      free(a_t_8);
+      free(b_t_8);
+      free(ip1_t);
+      return(VGD_ERROR);
+      
+    }
+    break;
   case 5100:
     nk   = size_hyb;
     if(c_vgrid_genab_5100(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *rcoef3, *rcoef4, &ptop_out_8, *pref_8, &a_m_8, &b_m_8, &c_m_8, &ip1_m, &a_t_8, &b_t_8, &c_t_8, &ip1_t, *dhm, *dht, avg) == VGD_ERROR ) {
@@ -3622,19 +3740,6 @@ int Cvgd_new_gen(vgrid_descriptor **self, int kind, int version, float *hyb, int
       free(ip1_t);
       return(VGD_ERROR);
 
-    }
-    break;
-  case 5005:
-    nk   = size_hyb;
-    if(c_vgrid_genab_5005(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, &ptop_out_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t, *dhm, *dht) == VGD_ERROR ) {
-      free(a_m_8);
-      free(b_m_8);
-      free(ip1_m);
-      free(a_t_8);
-      free(b_t_8);
-      free(ip1_t);
-      return(VGD_ERROR);
-      
     }
     break;
   default:

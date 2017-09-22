@@ -358,7 +358,7 @@ module vGrid_Descriptors
 contains
    
    integer function new_read(self,unit,format,ip1,ip2,kind,version) result(status)
-      use utils, only: up
+      use vgrid_utils, only: up
       ! Coordinate constructor - read from a file and initialize instance
       type(vgrid_descriptor), intent(inout) :: self !Vertical descriptor instance
       integer, intent(in) :: unit                 !File unit to read descriptor information from
@@ -690,7 +690,7 @@ contains
    end function garbage_collection
 
    integer function getopt_logical(key,value,quiet) result(status)
-      use utils, only: up
+      use vgrid_utils, only: up
       character(len=*), intent(in) :: key           !Descriptor key to retrieve
       logical, intent(out) :: value                 !Retrieved value
       logical, intent(in), optional :: quiet        !Do not generate messages
@@ -1060,7 +1060,7 @@ contains
   end function levels_readref
 
   integer function levels_withref_prof(self,ip1_list,levels,sfc_field,in_log,sfc_field_ls) result(status)
-     use utils, only: get_allocate
+     use vgrid_utils, only: get_allocate
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
      real, dimension(:), pointer :: levels                       !Physical level values
@@ -1147,7 +1147,7 @@ contains
   end function levels_withref_prof_8
 
   integer function dpidpis_withref_prof(self,ip1_list,dpidpis,sfc_field) result(status)
-     use utils, only: get_allocate,up
+     use vgrid_utils, only: get_allocate,up
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
      real, dimension(:), pointer :: dpidpis                      !Derivative values
@@ -1191,7 +1191,7 @@ contains
   end function dpidpis_withref_prof
 
   integer function dpidpis_withref_prof_8(self,ip1_list,dpidpis,sfc_field) result(status)
-     use utils, only: up
+     use vgrid_utils, only: up
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
      real*8, dimension(:), pointer :: dpidpis                      !Derivative values
@@ -1223,7 +1223,7 @@ contains
   end function dpidpis_withref_prof_8
 
   integer function diag_withref_prof_8(self,ip1_list,levels,sfc_field,in_log,dpidpis,sfc_field_ls) result(status)
-     use utils, only: get_allocate
+     use vgrid_utils, only: get_allocate
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
      real*8, dimension(:), pointer :: levels                       !Physical level values
@@ -1293,7 +1293,7 @@ contains
   end function diag_withref_prof_8
 
   integer function levels_withref(self,ip1_list,levels,sfc_field,in_log,sfc_field_ls) result(status)
-     use utils, only: get_allocate
+     use vgrid_utils, only: get_allocate
      ! Given referent, compute physical levelling information from the vertical description
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
@@ -1427,7 +1427,7 @@ contains
    end function levels_withref_8
 
    integer function dpidpis_withref(self,ip1_list,dpidpis,sfc_field) result(status)
-      use utils, only: get_allocate
+      use vgrid_utils, only: get_allocate
       ! Given referent, compute physical levelling information from the vertical description
       type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
       integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
@@ -1486,7 +1486,7 @@ contains
    end function dpidpis_withref
    
    integer function dpidpis_withref_8(self,ip1_list,dpidpis,sfc_field) result(status)
-      use utils, only: get_allocate
+      use vgrid_utils, only: get_allocate
       ! Given referent, compute physical levelling information from the vertical description
       type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
       integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
@@ -1538,7 +1538,7 @@ contains
    end function dpidpis_withref_8
 
    integer function diag_withref_8(self,ip1_list,levels,sfc_field,in_log,dpidpis,sfc_field_ls) result(status)
-      use utils, only: get_allocate
+      use vgrid_utils, only: get_allocate
       ! Given referent, compute physical levelling information from the vertical description
       type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
       integer, target, dimension(:), intent(in) :: ip1_list               !Key of prototype field
@@ -1658,7 +1658,7 @@ contains
 !!! Write descriptors
    
    integer function write_desc(self,unit,format) result(status)     
-      use utils, only: up, get_allocate
+      use vgrid_utils, only: up, get_allocate
       ! Write descriptors to the requested file
       type(vgrid_descriptor), intent(in) :: self       !Vertical descriptor instance
       integer, intent(in) :: unit                      !File unit to write to
@@ -1713,7 +1713,7 @@ contains
    end function write_desc   
 
    integer function get_int(self,key,value,quiet) result(status)
-       use utils, only: up
+       use vgrid_utils, only: up
       ! Retrieve the value of the requested instance variable
       type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
       character(len=*), intent(in) :: key                 !Descriptor key to retrieve
@@ -1741,7 +1741,7 @@ contains
    end function get_int
  
    integer function get_int_1d(self,key,value,quiet) result(status)
-      use utils, only: get_allocate,up,get_error
+      use vgrid_utils, only: get_allocate,up,get_error
       ! Retrieve the value of the requested instance variable
       type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
       character(len=*), intent(in) :: key                 !Descriptor key to retrieve
@@ -1816,7 +1816,7 @@ contains
    end function get_int_1d
    
    integer function get_real(self,key,value,quiet) result(status)
-      use utils, only: up
+      use vgrid_utils, only: up
       ! Retrieve the value of the requested instance variable
       type(vgrid_descriptor), intent(in) :: self     !Vertical descriptor instance
       character(len=*), intent(in) :: key            !Descriptor key to retrieve
@@ -1848,7 +1848,7 @@ contains
   
 
    integer function get_real_1d(self,key,value,quiet) result(status)
-      use utils, only: get_allocate,up,get_error
+      use vgrid_utils, only: get_allocate,up,get_error
       ! Retrieve the value of the requested instance variable
       type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
       character(len=*), intent(in) :: key         !Descriptor key to retrieve
@@ -1935,7 +1935,7 @@ contains
    end function get_real_1d
    
    integer function get_real8(self,key,value,quiet) result(status)
-      use utils, only: up
+      use vgrid_utils, only: up
       type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
       character(len=*), intent(in) :: key         !Descriptor key to retrieve
       real(kind=8), target, intent(out) :: value  !Retrieved value
@@ -1967,7 +1967,7 @@ contains
    end function get_real8
 
    integer function get_real8_1d(self,key,value,quiet) result(status)
-      use utils, only: get_allocate,up,get_error
+      use vgrid_utils, only: get_allocate,up,get_error
       ! Wrapper function to C f_get_real8_1d
       type(vgrid_descriptor), intent(in) :: self     !Vertical descriptor instance
       character(len=*), intent(in) :: key            !Descriptor key to retrieve
@@ -2078,7 +2078,7 @@ contains
    end function get_real8_1d
 
    integer function get_real8_3d(self,key,value,quiet) result(status)
-      use utils, only: get_allocate,up
+      use vgrid_utils, only: get_allocate,up
       ! Retrieve the value of the requested instance variable
       type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
       character(len=*), intent(in) :: key         !Descriptor key to retrieve
@@ -2135,7 +2135,7 @@ contains
    end function get_real8_3d
    
    integer function get_char(self,key,value,quiet) result(status)
-      use utils, only: up
+      use vgrid_utils, only: up
       type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
       character(len=*), intent(in) :: key         !Descriptor key to retrieve
       character(len=*), intent(out) :: value      !Retrieved value
@@ -2194,7 +2194,7 @@ contains
    end function get_char
     
    integer function get_logical(self,key,value,quiet) result(status)
-      use utils, only: up
+      use vgrid_utils, only: up
       ! Retrieve the value of the requested instance variable
       type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
       character(len=*), intent(in) :: key                 !Descriptor key to retrieve
@@ -2230,7 +2230,7 @@ contains
 
 
    integer function put_int(self, key, value) result(status)
-      use utils, only : up
+      use vgrid_utils, only : up
       type(vgrid_descriptor), intent(inout) :: self !Vertical descriptor instance
       character(len=*), intent(in) :: key           !Descriptor key to set
       integer, target, intent(in) :: value          !Value to set
@@ -2243,7 +2243,7 @@ contains
    end function put_int
 
    integer function put_real8(self, key, value) result(status)
-      use utils, only : up
+      use vgrid_utils, only : up
       type(vgrid_descriptor), intent(inout) :: self !Vertical descriptor instance
       character(len=*), intent(in) :: key           !Descriptor key to set
       real(kind=8), target, intent(in) :: value     !Value to set
@@ -2257,7 +2257,7 @@ contains
    end function put_real8
 
    integer function put_char(self,key,value) result(status)
-      use utils, only: up,put_error
+      use vgrid_utils, only: up,put_error
       ! Set the value of the requested instance variable
       type(vgrid_descriptor), intent(in) :: self  !Descriptor instance
       character(len=*), intent(in) :: key         !Descriptor key to set

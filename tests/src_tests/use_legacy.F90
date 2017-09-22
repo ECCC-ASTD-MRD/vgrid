@@ -86,7 +86,7 @@ integer function test_it(F_file) result(istat)
    stat=vgd_new(vgd,lu)
    if(stat.eq.VGD_ERROR)return
   
-   stat=vgd_print(vgd,6)  
+   stat=vgd_print(vgd,-1)  
    if(stat.eq.VGD_ERROR)return
 
    stat=fstinl(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ','PX',liste,infon,nmax)

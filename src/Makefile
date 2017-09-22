@@ -15,10 +15,10 @@ dependencies.mk: *.c *.F90 *.h *.hc
 include dependencies.mk
 
 %.o: %.F90
-	s.f90 -c $(MY_FFLAGS) $<
+	s.f90 -c $(MY_FFLAGS) $(FFLAGS) $<
 
 %.o: %.c
-	s.cc -c $(MY_CFLAGS) $<
+	s.cc -c $(MY_CFLAGS) $(CFLAGS) $<
 
 libdescrip.a: $(OBJECTS) dependencies.mk
 	rm -f libdescrip.a && ar scru libdescrip.a *.o ;\

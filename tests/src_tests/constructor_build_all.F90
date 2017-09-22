@@ -73,7 +73,6 @@ program constructor_build_all
      endif
 
   end do
-stop
   call ut_report(ok,'Grid_Descriptors, vgd_get, LOGP 5002')  
 
 end program constructor_build_all

@@ -8,20 +8,20 @@ endif
 DESCRIP_PATH = ../src
 
 %.o: %.F90
-	s.f90 -c $(MY_FFLAGS) -libpath $(DESCRIP_PATH) -I$(DESCRIP_PATH) $<
+	s.f90 -c $(MY_FFLAGS) $(FFLAGS) -libpath $(DESCRIP_PATH) -I$(DESCRIP_PATH) $<
 
 %.o: %.c
-	s.cc -c  $(MY_CFLAGS) -libpath $(DESCRIP_PATH) -I$(DESCRIP_PATH) $<
+	s.cc -c  $(MY_CFLAGS) $(CFLAGS) -libpath $(DESCRIP_PATH) -I$(DESCRIP_PATH) $<
 
 OBJECTS = unit_testing.o c_ut_report.o
 
 UNIT_TEST_F: $(OBJECTS) UNIT_TEST_F.F90 $(DESCRIP_PATH)/libdescrip.a
 	# Ne trouve pas msg avec commande suivnate (ajouter  UNIT_TEST_F.o a liste OBJECTS = pour tester)
-	# s.f90 $(OBJECTS) -o UNIT_TEST_F -I$(DESCRIP_PATH) -L$(DESCRIP_PATH) -lrmn -ldescrip $(OPENMP) $(MY_FFLAGS) 
-	s.compile $(OPENMP) -optf "=$(MY_FFLAGS)" -includes $(DESCRIP_PATH) -src UNIT_TEST_F.F90 -o UNIT_TEST_F -obj $(OBJECTS) -libpath $(DESCRIP_PATH) -librmn -libappl descrip
+	# s.f90 $(OBJECTS) -o UNIT_TEST_F -I$(DESCRIP_PATH) -L$(DESCRIP_PATH) -lrmn -ldescrip $(OPENMP) $(MY_FFLAGS) $(FFLAGS)
+	s.compile $(OPENMP) -optf "=$(MY_FFLAGS) $(FFLAGS)" -includes $(DESCRIP_PATH) -src UNIT_TEST_F.F90 -o UNIT_TEST_F -obj $(OBJECTS) -libpath $(DESCRIP_PATH) -librmn -libappl descrip
 
 UNIT_TEST_C: $(OBJECTS) UNIT_TEST_C.c $(DESCRIP_PATH)/libdescrip.a
-	s.compile $(OPENMP) -optc "=$(MY_CFLAGS)" -includes $(DESCRIP_PATH) -src UNIT_TEST_C.c -o UNIT_TEST_C -bidon c -main UNIT_TEST_C -obj $(OBJECTS) -libpath $(DESCRIP_PATH) -librmn -libappl descrip
+	s.compile $(OPENMP) -optc "=$(MY_CFLAGS) $(CFLAGS)" -includes $(DESCRIP_PATH) -src UNIT_TEST_C.c -o UNIT_TEST_C -bidon c -main UNIT_TEST_C -obj $(OBJECTS) -libpath $(DESCRIP_PATH) -librmn -libappl descrip
 
 $(DESCRIP_PATH)/libdescrip.a: $(DESCRIP_PATH)/*.c $(DESCRIP_PATH)/*.F90 $(DESCRIP_PATH)/*.h $(DESCRIP_PATH)/*.hc
 	cd ../src ;
