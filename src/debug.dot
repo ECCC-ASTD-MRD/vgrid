@@ -1,2 +1,2 @@
-export FFLAGS='-g -C -O0'
-export CFLAGS='-g -O0'
+export FFLAGS='-g -C -O1'
+export CFLAGS='-g -O1'
