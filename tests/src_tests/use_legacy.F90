@@ -105,7 +105,7 @@ integer function test_it(F_file) result(istat)
       ff=abs(px(1,1,k)-levels(1,1,k)/100.)/px(1,1,k)
       if(ff.gt.epsilon)then        
          print*,'OUPS, these should be equal within epsilon',px(1,1,k),levels(1,1,k)/100.
-         print*,'But found difference of',ff
+         print*,'But found difference of',ff,' for k =',k
          return
       endif
    enddo
