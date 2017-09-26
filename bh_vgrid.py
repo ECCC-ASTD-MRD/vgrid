@@ -41,8 +41,8 @@ def _make(b):
              echo \"           make\"                                                                             >> ${CONTROL_FILE}
              echo \"Vertical grid descriptors package\"                                                           >> ${CONTROL_FILE}
              cd ${BH_BUILD_DIR}/src
-             ${BH_MAKE} vgrid_version
-             ${BH_MAKE} shared
+             make vgrid_version
+             make shared
             )""",environ)
    
 def _test(b):
@@ -50,7 +50,7 @@ def _test(b):
         (
          set -e
          cd ${BH_BUILD_DIR}/tests
-         ${BH_MAKE} tests
+         make tests
         )""",environ)
 
 def _install(b):
@@ -72,7 +72,7 @@ def _install(b):
          cp ${BH_TOP_BUILD_DIR}/src/vgrid_version.h* .
          mkdir -p ${BH_INSTALL_DIR}/src
          cd ${BH_TOP_BUILD_DIR}/src
-         ${BH_MAKE} clean
+         make clean
          cp * ${BH_INSTALL_DIR}/src
         )""")
 
@@ -80,7 +80,7 @@ if __name__ == "__main__":
    dr, b = bhlib.init(sys.argv, bhlib.PackageBuilder)
    b.actions.set("init", _init)
    b.actions.set("pull", [actions.pull.git_archive])
-   b.actions.set("clean", ["""(cd ${BH_BUILD_DIR}/src; ${BH_MAKE} clean)"""])
+   b.actions.set("clean", ["""(cd ${BH_BUILD_DIR}/src; make clean)"""])
    b.actions.set("make", _make)
    #b.actions.set("test",_test)
    b.actions.set("install", _install)
