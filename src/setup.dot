@@ -33,6 +33,9 @@ unset MY_FFLAGS MY_CFLAGS
 # On ubuntu-14.04-amd64-64 cote science machine eccc-ppp2 intel-2016.1.156 no problem with -02
 # On ubuntu-14.04-amd64-64 cote science machine eccc-ppp2 intel-2016.1.156 no problem with -03
 #
+# I checkout the code tagged 6.1.5 which is the one used that was producing the error on 18 sep 2016 on gpsc-in but could not
+# reproduce the error.
+#
 # Previous notes on the same problem
 # Les erreurs semblent lier a c_vgd_construct, apres le malloc sur la structure vgrid le yabbe est aux vaches pour certaines optoimisations,
 # Note avec -O1 sur ubuntu-12.04-amd64-64 intel13sp1u2 les tests suivants donnent un SIGSEGV a la ligne entre () (OK avec -O2 (defaul) OK avec -O3)
@@ -66,5 +69,5 @@ else
    echo Domain $(hostname -d) not supported
 fi
 
-export MY_FFLAGS BH_MAKE BH_HOST BH_MODE RPN_LIB SHARED_RNM_SSM_PREF SHARED_RNM_EXT
+export MY_FFLAGS BH_HOST BH_MODE RPN_LIB SHARED_RNM_SSM_PREF SHARED_RNM_EXT
 

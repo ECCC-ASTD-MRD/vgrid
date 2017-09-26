@@ -5,7 +5,6 @@ case "${ORDENV_PLAT}" in
    ubuntu-12.04-amd64-64)
       #MY_FFLAGS="-C -g -O0 -lefence"
       #MY_CFLAGS="-g -O0 -lefence"
-      export BH_MAKE=make
       export BH_MODE=intel
       HPCS_BASE=hpcs/201402/02/base
       HPCS_COMP=hpcs/201402/02/intel13sp1u2
@@ -20,7 +19,6 @@ case "${ORDENV_PLAT}" in
       :;;
 
    ubuntu-14.04-amd64-64)
-      export BH_MAKE=make
       export BH_MODE=intel
       #VGRID_COMPILER=intel13sp1u2
       VGRID_COMPILER=intel2016
@@ -59,7 +57,6 @@ case "${ORDENV_PLAT}" in
       :;;
 
    aix-7.1-ppc7-64)
-      export BH_MAKE=gmake
       r.use gmake as make
       export BH_MODE=xlf13
       HPCS_BASE=hpcs/201402/02/base
