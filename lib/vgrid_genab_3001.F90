@@ -152,19 +152,20 @@ contains
       !     Momentum levels
       !
 
-      pr1 = 1.0d0/F_hybuser(1)
+      pr1 = 1.d0/(F_hybuser(1)-F_hybuser(Nk))
       do k = 1, Nk
-         lamda_8 = F_hybuser(k) * pr1
-         rcoefL  = F_rcoef(1) * lamda_8
-         rcoef   = F_rcoef(2) * lamda_8
-         F_am_8(k) = F_hybuser(1) * lamda_8
-         F_bm_8(k) = ( 1.d0 - lamda_8 ) ** rcoef
-         F_cm_8(k) = ( 1.d0 - lamda_8 ) ** rcoefL - F_bm_8(k)
+         lamda_8 = ( F_hybuser(1) - F_hybuser(k) ) * pr1
+         rcoef   = F_rcoef(2) - ( F_rcoef(2) - F_rcoef(1) )* lamda_8
+         F_am_8(k) = F_hybuser(k)
+         F_bm_8(k) = lamda_8 ** rcoef
+         F_cm_8(k) = 0.d0
          ! Since rcoef* may be big we limit B and C to avoid floating point overflow
          if(F_bm_8(k) < 1.e-16)F_bm_8(k) = 0.d0
          if(F_cm_8(k) < 1.e-16)F_cm_8(k) = 0.d0
       enddo
       
+      F_bm_8(Nk)   = 1.d0
+
       F_am_8(Nk+1) = 0.d0
       F_bm_8(Nk+1) = 1.d0 
       F_cm_8(Nk+1) = 0.d0 
@@ -183,6 +184,8 @@ contains
          if(F_bt_8(k) < 1.e-16)F_bt_8(k) = 0.d0
          if(F_ct_8(k) < 1.e-16)F_ct_8(k) = 0.d0
       enddo
+      F_bt_8(Nk)   = 1.d0
+
       F_at_8(Nk+1) = 0.d0
       F_bt_8(Nk+1) = 1.d0
       F_ct_8(Nk+1) = 0.d0
