@@ -87,22 +87,14 @@ module vGrid_Descriptors
    end type vgrid_descriptor
    
    interface
-
-      integer function f_diag_withref_8(vgd_CP, ni, nj, nk, ip1_list_CP, levels_CP,sfc_field_CP, in_log, dpidpis) bind(c, name='Cvgd_diag_withref_8')
-         use iso_c_binding, only: c_ptr, c_int
-         type(c_ptr), value :: vgd_CP, ip1_list_CP, sfc_field_CP
-         integer (c_int), value :: in_log, dpidpis
-         type(c_ptr), value  :: levels_CP
-         integer (c_int), value :: ni, nj, nk
-      end function f_diag_withref_8
-
-      integer function f_diag_withref2_8(vgd_CP, ni, nj, nk, ip1_list_CP, levels_CP,sfc_field_CP,sfc_field_ls_CP, in_log, dpidpis) bind(c, name='Cvgd_diag_withref2_8')
+      
+      integer function f_diag_withref_8(vgd_CP, ni, nj, nk, ip1_list_CP, levels_CP,sfc_field_CP,sfc_field_ls_CP, in_log, dpidpis) bind(c, name='C_diag_withref_8')
          use iso_c_binding, only: c_ptr, c_int
          type(c_ptr), value :: vgd_CP, ip1_list_CP, sfc_field_CP, sfc_field_ls_CP
          integer (c_int), value :: in_log, dpidpis
          type(c_ptr), value  :: levels_CP
          integer (c_int), value :: ni, nj, nk
-       end function f_diag_withref2_8
+       end function f_diag_withref_8
 
       integer function f_get_int(vgd_CP, key, value_CP, quiet) bind(c, name='Cvgd_get_int')
          use iso_c_binding, only: c_ptr, c_char, c_int
@@ -205,7 +197,7 @@ module vGrid_Descriptors
          character(kind=c_char) :: key(*), value(*)
       end function f_put_char
 
-      integer function f_is_valid(vgd_CP, valid_table_name) bind(c, name='Cvgd_is_valid')
+      integer function f_is_valid(vgd_CP, valid_table_name) bind(c, name='C_is_valid')
          use iso_c_binding, only: c_ptr, c_char
          type(c_ptr), value :: vgd_CP
          character(kind=c_char) :: valid_table_name(*)
@@ -258,7 +250,7 @@ module vGrid_Descriptors
       
       integer function f_new_build_vert(vgd,kind,version,nk,ip1,ip2, &
            ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, &
-           a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, ip1_m_CP, ip1_t_CP, nl_m, nl_t) bind(c, name='Cvgd_new_build_vert')         
+           a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, ip1_m_CP, ip1_t_CP, nl_m, nl_t) bind(c, name='C_new_build_vert')
          use iso_c_binding, only : c_ptr, c_int
          type(c_ptr) :: vgd
          integer (c_int), value :: kind,version,nk,ip1,ip2
@@ -1624,7 +1616,7 @@ contains
       sfc_field_ls_CP = C_NULL_PTR
       if (present(sfc_field_ls)) sfc_field_ls_CP = c_loc(sfc_field_ls(1,1))
       
-      istat = f_diag_withref2_8(self%cptr,ni,nj,nk,ip1_list_CP,levels_CP,sfc_field_CP,sfc_field_ls_CP,in_log_int,dpidpis_int)      
+      istat = f_diag_withref_8(self%cptr,ni,nj,nk,ip1_list_CP,levels_CP,sfc_field_CP,sfc_field_ls_CP,in_log_int,dpidpis_int)      
       if (istat /= VGD_OK) then
          if(my_dpidpis)then
             write(for_msg,*) 'error computing dpidpis in diag_withref_8'

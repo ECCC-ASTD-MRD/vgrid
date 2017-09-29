@@ -19,6 +19,7 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "vgrid.h"
 
 void c_use_new_read() {
@@ -100,7 +101,10 @@ void c_use_new_read() {
     return;
   }
 
-  // Write descriptor in new file
+  // Write descriptor in new file  
+  char command[50];
+  strcpy( command, "rm -f to_erase" );
+  system(command);
   ier = c_fnom(iun2,"to_erase",mode,0);
   if( ier < 0 ) {
     printf("ERROR with c_fnom on iun2\n");
@@ -164,7 +168,7 @@ void c_use_new_read() {
       return;
     }
     for( ij = 0; ij < ni2*nj2; ij++, ijk++){
-      if( abs(p0[ij] - levels_8[ijk]/100.) > 1.e-6 ) {
+      if( fabs(p0[ij] - levels_8[ijk]/100.)/p0[ij] > 1.e-6 ) {
 	printf("Difference is too large, expected %f, got %f\n", p0[ij], levels_8[ijk]/100.);
 	return;
       }

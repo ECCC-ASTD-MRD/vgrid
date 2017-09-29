@@ -32,10 +32,6 @@ case "${ORDENV_PLAT}" in
         . ssmuse-sh -d ${HPCS_BASE} -d ${HPCS_COMP} -d ${RPN_LIB}
       elif [ ${VGRID_COMPILER} == intel2016 ];then
          # Must use -O1 with intel2016
-         MY_FFLAGS="-O1"
-         MY_CFLAGS="-O1"
-         #MY_FFLAGS="-C -g -O0 -lefence"
-	 #MY_CFLAGS="-g -O0 -lefence"
          HPCS_BASE=/ssm/net/hpcs/201402/04/base
          HPCS_COMP=/ssm/net/hpcs/exp/intel2016/01
          RPN_LIB=rpn/libs/16.2
