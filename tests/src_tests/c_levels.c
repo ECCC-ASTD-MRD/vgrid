@@ -19,6 +19,7 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "vgrid.h"
 
 void c_levels() {
@@ -123,18 +124,18 @@ void c_levels() {
       printf("Problem getting info for PX for ip1 = %d\n",i_val[k]);
       return;
     }
-    // To simplify, PX are assumed to be on the same grid as P0. bur rhis should be check in an operational program!
+    // To simplify, PX are assumed to be on the same grid as P0. but this should be check in an operational program!
     ier = c_fstluk( p0, key, &ni2, &nj2, &nk2 );
     if( ier < 0 ){
       printf("Error with c_fstluk on level = %d\n",i_val[k]);
       return;
     }
     for( ij = 0; ij < ni2*nj2; ij++, ijk++){
-      if( abs(p0[ij] - levels[ijk]/100.) > 1.e-6 ) {
+      if( fabs(p0[ij] - levels[ijk]/100.)/p0[ij] > 1.e-6 ) {
 	printf("Difference is too large (float), expected %f, got %f\n", p0[ij], levels[ijk]/100.);
 	return;
       }
-      if( abs(p0[ij] - levels_8[ijk]/100.) > 1.e-6 ) {
+      if( fabs(p0[ij] - levels_8[ijk]/100.)/p0[ij] > 1.e-6 ) {
 	printf("Difference is too large (double), expected %f, got %f\n", p0_8[ij], levels_8[ijk]/100.);
 	return;
       }
