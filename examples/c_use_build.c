@@ -77,6 +77,11 @@ int c_use_build () {
   printf("\nOptional arguments needed for Vcode %d\n", kind*1000 + version);
   ier = Cvgd_new_build_vert(&vgd, kind, version, 3, ip1, ip2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
+  kind=5;
+  version=100;
+  printf("\nOptional arguments needed for Vcode %d\n", kind*1000 + version);
+  ier = Cvgd_new_build_vert(&vgd, kind, version, 3, ip1, ip2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
   // Here is the pressure example (Vcode 2001)
      kind=2;
   version=1;
