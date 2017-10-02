@@ -41,11 +41,11 @@ c_use_new_read: c_use_new_read.c $(DESCRIP_PATH)/libdescrip.a
 	s.compile -bidon c -main $@ -optc =$(MY_CFLAGS) -includes $(DESCRIP_PATH) -src $@.c -o $@ -libpath $(DESCRIP_PATH) -libappl rmn descrip
 
 c_use_build: c_use_build.c $(DESCRIP_PATH)/libdescrip.a
-	s.compile -bidon c -main $@ -optc =$(MY_CFLAGS) -includes $(DESCRIP_PATH) -src $@.c -o $@ -libpath $(DESCRIP_PATH) -libappl descrip -librmn
+	s.compile -bidon c -main $@ -optc ="$(MY_CFLAGS) $(CFLAGS)" -includes $(DESCRIP_PATH) -src $@.c -o $@ -libpath $(DESCRIP_PATH) -libappl descrip -librmn
 
-$(DESCRIP_PATH)/libdescrip.a: $(DESCRIP_PATH)/*.c $(DESCRIP_PATH)/*.ftn90 $(DESCRIP_PATH)/*.h $(DESCRIP_PATH)/*.hc
+$(DESCRIP_PATH)/libdescrip.a: $(DESCRIP_PATH)/*.c $(DESCRIP_PATH)/*.F90 $(DESCRIP_PATH)/*.h $(DESCRIP_PATH)/*.hc
 	cd $(DESCRIP_PATH) ;\
-	gmake;\
+	make;\
 
 clean:
 	rm -f *.f90 *.o *.mod test_output.fst
