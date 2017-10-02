@@ -1292,7 +1292,7 @@ int C_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, int
     if(rcoef2){
       (*self)->rcoef2 = *rcoef2;
     } else {
-      printf("rcoef2 is a required constructor entry\n");
+      printf("(Cvgd) rcoef2 is a required constructor entry\n");
       missingInput = 1;
     }
   }
@@ -1300,7 +1300,7 @@ int C_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, int
     if(rcoef3){
       (*self)->rcoef3 = *rcoef3;
     } else {
-      printf("rcoef3 is a required constructor entry\n");
+      printf("(Cvgd) rcoef3 is a required constructor entry\n");
       missingInput = 1;
     }
   }
@@ -1308,7 +1308,7 @@ int C_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, int
     if(rcoef4){
       (*self)->rcoef4 = *rcoef4;
     } else {
-      printf("rcoef4 is a required constructor entry\n");
+      printf("(Cvgd) rcoef4 is a required constructor entry\n");
       missingInput = 1;
     }
   }
