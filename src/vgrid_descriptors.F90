@@ -239,7 +239,7 @@ module vGrid_Descriptors
       end function f_new_from_table
 
       integer function f_new_gen(vgd,kind,version,hyb_CP,size_hyb,rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP, &
-           ip1,ip2,dhm_CP,dht_CP,avg) bind(c, name='Cvgd_new_gen')
+           ip1,ip2,dhm_CP,dht_CP,avg) bind(c, name='C_new_gen')
          use iso_c_binding, only : c_ptr, c_int
          type(c_ptr) :: vgd
          integer (c_int), value :: kind, version, size_hyb
@@ -2242,11 +2242,20 @@ contains
       type(vgrid_descriptor), intent(inout) :: self !Vertical descriptor instance
       character(len=*), intent(in) :: key           !Descriptor key to set
       real(kind=8), dimension(:,:,:), pointer :: value !Value to set
+      type(c_ptr) :: my_value_CP
       status = VGD_ERROR
       print*,'(F_vgd) ERROR: in put_real8_3d, putint real8 3D array is not implemented in this librairy'
       print*,'(F_vgd)        if you want to put the VGTB, you may do it by reconstructing a new '
       print*,'(F_vgd)        vgrid_descriptor e.g. vgd_new(self,table_8)'
       print*,'(F_vgd)        If you think you really need to vgd_put VGTB contact Andre PLante'
+      ! To silence the compiler warning
+      if(associated(value))then
+      endif
+      ! To silence the compiler warning
+      my_value_CP = c_loc(self%cptr)
+      ! To silence the compiler warning
+      if(key == "")then
+      endif
       return     
     end function put_real8_3d
 
