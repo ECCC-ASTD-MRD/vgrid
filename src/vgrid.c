@@ -589,7 +589,7 @@ int Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip) {
       printf("In Cvgd_print_desc: vgrid structure is not valid\n");
       return(VGD_ERROR);
     }
-    if(sout != -1){
+    if(sout != -1 && sout != 6){
       printf("In Cvgd_print_desc : please implement sout option = %d\n",sout);
       return(VGD_ERROR);
     }
@@ -639,6 +639,7 @@ int Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip) {
       printf("  Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100\n");
       break;
     case 5001:
+    case 5999:
       printf("  Number of hybrid levels (momentum levels) %d\n", self->nl_m );
       printf("  Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100\n");
       break;
@@ -667,7 +668,6 @@ int Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip) {
       printf("  Diagnostic thermo   level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
       printf("  Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref)\n");
       break;
-
     default:
       printf("(Cvgd) ERROR in Cvgd_print_desc, invalid kind or version: kind=%d, version=%d\n",self->kind,self->version);
       return(VGD_ERROR);
