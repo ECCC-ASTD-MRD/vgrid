@@ -131,9 +131,21 @@ int Cvgd_get_char(vgrid_descriptor *self, char *key, char out[], int quiet);
 int Cvgd_put_char(vgrid_descriptor **self, char *key, char *value);
 int Cvgd_putopt_int(char *key, int value);
 int Cvgd_put_int(vgrid_descriptor **self, char *key, int value);
-int Cvgd_new_gen(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
+int C_new_gen(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
 	      double *ptop_8, double *pref_8, double *ptop_out_8,
 		 int ip1, int ip2, float *dhm, float *dht, int avg);
+int Cvgd_new_gen(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2,
+	      double *ptop_8, double *pref_8, double *ptop_out_8,
+		 int ip1, int ip2, float *dhm, float *dht, int avg);
+int Cvgd_new_gen_1001(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, int ip1, int ip2);
+int Cvgd_new_gen_2001(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, int ip1, int ip2);
+int Cvgd_new_gen_5999(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, int ip1, int ip2);
+int Cvgd_new_gen_1002(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, double ptop_8, int ip1, int ip2);
+int Cvgd_new_gen_5001(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, double ptop_8, double pref_8, float rcoef1, int ip1, int ip2);
+int Cvgd_new_gen_5002(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, double ptop_8, double pref_8, float rcoef1, float rcoef2, int ip1, int ip2);
+int Cvgd_new_gen_5005(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, double pref_8, double *ptop_out_8, float rcoef1, float rcoef2, int ip1, int ip2, float dhm, float dht );
+int Cvgd_new_gen_5100(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, double pref_8, double *ptop_out_8, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, int avg);
+
 int Cvgd_new_read(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind, int version);
 int Cvgd_write_desc (vgrid_descriptor *self, int unit);
 int Cvgd_new_from_table(vgrid_descriptor **self, double *table, int ni, int nj, int nk);

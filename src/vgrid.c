@@ -350,6 +350,37 @@ static int same_vec_r8(double *vec1, int n1, double *vec2, int n2) {
   return(0);
 }
 
+static int similar_vec_r8(double *vec1, int n1, double *vec2, int n2) {
+  int i;
+  if(vec1) {
+    if (vec2) {
+      if ( n1 == n2 ) {
+	for(i = 0; i < n1; i++) {
+	  if( fabs(vec1[i]) < 1.e-307 ){
+	    if( fabs(vec2[i]) > 1.e-307 ){
+	      //printf("zero, vec1[i] = %f, vec2[i] = %f\n", vec1[i], vec2[i]);
+	      return(-1);
+	    }
+	  } else {
+	    if ( fabs(vec1[i]-vec2[i])/vec1[i] > 1.e-15 ){
+	      //printf("non zero, vec1[i] = %f, vec2[i] = %f, fabs(vec1[i]-vec2[i])/vec1[i]= %f\n", vec1[i], vec2[i], fabs(vec1[i]-vec2[i])/vec1[i]);
+	      return(-1);
+	    }
+	  }
+	}
+      } else {
+	// Vectors are not the same size.
+	return(-2);
+      }
+    } else {
+      // vec2 not allocated
+      return(-3);
+    }
+  }
+  // Vector are the same or are not allocated.
+  return(0);
+}
+
 static int c_convip_Level2IP(float level, int kind) {
 
   int    mode=2,flag=0, IP, strglen=0; 
@@ -521,10 +552,12 @@ int Cvgd_vgdcmp(vgrid_descriptor *vgd1, vgrid_descriptor *vgd2) {
   if(same_vec_i (vgd1->ip1_m, vgd1->nl_m, vgd2->ip1_m, vgd2->nl_m) != 0) return (-9);
   if(same_vec_i (vgd1->ip1_t, vgd1->nl_t, vgd2->ip1_t, vgd2->nl_t) != 0) return (-10);
   if(same_vec_r8(vgd1->a_m_8, vgd1->nl_m, vgd2->a_m_8, vgd2->nl_m) != 0) return (-11);
-  if(same_vec_r8(vgd1->b_m_8, vgd1->nl_m, vgd2->b_m_8, vgd2->nl_m) != 0) return (-12);
+  //if(same_vec_r8(vgd1->b_m_8, vgd1->nl_m, vgd2->b_m_8, vgd2->nl_m) != 0) return (-12);
+  if(similar_vec_r8(vgd1->b_m_8, vgd1->nl_m, vgd2->b_m_8, vgd2->nl_m) != 0) return (-12);
   if(same_vec_r8(vgd1->c_m_8, vgd1->nl_m, vgd2->c_m_8, vgd2->nl_m) != 0) return (-18);
   if(same_vec_r8(vgd1->a_t_8, vgd1->nl_t, vgd2->a_t_8, vgd2->nl_t) != 0) return (-13);
-  if(same_vec_r8(vgd1->b_t_8, vgd1->nl_t, vgd2->b_t_8, vgd2->nl_t) != 0) return (-14);
+  //if(same_vec_r8(vgd1->b_t_8, vgd1->nl_t, vgd2->b_t_8, vgd2->nl_t) != 0) return (-14);
+  if(similar_vec_r8(vgd1->b_t_8, vgd1->nl_t, vgd2->b_t_8, vgd2->nl_t) != 0) return (-14);
   if(same_vec_r8(vgd1->c_t_8, vgd1->nl_t, vgd2->c_t_8, vgd2->nl_t) != 0) return (-19);
 
   // Do not check table since all above parameters consist in a full check, at least it should.
@@ -1083,8 +1116,6 @@ int Cvgd_set_vcode(vgrid_descriptor *VGrid) {
  */
 static int fstd_init(vgrid_descriptor *VGrid) {
 
-   int err;
-  
    VGD_TFSTD *h = &VGrid->rec;
 
    if( h->fstd_initialized )
@@ -1092,7 +1123,9 @@ static int fstd_init(vgrid_descriptor *VGrid) {
 
    h->ig2=h->ig3=h->ig4=0;
 
-   err=Cvgd_set_vcode(VGrid);
+   if( Cvgd_set_vcode(VGrid) == VGD_ERROR ){
+     return(VGD_ERROR);
+   }
 
    switch(VGrid->vcode) {
       case 1001:
@@ -1234,7 +1267,7 @@ int C_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, int
 			double *a_m_8, double *b_m_8, double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8, int *ip1_m, int *ip1_t, int nl_m, int nl_t)
 {
   char cvcode[5];
-  int errorInput = 0, ier, missingInput;
+  int errorInput = 0, ier;
   
   if(*self){
     Cvgd_free(self);
@@ -1269,7 +1302,7 @@ int C_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, int
       (*self)->ptop_8 = *ptop_8;
     } else {
       printf("(Cvgd) ptop_8 is a required constructor entry\n");
-      missingInput = 1;
+      errorInput = 1;
     }
   }
   if(is_valid( *self, pref_8_valid)) {
@@ -1277,7 +1310,7 @@ int C_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, int
       (*self)->pref_8 = *pref_8;
     } else {
       printf("(Cvgd) pref_8 is a required constructor entry\n");
-      missingInput = 1;
+      errorInput = 1;
     }
   }
   if(is_valid( *self, rcoef1_valid)) {
@@ -1285,7 +1318,7 @@ int C_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, int
       (*self)->rcoef1 = *rcoef1;
     } else {
       printf("(Cvgd) rcoef1 is a required constructor entry\n");
-      missingInput = 1;
+      errorInput = 1;
     }
   }
   if(is_valid( *self, rcoef2_valid)) {
@@ -1293,7 +1326,7 @@ int C_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, int
       (*self)->rcoef2 = *rcoef2;
     } else {
       printf("(Cvgd) rcoef2 is a required constructor entry\n");
-      missingInput = 1;
+      errorInput = 1;
     }
   }
   if(is_valid( *self, rcoef3_valid)) {
@@ -1301,7 +1334,7 @@ int C_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, int
       (*self)->rcoef3 = *rcoef3;
     } else {
       printf("(Cvgd) rcoef3 is a required constructor entry\n");
-      missingInput = 1;
+      errorInput = 1;
     }
   }
   if(is_valid( *self, rcoef4_valid)) {
@@ -1309,7 +1342,7 @@ int C_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, int
       (*self)->rcoef4 = *rcoef4;
     } else {
       printf("(Cvgd) rcoef4 is a required constructor entry\n");
-      missingInput = 1;
+      errorInput = 1;
     }
   }
   if(is_valid( *self, a_m_8_valid)) {
@@ -1771,6 +1804,7 @@ static int c_encode_vert_5999(vgrid_descriptor **self,int nk){
   // Check ip1 validity
   for( k=0; k < nk; k++){
     hyb = c_convip_IP2Level((*self)->ip1_m[k],&kind);
+    hyb = hyb*2.f; // To silence the compiler warning
     // Even if hyb is kind 5, kind 4 may be present due to diag level in m AGL
     if( kind != 5 && kind != 4 ) {
       printf("Error in encode_vert_5999, ip1 kind must be 5 or 4 but got %d, for ip1 = %d\n", kind, (*self)->ip1_m[k]);
@@ -2373,7 +2407,7 @@ static int C_genab_1003(float *hybuser, int nk, float rcoef, double ptop_8, doub
   int complete, ip1, kind;
   float f_one=1.f, f_zero=0.f, pres;
   double hybtop = ptop_8 / pref_8;
-  double hyb, pr1;
+  double hyb;
    
   ok = 1;
   if( ptop_8 <= 0.) {
@@ -3760,11 +3794,85 @@ int Cvgd_put_int(vgrid_descriptor **self, char *key, int value) {
   }
   return(VGD_OK);
 }
-
-int Cvgd_new_gen(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
+int Cvgd_new_gen(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2, 
 	      double *ptop_8, double *pref_8, double *ptop_out_8,
-		 int ip1, int ip2, float *dhm, float *dht, int avg)
-{
+		 int ip1, int ip2, float *dhm, float *dht, int avg){
+  if( C_new_gen(self, kind, version, hyb, size_hyb, rcoef1, rcoef2, NULL, NULL,
+		   ptop_8, pref_8, ptop_out_8,
+		   ip1, ip2, dhm, dht, avg) == VGD_ERROR ){
+    printf("(Cvgd) ERROR in Cvgd_new_gen, see details above\n");
+    return(VGD_ERROR);
+  }
+  return(VGD_OK);
+}
+int Cvgd_new_gen_1001(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, int ip1, int ip2) {
+  if( C_new_gen(self, kind, version, hyb, size_hyb, NULL, NULL, NULL, NULL,
+		   NULL, NULL, NULL, ip1, ip2, NULL, NULL, 0) == VGD_ERROR ){
+    printf("(Cvgd) ERROR in Cvgd_new_gen_1001, see details above\n");
+    return(VGD_ERROR);
+  }
+  return(VGD_OK);
+}
+int Cvgd_new_gen_2001(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, int ip1, int ip2) {
+  if( C_new_gen(self, kind, version, hyb, size_hyb, NULL, NULL, NULL, NULL,
+		   NULL, NULL, NULL, ip1, ip2, NULL, NULL, 0) == VGD_ERROR ){
+    printf("(Cvgd) ERROR in Cvgd_new_gen_2001, see details above\n");
+    return(VGD_ERROR);
+  }
+  return(VGD_OK);
+}
+int Cvgd_new_gen_5999(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, int ip1, int ip2) {
+  if( C_new_gen(self, kind, version, hyb, size_hyb, NULL, NULL, NULL, NULL,
+		   NULL, NULL, NULL, ip1, ip2, NULL, NULL, 0) == VGD_ERROR ){
+    printf("(Cvgd) ERROR in Cvgd_new_gen_5999, see details above\n");
+    return(VGD_ERROR);
+  }
+  return(VGD_OK);
+}
+int Cvgd_new_gen_1002(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, double ptop_8, int ip1, int ip2) {
+  if( C_new_gen(self, kind, version, hyb, size_hyb, NULL, NULL, NULL, NULL,
+		   &ptop_8, NULL, NULL, ip1, ip2, NULL, NULL, 0) == VGD_ERROR ){
+    printf("(Cvgd) ERROR in Cvgd_new_gen_1002, see details above\n");
+    return(VGD_ERROR);
+  }
+  return(VGD_OK);
+}
+int Cvgd_new_gen_5001(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, double ptop_8, double pref_8, float rcoef1, int ip1, int ip2) {
+  if( C_new_gen(self, kind, version, hyb, size_hyb, &rcoef1, NULL, NULL, NULL,
+		&ptop_8, &pref_8, NULL, ip1, ip2, NULL, NULL, 0) == VGD_ERROR ){
+    printf("(Cvgd) ERROR in Cvgd_new_gen_5001, see details above\n");
+    return(VGD_ERROR);
+  }
+  return(VGD_OK);
+}
+int Cvgd_new_gen_5002(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, double ptop_8, double pref_8, float rcoef1, float rcoef2, int ip1, int ip2) {
+  if( C_new_gen(self, kind, version, hyb, size_hyb, &rcoef1, &rcoef2, NULL, NULL,
+		&ptop_8, &pref_8, NULL, ip1, ip2, NULL, NULL, 0) == VGD_ERROR ){
+    printf("(Cvgd) ERROR in Cvgd_new_gen_5002, see details above\n");
+    return(VGD_ERROR);
+  }
+  return(VGD_OK);
+}
+int Cvgd_new_gen_5005(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, double pref_8, double *ptop_out_8, float rcoef1, float rcoef2, int ip1, int ip2, float dhm, float dht) {
+  if( C_new_gen(self, kind, version, hyb, size_hyb, &rcoef1, &rcoef2, NULL, NULL,
+		NULL, &pref_8, ptop_out_8, ip1, ip2, &dhm, &dht, 0) == VGD_ERROR ){
+    printf("(Cvgd) ERROR in Cvgd_new_gen_5005, see details above\n");
+    return(VGD_ERROR);
+  }
+  return(VGD_OK);
+}
+int Cvgd_new_gen_5100(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, double pref_8, double *ptop_out_8, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, int avg) {
+  if( C_new_gen(self, kind, version, hyb, size_hyb, &rcoef1, &rcoef2,  &rcoef3, &rcoef4,
+		NULL, &pref_8, ptop_out_8, ip1, ip2, &dhm, &dht, avg) == VGD_ERROR ){
+    printf("(Cvgd) ERROR in Cvgd_new_gen_5100, see details above\n");
+    return(VGD_ERROR);
+  }
+  return(VGD_OK);
+}
+
+int C_new_gen(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
+	      double *ptop_8, double *pref_8, double *ptop_out_8,
+		 int ip1, int ip2, float *dhm, float *dht, int avg){
 
   float *hybm = NULL;
   double *a_m_8 = NULL, *b_m_8 = NULL, *c_m_8 = NULL, *a_t_8 = NULL, *b_t_8 = NULL, *c_t_8 = NULL;
@@ -3776,12 +3884,12 @@ int Cvgd_new_gen(vgrid_descriptor **self, int kind, int version, float *hyb, int
 
   *self = c_vgd_construct();
   if(! *self){
-    printf("(Cvgd) ERROR in Cvgd_new_gen, null pointer returned by c_vgd_construct\n");
+    printf("(Cvgd) ERROR in C_new_gen, null pointer returned by c_vgd_construct\n");
     return (VGD_ERROR);
   }
 
   if(Cvgd_set_vcode_i(*self, kind, version) == VGD_ERROR)  {
-    printf("(Cvgd) ERROR in Cvgd_new_gen, ERROR with Cvgd_set_vcode_i");
+    printf("(Cvgd) ERROR in C_new_gen, ERROR with Cvgd_set_vcode_i");
     return (VGD_ERROR);
   }
 
@@ -3828,7 +3936,7 @@ int Cvgd_new_gen(vgrid_descriptor **self, int kind, int version, float *hyb, int
     }
     break;
   case 1003:
-    fprintf(stderr,"(Cvgd) ERROR in Cvgd_new_gen, kind=%d, version=%d\n cannot be generated, please use kind 1 of version 2\n",kind,version);
+    fprintf(stderr,"(Cvgd) ERROR in C_new_gen, kind=%d, version=%d\n cannot be generated, please use kind 1 of version 2\n",kind,version);
     return(VGD_ERROR);
     break;
   case 2001:
@@ -3920,11 +4028,11 @@ int Cvgd_new_gen(vgrid_descriptor **self, int kind, int version, float *hyb, int
     }
     break;
   default:
-    printf("(Cvgd) ERROR in Cvgd_new_gen, invalid kind or version, kind = %d, version = %d\n",kind,version);
+    printf("(Cvgd) ERROR in C_new_gen, invalid kind or version, kind = %d, version = %d\n",kind,version);
     return(VGD_ERROR);
   }
   if( VGD_ERROR == C_new_build_vert(self,kind,version,nk,ip1,ip2,ptop_8,pref_8,rcoef1,rcoef2,rcoef3,rcoef4,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,ip1_m,ip1_t,nl_m,nl_t) ) {
-    fprintf(stderr,"(Cvgd) ERROR in Cvgd_new_gen, problem with new_build_vert for kind = %d, version = %d\n",kind,version);
+    fprintf(stderr,"(Cvgd) ERROR in C_new_gen, problem with new_build_vert for kind = %d, version = %d\n",kind,version);
     return(VGD_ERROR);
   }
   free(hybm);
