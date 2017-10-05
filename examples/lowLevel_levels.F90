@@ -35,7 +35,7 @@ program tests
 
    ! Open file and get FST key for field of interest (in this case TT)
    status = fnom(iun,'../tests/data_Linux/dm_5002_from_model_run','STD',0)
-   status = fstouv(iun,'RND+R/O')
+   status = fstouv(iun,'RND')
    status = fnom(oun,'test_output.fst','STD',0)
    status = fstouv(oun,'RND')
    fstkey = fstinf(iun,ni,nj,nk,-1,' ',-1,-1,-1,' ','TT')

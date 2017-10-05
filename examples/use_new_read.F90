@@ -24,7 +24,7 @@ program use_new_read
    integer :: status,fnom,fstouv,iun=10
    type(vgrid_descriptor) :: vgd
 
-   status = fnom(iun,'../tests/data_Linux/dm_5002_from_model_run','RND+R/O',0)
+   status = fnom(iun,'../tests/data_Linux/dm_5002_from_model_run','RND',0)
    status = fstouv(iun,'RND')
 
    status = vgd_new(vgd,iun,'fst')

@@ -20,7 +20,7 @@ include dependencies.mk
 %.o: %.c
 	s.cc -c $(MY_CFLAGS) $(CFLAGS) $<
 
-libdescrip.a: $(OBJECTS) dependencies.mk
+libdescrip.a: $(OBJECTS) dependencies.mk vgrid_version
 	rm -f libdescrip.a && ar scru libdescrip.a *.o ;\
 
 shared: libdescrip.a

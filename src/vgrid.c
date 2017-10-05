@@ -425,10 +425,10 @@ static void decode_HY(VGD_TFSTD_ext var, double *ptop_8, double *pref_8, float *
 
 static int my_fstprm(int key,VGD_TFSTD_ext *ff) {
   //var->ip1 = 62;
-  STR_INIT(ff->typvar,VGD_MAXSTR_TYPVAR);
-  STR_INIT(ff->nomvar,VGD_MAXSTR_NOMVAR);
-  STR_INIT(ff->etiket,VGD_MAXSTR_ETIKET);
-  STR_INIT(ff->grtyp, VGD_MAXSTR_GRTYP);
+  STR_INIT(ff->typvar,VGD_LEN_TYPVAR);
+  STR_INIT(ff->nomvar,VGD_LEN_NAME);
+  STR_INIT(ff->etiket,VGD_LEN_ETIK);
+  STR_INIT(ff->grtyp, VGD_LEN_GRTYP);
  
   if( c_fstprm(key,
 	       &ff->dateo,  &ff->deet,   &ff->npas, 
@@ -665,7 +665,7 @@ int Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip) {
       break;
     case 2001:
       printf("  Number of pressure levels %d\n", self->nl_m );
-      printf("  Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100\n");
+      printf("  Equation to compute hydrostatic pressure (pi): pi = A\n");
       break;
     case 1003:
       printf("  Number of hybrid normalized levels %d\n", self->nl_m );
@@ -3686,6 +3686,7 @@ int Cvgd_get_double_3d(vgrid_descriptor *self, char *key, double **value, int *n
 }
 
 int Cvgd_get_char(vgrid_descriptor *self, char *key, char out[], int quiet) {
+  char ok = 1;
   if(! C_is_valid(self,"SELF")){
     printf("(Cvgd) ERROR in Cvgd_get_char, invalid vgrid structure.\n");
     return(VGD_ERROR);
@@ -3695,10 +3696,23 @@ int Cvgd_get_char(vgrid_descriptor *self, char *key, char out[], int quiet) {
   } else if( strcmp(key, "NAME") == 0 ){
     strcpy(out,self->rec.nomvar);
   } else if( strcmp(key, "RFLD") == 0 ){
-    strcpy(out,self->ref_name);
+    if( C_is_valid(self,"ref_name_valid") ){
+      strcpy(out,self->ref_name);
+    } else {
+      ok = 0;
+      strcpy(out,VGD_NO_REF_NOMVAR);
+    }
   } else if( strcmp(key, "RFLS") == 0 ){
-    strcpy(out,self->ref_namel);
+    if( C_is_valid(self,"ref_namel_valid") ){
+      strcpy(out,self->ref_namel);
+    } else {
+      ok = 0;
+      strcpy(out,VGD_NO_REF_NOMVAR);
+    }
   } else {
+    ok = 0;
+  }
+  if(! ok ){
     if(! quiet){
       printf("(Cvgd) ERROR in Cvgd_get_char, invalid key -> '%s'\n",key);
     }

@@ -37,12 +37,12 @@ void c_levels() {
 
   status = VGD_OK;
 
-  ier = c_fnom(iun,filename,mode,0);
+  ier = c_fnom(&iun,filename,mode,0);
   if( ier < 0 ) {
     printf("ERROR with c_fnom on iun, file %s\n", filename);
     return;
   }
-  ier = c_fstouv(iun,"RND");  
+  ier = c_fstouv(iun,"RND","");  
   if( ier < 0 ) {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
     return;

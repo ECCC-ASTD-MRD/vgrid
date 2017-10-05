@@ -35,10 +35,12 @@ use_new_read: use_new_read.ftn90 $(DESCRIP_PATH)/libdescrip.a
 	s.compile -optf =$(MY_FFLAGS) -includes $(DESCRIP_PATH) -src $@.ftn90 -o $@ -libpath $(DESCRIP_PATH) -libappl rmn descrip
 
 c_simple_pressure: c_simple_pressure.c $(DESCRIP_PATH)/libdescrip.a
-	s.compile -bidon c -main $@ -optc =$(MY_CFLAGS) -includes $(DESCRIP_PATH) -src $@.c -o $@ -libpath $(DESCRIP_PATH) -libappl rmn descrip
+	s.compile -bidon c -main $@ -optc ="$(MY_CFLAGS) $(CFLAGS)" -includes $(DESCRIP_PATH) -src $@.c -o $@ -libpath $(DESCRIP_PATH) -libappl rmn descrip
 
 c_use_new_read: c_use_new_read.c $(DESCRIP_PATH)/libdescrip.a
-	s.compile -bidon c -main $@ -optc =$(MY_CFLAGS) -includes $(DESCRIP_PATH) -src $@.c -o $@ -libpath $(DESCRIP_PATH) -libappl rmn descrip
+	s.compile -bidon c -main $@ -optc ="$(MY_CFLAGS) $(CFLAGS)" -includes $(DESCRIP_PATH) -src $@.c -o $@ -libpath $(DESCRIP_PATH) -libappl rmn descrip
+c_pressure_for_all_vcode: c_pressure_for_all_vcode.c $(DESCRIP_PATH)/libdescrip.a
+	s.compile -bidon c -main $@ -optc ="$(MY_CFLAGS) $(CFLAGS)" -includes $(DESCRIP_PATH) -src $@.c -o $@ -libpath $(DESCRIP_PATH) -libappl rmn descrip
 
 c_use_build: c_use_build.c $(DESCRIP_PATH)/libdescrip.a
 	s.compile -bidon c -main $@ -optc ="$(MY_CFLAGS) $(CFLAGS)" -includes $(DESCRIP_PATH) -src $@.c -o $@ -libpath $(DESCRIP_PATH) -libappl descrip -librmn

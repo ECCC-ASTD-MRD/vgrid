@@ -5,11 +5,13 @@
 #define VGD_OK       0
 #define VGD_ERROR    -1
 #define VGD_MISSING  -9999.
-#define VGD_MAXSTR_NOMVAR 5
-#define VGD_MAXSTR_TYPVAR 3
-#define VGD_MAXSTR_ETIKET 13
-#define VGD_MAXSTR_GRTYP  2
-#define VGD_NO_REF_NOMVAR "None"
+#define VGD_LEN_NAME 5
+#define VGD_LEN_RFLD 5
+#define VGD_LEN_RFLS 5
+#define VGD_LEN_ETIK 13
+#define VGD_LEN_TYPVAR 3
+#define VGD_LEN_GRTYP  2
+#define VGD_NO_REF_NOMVAR "    "
 
 typedef struct VGD_TFSTD {
    int   dateo;                 // date d'origine du champs
@@ -19,10 +21,10 @@ typedef struct VGD_TFSTD {
    int   datyp;                 // type de donnees
    int   ip1,ip2,ip3;           // specificateur du champs
    int   ig1,ig2,ig3,ig4;       // descripteur de grille
-   char  typvar[VGD_MAXSTR_TYPVAR]; // type de variable
-   char  nomvar[VGD_MAXSTR_NOMVAR]; // nom de la variable
-   char  etiket[VGD_MAXSTR_ETIKET]; // etiquette du champs
-   char  grtyp[VGD_MAXSTR_GRTYP];   // type de grilles
+   char  typvar[VGD_LEN_TYPVAR]; // type de variable
+   char  nomvar[VGD_LEN_NAME]; // nom de la variable
+   char  etiket[VGD_LEN_ETIK]; // etiquette du champs
+   char  grtyp[VGD_LEN_GRTYP];   // type de grilles
    char  fstd_initialized;      // if the fstd struct is initialized
 } VGD_TFSTD;
 
@@ -41,10 +43,10 @@ typedef struct VGD_TFSTD_ext {
    int   dltf;
    int   ubc;
    int   extra1,extra2,extra3;
-   char  typvar[VGD_MAXSTR_TYPVAR]; // type de variable
-   char  nomvar[VGD_MAXSTR_NOMVAR]; // nom de la variable
-   char  etiket[VGD_MAXSTR_ETIKET]; // etiquette du champs
-   char  grtyp[VGD_MAXSTR_GRTYP];   // type de grilles
+   char  typvar[VGD_LEN_TYPVAR]; // type de variable
+   char  nomvar[VGD_LEN_NAME]; // nom de la variable
+   char  etiket[VGD_LEN_ETIK]; // etiquette du champs
+   char  grtyp[VGD_LEN_GRTYP];   // type de grilles
 } VGD_TFSTD_ext;
 
 typedef struct vgrid_descriptor {

@@ -111,15 +111,9 @@ int test_it(char *filename, int ind) {
   //}
 
   // Compute 3D pressure levels
-  ier = Cvgd_get_char(vgd, "RFLD", nomvar1, 0);
-  if(ier == VGD_ERROR){
-    return(VGD_ERROR);
-  }
+  ier = Cvgd_get_char(vgd, "RFLD", nomvar1, 1);
   ref1 = strcmp(nomvar1,VGD_NO_REF_NOMVAR) ? 1 : 0;
-  ier = Cvgd_get_char(vgd, "RFLS", nomvar2, 0);
-  if(ier == VGD_ERROR){
-    return(VGD_ERROR);
-  }
+  ier = Cvgd_get_char(vgd, "RFLS", nomvar2, 1);
   ref2 = strcmp(nomvar2,VGD_NO_REF_NOMVAR) ? 1 : 0;
 
   if(! ref1){

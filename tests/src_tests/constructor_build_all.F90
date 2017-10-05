@@ -49,7 +49,7 @@ program constructor_build_all
   do i=10,10
      print*,'======================================================'
      print*,'file = ',trim(files(i))
-     stat=fnom(lu+i,files(i),"RND+R/O",0)
+     stat=fnom(lu+i,files(i),"RND",0)
      if(stat.lt.0)then
         print*,'ERROR with fnom on file ',trim(files(i))
         call exit(1)
