@@ -23,15 +23,19 @@
 
 int c_use_build () {
 
+  // 1)
   // This program is include in the examples package directory
   // To know what parameters to pass to Cvgd_new_build_vert for a given Vcode, call de function with NULL pointer for optional arguments (7th and up).
-  //    Functio is called below on all usefull Vcode with all options set to NULL to get the list of required options.
+  //    Functiom is called below on all usefull Vcode with all options set to NULL to get the list of required options.
   //    One example of a complete call is given for the pressure levels.
   //    Note that the parameter nl_m is always required and nl_t is required only if thermo level are required. The size of these vectors
   //         are variable depending of Vcode. This is why the use of this function is for the experts user like model developers.
+  // 2)
+  // Specific interfaces are also provided to build every Vcode. This is the prefered method, please refer the the interfce in vgrid.h for detail
+  // on arguments and look at tests c_new_build_all.c for exemple. One exemple for the pressure level Vcode 2001 is given below.
 
   int ier, kind, version, ip1 = 111, ip2 = 222;
-  vgrid_descriptor *vgd = NULL;
+  vgrid_descriptor *vgd = NULL, *vgd2 = NULL;
 #include "vgrid_version.hc"
   // Data for pressure example
   double a_m_8[3] = {100000.0, 85000.0, 50000.0};
@@ -82,7 +86,7 @@ int c_use_build () {
   printf("\nOptional arguments needed for Vcode %d\n", kind*1000 + version);
   ier = Cvgd_new_build_vert(&vgd, kind, version, 3, ip1, ip2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
-  // Here is the pressure example (Vcode 2001)
+  // Here is the pressure example (Vcode 2001) with the generic interface and the specific interface.
      kind=2;
   version=1;
   ier = Cvgd_new_build_vert(&vgd, kind, version,  3, ip1, ip2, NULL   , NULL   , NULL   , NULL   ,  a_m_8,  b_m_8, NULL  , NULL  , ip1_m , NULL  , 3, NULL);
@@ -91,6 +95,19 @@ int c_use_build () {
     return(1);
   }
   ier = Cvgd_print_desc(vgd, -1, -1);
+  
+  ier = Cvgd_new_build_vert_2001(&vgd2, ip1, ip2, a_m_8, b_m_8, ip1_m, 3);
+  if ( ier == VGD_ERROR){
+    printf("ERROR with Cvgd_new_build_vert on Vcode %d\n", kind*1000 + version);
+    return(1);
+  }
+  ier = Cvgd_vgdcmp(vgd, vgd2);
+  if( ier != 0 ){
+    printf("Descritors not equal, yhis should not happen, Cvgd_vgdcmp code is %d\n", ier);
+    return(VGD_ERROR);
+  } else {
+    printf("Descritors are equal.\n");
+  }
 
   return(0);
 }

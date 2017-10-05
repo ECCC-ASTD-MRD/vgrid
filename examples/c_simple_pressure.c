@@ -26,7 +26,7 @@ int c_simple_pressure() {
   // Goal: compute pressure for all thermo levels and a pressure profile
   // Note: error trapping is kept to a mimimum for clarity
   
-  char filename[]="/users/dor/afsg/apm/ords/cmdn/vgrid/tests/data/dm_5002_from_model_run";
+  char filename[]="../tests/data/dm_5002_from_model_run";
   int *i_val = NULL, nl_t, iun=10, ier, key, ni, nj, nk, ij, k;
   float *p0 = NULL, p0_stn, *pres = NULL, *prof = NULL;
   vgrid_descriptor *vgd = NULL;
@@ -36,7 +36,7 @@ int c_simple_pressure() {
   printf("%s\n", vgrid_descriptors_version);
 
   // Open RPN standard file on unit iun
-  ier = c_fnom(iun, filename, "RND", 0);
+  ier = c_fnom(&iun, filename, "RND+R/O", 0);
   ier = c_fstouv(iun, "RND");  
 
   // Construct a new Vgrid descriptor

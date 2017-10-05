@@ -47,7 +47,7 @@ program constructor
         print*,'ERROR with fnom, on file',trim(files(i))
         call exit(1)
      end if
-     if( fstouv(lu+i,'RND+R/O') <= 0 )then
+     if( fstouv(lu+i,'RND') <= 0 )then
         print*,'No record in RPN file ',trim(files(i))
         call exit(1)
      endif

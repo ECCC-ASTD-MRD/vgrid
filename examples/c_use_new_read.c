@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "vgrid.h"
+#include "armnlib.h"
 
 int c_use_new_read () {
 
@@ -27,9 +28,7 @@ int c_use_new_read () {
   int *i_val = NULL;
   int nl_t, nt, ni, nj, nk, k;
   char filename[]="../tests/data/dm_5005_from_model_run";
-  char mode[]="RND";
-  char format[] = "FST";
-  char name[5];
+  char mode[]="RND+R/O";
   float *f_val = NULL;
   double *a_8_t = NULL, *b_8_t = NULL, *table = NULL;
   vgrid_descriptor *vgd = NULL, *vgd2 = NULL;
@@ -39,12 +38,12 @@ int c_use_new_read () {
 
   printf("c_use_new_read\n");
 
-  ier = c_fnom(iun,filename,mode,0);
+  ier = c_fnom(&iun,filename,mode,0);
   if( ier < 0 ) {
     printf("ERROR with c_fnom on iun, file %s\n", filename);
     return 1;
   }
-  ier = c_fstouv(iun,"RND");  
+  ier = c_fstouv(iun,"RND","");  
   if( ier < 0 ) {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
     return 1;
@@ -85,7 +84,7 @@ int c_use_new_read () {
   }
 
   // Load table (this is the actual data in fst record !! which may also be
-  // obtained with fstlir, but why do it id vgd already contains it!)
+  // obtained with fstlir, but why do it if vgd already contains it!)
   if ( Cvgd_get_double_3d(vgd, "VTBL", &table, &ni, &nj, &nk, -1) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_double_3d for VTBL\n");
     return 1;
@@ -99,22 +98,22 @@ int c_use_new_read () {
 
   // Comparing new table with original table, must be the same.
   if( Cvgd_vgdcmp(vgd, vgd2) != 0 ){
-    printf("ERROR, vgd and vgd2 shouldne the same\n");
+    printf("ERROR, vgd and vgd2 should be the same\n");
     return(1);
   }
 
   // Write descriptor in new file
-  ier = c_fnom(iun2,"to_erase",mode,0);
+  ier = c_fnom(&iun2,"to_erase","RND",0);
   if( ier < 0 ) {
     printf("ERROR with c_fnom on iun2\n");
     return 1;
   }
-  ier = c_fstouv(iun2,"RND");  
+  ier = c_fstouv(iun2,"RND","");  
   if( ier < 0 ) {
     printf("ERROR with c_fstouv on iun2\n");
     return 1;
   }
-  if( Cvgd_write_desc(vgd, iun2, "FST") == VGD_ERROR ){
+  if( Cvgd_write_desc(vgd, iun2) == VGD_ERROR ){
     printf("ERROR with Cvgd_write_desc on iun2\n");
     return 1;
   }
@@ -122,12 +121,12 @@ int c_use_new_read () {
   ier = c_fclos(iun2);
 
   // Re open, read and compare
-  ier = c_fnom(iun2,"to_erase",mode,0);
+  ier = c_fnom(&iun2,"to_erase",mode,0);
   if( ier < 0 ) {
     printf("ERROR with c_fnom on iun2\n");
     return 1;
   }
-  ier = c_fstouv(iun2,"RND");  
+  ier = c_fstouv(iun2,"RND","");  
   if( ier < 0 ) {
     printf("ERROR with c_fstouv on iun2\n");
     return 1;

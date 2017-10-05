@@ -48,7 +48,7 @@
    ! Get its ip1s 
    !
    status = fnom(iun,"../tests/data_Linux/dm_5001_from_model_run",'STD',0)
-   status = fstouv(iun,'RND+R/O')
+   status = fstouv(iun,'RND')
    status = fstinl(iun,ni,nj,nk,-1,' ',-1,-1,-1,' ','TT',keys,count,size(keys))
    !
    ! Allocate space for 3D pressure, P0 and ip1s

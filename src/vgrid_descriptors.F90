@@ -55,7 +55,6 @@ module vGrid_Descriptors
    ! Private class variables
    logical :: ALLOW_RESHAPE=.false.              ! Allow reshape of class pointer members
    integer, parameter :: KEY_LENGTH=4            !length of key string considered for get/put operations
-   integer, parameter :: ETIK_LENGTH=12          !length of standard file etikets
    character(len=1), dimension(3), parameter :: MATCH_GRTYP=(/'X','Y','Z'/) !grid types with ip1,2 to ig1,2 mapping
    character(len=1) :: one_char                  !character mold for tranfer function
 
@@ -69,7 +68,7 @@ module vGrid_Descriptors
       character(len=4) :: grtyp
       character(len=4) :: typvar
       character(len=KEY_LENGTH) :: nomvar
-      character(len=ETIK_LENGTH) :: etiket
+      character(len=VGD_LEN_ETIK) :: etiket
    end type FSTD
    type FSTD_ext
       sequence
@@ -79,7 +78,7 @@ module vGrid_Descriptors
       character(len=4) :: grtyp
       character(len=4) :: typvar
       character(len=KEY_LENGTH) :: nomvar
-      character(len=ETIK_LENGTH) :: etiket
+      character(len=VGD_LEN_ETIK) :: etiket
    end type FSTD_ext
    type :: vgrid_descriptor
       ! The only member of this type is a C pointer
@@ -910,7 +909,7 @@ contains
     type(FSTD_ext) prmk,prm_check
     real, dimension(:,:), pointer :: p0, p0ls
     logical :: my_in_log, relax_ipig_match_L
-    character(len=4) :: ref_name
+    character(len=VGD_LEN_RFLD) :: ref_name
 
     nullify(p0, p0ls)
     
@@ -2146,13 +2145,13 @@ contains
       status = f_get_char(self%cptr, my_key//C_NULL_CHAR, my_char, l_quiet)
       select case(trim(my_key))
       case ('ETIK')
-         nchar=12
+         nchar=VGD_LEN_ETIK
       case ('NAME')
-         nchar=4
+         nchar=VGD_LEN_NAME
       case ('RFLD')
-         nchar=4
+         nchar=VGD_LEN_RFLD
       case ('RFLS')
-         nchar=4
+         nchar=VGD_LEN_RFLS
       case DEFAULT
          if( .not. my_quiet)then
             write(for_msg,*) 'invalid key in call to get_char: ',trim(key)
@@ -2169,8 +2168,6 @@ contains
          end if
          value(i:i)=my_char(i)         
       enddo
-      
-      status = VGD_OK
       
    end function get_char
     

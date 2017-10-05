@@ -482,7 +482,7 @@ int check_gen_5100(vgrid_descriptor *vgd){
 int test_it(char *filename, int ind) {
   int ier, iun, vcode;
   iun = 10 + ind;
-  char mode[]="RND";
+  char mode[]="RND+R/O";
   vgrid_descriptor *vgd = NULL;
 
   ier = c_fnom(&iun,filename,mode,0);

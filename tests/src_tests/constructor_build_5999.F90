@@ -50,7 +50,7 @@ program constructor_build_5999
   nullify(ff,ip1_m,a_m_8,b_m_8)
 
   file='data/dm_5001_from_model_run'
-  ier=fnom(lui,file,"RND+R/O",0)
+  ier=fnom(lui,file,"RND",0)
   if(ier.lt.0)then
      print*,'ERROR with fnom on file ',file
      call exit(1)

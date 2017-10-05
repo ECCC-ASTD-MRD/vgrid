@@ -37,12 +37,12 @@ void c_use_new_read() {
 
   status = VGD_OK;
 
-  ier = c_fnom(iun,filename,mode,0);
+  ier = c_fnom(&iun,filename,mode,0);
   if( ier < 0 ) {
     printf("ERROR with c_fnom on iun, file %s\n", filename);
     return;
   }
-  ier = c_fstouv(iun,"RND");  
+  ier = c_fstouv(iun,"RND","");  
   if( ier < 0 ) {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
     return;
@@ -105,12 +105,12 @@ void c_use_new_read() {
   char command[50];
   strcpy( command, "rm -f to_erase" );
   system(command);
-  ier = c_fnom(iun2,"to_erase",mode,0);
+  ier = c_fnom(&iun2,"to_erase",mode,0);
   if( ier < 0 ) {
     printf("ERROR with c_fnom on iun2\n");
     return;
   }
-  ier = c_fstouv(iun2,"RND");  
+  ier = c_fstouv(iun2,"RND","");  
   if( ier < 0 ) {
     printf("ERROR with c_fstouv on iun2\n");
     return;
@@ -179,12 +179,12 @@ void c_use_new_read() {
   ier = c_fclos(iun2);
 
   // Re open, read and compare
-  ier = c_fnom(iun2,"to_erase",mode,0);
+  ier = c_fnom(&iun2,"to_erase",mode,0);
   if( ier < 0 ) {
     printf("ERROR with c_fnom on iun2\n");
     return;
   }
-  ier = c_fstouv(iun2,"RND");  
+  ier = c_fstouv(iun2,"RND","");  
   if( ier < 0 ) {
     printf("ERROR with c_fstouv on iun2\n");
     return;
