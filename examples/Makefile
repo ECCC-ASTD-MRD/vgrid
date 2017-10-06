@@ -13,26 +13,29 @@ default: distclean all
 
 all: $(DIST)
 
-levels_with_ref: levels_with_ref.ftn90 $(DESCRIP_PATH)/libdescrip.a
-	s.compile -optf =$(MY_FFLAGS) -includes $(DESCRIP_PATH) -src $@.ftn90 -o $@ -libpath $(DESCRIP_PATH) -libappl rmn descrip
+pressure_for_all_vcode: pressure_for_all_vcode.F90 $(DESCRIP_PATH)/libdescrip.a
+	s.compile -optf ="$(MY_FFLAGS) $(FFLAGS)" -includes $(DESCRIP_PATH) -src $@.F90 -o $@ -libpath $(DESCRIP_PATH) -libappl descrip -librmn
 
-lowLevel_levels: lowLevel_levels.ftn90 $(DESCRIP_PATH)/libdescrip.a
-	s.compile -optf =$(MY_FFLAGS) -includes $(DESCRIP_PATH) -src $@.ftn90 -o $@ -libpath $(DESCRIP_PATH) -libappl rmn descrip
+levels_with_ref: levels_with_ref.F90 $(DESCRIP_PATH)/libdescrip.a
+	s.compile -optf ="$(MY_FFLAGS) $(FFLAGS)" -includes $(DESCRIP_PATH) -src $@.F90 -o $@ -libpath $(DESCRIP_PATH) -libappl descrip -librmn
 
-topLevel_levels: topLevel_levels.ftn90 $(DESCRIP_PATH)/libdescrip.a
-	s.compile -optf =$(MY_FFLAGS) -includes $(DESCRIP_PATH) -src $@.ftn90 -o $@ -libpath $(DESCRIP_PATH) -libappl rmn descrip
+lowLevel_levels: lowLevel_levels.F90 $(DESCRIP_PATH)/libdescrip.a
+	s.compile -optf ="$(MY_FFLAGS) $(FFLAGS)" -includes $(DESCRIP_PATH) -src $@.F90 -o $@ -libpath $(DESCRIP_PATH) -libappl descrip -librmn
 
-use_dpidpis: use_dpidpis.ftn90 $(DESCRIP_PATH)/libdescrip.a
-	s.compile -optf =$(MY_FFLAGS) -includes $(DESCRIP_PATH) -src $@.ftn90 -o $@ -libpath $(DESCRIP_PATH) -libappl rmn descrip
+topLevel_levels: topLevel_levels.F90 $(DESCRIP_PATH)/libdescrip.a
+	s.compile -optf ="$(MY_FFLAGS) $(FFLAGS)" -includes $(DESCRIP_PATH) -src $@.F90 -o $@ -libpath $(DESCRIP_PATH) -libappl descrip -librmn
 
-use_dpidpis_withref_prof: use_dpidpis_withref_prof.ftn90 $(DESCRIP_PATH)/libdescrip.a
-	s.compile -optf =$(MY_FFLAGS) -includes $(DESCRIP_PATH) -src $@.ftn90 -o $@ -libpath $(DESCRIP_PATH) -libappl rmn descrip
+use_dpidpis: use_dpidpis.F90 $(DESCRIP_PATH)/libdescrip.a
+	s.compile -optf ="$(MY_FFLAGS) $(FFLAGS)" -includes $(DESCRIP_PATH) -src $@.F90 -o $@ -libpath $(DESCRIP_PATH) -libappl descrip -librmn
 
-use_new_gen: use_new_gen.ftn90 $(DESCRIP_PATH)/libdescrip.a
-	s.compile -optf =$(MY_FFLAGS) -includes $(DESCRIP_PATH) -src $@.ftn90 -o $@ -libpath $(DESCRIP_PATH) -libappl rmn descrip
+use_dpidpis_withref_prof: use_dpidpis_withref_prof.F90 $(DESCRIP_PATH)/libdescrip.a
+	s.compile -optf ="$(MY_FFLAGS) $(FFLAGS)" -includes $(DESCRIP_PATH) -src $@.F90 -o $@ -libpath $(DESCRIP_PATH) -libappl descrip -librmn
 
-use_new_read: use_new_read.ftn90 $(DESCRIP_PATH)/libdescrip.a
-	s.compile -optf =$(MY_FFLAGS) -includes $(DESCRIP_PATH) -src $@.ftn90 -o $@ -libpath $(DESCRIP_PATH) -libappl rmn descrip
+use_new_gen: use_new_gen.F90 $(DESCRIP_PATH)/libdescrip.a
+	s.compile -optf ="$(MY_FFLAGS) $(FFLAGS)" -includes $(DESCRIP_PATH) -src $@.F90 -o $@ -libpath $(DESCRIP_PATH) -libappl descrip -librmn
+
+use_new_read: use_new_read.F90 $(DESCRIP_PATH)/libdescrip.a
+	s.compile -optf ="$(MY_FFLAGS) $(FFLAGS)" -includes $(DESCRIP_PATH) -src $@.F90 -o $@ -libpath $(DESCRIP_PATH) -libappl descrip -librmn
 
 c_simple_pressure: c_simple_pressure.c $(DESCRIP_PATH)/libdescrip.a
 	s.compile -bidon c -main $@ -optc ="$(MY_CFLAGS) $(CFLAGS)" -includes $(DESCRIP_PATH) -src $@.c -o $@ -libpath $(DESCRIP_PATH) -libappl rmn descrip

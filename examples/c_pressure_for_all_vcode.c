@@ -97,6 +97,22 @@ static int comp_pres(char *filename, int ind) {
   ier = Cvgd_get_char(vgd, "RFLD", rfld_S, 1);
   if( strcmp(rfld_S, VGD_NO_REF_NOMVAR) == 0 ){
     printf("   The current Vcode has no RFLD field\n");
+    // Get grid size from TT
+    key = c_fstinf( iun, &ni, &nj, &nk, -1, " ", -1, -1, -1, " ", "TT");
+    if(key < 0){
+      printf("Problem getting info for TT");
+      return(VGD_ERROR);
+    }
+    // Allocate the surface field rfld_2d since it will be used to get the horizontal problem size
+    // in the vgrid library. But the value in this surface field will not be used.
+    rfld_2d = malloc(ni*nj * sizeof(float));
+    if(! rfld_2d){
+      printf("Problem allocating rfld_2d of size %d\n",ni*nj);
+      return(VGD_ERROR);
+    }
+    for( ij = 0; ij < ni*nj; ij++){
+      rfld_2d[ij] = 0.f;
+    }
   } else {
     printf("   RFLD='%s'\n", rfld_S);
     key = c_fstinf( iun, &ni, &nj, &nk, -1, " ", -1, -1, -1, " ", rfld_S);
@@ -155,7 +171,7 @@ static int comp_pres(char *filename, int ind) {
 
   // Compute pressure for momentum level
   if( Cvgd_get_int_1d(vgd, "VIPM", &ip1_list, &nk, 0) ){
-    printf("Error with Cvgd_get_int on NL_M\n");
+    printf("Error with Cvgd_get_int on VIPM\n");
     return(VGD_ERROR);
   }
   nijk=ni*nj*nk;
@@ -182,7 +198,7 @@ static int comp_pres(char *filename, int ind) {
       return(VGD_ERROR);
     }
     if(ni2 != ni || nj2 != nj){
-      printf("Size problem with PPX for ip1=%d\n", ip1_list[k] );
+      printf("Size problem with PX for ip1=%d\n", ip1_list[k] );
       return(VGD_ERROR);
     }
     ier = c_fstluk(levels2+ni*nj*k, key, &ni2, &nj2, &nk2 );
@@ -190,6 +206,8 @@ static int comp_pres(char *filename, int ind) {
   for( ijk=0; ijk < nijk; ijk++){
     levels2[ijk] = levels2[ijk]*100.f;
   }
+  levels[0]=-1;
+  levels2[0]=0.;
   if( similar_vec_float(levels, nijk, levels2, nijk) == 0 ){
     printf(">>>> pressure is the same\n");
   } else {
@@ -212,8 +230,10 @@ int c_pressure_for_all_vcode() {
   }
   for (i = 0; i < (int) n_file; i++) {
     printf ("Computing pressure for %s\n", filenames[i]);
-    if(comp_pres(filenames[i],i) == VGD_ERROR)
+    if(comp_pres(filenames[i],i) == VGD_ERROR) {
       status = VGD_ERROR;
+      exit(1);
+    }
   }
   return(status);
 }
