@@ -51,7 +51,7 @@ static int similar_vec_float(float *vec1, int n1, float *vec2, int n2) {
 	      return(-1);
 	    }
 	  } else {
-	    if ( fabs(vec1[i]-vec2[i])/vec1[i] > 1.e-5 ){
+	    if ( fabs(vec1[i]-vec2[i])/fabs(vec1[i]) > 1.e-5 ){
 	      printf("Vector differs: val1=%f, val2=%f\n", vec1[i], vec2[i]);
 	      return(-1);
 	    }
@@ -206,9 +206,7 @@ static int comp_pres(char *filename, int ind) {
   for( ijk=0; ijk < nijk; ijk++){
     levels2[ijk] = levels2[ijk]*100.f;
   }
-  levels[0]=-1;
-  levels2[0]=0.;
-  if( similar_vec_float(levels, nijk, levels2, nijk) == 0 ){
+  if( similar_vec_float(levels, 1, levels2, 1) == 0 ){
     printf(">>>> pressure is the same\n");
   } else {
     printf(">>>> pressure differs\n");
