@@ -362,7 +362,7 @@ static int similar_vec_r8(double *vec1, int n1, double *vec2, int n2) {
 	      return(-1);
 	    }
 	  } else {
-	    if ( fabs(vec1[i]-vec2[i])/vec1[i] > 1.e-15 ){
+	    if ( fabs(vec1[i]-vec2[i])/fabs(vec1[i]) > 1.e-15 ){
 	      //printf("non zero, vec1[i] = %f, vec2[i] = %f, fabs(vec1[i]-vec2[i])/vec1[i]= %f\n", vec1[i], vec2[i], fabs(vec1[i]-vec2[i])/vec1[i]);
 	      return(-1);
 	    }
