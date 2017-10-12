@@ -797,6 +797,20 @@ int Cvgd_print_vcode_description(int vcode){
       printf("   First level at top is a momentum level\n");
       printf("   Diag level heights (m AGL) encoded\n");
   }
+  if(vcode == 5100 || vcode == -1){
+      printf("%s\nVcode 5100, kind 5, version 100\n",  hr);
+      printf("   Hybrid staggered SLEVE levels, same number of momentum and themro levels\n");
+      printf("   The SLEVE coordinate needs surface reference fields:\n");
+      printf("      P0   surface pressure\n");
+      printf("      P0LS large scale surface pressure\n");
+      printf("   First level at top is a momentum level\n");
+      printf("   Diag level heights (m AGL) encoded\n");
+  }
+  if(vcode == 5999 || vcode == -1){
+    printf("%s\nVcode 5999, kind 5, version 999\n",  hr);
+    printf("   Hybrid unstaggered levels of unkown source\n");
+    printf("   Can be used to encode any hybbrid unstaggered levels e.g. ECMWF\n");
+  }  
 
   return(VGD_OK);
 
