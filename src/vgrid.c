@@ -613,7 +613,8 @@ static int VGD_FindIp1Idx(int Ip1,int *Lst,int Size) {
 }
 
 int Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip) {
-  int k, ip1, kind;
+  int k, ip1, kind, my_int;
+  char pres_S[] = " p,";
   if(! self ) {
     printf("In Cvgd_print_desc: vgrid structure not constructed\n");
     return(VGD_ERROR);
@@ -626,126 +627,122 @@ int Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip) {
       printf("In Cvgd_print_desc : please implement sout option = %d\n",sout);
       return(VGD_ERROR);
     }
-    if(convip != -1){
-      //TODO
-      printf("In Cvgd_print_desc : please implement convip option %d in Cvgd_print_desc\n",sout);
-      return(VGD_ERROR);
+    if(convip == -1){
+      strcpy(pres_S,"");
     }
     
     // Dump general descriptor information
-    printf("-- Vertical Grid Descriptor Information --\n");
-    printf("  Vcode=%d\n",self->vcode);
-    
-    //printf("  Descriptor Nomvar: %s\n",trim(self%rec%nomvar)
-    printf("  level kind =%2d, level version = %3d\n", self->kind ,self->version);
+    printf(" -- Vertical Grid Descriptor Information --\n");
+    printf("   ip1 = %d\n   ip2 = %d\n", self->rec.ip1, self->rec.ip2);
+    printf("-------------------------------------------------------\n");
+    printf(" Vcode = %d\n",self->vcode);
+    printf("   Descriptor Nomvar: %s\n",self->rec.nomvar);
+    printf("   level kind = %d, level version = %d\n", self->kind, self->version);
     if( is_valid(self, ptop_8_valid) )
-      printf("  ptop=%f Pa\n",self->ptop_8);
+      printf("   ptop=%f Pa\n",self->ptop_8);
     if( is_valid(self, pref_8_valid) )
-      printf("  pref=%f Pa\n",self->pref_8);
+      printf("   pref=%f Pa\n",self->pref_8);
     if( is_valid(self, rcoef1_valid) )
-      printf("  rcoef1=%f\n",self->rcoef1);
+      printf("   rcoef1=%f\n",self->rcoef1);
     if( is_valid(self, rcoef2_valid) )
-      printf("  rcoef2=%f\n",self->rcoef2);
+      printf("   rcoef2=%f\n",self->rcoef2);
     if( is_valid(self, rcoef3_valid) )
-      printf("  rcoef3=%f\n",self->rcoef3);
+      printf("   rcoef3=%f\n",self->rcoef3);
     if( is_valid(self, rcoef4_valid) )
-      printf("  rcoef4=%f\n",self->rcoef4);
+      printf("   rcoef4=%f\n",self->rcoef4);
     if( is_valid(self,ref_name_valid) )
-      printf("  Surface field nomvar %s\n",self->ref_name);
+      printf("   Surface field nomvar %s\n",self->ref_name);
     if( is_valid(self,ref_namel_valid) )
-      printf("  Surface field nomvar large scale %s\n",self->ref_namel);
+      printf("   Surface field nomvar large scale %s\n",self->ref_namel);
     
     switch(self->vcode) {
     case 1001:
-      printf("  Number of sigma levels %d\n",self->nk);
-      printf("  Equation to compute hydrostatic pressure (pi): pi = B * P0*100\n");
+      printf("   Number of sigma levels %d\n",self->nk);
+      printf("   Equation to compute hydrostatic pressure (pi): pi = B * P0*100\n");
       break;
     case 1002:
-      printf("  Number of eta levels %d\n", self->nl_m );
+      printf("   Number of eta levels %d\n", self->nl_m );
       break;
     case 2001:
-      printf("  Number of pressure levels %d\n", self->nl_m );
-      printf("  Equation to compute hydrostatic pressure (pi): pi = A\n");
+      printf("   Number of pressure levels %d\n", self->nl_m );
+      printf("   Equation to compute hydrostatic pressure (pi): pi = A\n");
       break;
     case 1003:
-      printf("  Number of hybrid normalized levels %d\n", self->nl_m );
-      printf("  Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100\n");
+      printf("   Number of hybrid normalized levels %d\n", self->nl_m );
+      printf("   Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100\n");
       break;
     case 5001:
     case 5999:
-      printf("  Number of hybrid levels (momentum levels) %d\n", self->nl_m );
-      printf("  Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100\n");
+      printf("   Number of hybrid levels %d\n", self->nl_m );
+      printf("   Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100\n");
       break;
     case 5002:
     case 5003:
-      printf("  Number of hybrid levels %d\n", self->nl_m-1 );
-      printf("  Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref)\n");
-      break;
     case 5004:
-      printf("Cvgd_print_desc 5004 TODO!!!!!!!!! \n");
-      return(VGD_ERROR);
+      printf("   Number of hybrid levels (momentum levels) %d\n", self->nl_m-1 );
+      printf("   Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref)\n");
       break;
     case 5005:
-      printf("  Number of hybrid levels (momentum/thermo levels) %d\n", self->nl_m );
+      printf("   Number of hybrid levels (momentum/thermo levels) %d\n", self->nl_m-2 );
       ip1=self->ip1_m[self->nl_m-1];
-      printf("  Diagnostic momentum level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
+      printf("   Diagnostic momentum level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
       ip1=self->ip1_t[self->nl_t-1];
-      printf("  Diagnostic thermo   level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
-      printf("  Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref)\n");
+      printf("   Diagnostic thermo   level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
+      printf("   Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref)\n");
       break;
     case 5100:
-      printf("  Number of hybrid levels (momentum/thermo levels) %d\n", self->nl_m );
+      printf("   Number of hybrid levels (SLEVE momentum/thermo levels) %d\n", self->nl_m-2 );
       ip1=self->ip1_m[self->nl_m-1];
-      printf("  Diagnostic momentum level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
+      printf("   Diagnostic momentum level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
       ip1=self->ip1_t[self->nl_t-1];
-      printf("  Diagnostic thermo   level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
-      printf("  Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref)\n");
+      printf("   Diagnostic thermo   level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
+      printf("   Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref) + C * ln(P0LS*100/pref)\n");
       break;
     default:
       printf("(Cvgd) ERROR in Cvgd_print_desc, invalid kind or version: kind=%d, version=%d\n",self->kind,self->version);
       return(VGD_ERROR);
     }
 
-    if(convip != -1){
-      printf("Cvgd_print_desc TODO!!!!!!!!! ");
-      return(VGD_ERROR); 
-    }
-     
-    // TODO add format
-    
     if (is_valid(self, ip1_m_valid) ) {
-      printf("  Momentum levels ip1, A, B");
+      printf("   Momentum levels ip1,%s A, B",pres_S);
       if( is_valid(self, c_m_8_valid) ) {
 	printf(", C:\n");
       }else{
 	printf(":\n");
       }
       for ( k = 0; k < self->nl_m; k++) {
-	printf("%d %f %f",self->ip1_m[k],self->a_m_8[k],self->b_m_8[k]);
+	if(convip != -1){
+	  printf("%12d %-# 25.15G %-# 25.15G %-# 25.15G",self->ip1_m[k],c_convip_IP2Level(self->ip1_m[k],&my_int),self->a_m_8[k],self->b_m_8[k]);
+	} else {
+	  printf("%12d %-# 25.15G %-# 25.15G",self->ip1_m[k],self->a_m_8[k],self->b_m_8[k]);
+	}
 	if( is_valid(self, c_m_8_valid) ) {
-	  printf(" %f\n",self->c_m_8[k]);
+	  printf(" %-# 25.15G\n",self->c_m_8[k]);
 	}else{
 	  printf("\n");
 	}
       }
     }
     if (is_valid(self, ip1_t_valid) ) {
-      printf("  Thermodynamic levels ip1, A, B");
+      printf("   Thermodynamic levels ip1,%s A, B",pres_S);
       if( is_valid(self, c_t_8_valid) ) {
 	printf(", C:\n");
       }else{
 	printf(":\n");
       }
       for ( k = 0; k < self->nl_t; k++) {
-	printf("%d %f %f",self->ip1_t[k],self->a_t_8[k],self->b_t_8[k]);
+	if(convip != -1){
+	  printf("%12d %-# 25.15G %-# 25.15G %-# 25.15G",self->ip1_t[k],c_convip_IP2Level(self->ip1_t[k],&my_int),self->a_t_8[k],self->b_t_8[k]);
+	} else {
+	  printf("%12d %-# 25.15G %-# 25.15G",self->ip1_t[k],self->a_t_8[k],self->b_t_8[k]);
+	}
 	if( is_valid(self, c_t_8_valid) ) {
-	  printf(" %f\n",self->c_t_8[k]);
+	  printf(" %-# 25.15G\n",self->c_t_8[k]);
 	}else{
 	  printf("\n");
 	}
       }
     }
-    
     return(VGD_OK);
   }
 }
@@ -4236,7 +4233,7 @@ static int C_gen_legacy_desc(vgrid_descriptor **self, int unit, int *keylist , i
 	if( C_genab_1002(hyb, nb, &ptop_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ){	  
 	  goto bomb;
 	}
-	if( C_new_build_vert(self, kind, 2, nb, var.ip1, var.ip2, &ptop_8, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, ip1, NULL, nb, 0) == VGD_ERROR ){
+	if( C_new_build_vert(self, kind, 2, nb, var.ig1, var.ig2, &ptop_8, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, ip1, NULL, nb, 0) == VGD_ERROR ){
 	  goto bomb;
 	}
       }
@@ -4253,7 +4250,7 @@ static int C_gen_legacy_desc(vgrid_descriptor **self, int unit, int *keylist , i
       if( C_genab_1003(hyb, nb, rcoef, ptop_8, pref_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ) {      
 	goto bomb;
       }
-      if( C_new_build_vert(self, 1, 3, nb, var.ip1, var.ip2, &ptop_8, &pref_8, &rcoef, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, ip1, NULL, nb, 0) == VGD_ERROR ){
+      if( C_new_build_vert(self, 1, 3, nb, var.ig1, var.ig2, &ptop_8, &pref_8, &rcoef, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, ip1, NULL, nb, 0) == VGD_ERROR ){
 	goto bomb;
       }      
     } else {
@@ -4262,10 +4259,11 @@ static int C_gen_legacy_desc(vgrid_descriptor **self, int unit, int *keylist , i
 	printf("(Cvgd)   C_gen_legacy_desc error: sigma coordinate construction is not ALLOWED.\n(Cvgd)       If your are certain that you want this sigma coordinate, set ALLOW_SIGMA to true e.g.\n(Cvgd)          in fortran stat =  vgd_putopt(\"ALLOW_SIGMA\",.true.)\n(Cvgd)          in C       stat = Cvgd_putopt_int(\"ALLOW_SIGMA\",1)\n");
 	goto bomb;
       }
+      printf("(Cvgd)   sigma coordinate found\n");
       if( C_genab_1001(hyb, nb, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ){
 	goto bomb;
       }
-      if( C_new_build_vert(self, kind, 1, nb, var.ip1, var.ip2, NULL, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, ip1, NULL, nb, 0) == VGD_ERROR ){
+      if( C_new_build_vert(self, kind, 1, nb, var.ig1, var.ig2, NULL, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, ip1, NULL, nb, 0) == VGD_ERROR ){
 	goto bomb;
       }
     }
@@ -4275,7 +4273,7 @@ static int C_gen_legacy_desc(vgrid_descriptor **self, int unit, int *keylist , i
     if( C_genab_2001(hyb, nb, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ){
       goto bomb;
     }
-    if( C_new_build_vert(self, kind, 1, nb, var.ip1, var.ip2, NULL, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, ip1, NULL, nb, 0) == VGD_ERROR ){
+    if( C_new_build_vert(self, kind, 1, nb, var.ig1, var.ig2, NULL, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, ip1, NULL, nb, 0) == VGD_ERROR ){
       goto bomb;
     }	
   } else if ( kind == 5 ){
@@ -4288,7 +4286,7 @@ static int C_gen_legacy_desc(vgrid_descriptor **self, int unit, int *keylist , i
     if( C_genab_5001(hyb, nb, rcoef, ptop_8, pref_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ){
       goto bomb;
     }
-    if( C_new_build_vert(self, kind, 1, nb, var.ip1, var.ip2, &ptop_8, &pref_8, &rcoef, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, ip1, NULL, nb, 0) == VGD_ERROR ){
+    if( C_new_build_vert(self, kind, 1, nb, var.ig1, var.ig2, &ptop_8, &pref_8, &rcoef, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, ip1, NULL, nb, 0) == VGD_ERROR ){
       goto bomb;
     }	
   } else {
@@ -4325,9 +4323,8 @@ static int c_legacy(vgrid_descriptor **self, int unit, int F_kind) {
     num_in_kind[i] = 0;
   }
 
-  if(F_kind > 0) {
-    printf("(Cvgd) Looking for kind = %d\n",F_kind);
-  }
+  printf("(Cvgd) Looking for kind = %d\n",F_kind);
+
   error = c_fstinl(unit, &ni, &nj, &nk, -1, " ", -1, -1, -1, " ", " ", keylist, &count, nkeylist);
   if (error < 0) {
     printf("(Cvgd) ERROR in c_legacy, with fstinl\n");
