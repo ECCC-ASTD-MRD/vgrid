@@ -672,8 +672,11 @@ int Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip) {
       printf("   Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100\n");
       break;
     case 5001:
-    case 5999:
       printf("   Number of hybrid levels %d\n", self->nl_m );
+      printf("   Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100\n");
+      break;
+    case 5999: 
+      printf("   Number of hybrid unstaggered levels of unknown origin %d\n", self->nl_m );
       printf("   Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100\n");
       break;
     case 5002:
