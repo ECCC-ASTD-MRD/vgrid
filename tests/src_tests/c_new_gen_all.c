@@ -94,12 +94,12 @@ int check_gen_1001_2001(vgrid_descriptor *vgd, int vcode){
   printf("  Testing specific interface\n");
   switch(vcode) {
   case 1001:
-    if( Cvgd_new_gen_1001(&vgd2, kind, version, hyb, nk, 0, 0) == VGD_ERROR) {
+    if( Cvgd_new_gen_1001(&vgd2, hyb, nk, 0, 0) == VGD_ERROR) {
       return(VGD_ERROR);
     }
     break;
   case 2001:
-    if( Cvgd_new_gen_2001(&vgd2, kind, version, hyb, nk, 0, 0) == VGD_ERROR) {
+    if( Cvgd_new_gen_2001(&vgd2, hyb, nk, 0, 0) == VGD_ERROR) {
       return(VGD_ERROR);
     }
     break;
@@ -167,7 +167,7 @@ int check_gen_1002(vgrid_descriptor *vgd){
   Cvgd_free(&vgd2);
   
   printf("  Testing specific interface\n");
-  if( Cvgd_new_gen_1002(&vgd2, kind, version, hyb, nk, ptop_8, 0, 0) == VGD_ERROR) {
+  if( Cvgd_new_gen_1002(&vgd2, hyb, nk, ptop_8, 0, 0) == VGD_ERROR) {
     return(VGD_ERROR);
   }
   //Test equality
@@ -238,7 +238,7 @@ int check_gen_5001(vgrid_descriptor *vgd){
   Cvgd_free(&vgd2);
   
   printf("  Testing specific interface\n");
-  if( Cvgd_new_gen_5001(&vgd2, kind, version, hyb, nk, ptop_8, pref_8, rc_1, 0, 0) == VGD_ERROR) {
+  if( Cvgd_new_gen_5001(&vgd2, hyb, nk, ptop_8, pref_8, rc_1, 0, 0) == VGD_ERROR) {
     return(VGD_ERROR);
   }
   //Test equality
@@ -313,7 +313,7 @@ int check_gen_5002(vgrid_descriptor *vgd){
   }
 
   printf("  Testing specific interface\n");
-  if( Cvgd_new_gen_5002(&vgd2, kind, version, hyb, nk, ptop_8, pref_8, rc_1, rc_2, 0, 0) == VGD_ERROR) {
+  if( Cvgd_new_gen_5002(&vgd2, hyb, nk, ptop_8, pref_8, rc_1, rc_2, 0, 0) == VGD_ERROR) {
     return(VGD_ERROR);
   }
   //Test equality
@@ -388,7 +388,7 @@ int check_gen_5005(vgrid_descriptor *vgd){
   }
 
   printf("  Testing specific interface\n");
-  if( Cvgd_new_gen_5005(&vgd2, kind, version, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, 0, 0, dhm, dht) == VGD_ERROR) {
+  if( Cvgd_new_gen_5005(&vgd2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, 0, 0, dhm, dht) == VGD_ERROR) {
     return(VGD_ERROR);
   }
   //Test equality
@@ -457,7 +457,7 @@ int check_gen_5100(vgrid_descriptor *vgd){
   // No generic interface for 5100
   Cvgd_free(&vgd2);
   printf("  Testing specific interface\n");
-  if( Cvgd_new_gen_5100(&vgd2, kind, version, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, rc_3, rc_4, 0, 0, dhm, dht, 1) == VGD_ERROR) {
+  if( Cvgd_new_gen_5100(&vgd2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, rc_3, rc_4, 0, 0, dhm, dht, 1) == VGD_ERROR) {
     free(hyb);
     free(ip1_m);
     Cvgd_free(&vgd2);
