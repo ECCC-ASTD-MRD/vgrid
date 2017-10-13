@@ -1228,6 +1228,17 @@ int Cvgd_new_build_vert_1001(vgrid_descriptor **self, int ip1, int ip2,
   }
   return(VGD_OK);
 }
+
+int Cvgd_new_build_vert_1002(vgrid_descriptor **self, int ip1, int ip2, double ptop_8,
+			     double *a_m_8, double *b_m_8, int *ip1_m, int nk){
+  if( C_new_build_vert(self, 1, 2, nk, ip1, ip2, &ptop_8, NULL, NULL, NULL, NULL, NULL,
+		       a_m_8, b_m_8, NULL, NULL, NULL, NULL, ip1_m, NULL, nk, 0) == VGD_ERROR ){
+    printf("(Cvgd) ERROR with Cvgd_new_build_vert_1001 see details above\n");
+    return(VGD_ERROR);
+  }
+  return(VGD_OK);
+}
+
 int Cvgd_new_build_vert_2001(vgrid_descriptor **self, int ip1, int ip2, 
 			     double *a_m_8, double *b_m_8, int *ip1_m, int nk){
   if( C_new_build_vert(self, 2, 1, nk, ip1, ip2, NULL, NULL, NULL, NULL, NULL, NULL,
