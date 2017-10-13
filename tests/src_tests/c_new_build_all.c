@@ -246,11 +246,28 @@ int check_build_5001(vgrid_descriptor *vgd){
   } else {
     printf("     Descritors are equal.\n");
   }
+  Cvgd_free(&vgd2);
+
+  printf("  Testing specific interface\n");
+  if( Cvgd_new_build_vert_5001(&vgd2, -1, -1, ptop_8, pref_8, rc_1, 
+			       a_m_8, b_m_8, ip1_m, nk) == VGD_ERROR) {
+    free(a_m_8);
+    free(b_m_8);
+    Cvgd_free(&vgd2);
+    return(VGD_ERROR);
+  }
+  // Test equality
+  ier = Cvgd_vgdcmp(vgd, vgd2);
+  if( ier != 0 ){
+    printf("     Descritors not equal, Cvgd_vgdcmp code is %d\n", ier);
+    return(VGD_ERROR);
+  } else {
+    printf("     Descritors are equal.\n");
+  }
   
   free(a_m_8);
   free(b_m_8);
   Cvgd_free(&vgd2);
-
   return(VGD_OK);
 }
 
