@@ -5,6 +5,7 @@ eval `cclargs \
  -only     =-1 =-1 "[Only run the tests in the list e.g. -ONLY test1 test2]"\
  -compile  1   1   "[1 compile, 0 do not compile]"\
  -execute  1   1   "[1 execute, 0 do not execute]"\
+ -valgrind ""  ""  "[Run tests with valgrind not equal to '', put result in ${valgrind} directory]"\
  ++ $*`
 
 if [ "${only}" = -1 ];then
@@ -90,12 +91,20 @@ if [ ${execute} = 1 ];then
          MESSAGE=''
       fi      
       printf "Testing ${test} ${MESSAGE}..."
-      ./${test} >${test}.out 2>&1
+      if [ "${valgrind}" != "" ];then	 
+         d.valgrind ./${test} --leak-check=full --suppressions=/users/dor/afsg/apm/ords/cmdn/valgrid_stuff/fst.sup >${test}.out 2>&1	  
+      else
+         ./${test} >${test}.out 2>&1
+      fi
       result=`cat ${report_file}`
       Other_Tests
       if [[ ${result} == ' ok' && ${result_o} == ' ok' ]] ; then
          passed=$((passed + 1))
          printf "${result}\n"
+	 if [ "${valgrind}" != "" ];then
+	    mkdir -p ${valgrind}/VALGRIND/$BASE_ARCH/$COMP_ARCH
+            cp ${test}.out ${valgrind}/VALGRIND/$BASE_ARCH/$COMP_ARCH/.
+         fi
          rm -f ${test} ${test}.out
       else
          failed=$((failed + 1))

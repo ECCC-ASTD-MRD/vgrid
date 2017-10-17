@@ -22,6 +22,7 @@ tests/vgrid_maestro_tests/sequencing
 tests/.suites/vgrid_maestro_tests/hub/
 tests/.suites/vgrid_maestro_tests/listings/
 tests/.suites/vgrid_maestro_tests/sequencing/
+tests/VALGRIND
 Makefile.test
 examples/lowLevel_levels
 examples/topLevel_levels

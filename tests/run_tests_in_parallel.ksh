@@ -4,7 +4,12 @@ eval `cclargs \
  -MAX_CPUS 12  12  "[Number of cpus to run tests]"\
  -compile  1   1   "[1 compile, 0 do not compile]"\
  -execute  1   1   "[1 execute, 0 do not execute]"\
+ -valgrind ""  ""  "[Run tests with valgrind not equal to '', put result in ${valgrind} directory]"\
  ++ $*`
+
+if [ "${valgrind}" != "" ];then
+   echo "valgrind will be run, see results in ${vagrind} directory"
+fi
 
 set -e
 # Get list of tests
@@ -61,7 +66,7 @@ for test in ${tests[*]} ; do
    fi
    cd ${test}
    echo "   test ${test}"
-   make tests ONLY=${test} COMPILE=${compile} EXECUTE=${execute}> ../log_${test} 2>&1 &
+   make tests ONLY=${test} COMPILE=${compile} EXECUTE=${execute} VALGRIND=${valgrind} > ../log_${test} 2>&1 &
    ((NCPUS=NCPUS+1))
    if [[ ${NCPUS} -gt ${MAX_CPUS} ]];then
       NCPUS=1
