@@ -249,7 +249,7 @@ int check_gen_5001(vgrid_descriptor *vgd){
   } else {
     printf("     Descritors are equal.\n");
   }
-  
+    
   free(hyb);
   free(ip1_m);
   Cvgd_free(&vgd2);
@@ -311,6 +311,7 @@ int check_gen_5002(vgrid_descriptor *vgd){
   } else {
     printf("     Descritors are equal.\n");
   }
+  Cvgd_free(&vgd2);
 
   printf("  Testing specific interface\n");
   if( Cvgd_new_gen_5002(&vgd2, hyb, nk, ptop_8, pref_8, rc_1, rc_2, 0, 0) == VGD_ERROR) {
@@ -386,6 +387,7 @@ int check_gen_5005(vgrid_descriptor *vgd){
   } else {
     printf("     Descritors are equal.\n");
   }
+  Cvgd_free(&vgd2);
 
   printf("  Testing specific interface\n");
   if( Cvgd_new_gen_5005(&vgd2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, 0, 0, dhm, dht) == VGD_ERROR) {
@@ -458,9 +460,6 @@ int check_gen_5100(vgrid_descriptor *vgd){
   Cvgd_free(&vgd2);
   printf("  Testing specific interface\n");
   if( Cvgd_new_gen_5100(&vgd2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, rc_3, rc_4, 0, 0, dhm, dht, 1) == VGD_ERROR) {
-    free(hyb);
-    free(ip1_m);
-    Cvgd_free(&vgd2);
     return(VGD_ERROR);
   }
   //Test equality
@@ -474,6 +473,7 @@ int check_gen_5100(vgrid_descriptor *vgd){
   
   free(hyb);
   free(ip1_m);
+  free(ip1_t);
   Cvgd_free(&vgd2);
   return(VGD_OK);
 }
@@ -540,6 +540,7 @@ int test_it(char *filename, int ind) {
     printf("In test ERROR unsupported Vcode %d\n",vcode);
     return(VGD_ERROR);
   }	
+  Cvgd_free(&vgd);
   return(VGD_OK);
 }
 

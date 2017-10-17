@@ -57,8 +57,8 @@ void c_new_from_table() {
   } else {
     printf("     Descritors are equal.\n");
   }
-  Cvgd_free(vgd);
-  Cvgd_free(vgd2);
+  Cvgd_free(&vgd);
+  Cvgd_free(&vgd2);
   free(table);
   ier = c_ut_report(VGD_OK,"testing new_build");  
 }
