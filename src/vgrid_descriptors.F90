@@ -1093,12 +1093,13 @@ contains
      return
   end function levels_withref_prof
 
-  integer function levels_withref_prof_8(self,ip1_list,levels,sfc_field,in_log) result(status)
+  integer function levels_withref_prof_8(self,ip1_list,levels,sfc_field,in_log,sfc_field_ls) result(status)
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
-     real*8, dimension(:), pointer :: levels                       !Physical level values
-     real*8, optional, intent(in) :: sfc_field                     !Surface field reference for coordinate [none]
+     real*8, dimension(:), pointer :: levels                     !Physical level values
+     real*8, optional, intent(in) :: sfc_field                   !Surface field reference for coordinate [none]
      logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]          
+     real*8, optional, intent(in) :: sfc_field_ls                !Surface field reference for coordinate [none]
 
      ! Local variables
      real*8 :: my_sfc_field
@@ -1120,7 +1121,11 @@ contains
      if (present(in_log)) my_in_log = in_log
 
      ! Wrap call to level calculation
-     status = diag_withref_prof_8(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log)
+     if(present(sfc_field_ls))then
+        status = diag_withref_prof_8(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log,sfc_field_ls=sfc_field_ls)
+     else
+        status = diag_withref_prof_8(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log)
+     endif
      return
   end function levels_withref_prof_8
 
@@ -1251,9 +1256,13 @@ contains
         return
      endif
      sfc_field_2d=my_sfc_field
-     sfc_field_ls_2d=my_sfc_field_ls         
      ! Wrap call to level calculator
-     error = diag_withref_8(self,sfc_field=sfc_field_2d,sfc_field_ls=sfc_field_ls_2d,ip1_list=ip1_list,levels=levels_3d,in_log=my_in_log,dpidpis=my_dpidpis)    
+     if (present(sfc_field_ls))then
+        sfc_field_ls_2d=my_sfc_field_ls
+        error = diag_withref_8(self,sfc_field=sfc_field_2d,sfc_field_ls=sfc_field_ls_2d,ip1_list=ip1_list,levels=levels_3d,in_log=my_in_log,dpidpis=my_dpidpis) 
+     else
+        error = diag_withref_8(self,sfc_field=sfc_field_2d,ip1_list=ip1_list,levels=levels_3d,in_log=my_in_log,dpidpis=my_dpidpis)    
+     endif
      if (error /= 0) then
         deallocate(sfc_field_2d,levels_3d)
         write(for_msg,*) 'problem with diag_withref in diag_withref_prof_8'
@@ -1614,7 +1623,6 @@ contains
       if (present(sfc_field)) sfc_field_CP = c_loc(sfc_field(1,1))
       sfc_field_ls_CP = C_NULL_PTR
       if (present(sfc_field_ls)) sfc_field_ls_CP = c_loc(sfc_field_ls(1,1))
-      
       istat = f_diag_withref_8(self%cptr,ni,nj,nk,ip1_list_CP,levels_CP,sfc_field_CP,sfc_field_ls_CP,in_log_int,dpidpis_int)      
       if (istat /= VGD_OK) then
          if(my_dpidpis)then
