@@ -4,6 +4,11 @@ ifeq ($(BASE_ARCH),$(EC_ARCH))
    $(error )
 endif
 
+# Not to run valgrind
+#VALGRIND=
+# To run valgrind and see result in execution directory
+#VALGRIND=$(PWD)
+
 DATA_ARCH=`uname -s`
 
 alltests:
@@ -18,7 +23,7 @@ tests:
 	mkdir -p WORK ; \
         ln -s ../data_$(DATA_ARCH)/* . ; \
 	cd .. ; \
-	./run_tests.ksh -only $(ONLY) -compile $(COMPILE) -execute $(EXECUTE)
+	./run_tests.ksh -only $(ONLY) -compile $(COMPILE) -execute $(EXECUTE) -valgrind $(VALGRIND)
 
 tests_par:
 	rm -rf data/* 2>/dev/null ;\
@@ -27,7 +32,7 @@ tests_par:
 	mkdir -p WORK ;\
 	ln -s ../data_$(DATA_ARCH)/* . ;\
 	cd .. ;\
-	./run_tests_in_parallel.ksh -MAX_CPUS $(MAX_CPUS) -compile $(COMPILE) -execute $(EXECUTE)
+	./run_tests_in_parallel.ksh -MAX_CPUS $(MAX_CPUS) -compile $(COMPILE) -execute $(EXECUTE) -valgrind $(VALGRIND)
 
 clean:
 	rm -f *.o *.mod *.out
