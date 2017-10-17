@@ -31,7 +31,7 @@ void c_levels() {
   char mode[]="RND";
   char format[] = "FST";
   char name[5];
-  float *f_val = NULL, *p0 = NULL, *px = NULL, *levels = NULL;
+  float *p0 = NULL, *levels = NULL;
   double *p0_8 = NULL, *levels_8 = NULL;
   vgrid_descriptor *vgd = NULL;
 
@@ -146,7 +146,9 @@ void c_levels() {
 
   Cvgd_free(&vgd);
   free(p0);
+  free(p0_8);
   free(levels);
+  free(levels_8);
   free(i_val);
   
   ier = c_ut_report(status,"testing Cvgd_levels");
