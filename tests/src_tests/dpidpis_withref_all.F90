@@ -23,11 +23,11 @@ program tests
 
   implicit none
 
-  integer :: stat,lu=0,fnom,fstouv,fstfrm,fclos,ip1,ip2,lutxt=10,test_dpidpis,i
+  integer :: stat,lu=0,fnom,fstouv,fstfrm,test_dpidpis,i
   
-  integer, parameter :: nfile=3
+  integer, parameter :: nfile=4
 
-  character(len=4), dimension(nfile) :: vcode_S=(/"5002","5004","5005"/)
+  character(len=4), dimension(nfile) :: vcode_S=(/"5002","5004","5005","5100"/)
 
   logical :: ok=.true.
 
@@ -46,11 +46,7 @@ program tests
         print*,'No record in RPN file'
         call abort
      endif
-     open(unit=lutxt,file='data/dm_'//vcode_S(i)//'_ips.txt',status='OLD')
-     read(lutxt,*) ip1,ip2
-     close(lutxt)
-     
-     stat=test_dpidpis(lu,ip1,ip2)
+     stat=test_dpidpis(lu)
      if(stat.ne.VGD_OK)ok=.false.
 
   enddo
@@ -64,13 +60,13 @@ end program tests
 
 !=============================================================================================
 
-integer function test_dpidpis(F_lu,F_ip1,F_ip2) result(stat)
+integer function test_dpidpis(F_lu) result(stat)
 
    use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_dpidpis,vgd_free,VGD_ERROR,VGD_OK
 
    implicit none
    
-   integer :: F_lu, F_ip1, F_ip2
+   integer :: F_lu
    
    ! Local variables
    integer :: ni,nj,nk,fstlir,fstinf,k,kind
@@ -78,7 +74,7 @@ integer function test_dpidpis(F_lu,F_ip1,F_ip2) result(stat)
    integer, dimension(:), pointer :: ip1_list
    real, dimension(:,:,:), pointer :: dpidpis_cube
    real*8, dimension(:,:,:), pointer :: dpidpis_cube_8
-   real   :: epsilon  =1.e-5
+   real   :: epsilon  =1.e-6
    real, dimension(:,:), pointer :: p0,px
    real*8, dimension(:,:), pointer :: p0_8
    real   :: w1,pres
@@ -91,7 +87,7 @@ integer function test_dpidpis(F_lu,F_ip1,F_ip2) result(stat)
    stat=VGD_ERROR
 
    ! Get dpidpis
-   stat = vgd_new(d,unit=F_lu,format="fst",ip1=F_ip1,ip2=F_ip2)
+   stat = vgd_new(d,unit=F_lu,format="fst")
    if(stat /= VGD_OK)return
 
    stat = vgd_get(d,key='CB_T - vertical B coefficient (t)',value=coef_b)
@@ -119,7 +115,6 @@ integer function test_dpidpis(F_lu,F_ip1,F_ip2) result(stat)
       print*,'ERROR: problem with vgd_dpidpis real'
       return
    endif
-   
    print*,'size(dpidpis_cube)',size(dpidpis_cube)
    
    OK=.true.
@@ -131,10 +126,22 @@ integer function test_dpidpis(F_lu,F_ip1,F_ip2) result(stat)
          print*,'ERROR problem with fstlir on PX for ip1 ->',ip1_list(k)
          return
       endif
+      !
+      ! If the difference in the value of the derivtive (dpidpis) is smaller than epsilon*p
+      ! we consider this ok
+      ! 
       w1=coef_b(k)*px(i0,j0)*100./p0(i0,j0)
-      if(abs(dpidpis_cube(i0,j0,k)- w1)/w1>epsilon)then
-         print*,'vgd_dpidpis real do not validate, expect', w1,' got ',dpidpis_cube(i0,j0,k)
-         return
+      ! Cannot test zero so take a very small real value
+      if( abs(w1) < 1.E-37 )then
+         if ( abs(dpidpis_cube(i0,j0,k)) > 1.E-37 )then
+            print*,'vgd_dpidpis real do not validate, expect', w1,' got ',dpidpis_cube(i0,j0,k)
+            return
+         endif
+      else
+         print*,'TOTO',abs(dpidpis_cube(i0,j0,k)- w1), px(i0,j0)*100.*epsilon
+         if(abs(dpidpis_cube(i0,j0,k)- w1) > px(i0,j0)*100.*epsilon)then
+            print*,'vgd_dpidpis real do not validate, expect', w1,' got ',dpidpis_cube(i0,j0,k),abs(dpidpis_cube(i0,j0,k)- w1)/w1,epsilon
+         endif
       endif
    enddo
    
@@ -159,11 +166,17 @@ integer function test_dpidpis(F_lu,F_ip1,F_ip2) result(stat)
          return
       endif
       w1=coef_b(k)*px(i0,j0)*100./p0_8(i0,j0)
-      print*,w1,dpidpis_cube_8(i0,j0,k)
       ! Note since px is a real the precision cannot be hier than real
-      if(abs(dpidpis_cube_8(i0,j0,k)- w1)/w1>epsilon)then
-         print*,'vgd_dpidpis real*8 do not validate'
-         return
+      if( abs(w1) < 1.E-37)then
+         if ( abs(dpidpis_cube_8(i0,j0,k)) > 1.d0*1.0E-37)then
+            print*,'vgd_dpidpis real*8 do not validate, expect', w1,' got ',dpidpis_cube_8(i0,j0,k)
+            return
+         endif
+      else
+         if(abs(dpidpis_cube_8(i0,j0,k)- w1) > px(i0,j0)*100.d0*epsilon)then
+            print*,'vgd_dpidpis real*8 do not validate, expect', w1,' got ',dpidpis_cube_8(i0,j0,k)
+            return
+         endif
       endif
    enddo
 
