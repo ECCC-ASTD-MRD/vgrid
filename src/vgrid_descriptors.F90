@@ -1589,7 +1589,7 @@ contains
             return
          endif
       else
-         if (is_valid(self,"ref_namel_valid")) then
+         if (is_valid(self,"ref_namel_valid") .and. .not. my_dpidpis) then
             write(for_msg,*) 'reference large scale field must be provided to diag_withref_8'
             call msg(MSG_ERROR,VGD_PRFX//for_msg)
             return
