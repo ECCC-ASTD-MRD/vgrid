@@ -25,8 +25,6 @@ program tests
   type(vgrid_descriptor) :: d
   integer :: stat,fstkey,lu=0,fnom,fstouv,fstfrm,fclos,lutxt=69,ip1,ip2
   real, dimension(:,:,:), allocatable :: lev
-  character(len=VGD_LEN_NAME) :: rfld
-  character(len=4) :: rfld_NAME
   character(len=12) :: rfld_ETIK
   logical :: ok = .true.
 
@@ -48,14 +46,6 @@ program tests
   stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
 
   ! Change an element of the structure
-  stat = vgd_put(d,key='RFLD - reference field name',value='TEST')
-  stat = vgd_get(d,key='RFLD - reference field name',value=rfld)
-  if(rfld /= 'TEST') ok = .false.
-
-  stat = vgd_put(d,key='NAME',value='1234')
-  stat = vgd_get(d,key='NAME',value=rfld_NAME)
-  if(rfld_NAME /= '1234') ok = .false.
-
   stat = vgd_put(d,key='ETIK',value='123456789012')
   stat = vgd_get(d,key='ETIK',value=rfld_ETIK)
   if(rfld_ETIK /= '123456789012') ok = .false.

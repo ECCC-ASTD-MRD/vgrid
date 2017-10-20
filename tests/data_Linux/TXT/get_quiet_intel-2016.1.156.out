@@ -15,8 +15,8 @@ ERROR: (vgd)  invalid key UNDEFINED KEY given to gd_get (real 1D)
 ERROR: (vgd)  invalid key UNDEFINED KEY given to gd_get (real 1D)
  Error with get_real_1d detected and message printed above
  Error with get_real_1d detected and message not printed above
-(Cvgd) ERROR in Cvgd_put_double, invalid key 'UNDE'
-(Cvgd) ERROR in Cvgd_put_double, invalid key 'UNDE'
+(Cvgd) ERROR in Cvgd_get_double, invalid key 'UNDE'
+(Cvgd) ERROR in Cvgd_get_double, invalid key 'UNDE'
  Error with get_real8 detected and message printed above
  Error with get_real8 detected and message not printed above
 ERROR: (vgd)  invalid key UNDEFINED KEY given to gd_get (real8 1D)

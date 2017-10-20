@@ -25,7 +25,6 @@ program tests
   type(vgrid_descriptor) :: d
   integer :: stat,fnom,fstouv,lu=10
   real, dimension(:,:,:), allocatable :: lev
-  character(len=VGD_LEN_NAME) :: vname
   logical :: ok = .true.
 
   stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
@@ -47,7 +46,7 @@ program tests
   end if
 
   ! Change an element of the structure
-  stat = vgd_put(d,key='NAME - vertical coordinate name',value='VCRD')
+  stat = vgd_put(d,key='ETIKE',value='123456789123')
   if(stat == VGD_ERROR)then
      ok = .false.
      print*,'Error with vgd_put'
