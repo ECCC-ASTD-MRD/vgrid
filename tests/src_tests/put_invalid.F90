@@ -51,11 +51,14 @@ program tests
   stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
   if(stat /= VGD_OK) OK=.false.
 
-  ! Get information about the coordinate
-  ! The real name os PTOP not PT -
-  stat = vgd_put(d,key='PT - top level pressure',value=ptop_8)
+  print*,'The following error "Cvgd_put_int, invalid vgrid" is normal'
+  stat = vgd_put(d,key='TOTO',value=1)
   if(stat /= VGD_ERROR) OK=.false.
-  
+
+  print*,'The following error "Cvgd_put_char, invalid key" is normal'
+  stat = vgd_put(d,key='TOTO',value="ABC")
+  if(stat /= VGD_ERROR) OK=.false.
+
   call ut_report(OK,message='Grid_Descriptors::vgd_get get valid value')
 
   ! Close files

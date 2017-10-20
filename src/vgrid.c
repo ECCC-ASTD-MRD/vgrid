@@ -277,14 +277,20 @@ void Cvgd_table_shape(vgrid_descriptor *self, int **tshape) {
 }
 
 static int c_table_update(vgrid_descriptor **self) {
-  printf("(*self)->vcode)=%d\n",(*self)->vcode);
+  //printf("(*self)->vcode)=%d\n",(*self)->vcode);
   switch((*self)->vcode) {
   case 5002:
   case 5003:
   case 5004:
   case 5005:
     if( c_encode_vert_5002_5003_5004_5005(self, 1) == VGD_ERROR ) {
-      printf("(Cvgd) ERROR in c_table_update, cannot encode\n");
+      printf("(Cvgd) ERROR in c_table_update, cannot encode Vcode %d\n",(*self)->vcode);
+      return(VGD_ERROR);
+    }
+    break;
+  case 5100:
+    if( c_encode_vert_5100(self, 1) == VGD_ERROR ) {
+      printf("(Cvgd) ERROR in c_table_update, cannot encode Vcode %d\n",(*self)->vcode);
       return(VGD_ERROR);
     }
     break;
@@ -3270,6 +3276,7 @@ int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet)
     printf("(Cvgd) ERROR in Cvgd_get_int, value is a NULL pointer\n");
     return(VGD_ERROR);
   }
+  *value = VGD_MISSING;
   if (strcmp(key, "NL_M") == 0){
     *value = self->nl_m;
   } else if (strcmp(key, "NL_T") == 0){
@@ -3294,9 +3301,25 @@ int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet)
     *value = self->rec.ip1;
   } else if (strcmp(key, "IP_2") == 0){
     *value = self->rec.ip2;
+  } else if (strcmp(key, "IP_3") == 0){
+    *value = self->rec.ip3;
   } else if (strcmp(key, "DIPM") == 0){
+    if( ! C_is_valid(self,"dhm_valid") ){      
+      if(! quiet) {
+	printf("(Cvgd) ERROR in Cvgd_get_int, cannot get key %s\n",key);
+	fflush(stdout);
+      }
+      return(VGD_ERROR);
+    }
     *value = self->ip1_m[self->nl_m-1];
   } else if (strcmp(key, "DIPT") == 0){
+    if( ! C_is_valid(self,"dht_valid") ){      
+      if(! quiet) {
+	printf("(Cvgd) ERROR in Cvgd_get_int, cannot get key %s\n",key);
+	fflush(stdout);
+      }
+      return(VGD_ERROR);
+    }
     *value = self->ip1_t[self->nl_t-1];
   } else if (strcmp(key, "MIPG") == 0){
     *value = self->match_ipig;
@@ -3309,6 +3332,7 @@ int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet)
     }
     return(VGD_ERROR);
   }
+    
   
   return(VGD_OK);
 
@@ -3491,66 +3515,33 @@ int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk,
   return(VGD_OK);
 }
 
-static int c_get_put_double(vgrid_descriptor **self, char *key, double *value_get, double value_put, int quiet, char *action) {
-  int get, OK = 1;
-  if(! C_is_valid(*self,"SELF")){
-    printf("(Cvgd) ERROR in c_get_double, invalid vgrid.\n");
-    return(VGD_ERROR);
-  }
-  
-  if(strcmp(action,"GET") == 0 ) {
-    get = 1;
-  } else if (strcmp(action,"PUT") == 0 ) {
-    get = 0;
-  } else {
-    printf("(Cvgd) INTERNAL ERROR using c_get_put_double, please report to developers\n");
+int Cvgd_get_double(vgrid_descriptor *self, char *key, double *value_get, int quiet) {
+  int OK = 1;
+  if(! C_is_valid(self,"SELF")){
+    printf("(Cvgd) ERROR in Cvgd_get_double, invalid vgrid.\n");
     return(VGD_ERROR);
   }
   if( strcmp(key, "PTOP") == 0 ) {
-    if(! is_valid(*self, ptop_8_valid)) OK = 0;
-    if(get) {
-      *value_get = (*self)->ptop_8;
-    } else {
-      (*self)->ptop_8 = value_put;
-    }
+    if(! is_valid(self, ptop_8_valid)) OK = 0;
+    *value_get = (self)->ptop_8;
   } else if ( strcmp(key, "PREF") == 0 ) {
-    if(! is_valid(*self, pref_8_valid)) OK = 0;
-    if(get) {
-      *value_get = (*self)->pref_8;
-    } else {
-      (*self)->pref_8 = value_put;
-    }
+    if(! is_valid(self, pref_8_valid)) OK = 0;
+    *value_get = (self)->pref_8;
   } else if ( strcmp(key, "RC_1") == 0 ) {
-    if(! is_valid(*self, rcoef1_valid)) OK = 0;
-    if(get) {
-      *value_get = (*self)->rcoef1;
-    } else {
-      (*self)->rcoef1 = (float) value_put;
-    }
+    if(! is_valid(self, rcoef1_valid)) OK = 0;
+    *value_get = (self)->rcoef1;
   } else if ( strcmp(key, "RC_2") == 0 ) {
-    if(! is_valid(*self, rcoef2_valid)) OK = 0;
-    if(get) {
-      *value_get = (*self)->rcoef2;
-    } else {
-      (*self)->rcoef2 = (float) value_put;
-    }
+    if(! is_valid(self, rcoef2_valid)) OK = 0;
+    *value_get = (self)->rcoef2;
   } else if ( strcmp(key, "RC_3") == 0 ) {
-    if(! is_valid(*self, rcoef3_valid)) OK = 0;
-    if(get) {
-      *value_get = (*self)->rcoef3;
-    } else {
-      (*self)->rcoef3 = (float) value_put;
-    }
+    if(! is_valid(self, rcoef3_valid)) OK = 0;
+    *value_get = (self)->rcoef3;
   } else if ( strcmp(key, "RC_4") == 0 ) {
-    if(! is_valid(*self, rcoef4_valid)) OK = 0;
-    if(get) {
-      *value_get = (*self)->rcoef4;
-    } else {
-      (*self)->rcoef4 = (float) value_put;
-    }
+    if(! is_valid(self, rcoef4_valid)) OK = 0;
+    *value_get = (self)->rcoef4;
   } else {
     if(! quiet) {
-      printf("(Cvgd) ERROR in Cvgd_put_double, invalid key '%s'\n", key);
+      printf("(Cvgd) ERROR in Cvgd_get_double, invalid key '%s'\n", key);
       fflush(stdout);
     }
     return(VGD_ERROR);
@@ -3558,26 +3549,13 @@ static int c_get_put_double(vgrid_descriptor **self, char *key, double *value_ge
   
   if(! OK) {
     if(! quiet) {
-      printf("(Cvgd) ERROR in Cvgd_put_double, %s cannot be put for Vcode %d\n", key, (*self)->vcode);
+      printf("(Cvgd) ERROR in Cvgd_get_double, %s cannot get for Vcode %d\n", key, (self)->vcode);
       fflush(stdout);
     }
     return(VGD_ERROR);
   }    
   
   return(VGD_OK);
-
-}
-
-int Cvgd_put_double(vgrid_descriptor **self, char *key, double value_put) {
-  double value_get = 0.0; // Will not be used
-  int quiet = 0; //not quiet
-  return(c_get_put_double(self, key, &value_get, value_put, quiet, "PUT"));
-}
-
-int Cvgd_get_double(vgrid_descriptor *self, char *key, double *value_get, int quiet)
-{
-  double value_put = 0.0; //Will not be used
-  return(c_get_put_double(&self, key, value_get, value_put, quiet, "GET"));
 }
 
 int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *nk, int quiet)
@@ -3763,14 +3741,8 @@ int Cvgd_put_char(vgrid_descriptor **self, char *key, char *value) {
   }
   if( strcmp(key, "ETIK") == 0 ){
     strcpy((*self)->rec.etiket,value);
-  } else if( strcmp(key, "NAME") == 0 ){
-    strcpy((*self)->rec.nomvar,value);
-  } else if( strcmp(key, "RFLD") == 0 ){
-    strcpy((*self)->ref_name,value);
-  } else if( strcmp(key, "RFLS") == 0 ){
-    strcpy((*self)->ref_namel,value);
   } else {
-    printf("(Cvgd) ERROR in Cvgd_out_char, invalid key -> '%s'\n",key);
+    printf("(Cvgd) ERROR in Cvgd_put_char, invalid key -> '%s'\n",key);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -3800,17 +3772,17 @@ int Cvgd_put_int(vgrid_descriptor **self, char *key, int value) {
   if( strcmp(key, "DATE") == 0 ) {
     (*self)->rec.dateo = value;
   } else if( strcmp(key, "IG_1") == 0 ) {
-       (*self)->rec.ig1 = value;
+    (*self)->rec.ig1 = value;
   } else if( strcmp(key, "IG_2") == 0 ) {
-       (*self)->rec.ig2 = value;
+    (*self)->rec.ig2 = value;
   } else if( strcmp(key, "IG_3") == 0 ) {
-       (*self)->rec.ig3 = value;
+    (*self)->rec.ig3 = value;
   } else if( strcmp(key, "IG_4") == 0 ) {
-       (*self)->rec.ig4 = value;
+    (*self)->rec.ig4 = value;
   } else if( strcmp(key, "IP_1") == 0 ) {
-       (*self)->rec.ip1 = value;
+    (*self)->rec.ip1 = value;
   } else if( strcmp(key, "IP_2") == 0 ) {
-       (*self)->rec.ip2 = value;
+    (*self)->rec.ip2 = value;
   } else if( strcmp(key, "IP_3") == 0 ) {
     (*self)->rec.ip3 = value;
   } else if( strcmp(key, "DIPM") == 0 ) {
