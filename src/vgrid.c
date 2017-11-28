@@ -64,6 +64,7 @@ static int ref_namel_valid  [VALID_TABLE_SIZE] = {    0,    0,    0,    0,    0,
 static int dhm_valid        [VALID_TABLE_SIZE] = {    0,    0,    0,    0,    0,    0,    0,    0, 5005, 5100,    0};
 static int dht_valid        [VALID_TABLE_SIZE] = {    0,    0,    0,    0,    0,    0,    0,    0, 5005, 5100,    0};
 static int is_in_logp       [VALID_TABLE_SIZE] = {    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005, 5100,    0};
+static int vcode_valid      [VALID_TABLE_SIZE] = { 1001, 1002, 1003, 2001, 5001, 5002, 5003, 5004, 5005, 5100, 5999};
 
 static int c_encode_vert_5002_5003_5004_5005(vgrid_descriptor **self, char update);
 static int fstd_init(vgrid_descriptor *VGrid);
@@ -3913,7 +3914,11 @@ int C_new_gen(vgrid_descriptor **self, int kind, int version, float *hyb, int si
     printf("(Cvgd) ERROR in C_new_gen, ERROR with Cvgd_set_vcode_i");
     return (VGD_ERROR);
   }
-
+  if( ! is_valid(*self, vcode_valid) ){
+    printf("(Cvgd) ERROR in C_new_gen, vcode %d is not valid.\n",(*self)->vcode);
+    return (VGD_ERROR);
+  }
+  
   //TODO get better error handling like in new_build
   errorInput = 0;
   errorInput = errorInput + is_required_double((*self), ptop_8,     ptop_8_valid,     "ptop_8"    );
