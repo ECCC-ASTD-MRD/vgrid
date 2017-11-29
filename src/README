@@ -5,7 +5,7 @@ To add a new vertical coordinate type:
 2- Modify the validity tables to include your new Vcode
       C: in vgrid.c, e.g. :
          static int is_in_logp       [VALID_TABLE_SIZE] = {    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005, 5100,    0};
-	 NOTE : modify all lines. Put 0 if not relevent for this Vcode
+	 NOTE : modify all lines. Put 0 if not relevent for this Vcode, increase VALID_TABLE_SIZE by one.
 
 3- Add elements to the structure (typedef struct vgrid_descriptor) if necessary and initialized them
       C: vgrid.h, c_vgd_construct
