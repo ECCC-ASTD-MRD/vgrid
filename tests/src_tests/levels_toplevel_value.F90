@@ -60,12 +60,11 @@ program tests
 
   integer :: stat,lu=10,do_it,fstfrm,fclos,i,ier
   logical :: ok=.true.
-  integer, parameter :: nfiles=10
+  integer, parameter :: nfiles=9
   character(len=200), dimension(nfiles) :: files=(/&
        "data/dm_1001_from_model_run",&
        "data/dm_1002_from_model_run",&
        "data/dm_5001_from_model_run",&
-       "data/dm_5002_from_model_run",&
        "data/dm_5002_from_model_run",&
        "data/dm_5003_from_model_run",&
        "data/dm_5004_from_model_run",&
@@ -155,12 +154,12 @@ integer function do_it(lu,file) result(status)
      return
   endif
 
-  allocate(px(ni,nj))
+  allocate(px(ni,nj))  
   ier = fstlir(px,lu,ni,nj,nk,-1,'',prm%ip1,-1,-1,'','PX')
   if(ier.lt.0)then
      print*,'(Test) ERROR with fstlir on PX for ip1,file ',prm%ip1,file
      return
-  endif  
+  endif
 
   if(abs(lev(10,10,1)/100.-px(10,10))>epsilon)then
      print*,'(Test) ERROR difference in pressure to high',lev(10,10,1)/100.,' VS',px(10,10)

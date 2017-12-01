@@ -26,7 +26,7 @@ program constructor
   implicit none
 
   type(vgrid_descriptor) :: d
-  integer :: test_sleve_hgts, stat
+  integer :: test_hgts, stat
   real, dimension(80) :: hgts= &
 (/ 6.62078E+04, 6.29395E+04, 5.95406E+04, 5.60645E+04, 5.26367E+04, 4.93408E+04, 4.63244E+04, 4.35656E+04, 4.10827E+04, 3.88781E+04,&
  3.68699E+04, 3.50538E+04, 3.33957E+04, 3.18990E+04, 3.05104E+04, 2.92230E+04, 2.80314E+04, 2.69268E+04, 2.59083E+04, 2.49636E+04,&
@@ -56,7 +56,7 @@ program constructor
   endif
 
   file='data/data_constructor_gen_21001.txt'
-  stat = test_sleve_hgts(d,file,write_control_L,stat)
+  stat = test_hgts(d,file,write_control_L)
   if(stat.eq.VGD_ERROR)OK=.false.
 
   call ut_report(OK,'Grid_Descriptors::vgd_new vertical generate initializer SLEVE like coordinate')
@@ -64,15 +64,14 @@ end program constructor
 !==============================================================================
 !===============================================================================
 !===============================================================================
-integer function test_sleve_hgts(F_d,F_file,F_write_control_L,F_stat) result(istat)
+integer function test_hgts(F_d,F_file,F_write_control_L) result(istat)
    !
-   use vGrid_Descriptors, only: vgrid_descriptor,vgd_get,VGD_ERROR,VGD_OK
+   use vGrid_Descriptors, only: vgrid_descriptor,vgd_get,vgd_new,vgd_free,operator(==),VGD_ERROR,VGD_OK
    implicit none
    !
    type (vgrid_descriptor) :: F_d
    logical :: F_write_control_L
    character (len=256) :: F_file
-   integer :: F_stat
    !
    ! Local variable
    !
@@ -80,19 +79,28 @@ integer function test_sleve_hgts(F_d,F_file,F_write_control_L,F_stat) result(ist
    real*8, dimension(:), pointer :: b_m_8,a_m_8,b_t_8,a_t_8,work_8
    integer, dimension(:), pointer :: vipm,vipt,work_i
    integer :: nl_m,nl_t,k,nk,kind,vers,ip1,my_ip1
+   real(kind=8), dimension(:,:,:), pointer :: table
+   type (vgrid_descriptor) :: vgrid_rebuilt
 
-   nullify(vcdm,vcdt,work,a_m_8,b_m_8,a_t_8,b_t_8,work_8,vipm,vipt,work_i)
+   nullify(vcdm,vcdt,work,a_m_8,b_m_8,a_t_8,b_t_8,work_8,vipm,vipt,work_i,table)
 
    istat=VGD_OK
 
    call flush(6)
 
-   if(F_stat.eq.VGD_ERROR)then
-      print*,'In test_sleve_hgts: test not performed, since previous command failed'
-      istat=VGD_ERROR
+   istat = VGD_ERROR
+
+   if(vgd_get(F_d,'VTBL',table) == VGD_ERROR)return
+   if(vgd_new(vgrid_rebuilt,table) ==  VGD_ERROR)return
+   if (vgrid_rebuilt == F_d) then
+      ! Ok do noting
+   else
+      print*,'ERROR: rebuilding table'
       return
    endif
-
+   if(vgd_free(vgrid_rebuilt) ==  VGD_ERROR)return
+   deallocate(table)
+   
    if( vgd_get(F_d,key='KIND - vertical coordinate ip1 kind' ,value=kind)   == VGD_ERROR) return
    if( vgd_get(F_d,key='VERS - vertical coordinate version'  ,value=vers)   == VGD_ERROR) return
    if( vgd_get(F_d,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8)  == VGD_ERROR) return
@@ -289,4 +297,6 @@ integer function test_sleve_hgts(F_d,F_file,F_write_control_L,F_stat) result(ist
 
   deallocate(vcdm,vcdt,work,a_m_8,b_m_8,a_t_8,b_t_8,work_8,vipm,vipt,work_i)
 
-end function test_sleve_hgts
+  istat = VGD_OK
+
+end function test_hgts

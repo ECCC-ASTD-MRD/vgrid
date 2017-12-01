@@ -14,6 +14,8 @@ To add a new vertical coordinate type:
       Fortran : new_build_vert
       C: C_new_build_vert
       Test: add this Vcode in tests constructor_build_all.F90
+            To run this test you will need a model output with P0, TT, PX and UU and the new !!
+	    Run the GEM model with your new library in order to produce this file.
    
 5- Add a branch to your new Vcode new_gen
      Fortran: new_gen, add new required inputs if any
@@ -35,9 +37,9 @@ To add a new vertical coordinate type:
 9- Generate a file that contains your new coordinate record
 
 10- Write a decoder for your new Vcode (e.g. c_decode_vert_5002)
-       Tests:     
+       Tests: constructor_table    
 
-12- Add a level calculator (e.g. C_compute_pressure_5002)
+12- Add a level calculator (e.g. C_compute_pressure_5002 C_compute_heights_21001)
        Test: levels_withref_profile_all, levels_toplevel_value
 
 13- Add a branch for your new Vcode in the printer
@@ -55,5 +57,5 @@ To add a new vertical coordinate type:
 
 Write/amend tests cases to tests the added feature before you add the feature, make sure the test fails before the
 code is implemented to make sure the tests are affective.
-Leave tests in tests/src directory.
+Leave tests in tests/src directory (git add your_new_test; git commit -m 'Add test for Vcode xyz'.
 
