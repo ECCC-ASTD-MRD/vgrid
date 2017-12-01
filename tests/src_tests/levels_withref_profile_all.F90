@@ -68,6 +68,13 @@ program levels_withref_profile_all
   ier=check_levels_withref('data/dm_5999_from_model_run','','UU')
   if(ier==VGD_ERROR)stat=VGD_ERROR
 
+  ier=check_levels_withref('data/dm_21001_from_model_run','','TT')
+  if(ier==VGD_ERROR)stat=VGD_ERROR
+  ier=check_levels_withref('data/dm_21001_from_model_run','','UU')
+  if(ier==VGD_ERROR)stat=VGD_ERROR
+
+print*,'stat=',stat
+
   call ut_report(stat,'Grid_Descriptors, vgd_new')
 
 end program levels_withref_profile_all
@@ -93,8 +100,8 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
    real, dimension(:), pointer :: pres
    real*8, dimension(:), pointer :: pres_8
    real, dimension(:,:), pointer :: p0,p0ls,px
-   real :: epsilon=5.0e-6,pppp,p0_point,p0ls_point
-   real*8 :: p0_point_8,p0ls_point_8
+   real :: epsilon=5.0e-6,pppp,p0_point,p0ls_point,fact
+   real*8 :: p0_point_8,p0ls_point_8,fact_8
    integer, dimension(:), pointer :: ip1s
    character(len=VGD_LEN_RFLD) :: rfld_S, rfls_S
    ! Variable for fstprm, sorry...
@@ -102,7 +109,7 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
         ig2, ig3, ig4, ip1, ip2, ip3, iun, key, lng, nbits,&
         ni,  nj, nk, npak, npas, swa, ubc
    character(len=12) :: etiket
-   character(len=4)  :: nomvar
+   character(len=4)  :: nomvar,nomvar_metric
    character(len=2)  :: typvar
    character(len=1)  :: grtyp, ctype, dummy_S
    logical :: rewrit, two_refs_L
@@ -123,7 +130,7 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
    endif
    ier=fstouv(lu,'RND')
    if(ier.le.0)then
-      print*,'No record in RPN file ',trim(F_fst),ier
+      print*,'ERROR: No record in RPN file ',trim(F_fst),ier
       return
    endif
    if(trim(F_ips).eq.'')then
@@ -137,7 +144,7 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
    ! Get vertical grid descriptor
    ier = vgd_new(vgd,unit=lu,format="fst",ip1=ip1,ip2=ip2)
    if(ier == VGD_ERROR )then
-      print*,'Problem getting vertical grid descriptor'
+      print*,'ERROR: Problem getting vertical grid descriptor'
       print*,'FILE: ',trim(F_fst)
       return
    endif
@@ -148,7 +155,7 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
       return
    endif
    if(infon == 0 )then
-      print*,'pas de record de ',F_var
+      print*,'ERROR: pas de record de ',F_var
       print*,'FILE: ',trim(F_fst)
       return
    endif
@@ -162,19 +169,24 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
    
    ier = vgd_get(vgd, "RFLD", rfld_S, .true.);
    if( rfld_S == VGD_NO_REF_NOMVAR )then
-      print*,"TODO, review code for, pressure since no RFLD"
+      print*,"ERROR: TODO, review code for, pressure since no RFLD"
       return
    else
       key = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',rfld_S)
       allocate(p0(ni,nj),px(ni,nj))
       ier = fstluk(p0,key,ni,nj,nk)
       if(ier.lt.0)then
-         print*,'Problem with fstluk on ',rfld_S
+         print*,'ERROR: Problem with fstluk on ',rfld_S
          print*,'FILE: ',trim(F_fst)
          return
       endif
       if(trim(rfld_S) == "P0")then
          p0_point=p0(1,1)*100.
+      elseif(trim(rfld_S) == "ME")then
+         p0_point=p0(1,1)
+      else
+         print*,'ERROR: reference field not supported ',trim(rfld_S)
+         return
       endif
       p0_point_8=p0_point
    endif
@@ -187,7 +199,7 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
       allocate(p0ls(ni,nj))
       ier = fstluk(p0ls,key,ni,nj,nk)
       if(ier.lt.0)then
-         print*,'Problem with fstluk on ',rfls_S
+         print*,'ERROR: Problem with fstluk on ',rfls_S
          print*,'FILE: ',trim(F_fst)
          return
       endif
@@ -196,7 +208,6 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
       endif
       p0ls_point_8=p0ls_point
    endif
-
    ! Test 32 bits interface
    if(two_refs_L)then
       ier = vgd_levels(vgd,ip1s,pres,p0_point,sfc_field_ls=p0ls_point)
@@ -204,7 +215,7 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
       ier = vgd_levels(vgd,ip1s,pres,p0_point)
    endif
    if(ier == VGD_ERROR )then
-      print*,'Problem with vgd_levels 32 bits'
+      print*,'ERROR: Problem with vgd_levels 32 bits'
       print*,'FILE: ',trim(F_fst)
       return
    endif
@@ -213,36 +224,53 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
            ip1,ip2,ip3,typvar,nomvar,etiket,grtyp,ig1,ig2,ig3,ig4,swa,lng, &
            dltf,ubc,extra1,extra2,extra3)
       if(ier.lt.0)then
-         print*,'Problem with fstprm on ',F_var,', ip1=',ip1
-      print*,'FILE: ',trim(F_fst)
+         print*,'ERROR: Problem with fstprm on ',F_var,', ip1=',ip1
+         print*,'FILE: ',trim(F_fst)
          return
       endif
       ! Surface pressure must be equal to P0 for surface levels
       call convip(ip1,pppp,kind,-1,dummy_S,.false.)
-      if(abs(pppp-1.).lt.epsilon)then
+      if(abs(pppp-1.).lt.epsilon.or. ( abs(pppp).lt.epsilon .and. trim(rfld_S) == "ME") )then
          if(pres(k).ne.p0_point)then
-            print*,'Surface pressure must be exacly equal to p0'
+            print*,'ERROR: 32 bits level at surface must be exacly equal to ',rfld_S
             print*,'k,pres(k),p0_point',k,pres(k),p0_point
             print*,'FILE: ',trim(F_fst)
             return
          endif
       endif
       call incdatr(datev,dateo,deet*npas/3600.d0)
-      key=fstinf(lu,ni,nj,nk,datev,' ',ip1,ip2,-1,typvar,'PX')     
+      if(trim(rfld_S) == "P0")then
+         nomvar_metric="PX"
+         fact=.01
+         fact_8=.01
+      elseif(trim(rfld_S) == "ME")then
+         nomvar_metric="GZ"
+         fact=.1
+         fact_8=.1
+      else
+         print*,'ERROR: in test reference field not supported: ',trim(rfld_S)
+         return
+      endif
+      key=fstinf(lu,ni,nj,nk,datev,' ',ip1,ip2,-1,typvar,nomvar_metric)     
       ier = fstluk(px,key,ni,nj,nk)
       if(ier.lt.0)then
-         print*,'Problem with fstinf on PX, ip1=',ip1
+         print*,'ERROR: Problem with fstinf on',trim(nomvar_metric), ' , ip1=',ip1
          print*,'FILE: ',trim(F_fst)
          return
       endif
-      if(abs((px(1,1)-pres(k)/100.)/px(1,1))>epsilon)then
-         print*,'32 bits: Difference in pressure is too large at'
-         print*,'px(1,1),pres(k)/100.',k,px(1,1),pres(k)/100.
-         print*,'File: ',F_fst
+      if(abs((px(1,1)-pres(k)*fact)/abs(px(1,1)))>epsilon)then
+         if(trim(rfld_S) == "P0")then
+            print*,'ERROR: 32 bits: Difference in pressure is too large at'
+            print*,'k,px(1,1),pres(k)*fact.',k,px(1,1),pres(k)*fact
+         endif
+         if(trim(rfld_S) == "ME")then
+            print*,'ERROR: 32 bits: Difference in heights is too large at'
+            print*,'k,gz(1,1),heghts(k)*fact',k,px(1,1),pres(k)*fact
+         endif
+         print*,'ERROR: on file: ',F_fst
          return
       endif
    enddo
-   
    ! Test 64 bits interface
    if(two_refs_L)then
       ier = vgd_levels(vgd,ip1s,pres_8,p0_point_8,sfc_field_ls=p0ls_point_8)
@@ -250,7 +278,7 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
       ier = vgd_levels(vgd,ip1s,pres_8,p0_point_8)
    endif
    if(ier == VGD_ERROR )then
-      print*,'Problem with vgd_levels 64 bits'
+      print*,'ERROR: Problem with vgd_levels 64 bits'
       print*,'FILE: ',trim(F_fst)
       return
    endif 
@@ -259,37 +287,43 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
            ip1,ip2,ip3,typvar,nomvar,etiket,grtyp,ig1,ig2,ig3,ig4,swa,lng, &
            dltf,ubc,extra1,extra2,extra3)
       if(ier.lt.0)then
-         print*,'Problem with fstprm on ',F_var,' ip1=',ip1
+         print*,'ERROR: Problem with fstprm on ',F_var,' ip1=',ip1
          print*,'FILE: ',trim(F_fst)
          return
       endif
       ! Surface pressure must be equal to P0 for surface levels
       call convip(ip1,pppp,kind,-1,dummy_S,.false.)
-      if(abs(pppp-1.).lt.epsilon)then
+      if(abs(pppp-1.).lt.epsilon.or. ( abs(pppp).lt.epsilon .and. trim(rfld_S) == "ME") )then
          if(pres_8(k).ne.p0_point_8)then
-            print*,'Surface pressure must be exacly equal to p0_8'
+            print*,'ERROR: 64 bits level at surface must be exacly equal to ',trim(rfld_S)
             print*,'File:',F_fst
             print*,'k,pres_8(k),p0_point_8',k,pres_8(k),p0_point_8
             return
          endif
       endif
       call incdatr(datev,dateo,deet*npas/3600.d0)
-      key=fstinf(lu,ni,nj,nk,datev,' ',ip1,ip2,-1,typvar,'PX')     
+      key=fstinf(lu,ni,nj,nk,datev,' ',ip1,ip2,-1,typvar,nomvar_metric)     
       ier = fstluk(px,key,ni,nj,nk)
       if(ier.lt.0)then
-         print*,'Problem with fstinf on PX, ip1=',ip1
+         print*,'ERROR: Problem with fstinf on ',trim(nomvar_metric),', ip1=',ip1
          print*,'FILE: ',trim(F_fst)
          return
       endif
-      if(abs((px(1,1)-pres_8(k)/100.d0)/px(1,1))>epsilon)then
-         print*,'64 bits: Difference in pressure is too large at'
-         print*,'k,px(1,1),pres_8(k)/100.d0',k,px(1,1),pres_8(k)/100.d0
-         print*,'FILE: ',trim(F_fst)
+     if(abs((px(1,1)-pres_8(k)*fact_8)/abs(px(1,1)))>epsilon)then
+         if(trim(rfld_S) == "P0")then
+            print*,'ERROR: 46 bits: Difference in pressure is too large at'
+            print*,'k,px(1,1),pres_8(k)*fact_8',k,px(1,1),pres_8(k)*fact_8
+         endif
+         if(trim(rfld_S) == "ME")then
+            print*,'ERROR: 64 bits: Difference in heights is too large at'
+            print*,'k,gz(1,1),heights_8(k)*fact_8',k,px(1,1),pres_8(k)*fact_8
+         endif
+         print*,'ERROR: on FILE: ',trim(F_fst)
          return
       endif
    enddo
    deallocate(ip1s,px,p0,pres,pres_8)
-   
+
    print*,'   TEST OK!'
 
    ier=fstfrm(lu)

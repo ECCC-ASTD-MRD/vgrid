@@ -54,18 +54,18 @@ program constructor
    use vGrid_Descriptors, only:VGD_OK
    use Unit_Testing, only: ut_report
    implicit none
-   integer, parameter :: nversion=6
+   integer, parameter :: nversion=7
    integer stat,i,test_it
    logical :: OK=.true.
-   character(len=4), dimension(nversion) :: vcode_S=(/"5002","5003","5004","5005","5100","5999"/)
+   character(len=5), dimension(nversion) :: vcode_S=(/"5002","5003","5004","5005","5100","5999","21001"/)
 
    do i=1,nversion
       
-      print*,"============="//vcode_S(i)//"=============="
-      stat=test_it("data/dm_"//vcode_S(i)//"_from_model_run","data/dm_"//vcode_S(i)//"_ips.txt")
+      print*,"============="//trim(vcode_S(i))//"=============="
+      stat=test_it("data/dm_"//trim(vcode_S(i))//"_from_model_run","data/dm_"//trim(vcode_S(i))//"_ips.txt")
       if(stat.ne.VGD_OK)then
          OK=.false.
-         print*,'ERROR with ',vcode_S(i)
+         print*,'ERROR with ',trim(vcode_S(i))
       endif
    enddo
 

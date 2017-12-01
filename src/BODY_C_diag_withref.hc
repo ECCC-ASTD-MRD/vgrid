@@ -80,6 +80,15 @@
 	return(VGD_ERROR);
     }
     break;
+  case 21001:
+    if(double_interface){
+      if( C_compute_heights_21001_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8) == VGD_ERROR)
+	return(VGD_ERROR);
+    } else {
+      if( C_compute_heights_21001(self, ni, nj, nk, ip1_list, levels, sfc_field) == VGD_ERROR)
+	return(VGD_ERROR);
+    }
+    break;
   default:
     printf("(Cvgd) ERROR in %s, invalid kind or version: kind = %d, version = %d\n", proc_name, self->kind, self->version);
     return(VGD_ERROR);

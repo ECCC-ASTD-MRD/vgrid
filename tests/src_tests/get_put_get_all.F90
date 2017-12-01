@@ -24,19 +24,19 @@ program get_put_get_all
 
   implicit none
   integer :: i, test_it
-  integer, parameter :: nfiles=11 
+  integer, parameter :: nfiles=11
   character(len=200), dimension(nfiles) :: files=(/&
        "data/dm_1001_from_model_run",&
        "data/dm_1002_from_model_run",&
        "data/dm_2001_from_editfst",&
        "data/dm_5001_from_model_run",&
        "data/dm_5002_from_model_run",&
-       "data/dm_5002_from_model_run",&
        "data/dm_5003_from_model_run",&
        "data/dm_5004_from_model_run",&
        "data/dm_5005_from_model_run",&
        "data/dm_5100_from_model_run",&
-       "data/dm_5999_from_model_run"&
+       "data/dm_5999_from_model_run",&
+       "data/dm_21001_from_model_run"&
        /)
   
   if( vgd_putopt("ALLOW_SIGMA",.true.) == VGD_ERROR )then
@@ -98,7 +98,7 @@ integer function test_it(F_file, ind) result(status)
       if( vgd_get(vgd,key_S,intA) == VGD_ERROR )then
          ! Key DIPM and DIPT are not there for all Vcode
          if(key_S == "DIPM" .or. key_S == "DIPT")then
-            print*,'Error on Cvgd_get_int on DIPM or DIPT is normal for som Vcode'
+            print*,'Error on Cvgd_get_int on DIPM or DIPT is normal for some Vcode'
             cycle
          else
             return      
