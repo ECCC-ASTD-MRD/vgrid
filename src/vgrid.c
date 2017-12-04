@@ -28,6 +28,12 @@
 
 #define STR_INIT(str,len) if(len>1) memset(str,' ',len-1); if(len>0) str[len-1] = '\0'
 
+#define STDA76_N_LAYER 7
+static float stda76_tgrad[STDA76_N_LAYER]     = { -6.5E-3,    0.0,    1.0E-3, 2.8E-3, 0.0,    -2.8E-3, -2.0E-3 };
+static float stda76_zgrad[STDA76_N_LAYER + 1] = { 0., 11000., 20000., 32000., 47000., 51000.,  71000.,  84852. };
+static float stda76_sfc_temp = 273.15 +15;
+static float stda76_sfc_pres = 101325.;
+
 // Constants
 #define MAX_DESC_REC 10000      //maximum number of descriptor records in a single file
 #define MAX_VKIND    100
@@ -37,6 +43,13 @@
 
 // Options
 static int ALLOW_SIGMA = 0;
+
+// Don't want to depend on modelutls so define constante here.
+// These are not used to transform variables like T to GZ so it will not
+// produce any inconsistancies with data in fst files. 
+static float VGD_RGASD = 0.287050000000E+03;
+static float VGD_GRAV  = 0.980616000000E+01;
+static float VGD_TCDK  = 0.273150000000E+03;
 
 // Validity table for self
 #define VALID_TABLE_SIZE 12
@@ -269,6 +282,143 @@ static double c_get_error(char *key, int quiet) {
     printf("(Cvgd) ERROR in c_get_error, attempt to retrieve invalid key %s\n",key);
   }
   return(VGD_MISSING);
+}
+
+static int c_set_stda_layer(int ind, float Tk, float pk, float *zk, float *zkp, float *gammaT, float *pkp, char *zero_lapse_rate) {
+
+  //Andre PLante 2017
+  //
+  //Example of a Standard Atmophere Layer
+  //
+  //  \(pkp,zkp)
+  //   \  
+  //    \ gammaT (laspe rate in the layer)
+  //     \  
+  //      \(Tk,pk,zk) 
+  //
+  //Where
+  //      ind    (in)  is the index of the Standard Atmophere layer
+  //      gammaT (out) is the laspe rate in the layer ind
+  //      Tk     (in)  is the temperature at the base of the layer ind, it is specified by the user
+  //      pk     (in)  is the pressure    at the base of the layer ind, it is specified by the user
+  //      zk     (out) is the height      at the base of the layer ind, given by the Standard Atmophere
+  //      zkp    (out) is the height      at the top  of the layer ind, given by the Standard Atmophere
+  //      pkp    (out) is the pressure    at the top  of the layer ind, computed here with the above parameters
+  
+  static float epsilon = 1.e-6;
+
+  if( ind >=  STDA76_N_LAYER ){
+    printf("(Cvgd) ERROR in c_set_stda_layer, maximum layer excedded\n");    
+    return(VGD_ERROR);
+  }
+  *zero_lapse_rate = stda76_tgrad[ind] > -epsilon && stda76_tgrad[ind] < epsilon ;
+  *zk  = stda76_zgrad[ind];
+  *zkp = stda76_zgrad[ind+1];
+  *gammaT = stda76_tgrad[ind];
+  if( *zero_lapse_rate ){
+    *pkp = (float) pk * exp( -VGD_GRAV/(VGD_RGASD*Tk) * (*zkp-*zk) );
+  } else {
+    *pkp = (float) pk * exp( -VGD_GRAV/(VGD_RGASD*(*gammaT)) * log((*gammaT)*(*zkp-*zk)/Tk+1.) );
+  }
+  
+  return(VGD_OK);
+}
+
+int c_stda76_temp_from_press(vgrid_descriptor *self, int *i_val, int nl, float **temp){
+  int k, ind;
+  char zero_lapse_rate;
+  float pkp, Tk, pk, hgts_stda, zk, zkp, gammaT;
+  float *levs = NULL;
+  
+  levs = malloc( nl * sizeof(float) );
+  if(! levs){
+    printf("(Cvgd) ERROR in c_stda76_temp_from_press, problem allocating levs\n");
+    free(levs);
+    return(VGD_ERROR);
+  }
+  
+  if(! is_valid(self,ref_namel_valid) ){    
+    if( Cvgd_levels(self, 1, 1, nl, i_val, levs, &stda76_sfc_pres, 0) == VGD_ERROR){
+      printf("(Cvgd) ERROR in c_stda76_temp_from_press, problem with Cvgd_levels (computing pressure profile with one ref)\n");
+      return(VGD_ERROR);
+    }
+  } else {
+    if( Cvgd_levels_2ref(self, 1, 1, nl, i_val, levs, &stda76_sfc_pres, &stda76_sfc_pres, 0) == VGD_ERROR){
+      printf("(Cvgd) ERROR in c_stda76_temp_from_press, problem with Cvgd_levels (computing pressure profile with two refs)\n");
+      return(VGD_ERROR);
+    }
+  }
+  ind=0; pkp=-1.f;
+  // Start at Normal Temperature and Pressure
+  Tk  = stda76_sfc_temp;
+  pk  = stda76_sfc_pres;
+  if( c_set_stda_layer( ind, Tk, pk, &zk, &zkp, &gammaT, &pkp, &zero_lapse_rate) == VGD_ERROR ){
+    return(VGD_ERROR);
+  }  
+  for( k = nl-1; k >= 0; k--){
+    // Integrate the hypsometric equation, change temperature gradiant when height is above high boundary stda76_zgrad
+    while( levs[k] <= pkp){
+      // Current pressure level is above current stda layer
+      Tk = Tk + gammaT * (zkp - zk);
+      pk = pkp;
+      ind = ind++;
+      if( c_set_stda_layer( ind, Tk, pk, &zk, &zkp, &gammaT, &pkp, &zero_lapse_rate) == VGD_ERROR){
+	return(VGD_ERROR);
+      }
+    }
+    if( zero_lapse_rate ){
+      //hgts_stda = (float) zk - (VGD_RGASD*Tk)/VGD_GRAV * log(levs[k]/pk);
+      (*temp)[k] = Tk;
+    } else {
+      hgts_stda = (float) zk + Tk/gammaT * ( exp(-(VGD_RGASD*gammaT)/VGD_GRAV * log(levs[k]/pk )) - 1.f );
+      (*temp)[k] = Tk + gammaT*(hgts_stda-zk);
+    }
+  }
+  free(levs);
+  return(VGD_OK);
+}
+
+int c_stda76_temp_from_heights(vgrid_descriptor *self, int *i_val, int nl, float **temp){
+  int ind = 0, k;
+  float *levs = NULL;
+  float zero = 0.f, Tk;
+
+  levs = malloc( nl * sizeof(float) );
+  if(! levs){
+    printf("(Cvgd) ERROR in c_stda76_temp_from_press, problem allocating levs\n");
+    free(levs);
+    return(VGD_ERROR);
+  }
+  
+  if(! is_valid(self,ref_namel_valid) ){    
+    if( Cvgd_levels(self, 1, 1, nl, i_val, levs, &zero, 0) == VGD_ERROR){
+      printf("(Cvgd) ERROR in c_stda76_temp_from_heights, problem with Cvgd_levels (computing heights profile with one ref)\n");
+      return(VGD_ERROR);
+    }
+  } else {
+    if( Cvgd_levels_2ref(self, 1, 1, nl, i_val, levs, &zero, &zero, 0) == VGD_ERROR){
+      printf("(Cvgd) ERROR in c_stda76_temp_from_heights, problem with Cvgd_levels (computing heights profile with two refs)\n");
+      return(VGD_ERROR);
+    }
+  }
+  Tk = stda76_sfc_temp;
+  for( k = nl-1; k >= 0; k--){
+    // Change temperature gradiant when height is above high boundary stda76_zgrad
+    while( levs[k] >= stda76_zgrad[ind+1] ){
+      ind = ind++;
+      if( ind >= STDA76_N_LAYER ){
+	printf("(Cvgd) ERROR in c_stda76_temp_from_heights, maximum layer excedded\n");    
+	return(VGD_ERROR);
+      }      
+      Tk =  Tk + stda76_tgrad[ind-1] * (stda76_zgrad[ind] - stda76_zgrad[ind-1]);
+    }
+    // Complete the layer with current gradient and levs[k] height
+    (*temp)[k] =  Tk + stda76_tgrad[ind] * (levs[k] - stda76_zgrad[ind]);
+    //printf("k=%d, levs[k]=%f, (*temp)[k]=%f\n",k,levs[k],(*temp)[k]);
+  }
+  free(levs);
+  return(VGD_OK);
+
 }
 
 void Cvgd_table_shape(vgrid_descriptor *self, int **tshape) {
@@ -584,17 +734,11 @@ int Cvgd_vgdcmp(vgrid_descriptor *vgd1, vgrid_descriptor *vgd2) {
 }
 
 static double c_comp_diag_a_height(double pref_8, float height) {
-  float RGASD       =    0.287050000000E+03;
-  float GRAV        =    0.980616000000E+01;
-  float TCDK        =    0.273150000000E+03;
-  return log(pref_8) - GRAV*height/(RGASD*TCDK);
+  return log(pref_8) - VGD_GRAV*height/(VGD_RGASD*VGD_TCDK);
 }
 static double c_comp_diag_a_ip1(double pref_8, int ip1) {
-  float RGASD       =    0.287050000000E+03;
-  float GRAV        =    0.980616000000E+01;
-  float TCDK        =    0.273150000000E+03;
   int kind;
-  return log(pref_8) - GRAV * c_convip_IP2Level(ip1,&kind) / (RGASD*TCDK);
+  return log(pref_8) - VGD_GRAV * c_convip_IP2Level(ip1,&kind) / (VGD_RGASD*VGD_TCDK);
 }
 
 /*----------------------------------------------------------------------------
@@ -4903,4 +5047,26 @@ int Cvgd_write_desc (vgrid_descriptor *self, int unit) {
 
   return(VGD_OK);
 
+}
+
+int Cvgd_standard_atmosphere_1976_temp(vgrid_descriptor *self, int *i_val, int nl, float **temp){
+
+  if(! *temp){
+    *temp = malloc( nl * sizeof(float) );
+    if(! *temp){
+      printf("(Cvgd) ERROR in Cvgd_standard_atmosphere_1976_temp, problem allocating *temp\n");
+      return(VGD_ERROR);
+    }
+  }
+  if(! strcmp((*self).ref_name,"ME  ")){
+    if( c_stda76_temp_from_heights(self, i_val, nl, temp) == VGD_ERROR ){
+      return(VGD_ERROR);
+    }
+  } else {
+    if( c_stda76_temp_from_press(self, i_val, nl, temp) == VGD_ERROR ){
+      return(VGD_ERROR);
+    }
+  }
+
+  return(VGD_OK);
 }
