@@ -63,12 +63,18 @@ typedef struct vgrid_descriptor {
   double   *a_t_8;        // A-coefficients for thermodynamic levels
   double   *b_t_8;        // B-coefficients for thermodynamic levels
   double   *c_t_8;        // C-coefficients for thermodynamic levels
+  double   *a_w_8;        // A-coefficients for vertical-velocity levels
+  double   *b_w_8;        // B-coefficients for vertical-velocity levels
+  double   *c_w_8;        // C-coefficients for vertical-velocity levels
   int      *ip1_m;        // ip1 values for momentum levels
   int      *ip1_t;        // ip1 values for momentum levels
-  int      nl_m;          // Number of momentum      level (size of a_m_8, b_m_8 and ip1_m)
-  int      nl_t;          // Number ot thermodynamic level (size of a_t_8, b_t_8 and ip1_t)
+  int      *ip1_w;        // ip1 values for momentum levels
+  int      nl_m;          // Number of momentum      level
+  int      nl_t;          // Number ot thermodynamic level
+  int      nl_w;          // Number ot vertical volocity level
   float    dhm;           // Diag level Height (m) for Momentum variables UU,VV
   float    dht;           // Diag level Height (t) for Thermo variables TT,HU, etc
+  float    dhw;           // Diag level Height (m) for vertical-velocity variables WT1 ZZ
   char*    ref_name;      // Reference field name
   char*    ref_namel;     // Reference field name
   float    rcoef1;        // Rectification coefficient
@@ -122,8 +128,10 @@ int Cvgd_new_build_vert_5999(vgrid_descriptor **self, int ip1, int ip2,
 			     double *a_m_8, double *b_m_8, int *ip1_m, int nk);
 int Cvgd_new_build_vert_21001(vgrid_descriptor **self, int ip1, int ip2, float rcoef1, float rcoef2, 
 			      double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int nl);
+int Cvgd_new_build_vert_21002(vgrid_descriptor **self, int ip1, int ip2, float rcoef1, float rcoef2, 
+			      double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, double *a_w_8, double *b_w_8, int *ip1_m, int *ip1_t, int *ip1_w, int nl);
 int C_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, int ip1, int ip2, double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
-			double *a_m_8, double *b_m_8, double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8, int *ip1_m, int *ip1_t, int nl_m, int nl_t);
+		     double *a_m_8, double *b_m_8, double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8, double *a_w_8, double *b_w_8, double *c_w_8, int *ip1_m, int *ip1_t, int *ip1_w, int nl_m, int nl_t, int nl_w);
 int Cvgd_vgdcmp(vgrid_descriptor *vgd1, vgrid_descriptor *vgd2);
 void Cvgd_free(vgrid_descriptor **self);
 int Cvgd_getopt_int(char *key, int *value, int quiet);
@@ -141,7 +149,7 @@ int Cvgd_putopt_int(char *key, int value);
 int Cvgd_put_int(vgrid_descriptor **self, char *key, int value);
 int C_new_gen(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
 	      double *ptop_8, double *pref_8, double *ptop_out_8,
-		 int ip1, int ip2, float *dhm, float *dht, int avg);
+	      int ip1, int ip2, float *dhm, float *dht, float *dhw, int avg);
 int Cvgd_new_gen(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2,
 	      double *ptop_8, double *pref_8, double *ptop_out_8,
 		 int ip1, int ip2, float *dhm, float *dht, int avg);
@@ -154,6 +162,7 @@ int Cvgd_new_gen_5002(vgrid_descriptor **self, float *hyb, int size_hyb, double 
 int Cvgd_new_gen_5005(vgrid_descriptor **self, float *hyb, int size_hyb, double pref_8, double *ptop_out_8, float rcoef1, float rcoef2, int ip1, int ip2, float dhm, float dht );
 int Cvgd_new_gen_5100(vgrid_descriptor **self, float *hyb, int size_hyb, double pref_8, double *ptop_out_8, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, int avg);
 int Cvgd_new_gen_21001(vgrid_descriptor **self, float *hyb, int size_hyb, float rcoef1, float rcoef2, int ip1, int ip2, float dhm, float dht);
+int Cvgd_new_gen_21002(vgrid_descriptor **self, float *hyb, int size_hyb, float rcoef1, float rcoef2, int ip1, int ip2, float dhm, float dht, float dhw);
 
 int Cvgd_new_read(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind, int version);
 int Cvgd_write_desc (vgrid_descriptor *self, int unit);

@@ -231,24 +231,24 @@ module vGrid_Descriptors
       end function f_new_from_table
 
       integer function f_new_gen(vgd,kind,version,hyb_CP,size_hyb,rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP, &
-           ip1,ip2,dhm_CP,dht_CP,avg) bind(c, name='C_new_gen')
+           ip1,ip2,dhm_CP,dht_CP,dhw_CP,avg) bind(c, name='C_new_gen')
          use iso_c_binding, only : c_ptr, c_int
          type(c_ptr) :: vgd
          integer (c_int), value :: kind, version, size_hyb
          type(c_ptr), value :: hyb_CP,rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP
-         type(c_ptr), value :: dhm_CP,dht_CP
+         type(c_ptr), value :: dhm_CP,dht_CP,dhw_CP
          integer (c_int), value :: ip1,ip2,avg
       end function f_new_gen
       
       integer function f_new_build_vert(vgd,kind,version,nk,ip1,ip2, &
            ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, &
-           a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, ip1_m_CP, ip1_t_CP, nl_m, nl_t) bind(c, name='C_new_build_vert')
+           a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, ip1_m_CP, ip1_t_CP, ip1_w_CP, nl_m, nl_t, nl_w) bind(c, name='C_new_build_vert')
          use iso_c_binding, only : c_ptr, c_int
          type(c_ptr) :: vgd
          integer (c_int), value :: kind,version,nk,ip1,ip2
          type(c_ptr), value :: ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP
-         type(c_ptr), value :: a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, ip1_m_CP, ip1_t_CP
-         integer (c_int), value :: nl_m, nl_t
+         type(c_ptr), value :: a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, ip1_m_CP, ip1_t_CP, ip1_w_CP
+         integer (c_int), value :: nl_m, nl_t, nl_w
       end function f_new_build_vert
 
       subroutine f_vgd_free(vgd_CP) bind(c, name='Cvgd_free')
@@ -439,7 +439,7 @@ contains
       
     end function new_from_table
 
-   integer function new_gen(self,kind,version,hyb,rcoef1,rcoef2,rcoef3,rcoef4,ptop_8,pref_8,ptop_out_8,ip1,ip2,stdout_unit,dhm,dht,avg_L) result(status)
+   integer function new_gen(self,kind,version,hyb,rcoef1,rcoef2,rcoef3,rcoef4,ptop_8,pref_8,ptop_out_8,ip1,ip2,stdout_unit,dhm,dht,dhw,avg_L) result(status)
       implicit none
 
       ! Coordinate constructor - build vertical descriptor from hybrid coordinate entries
@@ -452,15 +452,14 @@ contains
       real*8, target, optional, intent(in) :: pref_8       !Reference-level pressure (Pa)
       integer, target, optional, intent(in) :: ip1,ip2     !IP1,2 values for FST file record [0,0]
       integer, target, optional, intent(in) :: stdout_unit !Unit number for verbose output [STDERR]
-      real, target, optional, intent(in) :: dhm,dht        !Diag levels Height for Momentum/Thermo vaiables
+      real, target, optional, intent(in) :: dhm,dht,dhw    !Diag levels Height for Momentum/Thermo/Vertical-Velocity vaiables
       logical, optional :: avg_L                           !Obtain thermo A, B and C by averaging momentum ones (Temporary for Vcode 5100)
                                                            !   If this option becoms permenant, some code will have to be added
                                                            !   to check this option for vcode 5100 only.
       ! Local variables
       type(c_ptr) :: hyb_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, ptop_8_CP, ptop_out_8_CP, pref_8_CP
-      type(c_ptr) :: stdout_unit_CP, dhm_CP, dht_CP
+      type(c_ptr) :: stdout_unit_CP, dhm_CP, dht_CP, dhw_CP
       integer :: my_ip1, my_ip2, my_avg
-
       hyb_CP = c_loc(hyb)
 
       status = VGD_ERROR;
@@ -527,6 +526,11 @@ contains
       else
          dht_CP = C_NULL_PTR
       endif
+      if(present(dhw))then
+         dhw_CP = c_loc(dhw)
+      else
+         dhw_CP = C_NULL_PTR
+      endif
       my_avg=1
       if(present(avg_L))then
          if(avg_L)then
@@ -540,7 +544,7 @@ contains
          self%cptr = C_NULL_PTR
       endif
 
-      if(f_new_gen(self%cptr,kind,version,hyb_CP,size(hyb),rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP,my_ip1,my_ip2,dhm_CP,dht_CP,my_avg) == VGD_ERROR)then
+      if(f_new_gen(self%cptr,kind,version,hyb_CP,size(hyb),rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP,my_ip1,my_ip2,dhm_CP,dht_CP,dhw_CP,my_avg) == VGD_ERROR)then
          print*,'(F_vgd) ERROR in new_gen, problem with f_new_gen'
          return
       endif
@@ -549,7 +553,7 @@ contains
 
    integer function new_build_vert(self,kind,version,nk,ip1,ip2, &
         ptop_8,pref_8,rcoef1,rcoef2,rcoef3,rcoef4,a_m_8,b_m_8,a_t_8,b_t_8, &
-        ip1_m,ip1_t,c_m_8,c_t_8) result(status)
+        ip1_m,ip1_t,c_m_8,c_t_8,a_w_8,b_w_8,c_w_8,ip1_w) result(status)
       ! Coordinate constructor - build vertical descriptor from arguments
       type(vgrid_descriptor) :: self                    !Vertical descriptor instance    
       integer, intent(in) :: kind,version               !Kind,version to create
@@ -558,22 +562,23 @@ contains
       real,target , optional, intent(in) :: rcoef1,rcoef2,rcoef3,rcoef4 !R-coefficient values for rectification
       real*8,target , optional, intent(in) :: ptop_8            !Top-level pressure (Pa)
       real*8,target , optional, intent(in) :: pref_8            !Reference-level pressure (Pa)
-      real*8,target , optional, dimension(:) :: a_m_8,a_t_8     !A-coefficients for momentum(m),thermo(t) levels
-      real*8,target , optional, dimension(:) :: b_m_8,b_t_8     !B-coefficients for momentum(m),thermo(t) levels
-      real*8,target , optional, dimension(:) :: c_m_8,c_t_8     !C-coefficients for momentum(m),thermo(t) levels
-      integer,target , optional, dimension(:) :: ip1_m,ip1_t    !Level ID (IP1) for momentum(m),thermo(t) levels
+      real*8,target , optional, dimension(:) :: a_m_8,a_t_8,a_w_8 !A-coefficients for momentum(m),thermo(t) and Vertical-Velocity levels
+      real*8,target , optional, dimension(:) :: b_m_8,b_t_8,b_w_8 !B-coefficients for momentum(m),thermo(t) and Vertical-Velocity levels
+      real*8,target , optional, dimension(:) :: c_m_8,c_t_8,c_w_8 !C-coefficients for momentum(m),thermo(t) and Vertical-Velocity levels
+      integer,target , optional, dimension(:) :: ip1_m,ip1_t,ip1_w !Level ID (IP1) for momentum(m),thermo(t) and Vertical-Velocity levels
 
       ! Assign optional argument to C_NULL_PTR    
 
       ! Local variables
       type(c_ptr) :: rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, ptop_8_CP, pref_8_CP
-      type(c_ptr) :: a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, ip1_m_CP, ip1_t_CP
-      integer l_ip1,l_ip2,nl_m, nl_t
+      type(c_ptr) :: a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, ip1_m_CP, ip1_t_CP, ip1_w_CP
+      integer l_ip1,l_ip2,nl_m, nl_t, nl_w
 
       status = VGD_ERROR
 
       nl_m=nk
       nl_t=-1
+      nl_w=-1
 
       if(present(ip1))then
          l_ip1 = ip1
@@ -647,6 +652,22 @@ contains
       else
          c_t_8_CP = C_NULL_PTR
       endif
+      if(present(a_w_8))then
+         a_w_8_CP = c_loc(a_w_8)
+         nl_w = size(a_w_8)
+      else
+         a_w_8_CP = C_NULL_PTR
+      endif
+      if(present(b_w_8))then
+         b_w_8_CP = c_loc(b_w_8)
+      else
+         b_w_8_CP = C_NULL_PTR
+      endif
+      if(present(c_w_8))then
+         c_w_8_CP = c_loc(c_w_8)
+      else
+         c_w_8_CP = C_NULL_PTR
+      endif
       if(present(ip1_m))then
          ip1_m_CP = c_loc(ip1_m)
       else
@@ -657,9 +678,15 @@ contains
       else
          ip1_t_CP = C_NULL_PTR
       endif
+      if(present(ip1_w))then
+         ip1_w_CP = c_loc(ip1_w)
+      else
+         ip1_w_CP = C_NULL_PTR
+      endif
       if( f_new_build_vert(self%cptr,kind,version,nk,l_ip1,l_ip2, &
            ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, &
-           a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, ip1_m_CP, ip1_t_CP, nl_m, nl_t) == VGD_ERROR )then
+           a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, &
+           ip1_m_CP, ip1_t_CP, ip1_w_CP, nl_m, nl_t, nl_w) == VGD_ERROR )then
          print*,'(F_vgd) ERROR in new_build_vert, problem with c_new_build_vert',VGD_ERROR
          return
       endif
@@ -764,6 +791,7 @@ contains
       
       ier = f_vgdcmp(vgd1%cptr, vgd2%cptr)
       if( ier /= 0 )then
+         print*,'Return code is',ier
          return
       end if
 
@@ -1774,18 +1802,19 @@ contains
             return
          endif
       case ('VIPT')
-         if (is_valid(self,"ip1_t_valid_get")) then
-            istat = get_int(self,'NL_T',nl_)
-            istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(VIPT in get_int_1d)')
-            if (istat /= 0) return
-            value_CP = c_loc(value(1))
-            status = f_get_int_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,nk_CP,l_quiet)
-         else
-            error = int(get_error(key,my_quiet))
-            return
-         endif
+         istat = get_int(self,'NL_T',nl_)
+         istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(VIPT in get_int_1d)')
+         if (istat /= 0) return
+         value_CP = c_loc(value(1))
+         status = f_get_int_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,nk_CP,l_quiet)
+      case ('VIPW')
+         istat = get_int(self,'NL_W',nl_)
+         istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(VIPT in get_int_1d)')
+         if (istat /= 0) return
+         value_CP = c_loc(value(1))
+         status = f_get_int_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,nk_CP,l_quiet)
       case DEFAULT
-         write(for_msg,*) 'invalid key '//trim(key)//' given to gd_get (int 1D)'
+         write(for_msg,*) 'invalid key '//trim(key)//' given to vgd_get (int 1D)'
          call msg(level_msg,VGD_PRFX//for_msg)
          return
       end select
@@ -1882,17 +1911,19 @@ contains
             return
          endif
       case ('VCDT')
-         if (is_valid(self, "ip1_t_valid_get")) then
-            istat = get_int(self,'NL_T',nl_)
-            istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(VCDT in get_real_1d)')
-            if (istat /= 0) return
-            value_CP = c_loc(value(1))
-            istat = f_get_real_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
-            if (istat == VGD_ERROR) return
-         else
-            error = int(get_error(key,my_quiet))
-            return
-         endif
+         istat = get_int(self,'NL_T',nl_)
+         istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(VCDT in get_real_1d)')
+         if (istat /= 0) return
+         value_CP = c_loc(value(1))
+         istat = f_get_real_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
+         if (istat == VGD_ERROR) return
+      case ('VCDW')
+         istat = get_int(self,'NL_W',nl_)
+         istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(VCDW in get_real_1d)')
+         if (istat /= 0) return
+         value_CP = c_loc(value(1))
+         istat = f_get_real_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
+         if (istat == VGD_ERROR) return
       case ('VCRD')
          if (is_valid(self,"ip1_m_valid")) then
             write(for_msg,*) 'depricated key '//trim(key)//', use VCDM instead'
@@ -1903,7 +1934,7 @@ contains
             return
          endif
       case DEFAULT
-         write(for_msg,*) 'invalid key '//trim(key)//' given to gd_get (real 1D)'
+         write(for_msg,*) 'invalid key '//trim(key)//' given to vgd_get (real 1D)'
          call msg(level_msg,VGD_PRFX//for_msg)
          return
       end select
@@ -2016,16 +2047,11 @@ contains
             return
          endif
       case ('CA_T')
-         if (is_valid(self,"a_t_8_valid_get")) then
-            istat = get_int(self,'NL_T',nl_)
-            istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CA_T in get_real8_1d)')         
-            if (istat /= 0) return
-            value_CP = c_loc(value(1))
-            status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)            
-         else
-            error = int(get_error(key,my_quiet))
-            return
-         endif
+         istat = get_int(self,'NL_T',nl_)
+         istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CA_T in get_real8_1d)')         
+         if (istat /= 0) return
+         value_CP = c_loc(value(1))
+         status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)            
       case ('CC_T')
          if (is_valid(self,"c_t_8_valid")) then
             istat = get_int(self,'NL_T',nl_)
@@ -2038,18 +2064,25 @@ contains
             return
          endif
       case ('CB_T')
-         if (is_valid(self,"b_t_8_valid_get")) then
-            istat = get_int(self,'NL_T',nl_)
-            istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CB_T in get_real8_1d)')         
-            if (istat /= 0) return
-            value_CP = c_loc(value(1))
-            status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
-         else
-            error = int(get_error(key,my_quiet))
-            return
-         endif
+         istat = get_int(self,'NL_T',nl_)
+         istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CB_T in get_real8_1d)')         
+         if (istat /= 0) return
+         value_CP = c_loc(value(1))
+         status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
+      case ('CA_W')
+         istat = get_int(self,'NL_W',nl_)
+         istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CA_W in get_real8_1d)')         
+         if (istat /= 0) return
+         value_CP = c_loc(value(1))
+         status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
+      case ('CB_W')
+         istat = get_int(self,'NL_W',nl_)
+         istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CB_W in get_real8_1d)')         
+         if (istat /= 0) return
+         value_CP = c_loc(value(1))
+         status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
       case DEFAULT
-         write(for_msg,*) 'invalid key '//trim(key)//' given to gd_get (real8 1D)'
+         write(for_msg,*) 'invalid key '//trim(key)//' given to vgd_get (real8 1D)'
          call msg(level_msg,VGD_PRFX//for_msg)
          return
       end select
@@ -2103,7 +2136,7 @@ contains
          value_CP = c_loc(value(1,1,1))
          status = f_get_real8_3d(self%cptr,"VTBL"//C_NULL_CHAR,value_CP,C_NULL_PTR,C_NULL_PTR,C_NULL_PTR,l_quiet)         
       case DEFAULT
-         write(for_msg,*) 'invalid key '//trim(key)//' given to gd_get (real8 3D)'
+         write(for_msg,*) 'invalid key '//trim(key)//' given to vgd_get (real8 3D)'
          call msg(level_msg,VGD_PRFX//for_msg)
          return
       end select
@@ -2123,7 +2156,7 @@ contains
       ! Internal variables
       integer :: l_quiet
       character(len=KEY_LENGTH) :: my_key
-      character(kind=c_char) :: my_char(13)
+      character(kind=c_char) :: my_char(100)
       integer :: i, nchar
       logical :: my_quiet, end_L
 

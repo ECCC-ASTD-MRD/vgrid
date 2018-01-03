@@ -85,9 +85,7 @@ if(.false.)then
   call flush(6)
 endif
   ! Construct a new set of vertical coordinate descriptors 5002
-print*,'ANDRE debut'
   stat = vgd_new(vgd,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref,ip1=0)
-print*,'ANDRE fin'
 
   file='data/data_constructor_gen_5002.txt'
   stat = test_5002(vgd,file,write_control_L,stat)
