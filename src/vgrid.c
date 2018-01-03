@@ -2066,14 +2066,9 @@ static int c_encode_vert_5999(vgrid_descriptor **self,int nk){
   (*self)->table[0] = (*self)->kind;
   (*self)->table[1] = (*self)->version;
   (*self)->table[2] = skip;
-
-  (*self)->table[3] = (*self)->ptop_8;
+  flip_transfer_c2d((*self)->ref_name, &((*self)->table[3]));
   (*self)->table[4] = 0.;
   (*self)->table[5] = 0.;
-  
-  flip_transfer_c2d((*self)->ref_name, &((*self)->table[6]));
-  (*self)->table[7] = 0.;
-  (*self)->table[8] = 0.;
 
   int ind = 6;
   for ( k = 0; k < nk; k++){
