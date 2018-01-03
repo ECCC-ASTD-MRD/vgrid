@@ -552,7 +552,7 @@ integer function check_build_21001(F_vgd) result(istat)
   implicit none
   type(vgrid_descriptor), intent(in) :: F_vgd
   
-  ! Local varibales
+  ! Local variables
   integer :: kind, version, ier
   integer, dimension(:), pointer :: ip1_m, ip1_t
   real :: rcoef1, rcoef2

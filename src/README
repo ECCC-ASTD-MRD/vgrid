@@ -10,19 +10,17 @@ To add a new vertical coordinate type:
 3- Add elements to the structure (typedef struct vgrid_descriptor) if necessary and initialized them
       C: vgrid.h, c_vgd_construct
 
-4- Add a branch to your new Vcode in the build constructor, add new required inputs if any
-      Fortran : new_build_vert
-      C: C_new_build_vert
-      Test: add this Vcode in tests constructor_build_all.F90
-            To run this test you will need a model output with P0, TT, PX and UU and the new !!
-	    Run the GEM model with your new library in order to produce this file.
-   
-5- Add a branch to your new Vcode new_gen
+4- Add a branch to your new Vcode new_gen
      Fortran: new_gen, add new required inputs if any
      C: C_new_gen, add new required inputs if any
         Add new interface Cvgd_new_gen_(Vcode)
      Test: add test e.g. constructor_gen_5100.F90
 
+5- Add a branch to your new Vcode in the build constructor, add new required inputs if any
+      Fortran : new_build_vert
+      C: C_new_build_vert
+      Test: add this Vcode in tests constructor_build_all.F90 see point 9.
+              
 6- Write the encoder for your new Vcode
       C: e.g. c_encode_vert_5002
       Test: constructor_build_all.F90 constructor_gen_*
@@ -35,6 +33,8 @@ To add a new vertical coordinate type:
       Tests: put_*
 
 9- Generate a file that contains your new coordinate record
+      To run the tests you will need a model output with P0, UU, TT, WT1, PX, GZ and the new !!
+      Run the GEM model with your new library in order to produce this file.
 
 10- Write a decoder for your new Vcode (e.g. c_decode_vert_5002)
        Tests: constructor_table    
@@ -55,7 +55,6 @@ To add a new vertical coordinate type:
 
 16- Add new elements to the structure if any in the garbage_collection function
 
-Write/amend tests cases to tests the added feature before you add the feature, make sure the test fails before the
+Write/amend tests cases to tests the added feature before you add the feature, make sure the tests fail before the
 code is implemented to make sure the tests are affective.
 Leave tests in tests/src directory (git add your_new_test; git commit -m 'Add test for Vcode xyz'.
-

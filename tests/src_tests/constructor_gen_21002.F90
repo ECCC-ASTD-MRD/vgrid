@@ -44,18 +44,18 @@ program constructor
   logical, parameter :: write_control_L=.false.
   character (len=256) :: file
 
-  ! Construct a new set of vertical coordinate descriptors 21001 Gal-Chen
-  if( vgd_new(d,kind=21,version=1,hyb=hgts,rcoef1=rcoef1,rcoef2=rcoef2,dhm=10.0,dht=1.5) == VGD_ERROR )OK=.false.
+  ! Construct a new set of vertical coordinate descriptors 21002 hyb heights on Lorenz grid
+  if( vgd_new(d,kind=21,version=2,hyb=hgts,rcoef1=rcoef1,rcoef2=rcoef2,dhm=10.0,dht=1.5,dhw=0.) == VGD_ERROR )OK=.false.
   if( vgd_print(d,convip_L=.true.) == VGD_ERROR )then
      print*,'ERROR'
      stop
   endif
-  if( vgd_print(21001) == VGD_ERROR )then
+  if( vgd_print(21002) == VGD_ERROR )then
      print*,'ERROR'
      stop
   endif
 
-  file='data/data_constructor_gen_21001.txt'
+  file='data/data_constructor_gen_21002.txt'
   stat = test_hgts(d,file,write_control_L)
   if(stat.eq.VGD_ERROR)OK=.false.
 
@@ -75,14 +75,14 @@ integer function test_hgts(F_d,F_file,F_write_control_L) result(istat)
    !
    ! Local variable
    !
-   real, dimension(:), pointer :: vcdm,vcdt,work
-   real*8, dimension(:), pointer :: b_m_8,a_m_8,b_t_8,a_t_8,work_8
-   integer, dimension(:), pointer :: vipm,vipt,work_i
-   integer :: nl_m,nl_t,k,nk,kind,vers,ip1,my_ip1
+   real, dimension(:), pointer :: vcdm,vcdt,vcdw,work
+   real*8, dimension(:), pointer :: b_m_8,a_m_8,b_t_8,a_t_8,b_w_8,a_w_8,work_8
+   integer, dimension(:), pointer :: vipm,vipt,vipw,work_i
+   integer :: nl_m,nl_t,nl_w,k,nk,kind,vers,ip1,my_ip1
    real(kind=8), dimension(:,:,:), pointer :: table
    type (vgrid_descriptor) :: vgrid_rebuilt
 
-   nullify(vcdm,vcdt,work,a_m_8,b_m_8,a_t_8,b_t_8,work_8,vipm,vipt,work_i,table)
+   nullify(vcdm,vcdt,vcdw,work,a_m_8,b_m_8,a_t_8,b_t_8,a_w_8,b_w_8,work_8,vipm,vipt,vipw,work_i,table)
 
    istat=VGD_ERROR
 
@@ -103,14 +103,19 @@ integer function test_hgts(F_d,F_file,F_write_control_L) result(istat)
    if( vgd_get(F_d,key='VERS - vertical coordinate version'  ,value=vers)   == VGD_ERROR) return
    if( vgd_get(F_d,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8)  == VGD_ERROR) return
    if( vgd_get(F_d,key='CA_T - vertical A coefficient (t)'   ,value=a_t_8)  == VGD_ERROR) return
+   if( vgd_get(F_d,key='CA_W - vertical A coefficient (w)'   ,value=a_w_8)  == VGD_ERROR) return
    if( vgd_get(F_d,key='CB_M - vertical B coefficient (m)'   ,value=b_m_8)  == VGD_ERROR) return
    if( vgd_get(F_d,key='CB_T - vertical B coefficient (t)'   ,value=b_t_8)  == VGD_ERROR) return
+   if( vgd_get(F_d,key='CB_W - vertical B coefficient (w)'   ,value=b_w_8)  == VGD_ERROR) return
    if( vgd_get(F_d,key='VIPM - level ip1 list (m)'           ,value=vipm)   == VGD_ERROR) return
    if( vgd_get(F_d,key='VIPT - level ip1 list (t)'           ,value=vipt)   == VGD_ERROR) return
+   if( vgd_get(F_d,key='VIPW - level ip1 list (w)'           ,value=vipw)   == VGD_ERROR) return
    if( vgd_get(F_d,key='VCDM - vertical coordinate (m)'      ,value=vcdm)   == VGD_ERROR) return
    if( vgd_get(F_d,key='VCDT - vertical coordinate (t)'      ,value=vcdt)   == VGD_ERROR) return
+   if( vgd_get(F_d,key='VCDW - vertical coordinate (w)'      ,value=vcdw)   == VGD_ERROR) return
    if( vgd_get(F_d,key='NL_M - Number of vertical levels (m)',value=nl_m)   == VGD_ERROR) return
    if( vgd_get(F_d,key='NL_T - Number of vertical levels (t)',value=nl_t)   == VGD_ERROR) return
+   if( vgd_get(F_d,key='NL_W - Number of vertical levels (w)',value=nl_w)   == VGD_ERROR) return
    if( vgd_get(F_d,key='IP_1 - record ip1'                   ,value=ip1)    == VGD_ERROR) return
    print*,'TESTING ',kind*1000+vers
 
@@ -118,12 +123,16 @@ integer function test_hgts(F_d,F_file,F_write_control_L) result(istat)
      open(unit=10,file=F_file)
      write(10,*)a_m_8
      write(10,*)a_t_8
+     write(10,*)a_w_8
      write(10,*)b_m_8
      write(10,*)b_t_8
+     write(10,*)b_w_8
      write(10,*)vipm
      write(10,*)vipt
+     write(10,*)vipw
      write(10,*)vcdm
      write(10,*)vcdt
+     write(10,*)vcdw
      write(10,*)ip1
      close(10)
   endif
@@ -137,6 +146,10 @@ integer function test_hgts(F_d,F_file,F_write_control_L) result(istat)
   if(nl_t.ne.size(b_t_8))then
      print*,'wrong size with NL_T, got',nl_t,' should be ',size(b_t_8)
      istat=VGD_ERROR
+  if(nl_w.ne.size(b_w_8))then
+     print*,'wrong size with NL_W, got',nl_w,' should be ',size(b_w_8)
+     istat=VGD_ERROR
+  endif
   endif
 
   nk=nl_m
@@ -185,6 +198,26 @@ integer function test_hgts(F_d,F_file,F_write_control_L) result(istat)
      endif
   enddo
 
+  print*,'Reading A W'
+  read(10,*)work_8
+  do k=1,nk
+     if(a_w_8(k).eq.0.)then
+        if(abs(work_8(k)-a_w_8(k))>100.*epsilon(1.))then
+           istat=VGD_ERROR
+           print*,'Probleme avec A W, pas dans les limites tollerees'
+           print*,work_8(k),'vs'
+           print*,a_w_8(k)
+        endif
+     else
+        if(abs(work_8(k)-a_w_8(k))/a_w_8(k)>100.*epsilon(1.))then
+           istat=VGD_ERROR
+           print*,'Probleme avec A W, pas dans les limites tollerees'
+           print*,work_8(k),'vs'
+           print*,a_w_8(k)
+        endif
+     endif
+  enddo
+  
   ! Check B
   print*,'Reading B M'
   read(10,*)work_8
@@ -220,6 +253,23 @@ integer function test_hgts(F_d,F_file,F_write_control_L) result(istat)
         endif
      endif
   enddo
+  print*,'Reading B W'
+  read(10,*)work_8
+  do k=1,nk
+     if(b_w_8(k).eq.0.)then
+        if(work_8(k).ne.0.)then
+           istat=VGD_ERROR
+           print*,'Probleme avec B W, pas egal a zero ',work_8(k)
+        endif
+     else
+        if(abs(work_8(k)-b_w_8(k))/b_w_8(k)>100.*epsilon(1.))then
+           istat=VGD_ERROR
+           print*,'Probleme avec B W, pas dans les limites tollerees'
+           print*,work_8(k),'vs'
+           print*,b_w_8(k)
+        endif
+     endif
+  enddo
 
   ! Check IPs
   allocate(work_i(size(vipm)))
@@ -241,6 +291,16 @@ integer function test_hgts(F_d,F_file,F_write_control_L) result(istat)
         print*,'Probleme avec IP T:'
         print*,work_i(k),'vs'
         print*,vipt(k)
+     endif
+  enddo
+  print*,'Reading IP W'
+  read(10,*)work_i
+  do k=1,nk
+     if(work_i(k).ne.vipw(k))then
+        istat=VGD_ERROR
+        print*,'Probleme avec IP W:'
+        print*,work_i(k),'vs'
+        print*,vipw(k)
      endif
   enddo
 
@@ -286,6 +346,26 @@ integer function test_hgts(F_d,F_file,F_write_control_L) result(istat)
      endif
   enddo
 
+  print*,'Reading VCDW'
+  read(10,*)work
+  do k=1,nk
+     if(vcdw(k).eq.0.)then
+        if(abs(work(k)-vcdw(k))>100.*epsilon(vcdw(k)))then
+           istat=VGD_ERROR
+           print*,'Probleme avec vcdm, pas dans les limites tollerees'
+           print*,work(k),'vs'
+           print*,vcdw(k)
+        endif
+     else
+        if(abs(work(k)-vcdw(k))/vcdw(k)>100.*epsilon(vcdw(k)))then
+           istat=VGD_ERROR
+           print*,'Probleme avec vcdw, pas dans les limites tollerees'
+           print*,work(k),'vs'
+           print*,vcdw(k)
+        endif
+     endif
+  enddo  
+
   print*,'Reading ip1'
   read(10,*)my_ip1
   if(my_ip1.ne.ip1)then
@@ -295,6 +375,6 @@ integer function test_hgts(F_d,F_file,F_write_control_L) result(istat)
 
   close(10)
 
-  deallocate(vcdm,vcdt,work,a_m_8,b_m_8,a_t_8,b_t_8,work_8,vipm,vipt,work_i)
+  deallocate(vcdm,vcdt,vcdw,work,a_m_8,b_m_8,a_t_8,b_t_8,a_w_8,b_w_8,work_8,vipm,vipt,vipw,work_i)
 
 end function test_hgts
