@@ -34,8 +34,8 @@ def _make(b):
              echo \"Maintainer: cmdn (A. Plante)\"                                                                >> ${CONTROL_FILE}
              echo \"BuildInfo: git clone ${REMOTE}\"                                                              >> ${CONTROL_FILE}
              echo \"           cd in new directory created\"                                                      >> ${CONTROL_FILE}
-             echo \"           git checkout -b temp ${BH_PULL_SOURCE_GIT_BRANCH}"\                                >> ${CONTROL_FILE}
-             echo \"           # or git checkout -b temp $(git rev-parse HEAD)"\                                  >> ${CONTROL_FILE}
+             echo \"           git checkout -b temp ${BH_PULL_SOURCE_GIT_BRANCH}\"                                >> ${CONTROL_FILE}
+             echo \"           # or git checkout -b temp $(git rev-parse HEAD)\"                                  >> ${CONTROL_FILE}
              echo \"           cd src\"                                                                           >> ${CONTROL_FILE}
              echo \"           . setup.dot\"                                                                      >> ${CONTROL_FILE}
              echo \"           make\"                                                                             >> ${CONTROL_FILE}
