@@ -5,6 +5,19 @@
   }
   
   switch(self->vcode) {
+  case 1:
+    if( dpidpis ){
+      printf("(Cvgd) ERROR: dpidpis not supported for vertical coordinate 1\n");
+      return(VGD_ERROR);
+    }
+    if(double_interface){
+      if( C_compute_heights_0001_8(self, ni, nj, nk, ip1_list, levels_8) == VGD_ERROR)
+	return(VGD_ERROR);
+    } else {
+      if( C_compute_heights_0001(self, ni, nj, nk, ip1_list, levels) == VGD_ERROR)
+	return(VGD_ERROR);
+    }
+    break;    
   case 1001:
     if(double_interface){
       if( C_compute_pressure_1001_1002_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log) == VGD_ERROR)
