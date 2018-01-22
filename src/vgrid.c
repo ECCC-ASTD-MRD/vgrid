@@ -1078,31 +1078,40 @@ static int C_compute_pressure_1003_5001(vgrid_descriptor *self, int ni, int nj, 
 
 static int C_compute_pressure_5002_5003_5004_5005_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log, int dpidpis) {
   char proc_name[] = "C_compute_pressure_5002_5003_5004_5005_8";
+#define REAL_8 1
 #include "BODY_C_compute_pressure_5002_5003_5004_5005.hc"
+#undef REAL_8
 }
 
 static int C_compute_pressure_5002_5003_5004_5005(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log, int dpidpis) {
   char proc_name[] = "C_compute_pressure_5002_5003_5004_5005";
+#undef REAL_8
 #include "BODY_C_compute_pressure_5002_5003_5004_5005.hc"
 }
 
 static int C_compute_pressure_5100_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, double *sfc_field_ls, int in_log, int dpidpis) {
   char proc_name[] = "C_compute_pressure_5100_8";
+#define REAL_8 1
 #include "BODY_C_compute_pressure_5100.hc"
+#undef REAL_8
 }
 
 static int C_compute_pressure_5100(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, float *sfc_field_ls, int in_log, int dpidpis) {
   char proc_name[] = "C_compute_pressure_5100";
+#undef REAL_8
 #include "BODY_C_compute_pressure_5100.hc"
 }
 
 static int C_compute_heights_21001_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field) {
   char proc_name[] = "C_compute_heights_21001_8";
+#define REAL_8 1
 #include "BODY_C_compute_heights_21001.hc"
+#undef REAL_8
 }
 
 static int C_compute_heights_21001(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field) {
   char proc_name[] = "C_compute_heights_21001";
+#undef REAL_8
 #include "BODY_C_compute_heights_21001.hc"
 }
 
