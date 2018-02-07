@@ -38,24 +38,24 @@ program constructor
  1.43746E+03, 1.22341E+03, 1.02339E+03, 8.36754E+02, 6.73131E+02, 5.21595E+02, 3.81767E+02, 2.53260E+02, 1.45511E+02, 4.83247E+01/)
 
 
-  real :: rcoef1=4.,rcoef2=30.
+  real :: rcoef1=0.,rcoef2=4.,rcoef3=0.,rcoef4=200.
   
   logical :: OK=.true.
   logical, parameter :: write_control_L=.false.
   character (len=256) :: file
 
-  ! Construct a new set of vertical coordinate descriptors 21001 Gal-Chen
-  if( vgd_new(d,kind=21,version=1,hyb=hgts,rcoef1=rcoef1,rcoef2=rcoef2,dhm=10.0,dht=1.5) == VGD_ERROR )OK=.false.
+  ! Construct a new set of vertical coordinate descriptors 21101 Gal-Chen
+  if( vgd_new(d,kind=21,version=1,hyb=hgts,rcoef1=rcoef1,rcoef2=rcoef2,rcoef3=rcoef3,rcoef4=rcoef4,dhm=10.0,dht=1.5) == VGD_ERROR )OK=.false.
   if( vgd_print(d,convip_L=.true.) == VGD_ERROR )then
      print*,'ERROR'
      stop
   endif
-  if( vgd_print(21001) == VGD_ERROR )then
+  if( vgd_print(21101) == VGD_ERROR )then
      print*,'ERROR'
      stop
   endif
 
-  file='data/data_constructor_gen_21001.txt'
+  file='data/data_constructor_gen_21001_SLEVE.txt'
   stat = test_hgts(d,file,write_control_L)
   if(stat.eq.VGD_ERROR)OK=.false.
 
@@ -76,13 +76,13 @@ integer function test_hgts(F_d,F_file,F_write_control_L) result(istat)
    ! Local variable
    !
    real, dimension(:), pointer :: vcdm,vcdt,work
-   real*8, dimension(:), pointer :: b_m_8,a_m_8,b_t_8,a_t_8,work_8
+   real*8, dimension(:), pointer :: b_m_8,a_m_8,c_m_8,a_t_8,b_t_8,c_t_8,work_8
    integer, dimension(:), pointer :: vipm,vipt,work_i
    integer :: nl_m,nl_t,k,nk,kind,vers,ip1,my_ip1
    real(kind=8), dimension(:,:,:), pointer :: table
    type (vgrid_descriptor) :: vgrid_rebuilt
 
-   nullify(vcdm,vcdt,work,a_m_8,b_m_8,a_t_8,b_t_8,work_8,vipm,vipt,work_i,table)
+   nullify(vcdm,vcdt,work,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,work_8,vipm,vipt,work_i,table)
 
    istat=VGD_ERROR
 
@@ -105,6 +105,8 @@ integer function test_hgts(F_d,F_file,F_write_control_L) result(istat)
    if( vgd_get(F_d,key='CA_T - vertical A coefficient (t)'   ,value=a_t_8)  == VGD_ERROR) return
    if( vgd_get(F_d,key='CB_M - vertical B coefficient (m)'   ,value=b_m_8)  == VGD_ERROR) return
    if( vgd_get(F_d,key='CB_T - vertical B coefficient (t)'   ,value=b_t_8)  == VGD_ERROR) return
+   if( vgd_get(F_d,key='CC_M - vertical C coefficient (m)'   ,value=c_m_8)  == VGD_ERROR) return
+   if( vgd_get(F_d,key='CC_T - vertical C coefficient (t)'   ,value=c_t_8)  == VGD_ERROR) return
    if( vgd_get(F_d,key='VIPM - level ip1 list (m)'           ,value=vipm)   == VGD_ERROR) return
    if( vgd_get(F_d,key='VIPT - level ip1 list (t)'           ,value=vipt)   == VGD_ERROR) return
    if( vgd_get(F_d,key='VCDM - vertical coordinate (m)'      ,value=vcdm)   == VGD_ERROR) return
@@ -120,6 +122,8 @@ integer function test_hgts(F_d,F_file,F_write_control_L) result(istat)
      write(10,*)a_t_8
      write(10,*)b_m_8
      write(10,*)b_t_8
+     write(10,*)c_m_8
+     write(10,*)c_t_8
      write(10,*)vipm
      write(10,*)vipt
      write(10,*)vcdm
@@ -217,6 +221,42 @@ integer function test_hgts(F_d,F_file,F_write_control_L) result(istat)
            print*,'Probleme avec B T, pas dans les limites tollerees'
            print*,work_8(k),'vs'
            print*,b_t_8(k)
+        endif
+     endif
+  enddo
+
+  ! Check C
+  print*,'Reading C M'
+  read(10,*)work_8
+  do k=1,nk
+     if(c_m_8(k).eq.0.)then
+        if(work_8(k).ne.0.)then
+           istat=VGD_ERROR
+           print*,'Probleme avec C M, pas egal a zero ',work_8(k)
+        endif
+     else
+        if(abs(work_8(k)-c_m_8(k))/c_m_8(k)>100.*epsilon(1.))then
+           istat=VGD_ERROR
+           print*,'Probleme avec C M, pas dans les limites tollerees'
+           print*,work_8(k),'vs'
+           print*,c_m_8(k)
+        endif
+     endif
+  enddo
+  print*,'Reading C T'
+  read(10,*)work_8
+  do k=1,nk
+     if(c_t_8(k).eq.0.)then
+        if(work_8(k).ne.0.)then
+           istat=VGD_ERROR
+           print*,'Probleme avec C T, pas egal a zero ',work_8(k)
+        endif
+     else
+        if(abs(work_8(k)-c_t_8(k))/c_t_8(k)>100.*epsilon(1.))then
+           istat=VGD_ERROR
+           print*,'Probleme avec C T, pas dans les limites tollerees'
+           print*,work_8(k),'vs'
+           print*,c_t_8(k)
         endif
      endif
   enddo

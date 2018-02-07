@@ -96,10 +96,10 @@
   case 21001:
   case 21002:
     if(double_interface){
-      if( C_compute_heights_21001_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8) == VGD_ERROR)
+      if( C_compute_heights_21001_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, sfc_field_ls_8) == VGD_ERROR)
 	return(VGD_ERROR);
     } else {
-      if( C_compute_heights_21001(self, ni, nj, nk, ip1_list, levels, sfc_field) == VGD_ERROR)
+      if( C_compute_heights_21001(self, ni, nj, nk, ip1_list, levels, sfc_field, sfc_field_ls) == VGD_ERROR)
 	return(VGD_ERROR);
     }
     break;

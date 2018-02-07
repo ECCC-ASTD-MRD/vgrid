@@ -57,12 +57,13 @@ program constructor
    integer, parameter :: nversion=7
    integer stat,i,test_it
    logical :: OK=.true.
-   character(len=5), dimension(nversion) :: vcode_S=(/"5002","5003","5004","5005","5100","5999","21001"/)
+   character(len=10), dimension(nversion) :: vcode_S=(/"5002","5003","5004","5005","5100","5999","21001"/)
+   character(len=60), dimension(nversion) :: suffix_S=(/""   ,""    ,""    ,""    ,""    ,""    ,"_NON_SLEVE"/)
 
    do i=1,nversion
       
       print*,"============="//trim(vcode_S(i))//"=============="
-      stat=test_it("data/dm_"//trim(vcode_S(i))//"_from_model_run","data/dm_"//trim(vcode_S(i))//"_ips.txt")
+      stat=test_it("data/dm_"//trim(vcode_S(i))//"_from_model_run"//trim(suffix_S(i)))
       if(stat.ne.VGD_OK)then
          OK=.false.
          print*,'ERROR with ',trim(vcode_S(i))
@@ -73,7 +74,7 @@ program constructor
 
 end program constructor
 !================================================================================================
-integer function test_it(F_file_from_model_run,F_file_with_ips) result(status)
+integer function test_it(F_file_from_model_run) result(status)
  
    use mod_constructor_table, only:FSTD_ext,my_fstprm
    use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_free,operator(==),vgd_write,VGD_OK,VGD_ERROR
@@ -81,7 +82,7 @@ integer function test_it(F_file_from_model_run,F_file_with_ips) result(status)
    
    implicit none
    
-   character(len=*) :: F_file_from_model_run,F_file_with_ips
+   character(len=*) :: F_file_from_model_run
 
    ! Local variables
 

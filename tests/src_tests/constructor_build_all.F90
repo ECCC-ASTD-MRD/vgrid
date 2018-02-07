@@ -40,7 +40,7 @@ program constructor_build_all
        "data/dm_5005_from_model_run",&
        "data/dm_5100_from_model_run",&
        "data/dm_5999_from_model_run",&
-       "data/dm_21001_from_model_run"&
+       "data/dm_21001_from_model_run_NON_SLEVE"&
        /)
 
   stat = vgd_putopt("ALLOW_SIGMA",.true.)
@@ -555,12 +555,12 @@ integer function check_build_21001(F_vgd) result(istat)
   ! Local variables
   integer :: kind, version, ier
   integer, dimension(:), pointer :: ip1_m, ip1_t
-  real :: rcoef1, rcoef2
+  real :: rcoef1, rcoef2, rcoef3, rcoef4
   real*8 :: pref_8
-  real*8, dimension(:), pointer :: a_m_8, b_m_8, a_t_8, b_t_8
+  real*8, dimension(:), pointer :: a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8
   type(vgrid_descriptor) :: vgd
   
-  nullify(ip1_m, ip1_t, a_m_8, b_m_8, a_t_8, b_t_8)
+  nullify(ip1_m, ip1_t, a_m_8, b_m_8, c_m_8, b_m_8, a_t_8, b_t_8, c_t_8)
   
   istat = VGD_ERROR
   
@@ -568,22 +568,30 @@ integer function check_build_21001(F_vgd) result(istat)
   if( vgd_get(F_vgd,"VERS", version) ) return  
   if( vgd_get(F_vgd,"CA_M - vertical A coefficient (m)", a_m_8) == VGD_ERROR ) return
   if( vgd_get(F_vgd,"CB_M - vertical B coefficient (m)", b_m_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"CC_M - vertical C coefficient (m)", c_m_8) == VGD_ERROR ) return
   if( vgd_get(F_vgd,"CA_T - vertical A coefficient (t)", a_t_8) == VGD_ERROR ) return
   if( vgd_get(F_vgd,"CB_T - vertical B coefficient (t)", b_t_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"CC_T - vertical C coefficient (t)", c_t_8) == VGD_ERROR ) return
   if( vgd_get(F_vgd,"VIPM - level ip1 list (m)"        , ip1_m) == VGD_ERROR ) return
   if( vgd_get(F_vgd,"VIPT - level ip1 list (t)"        , ip1_t) == VGD_ERROR ) return
   if( vgd_get(F_vgd,"RC_1"                             , rcoef1) == VGD_ERROR ) return
   if( vgd_get(F_vgd,"RC_2"                             , rcoef2) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"RC_3"                             , rcoef3) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"RC_4"                             , rcoef4) == VGD_ERROR ) return
 
   if( vgd_new(vgd,kind,version,size(ip1_m)-2, &
               ip1=-1,            &
               ip2=-1,            &
               rcoef1=rcoef1,     &
               rcoef2=rcoef2,     &
+              rcoef3=rcoef3,     &
+              rcoef4=rcoef4,     &
               a_m_8=a_m_8,       &
               b_m_8=b_m_8,       &
+              c_m_8=c_m_8,       &
               a_t_8=a_t_8,       &
               b_t_8=b_t_8,       &
+              c_t_8=c_t_8,       &
               ip1_m=ip1_m,       &
               ip1_t=ip1_t)       &
               == VGD_ERROR) return
@@ -595,7 +603,7 @@ integer function check_build_21001(F_vgd) result(istat)
      return
   endif
   
-  deallocate(ip1_m, ip1_t, a_m_8, b_m_8, a_t_8, b_t_8)
+  deallocate(ip1_m, ip1_t, a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8)
   
   istat = VGD_OK
   
