@@ -24,10 +24,15 @@
 	aa_8[k] = self->a_t_8[ind];
 	bb_8[k] = self->b_t_8[ind];
       } else {
-	printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n", proc_name,ip1_list[k]);
-	free(aa_8);
-	free(bb_8);  	
-	return(VGD_ERROR);	
+	if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_w, self->nl_w) ) != -1 ) {
+	  aa_8[k] = self->a_w_8[ind];
+	  bb_8[k] = self->b_w_8[ind];
+	} else {
+	  printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n", proc_name,ip1_list[k]);
+	  free(aa_8);
+	  free(bb_8);  	
+	  return(VGD_ERROR);	
+	}
       }
     }
   }
