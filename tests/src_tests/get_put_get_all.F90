@@ -36,7 +36,7 @@ program get_put_get_all
        "data/dm_5005_from_model_run",&
        "data/dm_5100_from_model_run",&
        "data/dm_5999_from_model_run",&
-       "data/dm_21001_from_model_run"&
+       "data/dm_21001_from_model_run_NON_SLEVE"&
        /)
   
   if( vgd_putopt("ALLOW_SIGMA",.true.) == VGD_ERROR )then

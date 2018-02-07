@@ -68,9 +68,9 @@ program levels_withref_profile_all
   ier=check_levels_withref('data/dm_5999_from_model_run','','UU')
   if(ier==VGD_ERROR)stat=VGD_ERROR
 
-  ier=check_levels_withref('data/dm_21001_from_model_run','','TT')
+  ier=check_levels_withref('data/dm_21001_from_model_run_NON_SLEVE','','TT')
   if(ier==VGD_ERROR)stat=VGD_ERROR
-  ier=check_levels_withref('data/dm_21001_from_model_run','','UU')
+  ier=check_levels_withref('data/dm_21001_from_model_run_NON_SLEVE','','UU')
   if(ier==VGD_ERROR)stat=VGD_ERROR
 
 print*,'stat=',stat
@@ -84,7 +84,7 @@ end program levels_withref_profile_all
 
 integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
 
-   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_levels,vgd_get,VGD_LEN_RFLD,VGD_NO_REF_NOMVAR,VGD_ERROR,VGD_OK
+   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_levels,vgd_get,vgd_print,VGD_LEN_RFLD,VGD_NO_REF_NOMVAR,VGD_ERROR,VGD_OK
 
    implicit none  
 
@@ -143,6 +143,7 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
 
    ! Get vertical grid descriptor
    ier = vgd_new(vgd,unit=lu,format="fst",ip1=ip1,ip2=ip2)
+   ier = vgd_print(vgd)
    if(ier == VGD_ERROR )then
       print*,'ERROR: Problem getting vertical grid descriptor'
       print*,'FILE: ',trim(F_fst)
@@ -193,6 +194,7 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
    
    two_refs_L = .false.
    ier = vgd_get(vgd, "RFLS", rfls_S, .true.);
+
    if( rfls_S /= VGD_NO_REF_NOMVAR )then      
       two_refs_L = .true.
       key = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',rfls_S)
@@ -230,6 +232,7 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
       endif
       ! Surface pressure must be equal to P0 for surface levels
       call convip(ip1,pppp,kind,-1,dummy_S,.false.)
+      print*,'ip1, level = ',ip1,pppp
       if(abs(pppp-1.).lt.epsilon.or. ( abs(pppp).lt.epsilon .and. trim(rfld_S) == "ME") )then
          if(pres(k).ne.p0_point)then
             print*,'ERROR: 32 bits level at surface must be exacly equal to ',rfld_S
@@ -265,7 +268,7 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
          endif
          if(trim(rfld_S) == "ME")then
             print*,'ERROR: 32 bits: Difference in heights is too large at'
-            print*,'k,gz(1,1),heghts(k)*fact',k,px(1,1),pres(k)*fact
+            print*,'k,gz(1,1),heights(k)*fact',k,px(1,1),pres(k)*fact
          endif
          print*,'ERROR: on file: ',F_fst
          return
