@@ -94,6 +94,7 @@
     }
     break;
   case 21001:
+  case 21002:
     if(double_interface){
       if( C_compute_heights_21001_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8) == VGD_ERROR)
 	return(VGD_ERROR);
