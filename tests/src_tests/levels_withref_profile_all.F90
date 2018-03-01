@@ -68,6 +68,11 @@ program levels_withref_profile_all
   ier=check_levels_withref('data/dm_5999_from_model_run','','UU')
   if(ier==VGD_ERROR)stat=VGD_ERROR
 
+  ier=check_levels_withref('data/dm_21001_from_model_run_SLEVE','','TT')
+  if(ier==VGD_ERROR)stat=VGD_ERROR
+  ier=check_levels_withref('data/dm_21001_from_model_run_SLEVE','','UU')
+  if(ier==VGD_ERROR)stat=VGD_ERROR
+
   ier=check_levels_withref('data/dm_21001_from_model_run_NON_SLEVE','','TT')
   if(ier==VGD_ERROR)stat=VGD_ERROR
   ier=check_levels_withref('data/dm_21001_from_model_run_NON_SLEVE','','UU')
@@ -96,7 +101,7 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
    type(vgrid_descriptor) :: vgd
    integer, parameter :: nmax=1000
    integer, dimension(nmax) :: liste
-   integer :: ier,fstinl,fstprm,fstinf,fstluk,infon,k
+   integer :: ier,fstinl,fstprm,fstinf,fstluk,infon,k,i,j,i0,j0
    real, dimension(:), pointer :: pres
    real*8, dimension(:), pointer :: pres_8
    real, dimension(:,:), pointer :: p0,p0ls,px
@@ -122,6 +127,9 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
    print*,'Testing, level: ',trim(F_var),' on file ',trim(F_fst)
 
    lu=lu+1
+   
+   i0=42
+   j0=9
 
    ier=fnom(lu,F_fst,"RND+R/O",0)
    if(ier.lt.0)then
@@ -182,9 +190,27 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
          return
       endif
       if(trim(rfld_S) == "P0")then
-         p0_point=p0(1,1)*100.
+         ! Find lowest pressure point
+         p0_point=10000.
+         do j=1,nj
+            do i=1,ni
+               if(p0(i,j)<p0_point)then
+                  i0=i; j0=j; p0_point=p0(i,j)
+               endif
+            end do
+         end do
+         p0_point=p0(i0,j0)*100.
       elseif(trim(rfld_S) == "ME")then
-         p0_point=p0(1,1)
+         ! Find heighest height point
+         p0_point=0
+         do j=1,nj
+            do i=1,ni
+               if(p0(i,j)>p0_point)then
+                  i0=i; j0=j; p0_point=p0(i,j)
+               endif
+            end do
+         end do
+         p0_point=p0(i0,j0)
       else
          print*,'ERROR: reference field not supported ',trim(rfld_S)
          return
@@ -194,7 +220,6 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
    
    two_refs_L = .false.
    ier = vgd_get(vgd, "RFLS", rfls_S, .true.);
-
    if( rfls_S /= VGD_NO_REF_NOMVAR )then      
       two_refs_L = .true.
       key = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',rfls_S)
@@ -206,7 +231,9 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
          return
       endif
       if(trim(rfls_S) == "P0LS")then
-         p0ls_point=p0ls(1,1)*100.
+         p0ls_point=p0ls(i0,j0)*100.
+      else
+         p0ls_point=p0ls(i0,j0)
       endif
       p0ls_point_8=p0ls_point
    endif
@@ -249,7 +276,7 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
       elseif(trim(rfld_S) == "ME")then
          nomvar_metric="GZ"
          fact=.1
-         fact_8=.1
+         fact_8=.1d0
       else
          print*,'ERROR: in test reference field not supported: ',trim(rfld_S)
          return
@@ -261,14 +288,15 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
          print*,'FILE: ',trim(F_fst)
          return
       endif
-      if(abs((px(1,1)-pres(k)*fact)/abs(px(1,1)))>epsilon)then
+ 
+      if(abs((px(i0,j0)-pres(k)*fact)/abs(px(i0,j0)))>epsilon)then
          if(trim(rfld_S) == "P0")then
             print*,'ERROR: 32 bits: Difference in pressure is too large at'
-            print*,'k,px(1,1),pres(k)*fact.',k,px(1,1),pres(k)*fact
+            print*,'k,px(i0,j0),pres(k)*fact.',k,px(i0,j0),pres(k)*fact
          endif
          if(trim(rfld_S) == "ME")then
             print*,'ERROR: 32 bits: Difference in heights is too large at'
-            print*,'k,gz(1,1),heights(k)*fact',k,px(1,1),pres(k)*fact
+            print*,'k,gz(i0,j0),heights(k)*fact',k,px(i0,j0),pres(k)*fact
          endif
          print*,'ERROR: on file: ',F_fst
          return
@@ -312,14 +340,14 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
          print*,'FILE: ',trim(F_fst)
          return
       endif
-     if(abs((px(1,1)-pres_8(k)*fact_8)/abs(px(1,1)))>epsilon)then
+     if(abs((px(i0,j0)-pres_8(k)*fact_8)/abs(px(i0,j0)))>epsilon)then
          if(trim(rfld_S) == "P0")then
             print*,'ERROR: 46 bits: Difference in pressure is too large at'
-            print*,'k,px(1,1),pres_8(k)*fact_8',k,px(1,1),pres_8(k)*fact_8
+            print*,'k,px(i0,j0),pres_8(k)*fact_8',k,px(i0,j0),pres_8(k)*fact_8
          endif
          if(trim(rfld_S) == "ME")then
             print*,'ERROR: 64 bits: Difference in heights is too large at'
-            print*,'k,gz(1,1),heights_8(k)*fact_8',k,px(1,1),pres_8(k)*fact_8
+            print*,'k,gz(i0,j0),heights_8(k)*fact_8',k,px(i0,j0),pres_8(k)*fact_8
          endif
          print*,'ERROR: on FILE: ',trim(F_fst)
          return
