@@ -28,7 +28,7 @@ program constructor_build_all
   integer :: fnom,fstouv,fstfrm,fclos
   logical :: ok
 
-  integer, parameter :: nfiles=11
+  integer, parameter :: nfiles=12
   character(len=200), dimension(nfiles) :: files=(/&
        "data/dm_1001_from_model_run",&
        "data/dm_1002_from_model_run",&
@@ -40,6 +40,7 @@ program constructor_build_all
        "data/dm_5005_from_model_run",&
        "data/dm_5100_from_model_run",&
        "data/dm_5999_from_model_run",&
+       "data/dm_21001_from_model_run_SLEVE",&
        "data/dm_21001_from_model_run_NON_SLEVE"&
        /)
 

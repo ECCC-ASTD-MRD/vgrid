@@ -27,7 +27,7 @@ program constructor
   integer :: i, stat
   integer :: fnom,fstouv,fstfrm
   logical :: ok = .true.
-  integer, parameter :: nfiles=10
+  integer, parameter :: nfiles=11
   character(len=200), dimension(nfiles) :: files=(/&
        "data/gg_5001_from_model_run_plus_toc",&
        "data/dm_1001_from_model_run",&
@@ -38,6 +38,7 @@ program constructor
        "data/dm_5005_from_model_run",&
        "data/dm_5100_from_model_run",&
        "data/dm_5999_from_model_run",&
+       "data/dm_21001_from_model_run_SLEVE",&
        "data/dm_21001_from_model_run_NON_SLEVE"&
        /)
 

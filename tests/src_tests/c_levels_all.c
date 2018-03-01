@@ -33,6 +33,7 @@ char *filenames[] = {
     "data/dm_5005_from_model_run",
     "data/dm_5100_from_model_run",
     "data/dm_5999_from_model_run",
+    "data/dm_21001_from_model_run_SLEVE",
     "data/dm_21001_from_model_run_NON_SLEVE"
 };
 
@@ -214,7 +215,7 @@ int test_it(char *filename, int ind) {
       return(VGD_ERROR);
     }
     for( ij = 0; ij < ni2*nj2; ij++, ijk++){
-      p0ls[ij] = p0ls[ij]*100.f;
+      p0ls[ij] = p0ls[ij]*fact;
       p0ls_8[ij] = p0ls[ij];
     }    
   }
