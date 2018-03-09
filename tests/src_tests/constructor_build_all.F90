@@ -28,7 +28,7 @@ program constructor_build_all
   integer :: fnom,fstouv,fstfrm,fclos
   logical :: ok
 
-  integer, parameter :: nfiles=12
+  integer, parameter :: nfiles=14
   character(len=200), dimension(nfiles) :: files=(/&
        "data/dm_1001_from_model_run",&
        "data/dm_1002_from_model_run",&
@@ -41,7 +41,9 @@ program constructor_build_all
        "data/dm_5100_from_model_run",&
        "data/dm_5999_from_model_run",&
        "data/dm_21001_from_model_run_SLEVE",&
-       "data/dm_21001_from_model_run_NON_SLEVE"&
+       "data/dm_21001_from_model_run_NON_SLEVE",&
+       "data/dm_21002_from_model_run_SLEVE",&
+       "data/dm_21002_from_model_run_NON_SLEVE"&
        /)
 
   stat = vgd_putopt("ALLOW_SIGMA",.true.)
@@ -93,7 +95,7 @@ integer function check_build(F_vgd) result(istat)
   type(vgrid_descriptor), intent(in) :: F_vgd
   
   ! Local varibales
-  integer :: check_build_1001_2001_5999, check_build_1002, check_build_5001, check_build_5002, check_build_5005, check_build_5100, check_build_21001
+  integer :: check_build_1001_2001_5999, check_build_1002, check_build_5001, check_build_5002, check_build_5005, check_build_5100, check_build_21001, check_build_21002
   integer :: vcode
 
   istat = VGD_ERROR
@@ -123,8 +125,11 @@ integer function check_build(F_vgd) result(istat)
      if(check_build_1001_2001_5999(F_vgd) == VGD_ERROR) return
   case (21001)
      if(check_build_21001(F_vgd) == VGD_ERROR) return
+  case (21002)
+     if(check_build_21002(F_vgd) == VGD_ERROR) return
   case DEFAULT
-     print*,'Add function for checking Vcode ',vcode
+     print*,'ERROR, no function for checking Vcode ',vcode
+     print*,'       please add this function in test'
      return
   end select
 
@@ -338,7 +343,7 @@ integer function check_build_5002(F_vgd) result(istat)
   type(vgrid_descriptor), intent(in) :: F_vgd
   
   ! Local varibales
-  integer :: kind, version, ier
+  integer :: kind, version
   integer, dimension(:), pointer :: ip1_m, ip1_t
   real :: rcoef1, rcoef2
   real*8 :: ptop_8, pref_8
@@ -482,7 +487,7 @@ integer function check_build_5100(F_vgd) result(istat)
   type(vgrid_descriptor), intent(in) :: F_vgd
   
   ! Local varibales
-  integer :: kind, version, ier
+  integer :: kind, version
   integer, dimension(:), pointer :: ip1_m, ip1_t
   real :: rcoef1, rcoef2, rcoef3, rcoef4
   real*8 :: pref_8
@@ -557,7 +562,6 @@ integer function check_build_21001(F_vgd) result(istat)
   integer :: kind, version, ier
   integer, dimension(:), pointer :: ip1_m, ip1_t
   real :: rcoef1, rcoef2, rcoef3, rcoef4
-  real*8 :: pref_8
   real*8, dimension(:), pointer :: a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8
   type(vgrid_descriptor) :: vgd
   
@@ -611,4 +615,82 @@ integer function check_build_21001(F_vgd) result(istat)
   return
   
 end function check_build_21001
+
+!=============================================================
+!=============================================================
+!=============================================================
+!=============================================================
+
+integer function check_build_21002(F_vgd) result(istat)
+
+  use Vgrid_Descriptors, only: Vgrid_descriptor,vgd_new, vgd_get, vgd_print, operator(==), VGD_ERROR, VGD_OK
+  
+  implicit none
+  type(vgrid_descriptor), intent(in) :: F_vgd
+  
+  ! Local variables
+  integer :: kind, version, ier
+  integer, dimension(:), pointer :: ip1_m, ip1_t, ip1_w
+  real :: rcoef1, rcoef2, rcoef3, rcoef4
+  real*8, dimension(:), pointer :: a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8, a_w_8, b_w_8, c_w_8
+  type(vgrid_descriptor) :: vgd
+  
+  nullify(ip1_m, ip1_t, ip1_w, a_m_8, b_m_8, c_m_8, b_m_8, a_t_8, b_t_8, c_t_8, a_w_8, b_w_8, c_w_8)
+  
+  istat = VGD_ERROR
+  
+  if( vgd_get(F_vgd,"KIND", kind) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"VERS", version) ) return  
+  if( vgd_get(F_vgd,"CA_M - vertical A coefficient (m)", a_m_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"CB_M - vertical B coefficient (m)", b_m_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"CC_M - vertical C coefficient (m)", c_m_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"CA_T - vertical A coefficient (t)", a_t_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"CB_T - vertical B coefficient (t)", b_t_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"CC_T - vertical C coefficient (t)", c_t_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"CA_W - vertical A coefficient (w)", a_w_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"CB_W - vertical B coefficient (w)", b_w_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"CC_W - vertical C coefficient (w)", c_w_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"VIPM - level ip1 list (m)"        , ip1_m) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"VIPT - level ip1 list (t)"        , ip1_t) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"VIPW - level ip1 list (w)"        , ip1_w) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"RC_1"                             , rcoef1) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"RC_2"                             , rcoef2) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"RC_3"                             , rcoef3) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"RC_4"                             , rcoef4) == VGD_ERROR ) return
+
+  if( vgd_new(vgd,kind,version,size(ip1_m)-2, &
+              ip1=-1,            &
+              ip2=-1,            &
+              rcoef1=rcoef1,     &
+              rcoef2=rcoef2,     &
+              rcoef3=rcoef3,     &
+              rcoef4=rcoef4,     &
+              a_m_8=a_m_8,       &
+              b_m_8=b_m_8,       &
+              c_m_8=c_m_8,       &
+              a_t_8=a_t_8,       &
+              b_t_8=b_t_8,       &
+              c_t_8=c_t_8,       &
+              a_w_8=a_w_8,       &
+              b_w_8=b_w_8,       &
+              c_w_8=c_w_8,       &
+              ip1_m=ip1_m,       &
+              ip1_t=ip1_t,       &
+              ip1_w=ip1_w)       &
+              == VGD_ERROR) return
+  
+  if(.not. vgd == F_vgd)then
+     print*,'ERROR : build descriptor not equal has the one read from the file see vgd_print output below'
+     ier = vgd_print(F_vgd)
+     ier = vgd_print(vgd)
+     return
+  endif
+  
+  deallocate(ip1_m, ip1_t, ip1_w, a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8, a_w_8, b_w_8, c_w_8)
+  
+  istat = VGD_OK
+  
+  return
+  
+end function check_build_21002
 

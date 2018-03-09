@@ -28,7 +28,7 @@ program constructor
   integer :: stat
   integer :: fnom,fstouv,fstfrm
 
-  integer, parameter :: nfiles=11
+  integer, parameter :: nfiles=13
   character(len=200), dimension(nfiles) :: files=(/&
        "data/dm_1001_from_model_run",&
        "data/dm_1002_from_model_run",&
@@ -40,7 +40,9 @@ program constructor
        "data/dm_5005_from_model_run",&
        "data/dm_5100_from_model_run",&
        "data/dm_21001_from_model_run_SLEVE",&
-       "data/dm_21001_from_model_run_NON_SLEVE"&
+       "data/dm_21001_from_model_run_NON_SLEVE",&
+       "data/dm_21002_from_model_run_SLEVE",&
+       "data/dm_21002_from_model_run_NON_SLEVE"&
        /)
 
   stat = VGD_OK

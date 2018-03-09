@@ -24,7 +24,7 @@ program get_put_get_all
 
   implicit none
   integer :: i, test_it
-  integer, parameter :: nfiles=12
+  integer, parameter :: nfiles=14
   character(len=200), dimension(nfiles) :: files=(/&
        "data/dm_1001_from_model_run",&
        "data/dm_1002_from_model_run",&
@@ -37,7 +37,9 @@ program get_put_get_all
        "data/dm_5100_from_model_run",&
        "data/dm_5999_from_model_run",&
        "data/dm_21001_from_model_run_SLEVE",&
-       "data/dm_21001_from_model_run_NON_SLEVE"&
+       "data/dm_21001_from_model_run_NON_SLEVE",&
+       "data/dm_21002_from_model_run_SLEVE",&
+       "data/dm_21002_from_model_run_NON_SLEVE"&
        /)
   
   if( vgd_putopt("ALLOW_SIGMA",.true.) == VGD_ERROR )then
