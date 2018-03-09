@@ -78,7 +78,15 @@ program levels_withref_profile_all
   ier=check_levels_withref('data/dm_21001_from_model_run_NON_SLEVE','','UU')
   if(ier==VGD_ERROR)stat=VGD_ERROR
 
-print*,'stat=',stat
+  ier=check_levels_withref('data/dm_21002_from_model_run_SLEVE','','TT')
+  if(ier==VGD_ERROR)stat=VGD_ERROR
+  ier=check_levels_withref('data/dm_21002_from_model_run_SLEVE','','UU')
+  if(ier==VGD_ERROR)stat=VGD_ERROR
+
+  ier=check_levels_withref('data/dm_21002_from_model_run_NON_SLEVE','','TT')
+  if(ier==VGD_ERROR)stat=VGD_ERROR
+  ier=check_levels_withref('data/dm_21002_from_model_run_NON_SLEVE','','UU')
+  if(ier==VGD_ERROR)stat=VGD_ERROR
 
   call ut_report(stat,'Grid_Descriptors, vgd_new')
 

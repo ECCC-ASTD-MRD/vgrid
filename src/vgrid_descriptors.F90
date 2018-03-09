@@ -2081,6 +2081,12 @@ contains
          if (istat /= 0) return
          value_CP = c_loc(value(1))
          status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
+      case ('CC_W')
+         istat = get_int(self,'NL_W',nl_)
+         istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CC_W in get_real8_1d)')         
+         if (istat /= 0) return
+         value_CP = c_loc(value(1))
+         status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
       case DEFAULT
          write(for_msg,*) 'invalid key '//trim(key)//' given to vgd_get (real8 1D)'
          call msg(level_msg,VGD_PRFX//for_msg)

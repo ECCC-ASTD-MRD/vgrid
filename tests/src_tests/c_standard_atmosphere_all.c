@@ -34,7 +34,9 @@ char *filenames[] = {
     "data/dm_5100_from_model_run",
     "data/dm_5999_from_model_run",
     "data/dm_21001_from_model_run_SLEVE",
-    "data/dm_21001_from_model_run_NON_SLEVE"
+    "data/dm_21001_from_model_run_NON_SLEVE",
+    "data/dm_21002_from_model_run_SLEVE",
+    "data/dm_21002_from_model_run_NON_SLEVE"
 };
 
 #define n_file (sizeof (filenames) / sizeof (const char *))

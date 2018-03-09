@@ -37,15 +37,12 @@ program constructor
  4.93475E+03, 4.51786E+03, 4.10324E+03, 3.69539E+03, 3.29876E+03, 2.91503E+03, 2.56689E+03, 2.24003E+03, 1.95540E+03, 1.68822E+03,&
  1.43746E+03, 1.22341E+03, 1.02339E+03, 8.36754E+02, 6.73131E+02, 5.21595E+02, 3.81767E+02, 2.53260E+02, 1.45511E+02, 4.83247E+01/)
 
-
-  real :: rcoef1=4.,rcoef2=30.
-  
   logical :: OK=.true.
-  logical, parameter :: write_control_L=.false.
+  logical, parameter :: write_control_L=.true.
   character (len=256) :: file
 
   ! Construct a new set of vertical coordinate descriptors 21002 hyb heights on Lorenz grid
-  if( vgd_new(d,kind=21,version=2,hyb=hgts,rcoef1=rcoef1,rcoef2=rcoef2,rcoef3=-1.,rcoef4=-1.,dhm=10.0,dht=1.5,dhw=0.) == VGD_ERROR )OK=.false.
+  if( vgd_new(d,kind=21,version=2,hyb=hgts,rcoef1=0.,rcoef2=1.,rcoef3=0.,rcoef4=1000.,dhm=10.0,dht=1.5,dhw=0.) == VGD_ERROR )OK=.false.
   if( vgd_print(d,convip_L=.true.) == VGD_ERROR )then
      print*,'ERROR'
      stop
@@ -55,7 +52,7 @@ program constructor
      stop
   endif
 
-  file='data/data_constructor_gen_21002.txt'
+  file='data/data_constructor_gen_21002_SLEVE.txt'
   stat = test_hgts(d,file,write_control_L)
   if(stat.eq.VGD_ERROR)OK=.false.
 
