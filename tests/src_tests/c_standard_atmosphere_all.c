@@ -57,6 +57,47 @@ char* concat(const char *s1, const char *s2)
     return result;
 }
 
+int compare(char *filename, char *filetype, int *i_val, float *temp, int nl_t) {
+  FILE *fp;
+  // Local variables
+  int nl_t_c, k, i_val_c;
+  float temp_c;
+  char buff[255], buff2[255];
+  char* sss = concat(filename,filetype);
+  if(write_control){
+    fp = fopen(sss, "w");
+    fprintf(fp, "size %d\n",nl_t);
+    for( k=0; k<nl_t; k++){
+      fprintf(fp, "ip1 %10i value %f\n",i_val[k],temp[k]);
+    }
+    fclose(fp);
+  }
+  fp = fopen(sss, "r");
+  if( fp == NULL ){
+    printf("ERROR in test, validation file not present %s\n",sss);
+  }
+  fscanf(fp, "%s %d",buff, &nl_t_c);
+  //printf("buff=%s, nl_t_c=%d\n",buff,nl_t_c);
+  if( nl_t_c != nl_t){
+    printf("ERROR in tests, size problem with validation file\n");
+    return(VGD_ERROR);
+  }
+  for( k=0; k<nl_t; k++){
+    fscanf(fp, "%s %d %s %f",buff, &i_val_c, buff2, &temp_c);
+    if( i_val_c != i_val[k] || fabs(temp_c - temp[k]) > .01f ){
+      printf("ERROR differences found, expecting:\n");
+      printf("%i %f\n",i_val_c,temp_c);
+      printf("got:\n%i %f\n",i_val[k],temp[k]);
+      printf("ERROR TEST on file %s failled\n",filename);
+      return(VGD_ERROR);
+    }
+  }
+  printf("TEST on file %s is OK\n",filename);
+  free(sss);
+  return(VGD_OK);
+}
+
+
 int test_it(char *filename, int ind) {
   FILE *fp;
   char buff[255],  buff2[255];
@@ -64,7 +105,8 @@ int test_it(char *filename, int ind) {
   int quiet=0, *i_val = NULL, i_val_c;
   int nl_t, nl_t_c;
   char mode[]="RND";
-  float *temp = NULL, temp_c;
+  char nomvar[] = "1234";
+  float *temp = NULL, *pres = NULL, temp_c;
   vgrid_descriptor *vgd = NULL;
       
   iun = 10 + ind;
@@ -95,53 +137,32 @@ int test_it(char *filename, int ind) {
     printf("ERROR cannot Cvgd_get_int on NL_T\n");
     return(VGD_ERROR);
   }
-  
+  printf("   Testing temperature\n");
   if( Cvgd_standard_atmosphere_1976_temp(vgd, i_val, nl_t, &temp) == VGD_ERROR ) {
     printf("ERROR with Cvgd_standard_atmosphere_1976_temp\n");
     return(VGD_ERROR);
   }
-  //for( k=0; k<nl_t; k++){
-  //  printf("k=%d\n",k);
-  //  printf("i_val[k]=%d, temp[k]=%f\n",i_val[k],temp[k]);
-  //}
-  char* sss = concat(filename,"_stda76_temp.txt");
-  if(write_control){
-    fp = fopen(sss, "w");
-    fprintf(fp, "size %d\n",nl_t);
-    for( k=0; k<nl_t; k++){
-      fprintf(fp, "ip1 %i temp %f\n",i_val[k],temp[k]);
-    }
-    fclose(fp);
-  }
-  
-  fp = fopen(sss, "r");
-  if( fp == NULL ){
-    printf("ERROR in test, validation file not present %s\n",sss);
-  }
-  fscanf(fp, "%s %d",buff, &nl_t_c);
-  //printf("buff=%s, nl_t_c=%d\n",buff,nl_t_c);
-  if( nl_t_c != nl_t){
-    printf("ERROR in tests, size problem with validation file\n");
+  if( compare(filename, "_stda76_temp.txt", i_val, temp, nl_t) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  for( k=0; k<nl_t; k++){
-    fscanf(fp, "%s %d %s %f",buff, &i_val_c, buff2, &temp_c);
-    if( i_val_c != i_val[k] || fabs(temp_c - temp[k]) > .01f ){
-      printf("ERROR differences found, expecting:\n");
-      printf("%i %f\n",i_val_c,temp_c);
-      printf("got:\n%i %f\n",i_val[k],temp[k]);
-      printf("ERROR TEST on file %s failled\n",filename);
+  ier = Cvgd_get_char(vgd, "RFLD", nomvar, 1);
+  if(! strcmp(nomvar,"ME  ")){
+    printf("   Testing pressure\n");
+    if( Cvgd_standard_atmosphere_1976_pres(vgd, i_val, nl_t, &pres) == VGD_ERROR ) {
+      printf("ERROR with Cvgd_standard_atmosphere_1976_pres\n");
+      return(VGD_ERROR);
+    }
+    if( compare(filename, "_stda76_pres.txt", i_val, pres, nl_t) == VGD_ERROR ){
       return(VGD_ERROR);
     }
   }
-  printf("TEST on file %s is OK\n",filename);
-  
-  fclose(fp);
+
   ier = c_fstfrm(iun);
   ier = c_fclos(iun);
       
-  free(sss);
   Cvgd_free(&vgd);
+  free(temp);
+  free(pres);
   free(i_val);
 
   return(VGD_OK);
