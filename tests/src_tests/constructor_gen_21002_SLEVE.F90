@@ -38,7 +38,7 @@ program constructor
  1.43746E+03, 1.22341E+03, 1.02339E+03, 8.36754E+02, 6.73131E+02, 5.21595E+02, 3.81767E+02, 2.53260E+02, 1.45511E+02, 4.83247E+01/)
 
   logical :: OK=.true.
-  logical, parameter :: write_control_L=.true.
+  logical, parameter :: write_control_L=.false.
   character (len=256) :: file
 
   ! Construct a new set of vertical coordinate descriptors 21002 hyb heights on Lorenz grid

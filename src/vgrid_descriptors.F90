@@ -47,6 +47,7 @@ module vGrid_Descriptors
    public :: vgd_write                           !write coordinates to a file
    public :: vgd_levels                          !compute physical level information
    public :: vgd_dpidpis                         !compute pressure derivative with respesct the sfc pressure
+   public :: vgd_standard_atmosphere_1976        !Get standard atmosphere 1976 variable for a given coordinate
    public :: operator(==)                        !overload equivalence operator
 
    ! Public class constants
@@ -267,7 +268,21 @@ module vGrid_Descriptors
          type(c_ptr), value :: vgd_CP
          integer (c_int), value :: unit
       end function f_write_desc
+      
+      integer function f_standard_atmosphere_1976_temp(vgd_CP, ip1s_CP, nl, temp_CP) bind(c, name='Cvgd_standard_atmosphere_1976_temp')
+        use iso_c_binding, only : c_ptr, c_int
+        type(c_ptr), value :: vgd_CP, ip1s_CP
+        integer (c_int), value :: nl
+        type(c_ptr) :: temp_CP
+      end function f_standard_atmosphere_1976_temp
 
+      integer function f_standard_atmosphere_1976_pres(vgd_CP, ip1s_CP, nl, pres_CP) bind(c, name='Cvgd_standard_atmosphere_1976_pres')
+        use iso_c_binding, only : c_ptr, c_int
+        type(c_ptr), value :: vgd_CP, ip1s_CP
+        integer (c_int), value :: nl
+        type(c_ptr) :: pres_CP
+      end function f_standard_atmosphere_1976_pres
+      
    end interface
    
    interface vgd_new
@@ -2425,5 +2440,45 @@ contains
 
  end function get_ref
   
-end module vGrid_Descriptors
+ integer function vgd_standard_atmosphere_1976(self, ip1s, val, var) result(status)
+   use vgrid_utils, only: get_allocate, up
+   type(vgrid_descriptor), intent(in) :: self         !Vertical descriptor instance
+   integer, dimension(:), intent(in) :: ip1s          !ip1 list to get value for
+   real, dimension(:), pointer, intent(inout) :: val  !Standard Atmosphere 1976 value for ip1s
+   character(len=*), intent(in) :: var                !Variable name to get valid choice are "TEMPERATURE", "PRESSURE"
+   ! Local variables
+   type (c_ptr) :: ip1s_CP, val_CP
+   status = VGD_ERROR
+   if(.not.is_valid(self,'SELF'))then
+      write(for_msg,*) 'vgrid structure is not valid in standard_atmosphere_1976'
+      call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+      return
+   endif
+   if( get_allocate('val',val,size(ip1s),ALLOW_RESHAPE,'(in standard_atmosphere_1976)') /= 0) then
+      if(associated(val))deallocate(val)
+      return
+   endif
+   ip1s_CP = c_loc(ip1s)
+   val_CP = c_loc(val)   
+   select case (trim(up(var)))
+   case ('TEMPERATURE')
+      if( f_standard_atmosphere_1976_temp(self%cptr, ip1s_CP, size(val), val_CP) /= VGD_OK) then
+         write(for_msg,*) 'ERROR with vgd_standard_atmosphere_1976_temp'
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+         return
+      endif
+   case ('PRESSURE')
+      if( f_standard_atmosphere_1976_pres(self%cptr, ip1s_CP, size(val), val_CP) /= VGD_OK) then
+         write(for_msg,*) 'ERROR with vgd_standard_atmosphere_1976_pres'
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+         return
+      endif
+   case DEFAULT
+      write(for_msg,*) 'invalid variable name given to vgd_standard_atmosphere_1976',trim(var)
+      call msg(MSG_ERROR,VGD_PRFX//for_msg)
+      return
+   end select
+   status = VGD_OK
+ end function vgd_standard_atmosphere_1976
 
+end module vGrid_Descriptors

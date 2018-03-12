@@ -288,6 +288,23 @@ static double c_get_error(char *key, int quiet) {
   return(VGD_MISSING);
 }
 
+void c_hypsometric (float *pkp, float pk, float Tk, float gammaT, float zk, float zkp){
+  // Compute pressure pkp which is at top of the following atmopheric layer
+  //
+  //  \(pkp,zkp)
+  //   \  
+  //    \ gammaT (laspe rate in the layer, may be zero or very small)
+  //     \  
+  //      \(Tk,pk,zk) 
+  //
+  static float epsilon = 1.e-6;
+  if( gammaT > -epsilon && gammaT < epsilon ) {
+    *pkp = (float) pk * exp( -VGD_GRAV/(VGD_RGASD*Tk) * (zkp-zk) );
+  } else {
+    *pkp = (float) pk * exp( -VGD_GRAV/(VGD_RGASD*gammaT) * log(gammaT*(zkp-zk)/Tk+1.) );
+  }
+}
+
 static int c_set_stda_layer(int ind, float Tk, float pk, float *zk, float *zkp, float *gammaT, float *pkp, char *zero_lapse_rate) {
 
   //Andre PLante 2017
@@ -319,12 +336,7 @@ static int c_set_stda_layer(int ind, float Tk, float pk, float *zk, float *zkp, 
   *zk  = stda76_zgrad[ind];
   *zkp = stda76_zgrad[ind+1];
   *gammaT = stda76_tgrad[ind];
-  if( *zero_lapse_rate ){
-    *pkp = (float) pk * exp( -VGD_GRAV/(VGD_RGASD*Tk) * (*zkp-*zk) );
-  } else {
-    *pkp = (float) pk * exp( -VGD_GRAV/(VGD_RGASD*(*gammaT)) * log((*gammaT)*(*zkp-*zk)/Tk+1.) );
-  }
-  
+  c_hypsometric (pkp, pk, Tk, *gammaT, *zk, *zkp);
   return(VGD_OK);
 }
 
@@ -382,43 +394,52 @@ int c_stda76_temp_from_press(vgrid_descriptor *self, int *i_val, int nl, float *
   return(VGD_OK);
 }
 
-int c_stda76_temp_from_heights(vgrid_descriptor *self, int *i_val, int nl, float **temp){
+int c_stda76_temp_pres_from_heights(vgrid_descriptor *self, int *i_val, int nl, float **temp, float **pres){
   int ind = 0, k;
+  char zero_lapse_rate;
   float *levs = NULL;
-  float zero = 0.f, Tk;
+  float zero = 0.f, pk, pkp, Tk, zk, zkp, gammaT;
 
   levs = malloc( nl * sizeof(float) );
   if(! levs){
-    printf("(Cvgd) ERROR in c_stda76_temp_from_press, problem allocating levs\n");
+    printf("(Cvgd) ERROR in c_stda76_temp_pres_from_heights, problem allocating levs\n");
     free(levs);
     return(VGD_ERROR);
   }
   
   if(! C_is_valid(self,"ref_namel_valid") ){    
     if( Cvgd_levels(self, 1, 1, nl, i_val, levs, &zero, 0) == VGD_ERROR){
-      printf("(Cvgd) ERROR in c_stda76_temp_from_heights, problem with Cvgd_levels (computing heights profile with one ref)\n");
+      printf("(Cvgd) ERROR in c_stda76_temp_pres_from_heights, problem with Cvgd_levels (computing heights profile with one ref)\n");
       return(VGD_ERROR);
     }
   } else {
     if( Cvgd_levels_2ref(self, 1, 1, nl, i_val, levs, &zero, &zero, 0) == VGD_ERROR){
-      printf("(Cvgd) ERROR in c_stda76_temp_from_heights, problem with Cvgd_levels (computing heights profile with two refs)\n");
+      printf("(Cvgd) ERROR in c_stda76_temp_pres_from_heights, problem with Cvgd_levels (computing heights profile with two refs)\n");
       return(VGD_ERROR);
     }
   }
+  // Start at Normal Temperature and Pressure  
   Tk = stda76_sfc_temp;
+  pk = stda76_sfc_pres;
+  if( c_set_stda_layer( ind, Tk, pk, &zk, &zkp, &gammaT, &pkp, &zero_lapse_rate) == VGD_ERROR ){
+    printf("Cvgd ERROR in c_stda76_temp_pres_from_heights with c_set_stda_layer\n");
+    return(VGD_ERROR);
+  }
   for( k = nl-1; k >= 0; k--){
     // Change temperature gradiant when height is above high boundary stda76_zgrad
-    while( levs[k] >= stda76_zgrad[ind+1] ){
+    while( levs[k] >= zkp ){
+      Tk = Tk + gammaT * (zkp - zk);
+      pk = pkp;
       ind = ind++;
-      if( ind >= STDA76_N_LAYER ){
-	printf("(Cvgd) ERROR in c_stda76_temp_from_heights, maximum layer excedded\n");    
+      if( c_set_stda_layer( ind, Tk, pk, &zk, &zkp, &gammaT, &pkp, &zero_lapse_rate) == VGD_ERROR){
 	return(VGD_ERROR);
-      }      
-      Tk =  Tk + stda76_tgrad[ind-1] * (stda76_zgrad[ind] - stda76_zgrad[ind-1]);
+      }
     }
     // Complete the layer with current gradient and levs[k] height
     (*temp)[k] =  Tk + stda76_tgrad[ind] * (levs[k] - stda76_zgrad[ind]);
     //printf("k=%d, levs[k]=%f, (*temp)[k]=%f\n",k,levs[k],(*temp)[k]);
+    // Compute pressure at zkp with temp or temp profile
+    c_hypsometric (&((*pres)[k]), pk, Tk, gammaT, zk, levs[k]);
   }
   free(levs);
   return(VGD_OK);
@@ -5514,7 +5535,7 @@ static int C_get_consistent_pt_e1(int iun, float *val, char *nomvar ){
 }
 
 static int C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, char *nomvar ){
-  int error, ni, nj, nk, nmax=1000, infon, ind;
+  int ni, nj, nk, nmax=1000, infon, ind;
   int liste[nmax];
   VGD_TFSTD_ext va3;
 
@@ -5991,7 +6012,13 @@ int Cvgd_write_desc (vgrid_descriptor *self, int unit) {
 }
 
 int Cvgd_standard_atmosphere_1976_temp(vgrid_descriptor *self, int *i_val, int nl, float **temp){
-
+  float *pres;
+  pres = malloc( nl * sizeof(float) );
+  if(! pres){
+    printf("(Cvgd) ERROR in Cvgd_standard_atmosphere_1976_temp, problem allocating pres\n");
+    return(VGD_ERROR);
+  }
+  
   if(! *temp){
     *temp = malloc( nl * sizeof(float) );
     if(! *temp){
@@ -6000,7 +6027,7 @@ int Cvgd_standard_atmosphere_1976_temp(vgrid_descriptor *self, int *i_val, int n
     }
   }
   if(! strcmp((*self).ref_name,"ME  ")){
-    if( c_stda76_temp_from_heights(self, i_val, nl, temp) == VGD_ERROR ){
+    if( c_stda76_temp_pres_from_heights(self, i_val, nl, temp, &pres) == VGD_ERROR ){
       return(VGD_ERROR);
     }
   } else {
@@ -6008,6 +6035,36 @@ int Cvgd_standard_atmosphere_1976_temp(vgrid_descriptor *self, int *i_val, int n
       return(VGD_ERROR);
     }
   }
+  free(pres);
+  return(VGD_OK);
+}
 
+int Cvgd_standard_atmosphere_1976_pres(vgrid_descriptor *self, int *i_val, int nl, float **pres){
+
+  float *temp;
+  temp = malloc( nl * sizeof(float) );
+  if(! temp){
+    printf("(Cvgd) ERROR in Cvgd_standard_atmosphere_1976_pres, problem allocating temp of size %d \n",nl);
+    return(VGD_ERROR);
+  }
+  if(! *pres){
+    *pres = malloc( nl * sizeof(float) );
+    if(! *pres){
+      printf("(Cvgd) ERROR in Cvgd_standard_atmosphere_1976_pres, problem allocating *pres\n");
+      return(VGD_ERROR);
+    }
+  }
+  if(! strcmp((*self).ref_name,"ME  ")){
+    if( c_stda76_temp_pres_from_heights(self, i_val, nl, &temp, pres) == VGD_ERROR ){
+      return(VGD_ERROR);
+    }
+  } else {
+    printf("ERROR: please contact the vgrid developpers to add c_stda76_pres_from_pres\n");
+    return(VGD_ERROR);
+    //if( c_stda76_pres_from_press(self, i_val, nl, pres) == VGD_ERROR ){
+    //  return(VGD_ERROR);
+    //}
+  }
+  free(temp);
   return(VGD_OK);
 }

@@ -1,7 +1,6 @@
 
-  double *aa_8, *bb_8;
-  int ij, k, ijk, ind, kind;
-  float hyb;
+  double *aa_8;
+  int ij, k, ijk, ind;
 
   aa_8 = malloc(nk*sizeof(double));
   if(! aa_8 ) {
