@@ -4454,7 +4454,6 @@ static int c_vgrid_genab_21002(float *hybuser, int nk, int *nl_m, int *nl_t, int
       c_m_8[k] = 0.;
     }
   }
-
   a_m_8[nk]   = 0.;
   b_m_8[nk]   = 1.;
   c_m_8[nk]   = 0.;
@@ -4466,23 +4465,21 @@ static int c_vgrid_genab_21002(float *hybuser, int nk, int *nl_m, int *nl_t, int
   for( k = 0; k < nk; k++ ){
     a_w_8[k] = 0.5*( a_m_8[k] + a_m_8[k+1] );
     b_w_8[k] = 0.5*( b_m_8[k] + b_m_8[k+1] );
-    c_t_8[k] = 0.5*( c_m_8[k] + c_m_8[k+1] );
+    c_w_8[k] = 0.5*( c_m_8[k] + c_m_8[k+1] );
     // Since rcoef* may be big we limit B and C to avoid floating point overflow         
     if( b_w_8[k] < 1.e-16){
       b_w_8[k] = 0.;
     }
-    if( c_t_8[k] < 1.e-16){
-      c_t_8[k] = 0.;
+    if( c_w_8[k] < 1.e-16){
+      c_w_8[k] = 0.;
     }
   }
-  a_w_8[nk-1]   = 0.;
-  b_w_8[nk-1]   = 1.;
   a_w_8[nk]   = 0.;
   b_w_8[nk]   = 1.;
-  c_t_8[nk]   = 0.;
+  c_w_8[nk]   = 0.;
   a_w_8[nk+1] = dhw;
   b_w_8[nk+1] = 1.;
-  c_t_8[nk+1] = 0.;
+  c_w_8[nk+1] = 0.;
   
   //Thermo levels
   for( k = 0; k <= nk+1; k++ ){
