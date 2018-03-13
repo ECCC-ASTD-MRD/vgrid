@@ -4242,8 +4242,8 @@ static int c_vgrid_genab_21001(float *hybuser, int nk, int *nl_m, int *nl_t, flo
     my_rcoef4 = rcoef4;
   }
   //Momentum levels
-
-  pr1 = 1. / (hybuser[0] - hybuser[nk-1] );
+  // Note: hybuser at surface in not in the list but we know it is zero
+  pr1 = 1. / hybuser[0];
   for( k = 0; k < nk; k++ ){
     lamda_8 = ( hybuser[0] - hybuser[k] ) * pr1;
     rcoef   = (float) my_rcoef4 - ( my_rcoef4 - my_rcoef3 ) * lamda_8;
@@ -4438,7 +4438,8 @@ static int c_vgrid_genab_21002(float *hybuser, int nk, int *nl_m, int *nl_t, int
   }
 
   //Momentum levels
-  pr1 = 1. / (hybuser[0] - hybuser[nk-1] );
+  // Note: hybuser at surface in not in the list but we know it is zero
+  pr1 = 1. / hybuser[0];
   for( k = 0; k < nk; k++ ){
     lamda_8 = ( hybuser[0] - hybuser[k] ) * pr1;
     rcoef   = (float) my_rcoef4 - ( my_rcoef4 - my_rcoef3 ) * lamda_8;
