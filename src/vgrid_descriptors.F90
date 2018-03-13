@@ -2270,9 +2270,10 @@ contains
 
       ! Internal variables
       character(len=KEY_LENGTH) :: my_key
-
+      status = VGD_ERROR
       my_key = up(key(1:KEY_LENGTH))
-      status = f_put_int(self%cptr, trim(my_key)//C_NULL_CHAR, value)
+      if( f_put_int(self%cptr, trim(my_key)//C_NULL_CHAR, value) == VGD_ERROR ) return      
+      status = VGD_OK      
    end function put_int
    
    integer function put_real8_3d(self, key, value) result(status)
