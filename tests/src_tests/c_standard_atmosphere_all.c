@@ -138,7 +138,13 @@ int test_it(char *filename, int ind) {
     return(VGD_ERROR);
   }
   printf("   Testing temperature\n");
-  if( Cvgd_standard_atmosphere_1976_temp(vgd, i_val, nl_t, &temp) == VGD_ERROR ) {
+  temp = malloc( nl_t * sizeof(float) );
+  if(! temp){
+    printf("ERROR in test, problem allocating temp\n");
+    free(temp);
+    return(VGD_ERROR);
+  }
+  if( Cvgd_standard_atmosphere_1976_temp(vgd, i_val, nl_t, temp) == VGD_ERROR ) {
     printf("ERROR with Cvgd_standard_atmosphere_1976_temp\n");
     return(VGD_ERROR);
   }
@@ -148,7 +154,13 @@ int test_it(char *filename, int ind) {
   ier = Cvgd_get_char(vgd, "RFLD", nomvar, 1);
   if(! strcmp(nomvar,"ME  ")){
     printf("   Testing pressure\n");
-    if( Cvgd_standard_atmosphere_1976_pres(vgd, i_val, nl_t, &pres) == VGD_ERROR ) {
+    pres = malloc( nl_t * sizeof(float) );
+    if(! pres){
+      printf("ERROR in test, problem allocating pres\n");
+      free(pres);
+      return(VGD_ERROR);
+    }
+    if( Cvgd_standard_atmosphere_1976_pres(vgd, i_val, nl_t, pres) == VGD_ERROR ) {
       printf("ERROR with Cvgd_standard_atmosphere_1976_pres\n");
       return(VGD_ERROR);
     }

@@ -340,7 +340,7 @@ static int c_set_stda_layer(int ind, float Tk, float pk, float *zk, float *zkp, 
   return(VGD_OK);
 }
 
-int c_stda76_temp_from_press(vgrid_descriptor *self, int *i_val, int nl, float **temp){
+int c_stda76_temp_from_press(vgrid_descriptor *self, int *i_val, int nl, float *temp){
   int k, ind;
   char zero_lapse_rate;
   float pkp, Tk, pk, hgts_stda, zk, zkp, gammaT;
@@ -384,17 +384,17 @@ int c_stda76_temp_from_press(vgrid_descriptor *self, int *i_val, int nl, float *
     }
     if( zero_lapse_rate ){
       //hgts_stda = (float) zk - (VGD_RGASD*Tk)/VGD_GRAV * log(levs[k]/pk);
-      (*temp)[k] = Tk;
+      temp[k] = Tk;
     } else {
       hgts_stda = (float) zk + Tk/gammaT * ( exp(-(VGD_RGASD*gammaT)/VGD_GRAV * log(levs[k]/pk )) - 1.f );
-      (*temp)[k] = Tk + gammaT*(hgts_stda-zk);
+      temp[k] = Tk + gammaT*(hgts_stda-zk);
     }
   }
   free(levs);
   return(VGD_OK);
 }
 
-int c_stda76_temp_pres_from_heights(vgrid_descriptor *self, int *i_val, int nl, float **temp, float **pres){
+int c_stda76_temp_pres_from_heights(vgrid_descriptor *self, int *i_val, int nl, float *temp, float *pres){
   int ind = 0, k;
   char zero_lapse_rate;
   float *levs = NULL;
@@ -436,10 +436,10 @@ int c_stda76_temp_pres_from_heights(vgrid_descriptor *self, int *i_val, int nl, 
       }
     }
     // Complete the layer with current gradient and levs[k] height
-    (*temp)[k] =  Tk + stda76_tgrad[ind] * (levs[k] - stda76_zgrad[ind]);
-    //printf("k=%d, levs[k]=%f, (*temp)[k]=%f\n",k,levs[k],(*temp)[k]);
+    temp[k] =  Tk + stda76_tgrad[ind] * (levs[k] - stda76_zgrad[ind]);
+    //printf("k=%d, levs[k]=%f, temp[k]=%f\n",k,levs[k],temp[k]);
     // Compute pressure at zkp with temp or temp profile
-    c_hypsometric (&((*pres)[k]), pk, Tk, gammaT, zk, levs[k]);
+    c_hypsometric (pres + k , pk, Tk, gammaT, zk, levs[k]);
   }
   free(levs);
   return(VGD_OK);
@@ -6008,23 +6008,19 @@ int Cvgd_write_desc (vgrid_descriptor *self, int unit) {
 
 }
 
-int Cvgd_standard_atmosphere_1976_temp(vgrid_descriptor *self, int *i_val, int nl, float **temp){
+int Cvgd_standard_atmosphere_1976_temp(vgrid_descriptor *self, int *i_val, int nl, float *temp){
   float *pres;
   pres = malloc( nl * sizeof(float) );
   if(! pres){
     printf("(Cvgd) ERROR in Cvgd_standard_atmosphere_1976_temp, problem allocating pres\n");
     return(VGD_ERROR);
-  }
-  
-  if(! *temp){
-    *temp = malloc( nl * sizeof(float) );
-    if(! *temp){
-      printf("(Cvgd) ERROR in Cvgd_standard_atmosphere_1976_temp, problem allocating *temp\n");
-      return(VGD_ERROR);
-    }
+  }  
+  if(! temp){
+    printf("(Cvgd) ERROR in Cvgd_standard_atmosphere_1976_temp, temp not allocated\n");
+    return(VGD_ERROR);
   }
   if(! strcmp((*self).ref_name,"ME  ")){
-    if( c_stda76_temp_pres_from_heights(self, i_val, nl, temp, &pres) == VGD_ERROR ){
+    if( c_stda76_temp_pres_from_heights(self, i_val, nl, temp, pres) == VGD_ERROR ){
       return(VGD_ERROR);
     }
   } else {
@@ -6036,7 +6032,7 @@ int Cvgd_standard_atmosphere_1976_temp(vgrid_descriptor *self, int *i_val, int n
   return(VGD_OK);
 }
 
-int Cvgd_standard_atmosphere_1976_pres(vgrid_descriptor *self, int *i_val, int nl, float **pres){
+int Cvgd_standard_atmosphere_1976_pres(vgrid_descriptor *self, int *i_val, int nl, float *pres){
 
   float *temp;
   temp = malloc( nl * sizeof(float) );
@@ -6044,15 +6040,12 @@ int Cvgd_standard_atmosphere_1976_pres(vgrid_descriptor *self, int *i_val, int n
     printf("(Cvgd) ERROR in Cvgd_standard_atmosphere_1976_pres, problem allocating temp of size %d \n",nl);
     return(VGD_ERROR);
   }
-  if(! *pres){
-    *pres = malloc( nl * sizeof(float) );
-    if(! *pres){
-      printf("(Cvgd) ERROR in Cvgd_standard_atmosphere_1976_pres, problem allocating *pres\n");
-      return(VGD_ERROR);
-    }
+  if(! pres){
+    printf("(Cvgd) ERROR in Cvgd_standard_atmosphere_1976_pres, pres not allocated\n");
+    return(VGD_ERROR);
   }
   if(! strcmp((*self).ref_name,"ME  ")){
-    if( c_stda76_temp_pres_from_heights(self, i_val, nl, &temp, pres) == VGD_ERROR ){
+    if( c_stda76_temp_pres_from_heights(self, i_val, nl, temp, pres) == VGD_ERROR ){
       return(VGD_ERROR);
     }
   } else {

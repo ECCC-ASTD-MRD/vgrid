@@ -273,14 +273,14 @@ module vGrid_Descriptors
         use iso_c_binding, only : c_ptr, c_int
         type(c_ptr), value :: vgd_CP, ip1s_CP
         integer (c_int), value :: nl
-        type(c_ptr) :: temp_CP
+        type(c_ptr), value :: temp_CP
       end function f_standard_atmosphere_1976_temp
 
       integer function f_standard_atmosphere_1976_pres(vgd_CP, ip1s_CP, nl, pres_CP) bind(c, name='Cvgd_standard_atmosphere_1976_pres')
         use iso_c_binding, only : c_ptr, c_int
         type(c_ptr), value :: vgd_CP, ip1s_CP
         integer (c_int), value :: nl
-        type(c_ptr) :: pres_CP
+        type(c_ptr), value :: pres_CP
       end function f_standard_atmosphere_1976_pres
       
    end interface
