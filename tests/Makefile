@@ -7,7 +7,7 @@ endif
 # Not to run valgrind
 #VALGRIND=
 # To run valgrind and see result in execution directory
-#VALGRIND=$(PWD)
+#VALGRIND=$PWD
 
 DATA_ARCH=`uname -s`
 
