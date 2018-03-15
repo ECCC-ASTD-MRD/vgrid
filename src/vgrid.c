@@ -1660,7 +1660,7 @@ int C_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, int
 {
   char cvcode[6];
   int errorInput = 0, ier;
-  
+
   if(*self){
     Cvgd_free(self);
   }
@@ -1868,7 +1868,7 @@ int C_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, int
   if(is_valid( *self, ip1_m_valid)) {
     if(ip1_m){
       free((*self)->ip1_m);
-      (*self)->ip1_m = malloc( nl_m * sizeof(double) );
+      (*self)->ip1_m = malloc( nl_m * sizeof(int) );
       if(! (*self)->ip1_m) {
 	printf("(Cvgd) ERROR in C_new_build_vert, problem allocating ip1_m in C_new_build_vert\n");
 	return(VGD_ERROR);
@@ -1882,7 +1882,7 @@ int C_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, int
   if(is_valid( *self, ip1_t_valid)) {
     if(ip1_t){
       free((*self)->ip1_t);
-      (*self)->ip1_t = malloc( nl_t * sizeof(double) );
+      (*self)->ip1_t = malloc( nl_t * sizeof(int) );
       if(! (*self)->ip1_t) {
 	printf("(Cvgd) ERROR: in C_new_build_vert, problem allocating ip1_t\n");
 	return(VGD_ERROR);
@@ -1896,7 +1896,7 @@ int C_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, int
   if(is_valid( *self, ip1_w_valid)) {
     if(ip1_w){
       free((*self)->ip1_w);
-      (*self)->ip1_w = malloc( nl_w * sizeof(double) );
+      (*self)->ip1_w = malloc( nl_w * sizeof(int) );
       if(! (*self)->ip1_w) {
 	printf("(Cvgd) ERROR: in C_new_build_vert, problem allocating ip1_w\n");
 	return(VGD_ERROR);
@@ -2020,7 +2020,6 @@ static int c_encode_vert_0001(vgrid_descriptor **self,int nk){
     ind = ind + 3;
   }
   (*self)->nl_w = (*self)->nl_w;
-  (*self)->c_t_8 = (*self)->c_m_8;
   (*self)->a_t_8 = (*self)->a_m_8;
   (*self)->b_t_8 = (*self)->b_m_8;
   (*self)->c_t_8 = (*self)->c_m_8;

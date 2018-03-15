@@ -91,9 +91,9 @@ integer function test_it(F_file,F_index) result(istat)
 
    if(vgd_get(vgd,key="KIND",value=kind)    == VGD_ERROR)return
    if(vgd_get(vgd,key="VERS",value=version) == VGD_ERROR)return
-   write(my_file,'(i4)')kind*1000+version   
-   my_file="data/toctoc_"//my_file//".fst"
-   print*,'my_file=',my_file
+   write(my_file,*)kind*1000+version   
+   my_file=adjustl(my_file)
+   my_file="data/toctoc_"//trim(my_file)//".fst"
 
    stat=fnom(lu2,my_file,"RND",0)
    if(stat.lt.0)then

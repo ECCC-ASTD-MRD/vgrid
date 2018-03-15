@@ -172,7 +172,7 @@ module vGrid_Descriptors
       end function f_get_char
       
       integer function f_putopt_int(key, value) bind(c, name='Cvgd_putopt_int')
-         use iso_c_binding, only: c_ptr, c_char, c_int
+         use iso_c_binding, only: c_char, c_int
          integer (c_int), value :: value
          character(kind=c_char) :: key(*)
       end function f_putopt_int
@@ -2183,9 +2183,10 @@ contains
 
       ! Set error status
       status = VGD_ERROR
-
       value="";
-
+      do i=1,100
+         my_char(i)=' '
+      end do
       l_quiet = 0
       my_quiet = .false.
       if (present(quiet))then
@@ -2223,7 +2224,6 @@ contains
          end if
          value(i:i)=my_char(i)         
       enddo
-      
    end function get_char
     
    integer function get_logical(self,key,value,quiet) result(status)
