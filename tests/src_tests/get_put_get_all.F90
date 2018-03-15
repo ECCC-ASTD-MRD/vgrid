@@ -63,13 +63,13 @@ end program get_put_get_all
 
 integer function test_it(F_file, ind) result(status)
   use vGrid_Descriptors, only: vgrid_descriptor, vgd_new, vgd_get, &
-       vgd_put, vgd_get, VGD_OK, VGD_ERROR, VGD_LEN_ETIK
+       vgd_put, vgd_get, vgd_free, VGD_OK, VGD_ERROR, VGD_LEN_ETIK
    implicit none
    integer, intent(in) :: ind
    character(len=*), intent(in) :: F_file
    ! Local variables
    integer :: lu, fnom, fstouv, fstfrm, fclos
-   integer :: i,intA,intB
+   integer :: i,intA,intB, ier
    integer, dimension(:), pointer :: intA_1d,intB_1d
    type (vgrid_descriptor) :: vgd
    character(len=4):: key_S
@@ -135,6 +135,7 @@ integer function test_it(F_file, ind) result(status)
    if(associated(intA_1d))deallocate(intA_1d)
    if(associated(intB_1d))deallocate(intB_1d)
    
+   ier = vgd_free(vgd)
    status = fstfrm(lu)
    status = fclos(lu)
    status = VGD_OK

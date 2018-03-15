@@ -12,8 +12,8 @@
     if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_m, self->nl_m) ) != -1 ) {
       aa_8[k] = self->a_m_8[ind];
     } else {
-      if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_t, self->nl_t) ) != -1 ) {
-	aa_8[k] = self->a_t_8[ind];
+      if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_w, self->nl_w) ) != -1 ) {
+	aa_8[k] = self->a_w_8[ind];
       } else {
 	printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n", proc_name,ip1_list[k]);
 	free(aa_8);
