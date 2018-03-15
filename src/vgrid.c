@@ -157,6 +157,8 @@ int C_is_valid(vgrid_descriptor *self, char *valid_table_name)
     return(is_valid(self,              dhm_valid));
   } else if( strcmp(valid_table_name, "dht_valid")        == 0 ){
     return(is_valid(self,              dht_valid));
+  } else if( strcmp(valid_table_name, "dhw_valid")        == 0 ){
+    return(is_valid(self,              dhw_valid));
   } else if( strcmp(valid_table_name, "is_in_logp")       == 0 ){
     return(is_valid(self,              is_in_logp));
   } else {
@@ -4581,7 +4583,7 @@ int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet)
       }
       return(VGD_ERROR);
     }
-    *value = self->ip1_m[self->nl_m-1];
+    *value = self->ip1_m[self->nl_m -1];
   } else if (strcmp(key, "DIPT") == 0){
     if( ! C_is_valid(self,"dht_valid") ){      
       if(! quiet) {
@@ -4590,7 +4592,16 @@ int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet)
       }
       return(VGD_ERROR);
     }
-    *value = self->ip1_t[self->nl_t-1];
+    *value = self->ip1_t[self->nl_t -1];
+  } else if (strcmp(key, "DIPW") == 0){
+    if( ! C_is_valid(self,"dhw_valid") ){      
+      if(! quiet) {
+	printf("(Cvgd) ERROR in Cvgd_get_int, cannot get key %s\n",key);
+	fflush(stdout);
+      }
+      return(VGD_ERROR);
+    }
+    *value = self->ip1_w[self->nl_w -1];
   } else if (strcmp(key, "MIPG") == 0){
     *value = self->match_ipig;
   } else if (strcmp(key, "LOGP") == 0){
@@ -4602,7 +4613,6 @@ int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet)
     }
     return(VGD_ERROR);
   }
-    
   
   return(VGD_OK);
 
@@ -5164,6 +5174,23 @@ int Cvgd_put_int(vgrid_descriptor **self, char *key, int value) {
       }
     } else {
       printf("(Cvgd) ERROR in Cvgd_put_int, DIPT cannot be put for Vcode %d\n", (*self)->vcode);
+      return(VGD_ERROR);
+    }
+  } else if( strcmp(key, "DIPW") == 0 ) {
+    if ( is_valid((*self), dhw_valid)) {
+      (*self)->ip1_w[(*self)->nl_w - 1] = value;
+      if ( is_valid((*self), pref_8_valid)) {
+	(*self)->a_w_8[(*self)->nl_w - 1] = c_comp_diag_a_ip1((*self)->pref_8, value);
+      } else {
+	// Height coordinate
+	(*self)->a_w_8[(*self)->nl_w -1 ] =  c_convip_IP2Level(value, &kind);
+      }
+      if( c_table_update(self) == VGD_ERROR) {
+	printf("(Cvgd) ERROR in Cvgd_put_int, problem with c_table_update for key %s\n", key);
+	return(VGD_ERROR);
+      }
+    } else {
+      printf("(Cvgd) ERROR in Cvgd_put_int, DIPW cannot be put for Vcode %d\n", (*self)->vcode);
       return(VGD_ERROR);
     }
   } else {
