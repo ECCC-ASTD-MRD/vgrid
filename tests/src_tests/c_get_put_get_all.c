@@ -158,7 +158,6 @@ void c_get_put_get_all() {
     }
   }  
 
-  exit(0);
   ier = c_ut_report(status,"testing Cvgd_standard_atmosphere");  
   
 }
