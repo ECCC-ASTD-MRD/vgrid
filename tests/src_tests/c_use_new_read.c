@@ -83,7 +83,7 @@ void c_use_new_read() {
   }
 
   // Load table (this is the actual data in fst record !! which may also be
-  // obtained with fstlir, but why do it id vgd already contains it!)
+  // obtained with fstlir, but why do it if vgd already contains it!)
   if ( Cvgd_get_double_3d(vgd, "VTBL", &table, &ni, &nj, &nk, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_double_3d for VTBL\n");
     return;

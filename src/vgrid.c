@@ -1639,9 +1639,9 @@ int Cvgd_new_build_vert_5100(vgrid_descriptor **self, int ip1, int ip2, double p
 }
 
 int Cvgd_new_build_vert_21001(vgrid_descriptor **self, int ip1, int ip2, float rcoef1, float rcoef2, float rcoef3, float rcoef4, 
-			      double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int nl){
+			      double *a_m_8, double *b_m_8, double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8, int *ip1_m, int *ip1_t, int nl){
   if( C_new_build_vert(self, 21, 1, 0, ip1, ip2, NULL, NULL, &rcoef1, &rcoef2, &rcoef3, &rcoef4,
-		       a_m_8, b_m_8, NULL, a_t_8, b_t_8, NULL, NULL, NULL, NULL, ip1_m, ip1_t, NULL, nl, nl, 0) == VGD_ERROR ){
+		       a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8, NULL, NULL, NULL, ip1_m, ip1_t, NULL, nl, nl, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR with Cvgd_new_build_vert_21001 see details above\n");
     return(VGD_ERROR);
   }
@@ -1649,9 +1649,12 @@ int Cvgd_new_build_vert_21001(vgrid_descriptor **self, int ip1, int ip2, float r
 }
 
 int Cvgd_new_build_vert_21002(vgrid_descriptor **self, int ip1, int ip2, float rcoef1, float rcoef2, float rcoef3, float rcoef4, 
-			      double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, double *a_w_8, double *b_w_8, int *ip1_m, int *ip1_t, int *ip1_w, int nl){
+			      double *a_m_8, double *b_m_8, double *c_m_8,
+			      double *a_t_8, double *b_t_8, double *c_t_8,
+			      double *a_w_8, double *b_w_8, double *c_w_8,
+			      int *ip1_m, int *ip1_t, int *ip1_w, int nl){
   if( C_new_build_vert(self, 21, 2, 0, ip1, ip2, NULL, NULL, &rcoef1, &rcoef2, &rcoef3, &rcoef4,
-		       a_m_8, b_m_8, NULL, a_t_8, b_t_8, NULL, a_w_8, b_w_8, NULL, ip1_m, ip1_t, ip1_w, nl, nl, nl) == VGD_ERROR ){
+		       a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8, a_w_8, b_w_8, c_w_8, ip1_m, ip1_t, ip1_w, nl, nl, nl) == VGD_ERROR ){
     printf("(Cvgd) ERROR with Cvgd_new_build_vert_21002 see details above\n");
     return(VGD_ERROR);
   }
@@ -4742,6 +4745,12 @@ int Cvgd_get_float(vgrid_descriptor *self, char *key, float *value, int quiet) {
     } else {
       *value = (float) c_get_error(key,quiet);
     }
+  } else  if( strcmp(key, "DHW " ) == 0 ){
+    if( is_valid(self,dhw_valid) ){
+      *value = self->dhw;
+    } else {
+      *value = (float) c_get_error(key,quiet);
+    }
   } else {
     if(! quiet) {
       printf("(Cvgd) ERROR in Cvgd_get_float, invalid key '%s'\n",key);
@@ -5276,7 +5285,7 @@ int Cvgd_new_gen_5100(vgrid_descriptor **self, float *hyb, int size_hyb, double 
 }
 
 int Cvgd_new_gen_21001(vgrid_descriptor **self, float *hyb, int size_hyb, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht) {
-  if( C_new_gen(self, 21, 101, hyb, size_hyb, &rcoef1, &rcoef2, &rcoef3, &rcoef4,
+  if( C_new_gen(self, 21, 1, hyb, size_hyb, &rcoef1, &rcoef2, &rcoef3, &rcoef4,
 		NULL, NULL, NULL, ip1, ip2, &dhm, &dht, NULL, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen_21001, see details above\n");
     return(VGD_ERROR);

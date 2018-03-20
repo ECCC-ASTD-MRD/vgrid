@@ -126,12 +126,13 @@ int Cvgd_new_build_vert_5100(vgrid_descriptor **self, int ip1, int ip2, double p
 			     double *a_m_8, double *b_m_8, double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8, int *ip1_m, int *ip1_t, int nl);
 int Cvgd_new_build_vert_5999(vgrid_descriptor **self, int ip1, int ip2, 
 			     double *a_m_8, double *b_m_8, int *ip1_m, int nk);
-int Cvgd_new_build_vert_21001(vgrid_descriptor **self, int ip1, int ip2, float rcoef1, float rcoef2, float rcoef3, float rcoef4,
-			      double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int nl);
+int Cvgd_new_build_vert_21001(vgrid_descriptor **self, int ip1, int ip2, float rcoef1, float rcoef2, float rcoef3, float rcoef4, 
+			      double *a_m_8, double *b_m_8, double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8, int *ip1_m, int *ip1_t, int nl);
 int Cvgd_new_build_vert_21002(vgrid_descriptor **self, int ip1, int ip2, float rcoef1, float rcoef2, float rcoef3, float rcoef4, 
-			      double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, double *a_w_8, double *b_w_8, int *ip1_m, int *ip1_t, int *ip1_w, int nl);
-int Cvgd_new_build_vert_21101(vgrid_descriptor **self, int ip1, int ip2, float rcoef1, float rcoef2, float rcoef3, float rcoef4, 
-			      double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int nl);
+			      double *a_m_8, double *b_m_8, double *c_m_8,
+			      double *a_t_8, double *b_t_8, double *c_t_8,
+			      double *a_w_8, double *b_w_8, double *c_w_8,
+			      int *ip1_m, int *ip1_t, int *ip1_w, int nl);
 int C_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, int ip1, int ip2, double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
 		     double *a_m_8, double *b_m_8, double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8, double *a_w_8, double *b_w_8, double *c_w_8, int *ip1_m, int *ip1_t, int *ip1_w, int nl_m, int nl_t, int nl_w);
 int Cvgd_vgdcmp(vgrid_descriptor *vgd1, vgrid_descriptor *vgd2);
