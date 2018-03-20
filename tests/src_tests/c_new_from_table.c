@@ -21,12 +21,30 @@
 #include "vgrid.h"
 #include "armnlib.h"
 
-void c_new_from_table() {
+char *filenames[] = {
+    "data/dm_1001_from_model_run",
+    "data/dm_1002_from_model_run",
+    "data/2001_from_model_run",
+    "data/dm_5001_from_model_run",
+    "data/dm_5002_from_model_run",
+    "data/dm_5005_from_model_run",
+    "data/dm_5100_from_model_run",
+    "data/dm_5999_from_model_run",
+    "data/dm_21001_from_model_run_SLEVE",
+    "data/dm_21001_from_model_run_NON_SLEVE",
+    "data/dm_21002_from_model_run_SLEVE",
+    "data/dm_21002_from_model_run_NON_SLEVE"
+};
 
-  int ni, nj, nk, iun=10, ier;
+#define n_file (sizeof (filenames) / sizeof (const char *))
+
+int test_it(char *filename, int ind) {
+
+  int ni, nj, nk, iun, ier;
   double *table = NULL;
-  char filename[]="data/dm_5005_from_model_run";
   vgrid_descriptor *vgd = NULL,  *vgd2 = NULL;
+
+  iun = 10 + ind;
 
   if( c_fnom(&iun,filename,"RND+R/O",0) < 0 ) {
     printf("ERROR with c_fnom on iun, file %s\n", filename);
@@ -52,13 +70,32 @@ void c_new_from_table() {
   // Test equality
   ier = Cvgd_vgdcmp(vgd, vgd2);
   if( ier != 0 ){
-    printf("     Descritors not equal, Cvgd_vgdcmp code is %d\n", ier);
-    return;
+    printf("     Descritors not equal, Cvgd_vgdcmp code is %d\n", ier);    
+    return (VGD_ERROR);
   } else {
     printf("     Descritors are equal.\n");
   }
   Cvgd_free(&vgd);
   Cvgd_free(&vgd2);
   free(table);
-  ier = c_ut_report(VGD_OK,"testing new_build");  
+  return (VGD_OK);
+}
+
+void c_new_from_table() {
+  
+  int i, ier, status = VGD_OK;
+
+  ier = Cvgd_putopt_int("ALLOW_SIGMA",1);
+  
+  for (i = 0; i < (int) n_file; i++) {
+    printf ("Testing %s\n", filenames[i]);
+    if(test_it(filenames[i],i) == VGD_ERROR){
+      printf("ERROR with %s\n",filenames[i]);
+      status = VGD_ERROR;
+      exit(1);
+    }
+  }  
+  printf("status=%d, VGD_OK=%d, VGD_ERROR=%d\n",status, VGD_OK, VGD_ERROR);
+  ier = c_ut_report(status,"testing Cvgd_levels");  
+  
 }

@@ -32,7 +32,7 @@ program constructor
 
   nullify(ip1_list)
 
-  stat=fnom(lu,"data/dm_5005_from_model_run","RND",0)
+  stat=fnom(lu,"data/dm_5005g_from_model_run","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
      call abort
