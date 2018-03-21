@@ -5,6 +5,10 @@ ifeq ($(BASE_ARCH),$(EC_ARCH))
    $(error )
 endif
 
+ifeq ($(USE_EFENCE),1)
+   LEFENCE=-lefence
+endif
+
 include version.dot
 
 default: libdescrip.a
@@ -15,10 +19,10 @@ dependencies.mk: *.c *.F90 *.h *.hc
 include dependencies.mk
 
 %.o: %.F90
-	s.f90 -c $(MY_FFLAGS) $(FFLAGS) $<
+	s.f90 -c $(MY_FFLAGS) $(FFLAGS) $(LEFENCE) $<
 
 %.o: %.c
-	s.cc -c $(MY_CFLAGS) $(CFLAGS) $<
+	s.cc -c $(MY_CFLAGS) $(CFLAGS) $(LEFENCE) $<
 
 libdescrip.a: $(OBJECTS) dependencies.mk vgrid_version
 	rm -f libdescrip.a && ar scru libdescrip.a *.o ;\
