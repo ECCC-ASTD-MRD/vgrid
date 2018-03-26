@@ -106,7 +106,7 @@ int test_it(char *filename, int ind) {
   int nl_t, nl_t_c;
   char mode[]="RND";
   char nomvar[] = "1234";
-  float *temp = NULL, *pres = NULL, temp_c;
+  float *temp = NULL, *pres = NULL, temp_c, sfc_pres, sfc_temp;
   vgrid_descriptor *vgd = NULL;
       
   iun = 10 + ind;
@@ -160,11 +160,29 @@ int test_it(char *filename, int ind) {
       free(pres);
       return(VGD_ERROR);
     }
-    if( Cvgd_standard_atmosphere_1976_pres(vgd, i_val, nl_t, pres) == VGD_ERROR ) {
+    if( Cvgd_standard_atmosphere_1976_pres(vgd, i_val, nl_t, pres, NULL, NULL) == VGD_ERROR ) {
       printf("ERROR with Cvgd_standard_atmosphere_1976_pres\n");
       return(VGD_ERROR);
     }
     if( compare(filename, "_stda76_pres.txt", i_val, pres, nl_t) == VGD_ERROR ){
+      return(VGD_ERROR);
+    }
+    printf("   Testing pressure, option sfc_pres\n");
+    sfc_pres=100000.;
+    if( Cvgd_standard_atmosphere_1976_pres(vgd, i_val, nl_t, pres, NULL, &sfc_pres) == VGD_ERROR ) {
+      printf("ERROR with Cvgd_standard_atmosphere_1976_pres, option sfc_pres\n");
+      return(VGD_ERROR);
+    }
+    if( compare(filename, "_stda76_pres_sfc_pres_100000.txt", i_val, pres, nl_t) == VGD_ERROR ){
+      return(VGD_ERROR);
+    }
+    printf("   Testing pressure, option sfc_temp\n");
+    sfc_temp=273.;
+    if( Cvgd_standard_atmosphere_1976_pres(vgd, i_val, nl_t, pres, &sfc_temp, NULL) == VGD_ERROR ) {
+      printf("ERROR with Cvgd_standard_atmosphere_1976_pres, option sfc_pres\n");
+      return(VGD_ERROR);
+    }
+    if( compare(filename, "_stda76_pres_sfc_temp_273.txt", i_val, pres, nl_t) == VGD_ERROR ){
       return(VGD_ERROR);
     }
   }
