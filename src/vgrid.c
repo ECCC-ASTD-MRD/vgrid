@@ -396,7 +396,7 @@ int c_stda76_temp_from_press(vgrid_descriptor *self, int *i_val, int nl, float *
   return(VGD_OK);
 }
 
-int c_stda76_temp_pres_from_heights(vgrid_descriptor *self, int *i_val, int nl, float *temp, float *pres){
+int c_stda76_temp_pres_from_heights(vgrid_descriptor *self, int *i_val, int nl, float *temp, float *pres, float *sfc_temp, float *sfc_pres){
   int ind = 0, k;
   char zero_lapse_rate;
   float *levs = NULL;
@@ -420,9 +420,17 @@ int c_stda76_temp_pres_from_heights(vgrid_descriptor *self, int *i_val, int nl, 
       return(VGD_ERROR);
     }
   }
-  // Start at Normal Temperature and Pressure  
-  Tk = stda76_sfc_temp;
-  pk = stda76_sfc_pres;
+  // Start at Normal Temperature and Pressure
+  if( sfc_temp ){
+    Tk = *sfc_temp;
+  } else {
+    Tk = stda76_sfc_temp;
+  }
+  if( sfc_pres ){
+    pk = *sfc_pres;
+  } else {
+    pk = stda76_sfc_pres;
+  }
   if( c_set_stda_layer( ind, Tk, pk, &zk, &zkp, &gammaT, &pkp, &zero_lapse_rate) == VGD_ERROR ){
     printf("Cvgd ERROR in c_stda76_temp_pres_from_heights with c_set_stda_layer\n");
     return(VGD_ERROR);
@@ -6056,7 +6064,7 @@ int Cvgd_standard_atmosphere_1976_temp(vgrid_descriptor *self, int *i_val, int n
     return(VGD_ERROR);
   }
   if(! strcmp((*self).ref_name,"ME  ")){
-    if( c_stda76_temp_pres_from_heights(self, i_val, nl, temp, pres) == VGD_ERROR ){
+    if( c_stda76_temp_pres_from_heights(self, i_val, nl, temp, pres, NULL, NULL) == VGD_ERROR ){
       return(VGD_ERROR);
     }
   } else {
@@ -6068,7 +6076,7 @@ int Cvgd_standard_atmosphere_1976_temp(vgrid_descriptor *self, int *i_val, int n
   return(VGD_OK);
 }
 
-int Cvgd_standard_atmosphere_1976_pres(vgrid_descriptor *self, int *i_val, int nl, float *pres){
+int Cvgd_standard_atmosphere_1976_pres(vgrid_descriptor *self, int *i_val, int nl, float *pres, float *sfc_temp, float *sfc_pres){
 
   float *temp;
   temp = malloc( nl * sizeof(float) );
@@ -6081,7 +6089,7 @@ int Cvgd_standard_atmosphere_1976_pres(vgrid_descriptor *self, int *i_val, int n
     return(VGD_ERROR);
   }
   if(! strcmp((*self).ref_name,"ME  ")){
-    if( c_stda76_temp_pres_from_heights(self, i_val, nl, temp, pres) == VGD_ERROR ){
+    if( c_stda76_temp_pres_from_heights(self, i_val, nl, temp, pres, sfc_temp, sfc_pres) == VGD_ERROR ){
       return(VGD_ERROR);
     }
   } else {

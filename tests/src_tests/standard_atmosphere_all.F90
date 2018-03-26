@@ -17,6 +17,9 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 !================================================================================================
+
+! NOTE : the control files for comparison can be produce by the test c_standard_atmophere_all.c
+
 program standard_atmosphere
 #include <msg.h>
   use Unit_Testing, only: ut_report
@@ -102,6 +105,22 @@ integer function stda_do_it(lu,file) result(status)
         return
      endif
      if( compare(file, "_stda76_pres.txt", ip1s, pres, size(ip1s)) == VGD_ERROR )then
+        return
+     endif
+     print*,"   Testing pressure, option sfc_pres"
+     if( vgd_standard_atmosphere_1976(vgd, ip1s, pres, 'PRESSURE', sfc_pres=100000.) == VGD_ERROR )then
+        print*,"In test : ERROR with Cvgd_standard_atmosphere_1976_pres"
+        return
+     endif
+     if( compare(file, "_stda76_pres_sfc_pres_100000.txt", ip1s, pres, size(ip1s)) == VGD_ERROR )then
+        return
+     endif
+     print*,"   Testing pressure, option sfc_temp"
+     if( vgd_standard_atmosphere_1976(vgd, ip1s, pres, 'PRESSURE', sfc_temp=273.) == VGD_ERROR )then
+        print*,"In test : ERROR with Cvgd_standard_atmosphere_1976_pres"
+        return
+     endif
+     if( compare(file, "_stda76_pres_sfc_temp_273.txt", ip1s, pres, size(ip1s)) == VGD_ERROR )then
         return
      endif
      deallocate(pres)

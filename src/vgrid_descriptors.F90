@@ -276,11 +276,11 @@ module vGrid_Descriptors
         type(c_ptr), value :: temp_CP
       end function f_standard_atmosphere_1976_temp
 
-      integer function f_standard_atmosphere_1976_pres(vgd_CP, ip1s_CP, nl, pres_CP) bind(c, name='Cvgd_standard_atmosphere_1976_pres')
+      integer function f_standard_atmosphere_1976_pres(vgd_CP, ip1s_CP, nl, pres_CP, sfc_temp_CP, sfc_pres_CP) bind(c, name='Cvgd_standard_atmosphere_1976_pres')
         use iso_c_binding, only : c_ptr, c_int
         type(c_ptr), value :: vgd_CP, ip1s_CP
         integer (c_int), value :: nl
-        type(c_ptr), value :: pres_CP
+        type(c_ptr), value :: pres_CP, sfc_temp_CP, sfc_pres_CP
       end function f_standard_atmosphere_1976_pres
       
    end interface
@@ -2441,14 +2441,16 @@ contains
 
  end function get_ref
   
- integer function vgd_standard_atmosphere_1976(self, ip1s, val, var) result(status)
+ integer function vgd_standard_atmosphere_1976(self, ip1s, val, var, sfc_temp, sfc_pres) result(status)
    use vgrid_utils, only: get_allocate, up
    type(vgrid_descriptor), intent(in) :: self         !Vertical descriptor instance
    integer, dimension(:), intent(in) :: ip1s          !ip1 list to get value for
    real, dimension(:), pointer, intent(inout) :: val  !Standard Atmosphere 1976 value for ip1s
    character(len=*), intent(in) :: var                !Variable name to get valid choice are "TEMPERATURE", "PRESSURE"
+   real, optional, intent(in) :: sfc_temp             !Use this surface temperature for standard atmosphere
+   real, optional, intent(in) :: sfc_pres             !Use this surface pressure for standard atmosphere
    ! Local variables
-   type (c_ptr) :: ip1s_CP, val_CP
+   type (c_ptr) :: ip1s_CP, val_CP, sfc_pres_CP, sfc_temp_CP
    status = VGD_ERROR
    if(.not.is_valid(self,'SELF'))then
       write(for_msg,*) 'vgrid structure is not valid in standard_atmosphere_1976'
@@ -2460,16 +2462,32 @@ contains
       return
    endif
    ip1s_CP = c_loc(ip1s)
-   val_CP = c_loc(val)   
+   val_CP = c_loc(val)
+   if( present(sfc_temp) )then
+      sfc_temp_CP = c_loc(sfc_temp)
+   else
+      sfc_temp_CP = C_NULL_PTR
+   endif
+   if( present(sfc_pres) )then
+      sfc_pres_CP = c_loc(sfc_pres)
+   else
+      sfc_pres_CP = C_NULL_PTR
+   endif
    select case (trim(up(var)))
    case ('TEMPERATURE')
+      if (present(sfc_temp) .or. present(sfc_pres) )then
+          write(for_msg,*) 'ERROR with vgd_standard_atmosphere_1976_temp, option sfc_temp and/or sfc_pres not implemented for TEMPERATURE.'&
+               //'Please contact the vgrid dev team.'
+          call msg(MSG_ERROR,VGD_PRFX//for_msg) 
+          return
+      endif
       if( f_standard_atmosphere_1976_temp(self%cptr, ip1s_CP, size(val), val_CP) /= VGD_OK) then
          write(for_msg,*) 'ERROR with vgd_standard_atmosphere_1976_temp'
          call msg(MSG_ERROR,VGD_PRFX//for_msg)       
          return
       endif
    case ('PRESSURE')
-      if( f_standard_atmosphere_1976_pres(self%cptr, ip1s_CP, size(val), val_CP) /= VGD_OK) then
+      if( f_standard_atmosphere_1976_pres(self%cptr, ip1s_CP, size(val), val_CP, sfc_temp_CP, sfc_pres_CP ) /= VGD_OK) then
          write(for_msg,*) 'ERROR with vgd_standard_atmosphere_1976_pres'
          call msg(MSG_ERROR,VGD_PRFX//for_msg)       
          return
