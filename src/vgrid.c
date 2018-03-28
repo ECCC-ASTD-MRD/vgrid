@@ -4475,7 +4475,7 @@ static int c_vgrid_genab_21002(float *hybuser, int nk, int *nl_m, int *nl_t, int
   c_m_8[nk+1] = 0.;
   
   //Vertical-Velocity levels
-  for( k = 0; k < nk; k++ ){
+  for( k = 0; k < nk-1; k++ ){
     a_w_8[k] = 0.5*( a_m_8[k] + a_m_8[k+1] );
     b_w_8[k] = 0.5*( b_m_8[k] + b_m_8[k+1] );
     c_w_8[k] = 0.5*( c_m_8[k] + c_m_8[k+1] );
@@ -4487,9 +4487,15 @@ static int c_vgrid_genab_21002(float *hybuser, int nk, int *nl_m, int *nl_t, int
       c_w_8[k] = 0.;
     }
   }
+  // In order to have the same number of level as momentum, we put two levels at the surface
+  // Level at surface
+  a_w_8[nk-1]   = 0.;
+  b_w_8[nk-1]   = 1.;
+  c_w_8[nk-1]   = 0.;
   a_w_8[nk]   = 0.;
   b_w_8[nk]   = 1.;
   c_w_8[nk]   = 0.;
+  // Diag level
   a_w_8[nk+1] = dhw;
   b_w_8[nk+1] = 1.;
   c_w_8[nk+1] = 0.;
