@@ -29,7 +29,6 @@ char *filenames[] = {
     "data/dm_1002_from_model_run",
     "data/2001_from_model_run",
     "data/dm_5001_from_model_run",
-    "data/dm_5002_from_model_run",
     "data/dm_5005_from_model_run",
     "data/dm_5100_from_model_run",
     "data/dm_5999_from_model_run",
@@ -37,11 +36,12 @@ char *filenames[] = {
     "data/dm_21001_from_model_run_NON_SLEVE",
     "data/dm_21002_from_model_run_SLEVE",
     "data/dm_21002_from_model_run_NON_SLEVE"
-};
+ };
+
 
 #define n_file (sizeof (filenames) / sizeof (const char *))
 
-int compare_values(int iun, float *levels, double *levels_8, float *p0, int *i_val, int nl_t, char *ref_nomvar){
+int compare_values(int iun, float *levels, double *levels_8, float *p0, int *i_val, int nl, char *ref_nomvar){
   int k, ij, ijk, ni2, nj2, nk2, key, ier, ip1;  
   char nomvar[5];
   float fact;
@@ -53,8 +53,8 @@ int compare_values(int iun, float *levels, double *levels_8, float *p0, int *i_v
     fact=.1f;
   }
 
-  printf("nl_t=%d\n",nl_t);
-  for( k = 0, ijk = 0; k < nl_t; k++){
+  printf("nl=%d\n",nl);
+  for( k = 0, ijk = 0; k < nl; k++){
     // Il n'est pas normal que GZ 0 m ne soit pas dans le fichier pour Vcode 21001
     ip1=i_val[k];
     if(i_val[k] == 82837504 && ! strcmp(ref_nomvar,"ME  ")){
@@ -97,12 +97,12 @@ int compare_values(int iun, float *levels, double *levels_8, float *p0, int *i_v
   return(VGD_OK);
 }
 
-int test_it(char *filename, int ind) {
+int test_it(char *filename, char *ip1_name, int ind) {
 
   int ier, iun;
   int quiet=0, *i_val = NULL, in_log = 0, dpidpis = 0;
-  int nl_t, ni, nj, nk, ni2, nj2, nk2, key, ij, ijk, kind, ref1, ref2;
-  char mode[]="RND";
+  int nl, ni, nj, nk, ni2, nj2, nk2, key, ij, ijk, kind, ref1, ref2;
+  char mode[]="RND", key_name[]="1234";
   char nomvar1[5], nomvar2[5];
   float *p0 = NULL, *p0ls = NULL, *levels = NULL, fact;
   double *p0_8 = NULL, *p0ls_8 = NULL, *levels_8 = NULL;
@@ -121,23 +121,34 @@ int test_it(char *filename, int ind) {
     return(VGD_ERROR);
   }
 
+  if (strcmp(ip1_name, "VIPM") == 0) {
+    strcpy(key_name,"NL_M");
+  } else if (strcmp(ip1_name, "VIPT") == 0) {
+    strcpy(key_name,"NL_T");
+  }else if (strcmp(ip1_name, "VIPW") == 0) {
+    strcpy(key_name,"NL_W");
+  } else {
+    printf("Wrong name passed to ip1_name %s\n",key_name);
+    return(VGD_ERROR);
+  }
+      
   if( Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
     return(VGD_ERROR);
   }
   //ier = Cvgd_print_desc(vgd, -1, -1);
 
-  if( Cvgd_get_int_1d(vgd, "VIPT", &i_val, NULL, quiet) ==  VGD_ERROR ) {
-    printf("ERROR with Cvgd_get_int for VIPT\n");
+  if( Cvgd_get_int_1d(vgd, ip1_name, &i_val, NULL, quiet) ==  VGD_ERROR ) {
+    printf("ERROR with Cvgd_get_int for %s\n",ip1_name);
     return(VGD_ERROR);
   }
-
-  ier = Cvgd_get_int(vgd, "NL_T", &nl_t, quiet);
+  
+  ier = Cvgd_get_int(vgd, key_name, &nl, quiet);
   if(ier == VGD_ERROR){
-    printf("ERROR cannot Cvgd_get_int on NL_T\n");
+    printf("ERROR cannot Cvgd_get_int on %s\n",key_name);
     return(VGD_ERROR);
   }
-  //for(ijk=0; ijk<nl_t; ijk++){
+  //for(ijk=0; ijk<nl; ijk++){
   //  printf("i_val[ijk]=%d\n",i_val[ijk]);
   //}
 
@@ -222,33 +233,33 @@ int test_it(char *filename, int ind) {
     }    
   }
 
-  levels = malloc(ni2*nj2*nl_t * sizeof(float));
+  levels = malloc(ni2*nj2*nl * sizeof(float));
   if(! levels){
     printf("Problem allocating levels of size %d\n",ni2*nj2);
     return(VGD_ERROR);
   }
-  levels_8 = malloc(ni2*nj2*nl_t * sizeof(double));
+  levels_8 = malloc(ni2*nj2*nl * sizeof(double));
   if(! levels_8){
     printf("Problem allocating levels_8 of size %d\n",ni2*nj2);
     return(VGD_ERROR);
   }
 
   //===================================================
-  printf("   testing Cvgd_levels* float interface\n");
+  printf("   testing Cvgd_levels* float interface for ip1 list %s\n",ip1_name);
   if(ref2){
-    ier = Cvgd_levels_2ref(vgd, ni2, nj2, nl_t, i_val, levels, p0, p0ls, in_log);
+    ier = Cvgd_levels_2ref(vgd, ni2, nj2, nl, i_val, levels, p0, p0ls, in_log);
   } else {
-    ier = Cvgd_levels(vgd, ni2, nj2, nl_t, i_val, levels, p0, in_log);
+    ier = Cvgd_levels(vgd, ni2, nj2, nl, i_val, levels, p0, in_log);
   }
   if(ier == VGD_ERROR){
     printf("Error with Cvgd_levels*\n");
     return(VGD_ERROR);
   }
-  printf("   testing Cvgd_levels* double interface\n");
+  printf("   testing Cvgd_levels* double interface for ip1 list %s\n",ip1_name);
   if(ref2){
-    ier = Cvgd_levels_2ref_8(vgd, ni2, nj2, nl_t, i_val, levels_8, p0_8, p0ls_8, in_log);
+    ier = Cvgd_levels_2ref_8(vgd, ni2, nj2, nl, i_val, levels_8, p0_8, p0ls_8, in_log);
   } else {
-    ier = Cvgd_levels_8(vgd, ni2, nj2, nl_t, i_val, levels_8, p0_8, in_log);
+    ier = Cvgd_levels_8(vgd, ni2, nj2, nl, i_val, levels_8, p0_8, in_log);
   }
   if(ier == VGD_ERROR){
     printf("Error with Cvgd_levels*_8\n");
@@ -258,26 +269,26 @@ int test_it(char *filename, int ind) {
   //===================================================
   printf("   testing Cvgd_diag_withref float interface\n");
   if(ref2){
-    ier = Cvgd_diag_withref_2ref(vgd, ni2, nj2, nl_t, i_val, levels, p0, p0ls, in_log, dpidpis);
+    ier = Cvgd_diag_withref_2ref(vgd, ni2, nj2, nl, i_val, levels, p0, p0ls, in_log, dpidpis);
   } else {
-    ier = Cvgd_diag_withref(vgd, ni2, nj2, nl_t, i_val, levels, p0, in_log, dpidpis);
+    ier = Cvgd_diag_withref(vgd, ni2, nj2, nl, i_val, levels, p0, in_log, dpidpis);
   }
   if(ier == VGD_ERROR){
     printf("Error with Cvgd_diag_withref*\n");
     return(VGD_ERROR);
   }
-  printf("   testing Cvgd_levels* double interface\n");
+  printf("   testing Cvgd_levels* double interface for ip1 list %s\n",ip1_name);
   if(ref2){
-    ier = Cvgd_diag_withref_2ref_8(vgd, ni2, nj2, nl_t, i_val, levels_8, p0_8, p0ls_8, in_log, dpidpis);
+    ier = Cvgd_diag_withref_2ref_8(vgd, ni2, nj2, nl, i_val, levels_8, p0_8, p0ls_8, in_log, dpidpis);
   } else {
-    ier = Cvgd_diag_withref_8(vgd, ni2, nj2, nl_t, i_val, levels_8, p0_8, in_log, dpidpis);
+    ier = Cvgd_diag_withref_8(vgd, ni2, nj2, nl, i_val, levels_8, p0_8, in_log, dpidpis);
   }
   if(ier == VGD_ERROR){
     printf("Error with Cvgd_diag_withref*_8\n");
     return(VGD_ERROR);
   }
 
-  if( compare_values(iun, levels, levels_8, p0, i_val, nl_t,nomvar1) == VGD_ERROR){
+  if( compare_values(iun, levels, levels_8, p0, i_val, nl,nomvar1) == VGD_ERROR){
     printf("ERROR comparison failed\n");
     return(VGD_ERROR);
   }
@@ -307,7 +318,17 @@ void c_levels_all() {
   
   for (i = 0; i < (int) n_file; i++) {
     printf ("Testing %s\n", filenames[i]);
-    if(test_it(filenames[i],i) == VGD_ERROR){
+    if(test_it(filenames[i],"VIPM",i) == VGD_ERROR){
+      printf("ERROR with %s\n",filenames[i]);
+      status = VGD_ERROR;
+      exit(1);
+    }
+    if(test_it(filenames[i],"VIPT",i) == VGD_ERROR){
+      printf("ERROR with %s\n",filenames[i]);
+      status = VGD_ERROR;
+      exit(1);
+    }
+    if(test_it(filenames[i],"VIPW",i) == VGD_ERROR){
       printf("ERROR with %s\n",filenames[i]);
       status = VGD_ERROR;
       exit(1);
