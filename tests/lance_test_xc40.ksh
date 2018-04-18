@@ -20,3 +20,7 @@ EOF
 cat vgrid_tests_${BH_PULL_SOURCE_GIT_BRANCH}
 
 ord_soumet vgrid_tests_${BH_PULL_SOURCE_GIT_BRANCH} -mach ${TRUE_HOST} -cm 5G -t 1800 -cpus 36
+
+echo "==============================================================="
+echo "Please look for the tests results in your ${TRUE_HOST} listings"
+
