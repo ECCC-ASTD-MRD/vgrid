@@ -19,12 +19,13 @@
 program tests
   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_put,VGD_ERROR, VGD_OK
   use Unit_Testing, only: ut_report
-
+  
+  
   implicit none
 
   type(vgrid_descriptor) :: d
   integer :: stat,lu=10,lutxt=69,ip1,ip2
-  real*8 :: ptop_8
+  real(kind=8) :: ptop_8
   logical :: OK = .true.
   
   integer, external :: fnom,fstouv,fclos,fstfrm

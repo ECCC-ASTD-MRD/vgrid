@@ -20,6 +20,7 @@ program constructor
 
   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,VGD_OK
   use Unit_Testing, only: ut_report
+  
 
   implicit none
 
@@ -38,8 +39,8 @@ program constructor
        0.9735557, 0.9851275, 0.9950425/)
   real :: rcoef1=0.,rcoef2=1.
   
-  real*8 :: ptop=805d0,pref=100000d0
-  real*8, dimension(:), pointer :: b_t_8
+  real(kind=8) :: ptop=805d0,pref=100000d0
+  real(kind=8), dimension(:), pointer :: b_t_8
   logical :: test_OK=.true.
 
   nullify(b_t_8)

@@ -82,6 +82,8 @@ end program constructor
 integer function test_hgts(F_d,F_file,F_write_control_L) result(istat)
    !
    use vGrid_Descriptors, only: vgrid_descriptor,vgd_get,vgd_new,vgd_free,operator(==),VGD_ERROR,VGD_OK
+   
+
    implicit none
    !
    type (vgrid_descriptor) :: F_d
@@ -91,7 +93,7 @@ integer function test_hgts(F_d,F_file,F_write_control_L) result(istat)
    ! Local variable
    !
    real, dimension(:), pointer :: vcdm,vcdt,vcdw,work
-   real*8, dimension(:), pointer :: b_m_8,a_m_8,b_t_8,a_t_8,b_w_8,a_w_8,work_8
+   real(kind=8), dimension(:), pointer :: b_m_8,a_m_8,b_t_8,a_t_8,b_w_8,a_w_8,work_8
    integer, dimension(:), pointer :: vipm,vipt,vipw,work_i
    integer :: nl_m,nl_t,nl_w,k,nk,kind,vers,ip1,my_ip1
    real(kind=8), dimension(:,:,:), pointer :: table

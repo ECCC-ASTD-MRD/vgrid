@@ -19,7 +19,9 @@
 program tests
   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_putopt,VGD_LEN_NAME,VGD_ERROR,VGD_OK
   use vgrid_utils, only: same_vec
+  
   use Unit_Testing, only: ut_report
+    
   implicit none
 
   type(vgrid_descriptor) :: vgd
@@ -29,9 +31,9 @@ program tests
   integer, dimension(:), pointer :: my_int_1d,my_int2_1d
   real :: my_real,my_real2
   real, dimension(:), pointer :: my_real_1d,my_real2_1d
-  real*8 :: my_real8,my_real82
-  real*8, dimension(:), pointer :: my_real8_1d,my_real82_1d
-  real*8, dimension(:,:,:), pointer :: my_real8_3d,my_real82_3d
+  real(kind=8) :: my_real8,my_real82
+  real(kind=8), dimension(:), pointer :: my_real8_1d,my_real82_1d
+  real(kind=8), dimension(:,:,:), pointer :: my_real8_3d,my_real82_3d
   character(len=VGD_LEN_NAME) :: my_char, my_char2
   logical :: my_logical, ok=.true.,my_logical2
 

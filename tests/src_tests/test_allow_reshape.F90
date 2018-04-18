@@ -19,6 +19,7 @@
 program tests
   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_getopt,vgd_putopt,vgd_print,vgd_levels,vgd_dpidpis,VGD_ERROR,VGD_OK
   use Unit_Testing, only: ut_report
+  
 
   implicit none
 
@@ -31,7 +32,7 @@ program tests
   real, dimension(3) :: hyb=(/0.1,  0.5, 0.9/)
   real, dimension(4) :: hyb2=(/0.1,0.33, 0.66, 0.9/)
   real :: rcoef1=0.,rcoef2=1.
-  real*8 :: ptop=1000d0,pref=100000d0
+  real(kind=8) :: ptop=1000d0,pref=100000d0
     
   nullify(p0)
 
@@ -115,6 +116,8 @@ end program tests
 !========================================================================================================
 integer function test_functions(lu,p0,ni,nj,reshape_L) result(status)
    use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_getopt,vgd_putopt,vgd_levels,vgd_dpidpis,vgd_get,VGD_ERROR,VGD_OK
+   
+
    implicit none
    
    integer :: lu,ni,nj
@@ -126,8 +129,8 @@ integer function test_functions(lu,p0,ni,nj,reshape_L) result(status)
    integer, dimension(:), pointer :: ip1_list,i1d
    real, dimension(:,:,:), pointer :: lev
    real, dimension(:), pointer :: lev_1d,r1d
-   real*8, dimension(:), pointer :: r81d
-   real*8, dimension(:,:,:), pointer :: table_8
+   real(kind=8), dimension(:), pointer :: r81d
+   real(kind=8), dimension(:,:,:), pointer :: table_8
    type(vgrid_descriptor) :: vgd
 
    nullify(ip1_list,i1d,lev,lev_1d,r1d,r81d,table_8)

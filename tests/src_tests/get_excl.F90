@@ -19,6 +19,7 @@
 program constructor
   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get
   use Unit_Testing, only: ut_report
+  
 
   implicit none
 
@@ -26,7 +27,7 @@ program constructor
   integer, parameter :: lu=10,lutxt=69
   integer :: stat,ip1,ip2
   integer :: fnom,fstouv,fstfrm
-  real*8, dimension(:), pointer :: my_a
+  real(kind=8), dimension(:), pointer :: my_a
   logical :: ok
 
   nullify(my_a)

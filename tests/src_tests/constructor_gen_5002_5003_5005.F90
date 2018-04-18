@@ -22,6 +22,7 @@ program constructor
 
   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_free,VGD_ERROR
   use Unit_Testing, only: ut_report
+  
 
   implicit none
 
@@ -47,7 +48,7 @@ program constructor
        (/.9,.5,.1/)
   real :: rcoef1=0.,rcoef2=1.
   
-  real*8 :: ptop=805d0,pref=100000d0
+  real(kind=8) :: ptop=805d0,pref=100000d0
   logical :: OK=.true.
   integer :: test_5002, ier
   logical, parameter :: write_control_L=.false.
@@ -130,6 +131,8 @@ end program constructor
 integer function test_5002(F_d,F_file,F_write_control_L,F_stat) result(istat)
    !
    use vGrid_Descriptors, only: vgrid_descriptor,vgd_get,VGD_ERROR,VGD_OK
+   
+
    implicit none
    !
    type (vgrid_descriptor) :: F_d
@@ -140,7 +143,7 @@ integer function test_5002(F_d,F_file,F_write_control_L,F_stat) result(istat)
    ! Local variable
    !
    real, dimension(:), pointer :: vcdm,vcdt,work
-   real*8, dimension(:), pointer :: b_m_8,a_m_8,b_t_8,a_t_8,work_8
+   real(kind=8), dimension(:), pointer :: b_m_8,a_m_8,b_t_8,a_t_8,work_8
    integer, dimension(:), pointer :: vipm,vipt,work_i
    integer :: nl_m,nl_t,k,nk,stat,kind,vers,vcode,ip1,my_ip1
 
