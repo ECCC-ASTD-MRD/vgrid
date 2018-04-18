@@ -57,7 +57,6 @@ module vGrid_Descriptors
    logical :: ALLOW_RESHAPE=.false.              ! Allow reshape of class pointer members
    integer, parameter :: KEY_LENGTH=4            !length of key string considered for get/put operations
    character(len=1), dimension(3), parameter :: MATCH_GRTYP=(/'X','Y','Z'/) !grid types with ip1,2 to ig1,2 mapping
-   character(len=1) :: one_char                  !character mold for tranfer function
 
    ! FST file record structure
    type FSTD
@@ -878,6 +877,7 @@ contains
 
     ! Construct appropriate grid_descriptor object (rebuild if new ig1-3 values are found)
     multiple_grids = .false.
+    
     grids: do i=1,size(fstkeys)
        error = my_fstprm(fstkeys(i),var)
        if (error /= VGD_OK) then
