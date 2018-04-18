@@ -19,6 +19,7 @@
 program constructor
   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_print,vgd_get,VGD_OK
   use Unit_Testing, only: ut_report
+  
 
   implicit none
 
@@ -29,7 +30,7 @@ program constructor
   integer, dimension(:), pointer :: vip1
   real, dimension(:), pointer :: vcr
   logical :: ok=.true.
-  real*8, dimension(:), pointer :: cam,cbm
+  real(kind=8), dimension(:), pointer :: cam,cbm
   real, dimension(:), pointer :: vcrd
 
   nullify(vip1,vcr,cam,cbm,vcrd)

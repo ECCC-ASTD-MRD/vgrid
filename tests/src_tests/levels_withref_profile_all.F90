@@ -98,7 +98,8 @@ end program levels_withref_profile_all
 integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
 
    use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_levels,vgd_get,vgd_print,VGD_LEN_RFLD,VGD_NO_REF_NOMVAR,VGD_ERROR,VGD_OK
-
+   
+  
    implicit none  
 
    character(len=*) :: F_fst,F_ips,F_var
@@ -111,10 +112,10 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
    integer, dimension(nmax) :: liste
    integer :: ier,fstinl,fstprm,fstinf,fstluk,infon,k,i,j,i0,j0
    real, dimension(:), pointer :: pres
-   real*8, dimension(:), pointer :: pres_8
+   real(kind=8), dimension(:), pointer :: pres_8
    real, dimension(:,:), pointer :: p0,p0ls,px
    real :: epsilon=5.0e-6,pppp,p0_point,p0ls_point,fact
-   real*8 :: p0_point_8,p0ls_point_8,fact_8
+   real(kind=8) :: p0_point_8,p0ls_point_8,fact_8
    integer, dimension(:), pointer :: ip1s
    character(len=VGD_LEN_RFLD) :: rfld_S, rfls_S
    ! Variable for fstprm, sorry...

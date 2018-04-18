@@ -19,6 +19,7 @@
 program tests
   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_dpidpis,vgd_free,VGD_OK
   use Unit_Testing, only: ut_report
+  
 
   implicit none
 
@@ -28,18 +29,18 @@ program tests
   integer :: i,j,tid,ii,jj
   integer, external :: omp_get_thread_num,omp_get_num_threads
   real, dimension(:), pointer :: dpidpis_profil
-  real*8, dimension(:), pointer :: dpidpis_profil_8
+  real(kind=8), dimension(:), pointer :: dpidpis_profil_8
   real, dimension(:,:,:), pointer :: dpidpis_3d,dpidpis_3d_from_prof
-  real*8, dimension(:,:,:), pointer :: dpidpis_3d_8,dpidpis_3d_from_prof_8
+  real(kind=8), dimension(:,:,:), pointer :: dpidpis_3d_8,dpidpis_3d_from_prof_8
   real :: epsilon=1.e-5
   real, dimension(:,:), pointer :: p0,px
-  real*8, dimension(:,:), pointer ::  p0_8
+  real(kind=8), dimension(:,:), pointer ::  p0_8
   real, dimension(:), pointer :: p00
-  real*8, dimension(:), pointer :: p00_8
+  real(kind=8), dimension(:), pointer :: p00_8
   real :: w1
   type(vgrid_descriptor) :: d
   logical :: ok
-  real*8, dimension(:), pointer :: coef_b
+  real(kind=8), dimension(:), pointer :: coef_b
 
   nullify(dpidpis_profil,dpidpis_profil_8,ip1_list,dpidpis_3d,dpidpis_3d_8,dpidpis_3d_from_prof,dpidpis_3d_from_prof_8,p0,px,p0_8,p00,p00_8,coef_b)
 
@@ -97,7 +98,7 @@ program tests
      nullify(dpidpis_profil_8)
      stat = vgd_dpidpis(d,sfc_field=p00_8(i),ip1_list=ip1_list,dpidpis=dpidpis_profil_8)         
      if(stat.ne.VGD_OK)then
-        print*,'ERROR: problem with vgd_dpidpis profil real*8 for i=',i
+        print*,'ERROR: problem with vgd_dpidpis profil real(kind=8) for i=',i
         stat=fstfrm(lu)
         call exit(1)
      endif
@@ -125,7 +126,7 @@ program tests
   if(associated(dpidpis_profil_8))deallocate(dpidpis_profil_8)
   stat = vgd_dpidpis(d,sfc_field=p0_8(i0,j0),ip1_list=ip1_list,dpidpis=dpidpis_profil_8)
   if(stat.ne.VGD_OK)then
-     print*,'ERROR: problem with vgd_dpidpis real*8'
+     print*,'ERROR: problem with vgd_dpidpis real(kind=8)'
      stat=fstfrm(lu)
      call exit(1)
   endif
@@ -141,7 +142,7 @@ program tests
               exit
            endif
            if(dpidpis_3d_from_prof_8(i,j,k).ne.dpidpis_3d_8(i,j,k))then
-              print*,'Problem : OpenMP do not reproduce result for real*8'
+              print*,'Problem : OpenMP do not reproduce result for real(kind=8)'
               print*,'problem in i,k,j',i,k,j,dpidpis_3d_from_prof_8(i,j,k),dpidpis_3d_8(i,j,k)
               OK=.false.
               exit

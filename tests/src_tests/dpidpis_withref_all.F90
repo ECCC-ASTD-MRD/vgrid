@@ -63,6 +63,7 @@ end program tests
 integer function test_dpidpis(F_lu) result(stat)
 
    use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_dpidpis,vgd_free,VGD_ERROR,VGD_OK
+   
 
    implicit none
    
@@ -73,14 +74,14 @@ integer function test_dpidpis(F_lu) result(stat)
    integer, parameter :: i0=20,j0=10
    integer, dimension(:), pointer :: ip1_list
    real, dimension(:,:,:), pointer :: dpidpis_cube
-   real*8, dimension(:,:,:), pointer :: dpidpis_cube_8
+   real(kind=8), dimension(:,:,:), pointer :: dpidpis_cube_8
    real   :: epsilon  =1.e-6
    real, dimension(:,:), pointer :: p0,px
-   real*8, dimension(:,:), pointer :: p0_8
+   real(kind=8), dimension(:,:), pointer :: p0_8
    real   :: w1,pres
    type(vgrid_descriptor) :: d
    logical :: ok
-   real*8, dimension(:), pointer :: coef_b
+   real(kind=8), dimension(:), pointer :: coef_b
   
    nullify(ip1_list,dpidpis_cube,dpidpis_cube_8,p0,px,p0_8,coef_b)
   
@@ -150,7 +151,7 @@ integer function test_dpidpis(F_lu) result(stat)
    
    stat = vgd_dpidpis(d,sfc_field=p0_8,ip1_list=ip1_list,dpidpis=dpidpis_cube_8)
    if(stat.ne.VGD_OK)then
-      print*,'ERROR: problem with vgd_dpidpis real*8'
+      print*,'ERROR: problem with vgd_dpidpis real(kind=8)'
       return
    endif
    
@@ -169,12 +170,12 @@ integer function test_dpidpis(F_lu) result(stat)
       ! Note since px is a real the precision cannot be hier than real
       if( abs(w1) < 1.E-37)then
          if ( abs(dpidpis_cube_8(i0,j0,k)) > 1.d0*1.0E-37)then
-            print*,'vgd_dpidpis real*8 do not validate, expect', w1,' got ',dpidpis_cube_8(i0,j0,k)
+            print*,'vgd_dpidpis real(kind=8) do not validate, expect', w1,' got ',dpidpis_cube_8(i0,j0,k)
             return
          endif
       else
          if(abs(dpidpis_cube_8(i0,j0,k)- w1) > px(i0,j0)*100.d0*epsilon)then
-            print*,'vgd_dpidpis real*8 do not validate, expect', w1,' got ',dpidpis_cube_8(i0,j0,k)
+            print*,'vgd_dpidpis real(kind=8) do not validate, expect', w1,' got ',dpidpis_cube_8(i0,j0,k)
             return
          endif
       endif

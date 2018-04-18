@@ -23,13 +23,15 @@ program constructor_build_5999
 
   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_print,vgd_write,vgd_put,VGD_ERROR,VGD_OK
   use Unit_Testing, only: ut_report
+  
+
   !
   implicit none
   !
   type(vgrid_descriptor) :: vgd,vgd2
   integer :: stat,lui=10,luo=11,fnom,fstouv,ier,fstfrm,i,j,fstinl,fstluk,fstprm,fstecr
   integer, dimension(:), pointer :: ip1_m
-  real*8, dimension(:), pointer :: a_m_8,b_m_8
+  real(kind=8), dimension(:), pointer :: a_m_8,b_m_8
   real, dimension(:,:), pointer :: ff
   real :: dummy
   logical :: OK=.true.

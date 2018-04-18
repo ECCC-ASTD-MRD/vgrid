@@ -30,19 +30,19 @@ program constructor_build_all
 
   integer, parameter :: nfiles=14
   character(len=200), dimension(nfiles) :: files=(/&
-       "data/dm_1001_from_model_run",&
-       "data/dm_1002_from_model_run",&
-       "data/dm_2001_from_editfst",&
-       "data/dm_5001_from_model_run",&
-       "data/dm_5002_from_model_run",&
-       "data/dm_5003_from_model_run",&
-       "data/dm_5004_from_model_run",&
-       "data/dm_5005_from_model_run",&
-       "data/dm_5100_from_model_run",&
-       "data/dm_5999_from_model_run",&
-       "data/dm_21001_from_model_run_SLEVE",&
+       "data/dm_1001_from_model_run           ",&
+       "data/dm_1002_from_model_run           ",&
+       "data/dm_2001_from_editfst             ",&
+       "data/dm_5001_from_model_run           ",&
+       "data/dm_5002_from_model_run           ",&
+       "data/dm_5003_from_model_run           ",&
+       "data/dm_5004_from_model_run           ",&
+       "data/dm_5005_from_model_run           ",&
+       "data/dm_5100_from_model_run           ",&
+       "data/dm_5999_from_model_run           ",&
+       "data/dm_21001_from_model_run_SLEVE    ",&
        "data/dm_21001_from_model_run_NON_SLEVE",&
-       "data/dm_21002_from_model_run_SLEVE",&
+       "data/dm_21002_from_model_run_SLEVE    ",&
        "data/dm_21002_from_model_run_NON_SLEVE"&
        /)
 
@@ -101,7 +101,7 @@ integer function check_build(F_vgd) result(istat)
   istat = VGD_ERROR
 
   ! Get Vcode
-  if( vgd_get(F_vgd,'vcode',vcode) )return
+  if( vgd_get(F_vgd,'vcode',vcode) == VGD_ERROR )return
   print*,'Testing build for Vcode ', vcode
 
   select case (vcode)
@@ -175,13 +175,14 @@ integer function check_build_1001_2001_5999(F_vgd) result(istat)
 
   use Vgrid_Descriptors, only: Vgrid_descriptor,vgd_new, vgd_get, vgd_print, operator(==), VGD_ERROR, VGD_OK
   
+ 
   implicit none
   type(vgrid_descriptor), intent(in) :: F_vgd
   
   ! Local varibales
   integer :: kind, version, ier
   integer, dimension(:), pointer :: ip1_m
-  real*8, dimension(:), pointer :: a_m_8, b_m_8
+  real(kind=8), dimension(:), pointer :: a_m_8, b_m_8
   type(vgrid_descriptor) :: vgd
   
   nullify(ip1_m, a_m_8, b_m_8)
@@ -189,7 +190,7 @@ integer function check_build_1001_2001_5999(F_vgd) result(istat)
   istat = VGD_ERROR
   
   if( vgd_get(F_vgd,"KIND", kind) == VGD_ERROR ) return
-  if( vgd_get(F_vgd,"VERS", version) ) return  
+  if( vgd_get(F_vgd,"VERS", version) == VGD_ERROR ) return  
   if( vgd_get(F_vgd,"CA_M - vertical A coefficient (m)", a_m_8) == VGD_ERROR ) return
   if( vgd_get(F_vgd,"CB_M - vertical B coefficient (m)", b_m_8) == VGD_ERROR ) return
   if( vgd_get(F_vgd,"VIPM - level ip1 list (m)"        , ip1_m) == VGD_ERROR ) return
@@ -226,14 +227,15 @@ integer function check_build_1002(F_vgd) result(istat)
 
   use Vgrid_Descriptors, only: Vgrid_descriptor,vgd_new, vgd_get, vgd_print, operator(==), VGD_ERROR, VGD_OK
   
+ 
   implicit none
   type(vgrid_descriptor), intent(in) :: F_vgd
   
   ! Local varibales
   integer :: kind, version, ier
   integer, dimension(:), pointer :: ip1_m
-  real*8 :: ptop_8
-  real*8, dimension(:), pointer :: a_m_8, b_m_8
+  real(kind=8) :: ptop_8
+  real(kind=8), dimension(:), pointer :: a_m_8, b_m_8
   type(vgrid_descriptor) :: vgd
   
   nullify(ip1_m, a_m_8, b_m_8)
@@ -241,7 +243,7 @@ integer function check_build_1002(F_vgd) result(istat)
   istat = VGD_ERROR
   
   if( vgd_get(F_vgd,"KIND", kind) == VGD_ERROR ) return
-  if( vgd_get(F_vgd,"VERS", version) ) return  
+  if( vgd_get(F_vgd,"VERS", version) == VGD_ERROR ) return  
   if( vgd_get(F_vgd,"CA_M - vertical A coefficient (m)", a_m_8) == VGD_ERROR ) return
   if( vgd_get(F_vgd,"CB_M - vertical B coefficient (m)", b_m_8) == VGD_ERROR ) return
   if( vgd_get(F_vgd,"VIPM - level ip1 list (m)"        , ip1_m) == VGD_ERROR ) return
@@ -280,6 +282,7 @@ integer function check_build_5001(F_vgd) result(istat)
 
   use Vgrid_Descriptors, only: Vgrid_descriptor,vgd_new, vgd_get, vgd_print, operator(==), VGD_ERROR, VGD_OK
   
+  
   implicit none
   type(vgrid_descriptor), intent(in) :: F_vgd
   
@@ -287,8 +290,8 @@ integer function check_build_5001(F_vgd) result(istat)
   integer :: kind, version, ier
   integer, dimension(:), pointer :: ip1_m
   real :: rcoef1
-  real*8 :: ptop_8, pref_8
-  real*8, dimension(:), pointer :: a_m_8, b_m_8
+  real(kind=8) :: ptop_8, pref_8
+  real(kind=8), dimension(:), pointer :: a_m_8, b_m_8
   type(vgrid_descriptor) :: vgd
   
   nullify(ip1_m, a_m_8, b_m_8)
@@ -296,7 +299,7 @@ integer function check_build_5001(F_vgd) result(istat)
   istat = VGD_ERROR
   
   if( vgd_get(F_vgd,"KIND", kind) == VGD_ERROR ) return
-  if( vgd_get(F_vgd,"VERS", version) ) return  
+  if( vgd_get(F_vgd,"VERS", version) == VGD_ERROR ) return  
   if( vgd_get(F_vgd,"CA_M - vertical A coefficient (m)", a_m_8) == VGD_ERROR ) return
   if( vgd_get(F_vgd,"CB_M - vertical B coefficient (m)", b_m_8) == VGD_ERROR ) return
   if( vgd_get(F_vgd,"VIPM - level ip1 list (m)"        , ip1_m) == VGD_ERROR ) return
@@ -339,6 +342,7 @@ integer function check_build_5002(F_vgd) result(istat)
 
   use Vgrid_Descriptors, only: Vgrid_descriptor,vgd_new, vgd_get, vgd_print, operator(==),VGD_LEN_NAME, VGD_ERROR, VGD_OK
   
+   
   implicit none
   type(vgrid_descriptor), intent(in) :: F_vgd
   
@@ -346,9 +350,9 @@ integer function check_build_5002(F_vgd) result(istat)
   integer :: kind, version
   integer, dimension(:), pointer :: ip1_m, ip1_t
   real :: rcoef1, rcoef2
-  real*8 :: ptop_8, pref_8
-  real*8, dimension(:), pointer :: a_m_8, b_m_8, a_t_8, b_t_8
-  real*8, dimension(:,:,:), pointer :: table
+  real(kind=8) :: ptop_8, pref_8
+  real(kind=8), dimension(:), pointer :: a_m_8, b_m_8, a_t_8, b_t_8
+  real(kind=8), dimension(:,:,:), pointer :: table
   type(vgrid_descriptor) :: vgd
   character(len=VGD_LEN_NAME) :: rfld_S
 
@@ -357,7 +361,7 @@ integer function check_build_5002(F_vgd) result(istat)
   istat = VGD_ERROR
   
   if( vgd_get(F_vgd,"KIND", kind) == VGD_ERROR ) return
-  if( vgd_get(F_vgd,"VERS", version) ) return  
+  if( vgd_get(F_vgd,"VERS", version) == VGD_ERROR ) return  
   if( vgd_get(F_vgd,"CA_M - vertical A coefficient (m)", a_m_8) == VGD_ERROR ) return
   if( vgd_get(F_vgd,"CB_M - vertical B coefficient (m)", b_m_8) == VGD_ERROR ) return
   if( vgd_get(F_vgd,"CA_T - vertical A coefficient (t)", a_t_8) == VGD_ERROR ) return
@@ -418,6 +422,7 @@ integer function check_build_5005(F_vgd) result(istat)
 
   use Vgrid_Descriptors, only: Vgrid_descriptor,vgd_new, vgd_get, vgd_print, operator(==), VGD_ERROR, VGD_OK
   
+   
   implicit none
   type(vgrid_descriptor), intent(in) :: F_vgd
   
@@ -425,8 +430,8 @@ integer function check_build_5005(F_vgd) result(istat)
   integer :: kind, version, ier
   integer, dimension(:), pointer :: ip1_m, ip1_t
   real :: rcoef1, rcoef2
-  real*8 :: pref_8
-  real*8, dimension(:), pointer :: a_m_8, b_m_8, a_t_8, b_t_8
+  real(kind=8) :: pref_8
+  real(kind=8), dimension(:), pointer :: a_m_8, b_m_8, a_t_8, b_t_8
   type(vgrid_descriptor) :: vgd
   
   nullify(ip1_m, ip1_t, a_m_8, b_m_8, a_t_8, b_t_8)
@@ -434,7 +439,7 @@ integer function check_build_5005(F_vgd) result(istat)
   istat = VGD_ERROR
   
   if( vgd_get(F_vgd,"KIND", kind) == VGD_ERROR ) return
-  if( vgd_get(F_vgd,"VERS", version) ) return  
+  if( vgd_get(F_vgd,"VERS", version) == VGD_ERROR ) return  
   if( vgd_get(F_vgd,"CA_M - vertical A coefficient (m)", a_m_8) == VGD_ERROR ) return
   if( vgd_get(F_vgd,"CB_M - vertical B coefficient (m)", b_m_8) == VGD_ERROR ) return
   if( vgd_get(F_vgd,"CA_T - vertical A coefficient (t)", a_t_8) == VGD_ERROR ) return
@@ -483,6 +488,7 @@ integer function check_build_5100(F_vgd) result(istat)
 
   use Vgrid_Descriptors, only: Vgrid_descriptor,vgd_new, vgd_get, vgd_print, operator(==), VGD_ERROR, VGD_OK
   
+  
   implicit none
   type(vgrid_descriptor), intent(in) :: F_vgd
   
@@ -490,8 +496,8 @@ integer function check_build_5100(F_vgd) result(istat)
   integer :: kind, version
   integer, dimension(:), pointer :: ip1_m, ip1_t
   real :: rcoef1, rcoef2, rcoef3, rcoef4
-  real*8 :: pref_8
-  real*8, dimension(:), pointer :: a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8
+  real(kind=8) :: pref_8
+  real(kind=8), dimension(:), pointer :: a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8
   type(vgrid_descriptor) :: vgd
   
   nullify(ip1_m, ip1_t, a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8)
@@ -499,7 +505,7 @@ integer function check_build_5100(F_vgd) result(istat)
   istat = VGD_ERROR
   
   if( vgd_get(F_vgd,"KIND", kind) == VGD_ERROR ) return
-  if( vgd_get(F_vgd,"VERS", version) ) return  
+  if( vgd_get(F_vgd,"VERS", version) == VGD_ERROR ) return  
   if( vgd_get(F_vgd,"CA_M - vertical A coefficient (m)", a_m_8) == VGD_ERROR ) return
   if( vgd_get(F_vgd,"CB_M - vertical B coefficient (m)", b_m_8) == VGD_ERROR ) return
   if( vgd_get(F_vgd,"CC_M - vertical C coefficient (m)", c_m_8) == VGD_ERROR ) return
@@ -555,6 +561,7 @@ integer function check_build_21001(F_vgd) result(istat)
 
   use Vgrid_Descriptors, only: Vgrid_descriptor,vgd_new, vgd_get, vgd_print, operator(==), VGD_ERROR, VGD_OK
   
+  
   implicit none
   type(vgrid_descriptor), intent(in) :: F_vgd
   
@@ -562,7 +569,7 @@ integer function check_build_21001(F_vgd) result(istat)
   integer :: kind, version, ier
   integer, dimension(:), pointer :: ip1_m, ip1_t
   real :: rcoef1, rcoef2, rcoef3, rcoef4
-  real*8, dimension(:), pointer :: a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8
+  real(kind=8), dimension(:), pointer :: a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8
   type(vgrid_descriptor) :: vgd
   
   nullify(ip1_m, ip1_t, a_m_8, b_m_8, c_m_8, b_m_8, a_t_8, b_t_8, c_t_8)
@@ -570,7 +577,7 @@ integer function check_build_21001(F_vgd) result(istat)
   istat = VGD_ERROR
   
   if( vgd_get(F_vgd,"KIND", kind) == VGD_ERROR ) return
-  if( vgd_get(F_vgd,"VERS", version) ) return  
+  if( vgd_get(F_vgd,"VERS", version) == VGD_ERROR ) return  
   if( vgd_get(F_vgd,"CA_M - vertical A coefficient (m)", a_m_8) == VGD_ERROR ) return
   if( vgd_get(F_vgd,"CB_M - vertical B coefficient (m)", b_m_8) == VGD_ERROR ) return
   if( vgd_get(F_vgd,"CC_M - vertical C coefficient (m)", c_m_8) == VGD_ERROR ) return
@@ -625,6 +632,7 @@ integer function check_build_21002(F_vgd) result(istat)
 
   use Vgrid_Descriptors, only: Vgrid_descriptor,vgd_new, vgd_get, vgd_print, operator(==), VGD_ERROR, VGD_OK
   
+   
   implicit none
   type(vgrid_descriptor), intent(in) :: F_vgd
   
@@ -632,7 +640,7 @@ integer function check_build_21002(F_vgd) result(istat)
   integer :: kind, version, ier
   integer, dimension(:), pointer :: ip1_m, ip1_t, ip1_w
   real :: rcoef1, rcoef2, rcoef3, rcoef4
-  real*8, dimension(:), pointer :: a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8, a_w_8, b_w_8, c_w_8
+  real(kind=8), dimension(:), pointer :: a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8, a_w_8, b_w_8, c_w_8
   type(vgrid_descriptor) :: vgd
   
   nullify(ip1_m, ip1_t, ip1_w, a_m_8, b_m_8, c_m_8, b_m_8, a_t_8, b_t_8, c_t_8, a_w_8, b_w_8, c_w_8)
@@ -640,7 +648,7 @@ integer function check_build_21002(F_vgd) result(istat)
   istat = VGD_ERROR
   
   if( vgd_get(F_vgd,"KIND", kind) == VGD_ERROR ) return
-  if( vgd_get(F_vgd,"VERS", version) ) return  
+  if( vgd_get(F_vgd,"VERS", version) == VGD_ERROR ) return  
   if( vgd_get(F_vgd,"CA_M - vertical A coefficient (m)", a_m_8) == VGD_ERROR ) return
   if( vgd_get(F_vgd,"CB_M - vertical B coefficient (m)", b_m_8) == VGD_ERROR ) return
   if( vgd_get(F_vgd,"CC_M - vertical C coefficient (m)", c_m_8) == VGD_ERROR ) return

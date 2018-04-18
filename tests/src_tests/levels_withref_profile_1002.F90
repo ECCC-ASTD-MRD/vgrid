@@ -19,18 +19,19 @@
 program tests
   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_levels,VGD_OK
   use Unit_Testing, only: ut_report
-
+  
+  
   implicit none
 
   integer :: stat,lu=0,ni,nj,fnom,fstouv,fstfrm,fclos,fstlir,fstinf,k,lutxt=69,ip1,ip2,nk
   integer, parameter :: i0=20,j0=10
   integer, dimension(:), pointer :: ip1_list
   real, dimension(:), pointer :: pres_profil
-  real*8, dimension(:), pointer :: pres_profil_8
+  real(kind=8), dimension(:), pointer :: pres_profil_8
   real :: epsilon=0.01
   real, dimension(:,:), pointer :: p0,px
   real :: local_pres
-  real*8 :: local_pres_8
+  real(kind=8) :: local_pres_8
   type(vgrid_descriptor) :: d
   logical :: ok
 

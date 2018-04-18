@@ -1,4 +1,4 @@
-! * libdescrip - Vertical grid descriptor library for FORTRAN programming
+! * Libdescrip - Vertical grid descriptor library for FORTRAN programming
 ! * Copyright (C) 2016  Direction du developpement des previsions nationales
 ! *                     Centre meteorologique canadien
 ! *
@@ -29,16 +29,16 @@ program standard_atmosphere
   logical :: ok=.true.
   integer, parameter :: nfiles=11
   character(len=200), dimension(nfiles) :: files=(/&
-       "data/dm_1001_from_model_run",&
-       "data/dm_1002_from_model_run",&
-       "data/dm_5001_from_model_run",&
-       "data/dm_5002_from_model_run",&
-       "data/dm_5005_from_model_run",&
-       "data/dm_5100_from_model_run",&
-       "data/dm_5999_from_model_run",&
-       "data/dm_21001_from_model_run_SLEVE",&
+       "data/dm_1001_from_model_run           ",&
+       "data/dm_1002_from_model_run           ",&
+       "data/dm_5001_from_model_run           ",&
+       "data/dm_5002_from_model_run           ",&
+       "data/dm_5005_from_model_run           ",&
+       "data/dm_5100_from_model_run           ",&
+       "data/dm_5999_from_model_run           ",&
+       "data/dm_21001_from_model_run_SLEVE    ",&
        "data/dm_21001_from_model_run_NON_SLEVE",&
-       "data/dm_21002_from_model_run_SLEVE",&
+       "data/dm_21002_from_model_run_SLEVE    ",&
        "data/dm_21002_from_model_run_NON_SLEVE"&
        /)
   call msg_verbosity(MSG_DEBUG)
@@ -149,20 +149,26 @@ integer function compare(F_filename, F_filetype, F_ip1s, F_temp, F_nl) result(st
   status = VGD_ERROR
 
   open(unit=62, file=trim(F_filename)//trim(F_filetype), status='OLD')
-  read(62,'(5x,i)')nl
+
+print*,trim(F_filename)//trim(F_filetype)
+
+  read(62,'(5x,i8)')nl
   if( nl /= F_nl) then
      print*,"ERROR in tests, size problem with validation file"
      close(62)
      return
   endif
   do k=1,nl
-     read(62,'(4x,i10,7x,f)')ip1, temp
+     !ip1   95101840 value 269.503143
+     !1234567890123456789012345678901234567890
+     !         1         2         3
+     read(62,'(4x,i10,7x,f10.6)')ip1, temp
      if( ip1 /= F_ip1s(k) .or. abs(temp - F_temp(k) ) > .01 )then
         print*,"ERROR differences found, expecting:"
         print*,ip1, temp
         print*,"got:"
         print*,F_ip1s(k),F_temp(k)
-        print*,"ERROR TEST on file %s failled\n",F_filename
+        print*,"ERROR TEST failled for file ",F_filename
         close(62)
         return
      endif

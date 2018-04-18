@@ -20,6 +20,7 @@ program constructor
 
   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_write,vgd_print,VGD_OK
   use Unit_Testing, only: ut_report
+  
 
   implicit none
 
@@ -31,9 +32,9 @@ program constructor
   logical :: ok
   real, dimension(:),allocatable :: sig
   real, dimension(:,:,:),allocatable :: ptop
-  real*8, dimension(:),allocatable :: a_m_8,b_m_8
-  real*8, dimension(:),allocatable :: a_t_8, b_t_8
-  real*8 :: ptop_8
+  real(kind=8), dimension(:),allocatable :: a_m_8,b_m_8
+  real(kind=8), dimension(:),allocatable :: a_t_8, b_t_8
+  real(kind=8) :: ptop_8
   real :: pp,rcoef1
   integer, dimension(:),allocatable :: ip1_m,ip1_t
   character(len=10) :: blk_S

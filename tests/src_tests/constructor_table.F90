@@ -17,6 +17,7 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 module mod_constructor_table
+  
   type FSTD_ext
      integer :: ig1,ig2,ig3,ig4,dateo,deet,npas,datyp,nbits,ni,nj,nk
      integer :: ip1,ip2,ip3,swa,lng,dltf,ubc,extra1,extra2,extra3,datev
@@ -32,7 +33,7 @@ contains
       type(FSTD_ext) :: record                    !Record information
       integer :: error,ni,nj,nk
       integer, external :: fstprm,fstinf
-      real*8 :: nhours
+      real(kind=8) :: nhours
       status = -1
       error=fstprm(fstkey,record%dateo,record%deet,record%npas, &
            record%ni,record%nj,record%nk,record%nbits,record%datyp,record%ip1,record%ip2, &
@@ -57,8 +58,8 @@ program constructor
    integer, parameter :: nversion=10
    integer stat,i,test_it
    logical :: OK=.true.
-   character(len=10), dimension(nversion) :: vcode_S=(/"5002","5003","5004","5005","5100","5999","21001", "21001",     "21002", "21002"/)
-   character(len=60), dimension(nversion) :: suffix_S=(/""   ,""    ,""    ,""    ,""    ,""    ,"_SLEVE","_NON_SLEVE","_SLEVE","_NON_SLEVE"/)
+   character(len=10), dimension(nversion) :: vcode_S=(/"5002 ","5003 ","5004 ","5005 ","5100 ","5999 ","21001", "21001",     "21002", "21002"/)
+   character(len=60), dimension(nversion) :: suffix_S=(/"          ","          " ,"          ","          ","          ","          " ,"_SLEVE    ","_NON_SLEVE","_SLEVE    ","_NON_SLEVE"/)
 
    do i=1,nversion
       

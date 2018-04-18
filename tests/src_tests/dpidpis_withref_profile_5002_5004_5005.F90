@@ -65,6 +65,7 @@ integer function test_it(F_lu,F_ip1,F_ip2) result(stat)
    
    use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_dpidpis,vgd_free,VGD_ERROR,VGD_OK
    
+   
    implicit none
    
    integer :: F_lu, F_ip1, F_ip2
@@ -74,13 +75,13 @@ integer function test_it(F_lu,F_ip1,F_ip2) result(stat)
    integer, parameter :: i0=20,j0=10
    integer, dimension(:), pointer :: ip1_list
    real, dimension(:), pointer :: dpidpis_profil
-   real*8, dimension(:), pointer :: dpidpis_profil_8
+   real(kind=8), dimension(:), pointer :: dpidpis_profil_8
    real :: epsilon=1.e-5
    real, dimension(:,:), pointer :: p0,px
    real :: local_pres,w1,pres
-   real*8 :: local_pres_8
+   real(kind=8) :: local_pres_8
    type(vgrid_descriptor) :: d
-   real*8, dimension(:), pointer :: coef_b   
+   real(kind=8), dimension(:), pointer :: coef_b   
 
    nullify(ip1_list,dpidpis_profil,dpidpis_profil_8,p0,px,coef_b)
 
@@ -136,7 +137,7 @@ integer function test_it(F_lu,F_ip1,F_ip2) result(stat)
    
    stat = vgd_dpidpis(d,sfc_field=local_pres_8,ip1_list=ip1_list,dpidpis=dpidpis_profil_8)
    if(stat.ne.VGD_OK)then
-      print*,'ERROR: problem with vgd_dpidpis real*8'
+      print*,'ERROR: problem with vgd_dpidpis real(kind=8)'
       return
    endif
    

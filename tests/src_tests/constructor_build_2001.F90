@@ -19,6 +19,8 @@
 program constructor
   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_print,VGD_ERROR
   use Unit_Testing, only: ut_report
+  
+
   !
   implicit none
   !
@@ -27,8 +29,8 @@ program constructor
   integer, dimension(:), pointer :: ip1s
   integer, dimension(:), pointer :: vipm,vipt,work_i
   real(kind=8), dimension(4) :: pres=(/700.,850.,925.,1000./),b=(/0.,0.,0.,0./)
-  real*8, dimension(:,:,:), pointer :: tbl
-  real*8, dimension(:), pointer :: a_m_8,a_t_8,b_m_8,b_t_8,work_8
+  real(kind=8), dimension(:,:,:), pointer :: tbl
+  real(kind=8), dimension(:), pointer :: a_m_8,a_t_8,b_m_8,b_t_8,work_8
   real, dimension(:), pointer :: hyb
   real :: my_real
   logical :: OK
@@ -77,6 +79,8 @@ end program constructor
 integer function test_2001(F_d,F_file,F_write_control_L) result(istat)
    !
    use vGrid_Descriptors, only: vgrid_descriptor,vgd_get,VGD_ERROR,VGD_OK
+   
+
    implicit none
    !
    type (vgrid_descriptor) :: F_d
@@ -86,7 +90,7 @@ integer function test_2001(F_d,F_file,F_write_control_L) result(istat)
    ! Local variable
    !
    real, dimension(:), pointer :: vcdm,vcdt,work
-   real*8, dimension(:), pointer :: b_m_8,a_m_8,b_t_8,a_t_8,work_8
+   real(kind=8), dimension(:), pointer :: b_m_8,a_m_8,b_t_8,a_t_8,work_8
    integer, dimension(:), pointer :: vipm,vipt,work_i
    integer :: nl_m,nl_t,k,nk,stat,kind,vers,vcode
    !

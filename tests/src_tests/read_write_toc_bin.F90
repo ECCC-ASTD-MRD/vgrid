@@ -19,6 +19,7 @@
 program constructor
   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_write,VGD_ERROR
   use Unit_Testing, only: ut_report
+  
 
   implicit none
 
@@ -27,7 +28,7 @@ program constructor
   integer, parameter :: LEVS=4
   integer, dimension(LEVS) :: ip1s
   real(kind=8), dimension(LEVS) :: pres=(/1000.,925.,850.,700./),b=(/0.,0.,0.,0./)
-  real*8, dimension(:), pointer :: pres_rtn
+  real(kind=8), dimension(:), pointer :: pres_rtn
 
   nullify(pres_rtn)
 
