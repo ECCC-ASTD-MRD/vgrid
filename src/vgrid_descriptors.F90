@@ -26,12 +26,12 @@ module vGrid_Descriptors
    ! Naming convention
    !
    ! var    may y a float or an integer
-   ! var_8  is of type real*8
+   ! var_8  is of type real(kind=8)
    ! var_L  is of type logical
    ! var_CP is of type type(c_prt) from iso_c_binging
 
-   use iso_c_binding, only : c_ptr, C_NULL_PTR, C_CHAR, C_NULL_CHAR, c_associated, c_loc
-   
+   use iso_c_binding, only : c_ptr, C_NULL_PTR, C_CHAR, C_NULL_CHAR, c_int, c_associated, c_loc
+
    implicit none
    private
 
@@ -88,7 +88,7 @@ module vGrid_Descriptors
    
    interface
       
-      integer function f_diag_withref_8(vgd_CP, ni, nj, nk, ip1_list_CP, levels_CP,sfc_field_CP,sfc_field_ls_CP, in_log, dpidpis) bind(c, name='C_diag_withref_8')
+      integer(c_int) function f_diag_withref_8(vgd_CP, ni, nj, nk, ip1_list_CP, levels_CP,sfc_field_CP,sfc_field_ls_CP, in_log, dpidpis) bind(c, name='C_diag_withref_8')
          use iso_c_binding, only: c_ptr, c_int
          type(c_ptr), value :: vgd_CP, ip1_list_CP, sfc_field_CP, sfc_field_ls_CP
          integer (c_int), value :: in_log, dpidpis
@@ -96,7 +96,7 @@ module vGrid_Descriptors
          integer (c_int), value :: ni, nj, nk
        end function f_diag_withref_8
 
-      integer function f_get_int(vgd_CP, key, value_CP, quiet) bind(c, name='Cvgd_get_int')
+      integer(c_int) function f_get_int(vgd_CP, key, value_CP, quiet) bind(c, name='Cvgd_get_int')
          use iso_c_binding, only: c_ptr, c_char, c_int
          type(c_ptr), value :: vgd_CP
          integer (c_int), value :: quiet
@@ -104,7 +104,7 @@ module vGrid_Descriptors
          character(kind=c_char) :: key(*)
       end function f_get_int
      
-      integer function f_get_int_1d(vgd_CP, key, value_CP, nk_CP, quiet) bind(c, name='Cvgd_get_int_1d')
+      integer(c_int) function f_get_int_1d(vgd_CP, key, value_CP, nk_CP, quiet) bind(c, name='Cvgd_get_int_1d')
          use iso_c_binding, only: c_ptr, c_char, c_int
          type(c_ptr), value :: vgd_CP
          integer (c_int), value :: quiet
@@ -113,14 +113,14 @@ module vGrid_Descriptors
          character(kind=c_char) :: key(*)
       end function f_get_int_1d
    
-      integer function f_getopt_int(key,value_CP,quiet) bind(c, name='Cvgd_getopt_int')
+      integer(c_int) function f_getopt_int(key,value_CP,quiet) bind(c, name='Cvgd_getopt_int')
          use iso_c_binding, only: c_char, c_ptr, c_int
          character(kind=c_char) :: key(*)
          type(c_ptr), value :: value_CP
          integer (c_int), value :: quiet
       end function f_getopt_int
 
-      integer function f_get_real(vgd_CP, key, value_CP, quiet) bind(c, name='Cvgd_get_float')
+      integer(c_int) function f_get_real(vgd_CP, key, value_CP, quiet) bind(c, name='Cvgd_get_float')
          use iso_c_binding, only: c_ptr, c_char, c_int
          type(c_ptr), value :: vgd_CP
          integer (c_int), value :: quiet
@@ -128,7 +128,7 @@ module vGrid_Descriptors
          character(kind=c_char) :: key(*)
       end function f_get_real
       
-      integer function f_get_real_1d(vgd_CP, key, value_CP, nk_CP, quiet) bind(c, name='Cvgd_get_float_1d')
+      integer(c_int) function f_get_real_1d(vgd_CP, key, value_CP, nk_CP, quiet) bind(c, name='Cvgd_get_float_1d')
          use iso_c_binding, only: c_ptr, c_char, c_int
          type(c_ptr), value :: vgd_CP
          integer (c_int), value :: quiet
@@ -137,7 +137,7 @@ module vGrid_Descriptors
          character(kind=c_char) :: key(*)
       end function f_get_real_1d
 
-      integer function f_get_real8(vgd_CP, key, value_CP, quiet) bind(c, name='Cvgd_get_double')
+      integer(c_int) function f_get_real8(vgd_CP, key, value_CP, quiet) bind(c, name='Cvgd_get_double')
          use iso_c_binding, only: c_ptr, c_char, c_int
          type(c_ptr), value :: vgd_CP
          integer (c_int), value :: quiet
@@ -145,7 +145,7 @@ module vGrid_Descriptors
          character(kind=c_char) :: key(*)
       end function f_get_real8
 
-      integer function f_get_real8_1d(vgd_CP, key, value_CP, nk_CP, quiet) bind(c, name='Cvgd_get_double_1d')
+      integer(c_int) function f_get_real8_1d(vgd_CP, key, value_CP, nk_CP, quiet) bind(c, name='Cvgd_get_double_1d')
          use iso_c_binding, only: c_ptr, c_char, c_int
          type(c_ptr), value :: vgd_CP
          integer (c_int), value :: quiet
@@ -154,7 +154,7 @@ module vGrid_Descriptors
          character(kind=c_char) :: key(*)
       end function f_get_real8_1d
 
-      integer function f_get_real8_3d(vgd_CP, key, value_CP, ni_CP, nj_CP, nk_CP, quiet) bind(c, name='Cvgd_get_double_3d')
+      integer(c_int) function f_get_real8_3d(vgd_CP, key, value_CP, ni_CP, nj_CP, nk_CP, quiet) bind(c, name='Cvgd_get_double_3d')
          use iso_c_binding, only: c_ptr, c_char, c_int
          type(c_ptr), value :: vgd_CP
          integer (c_int), value :: quiet
@@ -163,7 +163,7 @@ module vGrid_Descriptors
          character(kind=c_char) :: key(*)
       end function f_get_real8_3d
 
-      integer function f_get_char(vgd_CP, key, my_char, quiet) bind(c, name='Cvgd_get_char')
+      integer(c_int) function f_get_char(vgd_CP, key, my_char, quiet) bind(c, name='Cvgd_get_char')
          use iso_c_binding, only: c_ptr, c_char, c_int
          type(c_ptr), value :: vgd_CP
          integer (c_int), value :: quiet
@@ -171,13 +171,13 @@ module vGrid_Descriptors
          character(kind=c_char) :: my_char(*)
       end function f_get_char
       
-      integer function f_putopt_int(key, value) bind(c, name='Cvgd_putopt_int')
+      integer(c_int) function f_putopt_int(key, value) bind(c, name='Cvgd_putopt_int')
          use iso_c_binding, only: c_char, c_int
          integer (c_int), value :: value
          character(kind=c_char) :: key(*)
       end function f_putopt_int
 
-      integer function f_put_int(vgd_CP, key, value) bind(c, name='Cvgd_put_int')
+      integer(c_int) function f_put_int(vgd_CP, key, value) bind(c, name='Cvgd_put_int')
          use iso_c_binding, only: c_ptr, c_char, c_int
          type(c_ptr) :: vgd_CP
          integer (c_int), value :: value
@@ -196,18 +196,18 @@ module vGrid_Descriptors
          character(kind=c_char) :: valid_table_name(*)
        end function f_is_valid
 
-      integer function f_print_desc(vgd_CP, stdout, convip) bind(c, name='Cvgd_print_desc')
+      integer(c_int) function f_print_desc(vgd_CP, stdout, convip) bind(c, name='Cvgd_print_desc')
          use iso_c_binding, only : c_ptr, c_int
          type(c_ptr), value :: vgd_CP
          integer (c_int), value :: stdout, convip
       end function f_print_desc
 
-      integer function f_print_vcode_description(vcode) bind(c, name='Cvgd_print_vcode_description')
+      integer(c_int) function f_print_vcode_description(vcode) bind(c, name='Cvgd_print_vcode_description')
          use iso_c_binding, only : c_int
          integer (c_int), value :: vcode
       end function f_print_vcode_description
 
-      !integer function f_set_vcode_i(vgd_CP, kind, version) bind(c, name='Cvgd_set_vcode_i')
+      !integer(c_int) function f_set_vcode_i(vgd_CP, kind, version) bind(c, name='Cvgd_set_vcode_i')
       !   use iso_c_binding, only : c_ptr, c_int
       !   type(c_ptr), value :: vgd_CP
       !   integer (c_int), value :: kind, version
@@ -218,20 +218,20 @@ module vGrid_Descriptors
          type(c_ptr), value :: vgd1_CP, vgd2_CP
       end function f_vgdcmp
 
-      integer function f_new_read(vgd,unit,ip1,ip2,kind,version) bind(c, name='Cvgd_new_read')
+      integer(c_int) function f_new_read(vgd,unit,ip1,ip2,kind,version) bind(c, name='Cvgd_new_read')
          use iso_c_binding, only : c_ptr, c_int, c_char
          type(c_ptr) :: vgd
          integer (c_int), value :: unit, ip1, ip2, kind, version
       end function f_new_read
       
-      integer function f_new_from_table(vgd, table_CP, ni, nj, nk) bind(c, name='Cvgd_new_from_table')
+      integer(c_int) function f_new_from_table(vgd, table_CP, ni, nj, nk) bind(c, name='Cvgd_new_from_table')
          use iso_c_binding, only : c_ptr, c_int
          type(c_ptr) :: vgd
          type(c_ptr), value :: table_CP
          integer (c_int), value :: ni, nj, nk
       end function f_new_from_table
 
-      integer function f_new_gen(vgd,kind,version,hyb_CP,size_hyb,rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP, &
+      integer(c_int) function f_new_gen(vgd,kind,version,hyb_CP,size_hyb,rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP, &
            ip1,ip2,dhm_CP,dht_CP,dhw_CP,avg) bind(c, name='C_new_gen')
          use iso_c_binding, only : c_ptr, c_int
          type(c_ptr) :: vgd
@@ -241,7 +241,7 @@ module vGrid_Descriptors
          integer (c_int), value :: ip1,ip2,avg
       end function f_new_gen
       
-      integer function f_new_build_vert(vgd,kind,version,nk,ip1,ip2, &
+      integer(c_int) function f_new_build_vert(vgd,kind,version,nk,ip1,ip2, &
            ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, &
            a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, ip1_m_CP, ip1_t_CP, ip1_w_CP, nl_m, nl_t, nl_w) bind(c, name='C_new_build_vert')
          use iso_c_binding, only : c_ptr, c_int
@@ -263,20 +263,20 @@ module vGrid_Descriptors
          type(c_ptr) :: tshape_CP
       end subroutine f_table_shape
          
-      integer function f_write_desc(vgd_CP,unit) bind(c, name='Cvgd_write_desc')
+      integer(c_int) function f_write_desc(vgd_CP,unit) bind(c, name='Cvgd_write_desc')
          use iso_c_binding, only : c_ptr, c_int, c_char
          type(c_ptr), value :: vgd_CP
          integer (c_int), value :: unit
       end function f_write_desc
       
-      integer function f_standard_atmosphere_1976_temp(vgd_CP, ip1s_CP, nl, temp_CP) bind(c, name='Cvgd_standard_atmosphere_1976_temp')
+      integer(c_int) function f_standard_atmosphere_1976_temp(vgd_CP, ip1s_CP, nl, temp_CP) bind(c, name='Cvgd_standard_atmosphere_1976_temp')
         use iso_c_binding, only : c_ptr, c_int
         type(c_ptr), value :: vgd_CP, ip1s_CP
         integer (c_int), value :: nl
         type(c_ptr), value :: temp_CP
       end function f_standard_atmosphere_1976_temp
 
-      integer function f_standard_atmosphere_1976_pres(vgd_CP, ip1s_CP, nl, pres_CP, sfc_temp_CP, sfc_pres_CP) bind(c, name='Cvgd_standard_atmosphere_1976_pres')
+      integer(c_int) function f_standard_atmosphere_1976_pres(vgd_CP, ip1s_CP, nl, pres_CP, sfc_temp_CP, sfc_pres_CP) bind(c, name='Cvgd_standard_atmosphere_1976_pres')
         use iso_c_binding, only : c_ptr, c_int
         type(c_ptr), value :: vgd_CP, ip1s_CP
         integer (c_int), value :: nl
@@ -370,7 +370,7 @@ contains
       ! Local variables
       integer :: ni,nj,nk, istat, error, l_ip1, l_ip2, l_kind, l_version
       character(len=100) :: myformat
-      real*8, dimension(:,:,:), pointer :: table_8
+      real(kind=8), dimension(:,:,:), pointer :: table_8
 
       nullify(table_8)
 
@@ -462,9 +462,9 @@ contains
       integer, intent(in) :: kind,version                  !Kind,version to create
       real, target, dimension(:),intent(in) :: hyb         !List of hybrid levels
       real, target, optional, intent(in) :: rcoef1,rcoef2,rcoef3,rcoef4 !R-coefficient values for rectification
-      real*8, target, optional, intent(in) :: ptop_8       !Top-level pressure (Pa) inout
-      real*8, target, optional, intent(out):: ptop_out_8   !Top-level pressure (Pa) output if ptop_8 < 0
-      real*8, target, optional, intent(in) :: pref_8       !Reference-level pressure (Pa)
+      real(kind=8), target, optional, intent(in) :: ptop_8       !Top-level pressure (Pa) inout
+      real(kind=8), target, optional, intent(out):: ptop_out_8   !Top-level pressure (Pa) output if ptop_8 < 0
+      real(kind=8), target, optional, intent(in) :: pref_8       !Reference-level pressure (Pa)
       integer, target, optional, intent(in) :: ip1,ip2     !IP1,2 values for FST file record [0,0]
       integer, target, optional, intent(in) :: stdout_unit !Unit number for verbose output [STDERR]
       real, target, optional, intent(in) :: dhm,dht,dhw    !Diag levels Height for Momentum/Thermo/Vertical-Velocity vaiables
@@ -575,11 +575,11 @@ contains
       integer, intent(in) :: nk                         !Number of levels
       integer,target , optional, intent(in) :: ip1,ip2          !IP1,2 values for FST file record [0,0]
       real,target , optional, intent(in) :: rcoef1,rcoef2,rcoef3,rcoef4 !R-coefficient values for rectification
-      real*8,target , optional, intent(in) :: ptop_8            !Top-level pressure (Pa)
-      real*8,target , optional, intent(in) :: pref_8            !Reference-level pressure (Pa)
-      real*8,target , optional, dimension(:) :: a_m_8,a_t_8,a_w_8 !A-coefficients for momentum(m),thermo(t) and Vertical-Velocity levels
-      real*8,target , optional, dimension(:) :: b_m_8,b_t_8,b_w_8 !B-coefficients for momentum(m),thermo(t) and Vertical-Velocity levels
-      real*8,target , optional, dimension(:) :: c_m_8,c_t_8,c_w_8 !C-coefficients for momentum(m),thermo(t) and Vertical-Velocity levels
+      real(kind=8),target , optional, intent(in) :: ptop_8            !Top-level pressure (Pa)
+      real(kind=8),target , optional, intent(in) :: pref_8            !Reference-level pressure (Pa)
+      real(kind=8),target , optional, dimension(:) :: a_m_8,a_t_8,a_w_8 !A-coefficients for momentum(m),thermo(t) and Vertical-Velocity levels
+      real(kind=8),target , optional, dimension(:) :: b_m_8,b_t_8,b_w_8 !B-coefficients for momentum(m),thermo(t) and Vertical-Velocity levels
+      real(kind=8),target , optional, dimension(:) :: c_m_8,c_t_8,c_w_8 !C-coefficients for momentum(m),thermo(t) and Vertical-Velocity levels
       integer,target , optional, dimension(:) :: ip1_m,ip1_t,ip1_w !Level ID (IP1) for momentum(m),thermo(t) and Vertical-Velocity levels
 
       ! Assign optional argument to C_NULL_PTR    
@@ -1083,8 +1083,8 @@ contains
      logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]          
 
      ! Local variables
-     real*8 :: my_sfc_field_8, my_sfc_field_ls_8
-     real*8, dimension(:), pointer :: levels_8
+     real(kind=8) :: my_sfc_field_8, my_sfc_field_ls_8
+     real(kind=8), dimension(:), pointer :: levels_8
      integer :: error,stat
      logical :: my_in_log
 
@@ -1132,13 +1132,13 @@ contains
   integer function levels_withref_prof_8(self,ip1_list,levels,sfc_field,in_log,sfc_field_ls) result(status)
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
-     real*8, dimension(:), pointer :: levels                     !Physical level values
-     real*8, optional, intent(in) :: sfc_field                   !Surface field reference for coordinate [none]
+     real(kind=8), dimension(:), pointer :: levels                     !Physical level values
+     real(kind=8), optional, intent(in) :: sfc_field                   !Surface field reference for coordinate [none]
      logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]          
-     real*8, optional, intent(in) :: sfc_field_ls                !Surface field reference for coordinate [none]
+     real(kind=8), optional, intent(in) :: sfc_field_ls                !Surface field reference for coordinate [none]
 
      ! Local variables
-     real*8 :: my_sfc_field
+     real(kind=8) :: my_sfc_field
      logical :: my_in_log
 
      ! Set return value
@@ -1173,8 +1173,8 @@ contains
      real, optional, intent(in) :: sfc_field                     !Surface field reference for coordinate [none]
 
      ! Local variables
-     real*8 :: my_sfc_field_8
-     real*8, dimension(:), pointer :: dpidpis_8
+     real(kind=8) :: my_sfc_field_8
+     real(kind=8), dimension(:), pointer :: dpidpis_8
      integer :: error,stat
 
      nullify(dpidpis_8)
@@ -1213,11 +1213,11 @@ contains
      use vgrid_utils, only: up
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
-     real*8, dimension(:), pointer :: dpidpis                      !Derivative values
-     real*8, optional, intent(in) :: sfc_field                     !Surface field reference for coordinate [none]
+     real(kind=8), dimension(:), pointer :: dpidpis                      !Derivative values
+     real(kind=8), optional, intent(in) :: sfc_field                     !Surface field reference for coordinate [none]
 
      ! Local variables
-     real*8 :: my_sfc_field_8
+     real(kind=8) :: my_sfc_field_8
      integer :: stat
 
      ! Set return value
@@ -1245,18 +1245,18 @@ contains
      use vgrid_utils, only: get_allocate
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
-     real*8, dimension(:), pointer :: levels                       !Physical level values
-     real*8, optional, intent(in) :: sfc_field                     !Surface field reference for coordinate [none]
-     real*8, optional, intent(in) :: sfc_field_ls                  !Surface large scale field reference for coordinate [none]
+     real(kind=8), dimension(:), pointer :: levels                       !Physical level values
+     real(kind=8), optional, intent(in) :: sfc_field                     !Surface field reference for coordinate [none]
+     real(kind=8), optional, intent(in) :: sfc_field_ls                  !Surface large scale field reference for coordinate [none]
      logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]          
      logical, optional, intent(in) :: dpidpis                    !Compute partial derivative of hydrostatic pressure (pi) with
                                                                  !   respect to surface hydrostatic pressure(pis) [.false.]
      
      ! Local variables
      integer :: error,nk
-     real*8 :: my_sfc_field, my_sfc_field_ls
-     real*8, dimension(:,:), pointer :: sfc_field_2d, sfc_field_ls_2d
-     real*8, dimension(:,:,:), pointer :: levels_3d
+     real(kind=8) :: my_sfc_field, my_sfc_field_ls
+     real(kind=8), dimension(:,:), pointer :: sfc_field_2d, sfc_field_ls_2d
+     real(kind=8), dimension(:,:,:), pointer :: levels_3d
      logical :: my_in_log,my_dpidpis
 
      ! Set error status
@@ -1327,8 +1327,8 @@ contains
 
      ! Local variables
      integer :: error,ni,nj,stat
-     real*8, dimension(:,:,:), pointer :: levels_8
-     real*8, dimension(:,:), pointer :: my_sfc_field, my_sfc_field_ls
+     real(kind=8), dimension(:,:,:), pointer :: levels_8
+     real(kind=8), dimension(:,:), pointer :: my_sfc_field, my_sfc_field_ls
      logical :: my_in_log
 
      nullify(levels_8,my_sfc_field, my_sfc_field_ls)
@@ -1403,13 +1403,13 @@ contains
       ! Given referent, compute physical levelling information from the vertical description
       type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
       integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
-      real*8, dimension(:,:,:), pointer :: levels                   !Physical level values
-      real*8, dimension(:,:), optional, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
+      real(kind=8), dimension(:,:,:), pointer :: levels                   !Physical level values
+      real(kind=8), dimension(:,:), optional, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
       logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]
 
       ! Local variables
       integer :: error,ni,nj
-      real*8, dimension(:,:), pointer :: my_sfc_field
+      real(kind=8), dimension(:,:), pointer :: my_sfc_field
       logical :: my_in_log
       
       nullify(my_sfc_field)
@@ -1459,8 +1459,8 @@ contains
 
       ! Local variables 
       integer :: error,ni,nj,stat
-      real*8, dimension(:,:), pointer :: my_sfc_field_8
-      real*8, dimension(:,:,:), pointer :: dpidpis_8
+      real(kind=8), dimension(:,:), pointer :: my_sfc_field_8
+      real(kind=8), dimension(:,:,:), pointer :: dpidpis_8
       
       nullify(my_sfc_field_8,dpidpis_8)
       
@@ -1513,12 +1513,12 @@ contains
       ! Given referent, compute physical levelling information from the vertical description
       type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
       integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
-      real*8, dimension(:,:,:), pointer :: dpidpis                !pressure derivative with respect to sfc pressure
-      real*8, dimension(:,:), optional, intent(in) :: sfc_field   !Surface field reference for coordinate [none]
+      real(kind=8), dimension(:,:,:), pointer :: dpidpis                !pressure derivative with respect to sfc pressure
+      real(kind=8), dimension(:,:), optional, intent(in) :: sfc_field   !Surface field reference for coordinate [none]
       
       ! Local variables 
       integer :: ni,nj,error,stat
-      real*8, dimension(:,:), pointer :: my_sfc_field_8
+      real(kind=8), dimension(:,:), pointer :: my_sfc_field_8
       
       nullify(my_sfc_field_8)
       
@@ -1565,9 +1565,9 @@ contains
       ! Given referent, compute physical levelling information from the vertical description
       type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
       integer, target, dimension(:), intent(in) :: ip1_list               !Key of prototype field
-      real*8, dimension(:,:,:), pointer :: levels                   !Physical level values
-      real*8, dimension(:,:), optional, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
-      real*8, dimension(:,:), optional, intent(in) :: sfc_field_ls  !Surface field large scale reference for coordinate [none]
+      real(kind=8), dimension(:,:,:), pointer :: levels                   !Physical level values
+      real(kind=8), dimension(:,:), optional, target, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
+      real(kind=8), dimension(:,:), optional, target, intent(in) :: sfc_field_ls  !Surface field large scale reference for coordinate [none]
       logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]
       logical, optional, intent(in) :: dpidpis                    !Compute partial derivative of hydrostatic pressure (pi) with
       !   respect to surface hydrostatic pressure(pis) [.false.]
@@ -1689,7 +1689,7 @@ contains
       ! Local variables
       integer ier
       integer, target, dimension(3) :: tshape
-      real*8, dimension(:,:,:), pointer :: table_8
+      real(kind=8), dimension(:,:,:), pointer :: table_8
       type(c_ptr) :: tshape_CP      
       character(len=100) :: myformat
 
@@ -2278,7 +2278,7 @@ contains
    
    integer function put_real8_3d(self, key, value) result(status)
       use vgrid_utils, only : up
-      type(vgrid_descriptor), intent(inout) :: self !Vertical descriptor instance
+      type(vgrid_descriptor), target, intent(inout) :: self !Vertical descriptor instance
       character(len=*), intent(in) :: key           !Descriptor key to set
       real(kind=8), dimension(:,:,:), pointer :: value !Value to set
       type(c_ptr) :: my_value_CP
@@ -2339,7 +2339,7 @@ contains
       ! Local variables
       integer :: error
       integer, external :: fstprm,fstinf
-      real*8 :: nhours
+      real(kind=8) :: nhours
       status = VGD_ERROR
       error=fstprm(fstkey,record%dateo,record%deet,record%npas, &
            record%ni,record%nj,record%nk,record%nbits,record%datyp,record%ip1,record%ip2, &
@@ -2444,11 +2444,11 @@ contains
  integer function vgd_standard_atmosphere_1976(self, ip1s, val, var, sfc_temp, sfc_pres) result(status)
    use vgrid_utils, only: get_allocate, up
    type(vgrid_descriptor), intent(in) :: self         !Vertical descriptor instance
-   integer, dimension(:), intent(in) :: ip1s          !ip1 list to get value for
+   integer, dimension(:), target, intent(in) :: ip1s  !ip1 list to get value for
    real, dimension(:), pointer, intent(inout) :: val  !Standard Atmosphere 1976 value for ip1s
    character(len=*), intent(in) :: var                !Variable name to get valid choice are "TEMPERATURE", "PRESSURE"
-   real, optional, intent(in) :: sfc_temp             !Use this surface temperature for standard atmosphere
-   real, optional, intent(in) :: sfc_pres             !Use this surface pressure for standard atmosphere
+   real, optional, target, intent(in) :: sfc_temp     !Use this surface temperature for standard atmosphere
+   real, optional, target, intent(in) :: sfc_pres     !Use this surface pressure for standard atmosphere
    ! Local variables
    type (c_ptr) :: ip1s_CP, val_CP, sfc_pres_CP, sfc_temp_CP
    status = VGD_ERROR

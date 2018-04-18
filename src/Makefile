@@ -19,7 +19,7 @@ dependencies.mk: *.c *.F90 *.h *.hc
 include dependencies.mk
 
 %.o: %.F90
-	s.f90 -c $(MY_FFLAGS) $(FFLAGS) $(LEFENCE) $<
+	s.f90 -c $(MY_FFLAGS) $(FFLAGS) $(LEFENCE)-I/users/dor/armn/bou/ords/RPN_COMM_4.5.16.10/bh_scripts/LIBRMN/librmn-gfortran_016.2_ubuntu-14.04-amd64-64/include/Linux_x86-64/gfortran $<
 
 %.o: %.c
 	s.cc -c $(MY_CFLAGS) $(CFLAGS) $(LEFENCE) $<
