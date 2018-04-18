@@ -15,17 +15,17 @@ endif
 DESCRIP_PATH = ../src
 
 %.o: %.F90
-	s.f90 -c $(MY_FFLAGS) $(FFLAGS) -libpath $(DESCRIP_PATH) -I$(DESCRIP_PATH) $(LEFENCE) $<
+	s.f90 -c $(MY_FFLAGS) $(FFLAGS) -libpath $(DESCRIP_PATH) -I$(DESCRIP_PATH) -I/users/dor/armn/bou/ords/RPN_COMM_4.5.16.10/bh_scripts/LIBRMN/librmn-gfortran_016.2_ubuntu-14.04-amd64-64/include/Linux_x86-64/gfortran $(LEFENCE) $<
 
 %.o: %.c
-	s.cc -c  $(MY_CFLAGS) $(CFLAGS) -libpath $(DESCRIP_PATH) -I$(DESCRIP_PATH) $(LEFENCE) $<
+	s.cc -c  $(MY_CFLAGS) $(CFLAGS) -libpath $(DESCRIP_PATH) -I$(DESCRIP_PATH) -I/users/dor/armn/bou/ords/RPN_COMM_4.5.16.10/bh_scripts/LIBRMN/librmn-gfortran_016.2_ubuntu-14.04-amd64-64/include/Linux_x86-64/gfortran $(LEFENCE) $<
 
 OBJECTS = unit_testing.o c_ut_report.o
 
 UNIT_TEST_F: $(OBJECTS) UNIT_TEST_F.F90 $(DESCRIP_PATH)/libdescrip.a
 	# Ne trmake touve pas msg avec commande suivnate (ajouter  UNIT_TEST_F.o a liste OBJECTS = pour tester)
 	# s.f90 $(OBJECTS) -o UNIT_TEST_F -I$(DESCRIP_PATH) -L$(DESCRIP_PATH) -lrmn -ldescrip $(OPENMP) $(MY_FFLAGS) $(FFLAGS)
-	s.compile $(OPENMP) -optf "=$(MY_FFLAGS) $(FFLAGS)" -includes $(DESCRIP_PATH) -src UNIT_TEST_F.F90 -o UNIT_TEST_F -obj $(OBJECTS) -libpath $(DESCRIP_PATH) -librmn -libappl descrip $(EFENCE)
+	s.compile $(OPENMP) -optf "=$(MY_FFLAGS) -fall-intrinsics $(FFLAGS)" -includes $(DESCRIP_PATH) /users/dor/armn/bou/ords/RPN_COMM_4.5.16.10/bh_scripts/LIBRMN/librmn-gfortran_016.2_ubuntu-14.04-amd64-64/include/Linux_x86-64/gfortran -src UNIT_TEST_F.F90 -o UNIT_TEST_F -obj $(OBJECTS) -libpath $(DESCRIP_PATH) /users/dor/armn/bou/ords/RPN_COMM_4.5.16.10/bh_scripts/LIBRMN/librmn-gfortran_016.2_ubuntu-14.04-amd64-64/lib/Linux_x86-64/gfortran -librmn -libappl descrip $(EFENCE)
 
 UNIT_TEST_C: $(OBJECTS) UNIT_TEST_C.c $(DESCRIP_PATH)/libdescrip.a
 	s.compile $(OPENMP) -optc "=$(MY_CFLAGS) $(CFLAGS)" -includes $(DESCRIP_PATH) -src UNIT_TEST_C.c -o UNIT_TEST_C -bidon c -main UNIT_TEST_C -obj $(OBJECTS) -libpath $(DESCRIP_PATH) -librmn -libappl descrip $(EFENCE)

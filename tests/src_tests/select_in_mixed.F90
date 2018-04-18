@@ -17,6 +17,7 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 module mod_constructor_table
+  
   type FSTD_ext
      integer :: ig1,ig2,ig3,ig4,dateo,deet,npas,datyp,nbits,ni,nj,nk
      integer :: ip1,ip2,ip3,swa,lng,dltf,ubc,extra1,extra2,extra3,datev
@@ -32,7 +33,7 @@ contains
       type(FSTD_ext) :: record                    !Record information
       integer :: error,ni,nj,nk
       integer, external :: fstprm,fstinf
-      real*8 :: nhours
+      real(kind=8) :: nhours
       status = -1
       error=fstprm(fstkey,record%dateo,record%deet,record%npas, &
            record%ni,record%nj,record%nk,record%nbits,record%datyp,record%ip1,record%ip2, &

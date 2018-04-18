@@ -20,6 +20,7 @@ program constructor
 
   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_free,vgd_get,VGD_ERROR
   use Unit_Testing, only: ut_report
+  
 
   implicit none
 
@@ -30,7 +31,7 @@ program constructor
   real :: my_epsilon=1.e-6
   real, dimension(nk) :: sigma,sigma2
   real, dimension(:), pointer :: vcdm,vcdt,work
-  real*8, dimension(:), pointer :: b_m_8,a_m_8,b_t_8,a_t_8,work_8
+  real(kind=8), dimension(:), pointer :: b_m_8,a_m_8,b_t_8,a_t_8,work_8
   logical :: OK=.true.
   logical, parameter :: write_control_L=.false.
   character (len=1) :: dumc_S

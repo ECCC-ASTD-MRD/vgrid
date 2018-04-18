@@ -20,6 +20,7 @@ program constructor
 
   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_put,vgd_write
   use Unit_Testing, only: ut_report
+  
 
   implicit none
 
@@ -29,8 +30,8 @@ program constructor
   integer, external :: fnom,fstouv,fstfrm,fstinf
   logical :: ok
   real :: pp
-  real*8, dimension(:),pointer :: a_m_8,b_m_8
-  real*8, dimension(:),pointer :: a_t_8, b_t_8
+  real(kind=8), dimension(:),pointer :: a_m_8,b_m_8
+  real(kind=8), dimension(:),pointer :: a_t_8, b_t_8
   integer, dimension(:),pointer :: ip1_m,ip1_t
   character(len=10) :: blk_S
 

@@ -62,6 +62,7 @@ end program level_withref_5001
 integer function chek_levels_withref(F_fst,F_ips) result(status)
 
    use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_putopt,vgd_levels,vgd_get,vgd_free,VGD_ERROR,VGD_OK
+   
 
    implicit none  
 
@@ -75,9 +76,9 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
    integer, dimension(nmax) :: liste
    integer :: ier,fstinl,fstprm,fstinf,fstluk,infon,i,j,k
    real, dimension(:,:,:), pointer :: pres
-   real*8, dimension(:,:,:), pointer :: pres_8
+   real(kind=8), dimension(:,:,:), pointer :: pres_8
    real, dimension(:,:), pointer :: p0,px
-   real*8, dimension(:,:), pointer :: p0_8
+   real(kind=8), dimension(:,:), pointer :: p0_8
    real :: epsilon=5.0e-6,pppp
    integer, dimension(:), pointer :: ip1s
    logical :: ok

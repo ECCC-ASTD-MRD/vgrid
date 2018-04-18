@@ -29,18 +29,18 @@ program constructor
   logical :: ok = .true.
   integer, parameter :: nfiles=13
   character(len=200), dimension(nfiles) :: files=(/&
-       "data/gg_5001_from_model_run_plus_toc",&
-       "data/dm_1001_from_model_run",&
-       "data/dm_1002_from_model_run",&
-       "data/dm_2001_from_editfst",&
-       "data/dm_5001_from_model_run",&
-       "data/dm_5002_from_model_run",&
-       "data/dm_5005_from_model_run",&
-       "data/dm_5100_from_model_run",&
-       "data/dm_5999_from_model_run",&
-       "data/dm_21001_from_model_run_SLEVE",&
+       "data/gg_5001_from_model_run_plus_toc  ",&
+       "data/dm_1001_from_model_run           ",&
+       "data/dm_1002_from_model_run           ",&
+       "data/dm_2001_from_editfst             ",&
+       "data/dm_5001_from_model_run           ",&
+       "data/dm_5002_from_model_run           ",&
+       "data/dm_5005_from_model_run           ",&
+       "data/dm_5100_from_model_run           ",&
+       "data/dm_5999_from_model_run           ",&
+       "data/dm_21001_from_model_run_SLEVE    ",&
        "data/dm_21001_from_model_run_NON_SLEVE",&
-       "data/dm_21002_from_model_run_SLEVE",&
+       "data/dm_21002_from_model_run_SLEVE    ",&
        "data/dm_21002_from_model_run_NON_SLEVE"&
        /)
 

@@ -19,6 +19,7 @@
 program tests
   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_dpidpis,VGD_OK
   use Unit_Testing, only: ut_report
+  
 
   implicit none
 
@@ -26,12 +27,12 @@ program tests
   integer, parameter :: i0=1,j0=1
   integer, dimension(:), pointer :: ip1_list
   real, dimension(:,:,:), pointer :: dpidpis_cube
-  real*8, dimension(:,:,:), pointer :: dpidpis_cube_8
+  real(kind=8), dimension(:,:,:), pointer :: dpidpis_cube_8
   real :: eps=1.e-6
   real :: w1
   type(vgrid_descriptor) :: d
   logical :: ok
-  real*8, dimension(:), pointer :: coef_b
+  real(kind=8), dimension(:), pointer :: coef_b
   
   nullify(ip1_list,dpidpis_cube,dpidpis_cube_8,coef_b)
 
@@ -87,11 +88,11 @@ program tests
   enddo
 
   !=================
-  ! real*8 interface
+  ! real(kind=8) interface
 
   stat = vgd_dpidpis(d,ip1_list=ip1_list,dpidpis=dpidpis_cube_8)
   if(stat.ne.VGD_OK)then
-     print*,'ERROR: problem with vgd_dpidpis real*8'
+     print*,'ERROR: problem with vgd_dpidpis real(kind=8)'
      stat=fstfrm(lu)
      call abort
   endif
