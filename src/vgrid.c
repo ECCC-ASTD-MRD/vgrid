@@ -1,3 +1,4 @@
+
 /* libdescrip - Vertical grid descriptor library for FORTRAN programming
  * Copyright (C) 2016  Direction du developpement des previsions nationales
  *                     Centre meteorologique canadien
@@ -770,7 +771,7 @@ int Cvgd_vgdcmp(vgrid_descriptor *vgd1, vgrid_descriptor *vgd2) {
   //if(same_vec_r8(vgd1->c_w_8, vgd1->nl_w, vgd2->c_w_8, vgd2->nl_w) != 0) return (-27);
  
   // Do not check table since all above parameters consist in a full check, at least it should.
-  // Also, the transfer from char to real*8 do not always give same real8 value which
+  // Also, the transfer from char to real(kind=8) do not always give same real8 value which
   // made equality to be false even if above parameters are equal.
   //nt1 = vgd1->table_ni * vgd1->table_nj * vgd1->table_nk;
   //nt2 = vgd2->table_ni * vgd2->table_nj * vgd2->table_nk;
