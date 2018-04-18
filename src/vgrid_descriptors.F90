@@ -184,14 +184,14 @@ module vGrid_Descriptors
          character(kind=c_char) :: key(*)
       end function f_put_int
 
-      integer function f_put_char(vgd_CP, key, value) bind(c, name='Cvgd_put_char')
-         use iso_c_binding, only: c_ptr, c_char, c_char
+      integer(c_int) function f_put_char(vgd_CP, key, value) bind(c, name='Cvgd_put_char')
+         use iso_c_binding, only: c_ptr, c_char, c_char, c_int
          type(c_ptr) :: vgd_CP
          character(kind=c_char) :: key(*), value(*)
       end function f_put_char
 
-      integer function f_is_valid(vgd_CP, valid_table_name) bind(c, name='C_is_valid')
-         use iso_c_binding, only: c_ptr, c_char
+      integer(c_int) function f_is_valid(vgd_CP, valid_table_name) bind(c, name='C_is_valid')
+         use iso_c_binding, only: c_ptr, c_char, c_int
          type(c_ptr), value :: vgd_CP
          character(kind=c_char) :: valid_table_name(*)
        end function f_is_valid
@@ -213,8 +213,8 @@ module vGrid_Descriptors
       !   integer (c_int), value :: kind, version
       !end function f_set_vcode_i
 
-      integer function f_vgdcmp(vgd1_CP, vgd2_CP) bind(c, name='Cvgd_vgdcmp')
-         use iso_c_binding, only: c_ptr
+      integer(c_int) function f_vgdcmp(vgd1_CP, vgd2_CP) bind(c, name='Cvgd_vgdcmp')
+         use iso_c_binding, only: c_ptr, c_int
          type(c_ptr), value :: vgd1_CP, vgd2_CP
       end function f_vgdcmp
 
