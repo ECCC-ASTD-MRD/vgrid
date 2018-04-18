@@ -65,6 +65,7 @@ contains
       character(len=*) :: msg_S
       !Local variables
       logical :: alloc_lev_L   
+      external msg
       istat=-1
       alloc_lev_L=.false.
       if(.not.associated(value))then
@@ -103,7 +104,8 @@ contains
       logical :: allow_reshape_L
       character(len=*) :: msg_S
       !Local variables
-      logical :: alloc_lev_L   
+      logical :: alloc_lev_L
+      external msg
       istat=-1
       alloc_lev_L=.false.
       if(.not.associated(value))then
@@ -137,12 +139,13 @@ contains
       ! Allocate space for the result value and report error
       implicit none
       character(len=*), intent(in) :: key_S
-      real*8, dimension(:), pointer :: value
+      real(kind=8), dimension(:), pointer :: value
       integer, intent(in) :: len
       logical :: allow_reshape_L
       character(len=*) :: msg_S
       !Local variables
-      logical :: alloc_lev_L   
+      logical :: alloc_lev_L
+      external msg
       istat=-1
       alloc_lev_L=.false.
       if(.not.associated(value))then
@@ -150,7 +153,7 @@ contains
       else
          if(size(value)/=len)then
             if(allow_reshape_L)then
-               write(for_msg,*) 'reshaping 1D real*8 vector '//trim(msg_S)
+               write(for_msg,*) 'reshaping 1D real(kind=8) vector '//trim(msg_S)
                call msg(MSG_INFO,VGD_PRFX//for_msg)
                deallocate(value)
                alloc_lev_L=.true.
@@ -277,6 +280,7 @@ contains
     character(len=*), intent(in) :: string      !Input string to upper-case
     character(len=LONG_STRING) :: upper_string  !Upper-cased result
     integer :: i
+    external msg
     if (len_trim(string) > len(upper_string)) then
        write(for_msg,*) 'Long string truncated in up() ',trim(string)
        call msg(MSG_WARNING,for_msg)
@@ -299,7 +303,8 @@ contains
     logical :: allow_reshape_L
     character(len=*) :: msg_S
     !Local variables
-    logical :: alloc_lev_L   
+    logical :: alloc_lev_L
+    external msg
     istat=-1
     if (size(len) < 3) then
        write(for_msg,*) 'wrong array shape specified for '//trim(key_S)
@@ -340,12 +345,13 @@ contains
     ! Allocate space for the result value and report error (len is result of 'shape()')
     implicit none
     character(len=*), intent(in) :: key_S
-    real*8, dimension(:,:,:), pointer :: value
+    real(kind=8), dimension(:,:,:), pointer :: value
     integer, dimension(:), intent(in) :: len
     logical :: allow_reshape_L
     character(len=*) :: msg_S
     !Local variables
-    logical :: alloc_lev_L   
+    logical :: alloc_lev_L
+    external msg
     istat=-1
     if (size(len) < 3) then
        write(for_msg,*) 'wrong array shape specified for '//trim(key_S)
@@ -360,7 +366,7 @@ contains
             size(value,2)/=len(2).or.&
             size(value,3)/=len(3))then
           if(allow_reshape_L)then
-             write(for_msg,*) 'reshaping 3D real*8 table'//trim(msg_S)
+             write(for_msg,*) 'reshaping 3D real(kind=8) table'//trim(msg_S)
              call msg(MSG_INFO,VGD_PRFX//for_msg)
              deallocate(value)
              alloc_lev_L=.true.
@@ -392,6 +398,7 @@ contains
     logical, optional, intent(in) :: quiet      !Do not print massages
     ! Local variables
     integer :: level_msg
+    external msg
     level_msg=MSG_CRITICAL
     if (present(quiet)) then
        if(quiet)level_msg=MSG_QUIET    
@@ -404,6 +411,7 @@ contains
 
   integer function put_error(key) result(error)
     character(len=*), intent(in) :: key
+    external msg
     write(for_msg,*) 'WARNING: attempt to set useless value for '//trim(key)
     call msg(MSG_CRITICAL,for_msg)
     error = VGD_ERROR
