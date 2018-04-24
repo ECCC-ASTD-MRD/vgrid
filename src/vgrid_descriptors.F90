@@ -525,8 +525,9 @@ contains
          my_ip2 = -1
       endif
       if(present(stdout_unit))then
-         write(for_msg,*) 'ERROR: in new_gen, implement option stdout_unit'
+         write(for_msg,*) 'ERROR: in new_gen, implement option stdout_unit'         
          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         return
          stdout_unit_CP = c_loc(stdout_unit)
       else
          stdout_unit_CP = C_NULL_PTR
