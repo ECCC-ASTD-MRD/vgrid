@@ -1,4 +1,3 @@
-
 /* libdescrip - Vertical grid descriptor library for FORTRAN programming
  * Copyright (C) 2016  Direction du developpement des previsions nationales
  *                     Centre meteorologique canadien
@@ -250,23 +249,21 @@ static double reverseDouble (char *c) {
 
 static void flip_transfer_d2c(char *name, double val_8) {
   
+  // NOTE : Character un-stuffing from double is done right to left (Little endian style)
+
   if( 1 == 1 ){
 
-  // TODO ajout long de name
   int i;
   union {
     double d;
     uint64_t tt;
   } u;
   u.d = val_8;
+
   printf("MICHEL DECODE  %16.16lx %f\n",u.tt, val_8);
   name[8] = '\0';
   for( i = 0; i < 4; i++ ){
-    name[i] = (u.tt >> 8*(7-i)) & 0xFF;
-    //if( name[i] == ' ' ){
-    //  name[i] = ' ';
-    //  break;
-    //}
+    name[i] = (u.tt >> 8*(i)) & 0xFF;
   }
   printf("MICHEL DECODE '%s'\n",name);
 
@@ -290,6 +287,8 @@ static void flip_transfer_d2c(char *name, double val_8) {
 
 static void flip_transfer_c2d(unsigned char *name, void *val_8) {
   
+  // NOTE : Character stuffing into double is done right to left (Little endian style)
+
   int i;
   uint64_t *xx = val_8;
   uint64_t tt, bl;
@@ -297,17 +296,18 @@ static void flip_transfer_c2d(unsigned char *name, void *val_8) {
   tt = 0;
   bl = ' ';
   printf("MICHEL name='%s'\n",name);  
+  for( i = strlen(name); i < 4; i++ ){
+    tt <<= 8;
+    tt |= bl;
+  }
+
   for( i = 0; i < strlen(name); i++ ){
     if( i == 4 ) {
       break;
     }
     printf("MICHEL ENCODE name[i]='%c'\n",name[i]);
-    tt = (tt << 8) | name[i];
+    tt = (tt << 8) | name[3-i];
     printf("MICHEL ENCODE tt=%16.16lx\n",tt);
-  }
-  while ( i++ < 8) {
-    tt <<= 8;
-    tt |= bl;
   }
   *xx = tt;
   printf("MICHEL ENCODE tt=%16.16lx\n",tt);
