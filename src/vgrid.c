@@ -249,31 +249,89 @@ static double reverseDouble (char *c) {
 }
 
 static void flip_transfer_d2c(char *name, double val_8) {
+  
+  if( 1 == 1 ){
+
+  // TODO ajout long de name
+  int i;
   union {
     double d;
-    char c[sizeof(double)];
+    uint64_t tt;
+  } u;
+  u.d = val_8;
+  printf("MICHEL DECODE  %16.16lx %f\n",u.tt, val_8);
+  name[8] = '\0';
+  for( i = 0; i < 4; i++ ){
+    name[i] = (u.tt >> 8*(7-i)) & 0xFF;
+    //if( name[i] == ' ' ){
+    //  name[i] = ' ';
+    //  break;
+    //}
+  }
+  printf("MICHEL DECODE '%s'\n",name);
+
+  } else {
+    printf("CODE ANDRE %16.16x %f\n",val_8, val_8);
+  union {
+   double d;
+   char c[sizeof(double)];
   } u;
   u.d = val_8;
   if(! is_bigendian()) {
-    u.d = reverseDouble(u.c);
+   u.d = reverseDouble(u.c);
   }
+  //Le compilateur PGI n'aime pas la ligne suivante :
   strncpy(name, u.c, 4);
+  //int ier;
+  //TODO trap error
+  //ier = Fvgd_flip_transfer_char(&val_8,name);
+  }
 }
 
-static void flip_transfer_c2d(char *name, double *val_8) {
-  // TODO, pas certain que cela soit ok.
-  // les valeurs de u.d semblent etranges
-  union {
-    double d;
-    char c[sizeof(double)];
-  } u;
-  strcpy(u.c,"ABCDEFGH");
-  strncpy(u.c, name, 4);
-  if(! is_bigendian()) {
-    u.d = reverseDouble(u.c);
+static void flip_transfer_c2d(unsigned char *name, void *val_8) {
+  
+  int i;
+  uint64_t *xx = val_8;
+  uint64_t tt, bl;
+
+  tt = 0;
+  bl = ' ';
+  printf("MICHEL name='%s'\n",name);  
+  for( i = 0; i < strlen(name); i++ ){
+    if( i == 4 ) {
+      break;
+    }
+    printf("MICHEL ENCODE name[i]='%c'\n",name[i]);
+    tt = (tt << 8) | name[i];
+    printf("MICHEL ENCODE tt=%16.16lx\n",tt);
   }
-  *val_8 = u.d;
+  while ( i++ < 8) {
+    tt <<= 8;
+    tt |= bl;
+  }
+  *xx = tt;
+  printf("MICHEL ENCODE tt=%16.16lx\n",tt);
 }
+
+/* static void flip_transfer_c2d(unsigned char *name, double *val_8) { */
+
+/*   // TODO, pas certain que cela soit ok. */
+/*   // les valeurs de u.d semblent etranges */
+/*   union { */
+/*     double d; */
+/*     char c[sizeof(double)]; */
+/*   } u; */
+/*   strcpy(u.c,"ABCDEFGH"); */
+/*   strncpy(u.c, name, 4); */
+/*   if(! is_bigendian()) { */
+/*     u.d = reverseDouble(u.c); */
+/*   } */
+/*   *val_8 = u.d; */
+/*   //int ier; */
+/*   //TODO trap error */
+/*   //ier = Fvgd_flip_transfer_r8(name,val_8); */
+
+/* } */
 
 static int max_int(int *vec, int ni) {
   int i, ind = 0;
@@ -742,7 +800,10 @@ int Cvgd_vgdcmp(vgrid_descriptor *vgd1, vgrid_descriptor *vgd2) {
   if (vgd1->vcode != vgd2->vcode)                   return(-1);
   if (vgd1->kind != vgd2->kind)                     return(-2);
   if (vgd1->version != vgd2->version)               return(-3);
-  if (strcmp(vgd1->ref_name, vgd2->ref_name) != 0 ) return(-4);
+  if (strcmp(vgd1->ref_name, vgd2->ref_name) != 0 ){
+    printf("Should be '%s' got '%s'\n",vgd1->ref_name,vgd2->ref_name);
+    return(-4);
+  }
   if (strcmp(vgd1->ref_namel, vgd2->ref_namel) != 0 ) return(-20);
 
   if (vgd1->nl_w != vgd2->nl_w) return(-23);
@@ -1673,7 +1734,7 @@ int C_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, int
 		     double *a_m_8, double *b_m_8, double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8, double *a_w_8, double *b_w_8, double *c_w_8, int *ip1_m, int *ip1_t, int *ip1_w, int nl_m, int nl_t, int nl_w)
 {
   char cvcode[6];
-  int errorInput = 0, ier;
+  int errorInput = 0, ier, k;
 
   if(*self){
     Cvgd_free(self);
@@ -1879,6 +1940,7 @@ int C_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, int
       errorInput = 1;
     }
   }
+
   if(is_valid( *self, ip1_m_valid)) {
     if(ip1_m){
       free((*self)->ip1_m);
@@ -1924,6 +1986,7 @@ int C_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, int
   if (errorInput > 0) {
     return (VGD_ERROR);
   }  
+
   // Fill table with version-specific encoder
   switch((*self)->vcode) {
   case 1:
@@ -2059,17 +2122,23 @@ static int c_encode_vert_1001(vgrid_descriptor **self,int nk){
     printf("(Cvgd) ERROR in c_encode_vert_1001, cannot allocate table of bouble of size %d\n",table_size );
     return(VGD_ERROR);
   }
+
   strcpy((*self)->ref_name,"P0  ");
   strcpy((*self)->ref_namel,VGD_NO_REF_NOMVAR);
+
 
   //Fill header
   (*self)->table[0] = (*self)->kind;
   (*self)->table[1] = (*self)->version;
   (*self)->table[2] = skip;
+  printf("AVANT flip_transfer_c2d, (*self)->ref_name='%s'\n", (*self)->ref_name);
   flip_transfer_c2d((*self)->ref_name, &((*self)->table[3]));
+  printf("APRES flip_transfer_c2d, (*self)->ref_name='%s', (*self)->table[3]=%f\n",(*self)->ref_name, (*self)->table[3]);
+
   (*self)->table[4] = 0.;
   (*self)->table[5] = 0.;
   
+
   int k, ind = 6;
   for ( k = 0; k < nk; k++){
     (*self)->table[ind  ] = (*self)->ip1_m[k];
@@ -2612,6 +2681,7 @@ static int c_decode_vert_1001(vgrid_descriptor **self) {
   (*self)->kind    = (int) (*self)->table[0];
   (*self)->version = (int) (*self)->table[1];
   skip             = (int) (*self)->table[2];
+  printf("ANDRE (*self)->table[3]=%f\n",(*self)->table[3]);
   flip_transfer_d2c((*self)->ref_name,(*self)->table[3]);
   // The next two values in table are not used, so we continue with ind = 6
   ind = 6;
@@ -5905,6 +5975,7 @@ static int c_legacy(vgrid_descriptor **self, int unit, int F_kind) {
   }
   printf("(Cvgd)   Found %d unique ip1 of kind %d among the %d records in file to construct the vertical descriptor\n", nb, valid_kind, count);
   error = C_gen_legacy_desc(self, unit, keylist , nb);
+
   if( error == VGD_ERROR ){
     printf("(Cvgd) ERROR: problem with C_gen_legacy_desc\n");
     return(VGD_ERROR);
