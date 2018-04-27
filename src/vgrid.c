@@ -239,7 +239,7 @@ static void flip_transfer_d2c(char *name, double val_8) {
   //printf("DECODE '%s'\n",name);
 }
 
-static void flip_transfer_c2d(unsigned char *name, void *val_8) {
+static void flip_transfer_c2d(char *name, void *val_8) {
   // NOTE : Character stuffing into double is done right to left (Little endian style)
   int i;
   uint64_t *xx = val_8;
