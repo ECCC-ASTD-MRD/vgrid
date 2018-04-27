@@ -1,4 +1,4 @@
-
+#include <stdint.h>
 #ifndef VGRID_H
 #define VGRID_H
 
