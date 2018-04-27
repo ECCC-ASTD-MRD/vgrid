@@ -204,55 +204,44 @@ static int my_alloc_double(double **vec, int size, char *message){
   return(VGD_OK);
 }
 
-static int is_bigendian() {
-  int n = 1;
-  // little endian if true
-  if(*(char *)&n == 1) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
-
-static double reverseDouble (char *c) {
-    double d;
-    char *p = (char *)&d;
-    p[0] = c[7];
-    p[1] = c[6];
-    p[2] = c[5];
-    p[3] = c[4];
-    p[4] = c[3];
-    p[5] = c[2];
-    p[6] = c[1];
-    p[7] = c[0];
-    return d;
-}
-
-static void flip_transfer_d2c(char *name, double val_8) {
+static void flip_transfer_d2c(char *name, double val_8) {  
+  // NOTE : Character un-stuffing from double is done right to left (Little endian style)
+  int i;
   union {
     double d;
-    char c[sizeof(double)];
+    uint64_t tt;
   } u;
   u.d = val_8;
-  if(! is_bigendian()) {
-    u.d = reverseDouble(u.c);
+  //printf("DECODE  %16.16lx %f\n",u.tt, val_8);
+  name[4] = '\0';
+  for( i = 0; i < 4; i++ ){
+    name[i] = (u.tt >> 8*(i)) & 0xFF;
   }
-  strncpy(name, u.c, 4);
+  //printf("DECODE '%s'\n",name);
 }
 
-static void flip_transfer_c2d(char *name, double *val_8) {
-  // TODO, pas certain que cela soit ok.
-  // les valeurs de u.d semblent etranges
-  union {
-    double d;
-    char c[sizeof(double)];
-  } u;
-  strcpy(u.c,"ABCDEFGH");
-  strncpy(u.c, name, 4);
-  if(! is_bigendian()) {
-    u.d = reverseDouble(u.c);
+static void flip_transfer_c2d(char *name, void *val_8) {
+  // NOTE : Character stuffing into double is done right to left (Little endian style)
+  int i;
+  uint64_t *xx = val_8;
+  uint64_t tt, bl;
+  tt = 0;
+  bl = ' ';
+  //printf("ENCODE name='%s'\n",name);  
+  for( i = strlen(name); i < 4; i++ ){
+    tt <<= 8;
+    tt |= bl;
   }
-  *val_8 = u.d;
+  for( i = 0; i < strlen(name); i++ ){
+    if( i == 4 ) {
+      break;
+    }
+    //printf("ENCODE name[i]='%c'\n",name[i]);
+    tt = (tt << 8) | name[3-i];
+    //printf("ENCODE tt=%16.16lx\n",tt);
+  }
+  *xx = tt;
+  //printf("ENCODE tt=%16.16lx\n",tt);
 }
 
 static int max_int(int *vec, int ni) {
