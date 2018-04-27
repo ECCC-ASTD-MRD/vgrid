@@ -21,11 +21,11 @@ case "${ORDENV_PLAT}" in
    ubuntu-14.04-amd64-64)
       export BH_MODE=intel
       #VGRID_COMPILER=intel13sp1u2
-      #VGRID_COMPILER=intel2016
+      VGRID_COMPILER=intel2016
       #VGRID_COMPILER=gcc-5.1.0
       #VGRID_COMPILER=gcc-4.9.1
       #VGRID_COMPILER=pgi17.10
-      VGRID_COMPILER=pgi1401
+      #VGRID_COMPILER=pgi1401
       if [ ${VGRID_COMPILER} == intel13sp1u2 ];then
          #MY_FFLAGS="-C -g -O0 -lefence"
          #MY_CFLAGS="-g -O0 -lefence"
