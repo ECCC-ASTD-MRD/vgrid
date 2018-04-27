@@ -618,6 +618,7 @@ static void decode_HY(VGD_TFSTD_ext var, double *ptop_8, double *pref_8, float *
 
 static int my_fstprm(int key,VGD_TFSTD_ext *ff) {
   //var->ip1 = 62;
+  double nhours;
   STR_INIT(ff->typvar,VGD_LEN_TYPVAR);
   STR_INIT(ff->nomvar,VGD_LEN_NAME);
   STR_INIT(ff->etiket,VGD_LEN_ETIK);
@@ -635,6 +636,8 @@ static int my_fstprm(int key,VGD_TFSTD_ext *ff) {
     printf("(Cvgd) ERROR: cannot fstprm for fstkey %d\n",key);
     return(VGD_ERROR);
   }
+  nhours = ff->deet * ff->npas / 3600.;
+  f77name(incdatr)(&ff->datev,&ff->dateo,&nhours);
   return(VGD_OK);
 }
 
@@ -5576,28 +5579,29 @@ static int C_get_consistent_pt_e1(int iun, float *val, char *nomvar ){
 }
 
 static int C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, char *nomvar ){
-  int ni, nj, nk, nmax=1000, infon, ind;
+  int error, ni, nj, nk, nmax=1000, infon, ind;
   int liste[nmax];
   VGD_TFSTD_ext va3;
 
-  // Note: HY has dateo not datev
-  if (c_fstinl(iun, &ni, &nj, &nk, var.dateo, var.etiket, -1, -1, -1, " ", nomvar, liste, &infon, nmax) < 0) {
-    printf("(Cvgd) ERROR in C_get_consistent_hy, with fstinl\n");
+  // Note: HY may have dateo or datev
+  // Try dateo first
+  error = c_fstinl(iun, &ni, &nj, &nk, var.dateo, var.etiket, -1, -1, -1, " ", nomvar, liste, &infon, nmax);
+  if (error < 0) {
+    printf("(Cvgd) ERROR in C_get_consistent_hy, with fstinl on dateo\n");
     return(VGD_ERROR);
-  }
+  }  
   if( infon == 0 ){
-    printf("(Cvgd)  WARNING in C_get_consistent_hy, no record of nomvar = %s, date = %d, etiket = %s found\n", nomvar, var.dateo, var.etiket);
-    printf("                looking for %s with wild cards\n", nomvar);
-    if ( c_fstinl(iun, &ni, &nj, &nk, -1, " ", -1, -1, -1, " ", nomvar, liste, &infon, nmax) <  0) {
-      printf("(Cvgd) ERROR in C_get_consistent_hy, with fstinl with wild cards\n");
+    // No dateo, check datev
+    error = c_fstinl(iun, &ni, &nj, &nk, var.datev, var.etiket, -1, -1, -1, " ", nomvar, liste, &infon, nmax);
+    if (error < 0) {
+      printf("(Cvgd) ERROR in C_get_consistent_hy, with fstinl on datev\n");
       return(VGD_ERROR);
     }
     if( infon == 0 ){
-      printf("(Cvgd)  ERROR in C_get_consistent_hy, no record of nomvar = %s found\n", nomvar);
+      printf("(Cvgd)  ERROR in C_get_consistent_hy, no record of nomvar = %s, (dateo = %d or datev = %d), etiket = %s found\n", nomvar, var.dateo, var.datev, var.etiket);
       return(VGD_ERROR);
     }
   }
-  
   for( ind = 0; ind < infon; ind++ ){
     if( ind == 0 ){
       if( my_fstprm(liste[ind], va2) == VGD_ERROR ){
