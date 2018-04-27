@@ -7,10 +7,6 @@ eval `cclargs \
  -valgrind ""  ""  "[Run tests with valgrind not equal to '', put result in ${valgrind} directory]"\
  ++ $*`
 
-if [ "${valgrind}" != "" ];then
-   echo "valgrind will be run, see results in ${vagrind} directory"
-fi
-
 set -e
 # Get list of tests
 if [ -z "$*" ] ; then
@@ -45,6 +41,11 @@ echo "   Fortran ${MY_FFLAGS} ${FFLAGS}"
 echo "   C       ${MY_CFLAGS} ${CFLAGS}"
 echo "Using ${MAX_CPUS} cpus"
 echo
+if [ "${valgrind}" != "" ];then
+   echo "Tests will be run with valgrind, see results in directory: ${valgrind}"
+else
+   echo "Tests will NOT run with valgrind"
+fi
 
 for test in ${tests[*]} ; do
 
