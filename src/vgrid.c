@@ -223,115 +223,45 @@ static int my_alloc_double(double **vec, int size, char *message){
   return(VGD_OK);
 }
 
-static int is_bigendian() {
-  int n = 1;
-  // little endian if true
-  if(*(char *)&n == 1) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
-
-static double reverseDouble (char *c) {
-    double d;
-    char *p = (char *)&d;
-    p[0] = c[7];
-    p[1] = c[6];
-    p[2] = c[5];
-    p[3] = c[4];
-    p[4] = c[3];
-    p[5] = c[2];
-    p[6] = c[1];
-    p[7] = c[0];
-    return d;
-}
-
-static void flip_transfer_d2c(char *name, double val_8) {
-  
+static void flip_transfer_d2c(char *name, double val_8) {  
   // NOTE : Character un-stuffing from double is done right to left (Little endian style)
-
-  if( 1 == 1 ){
-
   int i;
   union {
     double d;
     uint64_t tt;
   } u;
   u.d = val_8;
-
-  printf("MICHEL DECODE  %16.16lx %f\n",u.tt, val_8);
+  //printf("DECODE  %16.16lx %f\n",u.tt, val_8);
   name[8] = '\0';
   for( i = 0; i < 4; i++ ){
     name[i] = (u.tt >> 8*(i)) & 0xFF;
   }
-  printf("MICHEL DECODE '%s'\n",name);
-
-  } else {
-    printf("CODE ANDRE %16.16x %f\n",val_8, val_8);
-  union {
-   double d;
-   char c[sizeof(double)];
-  } u;
-  u.d = val_8;
-  if(! is_bigendian()) {
-   u.d = reverseDouble(u.c);
-  }
-  //Le compilateur PGI n'aime pas la ligne suivante :
-  strncpy(name, u.c, 4);
-  //int ier;
-  //TODO trap error
-  //ier = Fvgd_flip_transfer_char(&val_8,name);
-  }
+  //printf("DECODE '%s'\n",name);
 }
 
 static void flip_transfer_c2d(unsigned char *name, void *val_8) {
-  
   // NOTE : Character stuffing into double is done right to left (Little endian style)
-
   int i;
   uint64_t *xx = val_8;
   uint64_t tt, bl;
-
   tt = 0;
   bl = ' ';
-  printf("MICHEL name='%s'\n",name);  
+  //printf("ENCODE name='%s'\n",name);  
   for( i = strlen(name); i < 4; i++ ){
     tt <<= 8;
     tt |= bl;
   }
-
   for( i = 0; i < strlen(name); i++ ){
     if( i == 4 ) {
       break;
     }
-    printf("MICHEL ENCODE name[i]='%c'\n",name[i]);
+    //printf("ENCODE name[i]='%c'\n",name[i]);
     tt = (tt << 8) | name[3-i];
-    printf("MICHEL ENCODE tt=%16.16lx\n",tt);
+    //printf("ENCODE tt=%16.16lx\n",tt);
   }
   *xx = tt;
-  printf("MICHEL ENCODE tt=%16.16lx\n",tt);
+  //printf("ENCODE tt=%16.16lx\n",tt);
 }
-
-/* static void flip_transfer_c2d(unsigned char *name, double *val_8) { */
-
-/*   // TODO, pas certain que cela soit ok. */
-/*   // les valeurs de u.d semblent etranges */
-/*   union { */
-/*     double d; */
-/*     char c[sizeof(double)]; */
-/*   } u; */
-/*   strcpy(u.c,"ABCDEFGH"); */
-/*   strncpy(u.c, name, 4); */
-/*   if(! is_bigendian()) { */
-/*     u.d = reverseDouble(u.c); */
-/*   } */
-/*   *val_8 = u.d; */
-/*   //int ier; */
-/*   //TODO trap error */
-/*   //ier = Fvgd_flip_transfer_r8(name,val_8); */
-
-/* } */
 
 static int max_int(int *vec, int ni) {
   int i, ind = 0;
@@ -800,12 +730,8 @@ int Cvgd_vgdcmp(vgrid_descriptor *vgd1, vgrid_descriptor *vgd2) {
   if (vgd1->vcode != vgd2->vcode)                   return(-1);
   if (vgd1->kind != vgd2->kind)                     return(-2);
   if (vgd1->version != vgd2->version)               return(-3);
-  if (strcmp(vgd1->ref_name, vgd2->ref_name) != 0 ){
-    printf("Should be '%s' got '%s'\n",vgd1->ref_name,vgd2->ref_name);
-    return(-4);
-  }
-  if (strcmp(vgd1->ref_namel, vgd2->ref_namel) != 0 ) return(-20);
-
+  if (strcmp(vgd1->ref_name, vgd2->ref_name) != 0 ) return(-4);
+  if (strcmp(vgd1->ref_namel, vgd2->ref_namel) != 0 )return(-20);
   if (vgd1->nl_w != vgd2->nl_w) return(-23);
   // Note, size nl_m and nl_t are tested in call to same_vec_i below
   if (memcmp(&(vgd1->ptop_8),&(vgd2->ptop_8), sizeof(double)/sizeof(char) ))return(-5);
@@ -1734,7 +1660,7 @@ int C_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, int
 		     double *a_m_8, double *b_m_8, double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8, double *a_w_8, double *b_w_8, double *c_w_8, int *ip1_m, int *ip1_t, int *ip1_w, int nl_m, int nl_t, int nl_w)
 {
   char cvcode[6];
-  int errorInput = 0, ier, k;
+  int errorInput = 0, ier;
 
   if(*self){
     Cvgd_free(self);
@@ -2131,9 +2057,7 @@ static int c_encode_vert_1001(vgrid_descriptor **self,int nk){
   (*self)->table[0] = (*self)->kind;
   (*self)->table[1] = (*self)->version;
   (*self)->table[2] = skip;
-  printf("AVANT flip_transfer_c2d, (*self)->ref_name='%s'\n", (*self)->ref_name);
   flip_transfer_c2d((*self)->ref_name, &((*self)->table[3]));
-  printf("APRES flip_transfer_c2d, (*self)->ref_name='%s', (*self)->table[3]=%f\n",(*self)->ref_name, (*self)->table[3]);
 
   (*self)->table[4] = 0.;
   (*self)->table[5] = 0.;
@@ -2681,7 +2605,6 @@ static int c_decode_vert_1001(vgrid_descriptor **self) {
   (*self)->kind    = (int) (*self)->table[0];
   (*self)->version = (int) (*self)->table[1];
   skip             = (int) (*self)->table[2];
-  printf("ANDRE (*self)->table[3]=%f\n",(*self)->table[3]);
   flip_transfer_d2c((*self)->ref_name,(*self)->table[3]);
   // The next two values in table are not used, so we continue with ind = 6
   ind = 6;
