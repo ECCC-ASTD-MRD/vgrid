@@ -58,7 +58,9 @@ unset MY_FFLAGS MY_CFLAGS
 # March 2018, crash with test get_put_get_all compiler PrgEnv-intel-5.2.82 on sles-11-haswell-64-xc4 sles-11-broadwell-64-xc4 with optimization -O2, ok with -O0 -O1 -O3
 #             if I put compilation flag -heap-arrays its ok.
 #             Fine with intel16 ubuntu-14.04-amd64-64 for all optinizarin levels.
-
+#
+# April 2018, found problem with flip_transfer_* functions with compuler PGI 14.01. The functions were rewritten
+# by M Valin and the SIGSEGV described in March 2018 above is gone.
 
 if [ ${ORDENV_PLAT} == aix-7.1-ppc7-64 ];then	
    . ./setup_cmc.ec.gc.ca.dot

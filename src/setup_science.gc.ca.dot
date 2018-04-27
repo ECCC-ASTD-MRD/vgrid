@@ -30,8 +30,8 @@ case "${ORDENV_PLAT}" in
       BH_MODE=intel
       BH_PACKAGE=/fs/ssm/hpco/exp/bh/bh_0.17_all
       RPN_LIB=/fs/ssm/eccc/mrd/rpn/libs/16.2
-      export MY_FFLAGS="-openmp -fp-model source -warn all ${MY_FFLAGS} -O1"
-      export MY_CFLAGS="-openmp -fp-model precise -w3 ${MY_CFLAGS} -O1"
+      export MY_FFLAGS="-openmp -fp-model source -warn all ${MY_FFLAGS}"
+      export MY_CFLAGS="-openmp -fp-model precise -w3 ${MY_CFLAGS}"
       . ssmuse-sh -d ${RPN_LIB}
       . ssmuse-sh -p ${BH_PACKAGE}
       export SHARED_COMP_rpath=/fs/ssm/hpco/exp/intel-2016.1.156/intelcomp_2016.1.156-01_multi/compilers_and_libraries_2016.1.150/linux/compiler/lib/intel64
@@ -43,8 +43,8 @@ case "${ORDENV_PLAT}" in
       BH_MODE=intel
       BH_PACKAGE=/fs/ssm/hpco/exp/bh/bh_0.17_all
       RPN_LIB=/fs/ssm/eccc/mrd/rpn/libs/16.2
-      export MY_FFLAGS="-openmp -fp-model source -warn all ${MY_FFLAGS} -O1"
-      export MY_CFLAGS="-openmp -fp-model precise -w3 ${MY_CFLAGS} -O1"
+      export MY_FFLAGS="-openmp -fp-model source -warn all ${MY_FFLAGS}"
+      export MY_CFLAGS="-openmp -fp-model precise -w3 ${MY_CFLAGS}"
       . ssmuse-sh -d ${RPN_LIB}
       . ssmuse-sh -p ${BH_PACKAGE}
       export SHARED_COMP_rpath=/fs/ssm/hpco/exp/intel-2016.1.156/intelcomp_2016.1.156-01_multi/compilers_and_libraries_2016.1.150/linux/compiler/lib/intel64
