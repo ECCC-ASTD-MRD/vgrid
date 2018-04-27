@@ -232,7 +232,7 @@ static void flip_transfer_d2c(char *name, double val_8) {
   } u;
   u.d = val_8;
   //printf("DECODE  %16.16lx %f\n",u.tt, val_8);
-  name[8] = '\0';
+  name[4] = '\0';
   for( i = 0; i < 4; i++ ){
     name[i] = (u.tt >> 8*(i)) & 0xFF;
   }
