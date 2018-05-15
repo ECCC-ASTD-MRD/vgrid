@@ -56,8 +56,8 @@ static float VGD_TCDK  = 0.273150000000E+03;
 
 static int ptop_out_8_valid [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0, 5004, 5005, 5100,    0,     0,    0};
 static int ptop_8_valid     [VALID_TABLE_SIZE] = {0,    0, 1002, 1003,    0, 5001, 5002, 5003, 5004,    0,    0,    0,     0,    0};
-static int pref_8_valid     [VALID_TABLE_SIZE] = {0,    0,    0,    0, 1003, 5001, 5002, 5003, 5004, 5005, 5100,    0,     0,    0};
-static int rcoef1_valid     [VALID_TABLE_SIZE] = {0,    0,    0,    0, 1003, 5001, 5002, 5003, 5004, 5005, 5100,    0, 21001,21002};
+static int pref_8_valid     [VALID_TABLE_SIZE] = {0,    0,    0, 1003,    0, 5001, 5002, 5003, 5004, 5005, 5100,    0,     0,    0};
+static int rcoef1_valid     [VALID_TABLE_SIZE] = {0,    0,    0, 1003,    0, 5001, 5002, 5003, 5004, 5005, 5100,    0, 21001,21002};
 static int rcoef2_valid     [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005, 5100,    0, 21001,21002};
 static int rcoef3_valid     [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 5100,    0, 21001,21002};
 static int rcoef4_valid     [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 5100,    0, 21001,21002};
