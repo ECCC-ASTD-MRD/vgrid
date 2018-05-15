@@ -80,22 +80,22 @@ program tests
   stat = vgd_dpidpis(d,sfc_field=p0  ,ip1_list=ip1_list,dpidpis=dpidpis_3d)  
   stat = vgd_dpidpis(d,sfc_field=p0_8,ip1_list=ip1_list,dpidpis=dpidpis_3d_8)  
 
-!$omp parallel private(tid,dpidpis_profil,dpidpis_profil_8,ii,jj,k,stat)
+!$omp parallel private(tid,dpidpis_profil,dpidpis_profil_8,ii,jj,i,k,stat) shared(ni,nj,nk,d,p00,ip1_list,lu)
   tid=omp_get_thread_num()
   if (tid .eq. 0) then
      print*,'number of threads=',omp_get_num_threads()
-  endif  
+  endif
+  nullify(dpidpis_profil,dpidpis_profil_8)
+  allocate(dpidpis_profil(size(ip1_list)),dpidpis_profil_8(size(ip1_list)))
 !$omp do
   do i=1,ni*nj
      !print*,'i=',i
-     nullify(dpidpis_profil)
      stat = vgd_dpidpis(d,sfc_field=p00(i),ip1_list=ip1_list,dpidpis=dpidpis_profil)         
      if(stat.ne.VGD_OK)then
         print*,'ERROR: problem with vgd_dpidpis profil for i=',i
         stat=fstfrm(lu)
         call exit(1)
      endif
-     nullify(dpidpis_profil_8)
      stat = vgd_dpidpis(d,sfc_field=p00_8(i),ip1_list=ip1_list,dpidpis=dpidpis_profil_8)         
      if(stat.ne.VGD_OK)then
         print*,'ERROR: problem with vgd_dpidpis profil real(kind=8) for i=',i
@@ -110,9 +110,9 @@ program tests
         dpidpis_3d_from_prof  (ii,jj,k)=dpidpis_profil  (k)
         dpidpis_3d_from_prof_8(ii,jj,k)=dpidpis_profil_8(k)
      enddo
-     deallocate(dpidpis_profil,dpidpis_profil_8)
   enddo
 !$omp enddo
+  deallocate(dpidpis_profil,dpidpis_profil_8)
 !$omp end parallel
 
   if(associated(dpidpis_profil))deallocate(dpidpis_profil)
