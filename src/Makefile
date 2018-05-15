@@ -19,10 +19,10 @@ dependencies.mk: *.c *.F90 *.h *.hc
 include dependencies.mk
 
 %.o: %.F90
-	s.f90 -c $(MY_FFLAGS) $(FFLAGS) $(LEFENCE) $<
+	s.f90 -c -openmp $(MY_FFLAGS) $(FFLAGS) $(LEFENCE) $<
 
 %.o: %.c
-	s.cc -c $(MY_CFLAGS) $(CFLAGS) $(LEFENCE) $<
+	s.cc -c -openmp $(MY_CFLAGS) $(CFLAGS) $(LEFENCE) $<
 
 libdescrip.a: $(OBJECTS) dependencies.mk vgrid_version
 	rm -f libdescrip.a && ar scru libdescrip.a *.o ;\
