@@ -52,32 +52,32 @@ static float VGD_GRAV  = 0.980616000000E+01;
 static float VGD_TCDK  = 0.273150000000E+03;
 
 // Validity table for self
-#define VALID_TABLE_SIZE 14
+#define VALID_TABLE_SIZE 15
 
-static int ptop_out_8_valid [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0, 5004, 5005, 5100,    0,     0,    0};
-static int ptop_8_valid     [VALID_TABLE_SIZE] = {0,    0, 1002, 1003,    0, 5001, 5002, 5003, 5004,    0,    0,    0,     0,    0};
-static int pref_8_valid     [VALID_TABLE_SIZE] = {0,    0,    0, 1003,    0, 5001, 5002, 5003, 5004, 5005, 5100,    0,     0,    0};
-static int rcoef1_valid     [VALID_TABLE_SIZE] = {0,    0,    0, 1003,    0, 5001, 5002, 5003, 5004, 5005, 5100,    0, 21001,21002};
-static int rcoef2_valid     [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005, 5100,    0, 21001,21002};
-static int rcoef3_valid     [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 5100,    0, 21001,21002};
-static int rcoef4_valid     [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 5100,    0, 21001,21002};
-static int a_m_8_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 5001, 5002, 5003, 5004, 5005, 5100, 5999, 21001,21002};
-static int b_m_8_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 5001, 5002, 5003, 5004, 5005, 5100, 5999, 21001,21002};
-static int c_m_8_valid      [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 5100,    0, 21001,21002};
-static int a_t_8_valid      [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005, 5100,    0, 21001,21002};
-static int b_t_8_valid      [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005, 5100,    0, 21001,21002};
-static int c_t_8_valid      [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 5100,    0, 21001,21002};
-static int a_w_8_valid      [VALID_TABLE_SIZE] = {1,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,21002};
-static int b_w_8_valid      [VALID_TABLE_SIZE] = {1,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,21002};
-static int c_w_8_valid      [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,21002};
-static int ip1_m_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 5001, 5002, 5003, 5004, 5005, 5100, 5999, 21001,21002};
-static int ip1_t_valid      [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005, 5100,    0, 21001,21002};
-static int ip1_w_valid      [VALID_TABLE_SIZE] = {1,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,21002};
-static int dhm_valid        [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0, 5005, 5100,    0, 21001,21002};
-static int dht_valid        [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0, 5005, 5100,    0, 21001,21002};
-static int dhw_valid        [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,21002};
-static int is_in_logp       [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005, 5100,    0,     0,    0};
-static int vcode_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 5001, 5002, 5003, 5004, 5005, 5100, 5999, 21001,21002};
+static int ptop_out_8_valid [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0, 5004, 5005, 5100,    0,     0,    0};
+static int ptop_8_valid     [VALID_TABLE_SIZE] = {0,    0, 1002, 1003,    0,    0, 5001, 5002, 5003, 5004,    0,    0,    0,     0,    0};
+static int pref_8_valid     [VALID_TABLE_SIZE] = {0,    0,    0, 1003,    0,    0, 5001, 5002, 5003, 5004, 5005, 5100,    0,     0,    0};
+static int rcoef1_valid     [VALID_TABLE_SIZE] = {0,    0,    0, 1003,    0,    0, 5001, 5002, 5003, 5004, 5005, 5100,    0, 21001,21002};
+static int rcoef2_valid     [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005, 5100,    0, 21001,21002};
+static int rcoef3_valid     [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 5100,    0, 21001,21002};
+static int rcoef4_valid     [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 5100,    0, 21001,21002};
+static int a_m_8_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 4001, 5001, 5002, 5003, 5004, 5005, 5100, 5999, 21001,21002};
+static int b_m_8_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 4001, 5001, 5002, 5003, 5004, 5005, 5100, 5999, 21001,21002};
+static int c_m_8_valid      [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 5100,    0, 21001,21002};
+static int a_t_8_valid      [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005, 5100,    0, 21001,21002};
+static int b_t_8_valid      [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005, 5100,    0, 21001,21002};
+static int c_t_8_valid      [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 5100,    0, 21001,21002};
+static int a_w_8_valid      [VALID_TABLE_SIZE] = {1,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,21002};
+static int b_w_8_valid      [VALID_TABLE_SIZE] = {1,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,21002};
+static int c_w_8_valid      [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,21002};
+static int ip1_m_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 4001, 5001, 5002, 5003, 5004, 5005, 5100, 5999, 21001,21002};
+static int ip1_t_valid      [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005, 5100,    0, 21001,21002};
+static int ip1_w_valid      [VALID_TABLE_SIZE] = {1,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,21002};
+static int dhm_valid        [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 5005, 5100,    0, 21001,21002};
+static int dht_valid        [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 5005, 5100,    0, 21001,21002};
+static int dhw_valid        [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,21002};
+static int is_in_logp       [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005, 5100,    0,     0,    0};
+static int vcode_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 4001, 5001, 5002, 5003, 5004, 5005, 5100, 5999, 21001,21002};
 
 static int fstd_init(vgrid_descriptor *VGrid);
 static vgrid_descriptor* c_vgd_construct();
@@ -1480,6 +1480,9 @@ static int fstd_init(vgrid_descriptor *VGrid) {
          h->ig2=(int)round(VGrid->ptop_8*10.0);
          h->ig3=(int)roundf(VGrid->rcoef1*100.0f);
          break;
+      case 4001:
+         strcpy(h->etiket,"M_ABOVE_SFC");
+         break;
       case 5001:
          strcpy(h->etiket,"HYB_GEMV3");
          h->ig2=(int)round(VGrid->ptop_8*10.0);
@@ -1933,6 +1936,9 @@ int C_new_build_vert(vgrid_descriptor **self, int kind, int version, int nk, int
   case 2001:
     ier = c_encode_vert_2001(self,nk);
     break;
+  case 4001:
+    ier = c_encode_vert_4001(self,nk);
+    break;
   case 1003:
   case 5001:
     strcpy(cvcode,"5001");
@@ -2164,6 +2170,52 @@ static int c_encode_vert_2001(vgrid_descriptor **self,int nk){
     (*self)->table[ind  ] = (*self)->ip1_m[k];
     (*self)->table[ind+1] = (*self)->a_m_8[k];
     (*self)->table[ind+2] = (*self)->b_m_8[k];
+    ind = ind + 3;
+  }
+  (*self)->nl_t = (*self)->nl_m;
+  (*self)->nl_w = (*self)->nl_m;
+  (*self)->a_t_8 = (*self)->a_m_8;
+  (*self)->b_t_8 = (*self)->b_m_8;
+  (*self)->c_t_8 = (*self)->c_m_8;
+  (*self)->a_w_8 = (*self)->a_m_8;
+  (*self)->b_w_8 = (*self)->b_m_8;
+  (*self)->c_w_8 = (*self)->c_m_8;
+  (*self)->ip1_t = (*self)->ip1_m;
+  (*self)->ip1_w = (*self)->ip1_m;
+
+  (*self)->valid = 1;
+
+  return(VGD_OK);
+}
+
+static int c_encode_vert_4001(vgrid_descriptor **self,int nk){
+  
+  int skip = 1, table_size;
+  
+  if( (*self)->table )
+    free( (*self)->table );
+  (*self)->table_ni = 3;
+  (*self)->table_nj = nk+skip;
+  (*self)->table_nk = 1;
+  table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
+  (*self)->table = malloc ( table_size * sizeof(double) );
+  if(! (*self)->table ) {
+    printf("(Cvgd) ERROR in c_encode_vert_4001, cannot allocate table of bouble of size %d\n",table_size );
+    return(VGD_ERROR);
+  }
+  strcpy((*self)->ref_name,VGD_NO_REF_NOMVAR);
+  strcpy((*self)->ref_namel,VGD_NO_REF_NOMVAR);
+
+  //Fill header
+  (*self)->table[0] = (*self)->kind;
+  (*self)->table[1] = (*self)->version;
+  (*self)->table[2] = skip;
+  
+  int k, ind = 3;
+  for ( k = 0; k < nk; k++){
+    (*self)->table[ind  ] = (*self)->ip1_m[k];
+    (*self)->table[ind+1] = (*self)->a_m_8[k];
+    (*self)->table[ind+2] = 0.;
     ind = ind + 3;
   }
   (*self)->nl_t = (*self)->nl_m;
@@ -3452,6 +3504,50 @@ static int C_genab_2001(float *pres, int nk, double **a_m_8, double **b_m_8, int
     (*b_m_8)[k] = 0.;
     // Go back and forth to ip1 in order to make sure pres value is encodable.
     (*ip1_m)[k] = c_convip_Level2IP(pres[k],2);
+  }
+
+  return(VGD_OK);
+  
+}
+
+static int C_genab_4001(float *hgts, int nk, double **a_m_8, double **b_m_8, int **ip1_m)
+{
+
+  // Andre Plante May 2018.
+  char ok = 1;
+  int k;
+  
+  if( my_alloc_double(a_m_8, nk, "(Cvgd) ERROR in C_genab_4001, malloc error with a_m_8") == VGD_ERROR )
+    return(VGD_ERROR);
+  if( my_alloc_double(b_m_8, nk, "(Cvgd) ERROR in C_genab_4001, malloc error with b_m_8") == VGD_ERROR )
+    return(VGD_ERROR);
+  if( my_alloc_int   (ip1_m, nk, "(Cvgd) ERROR in C_genab_4001, malloc error with ip1_m") == VGD_ERROR )
+    return(VGD_ERROR);
+  
+  //Check monotonicity
+  for ( k = 1; k < nk; k++){
+    if(hgts[k] <= hgts[k-1]){
+      printf("WRONG SPECIFICATION OF HEIGHTS VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n");
+      ok=0;
+      break;
+    }
+  }
+  if ( hgts[0] < 0. ){
+    printf("WRONG SPECIFICATION OF HEIGHTS VERTICAL LEVELS: LEVELS must be positive\n");
+    ok=0;
+  }
+  if(! ok){
+    printf("   Current choice:\n");
+    for ( k = 0; k < nk; k++){
+      printf("   %f\n", hgts[k]);
+    }
+    return(VGD_ERROR);
+  }
+
+  for ( k = 0; k < nk; k++){
+    (*a_m_8)[k] = hgts[k];
+    (*b_m_8)[k] = 0.;
+    (*ip1_m)[k] = c_convip_Level2IP(hgts[k],4);
   }
 
   return(VGD_OK);
@@ -5262,6 +5358,14 @@ int Cvgd_new_gen_1002(vgrid_descriptor **self, float *hyb, int size_hyb, double 
   }
   return(VGD_OK);
 }
+int Cvgd_new_gen_4001(vgrid_descriptor **self, float *hyb, int size_hyb, int ip1, int ip2) {  
+  if( C_new_gen(self, 4, 1, hyb, size_hyb, NULL, NULL, NULL, NULL,
+		NULL, NULL, NULL, ip1, ip2, NULL, NULL, NULL, 0) == VGD_ERROR ){
+    printf("(Cvgd) ERROR in Cvgd_new_gen_4001, see details above\n");
+    return(VGD_ERROR);
+  }
+  return(VGD_OK);
+}
 int Cvgd_new_gen_5001(vgrid_descriptor **self, float *hyb, int size_hyb, double ptop_8, double pref_8, float rcoef1, int ip1, int ip2) {
   if( C_new_gen(self, 5, 1, hyb, size_hyb, &rcoef1, NULL, NULL, NULL,
 		&ptop_8, &pref_8, NULL, ip1, ip2, NULL, NULL, NULL, 0) == VGD_ERROR ){
@@ -5394,6 +5498,17 @@ int C_new_gen(vgrid_descriptor **self, int kind, int version, float *hyb, int si
     nl_m = size_hyb;
     nl_t = -1;
     if(C_genab_2001(hyb, size_hyb, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
+      free(a_m_8);
+      free(b_m_8);
+      free(ip1_m);
+      return(VGD_ERROR);
+    }
+    break;
+  case 4001:
+    nk   = size_hyb;
+    nl_m = size_hyb;
+    nl_t = -1;
+    if(C_genab_4001(hyb, size_hyb, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
       free(a_m_8);
       free(b_m_8);
       free(ip1_m);
