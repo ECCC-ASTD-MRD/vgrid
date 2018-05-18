@@ -56,6 +56,8 @@ To add a new vertical coordinate type:
 
 16- Add new elements to the structure if any in the garbage_collection function
 
+17- Add new Vcode in Cvgd_print_vcode_description
+
 Write/amend tests cases to tests the added feature before you add the feature, make sure the tests fail before the
 code is implemented to make sure the tests are affective.
 Leave tests in tests/src directory (git add your_new_test; git commit -m 'Add test for Vcode xyz'.
