@@ -66,11 +66,12 @@ program constructor
   type(vgrid_descriptor) :: vgd
   integer, parameter :: nk=10
   integer :: stat,k,i,nl_m=-1,nl_t=-1,nl_w=-1
-  integer :: fnom,fstouv,fstfrm,ier,lu1=11,lu2=12,key,fstinf,ni,nj,nkk
+  integer :: fnom,fstouv,fstfrm,fstluk,fstecr,ier,lu1=11,lu2=12,key,fstinf,ni,nj,nkk
   integer, dimension(:), pointer :: vipm,vipt,vipw,work_i
-  real :: my_epsilon=1.e-6
+  real :: my_epsilon=1.e-6, dummy
   real, dimension(nk) :: hgts,hgts2
   real, dimension(:), pointer :: vcdm,vcdt,vcdw,work
+  real, dimension(:,:), allocatable :: ff
   real(kind=8), dimension(:), pointer :: a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,a_w_8,b_w_8,c_w_8,work_8
   logical :: OK=.true.
   logical, parameter :: write_control_L=.true.
@@ -78,7 +79,7 @@ program constructor
   character (len=256) :: file
   type(FSTD_ext) :: fst
 
-  nullify(vipm,vipt,vipw,work_i,vcdm,vcdt,vcdw,work,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,work_8)
+  nullify(vipm,vipt,vipw,work_i,vcdm,vcdt,vcdw,work,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,a_w_8,b_w_8,c_w_8,work_8)
 
   hgts=(/0.,20.,25.,40.,50.,80.,100.,120.,150.,200./)
 
@@ -243,9 +244,12 @@ program constructor
   stat = vgd_free(vgd)
 
   if(.true.) then
-     ! Generate file dm_4001_from_model_run
+     ! Generate file to copy in data_Linux/dm_4001_from_model_run
      if( vgd_new(vgd,kind=4,version=1,hyb=hgts) == VGD_ERROR)call exit(1)
-     file="data/dm_4001_from_model_run"
+     if( vgd_get(vgd,key='NL_M - Number of vertical levels (m)',value=nl_m) == VGD_ERROR )call exit(1)
+     if( vgd_get(vgd,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8) == VGD_ERROR )call exit(1)
+      if( vgd_get(vgd,key='VIPM - level ip1 list (m)'           ,value=vipm) == VGD_ERROR )call exit(1)
+     file="data/to_copy_in_dm_4001_from_model_run"
      if( fnom(lu1,file,"RND",0) < 0 )then
         print*,'ERROR with fnom on file ',trim(file)
         call exit(1)
@@ -266,8 +270,15 @@ program constructor
         call exit(1)
      endif
      ier = my_fstprm(key,fst)
-     print*,fst
-     !if( vgd_write(vgd,lu1,format='fst') == VGD_ERROR )call exit(1)
+     allocate(ff(fst%ni,fst%ni))
+     if( fstluk(ff,key,ni,nj,nkk) < 0 )call exit(1)     
+     do k=1,nl_m
+        ff=a_m_8(k)/10.
+        ier=fstecr(ff,dummy,-32,lu1,fst%dateo,fst%deet,fst%npas, &
+             ni,nj,nkk,vipm(k),fst%ip2,fst%ip3,fst%typvar,fst%nomvar,fst%etiket,fst%grtyp, &
+             fst%ig1,fst%ig2,fst%ig3,fst%ig4,fst%datyp,.true.)
+     enddo
+     if( vgd_write(vgd,lu1,format='fst') == VGD_ERROR )call exit(1)
      ier = fstfrm(lu1)
      ier = fstfrm(lu2)
   endif

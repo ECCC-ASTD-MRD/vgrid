@@ -28,11 +28,12 @@ program get_logp
   integer :: fnom,fstouv,fstfrm,fclos
   logical :: ok,logp_L
 
-  integer, parameter :: nfiles=14
+  integer, parameter :: nfiles=15
   character(len=200), dimension(nfiles) :: files=(/&
        "data/dm_1001_from_model_run           ",&
        "data/dm_1002_from_model_run           ",&
        "data/dm_2001_from_editfst             ",&
+       "data/dm_4001_from_model_run           ",&
        "data/dm_5001_from_model_run           ",&
        "data/dm_5002_from_model_run           ",&
        "data/dm_5003_from_model_run           ",&
@@ -47,6 +48,7 @@ program get_logp
        /)
 
   logical, dimension(nfiles) :: is_in_log =(/&
+       .false., &
        .false., &
        .false., &
        .false., &

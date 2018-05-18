@@ -53,6 +53,23 @@
 	return(VGD_ERROR);
     }
     break;
+  case 4001:
+    if( dpidpis ){
+      printf("(Cvgd) ERROR: dpidpis not implemented for vertical coordinate 4001\n");
+      return(VGD_ERROR);
+    }
+    if( in_log ){
+      printf("(Cvgd) ERROR: option in_log not supported for vertical coordinate 4001\n");
+      return(VGD_ERROR);
+    }
+    if(double_interface){
+      if( C_compute_heights_4001_8(self, ni, nj, nk, ip1_list, levels_8) == VGD_ERROR)
+	return(VGD_ERROR);
+    } else {
+      if( C_compute_heights_4001(self, ni, nj, nk, ip1_list, levels) == VGD_ERROR)
+	return(VGD_ERROR);
+    }
+    break;
   case 1003:
   case 5001:
     if(double_interface){

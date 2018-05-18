@@ -28,10 +28,11 @@ program constructor
   integer :: stat
   integer :: fnom,fstouv,fstfrm
 
-  integer, parameter :: nfiles=13
+  integer, parameter :: nfiles=14
   character(len=200), dimension(nfiles) :: files=(/&
        "data/dm_1001_from_model_run           ",&
        "data/dm_1002_from_model_run           ",&
+       "data/dm_4001_from_model_run           ",&
        "data/dm_5001_from_model_run           ",&
        "data/dm_5002_from_model_run           ",&
        "data/dm_5002_from_model_run           ",&

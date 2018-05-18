@@ -13,6 +13,7 @@ To add a new vertical coordinate type:
 4- Add a branch to your new Vcode new_gen
      Fortran: new_gen, add new required inputs if any
      C: C_new_gen, add new required inputs if any, add case clause and function
+     C: fstd_init, add new required inputs if any, add case clause and function
         Add new interface Cvgd_new_gen_(Vcode)
      Test: add test e.g. constructor_gen_5100.F90
 
@@ -26,7 +27,7 @@ To add a new vertical coordinate type:
       Test: constructor_build_all.F90 constructor_gen_*
 
 7- Add support to your vcode in 
-      C: fstd_init, Cvgd_new_from_table
+      C: Cvgd_new_from_table
       Tests: constructor_table, constructor_gen_...
 
 8- Add get/put entries if the structure has been modified (step 3 above)      
@@ -46,7 +47,7 @@ To add a new vertical coordinate type:
        C: Cvgd_print_desc, Cvgd_print_vcode_description
       Tests: add file for this Vcode in print_vcode
 
-14- Add elements to test_equality if any
+14- Add new elements to test_equality if any
        C: Cvgd_vgdcmp
 
 15- Add code in case statement of function table_update for new Vcode

@@ -28,6 +28,7 @@ char *filenames[] = {
     "data/dm_1001_from_model_run",
     "data/dm_1002_from_model_run",
     "data/2001_from_model_run",
+    "data/dm_4001_from_model_run",
     "data/dm_5001_from_model_run",
     "data/dm_5002_from_model_run",
     "data/dm_5005_from_model_run",

@@ -28,11 +28,12 @@ program constructor_build_all
   integer :: fnom,fstouv,fstfrm,fclos
   logical :: ok
 
-  integer, parameter :: nfiles=14
+  integer, parameter :: nfiles=15
   character(len=200), dimension(nfiles) :: files=(/&
        "data/dm_1001_from_model_run           ",&
        "data/dm_1002_from_model_run           ",&
        "data/dm_2001_from_editfst             ",&
+       "data/dm_4001_from_model_run           ",&
        "data/dm_5001_from_model_run           ",&
        "data/dm_5002_from_model_run           ",&
        "data/dm_5003_from_model_run           ",&
@@ -95,7 +96,7 @@ integer function check_build(F_vgd) result(istat)
   type(vgrid_descriptor), intent(in) :: F_vgd
   
   ! Local varibales
-  integer :: check_build_1001_2001_5999, check_build_1002, check_build_5001, check_build_5002, check_build_5005, check_build_5100, check_build_21001, check_build_21002
+  integer :: check_build_1001_2001_5999, check_build_1002, check_build_4001, check_build_5001, check_build_5002, check_build_5005, check_build_5100, check_build_21001, check_build_21002
   integer :: vcode
 
   istat = VGD_ERROR
@@ -109,6 +110,8 @@ integer function check_build(F_vgd) result(istat)
      if(check_build_1001_2001_5999(F_vgd) == VGD_ERROR) return
   case (1002)
      if(check_build_1002(F_vgd) == VGD_ERROR) return
+  case (4001)
+     if(check_build_4001(F_vgd) == VGD_ERROR) return
   case (5001)
      if(check_build_5001(F_vgd) == VGD_ERROR) return
   case (5002)
@@ -272,6 +275,58 @@ integer function check_build_1002(F_vgd) result(istat)
   return
   
 end function check_build_1002
+
+!=============================================================
+!=============================================================
+!=============================================================
+!=============================================================
+
+integer function check_build_4001(F_vgd) result(istat)
+
+  use Vgrid_Descriptors, only: Vgrid_descriptor,vgd_new, vgd_get, vgd_print, operator(==), VGD_ERROR, VGD_OK
+  
+ 
+  implicit none
+  type(vgrid_descriptor), intent(in) :: F_vgd
+  
+  ! Local varibales
+  integer :: kind, version, ier
+  integer, dimension(:), pointer :: ip1_m
+  real(kind=8), dimension(:), pointer :: a_m_8, b_m_8
+  type(vgrid_descriptor) :: vgd
+  
+  nullify(ip1_m, a_m_8, b_m_8)
+  
+  istat = VGD_ERROR
+  
+  if( vgd_get(F_vgd,"KIND", kind) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"VERS", version) == VGD_ERROR ) return  
+  if( vgd_get(F_vgd,"CA_M - vertical A coefficient (m)", a_m_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"CB_M - vertical B coefficient (m)", b_m_8) == VGD_ERROR ) return
+  if( vgd_get(F_vgd,"VIPM - level ip1 list (m)"        , ip1_m) == VGD_ERROR ) return
+
+  if( vgd_new(vgd,kind,version,size(ip1_m), &
+              ip1=-1,           &
+              ip2=-1,           &
+              a_m_8=a_m_8,       &
+              b_m_8=b_m_8,       &
+              ip1_m=ip1_m)       &
+              == VGD_ERROR) return
+  
+  if(.not. vgd == F_vgd)then
+     print*,'ERROR : build descriptor not equal has the one read from the file see vgd_print output below'
+     ier = vgd_print(F_vgd)
+     ier = vgd_print(vgd)
+     return
+  endif
+  
+  deallocate(ip1_m, a_m_8, b_m_8)
+  
+  istat = VGD_OK
+  
+  return
+  
+end function check_build_4001
 
 !=============================================================
 !=============================================================
