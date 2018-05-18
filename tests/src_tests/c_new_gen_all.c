@@ -28,6 +28,7 @@ char *filenames[] = {
     "data/dm_1001_from_model_run",
     "data/dm_1002_from_model_run",
     "data/2001_from_model_run",
+    "data/dm_4001_from_model_run",
     "data/dm_5001_from_model_run",
     "data/dm_5002_from_model_run",
     "data/dm_5005_from_model_run",
@@ -49,7 +50,7 @@ static float c_convip_IP2Level(int IP,int *kind) {
 }
 
 //========================================================================
-int check_gen_1001_2001(vgrid_descriptor *vgd, int vcode){
+int check_gen_1001_2001_4001(vgrid_descriptor *vgd, int vcode){
   int kind, kind2, version, nk, ier, k;
   int *ip1_m = NULL;
   float *hyb;
@@ -69,7 +70,7 @@ int check_gen_1001_2001(vgrid_descriptor *vgd, int vcode){
   }
   hyb = malloc( nk * sizeof(float) );
   if(! hyb ){ 
-    printf("ERROR: check_gen_1001_2001, problem allocating hyb\n");
+    printf("ERROR: check_gen_1001_2001_4001, problem allocating hyb\n");
     return(VGD_ERROR);
   }
   for( k=0; k < nk; k++){
@@ -103,8 +104,13 @@ int check_gen_1001_2001(vgrid_descriptor *vgd, int vcode){
       return(VGD_ERROR);
     }
     break;
+  case 4001:
+    if( Cvgd_new_gen_4001(&vgd2, hyb, nk, 0, 0) == VGD_ERROR) {
+      return(VGD_ERROR);
+    }
+    break;
   default:
-    printf("In test ERROR in check_gen_1001_2001, unsupported Vcode %d\n",vcode);
+    printf("In test ERROR in check_gen_1001_2001_4001, unsupported Vcode %d\n",vcode);
     return(VGD_ERROR);
   }
   //Test equality
@@ -507,7 +513,8 @@ int test_it(char *filename, int ind) {
   switch(vcode) {
   case 1001:
   case 2001:
-    if( check_gen_1001_2001(vgd, vcode) == VGD_ERROR){
+  case 4001:
+    if( check_gen_1001_2001_4001(vgd, vcode) == VGD_ERROR){
       return(VGD_ERROR);
     }
     break;

@@ -22,11 +22,12 @@ program constructor
   
   implicit none
   
-  integer, parameter :: nfiles=13
+  integer, parameter :: nfiles=14
   integer :: i,test_it
   character(len=200), dimension(nfiles) :: files=(/&
        "data/dm_1001_from_model_run           ",&
        "data/dm_1002_from_model_run           ",&
+       "data/dm_4001_from_model_run           ",&
        "data/dm_5001_from_model_run           ",&
        "data/dm_5002_from_model_run           ",&
        "data/dm_5003_from_model_run           ",&

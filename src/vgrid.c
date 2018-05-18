@@ -869,6 +869,10 @@ int Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip) {
       printf("   Number of hybrid normalized levels %d\n", self->nl_m );
       printf("   Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100\n");
       break;
+    case 4001:
+      printf("   Number of heights levels %d (height with respect to ground level)\n", self->nl_m );
+      printf("   Equation to compute heights (m): h = A\n");
+      break;
     case 5001:
       printf("   Number of hybrid levels %d\n", self->nl_m );
       printf("   Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100\n");
@@ -1104,6 +1108,18 @@ static int C_compute_pressure_2001(vgrid_descriptor *self, int ni, int nj, int n
   char proc_name[] = "C_compute_pressure_2001";
 #undef REAL_8
 #include "BODY_C_compute_pressure_2001.hc"
+}
+
+static int C_compute_heights_4001_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels) {
+  char proc_name[] = "C_compute_heights_4001_8";
+#define REAL_8 1
+#include "BODY_C_compute_heights_4001.hc"
+#undef REAL_8
+}
+static int C_compute_heights_4001(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels) {
+  char proc_name[] = "C_compute_heights_4001";
+#undef REAL_8
+#include "BODY_C_compute_heights_4001.hc"
 }
 
 static int C_compute_pressure_1003_5001_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log, int dpidpis ){
@@ -1586,6 +1602,15 @@ int Cvgd_new_build_vert_2001(vgrid_descriptor **self, int ip1, int ip2,
   if( C_new_build_vert(self, 2, 1, nk, ip1, ip2, NULL, NULL, NULL, NULL, NULL, NULL,
 		       a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1_m, NULL, NULL, nk, 0, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR with Cvgd_new_build_vert_2001 see details above\n");
+    return(VGD_ERROR);
+  }
+  return(VGD_OK);
+}
+int Cvgd_new_build_vert_4001(vgrid_descriptor **self, int ip1, int ip2, 
+			     double *a_m_8, double *b_m_8, int *ip1_m, int nk){
+  if( C_new_build_vert(self, 4, 1, nk, ip1, ip2, NULL, NULL, NULL, NULL, NULL, NULL,
+		       a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1_m, NULL, NULL, nk, 0, 0) == VGD_ERROR ){
+    printf("(Cvgd) ERROR with Cvgd_new_build_vert_4001 see details above\n");
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -2772,6 +2797,44 @@ static int c_decode_vert_2001(vgrid_descriptor **self) {
   return(VGD_OK);
 }
 
+static int c_decode_vert_4001(vgrid_descriptor **self) {
+  int skip, nk, k, ind;
+  (*self)->kind    = (int) (*self)->table[0];
+  (*self)->version = (int) (*self)->table[1];
+  skip             = (int) (*self)->table[2];
+  ind = 3;
+
+  nk = (*self)->table_nj - skip;
+
+  // Free A, B and Ip1 vectors for momentum and thermo.
+  c_vgd_free_abci(self);
+  // Allocate and assign level data, there are nk of them
+  (*self)->nl_m = nk;
+  (*self)->nl_t = nk;
+  (*self)->nl_w = nk;
+  (*self)->ip1_m = malloc( nk * sizeof(int) );
+  (*self)->a_m_8 = malloc( nk * sizeof(double) );
+  (*self)->b_m_8 = malloc( nk * sizeof(double) );
+  if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 ){
+    printf("(Cvgd) ERROR in c_decode_vert_1002, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nk);
+    return(VGD_ERROR);
+  }
+  for ( k = 0; k < nk; k++){      
+    (*self)->ip1_m[k] = (int) (*self)->table[ind  ];
+    (*self)->a_m_8[k] =       (*self)->table[ind+1];
+    (*self)->b_m_8[k] =       (*self)->table[ind+2];
+    ind = ind + 3;
+  }
+  (*self)->ip1_t = (*self)->ip1_m;
+  (*self)->a_t_8 = (*self)->a_m_8;
+  (*self)->b_t_8 = (*self)->b_m_8;
+  (*self)->ip1_w = (*self)->ip1_m;
+  (*self)->a_w_8 = (*self)->a_m_8;
+  (*self)->b_w_8 = (*self)->b_m_8;
+  (*self)->valid = 1;
+  return(VGD_OK);
+}
+
 static int c_decode_vert_1003_5001(vgrid_descriptor **self) {
   int skip, k, ind, nk;
   
@@ -3293,6 +3356,12 @@ int Cvgd_new_from_table(vgrid_descriptor **self, double *table, int ni, int nj, 
   case 5001:
     if( c_decode_vert_1003_5001(self) == VGD_ERROR ) {
       printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 1003 or 5001\n");
+      return(VGD_ERROR);
+    }
+    break;
+  case 4001:
+    if( c_decode_vert_4001(self) == VGD_ERROR ) {
+      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 4001\n");
       return(VGD_ERROR);
     }
     break;
@@ -6173,6 +6242,7 @@ int Cvgd_write_desc (vgrid_descriptor *self, int unit) {
 }
 
 int Cvgd_standard_atmosphere_1976_temp(vgrid_descriptor *self, int *i_val, int nl, float *temp){
+  int ier, vcode;
   float *pres;
   pres = malloc( nl * sizeof(float) );
   if(! pres){
@@ -6183,7 +6253,9 @@ int Cvgd_standard_atmosphere_1976_temp(vgrid_descriptor *self, int *i_val, int n
     printf("(Cvgd) ERROR in Cvgd_standard_atmosphere_1976_temp, temp not allocated\n");
     return(VGD_ERROR);
   }
-  if(! strcmp((*self).ref_name,"ME  ")){
+  
+  ier = Cvgd_get_int(self, "VCOD", &vcode, 1);
+  if(! strcmp((*self).ref_name,"ME  ") || vcode == 4001 ){
     if( c_stda76_temp_pres_from_heights(self, i_val, nl, temp, pres, NULL, NULL) == VGD_ERROR ){
       return(VGD_ERROR);
     }

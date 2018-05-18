@@ -28,6 +28,7 @@ char *filenames[] = {
     "data/dm_1001_from_model_run",
     "data/dm_1002_from_model_run",
     "data/2001_from_model_run",
+    "data/dm_4001_from_model_run",
     "data/dm_5001_from_model_run",
     "data/dm_5005_from_model_run",
     "data/dm_5100_from_model_run",
@@ -41,7 +42,7 @@ char *filenames[] = {
 
 #define n_file (sizeof (filenames) / sizeof (const char *))
 
-int compare_values(int iun, float *levels, double *levels_8, float *p0, int *i_val, int nl, char *ref_nomvar){
+int compare_values(int iun, int vcode, float *levels, double *levels_8, float *p0, int *i_val, int nl, char *ref_nomvar){
   int k, ij, ijk, ni2, nj2, nk2, key, ier, ip1;  
   char nomvar[5];
   float fact;
@@ -49,6 +50,10 @@ int compare_values(int iun, float *levels, double *levels_8, float *p0, int *i_v
   strcpy(nomvar,"PX  ");  
   fact=0.01f;
   if(! strcmp(ref_nomvar,"ME  ")){
+    strcpy(nomvar,"GZ  ");
+    fact=.1f;
+  }
+  if(vcode == 4001 ){
     strcpy(nomvar,"GZ  ");
     fact=.1f;
   }
@@ -99,7 +104,7 @@ int compare_values(int iun, float *levels, double *levels_8, float *p0, int *i_v
 
 int test_it(char *filename, char *ip1_name, int ind) {
 
-  int ier, iun;
+  int ier, iun, vcode;
   int quiet=0, *i_val = NULL, in_log = 0, dpidpis = 0;
   int nl, ni, nj, nk, ni2, nj2, nk2, key, ij, ijk, kind, ref1, ref2;
   char mode[]="RND", key_name[]="1234";
@@ -166,11 +171,16 @@ int test_it(char *filename, char *ip1_name, int ind) {
       printf("ERROR cannot Cvgd_get_int on KIND\n");
       return(VGD_ERROR);
     }
-    if( kind != 2 ){
-      printf("ERROR in test: Expecting kind = 2 (pressure) since no RFLD but got kind = %d\n",kind);
+    if( kind != 2 && kind != 4 ){
+      printf("ERROR in test: Expecting kind = 2 (pressure) or 4 (HAGL) since no RFLD but got kind = %d\n",kind);
       return(VGD_ERROR);
     }
-    strcpy(nomvar1,"TT  ");
+    if( kind == 2 ){
+      strcpy(nomvar1,"TT  ");
+    }
+    if( kind == 4 ){
+      strcpy(nomvar1,"GZ  ");
+    }
   }
 
   key = c_fstinf( iun, &ni2, &nj2, &nk2, -1, " ", -1, -1, -1, " ", nomvar1);
@@ -287,8 +297,9 @@ int test_it(char *filename, char *ip1_name, int ind) {
     printf("Error with Cvgd_diag_withref*_8\n");
     return(VGD_ERROR);
   }
-
-  if( compare_values(iun, levels, levels_8, p0, i_val, nl,nomvar1) == VGD_ERROR){
+  strcpy(key_name,"VCOD");
+  ier = Cvgd_get_int(vgd, key_name, &vcode, quiet);
+  if( compare_values(iun, vcode, levels, levels_8, p0, i_val, nl,nomvar1) == VGD_ERROR){
     printf("ERROR comparison failed\n");
     return(VGD_ERROR);
   }

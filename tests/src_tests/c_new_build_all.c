@@ -28,6 +28,7 @@ char *filenames[] = {
     "data/dm_1001_from_model_run",
     "data/dm_1002_from_model_run",
     "data/2001_from_model_run",
+    "data/dm_4001_from_model_run",
     "data/dm_5001_from_model_run",
     "data/dm_5002_from_model_run",
     "data/dm_5005_from_model_run",
@@ -42,7 +43,7 @@ char *filenames[] = {
 #define n_file (sizeof (filenames) / sizeof (const char *))
 
 //========================================================================
-int check_build_1001_2001_5999(vgrid_descriptor *vgd, int vcode){
+int check_build_1001_2001_5999_4001(vgrid_descriptor *vgd, int vcode){
   int kind, version, nk, ier;
   int *ip1_m = NULL;
   double *a_m_8 = NULL, *b_m_8 = NULL;
@@ -94,6 +95,12 @@ int check_build_1001_2001_5999(vgrid_descriptor *vgd, int vcode){
       return(VGD_ERROR);
     }
     break;
+  case 4001:
+    if( Cvgd_new_build_vert_4001(&vgd2, -1, -1,
+				 a_m_8, b_m_8, ip1_m, nk) == VGD_ERROR) {
+      return(VGD_ERROR);
+    }
+    break;
   case 5999:
     if( Cvgd_new_build_vert_5999(&vgd2, -1, -1,
 				 a_m_8, b_m_8, ip1_m, nk) == VGD_ERROR) {
@@ -101,7 +108,7 @@ int check_build_1001_2001_5999(vgrid_descriptor *vgd, int vcode){
     }
     break;
   default:
-    printf("In test ERROR in check_build_1001_2001_5999, unsupported Vcode %d\n",vcode);
+    printf("In test ERROR in check_build_1001_2001_5999_4001, unsupported Vcode %d\n",vcode);
     return(VGD_ERROR);
   }
   //Test equality
@@ -704,8 +711,9 @@ int test_it(char *filename, int ind) {
   switch(vcode) {
   case 1001:
   case 2001:
+  case 4001:
   case 5999:
-    if( check_build_1001_2001_5999(vgd, vcode) == VGD_ERROR){
+    if( check_build_1001_2001_5999_4001(vgd, vcode) == VGD_ERROR){
       return(VGD_ERROR);
     }
     break;

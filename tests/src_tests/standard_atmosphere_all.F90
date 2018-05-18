@@ -27,10 +27,11 @@ program standard_atmosphere
   implicit none
   integer :: stat,lu=10,i,stda_do_it
   logical :: ok=.true.
-  integer, parameter :: nfiles=11
+  integer, parameter :: nfiles=12
   character(len=200), dimension(nfiles) :: files=(/&
        "data/dm_1001_from_model_run           ",&
        "data/dm_1002_from_model_run           ",&
+       "data/dm_4001_from_model_run           ",&
        "data/dm_5001_from_model_run           ",&
        "data/dm_5002_from_model_run           ",&
        "data/dm_5005_from_model_run           ",&
