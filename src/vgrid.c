@@ -1072,15 +1072,15 @@ int Cvgd_print_vcode_description(int vcode){
     printf("   Can be used to encode any hybbrid unstaggered levels e.g. ECMWF\n");
   }
   if(vcode == 21001 || vcode == -1){
-    printf("   Hybrid height levels (Gal-Chen) (momentum/thermo levels) may be SLEVE %d\n", self->nl_m-2 );
+    printf("   Hybrid height levels (Gal-Chen) (momentum/thermo levels) may be SLEVE\n");
     printf("   The coordinate needs surface reference fields:\n");
     printf("      ME   surface pressure\n");
-     printf("     The SLEVE version also needs surface reference fields:\n");
+    printf("     The SLEVE version also needs surface reference fields:\n");
     printf("      MELS large scale surface pressure\n");
     printf("   Diag level heights (m AGL) encoded\n");
   }
   if(vcode == 21002 || vcode == -1){
-    printf("   Hybrid height levels on Lorenz grid (momentum/thermo levels/vertical-velocity) may be SLEVE %d\n", self->nl_m-2 );
+    printf("   Hybrid height levels on Lorenz grid (momentum/thermo levels/vertical-velocity) may be SLEVE\n");
     printf("   The coordinate needs surface reference fields:\n");
     printf("      ME   surface pressure\n");
      printf("     The SLEVE version also needs surface reference fields:\n");
