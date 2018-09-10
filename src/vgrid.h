@@ -173,5 +173,6 @@ int Cvgd_write_desc (vgrid_descriptor *self, int unit);
 int Cvgd_new_from_table(vgrid_descriptor **self, double *table, int ni, int nj, int nk);
 int Cvgd_standard_atmosphere_1976_temp(vgrid_descriptor *self, int *i_val, int nl_t, float *temp);
 int Cvgd_standard_atmosphere_1976_pres(vgrid_descriptor *self, int *i_val, int nl_t, float *pres, float *sfc_temp, float *sfc_pres);
-
+int Cvgd_standard_atmosphere_1976_hgts_from_pres_list(float *hgts, float *pres, int nb);
+int Cvgd_standard_atmosphere_1976_pres_from_hgts_list(float *pres, float *hgts, int nb);
 #endif // VGRID_H

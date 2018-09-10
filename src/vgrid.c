@@ -44,7 +44,7 @@ static float stda76_sfc_pres = 101325.;
 // Options
 static int ALLOW_SIGMA = 0;
 
-// Don't want to depend on modelutls so define constante here.
+// Don't want to depend on modelutils so define constantes here.
 // These are not used to transform variables like T to GZ so it will not
 // produce any inconsistancies with data in fst files. 
 static float VGD_RGASD = 0.287050000000E+03;
@@ -328,6 +328,46 @@ static int c_set_stda_layer(int ind, float Tk, float pk, float *zk, float *zkp, 
   *zkp = stda76_zgrad[ind+1];
   *gammaT = stda76_tgrad[ind];
   c_hypsometric (pkp, pk, Tk, *gammaT, *zk, *zkp);
+  return(VGD_OK);
+}
+
+static int c_get_stda76(float *Tk, float *pk, float *zk, float *gammaT, 
+			char *zero_lapse_rate){
+  int ind;
+
+  // Prepare temp, press and height array for the STDA76_N_LAYER + 1
+  // standard atmosphere interfaces.
+  // Start at Normal Temperature and Pressure
+  // Tk, pk, zk size STDA76_N_LAYER + 1
+  // gammaT, zero_lapse_rate size STDA76_N_LAYER
+			  
+  Tk[0]  = stda76_sfc_temp;
+  pk[0]  = stda76_sfc_pres;
+  for(ind=0; ind < STDA76_N_LAYER; ind++){
+    if( c_set_stda_layer( ind, Tk[ind], pk[ind], &zk[ind], &zk[ind+1],
+			  &gammaT[ind], &pk[ind+1], &zero_lapse_rate[ind])
+	== VGD_ERROR ){
+      return(VGD_ERROR);
+    }
+    if( zero_lapse_rate[ind] ){
+      Tk[ind+1] = Tk[ind];
+    } else {
+      Tk[ind+1] = Tk[ind] + gammaT[ind]*(zk[ind+1] - zk[ind]);
+    }
+  }
+  
+  //for(ind=0; ind < STDA76_N_LAYER+1; ind++){
+  //  printf("ind = %d, Tk[ind] = %f, pk[ind] = %f, zk[ind] = %f\n",
+  //          ind, Tk[ind], pk[ind], zk[ind]);
+  //}
+  //ind = 0, Tk[ind] = 288.149994, pk[ind] = 101325.000000, zk[ind] = 0.000000
+  //ind = 1, Tk[ind] = 216.649994, pk[ind] = 22633.392578, zk[ind] = 11000.000000
+  //ind = 2, Tk[ind] = 216.649994, pk[ind] = 5475.515137, zk[ind] = 20000.000000
+  //ind = 3, Tk[ind] = 228.649994, pk[ind] = 868.180603, zk[ind] = 32000.000000
+  //ind = 4, Tk[ind] = 270.649994, pk[ind] = 110.935928, zk[ind] = 47000.000000
+  //ind = 5, Tk[ind] = 270.649994, pk[ind] = 66.958076, zk[ind] = 51000.000000
+  //ind = 6, Tk[ind] = 214.649994, pk[ind] = 3.957995, zk[ind] = 71000.000000
+  //ind = 7, Tk[ind] = 186.945999, pk[ind] = 0.373567, zk[ind] = 84852.000000
   return(VGD_OK);
 }
 
@@ -6316,3 +6356,82 @@ int Cvgd_standard_atmosphere_1976_pres(vgrid_descriptor *self, int *i_val, int n
   free(temp);
   return(VGD_OK);
 }
+
+int Cvgd_standard_atmosphere_1976_hgts_from_pres_list(float *hgts, float *pres,
+						      int nb){
+
+  int i, k;
+  float Tk[STDA76_N_LAYER+1], pk[STDA76_N_LAYER+1], zk[STDA76_N_LAYER+1];
+  float gammaT[STDA76_N_LAYER];
+  char zero_lapse_rate[STDA76_N_LAYER];
+
+  if(c_get_stda76(Tk, pk, zk, gammaT, zero_lapse_rate) == VGD_ERROR){
+    return(VGD_ERROR);
+  }
+  for(i=0; i<nb; i++){
+    if( pres[i] <= pk[STDA76_N_LAYER]){
+      printf("Pressure %f Pa in list is out of the standard atmophere pressure upper bound which is %f Pa\n", pres[i], pk[STDA76_N_LAYER]);
+      return(VGD_ERROR);
+    }
+    if(pres[i] >= pk[0]){
+      // Integrate downward from surface pres and temp with gammaT[0]
+      hgts[i] = zk[0] + Tk[0]/gammaT[0] * ( exp(-(VGD_RGASD*gammaT[0])/VGD_GRAV * log(pres[i]/pk[0] )) - 1.f );
+    } else {
+      for(k=0; k<STDA76_N_LAYER; k++){
+	if(pres[i] > pk[k+1]){
+	  // compute height up to pressure value
+	  if( zero_lapse_rate[k] ){
+	    hgts[i] = zk[k] - (VGD_RGASD*Tk[k])/VGD_GRAV * log(pres[i]/pk[k]);
+	  } else {
+	    hgts[i] = zk[k] + Tk[k]/gammaT[k] * ( exp(-(VGD_RGASD*gammaT[k])/VGD_GRAV * log(pres[i]/pk[k] )) - 1.f );
+	  }
+	  break;
+	}
+      }
+    }
+    //printf("pres[i] = %f, hgts[i] = %f\n", pres[i], hgts[i]);
+  }
+  
+  return(VGD_OK);
+}
+
+int Cvgd_standard_atmosphere_1976_pres_from_hgts_list(float *pres, float *hgts,
+						      int nb){
+
+  int i, k;
+  float Tk[STDA76_N_LAYER+1], pk[STDA76_N_LAYER+1], zk[STDA76_N_LAYER+1];
+  float gammaT[STDA76_N_LAYER];
+  char zero_lapse_rate[STDA76_N_LAYER];
+
+  if(c_get_stda76(Tk, pk, zk, gammaT, zero_lapse_rate) == VGD_ERROR){
+    return(VGD_ERROR);
+  }
+  for(i=0; i<nb; i++){
+    if( hgts[i] > zk[STDA76_N_LAYER]){
+      printf("Height %f m in list is out of the standard atmophere height upper bound which is %f m\n", hgts[i], zk[STDA76_N_LAYER]);
+      return(VGD_ERROR);
+    }
+    if(hgts[i] <= zk[0]){
+      pres[i] = pk[0] * exp(-VGD_GRAV/(VGD_RGASD*gammaT[0])
+			    * log(gammaT[0]*(hgts[i]-zk[0])/Tk[0] + 1.f));
+			    
+    } else {
+      for(k=0; k<STDA76_N_LAYER; k++){
+	if(hgts[i] < zk[k+1]){
+	  if( zero_lapse_rate[k] ){
+	    pres[i] = pk[k] * exp(-VGD_GRAV/(VGD_RGASD*Tk[k])*(hgts[i]-zk[k]));
+	  } else {
+	    pres[i] = pk[k] * exp(-VGD_GRAV/(VGD_RGASD*gammaT[k])
+			    * log(gammaT[k]*(hgts[i]-zk[k])/Tk[k] + 1.f));
+	  }
+	  break;
+	}
+      }
+    }
+    //printf("pres[i] = %f, hgts[i] = %f\n", pres[i], hgts[i]);
+  }
+
+  return(VGD_OK);
+
+}
+ 

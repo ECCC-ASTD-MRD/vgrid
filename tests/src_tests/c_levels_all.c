@@ -245,12 +245,12 @@ int test_it(char *filename, char *ip1_name, int ind) {
 
   levels = malloc(ni2*nj2*nl * sizeof(float));
   if(! levels){
-    printf("Problem allocating levels of size %d\n",ni2*nj2);
+    printf("Problem allocating levels of size %d\n",ni2*nj2*nl);
     return(VGD_ERROR);
   }
   levels_8 = malloc(ni2*nj2*nl * sizeof(double));
   if(! levels_8){
-    printf("Problem allocating levels_8 of size %d\n",ni2*nj2);
+    printf("Problem allocating levels_8 of size %d\n",ni2*nj2*nl);
     return(VGD_ERROR);
   }
 
