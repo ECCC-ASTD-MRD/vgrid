@@ -106,7 +106,7 @@ void c_standard_atmosphere_pres_from_hgts() {
     fp = fopen(filename_c, "w");
     fprintf(fp, "size %d\n",nl);
     for( k=0; k<nl; k++){
-      fprintf(fp, "%f\n", hgts[k]);
+      fprintf(fp, "%f\n", pres[k]);
     }
     fclose(fp);
   }
@@ -121,8 +121,8 @@ void c_standard_atmosphere_pres_from_hgts() {
   }
   for( k=0; k<nl; k++){
     fscanf(fp,"%f", &ff);
-    if( fabs(ff - hgts[k]) > .01f ){
-      printf("ERROR differences found, expecting: %f, got %f\n", ff, hgts[k]);
+    if( fabs(ff - pres[k]) > .01f ){
+      printf("ERROR differences found, expecting: %f, got %f\n", ff, pres[k]);
       printf("ERROR TEST on file %s failled\n", filename_c);
       exit(1);
     }
