@@ -48,6 +48,8 @@ module vGrid_Descriptors
    public :: vgd_levels                          !compute physical level information
    public :: vgd_dpidpis                         !compute pressure derivative with respesct the sfc pressure
    public :: vgd_standard_atmosphere_1976        !Get standard atmosphere 1976 variable for a given coordinate
+   public :: vgd_standard_atmosphere_1976_pres_from_hgts_list ! Get standard atmosphere 1976 pressure in Pa from a height list in m
+   public :: vgd_standard_atmosphere_1976_hgts_from_pres_list ! Get standard atmosphere 1976 heights in m from a pressure list in Pa
    public :: operator(==)                        !overload equivalence operator
 
    ! Public class constants
@@ -282,6 +284,22 @@ module vGrid_Descriptors
         type(c_ptr), value :: pres_CP, sfc_temp_CP, sfc_pres_CP
       end function f_standard_atmosphere_1976_pres
       
+      integer(c_int) function f_standard_atmosphere_1976_pres_from_hgts_list( &
+           pres_CP, hgts_CP, nb) bind(c, name=&
+           'Cvgd_standard_atmosphere_1976_pres_from_hgts_list')
+        use iso_c_binding, only : c_ptr, c_int
+        type(c_ptr), value :: pres_CP, hgts_CP
+        integer (c_int), value :: nb
+      end function f_standard_atmosphere_1976_pres_from_hgts_list
+
+      integer(c_int) function f_standard_atmosphere_1976_hgts_from_pres_list( &
+           hgts_CP, pres_CP, nb) bind(c, name=&
+           'Cvgd_standard_atmosphere_1976_hgts_from_pres_list')
+        use iso_c_binding, only : c_ptr, c_int
+        type(c_ptr), value :: pres_CP, hgts_CP
+        integer (c_int), value :: nb
+      end function f_standard_atmosphere_1976_hgts_from_pres_list
+
    end interface
    
    interface vgd_new
@@ -2500,5 +2518,41 @@ contains
    end select
    status = VGD_OK
  end function vgd_standard_atmosphere_1976
+
+ integer function vgd_standard_atmosphere_1976_pres_from_hgts_list(pres, hgts, nb) result(status)
+   implicit none
+   integer :: nb
+   real, dimension(nb) :: pres, hgts   
+   ! Local variables
+   type (c_ptr) :: pres_CP, hgts_CP
+
+   status = VGD_ERROR
+   
+   pres_CP = c_loc(pres)
+   hgts_CP = c_loc(hgts)   
+   if( f_standard_atmosphere_1976_pres_from_hgts_list(pres_CP, hgts_CP, nb) &
+        == VGD_ERROR)return
+   status = VGD_OK
+   return
+
+ end function vgd_standard_atmosphere_1976_pres_from_hgts_list
+
+ integer function vgd_standard_atmosphere_1976_hgts_from_pres_list(hgts, pres, nb) result(status)
+   implicit none
+   integer :: nb
+   real, dimension(nb) :: hgts, pres   
+   ! Local variables
+   type (c_ptr) :: hgts_CP, pres_CP
+
+   status = VGD_ERROR
+   
+   hgts_CP = c_loc(hgts)
+   pres_CP = c_loc(pres)   
+   if( f_standard_atmosphere_1976_hgts_from_pres_list(hgts_CP, pres_CP, nb) &
+        == VGD_ERROR)return
+   status = VGD_OK
+   return
+
+ end function vgd_standard_atmosphere_1976_hgts_from_pres_list
 
 end module vGrid_Descriptors
