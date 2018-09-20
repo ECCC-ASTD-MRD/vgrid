@@ -20,10 +20,11 @@
 
 ! NOTE : the control files for comparison can be produce by the test c_standard_atmophere_all.c
 
-program standard_atmosphere
+program stda76
 #include <msg.h>
   use Unit_Testing, only: ut_report
-  use vGrid_Descriptors, only: vgd_putopt, VGD_ERROR
+  use vGrid_Descriptors, only: vgd_putopt, VGD_STDA76_SFC_T, VGD_STDA76_SFC_P, &
+       VGD_ERROR
   implicit none
   integer :: stat,lu=10,i,stda_do_it
   logical :: ok=.true.
@@ -44,20 +45,27 @@ program standard_atmosphere
        /)
   call msg_verbosity(MSG_DEBUG)
   stat = vgd_putopt("ALLOW_SIGMA",.true.)
+
+  if(abs(VGD_STDA76_SFC_T - 288.15)/288.15 > 1.e-5)then
+     call exit(1)
+  endif
+  if(abs(VGD_STDA76_SFC_P - 101325.)/101325. > 1.e-5)then
+     call exit(1)
+  endif
+ 
   do i=1,nfiles
      stat = stda_do_it(lu,files(i))
      if(stat==VGD_ERROR)then
-        ok=.false.
-        exit
+        call exit(1)
      endif
   enddo
   call ut_report(ok,message='Grid_Descriptors::vgd_levels level calculation status')
-end program standard_atmosphere
+end program stda76
 !=========================================================================
 !=========================================================================
 !=========================================================================
 integer function stda_do_it(lu,file) result(status)
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_standard_atmosphere_1976,VGD_OK,VGD_ERROR
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_stda76,VGD_OK,VGD_ERROR
   implicit none
   integer :: lu
   character(len=*) :: file
@@ -91,8 +99,8 @@ integer function stda_do_it(lu,file) result(status)
      return
   end if
   print*,"   Testing temperature"
-  if( vgd_standard_atmosphere_1976(vgd, ip1s, temp, 'TEMPERATURE') == VGD_ERROR )then
-     print*,"In test : ERROR with Cvgd_standard_atmosphere_1976_temp"
+  if( vgd_stda76(vgd, ip1s, temp, 'TEMPERATURE') == VGD_ERROR )then
+     print*,"In test : ERROR with Cvgd_stda76_temp"
      return
   endif
   if( compare(file, "_stda76_temp.txt", ip1s, temp, size(ip1s)) == VGD_ERROR )then
@@ -101,24 +109,24 @@ integer function stda_do_it(lu,file) result(status)
   ier = vgd_get(vgd, "RFLD", nomvar)
   if( trim(nomvar) == "ME" ) then
      print*,"   Testing pressure"
-     if( vgd_standard_atmosphere_1976(vgd, ip1s, pres, 'PRESSURE') == VGD_ERROR )then
-        print*,"In test : ERROR with Cvgd_standard_atmosphere_1976_pres"
+     if( vgd_stda76(vgd, ip1s, pres, 'PRESSURE') == VGD_ERROR )then
+        print*,"In test : ERROR with Cvgd_stda76_pres"
         return
      endif
      if( compare(file, "_stda76_pres.txt", ip1s, pres, size(ip1s)) == VGD_ERROR )then
         return
      endif
      print*,"   Testing pressure, option sfc_pres"
-     if( vgd_standard_atmosphere_1976(vgd, ip1s, pres, 'PRESSURE', sfc_pres=100000.) == VGD_ERROR )then
-        print*,"In test : ERROR with Cvgd_standard_atmosphere_1976_pres"
+     if( vgd_stda76(vgd, ip1s, pres, 'PRESSURE', sfc_pres=100000.) == VGD_ERROR )then
+        print*,"In test : ERROR with Cvgd_stda76_pres"
         return
      endif
      if( compare(file, "_stda76_pres_sfc_pres_100000.txt", ip1s, pres, size(ip1s)) == VGD_ERROR )then
         return
      endif
      print*,"   Testing pressure, option sfc_temp"
-     if( vgd_standard_atmosphere_1976(vgd, ip1s, pres, 'PRESSURE', sfc_temp=273.) == VGD_ERROR )then
-        print*,"In test : ERROR with Cvgd_standard_atmosphere_1976_pres"
+     if( vgd_stda76(vgd, ip1s, pres, 'PRESSURE', sfc_temp=273.) == VGD_ERROR )then
+        print*,"In test : ERROR with Cvgd_stda76_pres"
         return
      endif
      if( compare(file, "_stda76_pres_sfc_temp_273.txt", ip1s, pres, size(ip1s)) == VGD_ERROR )then

@@ -158,6 +158,6 @@ void c_get_put_get_all() {
     }
   }  
 
-  ier = c_ut_report(status,"testing Cvgd_standard_atmosphere");  
+  ier = c_ut_report(status,"testing Cvgd_stda76");  
   
 }

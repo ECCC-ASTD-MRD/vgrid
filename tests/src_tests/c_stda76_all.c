@@ -145,8 +145,8 @@ int test_it(char *filename, int ind) {
     free(temp);
     return(VGD_ERROR);
   }
-  if( Cvgd_standard_atmosphere_1976_temp(vgd, i_val, nl_t, temp) == VGD_ERROR ) {
-    printf("ERROR with Cvgd_standard_atmosphere_1976_temp\n");
+  if( Cvgd_stda76_temp(vgd, i_val, nl_t, temp) == VGD_ERROR ) {
+    printf("ERROR with Cvgd_stda76_temp\n");
     return(VGD_ERROR);
   }
   if( compare(filename, "_stda76_temp.txt", i_val, temp, nl_t) == VGD_ERROR ){
@@ -161,8 +161,8 @@ int test_it(char *filename, int ind) {
       free(pres);
       return(VGD_ERROR);
     }
-    if( Cvgd_standard_atmosphere_1976_pres(vgd, i_val, nl_t, pres, NULL, NULL) == VGD_ERROR ) {
-      printf("ERROR with Cvgd_standard_atmosphere_1976_pres\n");
+    if( Cvgd_stda76_pres(vgd, i_val, nl_t, pres, NULL, NULL) == VGD_ERROR ) {
+      printf("ERROR with Cvgd_stda76_pres\n");
       return(VGD_ERROR);
     }
     if( compare(filename, "_stda76_pres.txt", i_val, pres, nl_t) == VGD_ERROR ){
@@ -170,8 +170,8 @@ int test_it(char *filename, int ind) {
     }
     printf("   Testing pressure, option sfc_pres\n");
     sfc_pres=100000.;
-    if( Cvgd_standard_atmosphere_1976_pres(vgd, i_val, nl_t, pres, NULL, &sfc_pres) == VGD_ERROR ) {
-      printf("ERROR with Cvgd_standard_atmosphere_1976_pres, option sfc_pres\n");
+    if( Cvgd_stda76_pres(vgd, i_val, nl_t, pres, NULL, &sfc_pres) == VGD_ERROR ) {
+      printf("ERROR with Cvgd_stda76_pres, option sfc_pres\n");
       return(VGD_ERROR);
     }
     if( compare(filename, "_stda76_pres_sfc_pres_100000.txt", i_val, pres, nl_t) == VGD_ERROR ){
@@ -179,8 +179,8 @@ int test_it(char *filename, int ind) {
     }
     printf("   Testing pressure, option sfc_temp\n");
     sfc_temp=273.;
-    if( Cvgd_standard_atmosphere_1976_pres(vgd, i_val, nl_t, pres, &sfc_temp, NULL) == VGD_ERROR ) {
-      printf("ERROR with Cvgd_standard_atmosphere_1976_pres, option sfc_pres\n");
+    if( Cvgd_stda76_pres(vgd, i_val, nl_t, pres, &sfc_temp, NULL) == VGD_ERROR ) {
+      printf("ERROR with Cvgd_stda76_pres, option sfc_pres\n");
       return(VGD_ERROR);
     }
     if( compare(filename, "_stda76_pres_sfc_temp_273.txt", i_val, pres, nl_t) == VGD_ERROR ){
@@ -203,12 +203,27 @@ int test_it(char *filename, int ind) {
 //========================================================================
 //========================================================================
 
-void c_standard_atmosphere_all() {
+void c_stda76_all() {
   
   int i, ier, status = VGD_OK;
 
   ier = Cvgd_putopt_int("ALLOW_SIGMA",1);
+
+  // Tests avalability and value of VGD_STDA76_SFC_T VGD_STDA76_SFC_P
+    if(fabs(VGD_STDA76_SFC_T - (273.15 +15))/(273.15 +15) > 1.e-5){
+    printf("ERROR with VGD_STDA76_SFC_T, expected %f got %f\n", 273.15 +15,
+	   VGD_STDA76_SFC_T);
+    status = VGD_ERROR;
+    exit(1);
+  }
+  if(fabs(VGD_STDA76_SFC_P - 101325.)/101325. > 1.e-5){
+    printf("ERROR with VGD_STDA76_SFC_P, expected %f got %f\n", 101325.,
+	   VGD_STDA76_SFC_P);
+    status = VGD_ERROR;
+    exit(1);
+  }
   
+  // Tests stda76 functions on all files
   for (i = 0; i < (int) n_file; i++) {
     printf ("Testing %s\n", filenames[i]);
     if(test_it(filenames[i],i) == VGD_ERROR){
@@ -217,6 +232,6 @@ void c_standard_atmosphere_all() {
       exit(1);
     }
   }  
-  ier = c_ut_report(status,"testing Cvgd_standard_atmosphere");  
+  ier = c_ut_report(status,"testing Cvgd_stda76");  
   
 }

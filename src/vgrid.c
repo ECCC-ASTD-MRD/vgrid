@@ -31,8 +31,8 @@
 #define STDA76_N_LAYER 7
 static float stda76_tgrad[STDA76_N_LAYER]     = { -6.5E-3,    0.0,    1.0E-3, 2.8E-3, 0.0,    -2.8E-3, -2.0E-3 };
 static float stda76_zgrad[STDA76_N_LAYER + 1] = { 0., 11000., 20000., 32000., 47000., 51000.,  71000.,  84852. };
-static float stda76_sfc_temp = 273.15 +15;
-static float stda76_sfc_pres = 101325.;
+extern float VGD_STDA76_SFC_T = 288.15;
+extern float VGD_STDA76_SFC_P = 101325.;
 
 // Constants
 #define MAX_DESC_REC 10000      //maximum number of descriptor records in a single file
@@ -341,8 +341,8 @@ static int c_get_stda76(float *Tk, float *pk, float *zk, float *gammaT,
   // Tk, pk, zk size STDA76_N_LAYER + 1
   // gammaT, zero_lapse_rate size STDA76_N_LAYER
 			  
-  Tk[0]  = stda76_sfc_temp;
-  pk[0]  = stda76_sfc_pres;
+  Tk[0]  = VGD_STDA76_SFC_T;
+  pk[0]  = VGD_STDA76_SFC_P;
   for(ind=0; ind < STDA76_N_LAYER; ind++){
     if( c_set_stda_layer( ind, Tk[ind], pk[ind], &zk[ind], &zk[ind+1],
 			  &gammaT[ind], &pk[ind+1], &zero_lapse_rate[ind])
@@ -385,20 +385,20 @@ int c_stda76_temp_from_press(vgrid_descriptor *self, int *i_val, int nl, float *
   }
   
   if(! C_is_valid(self,"ref_namel_valid") ){    
-    if( Cvgd_levels(self, 1, 1, nl, i_val, levs, &stda76_sfc_pres, 0) == VGD_ERROR){
+    if( Cvgd_levels(self, 1, 1, nl, i_val, levs, &VGD_STDA76_SFC_P, 0) == VGD_ERROR){
       printf("(Cvgd) ERROR in c_stda76_temp_from_press, problem with Cvgd_levels (computing pressure profile with one ref)\n");
       return(VGD_ERROR);
     }
   } else {
-    if( Cvgd_levels_2ref(self, 1, 1, nl, i_val, levs, &stda76_sfc_pres, &stda76_sfc_pres, 0) == VGD_ERROR){
+    if( Cvgd_levels_2ref(self, 1, 1, nl, i_val, levs, &VGD_STDA76_SFC_P, &VGD_STDA76_SFC_P, 0) == VGD_ERROR){
       printf("(Cvgd) ERROR in c_stda76_temp_from_press, problem with Cvgd_levels (computing pressure profile with two refs)\n");
       return(VGD_ERROR);
     }
   }
   ind=0; pkp=-1.f;
   // Start at Normal Temperature and Pressure
-  Tk  = stda76_sfc_temp;
-  pk  = stda76_sfc_pres;
+  Tk  = VGD_STDA76_SFC_T;
+  pk  = VGD_STDA76_SFC_P;
   if( c_set_stda_layer( ind, Tk, pk, &zk, &zkp, &gammaT, &pkp, &zero_lapse_rate) == VGD_ERROR ){
     return(VGD_ERROR);
   }  
@@ -453,12 +453,12 @@ int c_stda76_temp_pres_from_heights(vgrid_descriptor *self, int *i_val, int nl, 
   if( sfc_temp ){
     Tk = *sfc_temp;
   } else {
-    Tk = stda76_sfc_temp;
+    Tk = VGD_STDA76_SFC_T;
   }
   if( sfc_pres ){
     pk = *sfc_pres;
   } else {
-    pk = stda76_sfc_pres;
+    pk = VGD_STDA76_SFC_P;
   }
   if( c_set_stda_layer( ind, Tk, pk, &zk, &zkp, &gammaT, &pkp, &zero_lapse_rate) == VGD_ERROR ){
     printf("Cvgd ERROR in c_stda76_temp_pres_from_heights with c_set_stda_layer\n");
@@ -6303,16 +6303,16 @@ int Cvgd_write_desc (vgrid_descriptor *self, int unit) {
 
 }
 
-int Cvgd_standard_atmosphere_1976_temp(vgrid_descriptor *self, int *i_val, int nl, float *temp){
+int Cvgd_stda76_temp(vgrid_descriptor *self, int *i_val, int nl, float *temp){
   int ier, vcode;
   float *pres;
   pres = malloc( nl * sizeof(float) );
   if(! pres){
-    printf("(Cvgd) ERROR in Cvgd_standard_atmosphere_1976_temp, problem allocating pres\n");
+    printf("(Cvgd) ERROR in Cvgd_stda76_temp, problem allocating pres\n");
     return(VGD_ERROR);
   }  
   if(! temp){
-    printf("(Cvgd) ERROR in Cvgd_standard_atmosphere_1976_temp, temp not allocated\n");
+    printf("(Cvgd) ERROR in Cvgd_stda76_temp, temp not allocated\n");
     return(VGD_ERROR);
   }
   
@@ -6330,16 +6330,16 @@ int Cvgd_standard_atmosphere_1976_temp(vgrid_descriptor *self, int *i_val, int n
   return(VGD_OK);
 }
 
-int Cvgd_standard_atmosphere_1976_pres(vgrid_descriptor *self, int *i_val, int nl, float *pres, float *sfc_temp, float *sfc_pres){
+int Cvgd_stda76_pres(vgrid_descriptor *self, int *i_val, int nl, float *pres, float *sfc_temp, float *sfc_pres){
 
   float *temp;
   temp = malloc( nl * sizeof(float) );
   if(! temp){
-    printf("(Cvgd) ERROR in Cvgd_standard_atmosphere_1976_pres, problem allocating temp of size %d \n",nl);
+    printf("(Cvgd) ERROR in Cvgd_stda76_pres, problem allocating temp of size %d \n",nl);
     return(VGD_ERROR);
   }
   if(! pres){
-    printf("(Cvgd) ERROR in Cvgd_standard_atmosphere_1976_pres, pres not allocated\n");
+    printf("(Cvgd) ERROR in Cvgd_stda76_pres, pres not allocated\n");
     return(VGD_ERROR);
   }
   if(! strcmp((*self).ref_name,"ME  ")){
@@ -6357,7 +6357,7 @@ int Cvgd_standard_atmosphere_1976_pres(vgrid_descriptor *self, int *i_val, int n
   return(VGD_OK);
 }
 
-int Cvgd_standard_atmosphere_1976_hgts_from_pres_list(float *hgts, float *pres,
+int Cvgd_stda76_hgts_from_pres_list(float *hgts, float *pres,
 						      int nb){
 
   int i, k;
@@ -6395,7 +6395,7 @@ int Cvgd_standard_atmosphere_1976_hgts_from_pres_list(float *hgts, float *pres,
   return(VGD_OK);
 }
 
-int Cvgd_standard_atmosphere_1976_pres_from_hgts_list(float *pres, float *hgts,
+int Cvgd_stda76_pres_from_hgts_list(float *pres, float *hgts,
 						      int nb){
 
   int i, k;

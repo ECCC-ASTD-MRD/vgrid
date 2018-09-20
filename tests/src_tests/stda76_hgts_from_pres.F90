@@ -18,23 +18,23 @@
 ! * Boston, MA 02111-1307, USA.
 !===============================================================================
 
-program standard_atmosphere_pres_from_hgts
+program stda76_hgts_from_pres
 #include <msg.h>
   use Unit_Testing, only: ut_report
   use vGrid_Descriptors, only: vgrid_descriptor, vgd_new, vgd_get, vgd_levels, &
-       vgd_standard_atmosphere_1976_pres_from_hgts_list, VGD_ERROR
+       vgd_stda76_hgts_from_pres_list, VGD_ERROR
   implicit none
   integer :: fnom, fstouv, nl, k
   integer :: lu = 10
   integer, dimension(:), pointer :: ip1s
-  real :: me, ff
-  real, dimension(:), pointer :: hgts, pres
+  real :: p0, ff
+  real, dimension(:), pointer :: pres, hgts
   character(len=100) :: file
   type(vgrid_descriptor) :: vgd
   
-  file="data/dm_21001_from_model_run_NON_SLEVE"
+  file="data/dm_5001_from_model_run"
   
-  !Get any heights vertical descriptor
+  !Get any pres vertical descriptor
   if(fnom(lu,file,"RND+R/O",0) < 0)then
      print*,'(Test) ERROR with fnom on file ',file
      call exit(1)
@@ -51,32 +51,32 @@ program standard_atmosphere_pres_from_hgts
      print*,"ERROR with Cvgd_get_int for VIPT"
      call exit(1)
   end if
-  me = -100.
-  if(vgd_levels(vgd,sfc_field=me,ip1_list=ip1s,levels=hgts) ==&
+  p0 = 105000.
+  if(vgd_levels(vgd,sfc_field=p0,ip1_list=ip1s,levels=pres) ==&
        VGD_ERROR)then
      print*,"ERROR with vgd_levels"
      call exit(1)
   endif
-  allocate(pres(size(hgts)))
-  if(vgd_standard_atmosphere_1976_pres_from_hgts_list(pres, hgts, size(hgts)) &
+  allocate(hgts(size(pres)))
+  if(vgd_stda76_hgts_from_pres_list(hgts, pres, size(pres)) &
        == VGD_ERROR) call exit(1)
   
-  ! Data for control is produce by tests c_standard_atmosphere_pres_from_ghts
-  open(unit=11, file="data/c_standard_atmosphere_pres_from_ghts.txt", &
+  ! Data for control is produce by tests c_stda76_hgts_from_pres_list
+  open(unit=11, file="data/c_stda76_hgts_from_pres.txt", &
        status='OLD')
   read(11,'(4x,i)')nl
-  if(nl /= size(hgts))then
+  if(nl /= size(pres))then
      print*,'In tests, size problem'
      call exit(1)
   end if
   do k=1, nl
      read(11,*)ff
-     if(abs(ff - pres(k))/pres(k) > 100.*epsilon(ff))then
-        print*,'OUPS, got ',ff,' expected ',pres(k)
+     if(abs(ff - hgts(k))/hgts(k) > 100.*epsilon(ff))then
+        print*,'OUPS, got ',ff,' expected ',hgts(k)
         call exit(1)
      endif
   end do
 
-  call ut_report(.true.,'stda76 pres from hgts list')
+  call ut_report(.true.,'stda76 hgts from pres list')
 
-end program standard_atmosphere_pres_from_hgts
+end program stda76_hgts_from_pres
