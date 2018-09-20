@@ -31,7 +31,7 @@
 #define write_control 0
 
 
-void c_standard_atmosphere_hgts_from_pres() {
+void c_stda76_hgts_from_pres() {
 
   FILE *fp;
   int ier, nk, key, ij, nl, nl_c, in_log, k;
@@ -39,7 +39,7 @@ void c_standard_atmosphere_hgts_from_pres() {
   float p0, *pres, *hgts, ff;
   char mode[]="RND";
   char *filename = "data/dm_5001_from_model_run";
-  char *filename_c ="data/c_standard_atmosphere_hgts_from_pres.txt";
+  char *filename_c ="data/c_stda76_hgts_from_pres.txt";
     char buff[255];
   vgrid_descriptor *vgd = NULL;
 
@@ -92,7 +92,7 @@ void c_standard_atmosphere_hgts_from_pres() {
     printf("Problem allocating hgts of size %d\n",nl);
     exit(1);
   }
-  if(Cvgd_standard_atmosphere_1976_hgts_from_pres_list(hgts, pres, nl)
+  if(Cvgd_stda76_hgts_from_pres_list(hgts, pres, nl)
      == VGD_ERROR){
     printf("Problem Computing heights from pressure value");
     exit(1);
@@ -127,7 +127,7 @@ void c_standard_atmosphere_hgts_from_pres() {
   }
   printf("The following error is expected\n");
   pres[0]=.3;
-  if(Cvgd_standard_atmosphere_1976_hgts_from_pres_list(hgts,pres,nl)
+  if(Cvgd_stda76_hgts_from_pres_list(hgts,pres,nl)
      == VGD_OK){
     printf("Problem: call sould have produce a bound error by did not\n");
     exit(1);
@@ -135,6 +135,6 @@ void c_standard_atmosphere_hgts_from_pres() {
   
   printf("All tests OK");
   ier = c_ut_report(VGD_OK,
-		    "testing Cvgd_standard_atmosphere_ghts_from_pres_list");
+		    "testing Cvgd_stda76_ghts_from_pres_list");
 
 }

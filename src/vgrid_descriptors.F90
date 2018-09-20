@@ -47,9 +47,9 @@ module vGrid_Descriptors
    public :: vgd_write                           !write coordinates to a file
    public :: vgd_levels                          !compute physical level information
    public :: vgd_dpidpis                         !compute pressure derivative with respesct the sfc pressure
-   public :: vgd_standard_atmosphere_1976        !Get standard atmosphere 1976 variable for a given coordinate
-   public :: vgd_standard_atmosphere_1976_pres_from_hgts_list ! Get standard atmosphere 1976 pressure in Pa from a height list in m
-   public :: vgd_standard_atmosphere_1976_hgts_from_pres_list ! Get standard atmosphere 1976 heights in m from a pressure list in Pa
+   public :: vgd_stda76        !Get standard atmosphere 1976 variable for a given coordinate
+   public :: vgd_stda76_pres_from_hgts_list ! Get standard atmosphere 1976 pressure in Pa from a height list in m
+   public :: vgd_stda76_hgts_from_pres_list ! Get standard atmosphere 1976 heights in m from a pressure list in Pa
    public :: operator(==)                        !overload equivalence operator
 
    ! Public class constants
@@ -59,7 +59,12 @@ module vGrid_Descriptors
    logical :: ALLOW_RESHAPE=.false.              ! Allow reshape of class pointer members
    integer, parameter :: KEY_LENGTH=4            !length of key string considered for get/put operations
    character(len=1), dimension(3), parameter :: MATCH_GRTYP=(/'X','Y','Z'/) !grid types with ip1,2 to ig1,2 mapping
-
+   
+   real, public, protected, bind(C, name="VGD_STDA76_SFC_T") :: &
+        VGD_STDA76_SFC_T
+   real, public, protected, bind(C, name="VGD_STDA76_SFC_P") :: &
+        VGD_STDA76_SFC_P
+   
    ! FST file record structure
    type FSTD
       sequence
@@ -270,35 +275,35 @@ module vGrid_Descriptors
          integer (c_int), value :: unit
       end function f_write_desc
       
-      integer(c_int) function f_standard_atmosphere_1976_temp(vgd_CP, ip1s_CP, nl, temp_CP) bind(c, name='Cvgd_standard_atmosphere_1976_temp')
+      integer(c_int) function f_stda76_temp(vgd_CP, ip1s_CP, nl, temp_CP) bind(c, name='Cvgd_stda76_temp')
         use iso_c_binding, only : c_ptr, c_int
         type(c_ptr), value :: vgd_CP, ip1s_CP
         integer (c_int), value :: nl
         type(c_ptr), value :: temp_CP
-      end function f_standard_atmosphere_1976_temp
+      end function f_stda76_temp
 
-      integer(c_int) function f_standard_atmosphere_1976_pres(vgd_CP, ip1s_CP, nl, pres_CP, sfc_temp_CP, sfc_pres_CP) bind(c, name='Cvgd_standard_atmosphere_1976_pres')
+      integer(c_int) function f_stda76_pres(vgd_CP, ip1s_CP, nl, pres_CP, sfc_temp_CP, sfc_pres_CP) bind(c, name='Cvgd_stda76_pres')
         use iso_c_binding, only : c_ptr, c_int
         type(c_ptr), value :: vgd_CP, ip1s_CP
         integer (c_int), value :: nl
         type(c_ptr), value :: pres_CP, sfc_temp_CP, sfc_pres_CP
-      end function f_standard_atmosphere_1976_pres
+      end function f_stda76_pres
       
-      integer(c_int) function f_standard_atmosphere_1976_pres_from_hgts_list( &
+      integer(c_int) function f_stda76_pres_from_hgts_list( &
            pres_CP, hgts_CP, nb) bind(c, name=&
-           'Cvgd_standard_atmosphere_1976_pres_from_hgts_list')
+           'Cvgd_stda76_pres_from_hgts_list')
         use iso_c_binding, only : c_ptr, c_int
         type(c_ptr), value :: pres_CP, hgts_CP
         integer (c_int), value :: nb
-      end function f_standard_atmosphere_1976_pres_from_hgts_list
+      end function f_stda76_pres_from_hgts_list
 
-      integer(c_int) function f_standard_atmosphere_1976_hgts_from_pres_list( &
+      integer(c_int) function f_stda76_hgts_from_pres_list( &
            hgts_CP, pres_CP, nb) bind(c, name=&
-           'Cvgd_standard_atmosphere_1976_hgts_from_pres_list')
+           'Cvgd_stda76_hgts_from_pres_list')
         use iso_c_binding, only : c_ptr, c_int
         type(c_ptr), value :: pres_CP, hgts_CP
         integer (c_int), value :: nb
-      end function f_standard_atmosphere_1976_hgts_from_pres_list
+      end function f_stda76_hgts_from_pres_list
 
    end interface
    
@@ -581,7 +586,7 @@ contains
          print*,'(F_vgd) ERROR in new_gen, problem with f_new_gen'
          return
       endif
-      status = VGD_OK;
+      status = VGD_OK
    end function new_gen
 
    integer function new_build_vert(self,kind,version,nk,ip1,ip2, &
@@ -2460,7 +2465,7 @@ contains
 
  end function get_ref
   
- integer function vgd_standard_atmosphere_1976(self, ip1s, val, var, sfc_temp, sfc_pres) result(status)
+ integer function vgd_stda76(self, ip1s, val, var, sfc_temp, sfc_pres) result(status)
    use vgrid_utils, only: get_allocate, up
    type(vgrid_descriptor), intent(in) :: self         !Vertical descriptor instance
    integer, dimension(:), target, intent(in) :: ip1s  !ip1 list to get value for
@@ -2472,11 +2477,11 @@ contains
    type (c_ptr) :: ip1s_CP, val_CP, sfc_pres_CP, sfc_temp_CP
    status = VGD_ERROR
    if(.not.is_valid(self,'SELF'))then
-      write(for_msg,*) 'vgrid structure is not valid in standard_atmosphere_1976'
+      write(for_msg,*) 'vgrid structure is not valid in stda76'
       call msg(MSG_ERROR,VGD_PRFX//for_msg)       
       return
    endif
-   if( get_allocate('val',val,size(ip1s),ALLOW_RESHAPE,'(in standard_atmosphere_1976)') /= 0) then
+   if( get_allocate('val',val,size(ip1s),ALLOW_RESHAPE,'(in stda76)') /= 0) then
       if(associated(val))deallocate(val)
       return
    endif
@@ -2495,31 +2500,31 @@ contains
    select case (trim(up(var)))
    case ('TEMPERATURE')
       if (present(sfc_temp) .or. present(sfc_pres) )then
-          write(for_msg,*) 'ERROR with vgd_standard_atmosphere_1976_temp, option sfc_temp and/or sfc_pres not implemented for TEMPERATURE.'&
+          write(for_msg,*) 'ERROR with vgd_stda76_temp, option sfc_temp and/or sfc_pres not implemented for TEMPERATURE.'&
                //'Please contact the vgrid dev team.'
           call msg(MSG_ERROR,VGD_PRFX//for_msg) 
           return
       endif
-      if( f_standard_atmosphere_1976_temp(self%cptr, ip1s_CP, size(val), val_CP) /= VGD_OK) then
-         write(for_msg,*) 'ERROR with vgd_standard_atmosphere_1976_temp'
+      if( f_stda76_temp(self%cptr, ip1s_CP, size(val), val_CP) /= VGD_OK) then
+         write(for_msg,*) 'ERROR with vgd_stda76_temp'
          call msg(MSG_ERROR,VGD_PRFX//for_msg)       
          return
       endif
    case ('PRESSURE')
-      if( f_standard_atmosphere_1976_pres(self%cptr, ip1s_CP, size(val), val_CP, sfc_temp_CP, sfc_pres_CP ) /= VGD_OK) then
-         write(for_msg,*) 'ERROR with vgd_standard_atmosphere_1976_pres'
+      if( f_stda76_pres(self%cptr, ip1s_CP, size(val), val_CP, sfc_temp_CP, sfc_pres_CP ) /= VGD_OK) then
+         write(for_msg,*) 'ERROR with vgd_stda76_pres'
          call msg(MSG_ERROR,VGD_PRFX//for_msg)       
          return
       endif
    case DEFAULT
-      write(for_msg,*) 'invalid variable name given to vgd_standard_atmosphere_1976',trim(var)
+      write(for_msg,*) 'invalid variable name given to vgd_stda76',trim(var)
       call msg(MSG_ERROR,VGD_PRFX//for_msg)
       return
    end select
    status = VGD_OK
- end function vgd_standard_atmosphere_1976
+ end function vgd_stda76
 
- integer function vgd_standard_atmosphere_1976_pres_from_hgts_list(pres, hgts, nb) result(status)
+ integer function vgd_stda76_pres_from_hgts_list(pres, hgts, nb) result(status)
    implicit none
    integer :: nb
    real, dimension(nb) :: pres, hgts   
@@ -2530,14 +2535,14 @@ contains
    
    pres_CP = c_loc(pres)
    hgts_CP = c_loc(hgts)   
-   if( f_standard_atmosphere_1976_pres_from_hgts_list(pres_CP, hgts_CP, nb) &
+   if( f_stda76_pres_from_hgts_list(pres_CP, hgts_CP, nb) &
         == VGD_ERROR)return
    status = VGD_OK
    return
 
- end function vgd_standard_atmosphere_1976_pres_from_hgts_list
+ end function vgd_stda76_pres_from_hgts_list
 
- integer function vgd_standard_atmosphere_1976_hgts_from_pres_list(hgts, pres, nb) result(status)
+ integer function vgd_stda76_hgts_from_pres_list(hgts, pres, nb) result(status)
    implicit none
    integer :: nb
    real, dimension(nb) :: hgts, pres   
@@ -2548,11 +2553,11 @@ contains
    
    hgts_CP = c_loc(hgts)
    pres_CP = c_loc(pres)   
-   if( f_standard_atmosphere_1976_hgts_from_pres_list(hgts_CP, pres_CP, nb) &
+   if( f_stda76_hgts_from_pres_list(hgts_CP, pres_CP, nb) &
         == VGD_ERROR)return
    status = VGD_OK
    return
 
- end function vgd_standard_atmosphere_1976_hgts_from_pres_list
+ end function vgd_stda76_hgts_from_pres_list
 
 end module vGrid_Descriptors
