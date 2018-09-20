@@ -44,6 +44,8 @@ case "${ORDENV_PLAT}" in
          export SHARED_RNM_EXT=_016.2
          . r.load.dot ${HPCS_BASE} ${HPCS_COMP}
 	 . r.load.dot rpn/libs/16.2 
+         export MY_FFLAGS="-openmp -fp-model source -warn all ${MY_FFLAGS}"
+         export MY_CFLAGS="-openmp -fp-model precise -w3 ${MY_CFLAGS}"
      elif [ ${VGRID_COMPILER} == gcc-4.9.1 ];then
         . r.load.dot /ssm/net/env/master/ssmuse_1.4_all
         export COMP_ARCH=gfortran
