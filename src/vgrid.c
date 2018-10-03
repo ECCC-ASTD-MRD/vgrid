@@ -85,6 +85,7 @@ static int c_encode_vert_0001(vgrid_descriptor **self,int nk);
 static int c_encode_vert_1001(vgrid_descriptor **self,int nk);
 static int c_encode_vert_1002(vgrid_descriptor **self,int nk);
 static int c_encode_vert_2001(vgrid_descriptor **self,int nk);
+static int c_encode_vert_4001(vgrid_descriptor **self,int nk);
 static int c_encode_vert_5001(vgrid_descriptor **self,int nk);
 static int c_encode_vert_5002_5003_5004_5005(vgrid_descriptor **self, char update);
 static int c_encode_vert_5100(vgrid_descriptor **self, char update);
