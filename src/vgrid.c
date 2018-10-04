@@ -4393,7 +4393,7 @@ static int c_vgrid_genab_21001(float *hybuser, int nk, int *nl_m, int *nl_t, flo
   //Check monotonicity
   for ( k = 1; k < nk; k++){
     if(hybuser[k] >= hybuser[k-1]){
-      printf(" WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n");
+      printf(" WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY DECREASING\n");
       ok=0;
       break;
     }
@@ -4563,7 +4563,7 @@ static int c_vgrid_genab_21002(float *hybuser, int nk, int *nl_m, int *nl_t, int
   //Check monotonicity
   for ( k = 1; k < nk; k++){
     if(hybuser[k] >= hybuser[k-1]){
-      printf(" WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n");
+      printf(" WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY DECREASING\n");
       ok=0;
       break;
     }
