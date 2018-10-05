@@ -94,7 +94,7 @@ module vGrid_Descriptors
    
    interface
       
-      integer(c_int) function f_diag_withref_8(vgd_CP, ni, nj, nk, ip1_list_CP, levels_CP,sfc_field_CP,sfc_field_ls_CP, in_log, dpidpis) bind(c, name='C_diag_withref_8')
+      integer(c_int) function f_diag_withref_8(vgd_CP, ni, nj, nk, ip1_list_CP, levels_CP,sfc_field_CP,sfc_field_ls_CP, in_log, dpidpis) bind(c, name='Cvgd_diag_withref_2ref_8')
          use iso_c_binding, only: c_ptr, c_int
          type(c_ptr), value :: vgd_CP, ip1_list_CP, sfc_field_CP, sfc_field_ls_CP
          integer (c_int), value :: in_log, dpidpis
@@ -196,7 +196,7 @@ module vGrid_Descriptors
          character(kind=c_char) :: key(*), value(*)
       end function f_put_char
 
-      integer(c_int) function f_is_valid(vgd_CP, valid_table_name) bind(c, name='C_is_valid')
+      integer(c_int) function f_is_valid(vgd_CP, valid_table_name) bind(c, name='Cvgd_is_valid')
          use iso_c_binding, only: c_ptr, c_char, c_int
          type(c_ptr), value :: vgd_CP
          character(kind=c_char) :: valid_table_name(*)
@@ -238,7 +238,7 @@ module vGrid_Descriptors
       end function f_new_from_table
 
       integer(c_int) function f_new_gen(vgd,kind,version,hyb_CP,size_hyb,rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP, &
-           ip1,ip2,dhm_CP,dht_CP,dhw_CP,avg) bind(c, name='C_new_gen')
+           ip1,ip2,dhm_CP,dht_CP,dhw_CP,avg) bind(c, name='Cvgd_new_gen2')
          use iso_c_binding, only : c_ptr, c_int
          type(c_ptr) :: vgd
          integer (c_int), value :: kind, version, size_hyb
@@ -249,7 +249,7 @@ module vGrid_Descriptors
       
       integer(c_int) function f_new_build_vert(vgd,kind,version,nk,ip1,ip2, &
            ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, &
-           a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, ip1_m_CP, ip1_t_CP, ip1_w_CP, nl_m, nl_t, nl_w) bind(c, name='C_new_build_vert')
+           a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, ip1_m_CP, ip1_t_CP, ip1_w_CP, nl_m, nl_t, nl_w) bind(c, name='Cvgd_new_build_vert2')
          use iso_c_binding, only : c_ptr, c_int
          type(c_ptr) :: vgd
          integer (c_int), value :: kind,version,nk,ip1,ip2
