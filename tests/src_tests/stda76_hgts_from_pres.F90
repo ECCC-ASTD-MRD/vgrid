@@ -32,6 +32,8 @@ program stda76_hgts_from_pres
   character(len=100) :: file
   type(vgrid_descriptor) :: vgd
   
+  nullify(ip1s, pres, hgts)
+
   file="data/dm_5001_from_model_run"
   
   !Get any pres vertical descriptor
