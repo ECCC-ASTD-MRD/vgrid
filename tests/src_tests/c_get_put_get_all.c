@@ -83,7 +83,7 @@ int test_it(char *filename, int ind) {
   for( i = 0; i < 11; i++ ){
     printf("   %s\n", key[i]);
     if (strcmp(key[i], "DIPM") == 0){
-      if(C_is_valid(vgd,"dhm_valid")){
+      if(Cvgd_is_valid(vgd,"dhm_valid")){
 	if( Cvgd_get_int(vgd, key[i], &value, quiet) == VGD_ERROR ) {
 	  printf("ERROR in test with Cvgd_get_int on key %s\n", key[i]);
 	  return(VGD_ERROR);
@@ -93,7 +93,7 @@ int test_it(char *filename, int ind) {
       }
     }
     if (strcmp(key[i], "DIPT") == 0){
-      if(C_is_valid(vgd,"dht_valid")){
+      if(Cvgd_is_valid(vgd,"dht_valid")){
 	if( Cvgd_get_int(vgd, key[i], &value, quiet) == VGD_ERROR ) {
 	  printf("ERROR in test with Cvgd_get_int on key %s\n", key[i]);
 	  return(VGD_ERROR);
@@ -103,7 +103,7 @@ int test_it(char *filename, int ind) {
       }
     }
     if (strcmp(key[i], "DIPW") == 0){
-      if(C_is_valid(vgd,"dhw_valid")){
+      if(Cvgd_is_valid(vgd,"dhw_valid")){
 	if( Cvgd_get_int(vgd, key[i], &value, quiet) == VGD_ERROR ) {
 	  printf("ERROR in test with Cvgd_get_int on key %s\n", key[i]);
 	  return(VGD_ERROR);
