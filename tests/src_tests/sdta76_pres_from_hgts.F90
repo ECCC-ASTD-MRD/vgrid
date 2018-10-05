@@ -32,6 +32,8 @@ program stda76_pres_from_hgts
   character(len=100) :: file
   type(vgrid_descriptor) :: vgd
   
+  nullify(ip1s, hgts, pres)
+
   file="data/dm_21001_from_model_run_NON_SLEVE"
   
   !Get any heights vertical descriptor
