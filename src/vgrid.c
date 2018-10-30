@@ -291,9 +291,9 @@ void c_hypsometric (float *pkp, float pk, float Tk, float gammaT, float zk, floa
   //
   static float epsilon = 1.e-6;
   if( gammaT > -epsilon && gammaT < epsilon ) {
-    *pkp = (float) pk * exp( -VGD_GRAV/(VGD_RGASD*Tk) * (zkp-zk) );
+    *pkp = (float) (pk * exp( -VGD_GRAV/(VGD_RGASD*Tk) * (zkp-zk) ));
   } else {
-    *pkp = (float) pk * exp( -VGD_GRAV/(VGD_RGASD*gammaT) * log(gammaT*(zkp-zk)/Tk+1.) );
+    *pkp = (float) (pk * exp( -VGD_GRAV/(VGD_RGASD*gammaT) * log(gammaT*(zkp-zk)/Tk+1.) ));
   }
 }
 
