@@ -369,7 +369,7 @@ int c_stda76_temp_from_press(vgrid_descriptor *self, int *i_val, int nl, float *
       // Current pressure level is above current stda layer
       Tk = Tk + gammaT * (zkp - zk);
       pk = pkp;
-      ind = ind++;
+      ind++;
       if( c_set_stda_layer( ind, Tk, pk, &zk, &zkp, &gammaT, &pkp, &zero_lapse_rate) == VGD_ERROR){
 	return(VGD_ERROR);
       }
@@ -430,7 +430,7 @@ int c_stda76_temp_pres_from_heights(vgrid_descriptor *self, int *i_val, int nl, 
     while( levs[k] >= zkp ){
       Tk = Tk + gammaT * (zkp - zk);
       pk = pkp;
-      ind = ind++;
+      ind++;
       if( c_set_stda_layer( ind, Tk, pk, &zk, &zkp, &gammaT, &pkp, &zero_lapse_rate) == VGD_ERROR){
 	return(VGD_ERROR);
       }
