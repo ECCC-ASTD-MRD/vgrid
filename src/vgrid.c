@@ -1421,10 +1421,10 @@ static void c_vgd_free_abci(vgrid_descriptor **self) {
     } else {
       FREE((*self)->c_w_8);
     }
-    if( (*self)->ip1_t == (*self)->ip1_m || (*self)->ip1_t == (*self)->ip1_t ) {
+    if( (*self)->ip1_w == (*self)->ip1_m || (*self)->ip1_w == (*self)->ip1_t ) {
       (*self)->ip1_t = NULL;
     } else {
-      FREE((*self)->ip1_t);
+      FREE((*self)->ip1_w);
     }
     
     FREE((*self)->a_m_8);
