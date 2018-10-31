@@ -32,7 +32,7 @@ case "${ORDENV_PLAT}" in
          HPCS_BASE=hpcs/201402/02/base
          HPCS_COMP=hpcs/201402/02/${VGRID_COMPILER}
          RPN_LIB=rpn/libs/15.2
-         export SHARED_RNM_EXT=_015.2
+         export SHARED_RNM_EXT=_015.2	 
         . ssmuse-sh -d ${HPCS_BASE} -d ${HPCS_COMP} -d ${RPN_LIB}
 	export MY_FFLAGS="-openmp -fp-model source -warn all ${MY_FFLAGS}"
         export MY_CFLAGS="-openmp -fp-model precise -w3 ${MY_CFLAGS}"
@@ -44,6 +44,8 @@ case "${ORDENV_PLAT}" in
          export SHARED_RNM_EXT=_016.2
          . r.load.dot ${HPCS_BASE} ${HPCS_COMP}
 	 . r.load.dot rpn/libs/16.2 
+         export MY_FFLAGS="-openmp -fp-model source  -warn all ${MY_FFLAGS}"
+         export MY_CFLAGS="-openmp -fp-model precise -w3 ${MY_CFLAGS}"
      elif [ ${VGRID_COMPILER} == gcc-4.9.1 ];then
         . r.load.dot /ssm/net/env/master/ssmuse_1.4_all
         export COMP_ARCH=gfortran

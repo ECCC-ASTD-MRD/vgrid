@@ -116,6 +116,8 @@ int Cvgd_new_build_vert_1002(vgrid_descriptor **self, int ip1, int ip2, double p
 			     double *a_m_8, double *b_m_8, int *ip1_m, int nk);
 int Cvgd_new_build_vert_2001(vgrid_descriptor **self, int ip1, int ip2, 
 			     double *a_m_8, double *b_m_8, int *ip1_m, int nk);
+int Cvgd_new_build_vert_4001(vgrid_descriptor **self, int ip1, int ip2, 
+			     double *a_m_8, double *b_m_8, int *ip1_m, int nk);
 int Cvgd_new_build_vert_5001(vgrid_descriptor **self, int ip1, int ip2, double ptop_8, double pref_8, float rcoef1,
 			     double *a_m_8, double *b_m_8, int *ip1_m, int nk);
 int Cvgd_new_build_vert_5002(vgrid_descriptor **self, int ip1, int ip2, double ptop_8, double pref_8, float rcoef1, float rcoef2,
