@@ -20,12 +20,12 @@ program constructor
 
   ! Revision : Andre Plante test on B instead of A since A not sensitive to rcoefs
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_print,VGD_ERROR
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_print,VGD_ERROR, operator(==)
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  type(vgrid_descriptor) :: vgd1, vgd2
   integer :: test_hgts, stat
   real, dimension(80) :: hgts= &
 (/ 6.62078E+04, 6.29395E+04, 5.95406E+04, 5.60645E+04, 5.26367E+04, 4.93408E+04, 4.63244E+04, 4.35656E+04, 4.10827E+04, 3.88781E+04,&
@@ -45,8 +45,19 @@ program constructor
   character (len=256) :: file
 
   ! Construct a new set of vertical coordinate descriptors 21002 hyb heights on Lorenz grid
-  if( vgd_new(d,kind=21,version=2,hyb=hgts,rcoef1=rcoef1,rcoef2=rcoef2,rcoef3=-1.,rcoef4=-1.,dhm=10.0,dht=1.5,dhw=0.) == VGD_ERROR )OK=.false.
-  if( vgd_print(d,convip_L=.true.) == VGD_ERROR )then
+  ! Call without rcoef3 and 4
+  if( vgd_new(vgd1,kind=21,version=2,hyb=hgts,rcoef1=rcoef1,rcoef2=rcoef2,dhm=10.0,dht=1.5,dhw=0.) == VGD_ERROR )OK=.false.
+
+  ! Construct a new set of vertical coordinate descriptors 21002 hyb heights on Lorenz grid
+  ! Call with rcoef3 and 4 but set to -1, should be the same as above
+  if( vgd_new(vgd2,kind=21,version=2,hyb=hgts,rcoef1=rcoef1,rcoef2=rcoef2,rcoef3=-1.,rcoef4=-1.,dhm=10.0,dht=1.5,dhw=0.) == VGD_ERROR )OK=.false.
+  
+  if(.not. vgd1 == vgd2)then
+     print*,'ERROR vgd1, vgd2 should be equal and are not'
+     stop
+  endif
+
+  if( vgd_print(vgd1,convip_L=.true.) == VGD_ERROR )then
      print*,'ERROR'
      stop
   endif
@@ -56,22 +67,7 @@ program constructor
   endif
 
   file='data/data_constructor_gen_21002.txt'
-  stat = test_hgts(d,file,write_control_L)
-  if(stat.eq.VGD_ERROR)OK=.false.
-
-  ! Construct a new set of vertical coordinate descriptors 21002 hyb heights on Lorenz grid with SLEVE
-  if( vgd_new(d,kind=21,version=2,hyb=hgts,rcoef1=0.,rcoef2=1.,rcoef3=0.,rcoef4=1000.,dhm=10.0,dht=1.5,dhw=0.) == VGD_ERROR )OK=.false.
-  if( vgd_print(d,convip_L=.true.) == VGD_ERROR )then
-     print*,'ERROR'
-     stop
-  endif
-  if( vgd_print(21002) == VGD_ERROR )then
-     print*,'ERROR'
-     stop
-  endif
-
-  file='data/data_constructor_gen_21002_SLEVE.txt'
-  stat = test_hgts(d,file,write_control_L)
+  stat = test_hgts(vgd1,file,write_control_L)
   if(stat.eq.VGD_ERROR)OK=.false.
 
   call ut_report(OK,'Grid_Descriptors::vgd_new vertical generate initializer Lorenz coordinate')

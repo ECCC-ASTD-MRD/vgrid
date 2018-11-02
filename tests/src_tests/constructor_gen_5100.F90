@@ -55,6 +55,10 @@ program constructor
   p0(:,1) =(/100000.,50000./)
   p0l(:,1)=(/100000.,90000./)
 
+  ! Call with missing rcoef3 and rcoef4
+  print*,'Following error on rcoef3 and rcoef4 is expected'
+  if( vgd_new(vgd,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,avg_L=.true.) /= VGD_ERROR)OK=.false.
+
   ! Construct a new set of vertical coordinate descriptors 5100
   stat = vgd_new(vgd,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,rcoef3=rcoef3,rcoef4=rcoef4,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,avg_L=.true.)
   stat = vgd_print(vgd)

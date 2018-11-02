@@ -61,6 +61,8 @@ static int rcoef1_valid     [VALID_TABLE_SIZE] = {0,    0,    0, 1003,    0,    
 static int rcoef2_valid     [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005, 5100,    0, 21001,21002};
 static int rcoef3_valid     [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 5100,    0, 21001,21002};
 static int rcoef4_valid     [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 5100,    0, 21001,21002};
+static int rcoef3_option    [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 21001,21002};
+static int rcoef4_option    [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 21001,21002};
 static int a_m_8_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 4001, 5001, 5002, 5003, 5004, 5005, 5100, 5999, 21001,21002};
 static int b_m_8_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 4001, 5001, 5002, 5003, 5004, 5005, 5100, 5999, 21001,21002};
 static int c_m_8_valid      [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 5100,    0, 21001,21002};
@@ -98,6 +100,16 @@ static int is_valid(vgrid_descriptor *self, int *table_valid)
   int k;
   for( k = 0; k < VALID_TABLE_SIZE; k++){
     if(self->vcode == table_valid[k]){
+      return(1);
+    }
+  }
+  return 0;
+}
+static int is_option(vgrid_descriptor *self, int *table_option)
+{
+  int k;
+  for( k = 0; k < VALID_TABLE_SIZE; k++){
+    if(self->vcode == table_option[k]){
       return(1);
     }
   }
@@ -5542,8 +5554,9 @@ int Cvgd_new_gen2(vgrid_descriptor **self, int kind, int version, float *hyb, in
 	      double *ptop_8, double *pref_8, double *ptop_out_8,
 	      int ip1, int ip2, float *dhm, float *dht, float *dhw, int avg){
 
+  float *l_rcoef3 = NULL, *l_rcoef4 = NULL, minus_one = -1.;
   double *a_m_8 = NULL, *b_m_8 = NULL, *c_m_8 = NULL, *a_t_8 = NULL, *b_t_8 = NULL, *c_t_8 = NULL, *a_w_8 = NULL, *b_w_8 = NULL, *c_w_8 = NULL;
-  int *ip1_m = NULL, *ip1_t = NULL, *ip1_w = NULL, tlift, errorInput;
+  int *ip1_m = NULL, *ip1_t = NULL, *ip1_w = NULL, tlift, OKInput;
 
   if(*self){
     Cvgd_free(self);
@@ -5565,22 +5578,43 @@ int Cvgd_new_gen2(vgrid_descriptor **self, int kind, int version, float *hyb, in
   }
   
   //TODO get better error handling like in new_build
-  errorInput = 0;
-  errorInput = errorInput + is_required_double((*self), ptop_8,     ptop_8_valid,     "ptop_8"    );
-  errorInput = errorInput + is_required_double((*self), ptop_out_8, ptop_out_8_valid, "ptop_out_8");
-  errorInput = errorInput + is_required_double((*self), pref_8,     pref_8_valid,     "pref_8"    );
-  errorInput = errorInput + is_required_float ((*self), rcoef1,     rcoef1_valid,     "rcoef1"    );
-  errorInput = errorInput + is_required_float ((*self), rcoef2,     rcoef2_valid,     "rcoef2"    );
-  errorInput = errorInput + is_required_float ((*self), rcoef3,     rcoef3_valid,     "rcoef3"    );
-  errorInput = errorInput + is_required_float ((*self), rcoef4,     rcoef4_valid,     "rcoef4"    );
-  errorInput = errorInput + is_required_float ((*self), dhm,        dhm_valid,        "dhm"       );
-  errorInput = errorInput + is_required_float ((*self), dht,        dht_valid,        "dht"       );  
-  errorInput = errorInput + is_required_float ((*self), dhw,        dhw_valid,        "dhw"       );  
+  OKInput = 0;
+  OKInput = OKInput + is_required_double((*self), ptop_8,     ptop_8_valid,     "ptop_8"    );
+  OKInput = OKInput + is_required_double((*self), ptop_out_8, ptop_out_8_valid, "ptop_out_8");
+  OKInput = OKInput + is_required_double((*self), pref_8,     pref_8_valid,     "pref_8"    );
+  OKInput = OKInput + is_required_float ((*self), rcoef1,     rcoef1_valid,     "rcoef1"    );
+  OKInput = OKInput + is_required_float ((*self), rcoef2,     rcoef2_valid,     "rcoef2"    );
+  OKInput = OKInput + is_required_float ((*self), dhm,        dhm_valid,        "dhm"       );
+  OKInput = OKInput + is_required_float ((*self), dht,        dht_valid,        "dht"       );  
+  OKInput = OKInput + is_required_float ((*self), dhw,        dhw_valid,        "dhw"       );  
 
-  if (errorInput != 10 ) {
+  if (OKInput != 8 ) {
     return(VGD_ERROR);
   }
-
+  OKInput = 0;
+  if(is_option((*self),rcoef3_option)) {
+    OKInput++;
+    l_rcoef3 = &minus_one;
+    if(rcoef3){
+      l_rcoef3 = rcoef3;
+    }
+  } else {    
+    OKInput = OKInput + is_required_float ((*self), rcoef3, rcoef3_valid, "rcoef3");
+    l_rcoef3 = rcoef3;
+  }
+  if(is_option((*self),rcoef4_option)) {
+    OKInput++;
+    l_rcoef4 = &minus_one;
+    if(rcoef4){
+      l_rcoef4 = rcoef4;
+    }
+  } else {    
+    OKInput = OKInput + is_required_float ((*self), rcoef4, rcoef4_valid, "rcoef4");
+    l_rcoef4 = rcoef4;
+  }  
+  if (OKInput != 2 ) {
+    return(VGD_ERROR);
+  }
   int nk = -1, nl_m = -1, nl_t = -1, nl_w = -1;
 
   switch((*self)->vcode) {
@@ -5700,7 +5734,7 @@ int Cvgd_new_gen2(vgrid_descriptor **self, int kind, int version, float *hyb, in
     break;
   case 5100:
     nk   = size_hyb;
-    if(c_vgrid_genab_5100(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *rcoef3, *rcoef4, &ptop_out_8, *pref_8, &a_m_8, &b_m_8, &c_m_8, &ip1_m, &a_t_8, &b_t_8, &c_t_8, &ip1_t, *dhm, *dht, avg) == VGD_ERROR ) {
+    if(c_vgrid_genab_5100(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *l_rcoef3, *l_rcoef4, &ptop_out_8, *pref_8, &a_m_8, &b_m_8, &c_m_8, &ip1_m, &a_t_8, &b_t_8, &c_t_8, &ip1_t, *dhm, *dht, avg) == VGD_ERROR ) {
       free(a_m_8);
       free(b_m_8);
       free(c_m_8);
@@ -5715,7 +5749,7 @@ int Cvgd_new_gen2(vgrid_descriptor **self, int kind, int version, float *hyb, in
     break;
   case 21001:
     nk   = size_hyb;
-    if(c_vgrid_genab_21001(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *rcoef3, *rcoef4, &a_m_8, &b_m_8, &c_m_8, &ip1_m, &a_t_8, &b_t_8, &c_t_8, &ip1_t, *dhm, *dht) == VGD_ERROR ) {
+    if(c_vgrid_genab_21001(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *l_rcoef3, *l_rcoef4, &a_m_8, &b_m_8, &c_m_8, &ip1_m, &a_t_8, &b_t_8, &c_t_8, &ip1_t, *dhm, *dht) == VGD_ERROR ) {
       free(a_m_8);
       free(b_m_8);
       free(c_m_8);
@@ -5730,7 +5764,7 @@ int Cvgd_new_gen2(vgrid_descriptor **self, int kind, int version, float *hyb, in
     break;
   case 21002:
     nk   = size_hyb;    
-    if(c_vgrid_genab_21002(hyb, size_hyb, &nl_m, &nl_t, &nl_w, *rcoef1, *rcoef2, *rcoef3, *rcoef4, &a_m_8, &b_m_8, &c_m_8, &ip1_m, &a_t_8, &b_t_8, &c_t_8, &ip1_t, &a_w_8, &b_w_8, &c_w_8, &ip1_w, *dhm, *dht, *dhw) == VGD_ERROR ) {
+    if(c_vgrid_genab_21002(hyb, size_hyb, &nl_m, &nl_t, &nl_w, *rcoef1, *rcoef2, *l_rcoef3, *l_rcoef4, &a_m_8, &b_m_8, &c_m_8, &ip1_m, &a_t_8, &b_t_8, &c_t_8, &ip1_t, &a_w_8, &b_w_8, &c_w_8, &ip1_w, *dhm, *dht, *dhw) == VGD_ERROR ) {
       free(a_m_8);
       free(b_m_8);
       free(c_m_8);
@@ -5751,7 +5785,7 @@ int Cvgd_new_gen2(vgrid_descriptor **self, int kind, int version, float *hyb, in
     printf("(Cvgd) ERROR in Cvgd_new_gen2, invalid kind or version, kind = %d, version = %d\n",kind,version);
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == Cvgd_new_build_vert2(self,kind,version,nk,ip1,ip2,ptop_8,pref_8,rcoef1,rcoef2,rcoef3,rcoef4,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,a_w_8,b_w_8,c_w_8,ip1_m,ip1_t,ip1_w,nl_m,nl_t,nl_w) ) {
+  if( VGD_ERROR == Cvgd_new_build_vert2(self,kind,version,nk,ip1,ip2,ptop_8,pref_8,rcoef1,rcoef2,l_rcoef3,l_rcoef4,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,a_w_8,b_w_8,c_w_8,ip1_m,ip1_t,ip1_w,nl_m,nl_t,nl_w) ) {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_new_gen2, problem with new_build_vert for kind = %d, version = %d\n",kind,version);
     return(VGD_ERROR);
   }
