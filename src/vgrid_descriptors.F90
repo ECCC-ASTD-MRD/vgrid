@@ -829,7 +829,7 @@ contains
       
       ier = f_vgdcmp(vgd1%cptr, vgd2%cptr)
       if( ier /= 0 )then
-         print*,'Return code is',ier
+         !print*,'Return code is',ier
          return
       end if
 
