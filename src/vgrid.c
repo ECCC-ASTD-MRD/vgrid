@@ -6367,15 +6367,18 @@ int Cvgd_stda76_hgts_from_pres_list(float *hgts, float *pres,
     }
     if(pres[i] >= pk[0]){
       // Integrate downward from surface pres and temp with gammaT[0]
-      hgts[i] = zk[0] + Tk[0]/gammaT[0] * ( exp(-(VGD_RGASD*gammaT[0])/VGD_GRAV * log(pres[i]/pk[0] )) - 1.f );
+      hgts[i] = (float) (zk[0] + Tk[0]/gammaT[0] * ( exp(-(VGD_RGASD*gammaT[0])/VGD_GRAV * log(pres[i]/pk[0] )) - 1.f ));
     } else {
       for(k=0; k<STDA76_N_LAYER; k++){
 	if(pres[i] > pk[k+1]){
 	  // compute height up to pressure value
 	  if( zero_lapse_rate[k] ){
-	    hgts[i] = zk[k] - (VGD_RGASD*Tk[k])/VGD_GRAV * log(pres[i]/pk[k]);
+	    hgts[i] = (float) (zk[k] - (VGD_RGASD*Tk[k])/VGD_GRAV 
+			       * log(pres[i]/pk[k]));
 	  } else {
-	    hgts[i] = zk[k] + Tk[k]/gammaT[k] * ( exp(-(VGD_RGASD*gammaT[k])/VGD_GRAV * log(pres[i]/pk[k] )) - 1.f );
+	    hgts[i] = (float) (zk[k] + Tk[k]/gammaT[k]
+			       * ( exp(-(VGD_RGASD*gammaT[k])/VGD_GRAV
+				       * log(pres[i]/pk[k] )) - 1.f ));
 	  }
 	  break;
 	}
@@ -6404,17 +6407,21 @@ int Cvgd_stda76_pres_from_hgts_list(float *pres, float *hgts,
       return(VGD_ERROR);
     }
     if(hgts[i] <= zk[0]){
-      pres[i] = pk[0] * exp(-VGD_GRAV/(VGD_RGASD*gammaT[0])
-			    * log(gammaT[0]*(hgts[i]-zk[0])/Tk[0] + 1.f));
+      pres[i] = (float) ( pk[0] * exp(-VGD_GRAV/(VGD_RGASD*gammaT[0])
+				      * log(gammaT[0]*(hgts[i]-zk[0])/Tk[0]
+					    + 1.f)));
 			    
     } else {
       for(k=0; k<STDA76_N_LAYER; k++){
 	if(hgts[i] < zk[k+1]){
 	  if( zero_lapse_rate[k] ){
-	    pres[i] = pk[k] * exp(-VGD_GRAV/(VGD_RGASD*Tk[k])*(hgts[i]-zk[k]));
+	    pres[i] = (float) (pk[k]
+			       * exp(-VGD_GRAV/(VGD_RGASD*Tk[k])
+				     *(hgts[i]-zk[k])));
 	  } else {
-	    pres[i] = pk[k] * exp(-VGD_GRAV/(VGD_RGASD*gammaT[k])
-			    * log(gammaT[k]*(hgts[i]-zk[k])/Tk[k] + 1.f));
+	    pres[i] = (float) (pk[k] * exp(-VGD_GRAV/(VGD_RGASD*gammaT[k])
+					   * log(gammaT[k]*(hgts[i]-zk[k])
+						 /Tk[k] + 1.f)));
 	  }
 	  break;
 	}
