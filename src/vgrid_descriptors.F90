@@ -1086,7 +1086,7 @@ contains
      ! Local variables
      real(kind=8) :: my_sfc_field_8, my_sfc_field_ls_8
      real(kind=8), dimension(:), pointer :: levels_8
-     integer :: error,stat
+     integer :: error,stat,i
      logical :: my_in_log
 
      nullify(levels_8)
@@ -1124,7 +1124,11 @@ contains
         if(associated(levels_8))deallocate(levels_8)
         return
      endif
-     levels=levels_8
+     ! Array copy levels=real(levels_8) or levels(:)=real(levels_8(:))
+     ! is allocating some space on stack with intel compiler (maybe other too).
+     do i=lbound(levels,dim=1),ubound(levels,dim=1)
+        levels(i)=real(levels_8(i))
+     end do
      deallocate(levels_8)
      status=VGD_OK
      return
@@ -1176,7 +1180,7 @@ contains
      ! Local variables
      real(kind=8) :: my_sfc_field_8
      real(kind=8), dimension(:), pointer :: dpidpis_8
-     integer :: error,stat
+     integer :: error,stat,i
 
      nullify(dpidpis_8)
 
@@ -1204,7 +1208,12 @@ contains
         if(associated(dpidpis_8))deallocate(dpidpis_8)
         return
      endif
-     dpidpis=dpidpis_8
+     ! Array copy dpidpis=real(dpidpis_8) or dpidpis(:)=real(dpidpis_8(:))
+     ! is allocating some space on stack with intel compiler (maybe other too).
+     ! This makes the stack too big on many machines.
+     do i=lbound(dpidpis,dim=1),ubound(dpidpis,dim=1)
+        dpidpis(i)=real(dpidpis_8(i))
+     end do
      deallocate(dpidpis_8)
      status=VGD_OK
      return
@@ -1327,7 +1336,7 @@ contains
      logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]
 
      ! Local variables
-     integer :: error,ni,nj,stat
+     integer :: error,ni,nj,stat,i,j,k
      real(kind=8), dimension(:,:,:), pointer :: levels_8
      real(kind=8), dimension(:,:), pointer :: my_sfc_field, my_sfc_field_ls
      logical :: my_in_log
@@ -1394,7 +1403,16 @@ contains
      if (error /= 0) then
         return
      endif
-     levels=levels_8
+     ! Array copy levels=real(levels_8) or levels(:,:,:)=real(levels_8(:,:,:))
+     ! is allocating some space on stack with intel compiler (maybe other too).
+     ! This makes the stack too big on many machines.
+     do k=lbound(levels,dim=3),ubound(levels,dim=3)
+        do j=lbound(levels,dim=2),ubound(levels,dim=2)
+           do i=lbound(levels,dim=1),ubound(levels,dim=1)
+              levels(i,j,k)=real(levels_8(i,j,k))
+           end do
+        end do
+     end do
      deallocate(my_sfc_field,levels_8)
      status=VGD_OK
      return
@@ -1459,7 +1477,7 @@ contains
       real, dimension(:,:), optional, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
 
       ! Local variables 
-      integer :: error,ni,nj,stat
+      integer :: error,ni,nj,stat,i,j,k
       real(kind=8), dimension(:,:), pointer :: my_sfc_field_8
       real(kind=8), dimension(:,:,:), pointer :: dpidpis_8
       
@@ -1503,7 +1521,16 @@ contains
       if (error /= 0) then
          return
       endif
-      dpidpis=dpidpis_8
+      ! Array copy dpidpis=real(dpidpis_8) or dpidpis(:,:,:)=real(dpidpis_8(:,:,:))
+      ! is allocating some space on stack with intel compiler (maybe other too).
+      ! This makes the stack too big on many machines.
+      do k=lbound(dpidpis,dim=3),ubound(dpidpis,dim=3)
+         do j=lbound(dpidpis,dim=2),ubound(dpidpis,dim=2)
+            do i=lbound(dpidpis,dim=1),ubound(dpidpis,dim=1)
+               dpidpis(i,j,k)=real(dpidpis_8(i,j,k))
+            end do
+         end do
+      end do
       deallocate(my_sfc_field_8,dpidpis_8)
       status=VGD_OK
       return
