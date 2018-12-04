@@ -74,7 +74,7 @@ program constructor
   real, dimension(:,:), allocatable :: ff
   real(kind=8), dimension(:), pointer :: a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,a_w_8,b_w_8,c_w_8,work_8
   logical :: OK=.true.
-  logical, parameter :: write_control_L=.true.
+  logical, parameter :: write_control_L=.false.
   character (len=1) :: dumc_S
   character (len=256) :: file
   type(FSTD_ext) :: fst
