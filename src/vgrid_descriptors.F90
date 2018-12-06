@@ -61,9 +61,9 @@ module vGrid_Descriptors
    character(len=1), dimension(3), parameter :: MATCH_GRTYP=(/'X','Y','Z'/) !grid types with ip1,2 to ig1,2 mapping
    
    real, public, protected, bind(C, name="VGD_STDA76_SFC_T") :: &
-        VGD_STDA76_SFC_T
+        VGD_STDA76_SFC_T = 288.15
    real, public, protected, bind(C, name="VGD_STDA76_SFC_P") :: &
-        VGD_STDA76_SFC_P
+        VGD_STDA76_SFC_P = 101325
    
    ! FST file record structure
    type FSTD

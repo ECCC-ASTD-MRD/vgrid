@@ -31,8 +31,6 @@
 #define STDA76_N_LAYER 7
 static float stda76_tgrad[STDA76_N_LAYER]     = { -6.5E-3,    0.0,    1.0E-3, 2.8E-3, 0.0,    -2.8E-3, -2.0E-3 };
 static float stda76_zgrad[STDA76_N_LAYER + 1] = { 0., 11000., 20000., 32000., 47000., 51000.,  71000.,  84852. };
-extern float VGD_STDA76_SFC_T = 288.15;
-extern float VGD_STDA76_SFC_P = 101325.;
 
 // Constants
 #define MAX_DESC_REC 10000      //maximum number of descriptor records in a single file
