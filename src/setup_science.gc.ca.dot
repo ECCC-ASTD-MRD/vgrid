@@ -17,10 +17,11 @@ case "${ORDENV_PLAT}" in
       export MY_FFLAGS="-openmp -fp-model source -warn all ${MY_FFLAGS}"
       export MY_CFLAGS="-openmp -fp-model precise -w3 ${MY_CFLAGS}"
       . ssmuse-sh -d ${HPCS_BASE} -d ${HPCS_COMP} -p ${HPCS_CODE_TOOL}
-      . ssmuse-sh -d ${RPN_LIB}
       . ssmuse-sh -p ${BH_PACKAGE}
-      # For shared librairy creation
-      export RPN_LIB
+      . r.load.dot ${RPN_LIB}
+      TEMPO=$(s.locate --lib rmnshared)
+      export RPN_SHARED_LIB=${TEMPO%/*}
+      # For shared library creation
       #export SHARED_COMP_rpath=/fs/ssm/hpco/exp/intel-2016.1.156/intelcomp_2016.1.156-01_multi/compilers_and_libraries_2016.1.150/linux/compiler/lib/intel64
       export SHARED_COMP_rpath=${INTELCOMP_HOME}/lib/intel64
       :;;
