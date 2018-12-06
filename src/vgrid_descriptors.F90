@@ -2554,7 +2554,7 @@ contains
  integer function vgd_stda76_pres_from_hgts_list(pres, hgts, nb) result(status)
    implicit none
    integer :: nb
-   real, dimension(nb) :: pres, hgts   
+   real, dimension(nb), target :: pres, hgts
    ! Local variables
    type (c_ptr) :: pres_CP, hgts_CP
 
@@ -2572,7 +2572,7 @@ contains
  integer function vgd_stda76_hgts_from_pres_list(hgts, pres, nb) result(status)
    implicit none
    integer :: nb
-   real, dimension(nb) :: hgts, pres   
+   real, dimension(nb), target :: hgts, pres
    ! Local variables
    type (c_ptr) :: hgts_CP, pres_CP
 
