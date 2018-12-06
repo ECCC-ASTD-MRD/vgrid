@@ -95,6 +95,14 @@ module vGrid_Descriptors
          integer (c_int), value :: ni, nj, nk
        end function f_diag_withref_8
 
+      integer(c_int) function f_diag_withref(vgd_CP, ni, nj, nk, ip1_list_CP, levels_CP,sfc_field_CP,sfc_field_ls_CP, in_log, dpidpis) bind(c, name='C_diag_withref')
+        use iso_c_binding, only: c_ptr, c_int
+        type(c_ptr), value :: vgd_CP, ip1_list_CP, sfc_field_CP, sfc_field_ls_CP
+        integer (c_int), value :: in_log, dpidpis
+        type(c_ptr), value  :: levels_CP
+        integer (c_int), value :: ni, nj, nk
+       end function f_diag_withref
+       
       integer(c_int) function f_get_int(vgd_CP, key, value_CP, quiet) bind(c, name='Cvgd_get_int')
          use iso_c_binding, only: c_ptr, c_char, c_int
          type(c_ptr), value :: vgd_CP
@@ -1075,21 +1083,16 @@ contains
   end function levels_readref
 
   integer function levels_withref_prof(self,ip1_list,levels,sfc_field,in_log,sfc_field_ls) result(status)
-     use vgrid_utils, only: get_allocate
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
-     real, dimension(:), pointer :: levels                       !Physical level values
-     real, optional, intent(in) :: sfc_field                     !Surface field reference for coordinate [none]
-     real, optional, intent(in) :: sfc_field_ls                  !Surface large scale field reference for coordinate [none]
+     real, dimension(:), pointer :: levels                     !Physical level values
+     real, optional, intent(in) :: sfc_field                   !Surface field reference for coordinate [none]
      logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]          
+     real, optional, intent(in) :: sfc_field_ls                !Surface field reference for coordinate [none]
 
      ! Local variables
-     real(kind=8) :: my_sfc_field_8, my_sfc_field_ls_8
-     real(kind=8), dimension(:), pointer :: levels_8
-     integer :: error,stat,i
+     real :: my_sfc_field
      logical :: my_in_log
-
-     nullify(levels_8)
 
      ! Set return value
      status = VGD_ERROR
@@ -1099,38 +1102,19 @@ contains
         call msg(MSG_ERROR,VGD_PRFX//for_msg)       
         return
      endif
-
+     
      ! Set default values
-     my_sfc_field_8 = VGD_MISSING
-     if (present(sfc_field)) my_sfc_field_8 = sfc_field
-     my_sfc_field_ls_8 = VGD_MISSING
-     if (present(sfc_field_ls)) my_sfc_field_ls_8 = sfc_field_ls
+     my_sfc_field = VGD_MISSING
+     if (present(sfc_field)) my_sfc_field = sfc_field
      my_in_log = .false.
      if (present(in_log)) my_in_log = in_log
 
      ! Wrap call to level calculation
      if(present(sfc_field_ls))then
-        stat = diag_withref_prof_8(self,ip1_list,levels_8,sfc_field=my_sfc_field_8,sfc_field_ls=my_sfc_field_ls_8,in_log=my_in_log)
+        status = diag_withref_prof(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log,sfc_field_ls=sfc_field_ls)
      else
-        stat = diag_withref_prof_8(self,ip1_list,levels_8,sfc_field=my_sfc_field_8,in_log=my_in_log)
+        status = diag_withref_prof(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log)
      endif
-     if(stat==VGD_ERROR)then
-        if(associated(levels_8))deallocate(levels_8)
-        return
-     endif
-     ! Write results back to 32 bits
-     error = get_allocate('levels',levels,size(levels_8),ALLOW_RESHAPE,'(in levels_withref_prof)')
-     if (error /= 0) then
-        if(associated(levels_8))deallocate(levels_8)
-        return
-     endif
-     ! Array copy levels=real(levels_8) or levels(:)=real(levels_8(:))
-     ! is allocating some space on stack with intel compiler (maybe other too).
-     do i=lbound(levels,dim=1),ubound(levels,dim=1)
-        levels(i)=real(levels_8(i))
-     end do
-     deallocate(levels_8)
-     status=VGD_OK
      return
   end function levels_withref_prof
 
@@ -1171,22 +1155,18 @@ contains
   end function levels_withref_prof_8
 
   integer function dpidpis_withref_prof(self,ip1_list,dpidpis,sfc_field) result(status)
-     use vgrid_utils, only: get_allocate,up
+     use vgrid_utils, only: up
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
      real, dimension(:), pointer :: dpidpis                      !Derivative values
      real, optional, intent(in) :: sfc_field                     !Surface field reference for coordinate [none]
 
      ! Local variables
-     real(kind=8) :: my_sfc_field_8
-     real(kind=8), dimension(:), pointer :: dpidpis_8
-     integer :: error,stat,i
-
-     nullify(dpidpis_8)
+     real :: my_sfc_field
+     integer :: stat
 
      ! Set return value
      status = VGD_ERROR
-
      if(.not.is_valid(self,'SELF'))then
         write(for_msg,*) 'vgrid structure is not valid in dpidpis_withref_prof'
         call msg(MSG_ERROR,VGD_PRFX//for_msg)       
@@ -1194,28 +1174,15 @@ contains
      endif
 
      ! Set default values
-     my_sfc_field_8 = VGD_MISSING
-     if (present(sfc_field)) my_sfc_field_8 = sfc_field
-     
+     my_sfc_field = VGD_MISSING
+     if (present(sfc_field)) my_sfc_field = sfc_field
      ! Wrap call to level calculation
-     stat = diag_withref_prof_8(self,ip1_list,dpidpis_8,sfc_field=my_sfc_field_8,dpidpis=.true.)
+     stat = diag_withref_prof(self,ip1_list,dpidpis,sfc_field=my_sfc_field,dpidpis=.true.)     
      if(stat==VGD_ERROR)then
-        if(associated(dpidpis_8))deallocate(dpidpis_8)
+        write(for_msg,*) 'ERROR with diag_withref_prof in dpidpis_withref_prof'
         return
      endif
-     error = get_allocate('dpidpis',dpidpis,size(dpidpis_8),ALLOW_RESHAPE,'(in dpidpis_withref_prof)')
-     if (error /= 0)then
-        if(associated(dpidpis_8))deallocate(dpidpis_8)
-        return
-     endif
-     ! Array copy dpidpis=real(dpidpis_8) or dpidpis(:)=real(dpidpis_8(:))
-     ! is allocating some space on stack with intel compiler (maybe other too).
-     ! This makes the stack too big on many machines.
-     do i=lbound(dpidpis,dim=1),ubound(dpidpis,dim=1)
-        dpidpis(i)=real(dpidpis_8(i))
-     end do
-     deallocate(dpidpis_8)
-     status=VGD_OK
+     status = VGD_OK
      return
   end function dpidpis_withref_prof
 
@@ -1250,6 +1217,80 @@ contains
      status = VGD_OK
      return
   end function dpidpis_withref_prof_8
+
+  integer function diag_withref_prof(self,ip1_list,levels,sfc_field,in_log,dpidpis,sfc_field_ls) result(status)
+     use vgrid_utils, only: get_allocate
+     type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
+     integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
+     real, dimension(:), pointer :: levels                       !Physical level values
+     real, optional, intent(in) :: sfc_field                     !Surface field reference for coordinate [none]
+     real, optional, intent(in) :: sfc_field_ls                  !Surface large scale field reference for coordinate [none]
+     logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]          
+     logical, optional, intent(in) :: dpidpis                    !Compute partial derivative of hydrostatic pressure (pi) with
+                                                                 !   respect to surface hydrostatic pressure(pis) [.false.]
+     
+     ! Local variables
+     integer :: error,nk
+     real :: my_sfc_field, my_sfc_field_ls
+     real, dimension(:,:), pointer :: sfc_field_2d, sfc_field_ls_2d
+     real, dimension(:,:,:), pointer :: levels_3d
+     logical :: my_in_log,my_dpidpis
+
+     ! Set error status
+     status = VGD_ERROR
+
+     nullify(sfc_field_2d,sfc_field_ls_2d,levels_3d)
+
+     if(.not.is_valid(self,'SELF'))then
+        write(for_msg,*) 'vgrid structure is not valid in levels_withref_prof'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+        return
+     endif
+
+     ! Set default values
+     my_sfc_field = VGD_MISSING
+     if (present(sfc_field)) my_sfc_field = sfc_field
+     my_sfc_field_ls = VGD_MISSING
+     if (present(sfc_field_ls)) my_sfc_field_ls = sfc_field_ls
+     my_in_log = .false.
+     if (present(in_log)) my_in_log = in_log
+     my_dpidpis = .false.
+     if (present(dpidpis)) my_dpidpis = dpidpis
+
+     nk=size(ip1_list)
+
+     allocate(sfc_field_2d(1,1),sfc_field_ls_2d(1,1),levels_3d(1,1,nk),stat=error)
+     if (error /= 0) then
+        if(associated(sfc_field_2d))deallocate(sfc_field_2d)
+        if(associated(sfc_field_ls_2d))deallocate(sfc_field_ls_2d)
+        if(associated(levels_3d))deallocate(levels_3d)
+        write(for_msg,*) 'cannot allocate space for p0/levels in diag_withref_prof'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
+     sfc_field_2d=my_sfc_field
+     ! Wrap call to level calculator
+     if (present(sfc_field_ls))then
+        sfc_field_ls_2d=my_sfc_field_ls
+        error = diag_withref(self,sfc_field=sfc_field_2d,sfc_field_ls=sfc_field_ls_2d,ip1_list=ip1_list,levels=levels_3d,in_log=my_in_log,dpidpis=my_dpidpis) 
+     else
+        error = diag_withref(self,sfc_field=sfc_field_2d,ip1_list=ip1_list,levels=levels_3d,in_log=my_in_log,dpidpis=my_dpidpis)    
+     endif
+     if (error /= 0) then
+        deallocate(sfc_field_2d,levels_3d)
+        write(for_msg,*) 'problem with diag_withref in diag_withref_prof'
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+     endif
+     error = get_allocate('levels',levels,nk,ALLOW_RESHAPE,'(in diag_withref_prof)')
+     if(error/=0)return
+     levels=levels_3d(1,1,1:nk)
+     deallocate(sfc_field_2d,sfc_field_ls_2d,levels_3d)
+     ! Set status and return
+     status = VGD_OK
+     return
+
+  end function diag_withref_prof
 
   integer function diag_withref_prof_8(self,ip1_list,levels,sfc_field,in_log,dpidpis,sfc_field_ls) result(status)
      use vgrid_utils, only: get_allocate
@@ -1326,97 +1367,66 @@ contains
   end function diag_withref_prof_8
 
   integer function levels_withref(self,ip1_list,levels,sfc_field,in_log,sfc_field_ls) result(status)
-     use vgrid_utils, only: get_allocate
-     ! Given referent, compute physical levelling information from the vertical description
-     type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
-     integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
-     real, dimension(:,:,:), pointer :: levels                   !Physical level values
-     real, dimension(:,:), optional, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
-     real, dimension(:,:), optional, intent(in) :: sfc_field_ls  !Surface field large scale reference for coordinate [none]
-     logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]
+      ! Given referent, compute physical levelling information from the vertical description
+      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
+      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
+      real, dimension(:,:,:), pointer :: levels                   !Physical level values
+      real, dimension(:,:), optional, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
+      real, dimension(:,:), optional, intent(in) :: sfc_field_ls  !Surface field large scale reference for coordinate [none]
+      logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]
 
-     ! Local variables
-     integer :: error,ni,nj,stat,i,j,k
-     real(kind=8), dimension(:,:,:), pointer :: levels_8
-     real(kind=8), dimension(:,:), pointer :: my_sfc_field, my_sfc_field_ls
-     logical :: my_in_log
+      ! Local variables
+      integer :: error,ni,nj
+      real, dimension(:,:), pointer :: my_sfc_field
+      logical :: my_in_log
+      
+      nullify(my_sfc_field)
 
-     nullify(levels_8,my_sfc_field, my_sfc_field_ls)
-
-     ! Set return value
-     status = VGD_ERROR
-
-     if(.not.is_valid(self,"SELF"))then
-        write(for_msg,*) 'vgrid structure is not valid in levels_withref'
-        call msg(MSG_ERROR,VGD_PRFX//for_msg)       
-        return
-     endif
-
-     ! Set default values
-     if (present(sfc_field)) then
-        ni = size(sfc_field,dim=1); nj = size(sfc_field,dim=2)
-     else
-        ni = 1; nj = 1
-     endif
-     allocate(my_sfc_field(ni,nj),stat=error)
-     if (error /= 0) then
-        write(for_msg,*) 'cannot allocate space for my_sfc_field in levels_withref'
-        call msg(MSG_ERROR,VGD_PRFX//for_msg)
-        return
-     endif
-     if (present(sfc_field)) then
-        my_sfc_field = sfc_field
-     else
-        my_sfc_field = VGD_MISSING
-     endif
-     if (present(sfc_field_ls)) then
-        if( size(sfc_field_ls,dim=1) /= ni .or. size(sfc_field_ls,dim=2) /= nj )then
-           write(for_msg,*) 'in levels_withref, size of sfc_field_ls not the same as sfc_field'
-           call msg(MSG_ERROR,VGD_PRFX//for_msg)
-           return
-        endif
-     endif
-     my_in_log = .false.
-     if (present(in_log)) my_in_log = in_log
-
-     ! Wrap call to level calculator at 64 bits
-     if (present(sfc_field_ls)) then
-        allocate(my_sfc_field_ls(ni,nj),stat=error)
-        if (error /= 0) then
-           write(for_msg,*) 'cannot allocate space for my_sfc_field_ls in levels_withref'
-           call msg(MSG_ERROR,VGD_PRFX//for_msg)
-           return
-        endif
-        my_sfc_field_ls=sfc_field_ls
-        stat=diag_withref_8(self,ip1_list,levels_8,sfc_field=my_sfc_field,in_log=my_in_log,sfc_field_ls=my_sfc_field_ls)
-        deallocate(my_sfc_field_ls)
-     else
-        stat=diag_withref_8(self,ip1_list,levels_8,sfc_field=my_sfc_field,in_log=my_in_log)
-        if(stat==VGD_ERROR)then
-           if(associated(levels_8))deallocate(levels_8)
-           deallocate(my_sfc_field)
-           return
-        endif
-     endif
-     ! Write results back to 32 bits     
-     error = get_allocate('levels',levels,shape(levels_8),ALLOW_RESHAPE,'(in levels_withref)')
-     if (error /= 0) then
-        return
-     endif
-     ! Array copy levels=real(levels_8) or levels(:,:,:)=real(levels_8(:,:,:))
-     ! is allocating some space on stack with intel compiler (maybe other too).
-     ! This makes the stack too big on many machines.
-     do k=lbound(levels,dim=3),ubound(levels,dim=3)
-        do j=lbound(levels,dim=2),ubound(levels,dim=2)
-           do i=lbound(levels,dim=1),ubound(levels,dim=1)
-              levels(i,j,k)=real(levels_8(i,j,k))
-           end do
-        end do
-     end do
-     deallocate(my_sfc_field,levels_8)
-     status=VGD_OK
-     return
-  end function levels_withref
+      ! Set return value
+      status = VGD_ERROR
+      
+      if(.not.is_valid(self,'SELF'))then
+         write(for_msg,*) 'vgrid structure is not valid in levels_withref'
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+         return
+      endif
+      
+      ! Set default values
+      if (present(sfc_field)) then
+         ni = size(sfc_field,dim=1); nj = size(sfc_field,dim=2)
+      else
+         ni = 1; nj = 1
+      endif
+      allocate(my_sfc_field(ni,nj),stat=error)
+      if (error /= 0) then
+         write(for_msg,*) 'cannot allocate space for sfc_field in levels_withref'
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         return
+      endif
+      if (present(sfc_field)) then
+         my_sfc_field = sfc_field
+      else
+         my_sfc_field = VGD_MISSING
+      endif
+      if (present(sfc_field_ls)) then
+         if( size(sfc_field_ls,dim=1) /= ni .or. size(sfc_field_ls,dim=2) /= nj )then
+            write(for_msg,*) 'in levels_withref, size of sfc_field_ls not the same as sfc_field'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            return
+         endif
+      endif
+      my_in_log = .false.
+      if (present(in_log)) my_in_log = in_log
+      
+      ! Wrap call to level calculator
+      if( present(sfc_field_ls) )then
+         status=diag_withref(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log,sfc_field_ls=sfc_field_ls)
+      else
+         status=diag_withref(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log)
+      endif
+      deallocate(my_sfc_field)
+      return
+   end function levels_withref
 
   integer function levels_withref_8(self,ip1_list,levels,sfc_field,in_log) result(status)
       ! Given referent, compute physical levelling information from the vertical description
@@ -1450,7 +1460,7 @@ contains
       endif
       allocate(my_sfc_field(ni,nj),stat=error)
       if (error /= 0) then
-         write(for_msg,*) 'cannot allocate space for sfc_field in levels_withref'
+         write(for_msg,*) 'cannot allocate space for sfc_field in levels_withref_8'
          call msg(MSG_ERROR,VGD_PRFX//for_msg)
          return
       endif
@@ -1473,15 +1483,14 @@ contains
       ! Given referent, compute physical levelling information from the vertical description
       type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
       integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
-      real, dimension(:,:,:), pointer :: dpidpis                  !pressure derivative with respect to sfc pressure
-      real, dimension(:,:), optional, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
-
-      ! Local variables 
-      integer :: error,ni,nj,stat,i,j,k
-      real(kind=8), dimension(:,:), pointer :: my_sfc_field_8
-      real(kind=8), dimension(:,:,:), pointer :: dpidpis_8
+      real, dimension(:,:,:), pointer :: dpidpis                !pressure derivative with respect to sfc pressure
+      real, dimension(:,:), optional, intent(in) :: sfc_field   !Surface field reference for coordinate [none]
       
-      nullify(my_sfc_field_8,dpidpis_8)
+      ! Local variables 
+      integer :: ni,nj,error,stat
+      real, dimension(:,:), pointer :: my_sfc_field
+      
+      nullify(my_sfc_field)
       
       ! Set return value
       status = VGD_ERROR
@@ -1491,47 +1500,32 @@ contains
          call msg(MSG_ERROR,VGD_PRFX//for_msg)       
          return
       endif
+      
       ! Set default values
       if (present(sfc_field)) then
          ni = size(sfc_field,dim=1); nj = size(sfc_field,dim=2)
       else
          ni = 1; nj = 1
       endif
-      allocate(my_sfc_field_8(ni,nj),stat=error)
+      allocate(my_sfc_field(ni,nj),stat=error)
       if (error /= 0) then
-         nullify(my_sfc_field_8)
+         nullify(my_sfc_field)
          write(for_msg,*) 'cannot allocate space for sfc_field in dpidpis_withref'
          call msg(MSG_ERROR,VGD_PRFX//for_msg)
          return
       endif
       if (present(sfc_field)) then
-         my_sfc_field_8 = sfc_field
+         my_sfc_field = sfc_field
       else
-         my_sfc_field_8 = VGD_MISSING
+         my_sfc_field = VGD_MISSING
       endif
       ! Wrap call to level calculator
-      stat=diag_withref_8(self,ip1_list,dpidpis_8,sfc_field=my_sfc_field_8,dpidpis=.true.)
+      stat=diag_withref(self,ip1_list,dpidpis,sfc_field=my_sfc_field,dpidpis=.true.)
       if(stat==VGD_ERROR)then
-         if(associated(my_sfc_field_8))deallocate(my_sfc_field_8)
-         if(associated(dpidpis_8))deallocate(dpidpis_8)
+         deallocate(my_sfc_field)
          return
       endif
-      ! Write results back to 32 bits
-      error = get_allocate('dpidpis',dpidpis,shape(dpidpis_8),ALLOW_RESHAPE,'(in dpidpis_withref)')
-      if (error /= 0) then
-         return
-      endif
-      ! Array copy dpidpis=real(dpidpis_8) or dpidpis(:,:,:)=real(dpidpis_8(:,:,:))
-      ! is allocating some space on stack with intel compiler (maybe other too).
-      ! This makes the stack too big on many machines.
-      do k=lbound(dpidpis,dim=3),ubound(dpidpis,dim=3)
-         do j=lbound(dpidpis,dim=2),ubound(dpidpis,dim=2)
-            do i=lbound(dpidpis,dim=1),ubound(dpidpis,dim=1)
-               dpidpis(i,j,k)=real(dpidpis_8(i,j,k))
-            end do
-         end do
-      end do
-      deallocate(my_sfc_field_8,dpidpis_8)
+      deallocate(my_sfc_field)
       status=VGD_OK
       return
    end function dpidpis_withref
@@ -1588,6 +1582,122 @@ contains
       return
    end function dpidpis_withref_8
 
+   integer function diag_withref(self,ip1_list,levels,sfc_field,in_log,dpidpis,sfc_field_ls) result(status)
+      use vgrid_utils, only: get_allocate
+      ! Given referent, compute physical levelling information from the vertical description
+      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
+      integer, target, dimension(:), intent(in) :: ip1_list               !Key of prototype field
+      real, dimension(:,:,:), pointer :: levels                   !Physical level values
+      real, dimension(:,:), optional, target, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
+      real, dimension(:,:), optional, target, intent(in) :: sfc_field_ls  !Surface field large scale reference for coordinate [none]
+      logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]
+      logical, optional, intent(in) :: dpidpis                    !Compute partial derivative of hydrostatic pressure (pi) with
+      !   respect to surface hydrostatic pressure(pis) [.false.]
+      
+      ! Local variables
+      integer istat,ni,nj,nk,error
+      type (c_ptr) :: ip1_list_CP ,levels_CP ,sfc_field_CP, sfc_field_ls_CP
+      integer :: in_log_int, dpidpis_int
+      logical :: my_dpidpis
+
+      ! Set error status
+      status = VGD_ERROR
+      
+      if(.not.is_valid(self,'SELF'))then
+         write(for_msg,*) 'vgrid structure is not valid in diag_withref'
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+         return
+      endif
+      
+      ! Set default values
+      in_log_int = 0
+      if (present(in_log))then
+         if(in_log)then
+            in_log_int = 1
+         else
+            in_log_int = 0
+         endif
+      endif
+      my_dpidpis=.false.
+      if(present(dpidpis))my_dpidpis=dpidpis
+      dpidpis_int = 0
+      if(my_dpidpis)then
+         dpidpis_int = 1
+      else
+         dpidpis_int = 0
+      endif
+      
+      if (present(sfc_field)) then
+         ni = size(sfc_field,dim=1); nj = size(sfc_field,dim=2); nk = size(ip1_list)
+      else
+         if (is_valid(self,"ref_name_valid")) then
+            write(for_msg,*) 'reference field must be provided to diag_withref'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            return
+         else
+            ni = 1; nj = 1; nk = size(ip1_list)
+         endif
+      endif
+      
+      if (present(sfc_field_ls)) then
+         if(  ni /= size(sfc_field_ls,dim=1) .or. &
+              nj /= size(sfc_field_ls,dim=2) )then
+            write(for_msg,*) 'reference large scale field is not of same size has reference field'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            return
+         endif
+      else
+         if (is_valid(self,"ref_namel_valid") .and. .not. my_dpidpis) then
+            write(for_msg,*) 'reference large scale field must be provided to diag_withref'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            return
+         endif
+      endif
+      if (associated(levels)) then
+         if (size(levels,dim=1) /= ni .or. size(levels,dim=2) /= nj .or. size(levels,dim=3) /= nk) then
+            if(ALLOW_RESHAPE)then
+               write(for_msg,*) 'Levels array size error - will be reallocated'
+               call msg(MSG_WARNING,VGD_PRFX//for_msg)
+               deallocate(levels)
+            else
+               write(for_msg,*) 'Levels array size error - will not reallocate since ALLOW_RESHAPE is set to false'
+               call msg(MSG_ERROR,VGD_PRFX//for_msg)
+               return
+            endif
+         endif
+      endif
+      if(.not. associated(levels) )then
+         allocate(levels(ni,nj,nk),stat=error)
+         if (error /= 0) then
+            write(for_msg,*) 'cannot allocate space for levels in diag_withref'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            return
+         endif
+      endif
+      
+      ip1_list_CP  = c_loc(ip1_list)
+      levels_CP    = c_loc(levels(1,1,1))
+      sfc_field_CP = C_NULL_PTR
+      if (present(sfc_field)) sfc_field_CP = c_loc(sfc_field(1,1))
+      sfc_field_ls_CP = C_NULL_PTR
+      if (present(sfc_field_ls)) sfc_field_ls_CP = c_loc(sfc_field_ls(1,1))
+      istat = f_diag_withref(self%cptr,ni,nj,nk,ip1_list_CP,levels_CP,sfc_field_CP,sfc_field_ls_CP,in_log_int,dpidpis_int)      
+      if (istat /= VGD_OK) then
+         if(my_dpidpis)then
+            write(for_msg,*) 'error computing dpidpis in diag_withref'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         else
+            write(for_msg,*) 'error computing pressure in diag_withref'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         endif
+         return
+      endif
+
+      ! Set status and return
+      status = VGD_OK
+      return
+   end function diag_withref
+   
    integer function diag_withref_8(self,ip1_list,levels,sfc_field,in_log,dpidpis,sfc_field_ls) result(status)
       use vgrid_utils, only: get_allocate
       ! Given referent, compute physical levelling information from the vertical description
@@ -1703,7 +1813,7 @@ contains
       status = VGD_OK
       return
    end function diag_withref_8
-   
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Write descriptors
    

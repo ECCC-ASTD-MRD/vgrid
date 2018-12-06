@@ -78,7 +78,8 @@ program tests
 
   stat = vgd_putopt("ALLOW_SIGMA",.true.)
 
-  do i=1,nfiles
+  !do i=1,nfiles
+  do i=8,8
      stat = do_it(lu,files(i))
      ier=fstfrm(lu)
      ier=fclos(lu)
