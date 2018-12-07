@@ -2,48 +2,17 @@
 
 case "${ORDENV_PLAT}" in
 
-   ubuntu-12.04-amd64-64)
-      #MY_FFLAGS="-C -g -O0 -lefence"
-      #MY_CFLAGS="-g -O0 -lefence"
-      export BH_MODE=intel
-      HPCS_BASE=hpcs/201402/02/base
-      HPCS_COMP=hpcs/201402/02/intel13sp1u2
-      RPN_LIB=rpn/libs/15.2
-      export MY_FFLAGS="-openmp -fp-model source  -warn all ${MY_FFLAGS}"
-      export MY_CFLAGS="-openmp -fp-model precise -w3 ${MY_CFLAGS}"
-      . ssmuse-sh -d ${HPCS_BASE} -d ${HPCS_COMP} -d ${RPN_LIB}
-      export RPN_LIB
-      export SHARED_RNM_SSM_PREF=/ssm/net/
-      export SHARED_RNM_EXT=_015.2
-      export SHARED_COMP_rpath=${INTELCOMP_HOME}/lib/intel64
-      :;;
-
    ubuntu-14.04-amd64-64)
       export BH_MODE=intel
-      #VGRID_COMPILER=intel13sp1u2
       VGRID_COMPILER=intel2016
-      #VGRID_COMPILER=gcc-5.1.0
-      #VGRID_COMPILER=gcc-4.9.1
-      #VGRID_COMPILER=pgi17.10
-      #VGRID_COMPILER=pgi1401
-      if [ ${VGRID_COMPILER} == intel13sp1u2 ];then
-         #MY_FFLAGS="-C -g -O0 -lefence"
-         #MY_CFLAGS="-g -O0 -lefence"
-         HPCS_BASE=hpcs/201402/02/base
-         HPCS_COMP=hpcs/201402/02/${VGRID_COMPILER}
-         RPN_LIB=rpn/libs/15.2
-         export SHARED_RNM_EXT=_015.2	 
-        . ssmuse-sh -d ${HPCS_BASE} -d ${HPCS_COMP} -d ${RPN_LIB}
-	export MY_FFLAGS="-openmp -fp-model source -warn all ${MY_FFLAGS}"
-        export MY_CFLAGS="-openmp -fp-model precise -w3 ${MY_CFLAGS}"
-      elif [ ${VGRID_COMPILER} == intel2016 ];then
-         # Must use -O1 with intel2016
+      if [ ${VGRID_COMPILER} == intel2016 ];then
          HPCS_BASE=/ssm/net/hpcs/201402/04/base
          HPCS_COMP=/ssm/net/hpcs/exp/intel2016/01
-         RPN_LIB=rpn/libs/16.2
          export SHARED_RNM_EXT=_016.2
          . r.load.dot ${HPCS_BASE} ${HPCS_COMP}
 	 . r.load.dot rpn/libs/16.2 
+	 TEMPO=$(s.locate --lib rmnshared)
+	 export RPN_SHARED_LIB=${TEMPO%/*}
          export MY_FFLAGS="-openmp -fp-model source  -warn all ${MY_FFLAGS}"
          export MY_CFLAGS="-openmp -fp-model precise -w3 ${MY_CFLAGS}"
      elif [ ${VGRID_COMPILER} == gcc-4.9.1 ];then
@@ -112,20 +81,8 @@ case "${ORDENV_PLAT}" in
          echo "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR"
          echo "Compiler not supported: " ${VGRID_COMPILER}
       fi
-      export RPN_LIB
       export SHARED_RNM_SSM_PREF=/ssm/net/
       export SHARED_COMP_rpath=${INTELCOMP_HOME}/lib/intel64
-      :;;
-
-   aix-7.1-ppc7-64)
-      r.use gmake as make
-      export BH_MODE=xlf13
-      HPCS_BASE=hpcs/201402/02/base
-      HPCS_COMP=hpcs/ext/xlf_13.1.0.10
-      RPN_LIB=rpn/libs/15.2
-      export MY_FFLAGS="${MY_FFLAGS}"
-      export MY_CFLAGS="${MY_FFLAGS}"
-      . ssmuse-sh -d ${HPCS_BASE} -d ${HPCS_COMP} -d ${RPN_LIB}
       :;;
 
    "") echo "ERROR: variable ORDENV_PLAT not set"
