@@ -42,7 +42,7 @@ ssm:
 	../bh_vgrid.py -p $(ORDENV_PLAT) -m $(BH_MODE) -v BH_PULL_SOURCE=$(PWD)/.. -v BH_PULL_SOURCE_GIT_BRANCH=$(BH_PULL_SOURCE_GIT_BRANCH) -v BH_PACKAGE_VERSION=$(BH_PULL_SOURCE_GIT_BRANCH)-$(COMP_ARCH) --local ;\
 
 clean:
-	rm -f *.o *.mod ;\
+	rm -f *.o *.mod dependencies.mk;\
 
 clean_ssm: clean_bh
 	rm -f *.ssm ;\

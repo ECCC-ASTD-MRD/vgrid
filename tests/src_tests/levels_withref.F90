@@ -52,6 +52,18 @@ program level_withref_5001
   ier=chek_levels_withref('data/dm_5002_from_model_run_ig4_ip1_link','')
   if(ier==VGD_ERROR)stat=VGD_ERROR
 
+  ier=chek_levels_withref('data/dm_21001_from_model_run_NON_SLEVE','')
+  if(ier==VGD_ERROR)stat=VGD_ERROR
+
+  ier=chek_levels_withref('data/dm_21001_from_model_run_SLEVE','')
+  if(ier==VGD_ERROR)stat=VGD_ERROR
+
+  ier=chek_levels_withref('data/dm_21002_from_model_run_NON_SLEVE','')
+  if(ier==VGD_ERROR)stat=VGD_ERROR
+
+  ier=chek_levels_withref('data/dm_21002_from_model_run_SLEVE','')
+  if(ier==VGD_ERROR)stat=VGD_ERROR
+
   call ut_report(stat,'Grid_Descriptors, vgd_new')
 
 end program level_withref_5001
@@ -61,7 +73,7 @@ end program level_withref_5001
 
 integer function chek_levels_withref(F_fst,F_ips) result(status)
 
-   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_putopt,vgd_levels,vgd_get,vgd_free,VGD_ERROR,VGD_OK
+   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_putopt,vgd_levels,vgd_get,vgd_free,VGD_ERROR,VGD_OK, VGD_NO_REF_NOMVAR
    
 
    implicit none  
@@ -77,9 +89,9 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
    integer :: ier,fstinl,fstprm,fstinf,fstluk,infon,i,j,k
    real, dimension(:,:,:), pointer :: pres
    real(kind=8), dimension(:,:,:), pointer :: pres_8
-   real, dimension(:,:), pointer :: p0,px
-   real(kind=8), dimension(:,:), pointer :: p0_8
-   real :: epsilon=5.0e-6,pppp
+   real, dimension(:,:), pointer :: p0, p0ls,px
+   real(kind=8), dimension(:,:), pointer :: p0_8, p0ls_8
+   real :: epsilon=5.0e-4,pppp, factor
    integer, dimension(:), pointer :: ip1s
    logical :: ok
    ! Variable for fstprm, sorry...
@@ -87,14 +99,14 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
         ig2, ig3, ig4, ip1, ip2, ip3, iun, key, lng, nbits,&
         ni,  nj, nk, npak, npas, swa, ubc
    character(len=12) :: etiket
-   character(len=4)  :: nomvar, rfld
+   character(len=4)  :: nomvar, rfld, nomvar_metric
    character(len=2)  :: typvar
    character(len=1)  :: grtyp, ctype, dummy_S
-   logical :: rewrit
+   logical :: rewrit, sfc_field_ls_L
 
    status=VGD_ERROR   
 
-   nullify(pres, pres_8, p0, px, p0_8, ip1s)
+   nullify(pres, pres_8, p0, p0ls, px, p0_8, p0ls_8, ip1s)
 
    ier=vgd_putopt('ALLOW_RESHAPE',.true.)
 
@@ -140,10 +152,12 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
       ip1s(k)=ip1
    end do
 
+   sfc_field_ls_L=.false.
    call convip(ip1,pppp,kind,-1,dummy_S,.false.)
    if(kind .eq. 2)then
       ! pressure levels do not have reference surface fields
-      allocate(p0(ni,nj),px(ni,nj))
+      allocate(p0(ni,nj),px(ni,nj),p0ls(ni,nj))
+      factor = 100.
       p0=0.
    else
       ier = vgd_get(vgd,'RFLD',rfld)
@@ -151,31 +165,44 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
          print*,'(Test) Problem with vgd_get "RFLD" for file ',F_fst
          return
       endif
-      if(trim(rfld) /= "P0")then
-         print*,'(Test) Problem with vgd_get RFLD, did not get "P0", got "',rfld,'"'
-         stop
-      endif
-
-!rfld="P0"
-!if(trim(rfld) /= "P0")then
-!   print*,'ERROR rfld devrait egaler P0'
-!   stop
-!endif
-
       key = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',rfld)
-      allocate(p0(ni,nj),px(ni,nj))
+      allocate(p0(ni,nj),px(ni,nj),p0ls(ni,nj))
       ier = fstluk(p0,key,ni,nj,nk)
       if(ier.lt.0)then
-         print*,'(Test) Problem with fstluk on P0'
+         print*,'(Test) Problem with fstluk on ',rfld
          return
       endif
-      p0=p0*100.
+      if(trim(rfld) == "P0")then
+         nomvar_metric = "PX"
+         factor = 100.
+         p0=p0*100.
+      else
+         nomvar_metric = "GZ"
+         factor = 10.
+      endif
+      ier = vgd_get(vgd,'RFLS',rfld,quiet=.true.)
+      if(rfld /= VGD_NO_REF_NOMVAR)sfc_field_ls_L=.true.
+      if(sfc_field_ls_L)then
+         key = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',rfld)
+         ier = fstluk(p0ls,key,ni,nj,nk)
+         if(ier.lt.0)then
+            print*,'(Test) Problem with fstluk on ',rfld
+            return
+         endif
+      else
+         p0ls = 0.
+      endif
    endif
       
-   allocate(p0_8(ni,nj))
+   allocate(p0_8(ni,nj),p0ls_8(ni,nj))
    p0_8=p0
+   p0ls_8=p0ls
    ! Test 32 bits interface
-   ier = vgd_levels(vgd,ip1s,pres,p0)
+   if(sfc_field_ls_L)then
+      ier = vgd_levels(vgd,ip1s,pres,p0,sfc_field_ls=p0ls)
+   else
+      ier = vgd_levels(vgd,ip1s,pres,p0)
+   endif
    if(ier == VGD_ERROR )then
       print*,'(Test) Problem with vgd_levels 32 bits'
       return
@@ -203,17 +230,18 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
          enddo
       endif
       call incdatr(datev,dateo,deet*npas/3600.d0)
-      key=fstinf(lu,ni,nj,nk,datev,' ',ip1,ip2,-1,typvar,'PX')     
+      key=fstinf(lu,ni,nj,nk,datev,' ',ip1,ip2,-1,typvar,nomvar_metric)     
       ier = fstluk(px,key,ni,nj,nk)
+      px = px * factor
       if(ier.lt.0)then
          print*,'(Test) Problem with fstinf on PX, ip1=',ip1
          return
       endif
       do j=1,nj
          do i=1,ni
-            if(abs((px(i,j)-pres(i,j,k)/100.)/px(i,j))>epsilon)then
+            if(abs((px(i,j)-pres(i,j,k))/px(i,j))>epsilon)then
                print*,'(Test) 32 bits: Difference in pressure is too large at'
-               print*,'i,j,k,px(i,j),pres(i,j,k)/100.',i,j,k,px(i,j),pres(i,j,k)/100.
+               print*,'i,j,k,px(i,j),pres(i,j,k)',i,j,k,px(i,j),pres(i,j,k)
                return
             endif
          enddo
@@ -221,7 +249,11 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
    enddo
 
    ! Test 64 bits interface
-   ier = vgd_levels(vgd,ip1s,pres_8,p0_8)
+   if(sfc_field_ls_L)then
+      ier = vgd_levels(vgd,ip1s,pres_8,p0_8,sfc_field_ls=p0ls_8)
+   else
+      ier = vgd_levels(vgd,ip1s,pres_8,p0_8)
+   endif
    if(ier == VGD_ERROR )then
       print*,'(Test) Problem with vgd_levels 64 bits'
       return
@@ -249,17 +281,18 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
          enddo
       endif
       call incdatr(datev,dateo,deet*npas/3600.d0)
-      key=fstinf(lu,ni,nj,nk,datev,' ',ip1,ip2,-1,typvar,'PX')     
+      key=fstinf(lu,ni,nj,nk,datev,' ',ip1,ip2,-1,typvar,nomvar_metric)     
       ier = fstluk(px,key,ni,nj,nk)
+      px = px * factor
       if(ier.lt.0)then
          print*,'(Test) Problem with fstinf on PX, ip1=',ip1
          return
       endif
       do j=1,nj
          do i=1,ni
-            if(abs((px(i,j)-pres_8(i,j,k)/100.d0)/px(i,j))>epsilon)then
+            if(abs((px(i,j)-pres_8(i,j,k))/px(i,j))>epsilon)then
                print*,'(Test) 64 bits: Difference in pressure is too large at'
-               print*,'i,j,k,px(i,j),pres_8(i,j,k)/100.d0',i,j,k,px(i,j),pres_8(i,j,k)/100.d0
+               print*,'i,j,k,px(i,j),pres_8(i,j,k)',i,j,k,px(i,j),pres_8(i,j,k)
                return
             endif
          enddo
