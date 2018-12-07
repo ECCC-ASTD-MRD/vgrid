@@ -1441,12 +1441,14 @@ contains
      return
   end function levels_withref
 
-  integer function levels_withref_8(self,ip1_list,levels,sfc_field,in_log) result(status)
+  integer function levels_withref_8(self,ip1_list,levels,sfc_field,in_log, &
+       sfc_field_ls) result(status)
       ! Given referent, compute physical levelling information from the vertical description
       type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
       integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
       real(kind=8), dimension(:,:,:), pointer :: levels                   !Physical level values
       real(kind=8), dimension(:,:), optional, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
+      real(kind=8), dimension(:,:), optional, intent(in) :: sfc_field_ls  !Surface field large scale reference for coordinate [none]
       logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]
 
       ! Local variables
@@ -1482,11 +1484,22 @@ contains
       else
          my_sfc_field = VGD_MISSING
       endif
+      if (present(sfc_field_ls)) then
+         if( size(sfc_field_ls,dim=1) /= ni .or. size(sfc_field_ls,dim=2) /= nj )then
+            write(for_msg,*) 'in levels_withref_8, size of sfc_field_ls not the same as sfc_field'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            return
+         endif
+      endif
       my_in_log = .false.
       if (present(in_log)) my_in_log = in_log
       
       ! Wrap call to level calculator
-      status=diag_withref_8(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log)
+      if( present(sfc_field_ls) )then
+         status=diag_withref_8(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log,sfc_field_ls=sfc_field_ls)
+      else
+         status=diag_withref_8(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log)
+      endif
       deallocate(my_sfc_field)
       return
    end function levels_withref_8
