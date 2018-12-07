@@ -1,0 +1,117 @@
+      use vgrid_utils, only: get_allocate
+      ! Given referent, compute physical levelling information from the vertical description
+      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
+      integer, target, dimension(:), intent(in) :: ip1_list               !Key of prototype field
+      real(kind=REAL_KIND), dimension(:,:,:), pointer :: levels                   !Physical level values
+      real(kind=REAL_KIND), dimension(:,:), optional, target, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
+      real(kind=REAL_KIND), dimension(:,:), optional, target, intent(in) :: sfc_field_ls  !Surface field large scale reference for coordinate [none]
+      logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]
+      logical, optional, intent(in) :: dpidpis                    !Compute partial derivative of hydrostatic pressure (pi) with
+      !   respect to surface hydrostatic pressure(pis) [.false.]
+      
+      ! Local variables
+      integer istat,ni,nj,nk,error
+      type (c_ptr) :: ip1_list_CP ,levels_CP ,sfc_field_CP, sfc_field_ls_CP
+      integer :: in_log_int, dpidpis_int
+      logical :: my_dpidpis
+
+      ! Set error status
+      status = VGD_ERROR
+      
+      if(.not.is_valid(self,'SELF'))then
+         write(for_msg,*) 'vgrid structure is not valid in diag_withref'//PROC_SUFF
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+         return
+      endif
+      
+      ! Set default values
+      in_log_int = 0
+      if (present(in_log))then
+         if(in_log)then
+            in_log_int = 1
+         else
+            in_log_int = 0
+         endif
+      endif
+      my_dpidpis=.false.
+      if(present(dpidpis))my_dpidpis=dpidpis
+      dpidpis_int = 0
+      if(my_dpidpis)then
+         dpidpis_int = 1
+      else
+         dpidpis_int = 0
+      endif
+      
+      if (present(sfc_field)) then
+         ni = size(sfc_field,dim=1); nj = size(sfc_field,dim=2); nk = size(ip1_list)
+      else
+         if (is_valid(self,"ref_name_valid")) then
+            write(for_msg,*) 'reference field must be provided to diag_withref'//PROC_SUFF
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            return
+         else
+            ni = 1; nj = 1; nk = size(ip1_list)
+         endif
+      endif
+      
+      if (present(sfc_field_ls)) then
+         if(  ni /= size(sfc_field_ls,dim=1) .or. &
+              nj /= size(sfc_field_ls,dim=2) )then
+            write(for_msg,*) 'reference large scale field is not of same size has reference field'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            return
+         endif
+      else
+         if (is_valid(self,"ref_namel_valid") .and. .not. my_dpidpis) then
+            write(for_msg,*) 'reference large scale field must be provided to diag_withref'//PROC_SUFF
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            return
+         endif
+      endif
+      if (associated(levels)) then
+         if (size(levels,dim=1) /= ni .or. size(levels,dim=2) /= nj .or. size(levels,dim=3) /= nk) then
+            if(ALLOW_RESHAPE)then
+               write(for_msg,*) 'Levels array size error - will be reallocated'
+               call msg(MSG_WARNING,VGD_PRFX//for_msg)
+               deallocate(levels)
+            else
+               write(for_msg,*) 'Levels array size error - will not reallocate since ALLOW_RESHAPE is set to false'
+               call msg(MSG_ERROR,VGD_PRFX//for_msg)
+               return
+            endif
+         endif
+      endif
+      if(.not. associated(levels) )then
+         allocate(levels(ni,nj,nk),stat=error)
+         if (error /= 0) then
+            write(for_msg,*) 'cannot allocate space for levels in diag_withref'//PROC_SUFF
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            return
+         endif
+      endif
+      
+      ip1_list_CP  = c_loc(ip1_list)
+      levels_CP    = c_loc(levels(1,1,1))
+      sfc_field_CP = C_NULL_PTR
+      if (present(sfc_field)) sfc_field_CP = c_loc(sfc_field(1,1))
+      sfc_field_ls_CP = C_NULL_PTR
+      if (present(sfc_field_ls)) sfc_field_ls_CP = c_loc(sfc_field_ls(1,1))
+#if defined(REAL_8)
+      istat = f_diag_withref_8(self%cptr,ni,nj,nk,ip1_list_CP,levels_CP,sfc_field_CP,sfc_field_ls_CP,in_log_int,dpidpis_int)
+#else
+      istat = f_diag_withref(self%cptr,ni,nj,nk,ip1_list_CP,levels_CP,sfc_field_CP,sfc_field_ls_CP,in_log_int,dpidpis_int)
+#endif      
+      if (istat /= VGD_OK) then
+         if(my_dpidpis)then
+            write(for_msg,*) 'error computing dpidpis in diag_withref'//PROC_SUFF
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         else
+            write(for_msg,*) 'error computing pressure in diag_withref'//PROC_SUFF
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         endif
+         return
+      endif
+
+      ! Set status and return
+      status = VGD_OK
+      return

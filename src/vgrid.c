@@ -1102,7 +1102,7 @@ static int C_compute_heights_0001_8(vgrid_descriptor *self, int ni, int nj, int 
   char proc_name[] = "C_compute_heights_0001_8";
 #define REAL_8 1
 #include "BODY_C_compute_heights_0001.hc"
-#undef REAL_8 
+#undef REAL_8
 }
 
 static int C_compute_heights_0001(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels) {
