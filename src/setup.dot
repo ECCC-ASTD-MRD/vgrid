@@ -13,7 +13,7 @@ else
    # We are outside of EC env
    # We suppose we are in rmnlib-install env see https://github.com/mfvalin/rmnlib-install
    . r.load.dot dev/gfortran
-   . r.load.dot ssm-domains-base/lib
+   . r.load.dot dev/base
    . ./setup_generic.dot
 fi
 
