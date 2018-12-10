@@ -22,7 +22,6 @@ else
    fi
    if [ "${EC_ARCH}" != "" ];then
       . r.load.dot dev/gfortran
-      . r.load.dot dev/base
       . ./setup_generic.dot
    fi
 fi
