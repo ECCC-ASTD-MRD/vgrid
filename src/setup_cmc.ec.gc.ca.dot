@@ -5,11 +5,11 @@ case "${ORDENV_PLAT}" in
    ubuntu-14.04-amd64-64)
       export BH_MODE=intel
       VGRID_COMPILER=intel2016
+      #VGRID_COMPILER=gcc-4.9.1
       if [ ${VGRID_COMPILER} == intel2016 ];then
          HPCS_BASE=/ssm/net/hpcs/201402/04/base
          HPCS_COMP=/ssm/net/hpcs/exp/intel2016/01
-         export SHARED_RNM_EXT=_016.2
-         . r.load.dot ${HPCS_BASE} ${HPCS_COMP}
+         . r.load.dot ${HPCS_BASE} ${HPCS_COMP}	 
 	 . r.load.dot rpn/libs/16.2 
 	 TEMPO=$(s.locate --lib rmnshared)
 	 export RPN_SHARED_LIB=${TEMPO%/*}
@@ -81,8 +81,6 @@ case "${ORDENV_PLAT}" in
          echo "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR"
          echo "Compiler not supported: " ${VGRID_COMPILER}
       fi
-      export SHARED_RNM_SSM_PREF=/ssm/net/
-      export SHARED_COMP_rpath=${INTELCOMP_HOME}/lib/intel64
       :;;
 
    "") echo "ERROR: variable ORDENV_PLAT not set"

@@ -12,40 +12,35 @@ case "${ORDENV_PLAT}" in
       HPCS_BASE=/fs/ssm/hpco/tmp/eccc/201402/03/base
       HPCS_COMP=/fs/ssm/hpco/exp/intel-2016.1.156
       HPCS_CODE_TOOL=/fs/ssm/hpco/exp/jdm536/code-tools/code-tools_2.0_all
-      RPN_LIB=/fs/ssm/eccc/mrd/rpn/libs/16.2
       BH_PACKAGE=/fs/ssm/hpco/exp/bh/bh_0.17_all
       export MY_FFLAGS="-openmp -fp-model source -warn all ${MY_FFLAGS}"
       export MY_CFLAGS="-openmp -fp-model precise -w3 ${MY_CFLAGS}"
       . ssmuse-sh -d ${HPCS_BASE} -d ${HPCS_COMP} -p ${HPCS_CODE_TOOL}
       . ssmuse-sh -p ${BH_PACKAGE}
-      . r.load.dot ${RPN_LIB}
+      . r.load.dot /fs/ssm/eccc/mrd/rpn/libs/16.2
       TEMPO=$(s.locate --lib rmnshared)
       export RPN_SHARED_LIB=${TEMPO%/*}
       :;;
 
    sles-11-haswell-64-xc40)
-      BH_HOST=hare
-      BH_MODE=intel
+      export BH_MODE=intel
       BH_PACKAGE=/fs/ssm/hpco/exp/bh/bh_0.17_all
-      RPN_LIB=/fs/ssm/eccc/mrd/rpn/libs/16.2
       export MY_FFLAGS="-openmp -fp-model source -warn all ${MY_FFLAGS}"
       export MY_CFLAGS="-openmp -fp-model precise -w3 ${MY_CFLAGS}"
       . ssmuse-sh -p ${BH_PACKAGE}
-      . r.load.dot ${RPN_LIB}
+      . r.load.dot /fs/ssm/eccc/mrd/rpn/libs/16.2
       TEMPO=$(s.locate --lib rmnshared)
       export RPN_SHARED_LIB=${TEMPO%/*}
       :;;
    sles-11-broadwell-64-xc40)
       # Pour obtenir l'architecture broadwell faire :
       # . r.env.dot --arch sles-11-broadwell-64-xc40
-      BH_HOST=hare
-      BH_MODE=intel
+      export BH_MODE=intel
       BH_PACKAGE=/fs/ssm/hpco/exp/bh/bh_0.17_all
-      RPN_LIB=/fs/ssm/eccc/mrd/rpn/libs/16.2
       export MY_FFLAGS="-openmp -fp-model source -warn all ${MY_FFLAGS}"
       export MY_CFLAGS="-openmp -fp-model precise -w3 ${MY_CFLAGS}"
       . ssmuse-sh -p ${BH_PACKAGE}
-      . r.load.dot ${RPN_LIB}
+      . r.load.dot /fs/ssm/eccc/mrd/rpn/libs/16.2
       TEMPO=$(s.locate --lib rmnshared)
       export RPN_SHARED_LIB=${TEMPO%/*}
       :;;
