@@ -1,4 +1,3 @@
-set -e
 if [ ${0} = ${0##*/} -o ${0} = ./${0##*/} ];then
    echo "Run script with full path"
    exit 1

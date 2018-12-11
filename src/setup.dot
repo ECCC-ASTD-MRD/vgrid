@@ -7,7 +7,7 @@ unset MY_FFLAGS MY_CFLAGS
 
 if [ "$(hostname -d)" = cmc.ec.gc.ca ];then
    . ./setup_cmc.ec.gc.ca.dot
-elif [ "$(hostname -d)" = science.gc.ca -o $ORDENV_PLAT = sles-11-haswell-64-xc40 -o $ORDENV_PLAT = sles-11-broadwell-64-xc40 ];then
+elif [ "$(hostname -d)" = science.gc.ca -o "$ORDENV_PLAT" = sles-11-haswell-64-xc40 -o "$ORDENV_PLAT" = sles-11-broadwell-64-xc40 ];then
    . ./setup_science.gc.ca.dot
 else
    # We are outside of EC env
