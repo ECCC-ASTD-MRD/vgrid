@@ -66,7 +66,7 @@ program stda76_hgts_from_pres
   ! Data for control is produce by tests c_stda76_hgts_from_pres_list
   open(unit=11, file="data/c_stda76_hgts_from_pres.txt", &
        status='OLD')
-  read(11,'(4x,i)')nl
+  read(11,'(4x,i8)')nl
   if(nl /= size(pres))then
      print*,'In tests, size problem'
      call exit(1)
