@@ -47,7 +47,9 @@ module vGrid_Descriptors
    public :: vgd_write                           !write coordinates to a file
    public :: vgd_levels                          !compute physical level information
    public :: vgd_dpidpis                         !compute pressure derivative with respesct the sfc pressure
-   public :: vgd_stda76        !Get standard atmosphere 1976 variable for a given coordinate
+   public :: vgd_standard_atmosphere_1976   !Get standard atmosphere 1976 variable for a given coordinate
+                                            ! Kept only for backward compatibility with vgrid 6.3
+   public :: vgd_stda76                     !Get standard atmosphere 1976 variable for a given coordinate
    public :: vgd_stda76_pres_from_hgts_list ! Get standard atmosphere 1976 pressure in Pa from a height list in m
    public :: vgd_stda76_hgts_from_pres_list ! Get standard atmosphere 1976 heights in m from a pressure list in Pa
    public :: operator(==)                        !overload equivalence operator
@@ -1984,7 +1986,30 @@ contains
     status = VGD_OK
 
  end function get_ref
-  
+
+ integer function vgd_standard_atmosphere_1976(self, ip1s, val, var, sfc_temp, sfc_pres) result(status)
+    ! Kept only for backward compatibitity with vgrid 6.3
+    type(vgrid_descriptor), intent(in) :: self         !Vertical descriptor instance
+    integer, dimension(:), target, intent(in) :: ip1s  !ip1 list to get value for
+    real, dimension(:), pointer, intent(inout) :: val  !Standard Atmosphere 1976 value for ip1s
+    character(len=*), intent(in) :: var                !Variable name to get valid choice are "TEMPERATURE", "PRESSURE"
+    real, optional, target, intent(in) :: sfc_temp     !Use this surface temperature for standard atmosphere
+    real, optional, target, intent(in) :: sfc_pres     !Use this surface pressure for standard atmosphere
+    ! Local variables
+    if(present(sfc_temp) .and. present(sfc_pres))then
+       status=vgd_stda76(self, ip1s, val, var, sfc_temp=sfc_temp, sfc_pres=sfc_pres)
+       return
+    endif
+    if(present(sfc_temp))then
+       status=vgd_stda76(self, ip1s, val, var, sfc_temp=sfc_temp)
+       return
+    endif
+    if(present(sfc_pres))then
+       status=vgd_stda76(self, ip1s, val, var, sfc_pres=sfc_pres)
+       return
+    endif       
+ end function vgd_standard_atmosphere_1976
+ 
  integer function vgd_stda76(self, ip1s, val, var, sfc_temp, sfc_pres) result(status)
    use vgrid_utils, only: get_allocate, up
    type(vgrid_descriptor), intent(in) :: self         !Vertical descriptor instance
