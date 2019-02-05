@@ -65,7 +65,7 @@ end program stda76
 !=========================================================================
 !=========================================================================
 integer function stda_do_it(lu,file) result(status)
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_stda76,VGD_OK,VGD_ERROR
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_stda76,vgd_standard_atmosphere_1976,VGD_OK,VGD_ERROR
   implicit none
   integer :: lu
   character(len=*) :: file
@@ -95,43 +95,94 @@ integer function stda_do_it(lu,file) result(status)
      return
   endif
   if( vgd_get(vgd, "VIPT", ip1s) ==  VGD_ERROR )then
-     print*,"ERROR with Cvgd_get_int for VIPT"
+     print*,"ERROR with vgd_get for VIPT"
      return
   end if
+  !==============================
   print*,"   Testing temperature"
+  !------------------------------
   if( vgd_stda76(vgd, ip1s, temp, 'TEMPERATURE') == VGD_ERROR )then
-     print*,"In test : ERROR with Cvgd_stda76_temp"
+     print*,"In test : ERROR with vgd_stda76_temp on TEMPERATURE"
      return
   endif
   if( compare(file, "_stda76_temp.txt", ip1s, temp, size(ip1s)) == VGD_ERROR )then
+     print*,"In test : ERROR on values with vgd_stda76_temp on TEMPERATURE"
      return
   endif
+  ! Testing compatibility wrapper
+  if( vgd_standard_atmosphere_1976(vgd, ip1s, temp, 'TEMPERATURE') == VGD_ERROR )then
+     print*,"In test : ERROR with vgd_standard_atmosphere_1976 on TEMPERATURE"
+     return
+  endif
+  if( compare(file, "_stda76_temp.txt", ip1s, temp, size(ip1s)) == VGD_ERROR )then
+     print*,'ERROR on values with vgd_standard_atmosphere_1976 on TEMPERATURE'
+     return
+  endif
+
   ier = vgd_get(vgd, "RFLD", nomvar)
   if( trim(nomvar) == "ME" ) then
+     !===========================
      print*,"   Testing pressure"
+     !---------------------------
      if( vgd_stda76(vgd, ip1s, pres, 'PRESSURE') == VGD_ERROR )then
-        print*,"In test : ERROR with Cvgd_stda76_pres"
+        print*,"In test : ERROR with vgd_stda76 on PRESSURE with hgts"
         return
      endif
      if( compare(file, "_stda76_pres.txt", ip1s, pres, size(ip1s)) == VGD_ERROR )then
+        print*,"In test : ERROR on values with vgd_stda76 on PRESSURE with hgts"
         return
      endif
+     ! Testing compatibility wrapper
+     if( vgd_standard_atmosphere_1976(vgd, ip1s, pres, 'PRESSURE') == VGD_ERROR )then
+        print*,"In test : ERROR with vgd_standard_atmosphere_1976 on PRESSURE with hgts"
+        return
+     endif
+     if( compare(file, "_stda76_pres.txt", ip1s, pres, size(ip1s)) == VGD_ERROR )then
+        print*,"In test : ERROR on values with vgd_standard_atmosphere_1976 on PRESSURE with hgts"
+        return
+     endif
+     
+     !============================================
      print*,"   Testing pressure, option sfc_pres"
+     !--------------------------------------------
      if( vgd_stda76(vgd, ip1s, pres, 'PRESSURE', sfc_pres=100000.) == VGD_ERROR )then
-        print*,"In test : ERROR with Cvgd_stda76_pres"
+        print*,"In test : ERROR with vgd_stda76 on PRESSURE with hgts with sfc_pres"
         return
      endif
      if( compare(file, "_stda76_pres_sfc_pres_100000.txt", ip1s, pres, size(ip1s)) == VGD_ERROR )then
+        print*,"In test : ERROR values with vgd_stda76 on PRESSURE with hgts with sfc_pres"
         return
      endif
+     ! Testing compatibility wrapper
+      if( vgd_standard_atmosphere_1976(vgd, ip1s, pres, 'PRESSURE', sfc_pres=100000.) == VGD_ERROR )then
+        print*,"In test : ERROR with vgd_standard_atmosphere_1976 on PRESSURE with hgts with sfc_pres"
+        return
+     endif
+     if( compare(file, "_stda76_pres_sfc_pres_100000.txt", ip1s, pres, size(ip1s)) == VGD_ERROR )then
+        print*,"In test : ERROR on values with vgd_standard_atmosphere_1976 on PRESSURE with hgts with sfc_pres"
+        return
+     endif
+     !============================================
      print*,"   Testing pressure, option sfc_temp"
+     !--------------------------------------------
      if( vgd_stda76(vgd, ip1s, pres, 'PRESSURE', sfc_temp=273.) == VGD_ERROR )then
-        print*,"In test : ERROR with Cvgd_stda76_pres"
+        print*,"In test : ERROR with vgd_stda76 on PRESSURE with hgts with sfc_temp"
         return
      endif
      if( compare(file, "_stda76_pres_sfc_temp_273.txt", ip1s, pres, size(ip1s)) == VGD_ERROR )then
+        print*,"In test : ERROR on values with vgd_stda76 on PRESSURE with hgts with sfc_temp"
         return
      endif
+     ! Testing compatibility wrapper
+     if( vgd_standard_atmosphere_1976(vgd, ip1s, pres, 'PRESSURE', sfc_temp=273.) == VGD_ERROR )then
+        print*,"In test : ERROR with vgd_standard_atmosphere_1976 on PRESSURE with hgts with sfc_temp"
+        return
+     endif
+     if( compare(file, "_stda76_pres_sfc_temp_273.txt", ip1s, pres, size(ip1s)) == VGD_ERROR )then
+        print*,"In test : ERROR on values with vgd_standard_atmosphere_1976 on PRESSURE with hgts with sfc_temp"
+        return
+     endif
+     
      deallocate(pres)
   endif
   deallocate(ip1s)
