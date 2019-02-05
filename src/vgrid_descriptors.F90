@@ -30,7 +30,7 @@ module vGrid_Descriptors
    ! var_L  is of type logical
    ! var_CP is of type type(c_prt) from iso_c_binging
 
-   use iso_c_binding, only : c_ptr, C_NULL_PTR, C_CHAR, C_NULL_CHAR, c_int, c_associated, c_loc
+   use iso_c_binding, only : c_ptr, C_NULL_PTR, C_CHAR, C_NULL_CHAR, c_int, C_FLOAT, c_associated, c_loc
 
    implicit none
    private
@@ -61,10 +61,9 @@ module vGrid_Descriptors
    logical :: ALLOW_RESHAPE=.false.              ! Allow reshape of class pointer members
    integer, parameter :: KEY_LENGTH=4            !length of key string considered for get/put operations
    character(len=1), dimension(3), parameter :: MATCH_GRTYP=(/'X','Y','Z'/) !grid types with ip1,2 to ig1,2 mapping
-   
-   real, public, protected, bind(C, name="VGD_STDA76_SFC_T") :: &
+   real(C_FLOAT), public, protected, bind(C, name="VGD_STDA76_SFC_T") :: &
         VGD_STDA76_SFC_T = 288.15
-   real, public, protected, bind(C, name="VGD_STDA76_SFC_P") :: &
+   real(C_FLOAT), public, protected, bind(C, name="VGD_STDA76_SFC_P") :: &
         VGD_STDA76_SFC_P = 101325
    
    ! FST file record structure
