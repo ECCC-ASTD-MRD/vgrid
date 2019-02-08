@@ -11,9 +11,11 @@
       
       ! Local variables
       integer istat,ni,nj,nk,error
+      real(kind=REAL_KIND), dimension(:,:), pointer :: my_sfc_field, my_sfc_field_ls
+      real(kind=REAL_KIND), dimension(:,:,:), pointer :: my_levels 
       type (c_ptr) :: ip1_list_CP ,levels_CP ,sfc_field_CP, sfc_field_ls_CP
       integer :: in_log_int, dpidpis_int
-      logical :: my_dpidpis
+      logical :: my_dpidpis, alloc_my_sfc_field_L, alloc_my_sfc_field_ls_L, alloc_my_levels_L
 
       ! Set error status
       status = VGD_ERROR
@@ -24,7 +26,7 @@
          return
       endif
       
-      ! Set default values
+      ! Set default values      
       in_log_int = 0
       if (present(in_log))then
          if(in_log)then
@@ -42,8 +44,22 @@
          dpidpis_int = 0
       endif
       
+      alloc_my_sfc_field_L = .false.; alloc_my_sfc_field_ls_L = .false.; alloc_my_levels_L = .false.
+
       if (present(sfc_field)) then
          ni = size(sfc_field,dim=1); nj = size(sfc_field,dim=2); nk = size(ip1_list)
+         if(is_contiguous(sfc_field))then
+            my_sfc_field => sfc_field
+         else
+            alloc_my_sfc_field_L = .true.
+            allocate(my_sfc_field(ni,nj),stat=error)
+            if (error /= 0) then
+               write(for_msg,*) 'cannot allocate space for my_sfc_field in diag_withref'//PROC_SUFF
+               call msg(MSG_ERROR,VGD_PRFX//for_msg)
+               return
+            endif
+            my_sfc_field(1:ni,1:nj) = sfc_field(1:ni,1:nj)
+         endif
       else
          if (is_valid(self,"ref_name_valid")) then
             write(for_msg,*) 'reference field must be provided to diag_withref'//PROC_SUFF
@@ -60,6 +76,19 @@
             write(for_msg,*) 'reference large scale field is not of same size has reference field'
             call msg(MSG_ERROR,VGD_PRFX//for_msg)
             return
+         endif
+         if(is_contiguous(sfc_field_ls))then
+            my_sfc_field_ls => sfc_field_ls
+         else
+            alloc_my_sfc_field_ls_L = .true.
+            allocate(my_sfc_field_ls(ni,nj),stat=error)
+            if (error /= 0) then
+               write(for_msg,*) 'cannot allocate space for my_sfc_field_ls in diag_withref'//PROC_SUFF
+               call msg(MSG_ERROR,VGD_PRFX//for_msg)
+               return
+            endif
+            my_sfc_field_ls(1:ni,1:nj) = sfc_field_ls(1:ni,1:nj)
+
          endif
       else
          if (is_valid(self,"ref_namel_valid") .and. .not. my_dpidpis) then
@@ -89,13 +118,24 @@
             return
          endif
       endif
+      if(is_contiguous(levels))then
+         my_levels => levels
+      else
+         alloc_my_levels_L = .true.
+         allocate(my_levels(ni,nj,nk),stat=error)
+         if (error /= 0) then
+            write(for_msg,*) 'cannot allocate space for my_levels in diag_withref'//PROC_SUFF
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            return
+         endif
+      endif
       
       ip1_list_CP  = c_loc(ip1_list)
-      levels_CP    = c_loc(levels(1,1,1))
+      levels_CP    = c_loc(my_levels(1,1,1))
       sfc_field_CP = C_NULL_PTR
-      if (present(sfc_field)) sfc_field_CP = c_loc(sfc_field(1,1))
+      if (present(sfc_field)) sfc_field_CP = c_loc(my_sfc_field(1,1))
       sfc_field_ls_CP = C_NULL_PTR
-      if (present(sfc_field_ls)) sfc_field_ls_CP = c_loc(sfc_field_ls(1,1))
+      if (present(sfc_field_ls)) sfc_field_ls_CP = c_loc(my_sfc_field_ls(1,1))
 #if defined(REAL_8)
       istat = f_diag_withref_8(self%cptr,ni,nj,nk,ip1_list_CP,levels_CP,sfc_field_CP,sfc_field_ls_CP,in_log_int,dpidpis_int)
 #else
@@ -111,7 +151,13 @@
          endif
          return
       endif
-
+      if(alloc_my_sfc_field_L)    deallocate(my_sfc_field)
+      if(alloc_my_sfc_field_ls_L) deallocate(my_sfc_field_ls)
+      if(alloc_my_levels_L)then
+         levels(1:ni,1:nj,1:nk) = my_levels(1:ni,1:nj,1:nk)
+         deallocate(my_levels)
+      end if
+      
       ! Set status and return
       status = VGD_OK
       return
