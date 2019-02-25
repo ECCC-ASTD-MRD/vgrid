@@ -2,6 +2,17 @@
 
 case "${ORDENV_PLAT}" in
 
+     ubuntu-18.04-amd64-64)
+      export BH_MODE=intel
+      . ssmuse-sh -x /fs/ssm/hpco/exp/intelcomp-2019.0.045
+      . ssmuse-sh -x /fs/ssm/hpco/exp/mib002/code-tools-gppf
+      . ssmuse-sh -x /ssm/net/rpn/libs/19.0-beta
+      TEMPO=$(s.locate --lib rmnshared)
+      export RPN_SHARED_LIB=${TEMPO%/*}
+      export MY_FFLAGS="-qopenmp -fp-model source  -warn all ${MY_FFLAGS}"
+      export MY_CFLAGS="-qopenmp -fp-model precise -w3 ${MY_CFLAGS}"
+      :;;
+      
    ubuntu-14.04-amd64-64)
       export BH_MODE=intel
       VGRID_COMPILER=intel2016
@@ -39,6 +50,8 @@ case "${ORDENV_PLAT}" in
 	export GFORTRAN_INCLUDE=/users/dor/armn/bou/ords/RPN_COMM_4.5.16.10/bh_scripts/LIBRMN/librmn-gfortran_016.2_ubuntu-14.04-amd64-64/include/Linux_x86-64/gfortran
 	export GFORTRAN_LIB=/users/dor/armn/bou/ords/RPN_COMM_4.5.16.10/bh_scripts/LIBRMN/librmn-gfortran_016.2_ubuntu-14.04-amd64-64/lib/Linux_x86-64/gfortran
 	MY_FFLAGS=-I${GFORTRAN_INCLUDE}
+
+
 
       elif [ ${VGRID_COMPILER} == pgi1401 ];then
            . ssmuse-sh -d hpcs/201402/02/base -d hpcs/201402/02/pgi1401
