@@ -6,7 +6,7 @@ case "${ORDENV_PLAT}" in
       export BH_MODE=intel
       . ssmuse-sh -x /fs/ssm/hpco/exp/intelcomp-2019.0.045
       . ssmuse-sh -x /fs/ssm/hpco/exp/mib002/code-tools-gppf
-      . ssmuse-sh -x /ssm/net/rpn/libs/19.0-beta
+      . ssmuse-sh -x /ssm/net/rpn/libs/16.3-beta
       TEMPO=$(s.locate --lib rmnshared)
       export RPN_SHARED_LIB=${TEMPO%/*}
       export MY_FFLAGS="-qopenmp -fp-model source  -warn all ${MY_FFLAGS}"
