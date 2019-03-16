@@ -87,16 +87,11 @@ if __name__ == "__main__":
    b.actions.set("package", actions.package.to_ssm)
 
    b.supported_platforms = [
-      "ubuntu-12.04-amd64-64",
       "ubuntu-14.04-amd64-64",
-      "aix-7.1-ppc7-64",
+      "ubuntu-18.04-amd64-64",
    ]
    dr.run(b)
 
-   b.supported_modes = [
-      "intel",
-      "xlf13",
-   ]
 
 # Exemple d'appel:
 #   ./bh_vgrid.py -p ubuntu-12.04-amd64-64 -m intel
