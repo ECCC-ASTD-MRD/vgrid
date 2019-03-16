@@ -7,6 +7,16 @@ export EF_ALLOW_MALLOC_0=1 # Pour eviter les erreur de efence avec 0 byte alloca
 
 case "${ORDENV_PLAT}" in
 
+   ubuntu-18.04-amd64-64)
+      . ssmuse-sh -x hpco/exp/intelcomp-2019.0.045
+      . ssmuse-sh -x /fs/ssm/hpco/exp/mib002/code-tools-gppf
+      . r.load.dot /fs/ssm/eccc/mrd/rpn/libs/16.3-beta
+      TEMPO=$(s.locate --lib rmnshared)
+      export RPN_SHARED_LIB=${TEMPO%/*}
+      export MY_FFLAGS="-qopenmp -fp-model source  -warn all ${MY_FFLAGS}"
+      export MY_CFLAGS="-qopenmp -fp-model precise -w3 ${MY_CFLAGS}"
+      :;;
+
    ubuntu-14.04-amd64-64)
       export BH_MODE=intel
       HPCS_BASE=/fs/ssm/hpco/tmp/eccc/201402/03/base
