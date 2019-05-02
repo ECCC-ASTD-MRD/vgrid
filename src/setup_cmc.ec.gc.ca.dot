@@ -4,9 +4,9 @@ case "${ORDENV_PLAT}" in
 
      ubuntu-18.04-amd64-64)
       export BH_MODE=intel
-      . ssmuse-sh -x /fs/ssm/hpco/exp/intelcomp-2019.0.045
-      . ssmuse-sh -x /fs/ssm/hpco/exp/mib002/code-tools-gppf
-      . r.load.dot /ssm/net/rpn/libs/16.3-beta
+      . ssmuse-sh -x /fs/ssm/hpco/exp/intelpsxe-cluster-19.0.3.199
+      . ssmuse-sh -x /ssm/net/rpn/base/01.0
+      . r.load.dot /ssm/net/rpn/libs/19.0-beta
       TEMPO=$(s.locate --lib rmnshared)
       export RPN_SHARED_LIB=${TEMPO%/*}
       export MY_FFLAGS="-qopenmp -fp-model source  -warn all ${MY_FFLAGS}"
