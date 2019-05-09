@@ -17,7 +17,7 @@ def _make(b):
     b.shell("""
             set -e
             cd ${BH_PULL_SOURCE}
-            REMOTE_NAME=/home/dormrb02/vgrid_testing/.git
+            REMOTE_NAME=/home/sidr000/SSM_pkg_installation/autobuild_sandboxes/autobuild_jeff/vgrid
             REMOTE=$(git remote -v | grep fetch | grep ${REMOTE_NAME} | awk '{print $2}')
             #if [ "${REMOTE}" = "" ];then
             #   echo "ERROR git remote ${REMOTE_NAME} not found"

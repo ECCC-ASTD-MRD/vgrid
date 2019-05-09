@@ -7,10 +7,10 @@ export EF_ALLOW_MALLOC_0=1 # Pour eviter les erreur de efence avec 0 byte alloca
 
 case "${ORDENV_PLAT}" in
 
-   ubuntu-18.04-amd64-64)
-      . ssmuse-sh -x hpco/exp/intelcomp-2019.0.045
-      . ssmuse-sh -x /fs/ssm/hpco/exp/mib002/code-tools-gppf
-      . r.load.dot /fs/ssm/eccc/mrd/rpn/libs/16.3-beta
+   ubuntu-18.04-amd64-64 | ubuntu-18.04-skylake-64)
+      . ssmuse-sh -x /fs/ssm/hpco/exp/intelpsxe-cluster-19.0.3.199
+      . ssmuse-sh -x /fs/ssm/eccc/mrd/rpn/base/01.0
+      . r.load.dot /fs/ssm/eccc/mrd/rpn/libs/19.0-beta
       . r.load.dot /fs/ssm/hpco/exp/bh/bh_0.17_all
       TEMPO=$(s.locate --lib rmnshared)
       export RPN_SHARED_LIB=${TEMPO%/*}
