@@ -38,6 +38,8 @@ module vGrid_Descriptors
    ! Public methods
    public :: vgrid_descriptor                    !vertical grid descriptor structure
    public :: vgd_free                            !class destructor
+   public :: vgd_nullify                         !nullify vgrid C pointer
+   public :: vgd_associated                      !status of vgrid C pointer
    public :: vgd_get                             !get instance variable value
    public :: vgd_put                             !set instance variable value
    public :: vgd_new                             !class constructor
@@ -2103,5 +2105,29 @@ contains
    return
 
  end function vgd_stda76_hgts_from_pres_list
+
+   subroutine vgd_nullify(F_vgd)
+      implicit none
+      !@arguments
+      type(vgrid_descriptor),intent(out) :: F_vgd
+      !*@/
+      !---------------------------------------------------------------
+      F_vgd%cptr = C_NULL_PTR
+      !---------------------------------------------------------------
+      return
+   end subroutine vgd_nullify
+
+   function vgd_associated(F_vgd) result(F_istat_L)
+      implicit none
+      !@arguments
+      type(vgrid_descriptor),intent(in) :: F_vgd
+      !@returns
+      logical :: F_istat_L
+      !*@/
+      !---------------------------------------------------------------
+      F_istat_L = c_associated(F_vgd%cptr)
+      !---------------------------------------------------------------
+      return
+   end function vgd_associated
 
 end module vGrid_Descriptors

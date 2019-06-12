@@ -47,10 +47,17 @@
       alloc_my_sfc_field_L = .false.; alloc_my_sfc_field_ls_L = .false.; alloc_my_levels_L = .false.
 
       if (present(sfc_field)) then
+
          ni = size(sfc_field,dim=1); nj = size(sfc_field,dim=2); nk = size(ip1_list)
+
+#ifdef WITH_intel
+!        is_contiguous is not Fortran 2008 standard but Intel
          if(is_contiguous(sfc_field))then
             my_sfc_field => sfc_field
          else
+#endif
+
+!        Copy in and out 
             alloc_my_sfc_field_L = .true.
             allocate(my_sfc_field(ni,nj),stat=error)
             if (error /= 0) then
@@ -59,7 +66,11 @@
                return
             endif
             my_sfc_field(1:ni,1:nj) = sfc_field(1:ni,1:nj)
-         endif
+
+#ifdef WITH_intel
+         endif 
+#endif
+
       else
          if (is_valid(self,"ref_name_valid")) then
             write(for_msg,*) 'reference field must be provided to diag_withref'//PROC_SUFF
@@ -77,9 +88,14 @@
             call msg(MSG_ERROR,VGD_PRFX//for_msg)
             return
          endif
+
+#ifdef WITH_intel
+!        is_contiguous is not Fortran 2008 standard but Intel
          if(is_contiguous(sfc_field_ls))then
             my_sfc_field_ls => sfc_field_ls
          else
+#endif
+!        Copy in and out instead
             alloc_my_sfc_field_ls_L = .true.
             allocate(my_sfc_field_ls(ni,nj),stat=error)
             if (error /= 0) then
@@ -89,7 +105,9 @@
             endif
             my_sfc_field_ls(1:ni,1:nj) = sfc_field_ls(1:ni,1:nj)
 
+#ifdef WITH_intel
          endif
+#endif
       else
          if (is_valid(self,"ref_namel_valid") .and. .not. my_dpidpis) then
             write(for_msg,*) 'reference large scale field must be provided to diag_withref'//PROC_SUFF
@@ -118,9 +136,14 @@
             return
          endif
       endif
+
+#ifdef WITH_intel
+!        is_contiguous is not Fortran 2008 standard but Intel
       if(is_contiguous(levels))then
          my_levels => levels
       else
+#endif
+!        Copy in and out instead
          alloc_my_levels_L = .true.
          allocate(my_levels(ni,nj,nk),stat=error)
          if (error /= 0) then
@@ -128,7 +151,10 @@
             call msg(MSG_ERROR,VGD_PRFX//for_msg)
             return
          endif
+
+#ifdef WITH_intel
       endif
+#endif
       
       ip1_list_CP  = c_loc(ip1_list)
       levels_CP    = c_loc(my_levels(1,1,1))
