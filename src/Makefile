@@ -1,59 +1,65 @@
+.SUFFIXES:
 
-ifeq ($(BASE_ARCH),$(EC_ARCH))
-   $(info ERROR: please setup the compilation environment by typing the folowing:)
-   $(info . setup.dot or . setup_gpsc.dot)
-   $(error )
-endif
+.SUFFIXES : .o .F90 .c .a .h .hc .hf
 
-ifeq ($(USE_EFENCE),1)
-   LEFENCE=-lefence
-endif
+SHELL = /bin/sh
 
-include version.dot
+!!!FFLAGS =
+FFLAGS="'-C -qopenmp -fp-model source -warn all'"
 
-default: libdescrip.a
+CFLAGS="'-qopenmp -fp-model precise -w3'"
 
-dependencies.mk: *.c *.F90 *.h *.hc
-	ls *.hc *.c *.F90 | ./s.dependencies.pl > dependencies.mk ;\
+SUPP_OPT = -openmp
 
-include dependencies.mk
+OPTIMIZ = 2
+#OPTIMIZ =  1
+#OPTIMIZ =  0
+#OPTIMIZ =  0 -debug
 
-%.o: %.F90
-	s.f90 -c -openmp $(MY_FFLAGS) $(FFLAGS) $(LEFENCE) $<
+MYLIB = libvgrid.a
 
-%.o: %.c
-	s.cc -c -openmp $(MY_CFLAGS) $(CFLAGS) $(LEFENCE) $<
+UPDATEX =
 
-libdescrip.a: $(OBJECTS) dependencies.mk vgrid_version
-	rm -f libdescrip.a && ar scru libdescrip.a *.o ;\
+TARRLS = beta
 
-shared: libdescrip.a
-	if [ $$ORDENV_PLAT != ubuntu-12.04-amd64-64 -a $$ORDENV_PLAT != aix-7.1-ppc7-64 ]; then \
-	   s.f90 -shared -openmp -o libdescripshared.so *.o -lrmnshared -Wl,-rpath,$(RPN_SHARED_LIB);\
-	else \
-	   echo "No shared library on $$ORDENV_PLAT anymore due to new incompatible flag -static-intel";\
-	fi
+.PRECIOUS:
 
-vgrid_version:
-	echo "character(len=128) :: vgrid_descriptors_version = \"VGRID $(BH_PULL_SOURCE_GIT_BRANCH) $(COMP_ARCH) $(ORDENV_PLAT) $(shell date)\"" > vgrid_version.hf ;\
-	echo                "char vgrid_descriptors_version[] = \"VGRID $(BH_PULL_SOURCE_GIT_BRANCH) $(COMP_ARCH) $(ORDENV_PLAT) $(shell date)\";" > vgrid_version.hc ;\
+# It is assumed that the environment makes available makefile_suffix_rules.inc; e.g.
+#     . ssmuse-sh -p /ssm/net/rpn/libs/4.1b/environment-includes_4.3_all
 
-ssm:
-	../bh_vgrid.py -p $(ORDENV_PLAT) -m $(BH_MODE) -v BH_PULL_SOURCE=$(PWD)/.. -v BH_PULL_SOURCE_GIT_BRANCH=$(BH_PULL_SOURCE_GIT_BRANCH) -v BH_PACKAGE_VERSION=$(BH_PULL_SOURCE_GIT_BRANCH)-$(COMP_ARCH) --local ;\
+
+OBJECTS= \
+	VertInterpConstants_90.o VerticalGrid_90.o VerticalInterpolation_90.o 
+OBJECTS= \
+	vgrid.o  vgrid_descriptors.o  vgrid_utils.o  
+
+obj:	$(OBJECTS)
+
+vgrid.o:	vgrid.c \
+	BODY_C_compute_heights_4001.hc  BODY_C_compute_pressure_2001.hc  armnlib.h  BODY_C_compute_pressure_5100.hc  \
+	BODY_Cvgd_diag_withref_2ref.hc BODY_C_compute_pressure_5002_5003_5004_5005.hc  vgrid.h  \
+	BODY_C_compute_heights_0001.hc  BODY_C_compute_pressure_1003_5001.hc  BODY_C_compute_pressure_1001_1002.hc   \
+	BODY_C_compute_heights_21001.hc  
+
+vgrid_descriptors.o:	vgrid_descriptors.F90 \
+	vgrid_utils.o  BODY_F_dpidpis_withref.hf  BODY_F_dpidpis_withref_prof.hf  BODY_F_diag_withref.hf  \
+	BODY_F_levels_withref_prof.hf   BODY_F_levels_withref.hf  BODY_F_diag_withref_prof.hf  vgrid_descriptors.hf  
+
+vgrid_utils.o:	vgrid_utils.F90 vgrid_descriptors.hf  
+
+
+genlib: $(OBJECTS)
+#Creer ou mettre a jour la programmatheque 
+	ar rcv $(MYLIB) $(OBJECTS)
 
 clean:
-	rm -f *.o *.mod dependencies.mk;\
-
-clean_ssm: clean_bh
-	rm -f *.ssm ;\
-
-clean_bh:
-	rm -rf vgriddescriptors vgriddescriptors_*  log-*-*-*-*-* report-*-*-*-*-* work-*-*-*-*-* ;\
-
-distclean: clean
-	rm -f libdescrip.a libdescripshared.so ;\
-
-clean_tilde:
-	rm -f *~ ;\
-
-clean_all: distclean clean_ssm clean_bh clean_tilde
+#Faire le grand menage. On enleve tous les fichiers sources\ninutiles et les .o 
+	-if [ "*.ftn" != "`echo *.ftn`" ] ; \
+	then \
+	for i in *.ftn ; \
+	do \
+	fn=`r.basename $$i '.ftn'`; \
+	rm -f $$fn.f; \
+	done \
+	fi
+	rm -f *.o *.f90 *.mod *.stb  VInterp_*.Abs
