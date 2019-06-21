@@ -934,7 +934,7 @@ contains
        endif
     enddo grids
 
-    call convip (ip1, lev, kind,-1, blk_S, .false.)
+    call convip_plus (ip1, lev, kind,-1, blk_S, .false.)
     ! Create grid descriptor instance and call level calculator
     if (any(MATCH_GRTYP == grtyp)) then
        error = new_read(gd,unit=unit,format='fst',ip1=ig1,ip2=ig2,kind=kind)
