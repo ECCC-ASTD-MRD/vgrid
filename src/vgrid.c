@@ -1149,97 +1149,953 @@ int Cvgd_print_vcode_description(int vcode){
 static int C_compute_heights_0001_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels) {
   char proc_name[] = "C_compute_heights_0001_8";
 #define REAL_8 1
-#include "BODY_C_compute_heights_0001.hc"
+  double *aa_8;
+  int ij, k, ijk, ind;
+
+  aa_8 = malloc(nk*sizeof(double));
+  if(! aa_8 ) {
+    printf("(Cvgd) ERROR in %s, cannot allocate aa_8 of bouble of size %d\n", proc_name, nk);
+    return(VGD_ERROR);
+  }  
+
+  for(k=0; k < nk; k++) {
+    if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_m, self->nl_m) ) != -1 ) {
+      aa_8[k] = self->a_m_8[ind];
+    } else {
+      if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_w, self->nl_w) ) != -1 ) {
+	aa_8[k] = self->a_w_8[ind];
+      } else {
+	printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n", proc_name,ip1_list[k]);
+	free(aa_8);
+	return(VGD_ERROR);	
+      }
+    }
+  }
+
+  for(k=0, ijk=0; k < nk; k++) {
+    for(ij=0; ij < ni*nj; ij++, ijk++) {
+#if defined(REAL_8)
+      levels[ijk] = aa_8[k];
+#else
+      levels[ijk] = (float) aa_8[k];
+#endif
+    }
+  }
+
+  free(aa_8);
+
+  return(VGD_OK);
 #undef REAL_8 
 }
 
 static int C_compute_heights_0001(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels) {
   char proc_name[] = "C_compute_heights_0001";
 #undef REAL_8
-#include "BODY_C_compute_heights_0001.hc"
+  double *aa_8;
+  int ij, k, ijk, ind;
+
+  aa_8 = malloc(nk*sizeof(double));
+  if(! aa_8 ) {
+    printf("(Cvgd) ERROR in %s, cannot allocate aa_8 of bouble of size %d\n", proc_name, nk);
+    return(VGD_ERROR);
+  }  
+
+  for(k=0; k < nk; k++) {
+    if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_m, self->nl_m) ) != -1 ) {
+      aa_8[k] = self->a_m_8[ind];
+    } else {
+      if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_w, self->nl_w) ) != -1 ) {
+	aa_8[k] = self->a_w_8[ind];
+      } else {
+	printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n", proc_name,ip1_list[k]);
+	free(aa_8);
+	return(VGD_ERROR);	
+      }
+    }
+  }
+
+  for(k=0, ijk=0; k < nk; k++) {
+    for(ij=0; ij < ni*nj; ij++, ijk++) {
+#if defined(REAL_8)
+      levels[ijk] = aa_8[k];
+#else
+      levels[ijk] = (float) aa_8[k];
+#endif
+    }
+  }
+
+  free(aa_8);
+
+  return(VGD_OK);
 }
 
 static int C_compute_pressure_1001_1002_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log) {
   char proc_name[] = "C_compute_pressure_1001_1002_8";
 #define REAL_8 1
-#include "BODY_C_compute_pressure_1001_1002.hc"
+  int k,*ind,ij,ijk;
+  double lvl;
+  char message[128];
+
+  strcpy(message,"(Cvgd) ERROR in ");
+  strcat(message,proc_name);
+  strcat(message,", cannot allocate ind of int of size\n");
+
+  if( my_alloc_int(&ind, nk, message) == VGD_ERROR )
+    return(VGD_ERROR);
+  
+  // Find ip1 indexes  
+  for( k = 0; k < nk; ++k ){
+    if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],self->ip1_m,self->nl_m)) == -1 ) {
+      printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n", proc_name, ip1_list[k]);
+      free(ind);
+      return(VGD_ERROR);
+    }    
+  }
+  
+  // Compute pressure
+  for( k = 0, ijk=0; k < nk; ++k ){
+    for( ij = 0; ij < ni*nj; ++ij, ++ijk ){
+      lvl = self->a_m_8[ind[k]] + self->b_m_8[ind[k]] * sfc_field[ij];
+#if defined(REAL_8)
+      levels[ijk] = in_log ? log(lvl) : lvl;
+#else
+      levels[ijk] = (float) (in_log ? log(lvl) : lvl);
+#endif
+    }
+  }
+  free(ind);
+  return(VGD_OK);
 #undef REAL_8 
 }
 
 static int C_compute_pressure_1001_1002(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log) {
   char proc_name[] = "C_compute_pressure_1001_1002";
 #undef REAL_8
-#include "BODY_C_compute_pressure_1001_1002.hc"
+  int k,*ind,ij,ijk;
+  double lvl;
+  char message[128];
+
+  strcpy(message,"(Cvgd) ERROR in ");
+  strcat(message,proc_name);
+  strcat(message,", cannot allocate ind of int of size\n");
+
+  if( my_alloc_int(&ind, nk, message) == VGD_ERROR )
+    return(VGD_ERROR);
+  
+  // Find ip1 indexes  
+  for( k = 0; k < nk; ++k ){
+    if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],self->ip1_m,self->nl_m)) == -1 ) {
+      printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n", proc_name, ip1_list[k]);
+      free(ind);
+      return(VGD_ERROR);
+    }    
+  }
+  
+  // Compute pressure
+  for( k = 0, ijk=0; k < nk; ++k ){
+    for( ij = 0; ij < ni*nj; ++ij, ++ijk ){
+      lvl = self->a_m_8[ind[k]] + self->b_m_8[ind[k]] * sfc_field[ij];
+#if defined(REAL_8)
+      levels[ijk] = in_log ? log(lvl) : lvl;
+#else
+      levels[ijk] = (float) (in_log ? log(lvl) : lvl);
+#endif
+    }
+  }
+  free(ind);
+  return(VGD_OK);
 }
 
 static int C_compute_pressure_2001_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, int in_log) {
   char proc_name[] = "C_compute_pressure_2001_8";
 #define REAL_8 1
-#include "BODY_C_compute_pressure_2001.hc"
+  int k,*ind,ij,ijk;
+  double lvl;
+  char message[128];
+
+  strcpy(message,"(Cvgd) ERROR in ");
+  strcat(message,proc_name);
+  strcat(message,", cannot allocate ind of int of size\n");
+  
+if( my_alloc_int(&ind, nk, message) == VGD_ERROR )
+    return(VGD_ERROR);
+  
+  // Find ip1 indexes
+  for( k = 0; k < nk; ++k ){
+    if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],self->ip1_m,self->nl_m)) == -1 ) {
+      printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n",proc_name, ip1_list[k]);
+      free(ind);
+      return(VGD_ERROR);
+    }
+  }
+  
+  // Compute pressure
+  for( k = 0, ijk=0; k < nk; ++k ){
+    for( ij = 0; ij < ni*nj; ++ij, ++ijk ){
+      lvl = self->a_m_8[ind[k]];
+#if defined(REAL_8)
+      levels[ijk] = in_log ? log(lvl) : lvl;
+#else
+      levels[ijk] = (float) (in_log ? log(lvl) : lvl);
+#endif
+    }
+  }
+  free(ind);
+  return(VGD_OK);
 #undef REAL_8
 }
 static int C_compute_pressure_2001(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, int in_log) {
   char proc_name[] = "C_compute_pressure_2001";
 #undef REAL_8
-#include "BODY_C_compute_pressure_2001.hc"
+  int k,*ind,ij,ijk;
+  double lvl;
+  char message[128];
+
+  strcpy(message,"(Cvgd) ERROR in ");
+  strcat(message,proc_name);
+  strcat(message,", cannot allocate ind of int of size\n");
+  
+if( my_alloc_int(&ind, nk, message) == VGD_ERROR )
+    return(VGD_ERROR);
+  
+  // Find ip1 indexes
+  for( k = 0; k < nk; ++k ){
+    if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],self->ip1_m,self->nl_m)) == -1 ) {
+      printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n",proc_name, ip1_list[k]);
+      free(ind);
+      return(VGD_ERROR);
+    }
+  }
+  
+  // Compute pressure
+  for( k = 0, ijk=0; k < nk; ++k ){
+    for( ij = 0; ij < ni*nj; ++ij, ++ijk ){
+      lvl = self->a_m_8[ind[k]];
+#if defined(REAL_8)
+      levels[ijk] = in_log ? log(lvl) : lvl;
+#else
+      levels[ijk] = (float) (in_log ? log(lvl) : lvl);
+#endif
+    }
+  }
+  free(ind);
+  return(VGD_OK);
 }
 
 static int C_compute_heights_4001_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels) {
   char proc_name[] = "C_compute_heights_4001_8";
 #define REAL_8 1
-#include "BODY_C_compute_heights_4001.hc"
+  int k,*ind,ij,ijk;
+  double lvl;
+  char message[128];
+
+  strcpy(message,"(Cvgd) ERROR in ");
+  strcat(message,proc_name);
+  strcat(message,", cannot allocate ind of int of size\n");
+  
+  if( my_alloc_int(&ind, nk, message) == VGD_ERROR )
+    return(VGD_ERROR);
+  
+  // Find ip1 indexes
+  for( k = 0; k < nk; ++k ){
+    if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],self->ip1_m,self->nl_m)) == -1 ) {
+      printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n",proc_name, ip1_list[k]);
+      free(ind);
+      return(VGD_ERROR);
+    }
+  }
+  
+  // Compute heights
+  for( k = 0, ijk=0; k < nk; ++k ){
+    for( ij = 0; ij < ni*nj; ++ij, ++ijk ){
+      lvl = self->a_m_8[ind[k]];
+#if defined(REAL_8)
+      levels[ijk] = lvl;
+#else
+      levels[ijk] = (float) lvl;
+#endif
+    }
+  }
+  free(ind);
+  return(VGD_OK);
 #undef REAL_8
 }
 static int C_compute_heights_4001(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels) {
   char proc_name[] = "C_compute_heights_4001";
 #undef REAL_8
-#include "BODY_C_compute_heights_4001.hc"
+  int k,*ind,ij,ijk;
+  double lvl;
+  char message[128];
+
+  strcpy(message,"(Cvgd) ERROR in ");
+  strcat(message,proc_name);
+  strcat(message,", cannot allocate ind of int of size\n");
+  
+  if( my_alloc_int(&ind, nk, message) == VGD_ERROR )
+    return(VGD_ERROR);
+  
+  // Find ip1 indexes
+  for( k = 0; k < nk; ++k ){
+    if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],self->ip1_m,self->nl_m)) == -1 ) {
+      printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n",proc_name, ip1_list[k]);
+      free(ind);
+      return(VGD_ERROR);
+    }
+  }
+  
+  // Compute heights
+  for( k = 0, ijk=0; k < nk; ++k ){
+    for( ij = 0; ij < ni*nj; ++ij, ++ijk ){
+      lvl = self->a_m_8[ind[k]];
+#if defined(REAL_8)
+      levels[ijk] = lvl;
+#else
+      levels[ijk] = (float) lvl;
+#endif
+    }
+  }
+  free(ind);
+  return(VGD_OK);
 }
 
 static int C_compute_pressure_1003_5001_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log, int dpidpis ){
   char proc_name[] = "C_compute_pressure_1003_5001_8";
 #define REAL_8 1
-#include "BODY_C_compute_pressure_1003_5001.hc"
+  int k,*ind,ij,ijk;
+  double lvl;
+  char message[128];
+
+  strcpy(message,"(Cvgd) ERROR in ");
+  strcat(message,proc_name);
+  strcat(message,", cannot allocate ind of int of size\n");
+
+  if( my_alloc_int(&ind, nk, message) == VGD_ERROR )
+    return(VGD_ERROR);
+  
+  // Find ip1 indexes
+  for( k = 0; k < nk; ++k ){
+    if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],self->ip1_m,self->nl_m)) == -1 ) {
+      printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n",proc_name, ip1_list[k]);
+      free(ind);
+      return(VGD_ERROR);
+    }
+  }  
+  if( dpidpis ){
+    if(in_log){
+      printf("(Cvgd) ERROR in %s, option in_log not allowed with option dpidpis\n", proc_name);
+      return(VGD_ERROR);
+    }
+    for( k = 0, ijk=0; k < nk; ++k ){
+      for( ij = 0; ij < ni*nj; ++ij, ++ijk ){
+#if defined(REAL_8)
+	levels[ijk] = self->b_m_8[ind[k]];
+#else
+	levels[ijk] = (float) self->b_m_8[ind[k]];
+#endif	
+      }
+    }    
+    free(ind);
+    return(VGD_OK);
+  }
+  // Compute pressure
+  for( k = 0, ijk=0; k < nk; ++k ){
+    for( ij = 0; ij < ni*nj; ++ij, ++ijk ){
+      lvl = self->a_m_8[ind[k]] + self->b_m_8[ind[k]] * sfc_field[ij];
+#if defined(REAL_8)
+      levels[ijk] = in_log ? log(lvl) : lvl;
+#else
+      levels[ijk] = (float) (in_log ? log(lvl) : lvl);
+#endif
+    }
+  }
+  free(ind);
+  
+  return(VGD_OK);
 #undef REAL_8
 }
 
 static int C_compute_pressure_1003_5001(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log, int dpidpis ){
   char proc_name[] = "C_compute_pressure_1003_5001";
 #undef REAL_8
-#include "BODY_C_compute_pressure_1003_5001.hc"
+  int k,*ind,ij,ijk;
+  double lvl;
+  char message[128];
+
+  strcpy(message,"(Cvgd) ERROR in ");
+  strcat(message,proc_name);
+  strcat(message,", cannot allocate ind of int of size\n");
+
+  if( my_alloc_int(&ind, nk, message) == VGD_ERROR )
+    return(VGD_ERROR);
+  
+  // Find ip1 indexes
+  for( k = 0; k < nk; ++k ){
+    if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],self->ip1_m,self->nl_m)) == -1 ) {
+      printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n",proc_name, ip1_list[k]);
+      free(ind);
+      return(VGD_ERROR);
+    }
+  }  
+  if( dpidpis ){
+    if(in_log){
+      printf("(Cvgd) ERROR in %s, option in_log not allowed with option dpidpis\n", proc_name);
+      return(VGD_ERROR);
+    }
+    for( k = 0, ijk=0; k < nk; ++k ){
+      for( ij = 0; ij < ni*nj; ++ij, ++ijk ){
+#if defined(REAL_8)
+	levels[ijk] = self->b_m_8[ind[k]];
+#else
+	levels[ijk] = (float) self->b_m_8[ind[k]];
+#endif	
+      }
+    }    
+    free(ind);
+    return(VGD_OK);
+  }
+  // Compute pressure
+  for( k = 0, ijk=0; k < nk; ++k ){
+    for( ij = 0; ij < ni*nj; ++ij, ++ijk ){
+      lvl = self->a_m_8[ind[k]] + self->b_m_8[ind[k]] * sfc_field[ij];
+#if defined(REAL_8)
+      levels[ijk] = in_log ? log(lvl) : lvl;
+#else
+      levels[ijk] = (float) (in_log ? log(lvl) : lvl);
+#endif
+    }
+  }
+  free(ind);
+  
+  return(VGD_OK);
 }
 
 static int C_compute_pressure_5002_5003_5004_5005_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log, int dpidpis) {
   char proc_name[] = "C_compute_pressure_5002_5003_5004_5005_8";
 #define REAL_8 1
-#include "BODY_C_compute_pressure_5002_5003_5004_5005.hc"
+  double *aa_8, *bb_8, *s_8, lvl;
+  int ij, k, ijk, ind, kind;
+  float hyb;
+
+  aa_8 = malloc(nk*sizeof(double));
+  if(! aa_8 ) {
+    printf("(Cvgd) ERROR in %s, cannot allocate aa_8 of bouble of size %d\n", proc_name, nk);
+    return(VGD_ERROR);
+  }  
+  bb_8 = malloc(nk*sizeof(double));
+  if(! bb_8 ) {
+    printf("(Cvgd) ERROR in %s, cannot allocate bb_8 of bouble of size %d\n", proc_name, nk);
+    free(aa_8);
+    return(VGD_ERROR);
+  }
+
+  for(k=0; k < nk; k++) {
+    if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_m, self->nl_m) ) != -1 ) {
+      aa_8[k] = self->a_m_8[ind];
+      bb_8[k] = self->b_m_8[ind];
+    } else {
+      if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_t, self->nl_t) ) != -1 ) {
+	aa_8[k] = self->a_t_8[ind];
+	bb_8[k] = self->b_t_8[ind];
+      } else {
+	printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n", proc_name,ip1_list[k]);
+	free(aa_8);
+	free(bb_8);  	
+	return(VGD_ERROR);	
+      }
+    }
+  }
+  s_8 = malloc(ni*nj*sizeof(double));
+  if(! s_8 ) {
+    printf("(Cvgd) ERROR in %s, cannot allocate s_8 of bouble of size %dx%d\n", proc_name, ni,nj);
+    free(aa_8);
+    free(bb_8);
+    return(VGD_ERROR);
+  }
+  for(ij=0; ij < ni*nj; ij++) {
+    s_8[ij] = log(sfc_field[ij]/self->pref_8);
+  }
+
+  for(k=0, ijk=0; k < nk; k++) {
+    for(ij=0; ij < ni*nj; ij++, ijk++) {
+      lvl = aa_8[k] + bb_8[k]*s_8[ij];
+#if defined(REAL_8)
+      levels[ijk] = in_log ? lvl : exp(lvl);
+#else
+      levels[ijk] = (float) (in_log ? lvl : exp(lvl));
+#endif
+    }
+  }
+  //Force surface pressure to be equal to sfc_field
+  //Needed by assimilation section.  
+  if(! in_log) {
+    for(k=0; k < nk; k++) {
+      hyb = c_convip_IP2Level(ip1_list[k],&kind);
+      if(fabs(hyb - 1.) < .000001 && kind == 5) {
+  	ijk=k*ni*nj;
+  	for(ij=0; ij < ni*nj; ij++, ijk++) {
+  	  levels[ijk] = sfc_field[ij];
+  	}
+      }
+    }
+  }
+
+  if( dpidpis ){
+    if( in_log ){
+      printf("(Cvgd) ERROR: in %s, cannot get dpidpis in log\n", proc_name);
+      free(s_8);
+      free(aa_8);
+      free(bb_8);
+      return(VGD_ERROR);
+    }
+    for(k=0, ijk=0; k < nk; k++) {
+      for(ij=0; ij < ni*nj; ij++, ijk++) {
+#if defined(REAL_8)
+  	levels[ijk] = bb_8[k]*levels[ijk]/sfc_field[ij];
+#else
+	levels[ijk] = (float) bb_8[k]*levels[ijk]/sfc_field[ij];
+#endif	
+      }
+    }
+  }
+  
+  free(s_8);
+  free(aa_8);
+  free(bb_8);
+
+  return(VGD_OK);
 #undef REAL_8
 }
 
 static int C_compute_pressure_5002_5003_5004_5005(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log, int dpidpis) {
   char proc_name[] = "C_compute_pressure_5002_5003_5004_5005";
 #undef REAL_8
-#include "BODY_C_compute_pressure_5002_5003_5004_5005.hc"
+  double *aa_8, *bb_8, *s_8, lvl;
+  int ij, k, ijk, ind, kind;
+  float hyb;
+
+  aa_8 = malloc(nk*sizeof(double));
+  if(! aa_8 ) {
+    printf("(Cvgd) ERROR in %s, cannot allocate aa_8 of bouble of size %d\n", proc_name, nk);
+    return(VGD_ERROR);
+  }  
+  bb_8 = malloc(nk*sizeof(double));
+  if(! bb_8 ) {
+    printf("(Cvgd) ERROR in %s, cannot allocate bb_8 of bouble of size %d\n", proc_name, nk);
+    free(aa_8);
+    return(VGD_ERROR);
+  }
+
+  for(k=0; k < nk; k++) {
+    if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_m, self->nl_m) ) != -1 ) {
+      aa_8[k] = self->a_m_8[ind];
+      bb_8[k] = self->b_m_8[ind];
+    } else {
+      if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_t, self->nl_t) ) != -1 ) {
+	aa_8[k] = self->a_t_8[ind];
+	bb_8[k] = self->b_t_8[ind];
+      } else {
+	printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n", proc_name,ip1_list[k]);
+	free(aa_8);
+	free(bb_8);  	
+	return(VGD_ERROR);	
+      }
+    }
+  }
+  s_8 = malloc(ni*nj*sizeof(double));
+  if(! s_8 ) {
+    printf("(Cvgd) ERROR in %s, cannot allocate s_8 of bouble of size %dx%d\n", proc_name, ni,nj);
+    free(aa_8);
+    free(bb_8);
+    return(VGD_ERROR);
+  }
+  for(ij=0; ij < ni*nj; ij++) {
+    s_8[ij] = log(sfc_field[ij]/self->pref_8);
+  }
+
+  for(k=0, ijk=0; k < nk; k++) {
+    for(ij=0; ij < ni*nj; ij++, ijk++) {
+      lvl = aa_8[k] + bb_8[k]*s_8[ij];
+#if defined(REAL_8)
+      levels[ijk] = in_log ? lvl : exp(lvl);
+#else
+      levels[ijk] = (float) (in_log ? lvl : exp(lvl));
+#endif
+    }
+  }
+  //Force surface pressure to be equal to sfc_field
+  //Needed by assimilation section.  
+  if(! in_log) {
+    for(k=0; k < nk; k++) {
+      hyb = c_convip_IP2Level(ip1_list[k],&kind);
+      if(fabs(hyb - 1.) < .000001 && kind == 5) {
+  	ijk=k*ni*nj;
+  	for(ij=0; ij < ni*nj; ij++, ijk++) {
+  	  levels[ijk] = sfc_field[ij];
+  	}
+      }
+    }
+  }
+
+  if( dpidpis ){
+    if( in_log ){
+      printf("(Cvgd) ERROR: in %s, cannot get dpidpis in log\n", proc_name);
+      free(s_8);
+      free(aa_8);
+      free(bb_8);
+      return(VGD_ERROR);
+    }
+    for(k=0, ijk=0; k < nk; k++) {
+      for(ij=0; ij < ni*nj; ij++, ijk++) {
+#if defined(REAL_8)
+  	levels[ijk] = bb_8[k]*levels[ijk]/sfc_field[ij];
+#else
+	levels[ijk] = (float) bb_8[k]*levels[ijk]/sfc_field[ij];
+#endif	
+      }
+    }
+  }
+  
+  free(s_8);
+  free(aa_8);
+  free(bb_8);
+
+  return(VGD_OK);
 }
 
 static int C_compute_pressure_5100_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, double *sfc_field_ls, int in_log, int dpidpis) {
   char proc_name[] = "C_compute_pressure_5100_8";
 #define REAL_8 1
-#include "BODY_C_compute_pressure_5100.hc"
+  double *aa_8, *bb_8, *cc_8, *s_8, *sl_8, lvl;
+  int ij, k, ijk, ind, kind;
+  float hyb;
+
+  aa_8 = malloc(nk*sizeof(double));
+  if(! aa_8 ) {
+    printf("(Cvgd) ERROR in %s, cannot allocate aa_8 of bouble of size %d\n", proc_name, nk);
+    return(VGD_ERROR);
+  }  
+  bb_8 = malloc(nk*sizeof(double));
+  if(! bb_8 ) {
+    printf("(Cvgd) ERROR in %s, cannot allocate bb_8 of bouble of size %d\n", proc_name, nk);
+    free(aa_8);
+    return(VGD_ERROR);
+  }
+  cc_8 = malloc(nk*sizeof(double));
+  if(! cc_8 ) {
+    printf("(Cvgd) ERROR in %s, cannot allocate cc_8 of bouble of size %d\n", proc_name, nk);
+    free(cc_8);
+    return(VGD_ERROR);
+  }
+
+  for(k=0; k < nk; k++) {
+    if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_m, self->nl_m) ) != -1 ) {
+      aa_8[k] = self->a_m_8[ind];
+      bb_8[k] = self->b_m_8[ind];
+      cc_8[k] = self->c_m_8[ind];
+    } else {
+      if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_t, self->nl_t) ) != -1 ) {
+	aa_8[k] = self->a_t_8[ind];
+	bb_8[k] = self->b_t_8[ind];
+	cc_8[k] = self->c_t_8[ind];
+      } else {
+	printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n", proc_name,ip1_list[k]);
+	free(aa_8);
+	free(bb_8);  	
+	free(cc_8);  	
+	return(VGD_ERROR);	
+      }
+    }
+  }
+  s_8 = malloc(ni*nj*sizeof(double));
+  if(! s_8 ) {
+    printf("(Cvgd) ERROR in %s, cannot allocate s_8 of bouble of size %dx%d\n", proc_name, ni,nj);
+    free(aa_8);
+    free(bb_8);
+    free(cc_8);
+    return(VGD_ERROR);
+  }
+  for(ij=0; ij < ni*nj; ij++) {
+    s_8[ij] = log(sfc_field[ij]/self->pref_8);
+  }
+  sl_8 = malloc(ni*nj*sizeof(double));
+  if(! sl_8 ) {
+    printf("(Cvgd) ERROR in %s, cannot allocate sl_8 of bouble of size %dx%d\n", proc_name, ni,nj);
+    free(aa_8);
+    free(bb_8);
+    free(cc_8);
+    free(s_8);
+    return(VGD_ERROR);
+  }
+  if(dpidpis){
+    for(ij=0; ij < ni*nj; ij++) {
+      sl_8[ij] = 0.;
+    }
+  } else {
+    for(ij=0; ij < ni*nj; ij++) {
+      sl_8[ij] = log(sfc_field_ls[ij]/self->pref_8);
+    }
+  }
+  for(k=0, ijk=0; k < nk; k++) {
+    for(ij=0; ij < ni*nj; ij++, ijk++) {
+      lvl = aa_8[k] + bb_8[k]*s_8[ij] + cc_8[k]*sl_8[ij];
+#if defined(REAL_8)
+      levels[ijk] = in_log ? lvl : exp(lvl);
+#else
+      levels[ijk] = (float) (in_log ? lvl : exp(lvl));
+#endif
+    }
+  }
+  //Force surface pressure to be equal to sfc_field
+  //Needed by assimilation section.  
+  if(! in_log) {
+    for(k=0; k < nk; k++) {
+      hyb = c_convip_IP2Level(ip1_list[k],&kind);
+      if(fabs(hyb - 1.) < .000001 && kind == 5) {
+  	ijk=k*ni*nj;
+  	for(ij=0; ij < ni*nj; ij++, ijk++) {
+  	  levels[ijk] = sfc_field[ij];
+  	}
+      }
+    }
+  }
+
+  if( dpidpis ){
+    if( in_log ){
+      printf("(Cvgd) ERROR: in %s, cannot get dpidpis in log\n", proc_name);
+      free(s_8);
+      free(aa_8);
+      free(bb_8);
+      return(VGD_ERROR);
+    }
+    for(k=0, ijk=0; k < nk; k++) {
+      for(ij=0; ij < ni*nj; ij++, ijk++) {
+#if defined(REAL_8)
+  	levels[ijk] = bb_8[k]*levels[ijk]/sfc_field[ij];
+#else
+	levels[ijk] = (float) bb_8[k]*levels[ijk]/sfc_field[ij];
+#endif	
+      }
+    }
+  }
+  
+  free(s_8);
+  free(sl_8);
+  free(aa_8);
+  free(bb_8);
+
+  return(VGD_OK);
 #undef REAL_8
 }
 
 static int C_compute_pressure_5100(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, float *sfc_field_ls, int in_log, int dpidpis) {
   char proc_name[] = "C_compute_pressure_5100";
 #undef REAL_8
-#include "BODY_C_compute_pressure_5100.hc"
+  double *aa_8, *bb_8, *cc_8, *s_8, *sl_8, lvl;
+  int ij, k, ijk, ind, kind;
+  float hyb;
+
+  aa_8 = malloc(nk*sizeof(double));
+  if(! aa_8 ) {
+    printf("(Cvgd) ERROR in %s, cannot allocate aa_8 of bouble of size %d\n", proc_name, nk);
+    return(VGD_ERROR);
+  }  
+  bb_8 = malloc(nk*sizeof(double));
+  if(! bb_8 ) {
+    printf("(Cvgd) ERROR in %s, cannot allocate bb_8 of bouble of size %d\n", proc_name, nk);
+    free(aa_8);
+    return(VGD_ERROR);
+  }
+  cc_8 = malloc(nk*sizeof(double));
+  if(! cc_8 ) {
+    printf("(Cvgd) ERROR in %s, cannot allocate cc_8 of bouble of size %d\n", proc_name, nk);
+    free(cc_8);
+    return(VGD_ERROR);
+  }
+
+  for(k=0; k < nk; k++) {
+    if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_m, self->nl_m) ) != -1 ) {
+      aa_8[k] = self->a_m_8[ind];
+      bb_8[k] = self->b_m_8[ind];
+      cc_8[k] = self->c_m_8[ind];
+    } else {
+      if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_t, self->nl_t) ) != -1 ) {
+	aa_8[k] = self->a_t_8[ind];
+	bb_8[k] = self->b_t_8[ind];
+	cc_8[k] = self->c_t_8[ind];
+      } else {
+	printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n", proc_name,ip1_list[k]);
+	free(aa_8);
+	free(bb_8);  	
+	free(cc_8);  	
+	return(VGD_ERROR);	
+      }
+    }
+  }
+  s_8 = malloc(ni*nj*sizeof(double));
+  if(! s_8 ) {
+    printf("(Cvgd) ERROR in %s, cannot allocate s_8 of bouble of size %dx%d\n", proc_name, ni,nj);
+    free(aa_8);
+    free(bb_8);
+    free(cc_8);
+    return(VGD_ERROR);
+  }
+  for(ij=0; ij < ni*nj; ij++) {
+    s_8[ij] = log(sfc_field[ij]/self->pref_8);
+  }
+  sl_8 = malloc(ni*nj*sizeof(double));
+  if(! sl_8 ) {
+    printf("(Cvgd) ERROR in %s, cannot allocate sl_8 of bouble of size %dx%d\n", proc_name, ni,nj);
+    free(aa_8);
+    free(bb_8);
+    free(cc_8);
+    free(s_8);
+    return(VGD_ERROR);
+  }
+  if(dpidpis){
+    for(ij=0; ij < ni*nj; ij++) {
+      sl_8[ij] = 0.;
+    }
+  } else {
+    for(ij=0; ij < ni*nj; ij++) {
+      sl_8[ij] = log(sfc_field_ls[ij]/self->pref_8);
+    }
+  }
+  for(k=0, ijk=0; k < nk; k++) {
+    for(ij=0; ij < ni*nj; ij++, ijk++) {
+      lvl = aa_8[k] + bb_8[k]*s_8[ij] + cc_8[k]*sl_8[ij];
+#if defined(REAL_8)
+      levels[ijk] = in_log ? lvl : exp(lvl);
+#else
+      levels[ijk] = (float) (in_log ? lvl : exp(lvl));
+#endif
+    }
+  }
+  //Force surface pressure to be equal to sfc_field
+  //Needed by assimilation section.  
+  if(! in_log) {
+    for(k=0; k < nk; k++) {
+      hyb = c_convip_IP2Level(ip1_list[k],&kind);
+      if(fabs(hyb - 1.) < .000001 && kind == 5) {
+  	ijk=k*ni*nj;
+  	for(ij=0; ij < ni*nj; ij++, ijk++) {
+  	  levels[ijk] = sfc_field[ij];
+  	}
+      }
+    }
+  }
+
+  if( dpidpis ){
+    if( in_log ){
+      printf("(Cvgd) ERROR: in %s, cannot get dpidpis in log\n", proc_name);
+      free(s_8);
+      free(aa_8);
+      free(bb_8);
+      return(VGD_ERROR);
+    }
+    for(k=0, ijk=0; k < nk; k++) {
+      for(ij=0; ij < ni*nj; ij++, ijk++) {
+#if defined(REAL_8)
+  	levels[ijk] = bb_8[k]*levels[ijk]/sfc_field[ij];
+#else
+	levels[ijk] = (float) bb_8[k]*levels[ijk]/sfc_field[ij];
+#endif	
+      }
+    }
+  }
+  
+  free(s_8);
+  free(sl_8);
+  free(aa_8);
+  free(bb_8);
+
+  return(VGD_OK);
 }
 
 static int C_compute_heights_21001_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, double *sfc_field_ls) {
   char proc_name[] = "C_compute_heights_21001_8";
   double *my_sfc_field_ls;
 #define REAL_8 1
-#include "BODY_C_compute_heights_21001.hc"
+  double *aa_8, *bb_8, *cc_8;
+  int ij, k, ijk, ind, kind;
+  float hyb;
+
+  aa_8 = malloc(nk*sizeof(double));
+  if(! aa_8 ) {
+    printf("(Cvgd) ERROR in %s, cannot allocate aa_8 of bouble of size %d\n", proc_name, nk);
+    return(VGD_ERROR);
+  }  
+  bb_8 = malloc(nk*sizeof(double));
+  if(! bb_8 ) {
+    printf("(Cvgd) ERROR in %s, cannot allocate bb_8 of bouble of size %d\n", proc_name, nk);
+    free(aa_8);
+    return(VGD_ERROR);
+  }
+  cc_8 = malloc(nk*sizeof(double));
+  if(! cc_8 ) {
+    printf("(Cvgd) ERROR in %s, cannot allocate cc_8 of bouble of size %d\n", proc_name, nk);
+    free(aa_8);
+    free(bb_8);
+    return(VGD_ERROR);
+  }
+
+  for(k=0; k < nk; k++) {
+    if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_m, self->nl_m) ) != -1 ) {
+      aa_8[k] = self->a_m_8[ind];
+      bb_8[k] = self->b_m_8[ind];
+      cc_8[k] = self->c_m_8[ind];
+    } else {
+      if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_t, self->nl_t) ) != -1 ) {
+	aa_8[k] = self->a_t_8[ind];
+	bb_8[k] = self->b_t_8[ind];
+	cc_8[k] = self->c_t_8[ind];
+      } else {
+	if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_w, self->nl_w) ) != -1 ) {
+	  aa_8[k] = self->a_w_8[ind];
+	  bb_8[k] = self->b_w_8[ind];
+	  cc_8[k] = self->c_w_8[ind];
+	} else {
+	  printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n", proc_name,ip1_list[k]);
+	  free(aa_8);
+	  free(bb_8);
+	  free(cc_8);
+	  return(VGD_ERROR);	
+	}
+      }
+    }
+  }
+
+  if( strcmp(self->ref_namel, VGD_NO_REF_NOMVAR) == 0 ){
+    my_sfc_field_ls = sfc_field;
+  } else {
+    my_sfc_field_ls = sfc_field_ls;
+  }
+
+  for(k=0, ijk=0; k < nk; k++) {
+    for(ij=0; ij < ni*nj; ij++, ijk++) {
+#if defined(REAL_8)
+      levels[ijk] = aa_8[k] + bb_8[k]*sfc_field[ij] + cc_8[k]*my_sfc_field_ls[ij];
+#else
+      levels[ijk] = (float) ( aa_8[k] + bb_8[k]*sfc_field[ij] + cc_8[k]*my_sfc_field_ls[ij] );
+#endif
+    }
+  }
+  //Force surface heights to be equal to sfc_field
+  //Needed by assimilation section.  
+  for(k=0; k < nk; k++) {
+    hyb = c_convip_IP2Level(ip1_list[k],&kind);
+    if(fabs(hyb) < .000001 && kind == 21) {
+      ijk=k*ni*nj;
+      for(ij=0; ij < ni*nj; ij++, ijk++) {
+        levels[ijk] = sfc_field[ij];
+      }
+    }
+  }
+
+  free(aa_8);
+  free(bb_8);
+  free(cc_8);
+
+  return(VGD_OK);
 #undef REAL_8
 }
 
@@ -1247,7 +2103,87 @@ static int C_compute_heights_21001(vgrid_descriptor *self, int ni, int nj, int n
   char proc_name[] = "C_compute_heights_21001";
   float *my_sfc_field_ls;
 #undef REAL_8
-#include "BODY_C_compute_heights_21001.hc"
+  double *aa_8, *bb_8, *cc_8;
+  int ij, k, ijk, ind, kind;
+  float hyb;
+
+  aa_8 = malloc(nk*sizeof(double));
+  if(! aa_8 ) {
+    printf("(Cvgd) ERROR in %s, cannot allocate aa_8 of bouble of size %d\n", proc_name, nk);
+    return(VGD_ERROR);
+  }  
+  bb_8 = malloc(nk*sizeof(double));
+  if(! bb_8 ) {
+    printf("(Cvgd) ERROR in %s, cannot allocate bb_8 of bouble of size %d\n", proc_name, nk);
+    free(aa_8);
+    return(VGD_ERROR);
+  }
+  cc_8 = malloc(nk*sizeof(double));
+  if(! cc_8 ) {
+    printf("(Cvgd) ERROR in %s, cannot allocate cc_8 of bouble of size %d\n", proc_name, nk);
+    free(aa_8);
+    free(bb_8);
+    return(VGD_ERROR);
+  }
+
+  for(k=0; k < nk; k++) {
+    if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_m, self->nl_m) ) != -1 ) {
+      aa_8[k] = self->a_m_8[ind];
+      bb_8[k] = self->b_m_8[ind];
+      cc_8[k] = self->c_m_8[ind];
+    } else {
+      if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_t, self->nl_t) ) != -1 ) {
+	aa_8[k] = self->a_t_8[ind];
+	bb_8[k] = self->b_t_8[ind];
+	cc_8[k] = self->c_t_8[ind];
+      } else {
+	if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_w, self->nl_w) ) != -1 ) {
+	  aa_8[k] = self->a_w_8[ind];
+	  bb_8[k] = self->b_w_8[ind];
+	  cc_8[k] = self->c_w_8[ind];
+	} else {
+	  printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n", proc_name,ip1_list[k]);
+	  free(aa_8);
+	  free(bb_8);
+	  free(cc_8);
+	  return(VGD_ERROR);	
+	}
+      }
+    }
+  }
+
+  if( strcmp(self->ref_namel, VGD_NO_REF_NOMVAR) == 0 ){
+    my_sfc_field_ls = sfc_field;
+  } else {
+    my_sfc_field_ls = sfc_field_ls;
+  }
+
+  for(k=0, ijk=0; k < nk; k++) {
+    for(ij=0; ij < ni*nj; ij++, ijk++) {
+#if defined(REAL_8)
+      levels[ijk] = aa_8[k] + bb_8[k]*sfc_field[ij] + cc_8[k]*my_sfc_field_ls[ij];
+#else
+      levels[ijk] = (float) ( aa_8[k] + bb_8[k]*sfc_field[ij] + cc_8[k]*my_sfc_field_ls[ij] );
+#endif
+    }
+  }
+  //Force surface heights to be equal to sfc_field
+  //Needed by assimilation section.  
+  for(k=0; k < nk; k++) {
+    hyb = c_convip_IP2Level(ip1_list[k],&kind);
+    if(fabs(hyb) < .000001 && kind == 21) {
+      ijk=k*ni*nj;
+      for(ij=0; ij < ni*nj; ij++, ijk++) {
+        levels[ijk] = sfc_field[ij];
+      }
+    }
+  }
+
+  free(aa_8);
+  free(bb_8);
+  free(cc_8);
+
+  return(VGD_OK);
 }
 
 int Cvgd_levels_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8, int in_log) {
@@ -1294,7 +2230,133 @@ int Cvgd_diag_withref_2ref_8(vgrid_descriptor *self, int ni, int nj, int nk, int
   // The following pointers will never be used but they are needed to compile
   float *levels = NULL, *sfc_field = NULL, *sfc_field_ls = NULL;
 #define REAL_8 1
-#include "BODY_Cvgd_diag_withref_2ref.hc"
+  if(! Cvgd_is_valid(self,"SELF")){
+    printf("(Cvgd) ERROR in %s, invalid vgrid.\n",proc_name);
+    return(VGD_ERROR);
+  }
+  
+  switch(self->vcode) {
+  case 1:
+    if( dpidpis ){
+      printf("(Cvgd) ERROR: dpidpis not supported for vertical coordinate 1\n");
+      return(VGD_ERROR);
+    }
+    if(double_interface){
+      if( C_compute_heights_0001_8(self, ni, nj, nk, ip1_list, levels_8) == VGD_ERROR)
+	return(VGD_ERROR);
+    } else {
+      if( C_compute_heights_0001(self, ni, nj, nk, ip1_list, levels) == VGD_ERROR)
+	return(VGD_ERROR);
+    }
+    break;    
+  case 1001:
+    if(double_interface){
+      if( C_compute_pressure_1001_1002_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log) == VGD_ERROR)
+	return(VGD_ERROR);
+    } else {
+      if( C_compute_pressure_1001_1002(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log) == VGD_ERROR)
+	return(VGD_ERROR);
+    }
+    break;
+  case 1002:
+    if( dpidpis ){
+      printf("(Cvgd) ERROR: dpidpis not implemented for vertical coordinate 1002\n");
+      return(VGD_ERROR);
+    }
+    if(double_interface){
+      if( C_compute_pressure_1001_1002_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log) == VGD_ERROR)
+	return(VGD_ERROR);
+    } else {
+      if( C_compute_pressure_1001_1002(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log) == VGD_ERROR)
+	return(VGD_ERROR);
+    }
+    break;
+  case 2001:
+    if( dpidpis ){
+      printf("(Cvgd) ERROR: dpidpis not implemented for vertical coordinate 2001\n");
+      return(VGD_ERROR);
+    }
+    if(double_interface){
+      if( C_compute_pressure_2001_8(self, ni, nj, nk, ip1_list, levels_8, in_log) == VGD_ERROR)
+	return(VGD_ERROR);
+    } else {
+      if( C_compute_pressure_2001(self, ni, nj, nk, ip1_list, levels, in_log) == VGD_ERROR)
+	return(VGD_ERROR);
+    }
+    break;
+  case 4001:
+    if( dpidpis ){
+      printf("(Cvgd) ERROR: dpidpis not implemented for vertical coordinate 4001\n");
+      return(VGD_ERROR);
+    }
+    if( in_log ){
+      printf("(Cvgd) ERROR: option in_log not supported for vertical coordinate 4001\n");
+      return(VGD_ERROR);
+    }
+    if(double_interface){
+      if( C_compute_heights_4001_8(self, ni, nj, nk, ip1_list, levels_8) == VGD_ERROR)
+	return(VGD_ERROR);
+    } else {
+      if( C_compute_heights_4001(self, ni, nj, nk, ip1_list, levels) == VGD_ERROR)
+	return(VGD_ERROR);
+    }
+    break;
+  case 1003:
+  case 5001:
+    if(double_interface){
+      if( C_compute_pressure_1003_5001_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log, dpidpis) == VGD_ERROR )
+	return(VGD_ERROR);
+    } else {
+      if( C_compute_pressure_1003_5001(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log, dpidpis) == VGD_ERROR )
+	return(VGD_ERROR);
+    }
+    break;
+  case 5002:
+  case 5003:
+  case 5004:
+  case 5005:
+    if(double_interface){
+      if( C_compute_pressure_5002_5003_5004_5005_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log, dpidpis) == VGD_ERROR)
+	return(VGD_ERROR);
+    } else {
+      if( C_compute_pressure_5002_5003_5004_5005(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log, dpidpis) == VGD_ERROR)
+	return(VGD_ERROR);
+    }
+    break;
+  case 5100:
+    if(double_interface){
+      if( C_compute_pressure_5100_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, sfc_field_ls_8, in_log, dpidpis) == VGD_ERROR)
+	return(VGD_ERROR);
+    } else {
+      if( C_compute_pressure_5100(self, ni, nj, nk, ip1_list, levels, sfc_field, sfc_field_ls, in_log, dpidpis) == VGD_ERROR)
+	return(VGD_ERROR);
+    }
+    break;
+  case 5999:
+    if(double_interface){
+      if( C_compute_pressure_1001_1002_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log) == VGD_ERROR)
+	return(VGD_ERROR);
+    } else {
+      if( C_compute_pressure_1001_1002(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log) == VGD_ERROR)
+	return(VGD_ERROR);
+    }
+    break;
+  case 21001:
+  case 21002:
+    if(double_interface){
+      if( C_compute_heights_21001_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, sfc_field_ls_8) == VGD_ERROR)
+	return(VGD_ERROR);
+    } else {
+      if( C_compute_heights_21001(self, ni, nj, nk, ip1_list, levels, sfc_field, sfc_field_ls) == VGD_ERROR)
+	return(VGD_ERROR);
+    }
+    break;
+  default:
+    printf("(Cvgd) ERROR in %s, invalid kind or version: kind = %d, version = %d\n", proc_name, self->kind, self->version);
+    return(VGD_ERROR);
+  }
+  
+  return(VGD_OK);
 #undef REAL_8
 }
 
@@ -1304,7 +2366,133 @@ int Cvgd_diag_withref_2ref(vgrid_descriptor *self, int ni, int nj, int nk, int *
   // The following pointers will never be used but they are needed to compile
   double *levels_8 = NULL, *sfc_field_8 = NULL, *sfc_field_ls_8 = NULL;
 #undef REAL_8
-#include "BODY_Cvgd_diag_withref_2ref.hc"
+  if(! Cvgd_is_valid(self,"SELF")){
+    printf("(Cvgd) ERROR in %s, invalid vgrid.\n",proc_name);
+    return(VGD_ERROR);
+  }
+  
+  switch(self->vcode) {
+  case 1:
+    if( dpidpis ){
+      printf("(Cvgd) ERROR: dpidpis not supported for vertical coordinate 1\n");
+      return(VGD_ERROR);
+    }
+    if(double_interface){
+      if( C_compute_heights_0001_8(self, ni, nj, nk, ip1_list, levels_8) == VGD_ERROR)
+	return(VGD_ERROR);
+    } else {
+      if( C_compute_heights_0001(self, ni, nj, nk, ip1_list, levels) == VGD_ERROR)
+	return(VGD_ERROR);
+    }
+    break;    
+  case 1001:
+    if(double_interface){
+      if( C_compute_pressure_1001_1002_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log) == VGD_ERROR)
+	return(VGD_ERROR);
+    } else {
+      if( C_compute_pressure_1001_1002(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log) == VGD_ERROR)
+	return(VGD_ERROR);
+    }
+    break;
+  case 1002:
+    if( dpidpis ){
+      printf("(Cvgd) ERROR: dpidpis not implemented for vertical coordinate 1002\n");
+      return(VGD_ERROR);
+    }
+    if(double_interface){
+      if( C_compute_pressure_1001_1002_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log) == VGD_ERROR)
+	return(VGD_ERROR);
+    } else {
+      if( C_compute_pressure_1001_1002(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log) == VGD_ERROR)
+	return(VGD_ERROR);
+    }
+    break;
+  case 2001:
+    if( dpidpis ){
+      printf("(Cvgd) ERROR: dpidpis not implemented for vertical coordinate 2001\n");
+      return(VGD_ERROR);
+    }
+    if(double_interface){
+      if( C_compute_pressure_2001_8(self, ni, nj, nk, ip1_list, levels_8, in_log) == VGD_ERROR)
+	return(VGD_ERROR);
+    } else {
+      if( C_compute_pressure_2001(self, ni, nj, nk, ip1_list, levels, in_log) == VGD_ERROR)
+	return(VGD_ERROR);
+    }
+    break;
+  case 4001:
+    if( dpidpis ){
+      printf("(Cvgd) ERROR: dpidpis not implemented for vertical coordinate 4001\n");
+      return(VGD_ERROR);
+    }
+    if( in_log ){
+      printf("(Cvgd) ERROR: option in_log not supported for vertical coordinate 4001\n");
+      return(VGD_ERROR);
+    }
+    if(double_interface){
+      if( C_compute_heights_4001_8(self, ni, nj, nk, ip1_list, levels_8) == VGD_ERROR)
+	return(VGD_ERROR);
+    } else {
+      if( C_compute_heights_4001(self, ni, nj, nk, ip1_list, levels) == VGD_ERROR)
+	return(VGD_ERROR);
+    }
+    break;
+  case 1003:
+  case 5001:
+    if(double_interface){
+      if( C_compute_pressure_1003_5001_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log, dpidpis) == VGD_ERROR )
+	return(VGD_ERROR);
+    } else {
+      if( C_compute_pressure_1003_5001(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log, dpidpis) == VGD_ERROR )
+	return(VGD_ERROR);
+    }
+    break;
+  case 5002:
+  case 5003:
+  case 5004:
+  case 5005:
+    if(double_interface){
+      if( C_compute_pressure_5002_5003_5004_5005_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log, dpidpis) == VGD_ERROR)
+	return(VGD_ERROR);
+    } else {
+      if( C_compute_pressure_5002_5003_5004_5005(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log, dpidpis) == VGD_ERROR)
+	return(VGD_ERROR);
+    }
+    break;
+  case 5100:
+    if(double_interface){
+      if( C_compute_pressure_5100_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, sfc_field_ls_8, in_log, dpidpis) == VGD_ERROR)
+	return(VGD_ERROR);
+    } else {
+      if( C_compute_pressure_5100(self, ni, nj, nk, ip1_list, levels, sfc_field, sfc_field_ls, in_log, dpidpis) == VGD_ERROR)
+	return(VGD_ERROR);
+    }
+    break;
+  case 5999:
+    if(double_interface){
+      if( C_compute_pressure_1001_1002_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log) == VGD_ERROR)
+	return(VGD_ERROR);
+    } else {
+      if( C_compute_pressure_1001_1002(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log) == VGD_ERROR)
+	return(VGD_ERROR);
+    }
+    break;
+  case 21001:
+  case 21002:
+    if(double_interface){
+      if( C_compute_heights_21001_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, sfc_field_ls_8) == VGD_ERROR)
+	return(VGD_ERROR);
+    } else {
+      if( C_compute_heights_21001(self, ni, nj, nk, ip1_list, levels, sfc_field, sfc_field_ls) == VGD_ERROR)
+	return(VGD_ERROR);
+    }
+    break;
+  default:
+    printf("(Cvgd) ERROR in %s, invalid kind or version: kind = %d, version = %d\n", proc_name, self->kind, self->version);
+    return(VGD_ERROR);
+  }
+  
+  return(VGD_OK);
 }
 
 /*----------------------------------------------------------------------------

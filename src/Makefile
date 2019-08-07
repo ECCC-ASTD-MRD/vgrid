@@ -30,17 +30,11 @@ OBJECTS = vgrid_utils.o vgrid.o vgrid_descriptors.o
 
 obj:	$(OBJECTS)
 
-vgrid.o:	vgrid.c \
-	BODY_C_compute_heights_4001.hc  BODY_C_compute_pressure_2001.hc  armnlib.h  BODY_C_compute_pressure_5100.hc  \
-	BODY_Cvgd_diag_withref_2ref.hc BODY_C_compute_pressure_5002_5003_5004_5005.hc  vgrid.h  \
-	BODY_C_compute_heights_0001.hc  BODY_C_compute_pressure_1003_5001.hc  BODY_C_compute_pressure_1001_1002.hc   \
-	BODY_C_compute_heights_21001.hc  
+vgrid.o: vgrid.c armnlib.h vgrid.h
 
-vgrid_descriptors.o:	vgrid_descriptors.F90 \
-	vgrid_utils.o  BODY_F_dpidpis_withref.hf  BODY_F_dpidpis_withref_prof.hf  BODY_F_diag_withref.hf  \
-	BODY_F_levels_withref_prof.hf   BODY_F_levels_withref.hf  BODY_F_diag_withref_prof.hf  vgrid_descriptors.hf  
+vgrid_descriptors.o: vgrid_descriptors.F90 vgrid_utils.o vgrid_descriptors.hf
 
-vgrid_utils.o:	vgrid_utils.F90 vgrid_descriptors.hf  
+vgrid_utils.o: vgrid_utils.F90 vgrid_descriptors.hf
 
 
 genlib: $(OBJECTS)
