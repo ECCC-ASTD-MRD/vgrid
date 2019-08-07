@@ -1,6 +1,6 @@
 .SUFFIXES:
 
-.SUFFIXES : .o .F90 .c .a
+.SUFFIXES : .o .c .F90 .cpp .a .h
 
 SHELL = /bin/bash
 
@@ -26,11 +26,15 @@ DEFINE = -DFICHSTD98
 #     . ssmuse-sh -p /ssm/net/rpn/libs/4.1b/environment-includes_4.3_all
 
 
+.cpp.o:
+	s.cc -c -O $(OPTIMIZ) $(DEFINE) $(CFLAGS) $(SUPP_OPT) $(C_SUPP_OPT) $<
+
+
 OBJECTS = vgrid_utils.o vgrid.o vgrid_descriptors.o
 
 obj:	$(OBJECTS)
 
-vgrid.o: vgrid.c armnlib.h vgrid.h
+vgrid.o: vgrid.cpp armnlib.h vgrid.h
 
 vgrid_descriptors.o: vgrid_descriptors.F90 vgrid_utils.o vgrid_descriptors.hf
 
