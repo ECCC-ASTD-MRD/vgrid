@@ -75,6 +75,7 @@ fi
 if [ ${execute} = 1 ];then
    printf "Running tests\n"
    report_file=test_report.txt
+   echo 'failed' > $report_file
    passed=0
    failed=0
    for test in ${tests[*]} ; do
@@ -109,9 +110,12 @@ if [ ${execute} = 1 ];then
       else
          failed=$((failed + 1))
          if [ "${result}" != ' ok' ];then
+            if [ "${result}" == "" ];then
+               result="failed"
+            fi
             printf "${result} (see ${test}.out for details)\n"	
          else
-            printf "   Shell script test failled, see reason above"
+            printf "   Shell script test failed, see reason above\n"
          fi
       fi
       rm -f ${report_file}
