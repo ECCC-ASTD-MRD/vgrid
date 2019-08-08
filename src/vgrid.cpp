@@ -18,13 +18,13 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#include "vgrid.h"
+#include "vgrid.hpp"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
 #include "rpnmacros.h"
-#include "armnlib.h"
+#include "armnlib.hpp"
 
 #define STR_INIT(str,len) if(len>1) memset(str,' ',len-1); if(len>0) str[len-1] = '\0'
 

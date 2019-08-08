@@ -35,7 +35,7 @@ tests_par:
 	./run_tests_in_parallel.ksh -MAX_CPUS $(MAX_CPUS) -compile $(COMPILE) -execute $(EXECUTE) -valgrind $(VALGRIND)
 
 clean:
-	rm -f *.o *.mod *.out
+	rm -f *.o *.mod *.out Makefile.test
 
 distclean: clean
 	rm -rf data/*

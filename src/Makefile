@@ -34,7 +34,7 @@ OBJECTS = vgrid_utils.o vgrid.o vgrid_descriptors.o
 
 obj:	$(OBJECTS)
 
-vgrid.o: vgrid.cpp armnlib.h vgrid.h
+vgrid.o: vgrid.cpp armnlib.hpp armnlib.h vgrid.hpp vgrid.h
 
 vgrid_descriptors.o: vgrid_descriptors.F90 vgrid_utils.o vgrid_descriptors.hf
 
