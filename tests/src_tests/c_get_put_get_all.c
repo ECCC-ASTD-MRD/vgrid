@@ -64,6 +64,8 @@ int test_it(char *filename, int ind) {
   vgrid_descriptor *vgd = NULL;
   char key[11][5] = {"DATE","IG_1","IG_2","IG_3","IG_4","IP_1","IP_2","IP_3","DIPM", "DIPT", "DIPW"};
 
+  // Run the test on one input data file, filename
+
   iun = 10 + ind;
   
   if( c_fnom(&iun,filename,mode,0) < 0 ) {
