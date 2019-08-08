@@ -28,7 +28,7 @@ module vGrid_Descriptors
    ! var    may y a float or an integer
    ! var_8  is of type real(kind=8)
    ! var_L  is of type logical
-   ! var_CP is of type type(c_prt) from iso_c_binging
+   ! var_CP is of type type(c_ptr) from iso_c_binding
 
    use iso_c_binding, only : c_ptr, C_NULL_PTR, C_CHAR, C_NULL_CHAR, c_int, C_FLOAT, c_associated, c_loc
 

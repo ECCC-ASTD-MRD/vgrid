@@ -4,6 +4,8 @@
 
 #include <rpnmacros.h>
 
+extern "C"
+{
 int c_fnom(int *iun,char *filename,char *options,int i);
 int c_fstouv(int iun,char *filename,char *options);
 void c_fstvoi(int iun,char *options);
@@ -79,5 +81,6 @@ int c_gdllvval(int gdid, float * uuvals, float * vvvals, float * uuin, float * v
 // (x,y) vector interpolation
 int c_gdxyvval(int gdid, float * uuvals, float * vvvals, float * uuin, float * vvin,
                float * x, float * y, int n);
+}
 
 #endif

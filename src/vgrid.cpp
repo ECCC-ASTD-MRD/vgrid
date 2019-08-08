@@ -208,7 +208,7 @@ static int is_required_float(vgrid_descriptor *self, float *ptr, int *table_vali
 }
 
 static int my_alloc_int(int **vec, int size, char *message){
-  *vec = malloc ( size * sizeof(int) );
+  *vec = (int*)malloc ( size * sizeof(int) );
   if(! *vec){    
     printf("%s %d\n",message, size);
     return(VGD_ERROR);
@@ -217,7 +217,7 @@ static int my_alloc_int(int **vec, int size, char *message){
 }
 
 static int my_alloc_float(float **vec, int size, char *message){
-  *vec = malloc ( size * sizeof(float) );
+  *vec = (float*)malloc ( size * sizeof(float) );
   if(! *vec){    
     printf("%s %d\n",message, size);
     return(VGD_ERROR);
@@ -226,7 +226,7 @@ static int my_alloc_float(float **vec, int size, char *message){
 }
 
 static int my_alloc_double(double **vec, int size, char *message){
-  *vec = malloc ( size * sizeof(double) );
+  *vec = (double*)malloc ( size * sizeof(double) );
   if(! *vec){    
     printf("%s %d\n",message, size);
     return(VGD_ERROR);
@@ -253,7 +253,7 @@ static void flip_transfer_d2c(char *name, double val_8) {
 static void flip_transfer_c2d(char *name, void *val_8) {
   // NOTE : Character stuffing into double is done right to left (Little endian style)
   int i;
-  uint64_t *xx = val_8;
+  uint64_t *xx = (unsigned long *)val_8;
   uint64_t tt, bl;
   tt = 0;
   bl = ' ';
@@ -390,7 +390,7 @@ int c_stda76_temp_from_press(vgrid_descriptor *self, int *i_val, int nl, float *
   float pkp, Tk, pk, hgts_stda, zk, zkp, gammaT;
   float *levs = NULL;
   
-  levs = malloc( nl * sizeof(float) );
+  levs = (float*)malloc( nl * sizeof(float) );
   if(! levs){
     printf("(Cvgd) ERROR in c_stda76_temp_from_press, problem allocating levs\n");
     free(levs);
@@ -443,7 +443,7 @@ int c_stda76_temp_pres_from_heights(vgrid_descriptor *self, int *i_val, int nl, 
   float *levs = NULL;
   float zero = 0.f, pk, pkp, Tk, zk, zkp, gammaT;
 
-  levs = malloc( nl * sizeof(float) );
+  levs = (float*)malloc( nl * sizeof(float) );
   if(! levs){
     printf("(Cvgd) ERROR in c_stda76_temp_pres_from_heights, problem allocating levs\n");
     free(levs);
@@ -735,7 +735,7 @@ static int C_load_toctoc(vgrid_descriptor *self, VGD_TFSTD_ext var, int key) {
   self->table_nk = var.nk;
 
   table_size = self->table_ni * self->table_nj * self->table_nk;
-  self->table = malloc ( table_size * sizeof(double) );
+  self->table = (double*)malloc ( table_size * sizeof(double) );
   if(! self->table ) {
     printf("(Cvgd) ERROR in C_load_toctoc, cannot allocate table of bouble of size %d\n",table_size );
     return(VGD_ERROR);
@@ -1152,7 +1152,7 @@ static int C_compute_heights_0001_8(vgrid_descriptor *self, int ni, int nj, int 
   double *aa_8;
   int ij, k, ijk, ind;
 
-  aa_8 = malloc(nk*sizeof(double));
+  aa_8 = (double*)malloc(nk*sizeof(double));
   if(! aa_8 ) {
     printf("(Cvgd) ERROR in %s, cannot allocate aa_8 of bouble of size %d\n", proc_name, nk);
     return(VGD_ERROR);
@@ -1194,7 +1194,7 @@ static int C_compute_heights_0001(vgrid_descriptor *self, int ni, int nj, int nk
   double *aa_8;
   int ij, k, ijk, ind;
 
-  aa_8 = malloc(nk*sizeof(double));
+  aa_8 = (double*)malloc(nk*sizeof(double));
   if(! aa_8 ) {
     printf("(Cvgd) ERROR in %s, cannot allocate aa_8 of bouble of size %d\n", proc_name, nk);
     return(VGD_ERROR);
@@ -1576,12 +1576,12 @@ static int C_compute_pressure_5002_5003_5004_5005_8(vgrid_descriptor *self, int 
   int ij, k, ijk, ind, kind;
   float hyb;
 
-  aa_8 = malloc(nk*sizeof(double));
+  aa_8 = (double*)malloc(nk*sizeof(double));
   if(! aa_8 ) {
     printf("(Cvgd) ERROR in %s, cannot allocate aa_8 of bouble of size %d\n", proc_name, nk);
     return(VGD_ERROR);
   }  
-  bb_8 = malloc(nk*sizeof(double));
+  bb_8 = (double*)malloc(nk*sizeof(double));
   if(! bb_8 ) {
     printf("(Cvgd) ERROR in %s, cannot allocate bb_8 of bouble of size %d\n", proc_name, nk);
     free(aa_8);
@@ -1604,7 +1604,7 @@ static int C_compute_pressure_5002_5003_5004_5005_8(vgrid_descriptor *self, int 
       }
     }
   }
-  s_8 = malloc(ni*nj*sizeof(double));
+  s_8 = (double*)malloc(ni*nj*sizeof(double));
   if(! s_8 ) {
     printf("(Cvgd) ERROR in %s, cannot allocate s_8 of bouble of size %dx%d\n", proc_name, ni,nj);
     free(aa_8);
@@ -1673,12 +1673,12 @@ static int C_compute_pressure_5002_5003_5004_5005(vgrid_descriptor *self, int ni
   int ij, k, ijk, ind, kind;
   float hyb;
 
-  aa_8 = malloc(nk*sizeof(double));
+  aa_8 = (double*)malloc(nk*sizeof(double));
   if(! aa_8 ) {
     printf("(Cvgd) ERROR in %s, cannot allocate aa_8 of bouble of size %d\n", proc_name, nk);
     return(VGD_ERROR);
   }  
-  bb_8 = malloc(nk*sizeof(double));
+  bb_8 = (double*)malloc(nk*sizeof(double));
   if(! bb_8 ) {
     printf("(Cvgd) ERROR in %s, cannot allocate bb_8 of bouble of size %d\n", proc_name, nk);
     free(aa_8);
@@ -1701,7 +1701,7 @@ static int C_compute_pressure_5002_5003_5004_5005(vgrid_descriptor *self, int ni
       }
     }
   }
-  s_8 = malloc(ni*nj*sizeof(double));
+  s_8 = (double*)malloc(ni*nj*sizeof(double));
   if(! s_8 ) {
     printf("(Cvgd) ERROR in %s, cannot allocate s_8 of bouble of size %dx%d\n", proc_name, ni,nj);
     free(aa_8);
@@ -1769,18 +1769,18 @@ static int C_compute_pressure_5100_8(vgrid_descriptor *self, int ni, int nj, int
   int ij, k, ijk, ind, kind;
   float hyb;
 
-  aa_8 = malloc(nk*sizeof(double));
+  aa_8 = (double*)malloc(nk*sizeof(double));
   if(! aa_8 ) {
     printf("(Cvgd) ERROR in %s, cannot allocate aa_8 of bouble of size %d\n", proc_name, nk);
     return(VGD_ERROR);
   }  
-  bb_8 = malloc(nk*sizeof(double));
+  bb_8 = (double*)malloc(nk*sizeof(double));
   if(! bb_8 ) {
     printf("(Cvgd) ERROR in %s, cannot allocate bb_8 of bouble of size %d\n", proc_name, nk);
     free(aa_8);
     return(VGD_ERROR);
   }
-  cc_8 = malloc(nk*sizeof(double));
+  cc_8 = (double*)malloc(nk*sizeof(double));
   if(! cc_8 ) {
     printf("(Cvgd) ERROR in %s, cannot allocate cc_8 of bouble of size %d\n", proc_name, nk);
     free(cc_8);
@@ -1806,7 +1806,7 @@ static int C_compute_pressure_5100_8(vgrid_descriptor *self, int ni, int nj, int
       }
     }
   }
-  s_8 = malloc(ni*nj*sizeof(double));
+  s_8 = (double*)malloc(ni*nj*sizeof(double));
   if(! s_8 ) {
     printf("(Cvgd) ERROR in %s, cannot allocate s_8 of bouble of size %dx%d\n", proc_name, ni,nj);
     free(aa_8);
@@ -1817,7 +1817,7 @@ static int C_compute_pressure_5100_8(vgrid_descriptor *self, int ni, int nj, int
   for(ij=0; ij < ni*nj; ij++) {
     s_8[ij] = log(sfc_field[ij]/self->pref_8);
   }
-  sl_8 = malloc(ni*nj*sizeof(double));
+  sl_8 = (double*)malloc(ni*nj*sizeof(double));
   if(! sl_8 ) {
     printf("(Cvgd) ERROR in %s, cannot allocate sl_8 of bouble of size %dx%d\n", proc_name, ni,nj);
     free(aa_8);
@@ -1894,18 +1894,18 @@ static int C_compute_pressure_5100(vgrid_descriptor *self, int ni, int nj, int n
   int ij, k, ijk, ind, kind;
   float hyb;
 
-  aa_8 = malloc(nk*sizeof(double));
+  aa_8 = (double*)malloc(nk*sizeof(double));
   if(! aa_8 ) {
     printf("(Cvgd) ERROR in %s, cannot allocate aa_8 of bouble of size %d\n", proc_name, nk);
     return(VGD_ERROR);
   }  
-  bb_8 = malloc(nk*sizeof(double));
+  bb_8 = (double*)malloc(nk*sizeof(double));
   if(! bb_8 ) {
     printf("(Cvgd) ERROR in %s, cannot allocate bb_8 of bouble of size %d\n", proc_name, nk);
     free(aa_8);
     return(VGD_ERROR);
   }
-  cc_8 = malloc(nk*sizeof(double));
+  cc_8 = (double*)malloc(nk*sizeof(double));
   if(! cc_8 ) {
     printf("(Cvgd) ERROR in %s, cannot allocate cc_8 of bouble of size %d\n", proc_name, nk);
     free(cc_8);
@@ -1931,7 +1931,7 @@ static int C_compute_pressure_5100(vgrid_descriptor *self, int ni, int nj, int n
       }
     }
   }
-  s_8 = malloc(ni*nj*sizeof(double));
+  s_8 = (double*)malloc(ni*nj*sizeof(double));
   if(! s_8 ) {
     printf("(Cvgd) ERROR in %s, cannot allocate s_8 of bouble of size %dx%d\n", proc_name, ni,nj);
     free(aa_8);
@@ -1942,7 +1942,7 @@ static int C_compute_pressure_5100(vgrid_descriptor *self, int ni, int nj, int n
   for(ij=0; ij < ni*nj; ij++) {
     s_8[ij] = log(sfc_field[ij]/self->pref_8);
   }
-  sl_8 = malloc(ni*nj*sizeof(double));
+  sl_8 = (double*)malloc(ni*nj*sizeof(double));
   if(! sl_8 ) {
     printf("(Cvgd) ERROR in %s, cannot allocate sl_8 of bouble of size %dx%d\n", proc_name, ni,nj);
     free(aa_8);
@@ -2019,18 +2019,18 @@ static int C_compute_heights_21001_8(vgrid_descriptor *self, int ni, int nj, int
   int ij, k, ijk, ind, kind;
   float hyb;
 
-  aa_8 = malloc(nk*sizeof(double));
+  aa_8 = (double*)malloc(nk*sizeof(double));
   if(! aa_8 ) {
     printf("(Cvgd) ERROR in %s, cannot allocate aa_8 of bouble of size %d\n", proc_name, nk);
     return(VGD_ERROR);
   }  
-  bb_8 = malloc(nk*sizeof(double));
+  bb_8 = (double*)malloc(nk*sizeof(double));
   if(! bb_8 ) {
     printf("(Cvgd) ERROR in %s, cannot allocate bb_8 of bouble of size %d\n", proc_name, nk);
     free(aa_8);
     return(VGD_ERROR);
   }
-  cc_8 = malloc(nk*sizeof(double));
+  cc_8 = (double*)malloc(nk*sizeof(double));
   if(! cc_8 ) {
     printf("(Cvgd) ERROR in %s, cannot allocate cc_8 of bouble of size %d\n", proc_name, nk);
     free(aa_8);
@@ -2107,18 +2107,18 @@ static int C_compute_heights_21001(vgrid_descriptor *self, int ni, int nj, int n
   int ij, k, ijk, ind, kind;
   float hyb;
 
-  aa_8 = malloc(nk*sizeof(double));
+  aa_8 = (double*)malloc(nk*sizeof(double));
   if(! aa_8 ) {
     printf("(Cvgd) ERROR in %s, cannot allocate aa_8 of bouble of size %d\n", proc_name, nk);
     return(VGD_ERROR);
   }  
-  bb_8 = malloc(nk*sizeof(double));
+  bb_8 = (double*)malloc(nk*sizeof(double));
   if(! bb_8 ) {
     printf("(Cvgd) ERROR in %s, cannot allocate bb_8 of bouble of size %d\n", proc_name, nk);
     free(aa_8);
     return(VGD_ERROR);
   }
-  cc_8 = malloc(nk*sizeof(double));
+  cc_8 = (double*)malloc(nk*sizeof(double));
   if(! cc_8 ) {
     printf("(Cvgd) ERROR in %s, cannot allocate cc_8 of bouble of size %d\n", proc_name, nk);
     free(aa_8);
@@ -2511,7 +2511,7 @@ int Cvgd_diag_withref_2ref(vgrid_descriptor *self, int ni, int nj, int nk, int *
  */
 static vgrid_descriptor* c_vgd_construct() {
 
-   vgrid_descriptor *vgrid = malloc(sizeof(vgrid_descriptor));
+   vgrid_descriptor *vgrid = (vgrid_descriptor*)malloc(sizeof(vgrid_descriptor));
    if( !vgrid ){
      printf("(Cvgd) ERROR in c_vgd_construct, cannot allocate vgrid\n");
      return NULL;
@@ -3022,7 +3022,7 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
   if(is_valid( *self, a_m_8_valid)) {
     if(a_m_8){
       free((*self)->a_m_8);
-      (*self)->a_m_8 = malloc( nl_m * sizeof(double) );
+      (*self)->a_m_8 = (double*)malloc( nl_m * sizeof(double) );
       if(! (*self)->a_m_8){ 
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating a_m_8 of size = %d\n", nl_m);
 	return(VGD_ERROR);
@@ -3036,7 +3036,7 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
   if(is_valid( *self, b_m_8_valid)) {
     if(b_m_8){
       free((*self)->b_m_8);
-      (*self)->b_m_8 = malloc( nl_m * sizeof(double) );
+      (*self)->b_m_8 = (double*)malloc( nl_m * sizeof(double) );
       if(! (*self)->b_m_8) {
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating b_m_8\n");
 	return(VGD_ERROR);
@@ -3050,7 +3050,7 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
   if(is_valid( *self, c_m_8_valid)) {
     if(c_m_8){
       free((*self)->c_m_8);
-      (*self)->c_m_8 = malloc( nl_m * sizeof(double) );
+      (*self)->c_m_8 = (double*)malloc( nl_m * sizeof(double) );
       if(! (*self)->c_m_8) {
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating c_m_8\n");
 	return(VGD_ERROR);
@@ -3064,7 +3064,7 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
   if(is_valid( *self, a_t_8_valid)) {
     if(a_t_8){
       free((*self)->a_t_8);
-      (*self)->a_t_8 = malloc( nl_t * sizeof(double) );
+      (*self)->a_t_8 = (double*)malloc( nl_t * sizeof(double) );
       if(! (*self)->a_t_8) {
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating a_t_8\n");
 	return(VGD_ERROR);
@@ -3078,7 +3078,7 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
   if(is_valid( *self, b_t_8_valid)) {
     if(b_t_8){
       free((*self)->b_t_8);
-      (*self)->b_t_8 = malloc( nl_t * sizeof(double) );
+      (*self)->b_t_8 = (double*)malloc( nl_t * sizeof(double) );
       if(! (*self)->b_t_8) {
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating b_t_8\n");
 	return(VGD_ERROR);
@@ -3092,7 +3092,7 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
   if(is_valid( *self, c_t_8_valid)) {
     if(c_t_8){
       free((*self)->c_t_8);
-      (*self)->c_t_8 = malloc( nl_t * sizeof(double) );
+      (*self)->c_t_8 = (double*)malloc( nl_t * sizeof(double) );
       if(! (*self)->c_t_8) {
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating c_t_8\n");
 	return(VGD_ERROR);
@@ -3106,7 +3106,7 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
   if(is_valid( *self, a_w_8_valid)) {
     if(a_w_8){
       free((*self)->a_w_8);
-      (*self)->a_w_8 = malloc( nl_w * sizeof(double) );
+      (*self)->a_w_8 = (double*)malloc( nl_w * sizeof(double) );
       if(! (*self)->a_w_8) {
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating a_w_8\n");
 	return(VGD_ERROR);
@@ -3120,7 +3120,7 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
   if(is_valid( *self, b_w_8_valid)) {
     if(b_w_8){
       free((*self)->b_w_8);
-      (*self)->b_w_8 = malloc( nl_w * sizeof(double) );
+      (*self)->b_w_8 = (double*)malloc( nl_w * sizeof(double) );
       if(! (*self)->b_w_8) {
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating b_w_8\n");
 	return(VGD_ERROR);
@@ -3134,7 +3134,7 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
   if(is_valid( *self, c_w_8_valid)) {
     if(c_w_8){
       free((*self)->c_w_8);
-      (*self)->c_w_8 = malloc( nl_w * sizeof(double) );
+      (*self)->c_w_8 = (double*)malloc( nl_w * sizeof(double) );
       if(! (*self)->c_w_8) {
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating c_w_8\n");
 	return(VGD_ERROR);
@@ -3149,7 +3149,7 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
   if(is_valid( *self, ip1_m_valid)) {
     if(ip1_m){
       free((*self)->ip1_m);
-      (*self)->ip1_m = malloc( nl_m * sizeof(int) );
+      (*self)->ip1_m = (int*)malloc( nl_m * sizeof(int) );
       if(! (*self)->ip1_m) {
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating ip1_m in Cvgd_new_build_vert2\n");
 	return(VGD_ERROR);
@@ -3163,7 +3163,7 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
   if(is_valid( *self, ip1_t_valid)) {
     if(ip1_t){
       free((*self)->ip1_t);
-      (*self)->ip1_t = malloc( nl_t * sizeof(int) );
+      (*self)->ip1_t = (int*)malloc( nl_t * sizeof(int) );
       if(! (*self)->ip1_t) {
 	printf("(Cvgd) ERROR: in Cvgd_new_build_vert2, problem allocating ip1_t\n");
 	return(VGD_ERROR);
@@ -3177,7 +3177,7 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
   if(is_valid( *self, ip1_w_valid)) {
     if(ip1_w){
       free((*self)->ip1_w);
-      (*self)->ip1_w = malloc( nl_w * sizeof(int) );
+      (*self)->ip1_w = (int*)malloc( nl_w * sizeof(int) );
       if(! (*self)->ip1_w) {
 	printf("(Cvgd) ERROR: in Cvgd_new_build_vert2, problem allocating ip1_w\n");
 	return(VGD_ERROR);
@@ -3278,7 +3278,7 @@ static int c_encode_vert_0001(vgrid_descriptor **self,int nk){
   (*self)->table_nj = 2*nk+skip;
   (*self)->table_nk = 1;
   table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
-  (*self)->table = malloc ( table_size * sizeof(double) );
+  (*self)->table = (double*)malloc ( table_size * sizeof(double) );
   if(! (*self)->table ) {
     printf("(Cvgd) ERROR in c_encode_vert_0001, cannot allocate table of bouble of size %d\n",table_size );
     return(VGD_ERROR);
@@ -3325,7 +3325,7 @@ static int c_encode_vert_1001(vgrid_descriptor **self,int nk){
   (*self)->table_nj = nk+skip;
   (*self)->table_nk = 1;
   table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
-  (*self)->table = malloc ( table_size * sizeof(double) );
+  (*self)->table = (double*)malloc ( table_size * sizeof(double) );
   if(! (*self)->table ) {
     printf("(Cvgd) ERROR in c_encode_vert_1001, cannot allocate table of bouble of size %d\n",table_size );
     return(VGD_ERROR);
@@ -3377,7 +3377,7 @@ static int c_encode_vert_1002(vgrid_descriptor **self,int nk){
   (*self)->table_nj = nk+skip;
   (*self)->table_nk = 1;
   table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
-  (*self)->table = malloc ( table_size * sizeof(double) );
+  (*self)->table = (double*)malloc ( table_size * sizeof(double) );
   if(! (*self)->table ) {
     printf("(Cvgd) ERROR in c_encode_vert_1002, cannot allocate table of bouble of size %d\n",table_size );
     return(VGD_ERROR);
@@ -3425,7 +3425,7 @@ static int c_encode_vert_2001(vgrid_descriptor **self,int nk){
   (*self)->table_nj = nk+skip;
   (*self)->table_nk = 1;
   table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
-  (*self)->table = malloc ( table_size * sizeof(double) );
+  (*self)->table = (double*)malloc ( table_size * sizeof(double) );
   if(! (*self)->table ) {
     printf("(Cvgd) ERROR in c_encode_vert_2001, cannot allocate table of bouble of size %d\n",table_size );
     return(VGD_ERROR);
@@ -3471,7 +3471,7 @@ static int c_encode_vert_4001(vgrid_descriptor **self,int nk){
   (*self)->table_nj = nk+skip;
   (*self)->table_nk = 1;
   table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
-  (*self)->table = malloc ( table_size * sizeof(double) );
+  (*self)->table = (double*)malloc ( table_size * sizeof(double) );
   if(! (*self)->table ) {
     printf("(Cvgd) ERROR in c_encode_vert_4001, cannot allocate table of bouble of size %d\n",table_size );
     return(VGD_ERROR);
@@ -3516,7 +3516,7 @@ static int c_encode_vert_5001(vgrid_descriptor **self,int nk){
   (*self)->table_nj = nk+skip;
   (*self)->table_nk = 1;
   table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
-  (*self)->table = malloc ( table_size * sizeof(double) );
+  (*self)->table = (double*)malloc ( table_size * sizeof(double) );
   if(! (*self)->table ) {
     printf("(Cvgd) ERROR in c_encode_vert_5001, cannot allocate table of bouble of size %d\n",table_size );
     return(VGD_ERROR);
@@ -3573,7 +3573,7 @@ static int c_encode_vert_5002_5003_5004_5005(vgrid_descriptor **self, char updat
     (*self)->table_nj = (*self)->nl_m + (*self)->nl_t + skip;
     (*self)->table_nk = 1;
     table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
-    (*self)->table = malloc ( table_size * sizeof(double) );
+    (*self)->table = (double*)malloc ( table_size * sizeof(double) );
     if(! (*self)->table ) {
       printf("(Cvgd) ERROR in c_encode_vert_5002_5003_5004_5005, cannot allocate table of bouble of size %d\n", table_size);
       return(VGD_ERROR);
@@ -3628,7 +3628,7 @@ static int c_encode_vert_5100(vgrid_descriptor **self, char update){
     (*self)->table_nj = (*self)->nl_m + (*self)->nl_t + skip;
     (*self)->table_nk = 1;
     table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
-    (*self)->table = malloc ( table_size * sizeof(double) );
+    (*self)->table = (double*)malloc ( table_size * sizeof(double) );
     if(! (*self)->table ) {
       printf("(Cvgd) ERROR in c_encode_vert_5100, cannot allocate table of bouble of size %d\n", table_size);
       return(VGD_ERROR);
@@ -3706,7 +3706,7 @@ static int c_encode_vert_5999(vgrid_descriptor **self,int nk){
   (*self)->table_nj = nk+skip;
   (*self)->table_nk = 1;
   table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
-  (*self)->table = malloc ( table_size * sizeof(double) );
+  (*self)->table = (double*)malloc ( table_size * sizeof(double) );
   if(! (*self)->table ) {
     printf("(Cvgd) ERROR in c_encode_vert_5999, cannot allocate table of bouble of size %d\n",table_size );
     return(VGD_ERROR);
@@ -3758,7 +3758,7 @@ static int c_encode_vert_21001(vgrid_descriptor **self, char update){
     (*self)->table_nj = (*self)->nl_m + (*self)->nl_t + skip;
     (*self)->table_nk = 1;
     table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
-    (*self)->table = malloc ( table_size * sizeof(double) );
+    (*self)->table = (double*)malloc ( table_size * sizeof(double) );
     if(! (*self)->table ) {
       printf("(Cvgd) ERROR in c_encode_vert_21001, cannot allocate table of bouble of size %d\n", table_size);
       return(VGD_ERROR);
@@ -3828,7 +3828,7 @@ static int c_encode_vert_21002(vgrid_descriptor **self, char update){
     (*self)->table_nj = (*self)->nl_m + (*self)->nl_w + 1 + skip;
     (*self)->table_nk = 1;
     table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
-    (*self)->table = malloc ( table_size * sizeof(double) );
+    (*self)->table = (double*)malloc ( table_size * sizeof(double) );
     if(! (*self)->table ) {
       printf("(Cvgd) ERROR in c_encode_vert_21002, cannot allocate table of bouble of size %d\n", table_size);
       return(VGD_ERROR);
@@ -3896,9 +3896,9 @@ static int c_decode_vert_0001(vgrid_descriptor **self) {
   (*self)->nl_m = nk;
   (*self)->nl_t = nk;
   (*self)->nl_w = nk;
-  (*self)->ip1_m = malloc( nk * sizeof(int) );
-  (*self)->a_m_8 = malloc( nk * sizeof(double) );
-  (*self)->b_m_8 = malloc( nk * sizeof(double) );
+  (*self)->ip1_m = (int*)malloc( nk * sizeof(int) );
+  (*self)->a_m_8 = (double*)malloc( nk * sizeof(double) );
+  (*self)->b_m_8 = (double*)malloc( nk * sizeof(double) );
   if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_1001, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nk);
     return(VGD_ERROR);
@@ -3909,9 +3909,9 @@ static int c_decode_vert_0001(vgrid_descriptor **self) {
     (*self)->b_m_8[k] =       (*self)->table[ind+2];
     ind = ind + 3;
   }
-  (*self)->ip1_t = malloc( nk * sizeof(int) );
-  (*self)->a_t_8 = malloc( nk * sizeof(double) );
-  (*self)->b_t_8 = malloc( nk * sizeof(double) );
+  (*self)->ip1_t = (int*)malloc( nk * sizeof(int) );
+  (*self)->a_t_8 = (double*)malloc( nk * sizeof(double) );
+  (*self)->b_t_8 = (double*)malloc( nk * sizeof(double) );
   if( !(*self)->ip1_t || !(*self)->a_t_8 || !(*self)->b_t_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_0001, cannot allocate,  ip1_t, a_t_8 and b_t_8 of size %d\n", nk);
     return(VGD_ERROR);
@@ -3944,9 +3944,9 @@ static int c_decode_vert_1001(vgrid_descriptor **self) {
   (*self)->nl_m = nk;
   (*self)->nl_t = nk;
   (*self)->nl_w = nk;
-  (*self)->ip1_m = malloc( nk * sizeof(int) );
-  (*self)->a_m_8 = malloc( nk * sizeof(double) );
-  (*self)->b_m_8 = malloc( nk * sizeof(double) );
+  (*self)->ip1_m = (int*)malloc( nk * sizeof(int) );
+  (*self)->a_m_8 = (double*)malloc( nk * sizeof(double) );
+  (*self)->b_m_8 = (double*)malloc( nk * sizeof(double) );
   if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_1001, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nk);
     return(VGD_ERROR);
@@ -3984,9 +3984,9 @@ static int c_decode_vert_1002(vgrid_descriptor **self) {
   (*self)->nl_m = nk;
   (*self)->nl_t = nk;
   (*self)->nl_w = nk;
-  (*self)->ip1_m = malloc( nk * sizeof(int) );
-  (*self)->a_m_8 = malloc( nk * sizeof(double) );
-  (*self)->b_m_8 = malloc( nk * sizeof(double) );
+  (*self)->ip1_m = (int*)malloc( nk * sizeof(int) );
+  (*self)->a_m_8 = (double*)malloc( nk * sizeof(double) );
+  (*self)->b_m_8 = (double*)malloc( nk * sizeof(double) );
   if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_1002, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nk);
     return(VGD_ERROR);
@@ -4022,9 +4022,9 @@ static int c_decode_vert_2001(vgrid_descriptor **self) {
   (*self)->nl_m = nk;
   (*self)->nl_t = nk;
   (*self)->nl_w = nk;
-  (*self)->ip1_m = malloc( nk * sizeof(int) );
-  (*self)->a_m_8 = malloc( nk * sizeof(double) );
-  (*self)->b_m_8 = malloc( nk * sizeof(double) );
+  (*self)->ip1_m = (int*)malloc( nk * sizeof(int) );
+  (*self)->a_m_8 = (double*)malloc( nk * sizeof(double) );
+  (*self)->b_m_8 = (double*)malloc( nk * sizeof(double) );
   if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_1002, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nk);
     return(VGD_ERROR);
@@ -4060,9 +4060,9 @@ static int c_decode_vert_4001(vgrid_descriptor **self) {
   (*self)->nl_m = nk;
   (*self)->nl_t = nk;
   (*self)->nl_w = nk;
-  (*self)->ip1_m = malloc( nk * sizeof(int) );
-  (*self)->a_m_8 = malloc( nk * sizeof(double) );
-  (*self)->b_m_8 = malloc( nk * sizeof(double) );
+  (*self)->ip1_m = (int*)malloc( nk * sizeof(int) );
+  (*self)->a_m_8 = (double*)malloc( nk * sizeof(double) );
+  (*self)->b_m_8 = (double*)malloc( nk * sizeof(double) );
   if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_1002, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nk);
     return(VGD_ERROR);
@@ -4104,9 +4104,9 @@ static int c_decode_vert_1003_5001(vgrid_descriptor **self) {
   (*self)->nl_m = nk;
   (*self)->nl_t = nk;
   (*self)->nl_w = nk;
-  (*self)->ip1_m = malloc( nk * sizeof(int) );
-  (*self)->a_m_8 = malloc( nk * sizeof(double) );
-  (*self)->b_m_8 = malloc( nk * sizeof(double) );
+  (*self)->ip1_m = (int*)malloc( nk * sizeof(int) );
+  (*self)->a_m_8 = (double*)malloc( nk * sizeof(double) );
+  (*self)->b_m_8 = (double*)malloc( nk * sizeof(double) );
   if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_1003_5001, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nk);
     return(VGD_ERROR);
@@ -4157,10 +4157,10 @@ static int c_decode_vert_5100(vgrid_descriptor **self) {
 
   // Allocate and assign momentum level data, there are nb of them nk + hyb=1 and possibly the diag in m
   (*self)->nl_m = nb;
-  (*self)->ip1_m = malloc( nb * sizeof(int) );
-  (*self)->a_m_8 = malloc( nb * sizeof(double) );
-  (*self)->b_m_8 = malloc( nb * sizeof(double) );
-  (*self)->c_m_8 = malloc( nb * sizeof(double) );
+  (*self)->ip1_m = (int*)malloc( nb * sizeof(int) );
+  (*self)->a_m_8 = (double*)malloc( nb * sizeof(double) );
+  (*self)->b_m_8 = (double*)malloc( nb * sizeof(double) );
+  (*self)->c_m_8 = (double*)malloc( nb * sizeof(double) );
   if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 || !(*self)->c_m_8){
     printf("(Cvgd) ERROR in c_decode_vert_5100, cannot allocate,  ip1_m, a_m_8, b_m_8 and c_m_8 of size %d\n", nb);
     return(VGD_ERROR);
@@ -4177,10 +4177,10 @@ static int c_decode_vert_5100(vgrid_descriptor **self) {
   // Allocate and assign thermodynamic level data
   (*self)->nl_t = nb;
   (*self)->nl_w = nb;
-  (*self)->ip1_t = malloc( nb * sizeof(int) );
-  (*self)->a_t_8 = malloc( nb * sizeof(double) );
-  (*self)->b_t_8 = malloc( nb * sizeof(double) );
-  (*self)->c_t_8 = malloc( nb * sizeof(double) );
+  (*self)->ip1_t = (int*)malloc( nb * sizeof(int) );
+  (*self)->a_t_8 = (double*)malloc( nb * sizeof(double) );
+  (*self)->b_t_8 = (double*)malloc( nb * sizeof(double) );
+  (*self)->c_t_8 = (double*)malloc( nb * sizeof(double) );
   if( !(*self)->ip1_t || !(*self)->a_t_8 || !(*self)->b_t_8 || !(*self)->c_t_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_5100, cannot allocate,  ip1_t, a_t_8, b_t_8 and c_t_8 of size %d\n", nb);
     return(VGD_ERROR);
@@ -4247,9 +4247,9 @@ static int c_decode_vert_5002_5003_5004_5005(vgrid_descriptor **self) {
   // Allocate and assign momentum level data, there are nb of them nk + hyb=1 and possibly the diag in m
   nb = nk + 1 + k_plus_diag;
   (*self)->nl_m = nb;
-  (*self)->ip1_m = malloc( nb * sizeof(int) );
-  (*self)->a_m_8 = malloc( nb * sizeof(double) );
-  (*self)->b_m_8 = malloc( nb * sizeof(double) );
+  (*self)->ip1_m = (int*)malloc( nb * sizeof(int) );
+  (*self)->a_m_8 = (double*)malloc( nb * sizeof(double) );
+  (*self)->b_m_8 = (double*)malloc( nb * sizeof(double) );
   if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_5002_5003_5004_5005, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nb);
     return(VGD_ERROR);
@@ -4266,9 +4266,9 @@ static int c_decode_vert_5002_5003_5004_5005(vgrid_descriptor **self) {
   nb = nb + k_plus_top;
   (*self)->nl_t = nb;
   (*self)->nl_w = nb;
-  (*self)->ip1_t = malloc( nb * sizeof(int) );
-  (*self)->a_t_8 = malloc( nb * sizeof(double) );
-  (*self)->b_t_8 = malloc( nb * sizeof(double) );
+  (*self)->ip1_t = (int*)malloc( nb * sizeof(int) );
+  (*self)->a_t_8 = (double*)malloc( nb * sizeof(double) );
+  (*self)->b_t_8 = (double*)malloc( nb * sizeof(double) );
   if( !(*self)->ip1_t || !(*self)->a_t_8 || !(*self)->b_t_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_5002_5003_5004_5005, cannot allocate,  ip1_t, a_t_8 and b_t_8 of size %d\n", nb);
     return(VGD_ERROR);
@@ -4307,9 +4307,9 @@ static int c_decode_vert_5999(vgrid_descriptor **self) {
   (*self)->nl_m = nk;
   (*self)->nl_t = nk;
   (*self)->nl_w = nk;
-  (*self)->ip1_m = malloc( nk * sizeof(int) );
-  (*self)->a_m_8 = malloc( nk * sizeof(double) );
-  (*self)->b_m_8 = malloc( nk * sizeof(double) );
+  (*self)->ip1_m = (int*)malloc( nk * sizeof(int) );
+  (*self)->a_m_8 = (double*)malloc( nk * sizeof(double) );
+  (*self)->b_m_8 = (double*)malloc( nk * sizeof(double) );
   if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_1003_5001, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nk);
     return(VGD_ERROR);
@@ -4351,10 +4351,10 @@ static int c_decode_vert_21001(vgrid_descriptor **self) {
   // nb is the number of momentum level with hyb=1.0 and the diag level
   nb = ( (*self)->table_nj - skip ) / 2;
   (*self)->nl_m = nb;
-  (*self)->ip1_m = malloc( nb * sizeof(int) );
-  (*self)->a_m_8 = malloc( nb * sizeof(double) );
-  (*self)->b_m_8 = malloc( nb * sizeof(double) );
-  (*self)->c_m_8 = malloc( nb * sizeof(double) );
+  (*self)->ip1_m = (int*)malloc( nb * sizeof(int) );
+  (*self)->a_m_8 = (double*)malloc( nb * sizeof(double) );
+  (*self)->b_m_8 = (double*)malloc( nb * sizeof(double) );
+  (*self)->c_m_8 = (double*)malloc( nb * sizeof(double) );
   if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 || !(*self)->c_m_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_21001, cannot allocate,  ip1_m, a_m_8, b_m_8 and c_m_8 of size %d\n", nb);
     return(VGD_ERROR);
@@ -4372,10 +4372,10 @@ static int c_decode_vert_21001(vgrid_descriptor **self) {
   // Allocate and assign thermodynamic level data
   (*self)->nl_t = nb;
   (*self)->nl_w = nb;
-  (*self)->ip1_t = malloc( nb * sizeof(int) );
-  (*self)->a_t_8 = malloc( nb * sizeof(double) );
-  (*self)->b_t_8 = malloc( nb * sizeof(double) );
-  (*self)->c_t_8 = malloc( nb * sizeof(double) );
+  (*self)->ip1_t = (int*)malloc( nb * sizeof(int) );
+  (*self)->a_t_8 = (double*)malloc( nb * sizeof(double) );
+  (*self)->b_t_8 = (double*)malloc( nb * sizeof(double) );
+  (*self)->c_t_8 = (double*)malloc( nb * sizeof(double) );
   if( !(*self)->ip1_t || !(*self)->a_t_8 || !(*self)->b_t_8 || !(*self)->c_t_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_2101, cannot allocate,  ip1_t, a_t_8, b_t_8 and c_t_8 of size %d\n", nb);
     return(VGD_ERROR);
@@ -4419,10 +4419,10 @@ static int c_decode_vert_21002(vgrid_descriptor **self) {
   nb = ( (*self)->table_nj - skip - 1 ) / 2;
   // Allocate and assign momentum arrays
   (*self)->nl_m = nb;
-  (*self)->ip1_m = malloc( nb * sizeof(int) );
-  (*self)->a_m_8 = malloc( nb * sizeof(double) );
-  (*self)->b_m_8 = malloc( nb * sizeof(double) );
-  (*self)->c_m_8 = malloc( nb * sizeof(double) );
+  (*self)->ip1_m = (int*)malloc( nb * sizeof(int) );
+  (*self)->a_m_8 = (double*)malloc( nb * sizeof(double) );
+  (*self)->b_m_8 = (double*)malloc( nb * sizeof(double) );
+  (*self)->c_m_8 = (double*)malloc( nb * sizeof(double) );
   if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 || !(*self)->c_m_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_21002, cannot allocate,  ip1_m, a_m_8, b_m_8 and c_m_8 of size %d\n", nb);
     return(VGD_ERROR);
@@ -4439,10 +4439,10 @@ static int c_decode_vert_21002(vgrid_descriptor **self) {
 
   // Allocate and assign Vertical-Velocity arrays
   (*self)->nl_w = nb;
-  (*self)->ip1_w = malloc( nb * sizeof(int) );
-  (*self)->a_w_8 = malloc( nb * sizeof(double) );
-  (*self)->b_w_8 = malloc( nb * sizeof(double) );
-  (*self)->c_w_8 = malloc( nb * sizeof(double) );
+  (*self)->ip1_w = (int*)malloc( nb * sizeof(int) );
+  (*self)->a_w_8 = (double*)malloc( nb * sizeof(double) );
+  (*self)->b_w_8 = (double*)malloc( nb * sizeof(double) );
+  (*self)->c_w_8 = (double*)malloc( nb * sizeof(double) );
   if( !(*self)->ip1_w || !(*self)->a_w_8 || !(*self)->b_w_8 || !(*self)->c_w_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_21002, cannot allocate,  ip1_w, a_w_8, b_w_8 and c_w_8 of size %d\n", nb);
     return(VGD_ERROR);
@@ -4458,10 +4458,10 @@ static int c_decode_vert_21002(vgrid_descriptor **self) {
 
   // Allocate and assign thermo arrays
   (*self)->nl_t = nb;
-  (*self)->ip1_t = malloc( nb * sizeof(int) );
-  (*self)->a_t_8 = malloc( nb * sizeof(double) );
-  (*self)->b_t_8 = malloc( nb * sizeof(double) );
-  (*self)->c_t_8 = malloc( nb * sizeof(double) );
+  (*self)->ip1_t = (int*)malloc( nb * sizeof(int) );
+  (*self)->a_t_8 = (double*)malloc( nb * sizeof(double) );
+  (*self)->b_t_8 = (double*)malloc( nb * sizeof(double) );
+  (*self)->c_t_8 = (double*)malloc( nb * sizeof(double) );
   if( !(*self)->ip1_t || !(*self)->a_t_8 || !(*self)->b_t_8 || !(*self)->c_t_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_21002, cannot allocate,  ip1_t, a_t_8, b_t_8 and c_t_8 of size %d\n", nb);
     return(VGD_ERROR);
@@ -4548,7 +4548,7 @@ int Cvgd_new_from_table(vgrid_descriptor **self, double *table, int ni, int nj, 
   (*self)->valid = 0;
   // Since table passed in argument may be the (*self)->table, we take a copy before the call to free
   table_size = ni * nj * nk;
-  ltable = malloc ( table_size * sizeof(double) );
+  ltable = (double*)malloc ( table_size * sizeof(double) );
   if(! ltable ) {
     printf("(Cvgd) ERROR in Cvgd_new_from_table, cannot allocate ltable of bouble of size %d\n", table_size);
     return(VGD_ERROR);
@@ -4558,7 +4558,7 @@ int Cvgd_new_from_table(vgrid_descriptor **self, double *table, int ni, int nj, 
   (*self)->table_ni = ni;
   (*self)->table_nj = nj;
   (*self)->table_nk = nk;
-  (*self)->table = malloc ( ni * nj * nk * sizeof(double) );
+  (*self)->table = (double*)malloc ( ni * nj * nk * sizeof(double) );
   if(! (*self)->table ) {
     printf("(Cvgd) ERROR in Cvgd_new_from_table, cannot allocate table of bouble of size %d\n",table_size );
     return(VGD_ERROR);
@@ -4969,32 +4969,32 @@ static int C_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float
   *nl_m = nk + 1;
   *nl_t = nk + 2;
 
-  *PP_a_m_8 = malloc( (*nl_m)*sizeof(double) );
+  *PP_a_m_8 = (double*)malloc( (*nl_m)*sizeof(double) );
   if(! *PP_a_m_8){
     printf("(Cvgd) ERROR in C_genab_5002_5003, malloc error with *PP_a_m_8\n");
     return(VGD_ERROR);
   }
-  *PP_b_m_8 = malloc( (*nl_m)*sizeof(double) );
+  *PP_b_m_8 = (double*)malloc( (*nl_m)*sizeof(double) );
   if(! *PP_b_m_8){
     printf("(Cvgd) ERROR in C_genab_5002_5003, malloc error with *PP_b_m_8\n");
     return(VGD_ERROR);
   }
-  *PP_ip1_m = malloc( (*nl_m)*sizeof(int) );
+  *PP_ip1_m = (int*)malloc( (*nl_m)*sizeof(int) );
   if(! *PP_ip1_m){
     printf("(Cvgd) ERROR in C_genab_5002_5003, malloc error with *PP_ip1_m\n");
     return(VGD_ERROR);
   }
-  *PP_a_t_8 = malloc( (*nl_t)*sizeof(double) );
+  *PP_a_t_8 = (double*)malloc( (*nl_t)*sizeof(double) );
   if(! *PP_a_t_8){
     printf("(Cvgd) ERROR in C_genab_5002_5003, malloc error with *PP_a_t_8\n");
     return(VGD_ERROR);
   }
-  *PP_b_t_8 = malloc( (*nl_t)*sizeof(double) );
+  *PP_b_t_8 = (double*)malloc( (*nl_t)*sizeof(double) );
   if(! *PP_b_t_8){
     printf("(Cvgd) ERROR in C_genab_5002_5003, malloc error with *PP_b_t_8\n");
     return(VGD_ERROR);
   }
-  *PP_ip1_t = malloc( (*nl_t)*sizeof(int) );
+  *PP_ip1_t = (int*)malloc( (*nl_t)*sizeof(int) );
   if(! *PP_ip1_t){
     printf("(Cvgd) ERROR in C_genab_5002_5003, malloc error with *PP_ip1_t\n");
     return(VGD_ERROR);
@@ -5116,32 +5116,32 @@ static int C_genab_5004(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoe
   *nl_m = nk + 1;
   *nl_t = nk + 1;
 
-  *PP_a_m_8 = malloc( (*nl_m)*sizeof(double) );
+  *PP_a_m_8 = (double*)malloc( (*nl_m)*sizeof(double) );
   if(! *PP_a_m_8){
     printf("(Cvgd) ERROR in C_genab_5004, malloc error with *PP_a_m_8\n");
     return(VGD_ERROR);
   }
-  *PP_b_m_8 = malloc( (*nl_m)*sizeof(double) );
+  *PP_b_m_8 = (double*)malloc( (*nl_m)*sizeof(double) );
   if(! *PP_b_m_8){
     printf("(Cvgd) ERROR in C_genab_5004, malloc error with *PP_b_m_8\n");
     return(VGD_ERROR);
   }
-  *PP_ip1_m = malloc( (*nl_m)*sizeof(int) );
+  *PP_ip1_m = (int*)malloc( (*nl_m)*sizeof(int) );
   if(! *PP_ip1_m){
     printf("(Cvgd) ERROR in C_genab_5004, malloc error with *PP_ip1_m\n");
     return(VGD_ERROR);
   }
-  *PP_a_t_8 = malloc( (*nl_t)*sizeof(double) );
+  *PP_a_t_8 = (double*)malloc( (*nl_t)*sizeof(double) );
   if(! *PP_a_t_8){
     printf("(Cvgd) ERROR in C_genab_5004, malloc error with *PP_a_t_8\n");
     return(VGD_ERROR);
   }
-  *PP_b_t_8 = malloc( (*nl_t)*sizeof(double) );
+  *PP_b_t_8 = (double*)malloc( (*nl_t)*sizeof(double) );
   if(! *PP_b_t_8){
     printf("(Cvgd) ERROR in C_genab_5004, malloc error with *PP_b_t_8\n");
     return(VGD_ERROR);
   }
-  *PP_ip1_t = malloc( (*nl_t)*sizeof(int) );
+  *PP_ip1_t = (int*)malloc( (*nl_t)*sizeof(int) );
   if(! *PP_ip1_t){
     printf("(Cvgd) ERROR in C_genab_5004, malloc error with *PP_ip1_t\n");
     return(VGD_ERROR);
@@ -5258,32 +5258,32 @@ static int c_vgrid_genab_5005(float *hybuser, int nk, int *nl_m, int *nl_t, floa
   *nl_m = nk + 2;
   *nl_t = nk + 2;
 
-  *PP_a_m_8 = malloc( (*nl_m)*sizeof(double) );
+  *PP_a_m_8 = (double*)malloc( (*nl_m)*sizeof(double) );
   if(! *PP_a_m_8){
     printf("(Cvgd) ERROR in c_vgrid_genab_5005, malloc error with *PP_a_m_8\n");
     return(VGD_ERROR);
   }
-  *PP_b_m_8 = malloc( (*nl_m)*sizeof(double) );
+  *PP_b_m_8 = (double*)malloc( (*nl_m)*sizeof(double) );
   if(! *PP_b_m_8){
     printf("(Cvgd) ERROR in c_vgrid_genab_5005, malloc error with *PP_b_m_8\n");
     return(VGD_ERROR);
   }
-  *PP_ip1_m = malloc( (*nl_m)*sizeof(int) );
+  *PP_ip1_m = (int*)malloc( (*nl_m)*sizeof(int) );
   if(! *PP_ip1_m){
     printf("(Cvgd) ERROR in c_vgrid_genab_5005, malloc error with *PP_ip1_m\n");
     return(VGD_ERROR);
   }
-  *PP_a_t_8 = malloc( (*nl_t)*sizeof(double) );
+  *PP_a_t_8 = (double*)malloc( (*nl_t)*sizeof(double) );
   if(! *PP_a_t_8){
     printf("(Cvgd) ERROR in c_vgrid_genab_5005, malloc error with *PP_a_t_8\n");
     return(VGD_ERROR);
   }
-  *PP_b_t_8 = malloc( (*nl_t)*sizeof(double) );
+  *PP_b_t_8 = (double*)malloc( (*nl_t)*sizeof(double) );
   if(! *PP_b_t_8){
     printf("(Cvgd) ERROR in c_vgrid_genab_5005, malloc error with *PP_b_t_8\n");
     return(VGD_ERROR);
   }
-  *PP_ip1_t = malloc( (*nl_t)*sizeof(int) );
+  *PP_ip1_t = (int*)malloc( (*nl_t)*sizeof(int) );
   if(! *PP_ip1_t){
     printf("(Cvgd) ERROR in c_vgrid_genab_5005, malloc error with *PP_ip1_t\n");
     return(VGD_ERROR);
@@ -5400,42 +5400,42 @@ static int c_vgrid_genab_5100(float *hybuser, int nk, int *nl_m, int *nl_t, floa
   *nl_m = nk + 2;
   *nl_t = nk + 2;
 
-  *PP_a_m_8 = malloc( (*nl_m)*sizeof(double) );
+  *PP_a_m_8 = (double*)malloc( (*nl_m)*sizeof(double) );
   if(! *PP_a_m_8){
     printf("(Cvgd) ERROR in c_vgrid_genab_5100, malloc error with *PP_a_m_8\n");
     return(VGD_ERROR);
   }
-  *PP_b_m_8 = malloc( (*nl_m)*sizeof(double) );
+  *PP_b_m_8 = (double*)malloc( (*nl_m)*sizeof(double) );
   if(! *PP_b_m_8){
     printf("(Cvgd) ERROR in c_vgrid_genab_5100, malloc error with *PP_b_m_8\n");
     return(VGD_ERROR);
   }
-  *PP_c_m_8 = malloc( (*nl_m)*sizeof(double) );
+  *PP_c_m_8 = (double*)malloc( (*nl_m)*sizeof(double) );
   if(! *PP_c_m_8){
     printf("(Cvgd) ERROR in c_vgrid_genab_5100, malloc error with *PP_c_m_8\n");
     return(VGD_ERROR);
   }
-  *PP_ip1_m = malloc( (*nl_m)*sizeof(int) );
+  *PP_ip1_m = (int*)malloc( (*nl_m)*sizeof(int) );
   if(! *PP_ip1_m){
     printf("(Cvgd) ERROR in c_vgrid_genab_5100, malloc error with *PP_ip1_m\n");
     return(VGD_ERROR);
   }
-  *PP_a_t_8 = malloc( (*nl_t)*sizeof(double) );
+  *PP_a_t_8 = (double*)malloc( (*nl_t)*sizeof(double) );
   if(! *PP_a_t_8){
     printf("(Cvgd) ERROR in c_vgrid_genab_5100, malloc error with *PP_a_t_8\n");
     return(VGD_ERROR);
   }
-  *PP_b_t_8 = malloc( (*nl_t)*sizeof(double) );
+  *PP_b_t_8 = (double*)malloc( (*nl_t)*sizeof(double) );
   if(! *PP_b_t_8){
     printf("(Cvgd) ERROR in c_vgrid_genab_5100, malloc error with *PP_b_t_8\n");
     return(VGD_ERROR);
   }
-  *PP_c_t_8 = malloc( (*nl_t)*sizeof(double) );
+  *PP_c_t_8 = (double*)malloc( (*nl_t)*sizeof(double) );
   if(! *PP_c_t_8){
     printf("(Cvgd) ERROR in c_vgrid_genab_5100, malloc error with *PP_c_t_8\n");
     return(VGD_ERROR);
   }
-  *PP_ip1_t = malloc( (*nl_t)*sizeof(int) );
+  *PP_ip1_t = (int*)malloc( (*nl_t)*sizeof(int) );
   if(! *PP_ip1_t){
     printf("(Cvgd) ERROR in c_vgrid_genab_5005, malloc error with *PP_ip1_t\n");
     return(VGD_ERROR);
@@ -5594,42 +5594,42 @@ static int c_vgrid_genab_21001(float *hybuser, int nk, int *nl_m, int *nl_t, flo
   *nl_m = nk + 2;
   *nl_t = nk + 2;
   
-  *PP_a_m_8 = malloc( (*nl_m)*sizeof(double) );
+  *PP_a_m_8 = (double*)malloc( (*nl_m)*sizeof(double) );
   if(! *PP_a_m_8){
     printf("(Cvgd) ERROR in c_vgrid_genab_21001, malloc error with *PP_a_m_8\n");
     return(VGD_ERROR);
   }
-  *PP_b_m_8 = malloc( (*nl_m)*sizeof(double) );
+  *PP_b_m_8 = (double*)malloc( (*nl_m)*sizeof(double) );
   if(! *PP_b_m_8){
     printf("(Cvgd) ERROR in c_vgrid_genab_21001, malloc error with *PP_b_m_8\n");
     return(VGD_ERROR);
   }
-  *PP_c_m_8 = malloc( (*nl_m)*sizeof(double) );
+  *PP_c_m_8 = (double*)malloc( (*nl_m)*sizeof(double) );
   if(! *PP_c_m_8){
     printf("(Cvgd) ERROR in c_vgrid_genab_21001, malloc error with *PP_c_m_8\n");
     return(VGD_ERROR);
   }
-  *PP_ip1_m = malloc( (*nl_m)*sizeof(int) );
+  *PP_ip1_m = (int*)malloc( (*nl_m)*sizeof(int) );
   if(! *PP_ip1_m){
     printf("(Cvgd) ERROR in c_vgrid_genab_21001, malloc error with *PP_ip1_m\n");
     return(VGD_ERROR);
   }
-  *PP_a_t_8 = malloc( (*nl_t)*sizeof(double) );
+  *PP_a_t_8 = (double*)malloc( (*nl_t)*sizeof(double) );
   if(! *PP_a_t_8){
     printf("(Cvgd) ERROR in c_vgrid_genab_21001, malloc error with *PP_a_t_8\n");
     return(VGD_ERROR);
   }
-  *PP_b_t_8 = malloc( (*nl_t)*sizeof(double) );
+  *PP_b_t_8 = (double*)malloc( (*nl_t)*sizeof(double) );
   if(! *PP_b_t_8){
     printf("(Cvgd) ERROR in c_vgrid_genab_21001, malloc error with *PP_b_t_8\n");
     return(VGD_ERROR);
   }
-  *PP_c_t_8 = malloc( (*nl_t)*sizeof(double) );
+  *PP_c_t_8 = (double*)malloc( (*nl_t)*sizeof(double) );
   if(! *PP_c_t_8){
     printf("(Cvgd) ERROR in c_vgrid_genab_21001, malloc error with *PP_c_t_8\n");
     return(VGD_ERROR);
   }
-  *PP_ip1_t = malloc( (*nl_t)*sizeof(int) );
+  *PP_ip1_t = (int*)malloc( (*nl_t)*sizeof(int) );
   if(! *PP_ip1_t){
     printf("(Cvgd) ERROR in c_vgrid_genab_21001, malloc error with *PP_ip1_t\n");
     return(VGD_ERROR);
@@ -5765,62 +5765,62 @@ static int c_vgrid_genab_21002(float *hybuser, int nk, int *nl_m, int *nl_t, int
   *nl_t = nk + 2;
   *nl_w = nk + 2;
   
-  *PP_a_m_8 = malloc( (*nl_m)*sizeof(double) );
+  *PP_a_m_8 = (double*)malloc( (*nl_m)*sizeof(double) );
   if(! *PP_a_m_8){
     printf("(Cvgd) ERROR in c_vgrid_genab_21002, malloc error with *PP_a_m_8\n");
     return(VGD_ERROR);
   }
-  *PP_b_m_8 = malloc( (*nl_m)*sizeof(double) );
+  *PP_b_m_8 = (double*)malloc( (*nl_m)*sizeof(double) );
   if(! *PP_b_m_8){
     printf("(Cvgd) ERROR in c_vgrid_genab_21002, malloc error with *PP_b_m_8\n");
     return(VGD_ERROR);
   }
-  *PP_c_m_8 = malloc( (*nl_m)*sizeof(double) );
+  *PP_c_m_8 = (double*)malloc( (*nl_m)*sizeof(double) );
   if(! *PP_c_m_8){
     printf("(Cvgd) ERROR in c_vgrid_genab_21002, malloc error with *PP_c_m_8\n");
     return(VGD_ERROR);
   }
-  *PP_ip1_m = malloc( (*nl_m)*sizeof(int) );
+  *PP_ip1_m = (int*)malloc( (*nl_m)*sizeof(int) );
   if(! *PP_ip1_m){
     printf("(Cvgd) ERROR in c_vgrid_genab_21002, malloc error with *PP_ip1_m\n");
     return(VGD_ERROR);
   }
-  *PP_a_t_8 = malloc( (*nl_t)*sizeof(double) );
+  *PP_a_t_8 = (double*)malloc( (*nl_t)*sizeof(double) );
   if(! *PP_a_t_8){
     printf("(Cvgd) ERROR in c_vgrid_genab_21002, malloc error with *PP_a_t_8\n");
     return(VGD_ERROR);
   }
-  *PP_b_t_8 = malloc( (*nl_t)*sizeof(double) );
+  *PP_b_t_8 = (double*)malloc( (*nl_t)*sizeof(double) );
   if(! *PP_b_t_8){
     printf("(Cvgd) ERROR in c_vgrid_genab_21002, malloc error with *PP_b_t_8\n");
     return(VGD_ERROR);
   }
-  *PP_c_t_8 = malloc( (*nl_t)*sizeof(double) );
+  *PP_c_t_8 = (double*)malloc( (*nl_t)*sizeof(double) );
   if(! *PP_c_t_8){
     printf("(Cvgd) ERROR in c_vgrid_genab_21002, malloc error with *PP_c_t_8\n");
     return(VGD_ERROR);
   }
-  *PP_ip1_t = malloc( (*nl_t)*sizeof(int) );
+  *PP_ip1_t = (int*)malloc( (*nl_t)*sizeof(int) );
   if(! *PP_ip1_t){
     printf("(Cvgd) ERROR in c_vgrid_genab_21002, malloc error with *PP_ip1_t\n");
     return(VGD_ERROR);
   }
-  *PP_a_w_8 = malloc( (*nl_w)*sizeof(double) );
+  *PP_a_w_8 = (double*)malloc( (*nl_w)*sizeof(double) );
   if(! *PP_a_w_8){
     printf("(Cvgd) ERROR in c_vgrid_genab_21002, malloc error with *PP_a_w_8\n");
     return(VGD_ERROR);
   }
-  *PP_b_w_8 = malloc( (*nl_w)*sizeof(double) );
+  *PP_b_w_8 = (double*)malloc( (*nl_w)*sizeof(double) );
   if(! *PP_b_w_8){
     printf("(Cvgd) ERROR in c_vgrid_genab_21002, malloc error with *PP_b_w_8\n");
     return(VGD_ERROR);
   }
-  *PP_c_w_8 = malloc( (*nl_w)*sizeof(double) );
+  *PP_c_w_8 = (double*)malloc( (*nl_w)*sizeof(double) );
   if(! *PP_c_w_8){
     printf("(Cvgd) ERROR in c_vgrid_genab_21002, malloc error with *PP_c_w_8\n");
     return(VGD_ERROR);
   }
-  *PP_ip1_w = malloc( (*nl_w)*sizeof(int) );
+  *PP_ip1_w = (int*)malloc( (*nl_w)*sizeof(int) );
   if(! *PP_ip1_w){
     printf("(Cvgd) ERROR in c_vgrid_genab_21002, malloc error with *PP_ip1_w\n");
     return(VGD_ERROR);
@@ -6071,7 +6071,7 @@ int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk, int
     // ----
     if( is_valid(self,ip1_m_valid) ){
       if(! *value){
-	(*value) = malloc(self->nl_m * sizeof(int));
+        (*value) = (int*)malloc(self->nl_m * sizeof(int));
 	if(! *value){
 	  printf("(Cvgd) ERROR in Cvgd_get_int_1d, problem allocating %d int\n",self->nl_m);
 	  return(VGD_ERROR);
@@ -6087,7 +6087,7 @@ int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk, int
     // VIPT
     // ----  
     if(! *value){
-      (*value) = malloc(self->nl_t * sizeof(int));
+      (*value) = (int*)malloc(self->nl_t * sizeof(int));
       if(! *value){
 	printf("(Cvgd) ERROR in Cvgd_get_int_1d, problem allocating %d int\n",self->nl_t);
 	return(VGD_ERROR);
@@ -6100,7 +6100,7 @@ int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk, int
     // VIPW
     // ----
     if(! *value){
-      (*value) = malloc(self->nl_w * sizeof(int));
+      (*value) = (int*)malloc(self->nl_w * sizeof(int));
       if(! *value){
 	printf("(Cvgd) ERROR in Cvgd_get_int_1d, problem allocating %d int\n",self->nl_w);
 	return(VGD_ERROR);
@@ -6198,7 +6198,7 @@ int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk,
   if( strcmp(key, "VCDM") == 0 ){
     if (is_valid(self,ip1_m_valid)) {
       if(! *value){
-	(*value) = malloc(self->nl_m * sizeof(float));
+        (*value) = (float*)malloc(self->nl_m * sizeof(float));
 	if(! *value){
 	  printf("(Cvgd) ERROR in Cvgd_get_float_1d, problem allocating %d double\n",self->nl_m);
 	  return(VGD_ERROR);
@@ -6216,7 +6216,7 @@ int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk,
     }
   } else if( strcmp(key, "VCDT") == 0 ){
     if(! *value){
-      (*value) = malloc(self->nl_t * sizeof(float));
+      (*value) = (float*)malloc(self->nl_t * sizeof(float));
       if(! *value){
 	printf("(Cvgd) ERROR in Cvgd_get_float_1d, problem allocating %d double\n",self->nl_t);
 	return(VGD_ERROR);
@@ -6231,7 +6231,7 @@ int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk,
     if(nk) *nk = self->nl_t;
   } else if( strcmp(key, "VCDW") == 0 ){
     if(! *value){
-      (*value) = malloc(self->nl_w * sizeof(float));
+      (*value) = (float*)malloc(self->nl_w * sizeof(float));
       if(! *value){
 	printf("(Cvgd) ERROR in Cvgd_get_float_1d, problem allocating %d double\n",self->nl_w);
 	return(VGD_ERROR);
@@ -6314,7 +6314,7 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     //-----
     if( is_valid(self,a_m_8_valid) ) {
       if(! *value){
-	(*value) = malloc(self->nl_m * sizeof(double));
+	(*value) = (double*)malloc(self->nl_m * sizeof(double));
 	if(! *value){
 	  printf("(Cvgd) ERROR in Cvgd_get_double_1d, problem allocating %d double for CA_M\n",self->nl_m);
 	  return(VGD_ERROR);
@@ -6331,7 +6331,7 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     //-----
     if( is_valid(self,b_m_8_valid) ) {
       if(! *value){
-	(*value) = malloc(self->nl_m * sizeof(double));
+	(*value) = (double*)malloc(self->nl_m * sizeof(double));
 	if(! *value){
 	  printf("(Cvgd) ERROR in Cvgd_get_double_1d, problem allocating %d double for CB_M\n",self->nl_m);
 	  return(VGD_ERROR);
@@ -6348,7 +6348,7 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     //-----
     if( is_valid(self,c_m_8_valid) ) {
       if(! *value){
-	(*value) = malloc(self->nl_m * sizeof(double));
+	(*value) = (double*)malloc(self->nl_m * sizeof(double));
 	if(! *value){
 	  printf("(Cvgd) ERROR in Cvgd_get_double_1d, problem allocating %d double for CC_M\n",self->nl_m);
 	  return(VGD_ERROR);
@@ -6364,7 +6364,7 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     // CA_T
     //-----
     if(! *value){
-      (*value) = malloc(self->nl_t * sizeof(double));
+      (*value) = (double*)malloc(self->nl_t * sizeof(double));
       if(! *value){
 	printf("(Cvgd) ERROR in Cvgd_get_double_1d, problem allocating %d double for CA_T\n",self->nl_t);
 	return(VGD_ERROR);
@@ -6377,7 +6377,7 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     // CB_T
     //-----
     if(! *value){
-      (*value) = malloc(self->nl_t * sizeof(double));
+      (*value) = (double*)malloc(self->nl_t * sizeof(double));
       if(! *value){
 	printf("(Cvgd) ERROR in Cvgd_get_double_1d, problem allocating %d double for CB_T\n",self->nl_t);
 	return(VGD_ERROR);
@@ -6390,7 +6390,7 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     // CC_T
     //-----
     if(! *value){
-      (*value) = malloc(self->nl_t * sizeof(double));
+      (*value) = (double*)malloc(self->nl_t * sizeof(double));
       if(! *value){
 	printf("(Cvgd) ERROR in Cvgd_get_double_1d, problem allocating %d double for CC_T\n",self->nl_t);
 	return(VGD_ERROR);
@@ -6403,7 +6403,7 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     // CA_W
     //-----
     if(! *value){
-      (*value) = malloc(self->nl_w * sizeof(double));
+      (*value) = (double*)malloc(self->nl_w * sizeof(double));
       if(! *value){
 	printf("(Cvgd) ERROR in Cvgd_get_double_1d, problem allocating %d double for CA_W\n",self->nl_w);
 	return(VGD_ERROR);
@@ -6416,7 +6416,7 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     // CB_W
     //-----
     if(! *value){
-      (*value) = malloc(self->nl_w * sizeof(double));
+      (*value) = (double*)malloc(self->nl_w * sizeof(double));
       if(! *value){
 	printf("(Cvgd) ERROR in Cvgd_get_double_1d, problem allocating %d double for CB_W\n",self->nl_w);
 	return(VGD_ERROR);
@@ -6429,7 +6429,7 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     // CC_W
     //-----
     if(! *value){
-      (*value) = malloc(self->nl_w * sizeof(double));
+      (*value) = (double*)malloc(self->nl_w * sizeof(double));
       if(! *value){
 	printf("(Cvgd) ERROR in Cvgd_get_double_1d, problem allocating %d double for CC_W\n",self->nl_w);
 	return(VGD_ERROR);
@@ -6467,7 +6467,7 @@ int Cvgd_get_double_3d(vgrid_descriptor *self, char *key, double **value, int *n
   int table_size = self->table_ni * self->table_nj * self->table_nk;
   if( strcmp(key, "VTBL") == 0 ){
     if(! *value){
-      (*value) = malloc( table_size * sizeof(double));
+      (*value) = (double*)malloc( table_size * sizeof(double));
       if(! *value){
 	printf("(Cvgd) ERROR in Cvgd_get_double_3d, problem allocating %d double.\n",table_size);
 	return(VGD_ERROR);
@@ -7514,7 +7514,7 @@ int Cvgd_write_desc (vgrid_descriptor *self, int unit) {
 int Cvgd_stda76_temp(vgrid_descriptor *self, int *i_val, int nl, float *temp){
   int vcode;
   float *pres;
-  pres = malloc( nl * sizeof(float) );
+  pres = (float*)malloc( nl * sizeof(float) );
   if(! pres){
     printf("(Cvgd) ERROR in Cvgd_stda76_temp, problem allocating pres\n");
     return(VGD_ERROR);
@@ -7543,7 +7543,7 @@ int Cvgd_stda76_temp(vgrid_descriptor *self, int *i_val, int nl, float *temp){
 int Cvgd_stda76_pres(vgrid_descriptor *self, int *i_val, int nl, float *pres, float *sfc_temp, float *sfc_pres){
 
   float *temp;
-  temp = malloc( nl * sizeof(float) );
+  temp = (float*)malloc( nl * sizeof(float) );
   if(! temp){
     printf("(Cvgd) ERROR in Cvgd_stda76_pres, problem allocating temp of size %d \n",nl);
     return(VGD_ERROR);

@@ -46,4 +46,4 @@ genlib: $(OBJECTS)
 	ar rcv $(MYLIB) $(OBJECTS)
 
 clean:
-	rm -f *.o *.mod
+	rm -f *.o *.mod libvgrid.a
