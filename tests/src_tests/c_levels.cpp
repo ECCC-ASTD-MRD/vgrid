@@ -20,12 +20,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "vgrid.h"
+#include "vgrid.hpp"
+#include "c_ut_report.h"
+#include "armnlib.h"
 
-void c_levels() {
+extern "C" void c_levels() {
 
   int ier, iun = 10;
-  int *quiet = NULL, *i_val = NULL, *in_log = NULL, *dpidpis = NULL;
+  int quiet = NULL, *i_val = NULL, in_log = NULL, *dpidpis = NULL;
   int nl_t, ni, nj, nk, ni2, nj2, nk2, k, key, ij, ijk, status;
   char filename[]="data/dm_5001_from_model_run";
   char mode[]="RND";
@@ -34,6 +36,7 @@ void c_levels() {
   float *p0 = NULL, *levels = NULL;
   double *p0_8 = NULL, *levels_8 = NULL;
   vgrid_descriptor *vgd = NULL;
+  vgrid my_vgrid;
 
   status = VGD_OK;
 
@@ -48,17 +51,17 @@ void c_levels() {
     return;
   }
   
-  if( Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
+  if( my_vgrid.Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
     return;
   }
 
-  if( Cvgd_get_int_1d(vgd, "VIPT", &i_val, NULL, quiet) ==  VGD_ERROR ) {
+  if( my_vgrid.Cvgd_get_int_1d(vgd, "VIPT", &i_val, NULL, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_int for VIPT\n");
     return;
   }
 
-  ier = Cvgd_get_int(vgd, "NL_T", &nl_t, quiet);
+  ier = my_vgrid.Cvgd_get_int(vgd, "NL_T", &nl_t, quiet);
   if(ier == VGD_ERROR){
     status = VGD_ERROR;
   }
@@ -70,22 +73,22 @@ void c_levels() {
     printf("Problem getting info for P0\n");
     return;
   }
-  p0 = malloc(ni2*nj2 * sizeof(float));
+  p0 = (float*)malloc(ni2*nj2 * sizeof(float));
   if(! p0){
     printf("Problem allocating p0 of size %d\n",ni2*nj2);
     return;
   }
-  p0_8 = malloc(ni2*nj2 * sizeof(double));
+  p0_8 = (double*)malloc(ni2*nj2 * sizeof(double));
   if(! p0_8){
     printf("Problem allocating p0_8 of size %d\n",ni2*nj2);
     return;
   }
-  levels = malloc(ni2*nj2*nl_t * sizeof(float));
+  levels = (float*)malloc(ni2*nj2*nl_t * sizeof(float));
   if(! levels){
     printf("Problem allocating levels of size %d\n",ni2*nj2);
     return;
   }
-  levels_8 = malloc(ni2*nj2*nl_t * sizeof(double));
+  levels_8 = (double*)malloc(ni2*nj2*nl_t * sizeof(double));
   if(! levels_8){
     printf("Problem allocating levels_8 of size %d\n",ni2*nj2);
     return;
@@ -100,18 +103,18 @@ void c_levels() {
     p0_8[ij] = p0[ij];
   }
 
-  ier = Cvgd_get_int(vgd, "NL_T", &nl_t, quiet);
+  ier = my_vgrid.Cvgd_get_int(vgd, "NL_T", &nl_t, quiet);
   if(ier == VGD_ERROR){
     status = VGD_ERROR;
   }
   printf("DANS TEST nl_t = %d\n", nl_t);
 
-  ier = Cvgd_levels(vgd, ni2, nj2, nl_t, i_val, levels, p0, in_log);
+  ier = my_vgrid.Cvgd_levels(vgd, ni2, nj2, nl_t, i_val, levels, p0, in_log);
   if(ier == VGD_ERROR){
     printf("Error with Cvgd_diag_withref\n");
     status = VGD_ERROR;
   }
-  ier = Cvgd_levels_8(vgd, ni2, nj2, nl_t, i_val, levels_8, p0_8, in_log);
+  ier = my_vgrid.Cvgd_levels_8(vgd, ni2, nj2, nl_t, i_val, levels_8, p0_8, in_log);
   if(ier == VGD_ERROR){
     printf("Error with Cvgd_diag_withref_8\n");
     status = VGD_ERROR;
@@ -144,7 +147,7 @@ void c_levels() {
   ier = c_fstfrm(iun);
   ier = c_fclos(iun);
 
-  Cvgd_free(&vgd);
+  my_vgrid.Cvgd_free(&vgd);
   free(p0);
   free(p0_8);
   free(levels);

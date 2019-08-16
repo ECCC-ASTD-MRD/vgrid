@@ -678,7 +678,7 @@ int c_convip_Level2IP(float level, int kind) {
   char   format;
   
   // Convertir niveau reel en ip1a
-  f77name(convip_plus)(&IP,&level,&kind,&mode,&format,&flag,strglen);
+  f77name(convip_plus)(&IP,&level,&kind,&mode,&format,&flag);
     
   return(IP);
 }
@@ -689,7 +689,7 @@ int c_convip_Level2IP_old_style(float level, int kind) {
   char   format; 
   
   // Convertir niveau reel en ip1a
-  f77name(convip_plus)(&IP,&level,&kind,&mode,&format,&flag,strglen);
+  f77name(convip_plus)(&IP,&level,&kind,&mode,&format,&flag);
     
   return(IP);
 }
@@ -701,7 +701,7 @@ float c_convip_IP2Level(int IP,int *kind) {
    char   format;
 
    /*Convertir en niveau reel*/
-    f77name(convip_plus)(&IP,&level,kind,&mode,&format,&flag,strglen);
+    f77name(convip_plus)(&IP,&level,kind,&mode,&format,&flag);
 
    return(level);
 }

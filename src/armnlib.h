@@ -28,18 +28,18 @@ extern "C" int c_fstecr(void *data,void *work,int nbits,int iun,int dateo,int de
 extern "C" int c_fsteff(int handle);
 extern "C" int c_fstfrm(int iun);
 extern "C" int c_fclos(int iun);
-void f77name(cxgaig)(char *grtyp,
+extern "C" void f77name(cxgaig)(char *grtyp,
     F77_INTEGER *ig1,F77_INTEGER *ig2,F77_INTEGER *ig3,F77_INTEGER *ig4,
     F77_REAL *xg1,F77_REAL *xg2,F77_REAL *xg3,F77_REAL *xg4);
-void f77name(cigaxg)(char *grtyp,
+extern "C" void f77name(cigaxg)(char *grtyp,
     F77_REAL *xg1,F77_REAL *xg2,F77_REAL *xg3,F77_REAL *xg4,
     F77_INTEGER *ig1,F77_INTEGER *ig2,F77_INTEGER *ig3,F77_INTEGER *ig4);
-void f77name(convip_plus)(F77_INTEGER *ipnew,F77_REAL *level,F77_INTEGER *fkind,
-    F77_INTEGER *fmode,char *strg,F77_INTEGER *flag,F77_INTEGER strglen);
-int f77name(newdate)(F77_INTEGER *fdat1,F77_INTEGER *fdat2,
+extern "C" void f77name(convip_plus)(F77_INTEGER *ipnew,F77_REAL *level,F77_INTEGER *fkind,
+    F77_INTEGER *fmode,char *strg,F77_INTEGER *flag);
+extern "C" int f77name(newdate)(F77_INTEGER *fdat1,F77_INTEGER *fdat2,
     F77_INTEGER *fdat3,F77_INTEGER *fmode);
-int f77name(difdatr)(F77_INTEGER *fdat1,F77_INTEGER *fdat2,F77_REAL8 *fnhours);
-int f77name(incdatr)(F77_INTEGER *fdat1,F77_INTEGER *fdat2,F77_REAL8 *fnhours);
+extern "C" int f77name(difdatr)(F77_INTEGER *fdat1,F77_INTEGER *fdat2,F77_REAL8 *fnhours);
+extern "C" int f77name(incdatr)(F77_INTEGER *fdat1,F77_INTEGER *fdat2,F77_REAL8 *fnhours);
 extern "C" int c_gdll(int gdid, float *lat, float *lon);
 extern "C" int c_gdxyfll(int gdid,float *x,float *y,float *lat,float *lon,int n);
 extern "C" int c_gdllfxy(int gdid,float *lat,float *lon,float *x,float *y,int n);

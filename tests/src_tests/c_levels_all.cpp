@@ -21,7 +21,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "vgrid.h"
+#include "vgrid.hpp"
+#include "armnlib.h"
+#include "c_ut_report.h"
 #include "armnlib.h"
 
 char *filenames[] = {
@@ -112,6 +114,7 @@ int test_it(char *filename, char *ip1_name, int ind) {
   float *p0 = NULL, *p0ls = NULL, *levels = NULL, fact;
   double *p0_8 = NULL, *p0ls_8 = NULL, *levels_8 = NULL;
   vgrid_descriptor *vgd = NULL;
+  vgrid my_vgrid;
       
   iun = 10 + ind;
   
@@ -137,18 +140,18 @@ int test_it(char *filename, char *ip1_name, int ind) {
     return(VGD_ERROR);
   }
       
-  if( Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
+  if( my_vgrid.Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
     return(VGD_ERROR);
   }
-  //ier = Cvgd_print_desc(vgd, -1, -1);
+  //ier = my_vgrid.Cvgd_print_desc(vgd, -1, -1);
 
-  if( Cvgd_get_int_1d(vgd, ip1_name, &i_val, NULL, quiet) ==  VGD_ERROR ) {
+  if( my_vgrid.Cvgd_get_int_1d(vgd, ip1_name, &i_val, NULL, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_int for %s\n",ip1_name);
     return(VGD_ERROR);
   }
   
-  ier = Cvgd_get_int(vgd, key_name, &nl, quiet);
+  ier = my_vgrid.Cvgd_get_int(vgd, key_name, &nl, quiet);
   if(ier == VGD_ERROR){
     printf("ERROR cannot Cvgd_get_int on %s\n",key_name);
     return(VGD_ERROR);
@@ -158,15 +161,15 @@ int test_it(char *filename, char *ip1_name, int ind) {
   //}
 
   // Compute 3D pressure levels or heights
-  ier = Cvgd_get_char(vgd, "RFLD", nomvar1, 1);
+  ier = my_vgrid.Cvgd_get_char(vgd, "RFLD", nomvar1, 1);
   ref1 = strcmp(nomvar1,VGD_NO_REF_NOMVAR) ? 1 : 0;
-  ier = Cvgd_get_char(vgd, "RFLS", nomvar2, 1);
+  ier = my_vgrid.Cvgd_get_char(vgd, "RFLS", nomvar2, 1);
   ref2 = strcmp(nomvar2,VGD_NO_REF_NOMVAR) ? 1 : 0;
 
   if(! ref1){
     // if no ref1 test if it kind == 2 (pressure level)
     // If is is then put nomvar1 to TT to get problem size. but the actual TT value will not be used
-    ier = Cvgd_get_int(vgd, "KIND", &kind, 0);
+    ier = my_vgrid.Cvgd_get_int(vgd, "KIND", &kind, 0);
     if(ier == VGD_ERROR){
       printf("ERROR cannot Cvgd_get_int on KIND\n");
       return(VGD_ERROR);
@@ -188,12 +191,12 @@ int test_it(char *filename, char *ip1_name, int ind) {
     printf("Problem getting info for %s", nomvar1);
     return(VGD_ERROR);
   }
-  p0 = malloc(ni2*nj2 * sizeof(float));
+  p0 = (float*)malloc(ni2*nj2 * sizeof(float));
   if(! p0){
     printf("Problem allocating surface reference field of size %d\n",ni2*nj2);
     return(VGD_ERROR);
   }
-  p0_8 = malloc(ni2*nj2 * sizeof(double));
+  p0_8 = (double*)malloc(ni2*nj2 * sizeof(double));
   if(! p0_8){
     printf("Problem allocating double surface reference field of size %d\n",ni2*nj2);
     return(VGD_ERROR);
@@ -222,12 +225,12 @@ int test_it(char *filename, char *ip1_name, int ind) {
       printf("Incompatible size of %s\n",nomvar2);
       return(VGD_ERROR);
     }
-    p0ls = malloc(ni2*nj2 * sizeof(float));
+    p0ls = (float*)malloc(ni2*nj2 * sizeof(float));
     if(! p0ls){
       printf("Problem allocating p0ls of size %d\n",ni2*nj2);
       return(VGD_ERROR);
     }
-    p0ls_8 = malloc(ni2*nj2 * sizeof(double));
+    p0ls_8 = (double*)malloc(ni2*nj2 * sizeof(double));
     if(! p0ls_8){
       printf("Problem allocating p0ls_8 of size %d\n",ni2*nj2);
       return(VGD_ERROR);
@@ -243,12 +246,12 @@ int test_it(char *filename, char *ip1_name, int ind) {
     }    
   }
 
-  levels = malloc(ni2*nj2*nl * sizeof(float));
+  levels = (float*)malloc(ni2*nj2*nl * sizeof(float));
   if(! levels){
     printf("Problem allocating levels of size %d\n",ni2*nj2*nl);
     return(VGD_ERROR);
   }
-  levels_8 = malloc(ni2*nj2*nl * sizeof(double));
+  levels_8 = (double*)malloc(ni2*nj2*nl * sizeof(double));
   if(! levels_8){
     printf("Problem allocating levels_8 of size %d\n",ni2*nj2*nl);
     return(VGD_ERROR);
@@ -257,9 +260,9 @@ int test_it(char *filename, char *ip1_name, int ind) {
   //===================================================
   printf("   testing Cvgd_levels* float interface for ip1 list %s\n",ip1_name);
   if(ref2){
-    ier = Cvgd_levels_2ref(vgd, ni2, nj2, nl, i_val, levels, p0, p0ls, in_log);
+    ier = my_vgrid.Cvgd_levels_2ref(vgd, ni2, nj2, nl, i_val, levels, p0, p0ls, in_log);
   } else {
-    ier = Cvgd_levels(vgd, ni2, nj2, nl, i_val, levels, p0, in_log);
+    ier = my_vgrid.Cvgd_levels(vgd, ni2, nj2, nl, i_val, levels, p0, in_log);
   }
   if(ier == VGD_ERROR){
     printf("Error with Cvgd_levels*\n");
@@ -267,9 +270,9 @@ int test_it(char *filename, char *ip1_name, int ind) {
   }
   printf("   testing Cvgd_levels* double interface for ip1 list %s\n",ip1_name);
   if(ref2){
-    ier = Cvgd_levels_2ref_8(vgd, ni2, nj2, nl, i_val, levels_8, p0_8, p0ls_8, in_log);
+    ier = my_vgrid.Cvgd_levels_2ref_8(vgd, ni2, nj2, nl, i_val, levels_8, p0_8, p0ls_8, in_log);
   } else {
-    ier = Cvgd_levels_8(vgd, ni2, nj2, nl, i_val, levels_8, p0_8, in_log);
+    ier = my_vgrid.Cvgd_levels_8(vgd, ni2, nj2, nl, i_val, levels_8, p0_8, in_log);
   }
   if(ier == VGD_ERROR){
     printf("Error with Cvgd_levels*_8\n");
@@ -279,9 +282,9 @@ int test_it(char *filename, char *ip1_name, int ind) {
   //===================================================
   printf("   testing Cvgd_diag_withref float interface\n");
   if(ref2){
-    ier = Cvgd_diag_withref_2ref(vgd, ni2, nj2, nl, i_val, levels, p0, p0ls, in_log, dpidpis);
+    ier = my_vgrid.Cvgd_diag_withref_2ref(vgd, ni2, nj2, nl, i_val, levels, p0, p0ls, in_log, dpidpis);
   } else {
-    ier = Cvgd_diag_withref(vgd, ni2, nj2, nl, i_val, levels, p0, in_log, dpidpis);
+    ier = my_vgrid.Cvgd_diag_withref(vgd, ni2, nj2, nl, i_val, levels, p0, in_log, dpidpis);
   }
   if(ier == VGD_ERROR){
     printf("Error with Cvgd_diag_withref*\n");
@@ -289,16 +292,16 @@ int test_it(char *filename, char *ip1_name, int ind) {
   }
   printf("   testing Cvgd_levels* double interface for ip1 list %s\n",ip1_name);
   if(ref2){
-    ier = Cvgd_diag_withref_2ref_8(vgd, ni2, nj2, nl, i_val, levels_8, p0_8, p0ls_8, in_log, dpidpis);
+    ier = my_vgrid.Cvgd_diag_withref_2ref_8(vgd, ni2, nj2, nl, i_val, levels_8, p0_8, p0ls_8, in_log, dpidpis);
   } else {
-    ier = Cvgd_diag_withref_8(vgd, ni2, nj2, nl, i_val, levels_8, p0_8, in_log, dpidpis);
+    ier = my_vgrid.Cvgd_diag_withref_8(vgd, ni2, nj2, nl, i_val, levels_8, p0_8, in_log, dpidpis);
   }
   if(ier == VGD_ERROR){
     printf("Error with Cvgd_diag_withref*_8\n");
     return(VGD_ERROR);
   }
   strcpy(key_name,"VCOD");
-  ier = Cvgd_get_int(vgd, key_name, &vcode, quiet);
+  ier = my_vgrid.Cvgd_get_int(vgd, key_name, &vcode, quiet);
   if( compare_values(iun, vcode, levels, levels_8, p0, i_val, nl,nomvar1) == VGD_ERROR){
     printf("ERROR comparison failed\n");
     return(VGD_ERROR);
@@ -307,7 +310,7 @@ int test_it(char *filename, char *ip1_name, int ind) {
   ier = c_fstfrm(iun);
   ier = c_fclos(iun);
       
-  Cvgd_free(&vgd);
+  my_vgrid.Cvgd_free(&vgd);
   free(p0);
   free(levels);
   free(p0_8);
@@ -321,11 +324,12 @@ int test_it(char *filename, char *ip1_name, int ind) {
 //========================================================================
 //========================================================================
 
-void c_levels_all() {
+extern "C" void c_levels_all() {
   
   int i, ier, status = VGD_OK;
+  vgrid my_vgrid;
 
-  ier = Cvgd_putopt_int("ALLOW_SIGMA",1);
+  ier = my_vgrid.Cvgd_putopt_int("ALLOW_SIGMA",1);
   
   for (i = 0; i < (int) n_file; i++) {
     printf ("Testing %s\n", filenames[i]);

@@ -21,7 +21,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "vgrid.h"
+#include "vgrid.hpp"
+#include "c_ut_report.h"
 #include "armnlib.h"
 
 char *filenames[] = {
@@ -46,7 +47,7 @@ char *filenames[] = {
 
 char* concat(const char *s1, const char *s2)
 {
-    char *result = malloc(strlen(s1)+strlen(s2)+1);//+1 for the null-terminator
+    char *result = (char*)malloc(strlen(s1)+strlen(s2)+1);//+1 for the null-terminator
     if(! result){
       printf("Problem in tests with concat");
       exit(1);
@@ -62,6 +63,7 @@ int test_it(char *filename, int ind) {
   int value=0, value2=0;
   char mode[]="RND";
   vgrid_descriptor *vgd = NULL;
+  vgrid my_vgrid;
   char key[11][5] = {"DATE","IG_1","IG_2","IG_3","IG_4","IP_1","IP_2","IP_3","DIPM", "DIPT", "DIPW"};
 
   // Run the test on one input data file, filename
@@ -77,16 +79,16 @@ int test_it(char *filename, int ind) {
     return(VGD_ERROR);
   }
 
-  if( Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
+  if( my_vgrid.Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR in test with Cvgd_new_read on iun\n");
     return(VGD_ERROR);
   }
-  //ier = Cvgd_print_desc(vgd, -1, -1);
+  //ier = my_vgrid.Cvgd_print_desc(vgd, -1, -1);
   for( i = 0; i < 11; i++ ){
     printf("   %s\n", key[i]);
     if (strcmp(key[i], "DIPM") == 0){
-      if(Cvgd_is_valid(vgd,"dhm_valid")){
-	if( Cvgd_get_int(vgd, key[i], &value, quiet) == VGD_ERROR ) {
+      if(my_vgrid.Cvgd_is_valid(vgd,"dhm_valid")){
+	if( my_vgrid.Cvgd_get_int(vgd, key[i], &value, quiet) == VGD_ERROR ) {
 	  printf("ERROR in test with Cvgd_get_int on key %s\n", key[i]);
 	  return(VGD_ERROR);
 	}
@@ -95,8 +97,8 @@ int test_it(char *filename, int ind) {
       }
     }
     if (strcmp(key[i], "DIPT") == 0){
-      if(Cvgd_is_valid(vgd,"dht_valid")){
-	if( Cvgd_get_int(vgd, key[i], &value, quiet) == VGD_ERROR ) {
+      if(my_vgrid.Cvgd_is_valid(vgd,"dht_valid")){
+	if( my_vgrid.Cvgd_get_int(vgd, key[i], &value, quiet) == VGD_ERROR ) {
 	  printf("ERROR in test with Cvgd_get_int on key %s\n", key[i]);
 	  return(VGD_ERROR);
 	}
@@ -105,8 +107,8 @@ int test_it(char *filename, int ind) {
       }
     }
     if (strcmp(key[i], "DIPW") == 0){
-      if(Cvgd_is_valid(vgd,"dhw_valid")){
-	if( Cvgd_get_int(vgd, key[i], &value, quiet) == VGD_ERROR ) {
+      if(my_vgrid.Cvgd_is_valid(vgd,"dhw_valid")){
+	if( my_vgrid.Cvgd_get_int(vgd, key[i], &value, quiet) == VGD_ERROR ) {
 	  printf("ERROR in test with Cvgd_get_int on key %s\n", key[i]);
 	  return(VGD_ERROR);
 	}
@@ -116,10 +118,10 @@ int test_it(char *filename, int ind) {
     }    
     value2 = value;
     value = value + 1;
-    if( Cvgd_put_int(&vgd, key[i] , value) == VGD_ERROR ){
+    if( my_vgrid.Cvgd_put_int(&vgd, key[i] , value) == VGD_ERROR ){
       return(VGD_ERROR);
     }
-    if( Cvgd_get_int(vgd, key[i] , &value2, quiet) == VGD_ERROR ){
+    if( my_vgrid.Cvgd_get_int(vgd, key[i] , &value2, quiet) == VGD_ERROR ){
       return(VGD_ERROR);
     }
     if ( value2 != value ){
@@ -132,7 +134,7 @@ int test_it(char *filename, int ind) {
   ier = c_fclos(iun);
   printf("ier = %d\n",ier);
       
-  Cvgd_free(&vgd);
+  my_vgrid.Cvgd_free(&vgd);
 
   return(VGD_OK);
   
@@ -141,11 +143,12 @@ int test_it(char *filename, int ind) {
 //========================================================================
 //========================================================================
 
-void c_get_put_get_all() {
+extern "C" void c_get_put_get_all() {
   
   int ier, i, status = VGD_OK;
+  vgrid my_vgrid;
 
-  if( Cvgd_putopt_int("ALLOW_SIGMA",1) == VGD_ERROR){
+  if( my_vgrid.Cvgd_putopt_int("ALLOW_SIGMA",1) == VGD_ERROR){
     printf("ERROR with Cvgd_putopt_int on ALLOW_SIGMA)\n");
     status = VGD_ERROR;
     exit(1);

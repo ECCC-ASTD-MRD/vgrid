@@ -18,7 +18,9 @@
  * Boston, MA 02111-1307, USA.
  */
 #include <stdio.h>
-#include "vgrid.h"
+#include <stdlib.h>
+#include "vgrid.hpp"
+#include "c_ut_report.h"
 #include "armnlib.h"
 
 char *filenames[] = {
@@ -43,49 +45,52 @@ int test_it(char *filename, int ind) {
   int ni, nj, nk, iun, ier;
   double *table = NULL;
   vgrid_descriptor *vgd = NULL,  *vgd2 = NULL;
+  vgrid my_vgrid;
+  void free (void* ptr);
 
   iun = 10 + ind;
 
   if( c_fnom(&iun,filename,"RND+R/O",0) < 0 ) {
     printf("ERROR with c_fnom on iun, file %s\n", filename);
-    return;
+    return (VGD_ERROR);
   }
   if( c_fstouv(iun,"RND","") < 0 ) {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
-    return;
+    return (VGD_ERROR);
   }  
-  if( Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
+  if( my_vgrid.Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
-    return;
+    return (VGD_ERROR);
   }
   // Get table  
-  if( Cvgd_get_double_3d(vgd, "VTBL", &table, &ni, &nj, &nk, 0) == VGD_ERROR ){
+  if( my_vgrid.Cvgd_get_double_3d(vgd, "VTBL", &table, &ni, &nj, &nk, 0) == VGD_ERROR ){
     printf("ERROR with Cvgd_get_double_3d on VTBL\n");
-    return;
+    return (VGD_ERROR);
   }
-  if( Cvgd_new_from_table(&vgd2, table, ni, nj, nk) == VGD_ERROR ){
+  if( my_vgrid.Cvgd_new_from_table(&vgd2, table, ni, nj, nk) == VGD_ERROR ){
     printf("ERROR with Cvgd_new_from_table\n");
-    return;
+    return (VGD_ERROR);
   }
   // Test equality
-  ier = Cvgd_vgdcmp(vgd, vgd2);
+  ier = my_vgrid.Cvgd_vgdcmp(vgd, vgd2);
   if( ier != 0 ){
     printf("     Descritors not equal, Cvgd_vgdcmp code is %d\n", ier);    
     return (VGD_ERROR);
   } else {
     printf("     Descritors are equal.\n");
   }
-  Cvgd_free(&vgd);
-  Cvgd_free(&vgd2);
-  free(table);
+  my_vgrid.Cvgd_free(&vgd);
+  my_vgrid.Cvgd_free(&vgd2);
+  free((void*)table);
   return (VGD_OK);
 }
 
-void c_new_from_table() {
+extern "C" void c_new_from_table() {
   
   int i, ier, status = VGD_OK;
+  vgrid my_vgrid;
 
-  ier = Cvgd_putopt_int("ALLOW_SIGMA",1);
+  ier = my_vgrid.Cvgd_putopt_int("ALLOW_SIGMA",1);
   
   for (i = 0; i < (int) n_file; i++) {
     printf ("Testing %s\n", filenames[i]);

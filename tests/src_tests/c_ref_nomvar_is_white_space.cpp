@@ -18,16 +18,18 @@
  * Boston, MA 02111-1307, USA.
  */
 #include <stdio.h>
-#include "vgrid.h"
+#include "vgrid.hpp"
+#include "c_ut_report.h"
 #include "armnlib.h"
 
-int c_ref_nomvar_is_white_space() {
+extern "C" int c_ref_nomvar_is_white_space() {
 
   int iun = 10;
   char mode[]="RND+R/O", ok=VGD_OK;
   char filename[]="data/dm_2001_from_editfst";
   char value[]="VGD_NO_REF_NOMVAR";
   vgrid_descriptor *vgd = NULL;
+  vgrid my_vgrid;
 
   if( c_fnom(&iun,filename,mode,0) < 0 ) {
     printf("ERROR with c_fnom on iun, file %s\n", filename);
@@ -37,18 +39,18 @@ int c_ref_nomvar_is_white_space() {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
     return(1);
   }
-  if( Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
+  if( my_vgrid.Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
     return(1);
   }
 
-  if( Cvgd_get_char(vgd, "RFLD", value, 1) == VGD_OK ){
+  if( my_vgrid.Cvgd_get_char(vgd, "RFLD", value, 1) == VGD_OK ){
     printf("RFLD='%s'\n",value);
     printf("In test, problem with vgd_get on 'RFLD', should have returned an error but returned VGD_OK\n");
     ok = VGD_ERROR;
   }
 
-  if( Cvgd_get_char(vgd, "RFLS", value, 1) == VGD_OK ){
+  if( my_vgrid.Cvgd_get_char(vgd, "RFLS", value, 1) == VGD_OK ){
     printf("RFLS='%s'\n",value);
     printf("In test, problem with vgd_get on 'RFLS', should have returned an error but returned VGD_OK\n");
     ok = VGD_ERROR;

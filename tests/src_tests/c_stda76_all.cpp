@@ -21,7 +21,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "vgrid.h"
+#include "vgrid.hpp"
+#include "c_ut_report.h"
 #include "armnlib.h"
 
 char *filenames[] = {
@@ -48,7 +49,7 @@ char *filenames[] = {
 
 char* concat(const char *s1, const char *s2)
 {
-    char *result = malloc(strlen(s1)+strlen(s2)+1);//+1 for the null-terminator
+    char *result = (char*)malloc(strlen(s1)+strlen(s2)+1);//+1 for the null-terminator
     if(! result){
       printf("Problem in tests with concat");
       exit(1);
@@ -109,6 +110,7 @@ int test_it(char *filename, int ind) {
   char nomvar[] = "1234";
   float *temp = NULL, *pres = NULL, temp_c, sfc_pres, sfc_temp;
   vgrid_descriptor *vgd = NULL;
+  vgrid my_vgrid;
       
   iun = 10 + ind;
   
@@ -123,45 +125,45 @@ int test_it(char *filename, int ind) {
     return(VGD_ERROR);
   }
 
-  if( Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
+  if( my_vgrid.Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
     return(VGD_ERROR);
   }
-  //ier = Cvgd_print_desc(vgd, -1, -1);
+  //ier = my_vgrid.Cvgd_print_desc(vgd, -1, -1);
 
-  if( Cvgd_get_int_1d(vgd, "VIPT", &i_val, NULL, quiet) ==  VGD_ERROR ) {
+  if( my_vgrid.Cvgd_get_int_1d(vgd, "VIPT", &i_val, NULL, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_int for VIPT\n");
     return(VGD_ERROR);
   }
 
-  if( Cvgd_get_int(vgd, "NL_T", &nl_t, quiet) == VGD_ERROR){
+  if( my_vgrid.Cvgd_get_int(vgd, "NL_T", &nl_t, quiet) == VGD_ERROR){
     printf("ERROR cannot Cvgd_get_int on NL_T\n");
     return(VGD_ERROR);
   }
   printf("   Testing temperature\n");
-  temp = malloc( nl_t * sizeof(float) );
+  temp = (float*)malloc( nl_t * sizeof(float) );
   if(! temp){
     printf("ERROR in test, problem allocating temp\n");
     free(temp);
     return(VGD_ERROR);
   }
-  if( Cvgd_stda76_temp(vgd, i_val, nl_t, temp) == VGD_ERROR ) {
+  if( my_vgrid.Cvgd_stda76_temp(vgd, i_val, nl_t, temp) == VGD_ERROR ) {
     printf("ERROR with Cvgd_stda76_temp\n");
     return(VGD_ERROR);
   }
   if( compare(filename, "_stda76_temp.txt", i_val, temp, nl_t) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  ier = Cvgd_get_char(vgd, "RFLD", nomvar, 1);
+  ier = my_vgrid.Cvgd_get_char(vgd, "RFLD", nomvar, 1);
   if(! strcmp(nomvar,"ME  ")){
     printf("   Testing pressure\n");
-    pres = malloc( nl_t * sizeof(float) );
+    pres = (float*)malloc( nl_t * sizeof(float) );
     if(! pres){
       printf("ERROR in test, problem allocating pres\n");
       free(pres);
       return(VGD_ERROR);
     }
-    if( Cvgd_stda76_pres(vgd, i_val, nl_t, pres, NULL, NULL) == VGD_ERROR ) {
+    if( my_vgrid.Cvgd_stda76_pres(vgd, i_val, nl_t, pres, NULL, NULL) == VGD_ERROR ) {
       printf("ERROR with Cvgd_stda76_pres\n");
       return(VGD_ERROR);
     }
@@ -170,7 +172,7 @@ int test_it(char *filename, int ind) {
     }
     printf("   Testing pressure, option sfc_pres\n");
     sfc_pres=100000.;
-    if( Cvgd_stda76_pres(vgd, i_val, nl_t, pres, NULL, &sfc_pres) == VGD_ERROR ) {
+    if( my_vgrid.Cvgd_stda76_pres(vgd, i_val, nl_t, pres, NULL, &sfc_pres) == VGD_ERROR ) {
       printf("ERROR with Cvgd_stda76_pres, option sfc_pres\n");
       return(VGD_ERROR);
     }
@@ -179,7 +181,7 @@ int test_it(char *filename, int ind) {
     }
     printf("   Testing pressure, option sfc_temp\n");
     sfc_temp=273.;
-    if( Cvgd_stda76_pres(vgd, i_val, nl_t, pres, &sfc_temp, NULL) == VGD_ERROR ) {
+    if( my_vgrid.Cvgd_stda76_pres(vgd, i_val, nl_t, pres, &sfc_temp, NULL) == VGD_ERROR ) {
       printf("ERROR with Cvgd_stda76_pres, option sfc_pres\n");
       return(VGD_ERROR);
     }
@@ -191,7 +193,7 @@ int test_it(char *filename, int ind) {
   ier = c_fstfrm(iun);
   ier = c_fclos(iun);
       
-  Cvgd_free(&vgd);
+  my_vgrid.Cvgd_free(&vgd);
   free(temp);
   free(pres);
   free(i_val);
@@ -203,11 +205,12 @@ int test_it(char *filename, int ind) {
 //========================================================================
 //========================================================================
 
-void c_stda76_all() {
+extern "C" void c_stda76_all() {
   
   int i, ier, status = VGD_OK;
+  vgrid my_vgrid;
 
-  ier = Cvgd_putopt_int("ALLOW_SIGMA",1);
+  ier = my_vgrid.Cvgd_putopt_int("ALLOW_SIGMA",1);
 
   // Tests avalability and value of VGD_STDA76_SFC_T VGD_STDA76_SFC_P
     if(fabs(VGD_STDA76_SFC_T - (273.15 +15))/(273.15 +15) > 1.e-5){
