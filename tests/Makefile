@@ -12,16 +12,16 @@ endif
 DATA_ARCH=`uname -s`
 
 alltests:
-	make tests DATA_ARCH=Linux; \
-        make tests DATA_ARCH=AIX
+	make tests
 
+# e.g. make tests ONLY=c_use_new_read
 tests:
 	mkdir -p data;\
 	rm -rf data/* 2>/dev/null; \
 	cd data ; \
 	rm -rf WORK ; \
 	mkdir -p WORK ; \
-        ln -s ../data_$(DATA_ARCH)/* . ; \
+  ln -s ../data_Linux/* . ; \
 	cd .. ; \
 	./run_tests.ksh -only $(ONLY) -compile $(COMPILE) -execute $(EXECUTE) -valgrind $(VALGRIND)
 

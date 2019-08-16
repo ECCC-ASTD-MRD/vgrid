@@ -32,7 +32,9 @@ DEFINE = -DFICHSTD98
 
 OBJECTS = vgrid_utils.o vgrid.o vgrid_descriptors.o
 
-obj:	$(OBJECTS)
+# default:
+libvgrid.a: $(OBJECTS)
+	ar rcv libvgrid.a $(OBJECTS)
 
 vgrid.o: vgrid.cpp armnlib.hpp armnlib.h vgrid.hpp vgrid.h
 

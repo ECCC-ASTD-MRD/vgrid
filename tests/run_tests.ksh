@@ -9,7 +9,7 @@ eval `cclargs \
  ++ $*`
 
 if [ "${only}" = -1 ];then
-   set -A tests $(ls -1 src_tests/*.F90 | perl -p -e 's|src_tests/(.+)\.F90|$1|g') $(ls -1 src_tests/*.c | perl -p -e 's|src_tests/(.+)\.c|$1|g')
+   set -A tests $(ls -1 src_tests/*.F90 | perl -p -e 's|src_tests/(.+)\.F90|$1|g') $(ls -1 src_tests/*.cpp | perl -p -e 's|src_tests/(.+)\.cpp|$1|g')
 else
    set -A tests ${only}
 fi
@@ -45,7 +45,7 @@ if [ ${compile} = 1 ];then
       # Fortran or C ?
       if echo ${test} | grep -q '^c_' ;then
          IS_C=yes
-         EXT=.c
+         EXT=.cpp
       else
          IS_C=no
          EXT=.F90

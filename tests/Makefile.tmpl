@@ -18,10 +18,10 @@ DESCRIP_PATH = ../src
 	s.f90 -c $(MY_FFLAGS) $(FFLAGS) -L$(DESCRIP_PATH) -I$(DESCRIP_PATH) $(LEFENCE) $<
 
 %.o: %.c
-	s.cc -c  $(MY_CFLAGS) $(CFLAGS) -L$(DESCRIP_PATH) -I$(DESCRIP_PATH) $(LEFENCE) $<
+	s.cc -c  $(MY_CFLAGS) $(CFLAGS) -libpath $(DESCRIP_PATH) -I$(DESCRIP_PATH) $(LEFENCE) $<
 
 %.o: %.cpp
-	s.cc -c  $(MY_CFLAGS) $(CFLAGS) -L$(DESCRIP_PATH) -I$(DESCRIP_PATH) $(LEFENCE) $<
+	s.cc -c  $(MY_CFLAGS) $(CFLAGS) -libpath $(DESCRIP_PATH) -I$(DESCRIP_PATH) $(LEFENCE) $<
 
 OBJECTS = unit_testing.o c_ut_report.o
 
@@ -30,8 +30,8 @@ UNIT_TEST_F: $(OBJECTS) UNIT_TEST_F.F90 $(DESCRIP_PATH)/libvgrid.a
 	# s.f90 $(OBJECTS) -o UNIT_TEST_F -I$(DESCRIP_PATH) -L$(DESCRIP_PATH) -lrmn -vgrid $(OPENMP) $(MY_FFLAGS) $(FFLAGS)
 	s.compile $(OPENMP) -optf "=$(MY_FFLAGS) $(FFLAGS)" -includes $(DESCRIP_PATH) -src UNIT_TEST_F.F90 -o UNIT_TEST_F -obj $(OBJECTS) -libpath $(DESCRIP_PATH) $(GFORTRAN_LIB) -libappl vgrid -librmn $(EFENCE) -libsys stdc++
 
-UNIT_TEST_C: $(OBJECTS) UNIT_TEST_C.c $(DESCRIP_PATH)/libvgrid.a
-	s.compile $(OPENMP) -optc "=$(MY_CFLAGS) $(CFLAGS)" -includes $(DESCRIP_PATH) -src UNIT_TEST_C.c -o UNIT_TEST_C -bidon c -main UNIT_TEST_C -obj $(OBJECTS) -libpath $(DESCRIP_PATH) $(GFORTRAN_LIB) -libappl vgrid -librmn $(EFENCE) -libsys stdc++
+UNIT_TEST_C: $(OBJECTS) UNIT_TEST_C.cpp $(DESCRIP_PATH)/libvgrid.a
+	s.compile $(OPENMP) -optc "=$(MY_CFLAGS) $(CFLAGS)" -includes $(DESCRIP_PATH) -src UNIT_TEST_C.cpp -o UNIT_TEST_C -bidon c -main UNIT_TEST_C -obj $(OBJECTS) -libpath $(DESCRIP_PATH) $(GFORTRAN_LIB) -libappl vgrid -librmn $(EFENCE) -libsys stdc++
 
 $(DESCRIP_PATH)/libvgrid.a: $(DESCRIP_PATH)/*.cpp $(DESCRIP_PATH)/*.hpp $(DESCRIP_PATH)/*.h
 	cd ../src ;\
