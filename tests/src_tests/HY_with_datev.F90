@@ -44,7 +44,7 @@ program constructor
 
   ! Construct a new set of 3D coordinate descriptors
   print*,'The following error on optional ip2 is expected'
-  stat = vgd_new(d,unit=lu,format="fst")
+  stat = vgd_new(d,lu,"fst")
   
   call ut_report(stat,'Grid_Descriptors, vgd_new, vgd_get CA')
 

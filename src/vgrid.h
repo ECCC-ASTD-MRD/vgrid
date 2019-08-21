@@ -95,6 +95,12 @@ typedef struct vgrid_descriptor {
   char     valid;         // Validity of structure
 } vgrid_descriptor;
 
+
+int Cvgd_new_read(vgrid_descriptor **vgd, int unit, int ip1,int ip2,
+                  int kind, int version);
+int Cvgd_new_from_table(vgrid_descriptor **vgd, double *table, 
+                        int ni, int nj, int nk);
+
 class vgrid
 {
 public:

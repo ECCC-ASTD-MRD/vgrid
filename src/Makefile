@@ -30,7 +30,7 @@ DEFINE = -DFICHSTD98
 	s.cc -c -O $(OPTIMIZ) $(DEFINE) $(CFLAGS) $(SUPP_OPT) $(C_SUPP_OPT) $<
 
 
-OBJECTS = vgrid_utils.o vgrid.o vgrid_descriptors.o
+OBJECTS = vgrid_utils.o vgrid.o vgrid_descriptors.o tunnel_from_fortran.o
 
 # default:
 libvgrid.a: $(OBJECTS)
@@ -41,6 +41,8 @@ vgrid.o: vgrid.cpp armnlib.hpp armnlib.h vgrid.hpp vgrid.h
 vgrid_descriptors.o: vgrid_descriptors.F90 vgrid_utils.o vgrid_descriptors.hf
 
 vgrid_utils.o: vgrid_utils.F90 vgrid_descriptors.hf
+
+tunnel_from_fortran.o:  tunnel_from_fortran.cpp vgrid.hpp
 
 
 genlib: $(OBJECTS)
