@@ -22,9 +22,8 @@
 #include <string.h>
 #include <math.h>
 #include "vgrid.hpp"
-#include "armnlib.h"
+#include "armnlib.hpp"
 #include "c_ut_report.h"
-#include "armnlib.h"
 
 char *filenames[] = {
     "data/dm_1001_from_model_run",

@@ -22,7 +22,7 @@
 #include <math.h>
 #include "vgrid.hpp"
 #include "c_ut_report.h"
-#include "armnlib.h"
+#include "armnlib.hpp"
 
 extern "C" void c_levels() {
 

@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include "vgrid.hpp"
 #include "c_ut_report.h"
-#include "armnlib.h"
+#include "armnlib.hpp"
 
 extern "C" int c_ref_nomvar_is_white_space() {
 
