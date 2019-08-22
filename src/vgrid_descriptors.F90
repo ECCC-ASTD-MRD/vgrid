@@ -58,7 +58,6 @@ module vGrid_Descriptors
    
    interface
 
-
       integer(c_int) function f_new_read(vgd,unit,ip1,ip2,kind,version) bind(c, name='Cvgd_new_read')
          use iso_c_binding, only : c_ptr, c_int, c_char
          type(c_ptr) :: vgd
@@ -71,11 +70,23 @@ module vGrid_Descriptors
          type(c_ptr), value :: table_CP
          integer (c_int), value :: ni, nj, nk
       end function f_new_from_table
+      
+      integer(c_int) function f_new_build_vert(vgd,kind,version,nk,ip1,ip2, &
+           ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, &
+           a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, ip1_m_CP, ip1_t_CP, ip1_w_CP, nl_m, nl_t, nl_w) bind(c, name='Cvgd_new_build_vert2')
+         use iso_c_binding, only : c_ptr, c_int
+         type(c_ptr) :: vgd
+         integer (c_int), value :: kind,version,nk,ip1,ip2
+         type(c_ptr), value :: ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP
+         type(c_ptr), value :: a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, ip1_m_CP, ip1_t_CP, ip1_w_CP
+         integer (c_int), value :: nl_m, nl_t, nl_w
+      end function f_new_build_vert
 
    end interface
    
    interface vgd_new
       module procedure new_read_no_options
+      module procedure new_build_vert_no_options
    end interface vgd_new
    
 contains
@@ -160,5 +171,57 @@ contains
       status = VGD_OK
       
     end function new_from_table
+
+   integer function new_build_vert_no_options(self,kind,version,nk) result(status)
+      ! Coordinate constructor - build vertical descriptor from arguments
+      type(vgrid_descriptor) :: self                    !Vertical descriptor instance    
+      integer, intent(in) :: kind,version               !Kind,version to create
+      integer, intent(in) :: nk                         !Number of levelsLevel ID (IP1) for momentum(m),thermo(t) and Vertical-Velocity levels
+
+      ! Assign optional argument to C_NULL_PTR  
+
+      ! Local variables
+      type(c_ptr) :: rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, ptop_8_CP, pref_8_CP
+      type(c_ptr) :: a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, ip1_m_CP, ip1_t_CP, ip1_w_CP
+      integer l_ip1,l_ip2,nl_m, nl_t, nl_w
+
+      status = VGD_ERROR
+
+      nl_m=nk
+      nl_t=-1
+      nl_w=-1
+
+      l_ip1 = -1
+      l_ip2 = -1
+      ptop_8_CP = C_NULL_PTR
+      pref_8_CP = C_NULL_PTR
+      rcoef1_CP = C_NULL_PTR
+      rcoef2_CP = C_NULL_PTR
+      rcoef3_CP = C_NULL_PTR
+      rcoef4_CP = C_NULL_PTR
+      a_m_8_CP = C_NULL_PTR
+      b_m_8_CP = C_NULL_PTR
+      c_m_8_CP = C_NULL_PTR
+      a_t_8_CP = C_NULL_PTR
+      b_t_8_CP = C_NULL_PTR
+      c_t_8_CP = C_NULL_PTR
+      a_w_8_CP = C_NULL_PTR
+      b_w_8_CP = C_NULL_PTR
+      c_w_8_CP = C_NULL_PTR
+      ip1_m_CP = C_NULL_PTR
+      ip1_t_CP = C_NULL_PTR
+      ip1_w_CP = C_NULL_PTR
+
+      if( f_new_build_vert(self%cptr,kind,version,nk,l_ip1,l_ip2, &
+           ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, &
+           a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, &
+           ip1_m_CP, ip1_t_CP, ip1_w_CP, nl_m, nl_t, nl_w) == VGD_ERROR )then
+         print*,'(F_vgd) ERROR in new_build_vert, problem with c_new_build_vert',VGD_ERROR
+         return
+      endif
+
+      status = VGD_OK
+
+   end function new_build_vert_no_options
 
 end module vGrid_Descriptors

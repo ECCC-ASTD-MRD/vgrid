@@ -34,6 +34,12 @@ tests_par:
 	cd .. ;\
 	./run_tests_in_parallel.ksh -MAX_CPUS $(MAX_CPUS) -compile $(COMPILE) -execute $(EXECUTE) -valgrind $(VALGRIND)
 
+help:
+	@echo 'Possible commands:'
+	@echo '   make tests'
+	@echo '   make tests ONLY=HY_with_datev'
+	@echo '   make tests ONLY="c_get_put_get_all c_levels"'
+
 clean:
 	rm -f *.o *.mod *.out Makefile.test
 
