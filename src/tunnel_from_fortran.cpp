@@ -23,6 +23,7 @@
 
 
 #include "vgrid.hpp"
+#include "tunnel_from_fortran.hpp"
 
 int Cvgd_new_read(vgrid_descriptor **vgd, int unit, int ip1,int ip2, 
                   int kind, int version)

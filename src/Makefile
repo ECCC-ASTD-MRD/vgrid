@@ -1,6 +1,6 @@
 .SUFFIXES:
 
-.SUFFIXES : .o .c .F90 .cpp .a .h
+.SUFFIXES : .o .c .F90 .cpp .a .h .hpp
 
 SHELL = /bin/bash
 
@@ -42,7 +42,7 @@ vgrid_descriptors.o: vgrid_descriptors.F90 vgrid_utils.o vgrid_descriptors.hf
 
 vgrid_utils.o: vgrid_utils.F90 vgrid_descriptors.hf
 
-tunnel_from_fortran.o:  tunnel_from_fortran.cpp vgrid.hpp
+tunnel_from_fortran.o:  tunnel_from_fortran.cpp tunnel_from_fortran.hpp tunnel_from_fortran.h
 
 
 genlib: $(OBJECTS)
