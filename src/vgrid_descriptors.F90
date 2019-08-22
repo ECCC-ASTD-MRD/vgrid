@@ -85,21 +85,21 @@ module vGrid_Descriptors
    end interface
    
    interface vgd_new
-      module procedure new_read_no_options
-      module procedure new_build_vert_no_options
+      module procedure new_read
+      module procedure new_build_vert
    end interface vgd_new
    
 contains
    
-   integer function new_read_no_options(self,unit,format) result(status)
+   integer function new_read(self,unit,format,ip1,ip2,kind,version) result(status)
       use vgrid_utils, only: up
       ! Coordinate constructor - read from a file and initialize instance
       type(vgrid_descriptor), intent(inout) :: self !Vertical descriptor instance
       integer, intent(in) :: unit                 !File unit to read descriptor information from
       character(len=*), target, optional, intent(in) :: format !File format ('fst' or 'bin') default is 'fst'
-      integer, target :: ip1,ip2                 !ip1,2 values of the desired descriptors
-      integer, target :: kind        ! Level kind requested by user.
-      integer, target :: version     ! Level version requested by user.
+      integer, target,optional :: ip1,ip2                 !ip1,2 values of the desired descriptors
+      integer, target,optional, intent(in) :: kind        ! Level kind requested by user.
+      integer, target,optional, intent(in) :: version     ! Level version requested by user.
       
       ! Local variables
       integer :: ni,nj,nk, istat, error, l_ip1, l_ip2, l_kind, l_version
@@ -113,11 +113,27 @@ contains
       myformat='FST'
       if (present(format)) myformat = trim(up(format))
       select case (trim(up(myformat)))
-      case ('FST')    
-         l_ip1 = -1
-         l_ip2 = -1
-         l_kind = -1
-         l_version = -1
+      case ('FST')      
+         if(present(ip1))then
+            l_ip1 = ip1
+         else
+            l_ip1 = -1
+         endif
+         if(present(ip2))then
+            l_ip2 = ip2
+         else
+            l_ip2 = -1
+         endif
+         if(present(kind))then
+            l_kind = kind
+         else
+            l_kind = -1
+         endif
+         if(present(version))then
+            l_version = version
+         else
+            l_version = -1
+         endif
          
          if( f_new_read(self%cptr, unit, l_ip1, l_ip2, l_kind, l_version) == VGD_ERROR )then
             print*,'(F_vgd) ERROR: In new_read, problem with f_new_read'
@@ -149,7 +165,7 @@ contains
 
       status = VGD_OK
 
-   end function new_read_no_options
+   end function new_read
 
     integer function new_from_table(self,table) result(status)
        ! Coordinate constructor - build vertical descriptor from table input
@@ -172,13 +188,23 @@ contains
       
     end function new_from_table
 
-   integer function new_build_vert_no_options(self,kind,version,nk) result(status)
+   integer function new_build_vert(self,kind,version,nk,ip1,ip2, &
+        ptop_8,pref_8,rcoef1,rcoef2,rcoef3,rcoef4,a_m_8,b_m_8,a_t_8,b_t_8, &
+        ip1_m,ip1_t,c_m_8,c_t_8,a_w_8,b_w_8,c_w_8,ip1_w) result(status)
       ! Coordinate constructor - build vertical descriptor from arguments
       type(vgrid_descriptor) :: self                    !Vertical descriptor instance    
       integer, intent(in) :: kind,version               !Kind,version to create
-      integer, intent(in) :: nk                         !Number of levelsLevel ID (IP1) for momentum(m),thermo(t) and Vertical-Velocity levels
+      integer, intent(in) :: nk                         !Number of levels
+      integer,target , optional, intent(in) :: ip1,ip2          !IP1,2 values for FST file record [0,0]
+      real,target , optional, intent(in) :: rcoef1,rcoef2,rcoef3,rcoef4 !R-coefficient values for rectification
+      real(kind=8),target , optional, intent(in) :: ptop_8            !Top-level pressure (Pa)
+      real(kind=8),target , optional, intent(in) :: pref_8            !Reference-level pressure (Pa)
+      real(kind=8),target , optional, dimension(:) :: a_m_8,a_t_8,a_w_8 !A-coefficients for momentum(m),thermo(t) and Vertical-Velocity levels
+      real(kind=8),target , optional, dimension(:) :: b_m_8,b_t_8,b_w_8 !B-coefficients for momentum(m),thermo(t) and Vertical-Velocity levels
+      real(kind=8),target , optional, dimension(:) :: c_m_8,c_t_8,c_w_8 !C-coefficients for momentum(m),thermo(t) and Vertical-Velocity levels
+      integer,target , optional, dimension(:) :: ip1_m,ip1_t,ip1_w !Level ID (IP1) for momentum(m),thermo(t) and Vertical-Velocity levels
 
-      ! Assign optional argument to C_NULL_PTR  
+      ! Assign optional argument to C_NULL_PTR    
 
       ! Local variables
       type(c_ptr) :: rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, ptop_8_CP, pref_8_CP
@@ -191,27 +217,109 @@ contains
       nl_t=-1
       nl_w=-1
 
-      l_ip1 = -1
-      l_ip2 = -1
-      ptop_8_CP = C_NULL_PTR
-      pref_8_CP = C_NULL_PTR
-      rcoef1_CP = C_NULL_PTR
-      rcoef2_CP = C_NULL_PTR
-      rcoef3_CP = C_NULL_PTR
-      rcoef4_CP = C_NULL_PTR
-      a_m_8_CP = C_NULL_PTR
-      b_m_8_CP = C_NULL_PTR
-      c_m_8_CP = C_NULL_PTR
-      a_t_8_CP = C_NULL_PTR
-      b_t_8_CP = C_NULL_PTR
-      c_t_8_CP = C_NULL_PTR
-      a_w_8_CP = C_NULL_PTR
-      b_w_8_CP = C_NULL_PTR
-      c_w_8_CP = C_NULL_PTR
-      ip1_m_CP = C_NULL_PTR
-      ip1_t_CP = C_NULL_PTR
-      ip1_w_CP = C_NULL_PTR
-
+      if(present(ip1))then
+         l_ip1 = ip1
+      else
+         l_ip1 = -1
+      endif
+      if(present(ip2))then
+         l_ip2 = ip2
+      else
+         l_ip2 = -1
+      endif
+      if(present(ptop_8))then
+         ptop_8_CP = c_loc(ptop_8)
+      else
+         ptop_8_CP = C_NULL_PTR
+      endif
+      if(present(pref_8))then
+         pref_8_CP = c_loc(pref_8)
+      else
+         pref_8_CP = C_NULL_PTR
+      endif
+      if(present(rcoef1))then
+         rcoef1_CP = c_loc(rcoef1)
+      else
+         rcoef1_CP = C_NULL_PTR
+      endif
+      if(present(rcoef2))then
+         rcoef2_CP = c_loc(rcoef2)
+      else
+         rcoef2_CP = C_NULL_PTR
+      endif
+      if(present(rcoef3))then
+         rcoef3_CP = c_loc(rcoef3)
+      else
+         rcoef3_CP = C_NULL_PTR
+      endif
+      if(present(rcoef4))then
+         rcoef4_CP = c_loc(rcoef4)
+      else
+         rcoef4_CP = C_NULL_PTR
+      endif
+      if(present(a_m_8))then
+         a_m_8_CP = c_loc(a_m_8)
+         nl_m = size(a_m_8)
+      else
+         a_m_8_CP = C_NULL_PTR
+      endif
+      if(present(b_m_8))then
+         b_m_8_CP = c_loc(b_m_8)
+      else
+         b_m_8_CP = C_NULL_PTR
+      endif
+      if(present(c_m_8))then
+         c_m_8_CP = c_loc(c_m_8)
+      else
+         c_m_8_CP = C_NULL_PTR
+      endif
+      if(present(a_t_8))then
+         a_t_8_CP = c_loc(a_t_8)
+         nl_t = size(a_t_8)
+      else
+         a_t_8_CP = C_NULL_PTR
+      endif
+      if(present(b_t_8))then
+         b_t_8_CP = c_loc(b_t_8)
+      else
+         b_t_8_CP = C_NULL_PTR
+      endif
+      if(present(c_t_8))then
+         c_t_8_CP = c_loc(c_t_8)
+      else
+         c_t_8_CP = C_NULL_PTR
+      endif
+      if(present(a_w_8))then
+         a_w_8_CP = c_loc(a_w_8)
+         nl_w = size(a_w_8)
+      else
+         a_w_8_CP = C_NULL_PTR
+      endif
+      if(present(b_w_8))then
+         b_w_8_CP = c_loc(b_w_8)
+      else
+         b_w_8_CP = C_NULL_PTR
+      endif
+      if(present(c_w_8))then
+         c_w_8_CP = c_loc(c_w_8)
+      else
+         c_w_8_CP = C_NULL_PTR
+      endif
+      if(present(ip1_m))then
+         ip1_m_CP = c_loc(ip1_m)
+      else
+         ip1_m_CP = C_NULL_PTR
+      endif
+      if(present(ip1_t))then
+         ip1_t_CP = c_loc(ip1_t)
+      else
+         ip1_t_CP = C_NULL_PTR
+      endif
+      if(present(ip1_w))then
+         ip1_w_CP = c_loc(ip1_w)
+      else
+         ip1_w_CP = C_NULL_PTR
+      endif
       if( f_new_build_vert(self%cptr,kind,version,nk,l_ip1,l_ip2, &
            ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, &
            a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, &
@@ -222,6 +330,6 @@ contains
 
       status = VGD_OK
 
-   end function new_build_vert_no_options
+   end function new_build_vert
 
 end module vGrid_Descriptors
