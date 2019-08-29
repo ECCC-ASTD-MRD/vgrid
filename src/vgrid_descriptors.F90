@@ -212,6 +212,7 @@ module vGrid_Descriptors
    end interface vgd_putopt
 
    interface vgd_levels
+      module procedure levels_toplevel
       module procedure levels_withref_prof
    end interface vgd_levels
    
@@ -495,6 +496,86 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Compute vertical levelling
+
+  integer function levels_toplevel(unit,fstkeys,levels,in_log) result(status)
+    ! Top-level interface for computing physical levelling information
+    integer, intent(in) :: unit                         !File unit associated with the key
+    integer, dimension(:), intent(in) :: fstkeys        !Key of prototype field
+    real, dimension(:,:,:), pointer :: levels           !Physical level values
+    logical, optional, intent(in) :: in_log             !Compute levels in ln() [.false.]
+
+    ! Local variables
+    real :: lev
+    integer :: ip1,kind
+    character(len=1) :: blk_S
+    integer :: error,ig1,ig2,ig3,i
+    character(len=1) :: grtyp
+    logical :: multiple_grids,my_in_log
+    type(vgrid_descriptor) :: gd
+    type(FSTD_ext) :: var
+
+    ! Set error status
+    status = VGD_ERROR
+
+    ! Set default values
+    my_in_log = .false.
+    if (present(in_log)) my_in_log = in_log
+
+    ! Construct appropriate grid_descriptor object (rebuild if new ig1-3 values are found)
+    multiple_grids = .false.
+    
+    grids: do i=1,size(fstkeys)
+       error = my_fstprm(fstkeys(i),var)
+       if (error /= VGD_OK) then
+          write(for_msg,*) 'return from fstprm wrapper for fst key ',fstkeys(i)
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return
+       endif
+       if (i==1) then
+          ig1 = var%ig1
+          ig2 = var%ig2
+          ig3 = var%ig3
+          grtyp = var%grtyp(1:1)
+          ip1 = var%ip1
+       endif
+       if (var%ig1 /= ig1 .or. var%ig2 /= ig2 .or. var%ig3 /= ig3 .or. trim(var%grtyp(1:1)) /= trim(grtyp)) then
+          write(for_msg,*) 'multiple grids defined in fstkeys vector'
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return
+       endif
+    enddo grids
+
+    call convip_plus (ip1, lev, kind,-1, blk_S, .false.)
+    ! Create grid descriptor instance and call level calculator
+    if (any(MATCH_GRTYP == grtyp)) then
+       error = new_read(gd,unit=unit,format='fst',ip1=ig1,ip2=ig2,kind=kind)
+       if(error==VGD_ERROR)then
+          write(for_msg,*) 'The above error was produce with call to new_read with specific ip1 and 1p2, trying with wild card -1, if there is no error below, disregard the above error.'
+          call msg(MSG_WARNING,VGD_PRFX//for_msg)
+          error = new_read(gd,unit=unit,format='fst',                kind=kind)
+       endif
+    else
+       error = new_read(gd,unit=unit,format='fst',ip1=-1,ip2=-1,kind=kind)
+    endif
+
+    if (error /= VGD_OK) then
+       write(for_msg,*) 'cannot build grid descriptor instance for fst key ',fstkeys(1)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return
+    endif
+
+    error = levels_readref(gd,unit=unit,fstkeys=fstkeys,levels=levels,in_log=my_in_log)
+    if (error /= VGD_OK) then
+       write(for_msg,*) 'problem computing level information for fst key ',fstkeys(1)
+       call msg(MSG_ERROR,VGD_PRFX//for_msg)
+       return
+    endif
+
+    ! Set status and return
+    status = VGD_OK
+
+    return
+  end function levels_toplevel
 
   integer function levels_withref_prof(self,ip1_list,levels,sfc_field,in_log,sfc_field_ls) result(status)
 #undef REAL_8
