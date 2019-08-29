@@ -58,3 +58,70 @@ int Cvgd_new_build_vert2(vgrid_descriptor **vgd, int kind, int version, int nk,
                               ip1_t, ip1_w, nl_m, nl_t,
                               nl_w);
 };
+
+int Cvgd_diag_withref_2ref(vgrid_descriptor *vgd, int ni, int nj, int nk,
+                           int *ip1_list, float *levels, float *sfc_field,
+                           float *sfc_field_ls, int in_log, int dpidpis)
+{
+  vgrid::Cvgd_diag_withref_2ref(vgd, ni, nj, nk,
+                                ip1_list, levels, sfc_field,
+                                sfc_field_ls, in_log, dpidpis);
+};
+
+int Cvgd_get_int(vgrid_descriptor *vgd, char *key, int *value, int quiet)
+{
+  vgrid::Cvgd_get_int(vgd, key, value, quiet);
+};
+
+int Cvgd_get_int_1d(vgrid_descriptor *vgd, char *key, int **value, int *nk,
+                    int quiet)
+{
+  vgrid::Cvgd_get_int_1d(vgd, key, value, nk, quiet);
+};
+
+int Cvgd_get_float(vgrid_descriptor *vgd, char *key, float *value,
+                   int quiet)
+{
+  vgrid::Cvgd_get_float(vgd, key, value, quiet);
+};
+
+int Cvgd_get_float_1d(vgrid_descriptor *vgd, char *key, float **value, int *nk, int quiet)
+{
+  vgrid::Cvgd_get_float_1d(vgd, key, value, nk, quiet);
+};
+
+int Cvgd_get_double(vgrid_descriptor *vgd, char *key, double *value, int quiet)
+{
+  vgrid::Cvgd_get_double(vgd, key, value, quiet);
+};
+
+int Cvgd_get_double_1d(vgrid_descriptor *vgd, char *key, double **value, 
+                       int *nk, int quiet)
+{
+  vgrid::Cvgd_get_double_1d(vgd, key, value, nk, quiet);
+};
+
+int Cvgd_get_double_3d(vgrid_descriptor *vgd, char *key, double **value, int *ni, int *nj, int *nk, int quiet)
+{
+  vgrid::Cvgd_get_double_3d(vgd, key, value, ni, nj, nk, quiet);
+};
+
+int Cvgd_get_char(vgrid_descriptor *vgd, char *key, char *my_char, int quiet)
+{
+  vgrid::Cvgd_get_char(vgd, key, my_char, quiet);
+};
+
+int Cvgd_putopt_int(char *key, int value)
+{
+  vgrid::Cvgd_putopt_int(key, value);
+};
+
+int Cvgd_is_valid(vgrid_descriptor *vgd, char *valid_table_name)
+{
+  vgrid::Cvgd_is_valid(vgd, valid_table_name);
+};
+
+void Cvgd_table_shape(vgrid_descriptor *vgd, int *tshape)
+{
+  vgrid::Cvgd_table_shape(vgd, &tshape);
+};

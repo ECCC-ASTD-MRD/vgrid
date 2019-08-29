@@ -543,7 +543,7 @@ int vgrid::c_stda76_temp_pres_from_heights(vgrid_descriptor *self, int *i_val, i
 
 }
 
-void Cvgd_table_shape(vgrid_descriptor *self, int **tshape) {
+void vgrid::Cvgd_table_shape(vgrid_descriptor *self, int **tshape) {
   (*tshape)[0] = self->table_ni;
   (*tshape)[1] = self->table_nj;
   (*tshape)[2] = self->table_nk;
@@ -2681,14 +2681,15 @@ void vgrid::c_vgd_free_abci(vgrid_descriptor **self) {
 }
 
 void vgrid::Cvgd_free(vgrid_descriptor **self) {
-   if( *self ) {
-      FREE((*self)->table);
-      c_vgd_free_abci(self);
-      FREE((*self)->ref_name);      
-      FREE((*self)->ref_namel);      
-      free(*self);
-      *self = NULL;
-   }
+// Avoid crashing:  don't free
+//    if( *self ) {
+//       FREE((*self)->table);
+//       c_vgd_free_abci(self);
+//       FREE((*self)->ref_name);      
+//       FREE((*self)->ref_namel);      
+//       free(*self);
+//       *self = NULL;
+//    }
 }
 
 /*----------------------------------------------------------------------------
@@ -7412,13 +7413,14 @@ int vgrid::c_legacy(vgrid_descriptor **self, int unit, int F_kind) {
 }
 
 int vgrid::Cvgd_new_read(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind, int version) {
-  
+
   char  match_ipig;
   int error, i, ni, nj, nk;
   int toc_found = 0, count, nkeyList = MAX_DESC_REC;
   int keyList[nkeyList], status;
   VGD_TFSTD_ext var;
   vgrid_descriptor *self2;
+
 
   if(*self){
     Cvgd_free(self);

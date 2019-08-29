@@ -102,8 +102,8 @@ if [ ${execute} = 1 ];then
       if [[ ${result} == ' ok' && ${result_o} == ' ok' ]] ; then
          passed=$((passed + 1))
          printf "${result}\n"
-	 if [ "${valgrind}" != "" ];then
-	    mkdir -p ${valgrind}/VALGRIND/$BASE_ARCH/$COMP_ARCH
+         if [ "${valgrind}" != "" ];then
+            mkdir -p ${valgrind}/VALGRIND/$BASE_ARCH/$COMP_ARCH
             cp ${test}.out ${valgrind}/VALGRIND/$BASE_ARCH/$COMP_ARCH/.
          fi
          rm -f ${test} ${test}.out

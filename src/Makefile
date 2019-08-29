@@ -12,7 +12,7 @@ FFLAGS =
 
 SUPP_OPT = -openmp
 
-OPTIMIZ = 2
+OPTIMIZ = 0 -g
 
 MYLIB = libvgrid.a
 
