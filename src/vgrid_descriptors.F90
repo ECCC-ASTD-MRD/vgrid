@@ -164,6 +164,13 @@ module vGrid_Descriptors
          character(kind=c_char) :: key(*)
       end function f_putopt_int
 
+      integer(c_int) function f_put_int(vgd_CP, key, value) bind(c, name='Cvgd_put_int')
+         use iso_c_binding, only: c_ptr, c_char, c_int
+         type(c_ptr) :: vgd_CP
+         integer (c_int), value :: value
+         character(kind=c_char) :: key(*)
+      end function f_put_int
+
       integer(c_int) function f_put_char(vgd_CP, key, value) bind(c, name='Cvgd_put_char')
          use iso_c_binding, only: c_ptr, c_char, c_char, c_int
          type(c_ptr) :: vgd_CP
@@ -238,6 +245,7 @@ module vGrid_Descriptors
    end interface vgd_get
 
    interface vgd_put
+      module procedure put_int
       module procedure put_char
    end interface vgd_put
    
@@ -2192,6 +2200,20 @@ contains
       status = VGD_OK
 
    end function get_logical
+
+   integer function put_int(self, key, value) result(status)
+      use vgrid_utils, only : up
+      type(vgrid_descriptor), intent(inout) :: self !Vertical descriptor instance
+      character(len=*), intent(in) :: key           !Descriptor key to set
+      integer, target, intent(in) :: value          !Value to set
+
+      ! Internal variables
+      character(len=KEY_LENGTH) :: my_key
+      status = VGD_ERROR
+      my_key = up(key(1:KEY_LENGTH))
+      if( f_put_int(self%cptr, trim(my_key)//C_NULL_CHAR, value) == VGD_ERROR ) return      
+      status = VGD_OK      
+   end function put_int
 
    integer function put_char(self,key,value) result(status)
       use vgrid_utils, only: up,put_error

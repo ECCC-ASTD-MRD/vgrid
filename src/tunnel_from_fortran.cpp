@@ -130,6 +130,11 @@ int Cvgd_put_char(vgrid_descriptor **self, char *key, char *value)
   vgrid::Cvgd_put_char(self, key, value);
 };
 
+int Cvgd_put_int(vgrid_descriptor **self, char *key, int value)
+{
+  vgrid::Cvgd_put_int(self, key, value);
+};
+
 int Cvgd_putopt_int(char *key, int value)
 {
   vgrid::Cvgd_putopt_int(key, value);

@@ -50,6 +50,8 @@ int Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip);
 
 int Cvgd_put_char(vgrid_descriptor **self, char *key, char *value);
 
+int Cvgd_put_int(vgrid_descriptor **self, char *key, int value);
+
 int Cvgd_putopt_int(char *key, int value);
 
 int Cvgd_is_valid(vgrid_descriptor *vgd, char *valid_table_name);
