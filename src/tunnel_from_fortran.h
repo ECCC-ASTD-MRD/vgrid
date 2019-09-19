@@ -20,6 +20,10 @@ int Cvgd_diag_withref_2ref(vgrid_descriptor *vgd, int ni, int nj, int nk,
                            int *ip1_list, float *levels, float *sfc_field,
                            float *sfc_field_ls, int in_log, int dpidpis);
 
+int Cvgd_diag_withref_2ref_8(vgrid_descriptor *vgd, int ni, int nj, int nk,
+                             int *ip1_list,double *levels_8,double *sfc_field_8,
+                             double *sfc_field_ls_8, int in_log, int dpidpis);
+
 int Cvgd_get_int(vgrid_descriptor *vgd, char *key, int *value, int quiet);
 
 int Cvgd_get_int_1d(vgrid_descriptor *vgd, char *key, int **value, int *nk,

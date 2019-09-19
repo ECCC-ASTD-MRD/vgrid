@@ -68,6 +68,15 @@ int Cvgd_diag_withref_2ref(vgrid_descriptor *vgd, int ni, int nj, int nk,
                                 sfc_field_ls, in_log, dpidpis);
 };
 
+int Cvgd_diag_withref_2ref_8(vgrid_descriptor *vgd, int ni, int nj, int nk,
+                           int *ip1_list,double *levels_8,double *sfc_field_8,
+                           double *sfc_field_ls_8, int in_log, int dpidpis)
+{
+   vgrid::Cvgd_diag_withref_2ref_8(vgd, ni, nj, nk,
+                                   ip1_list, levels_8, sfc_field_8,
+                                   sfc_field_ls_8, in_log, dpidpis);
+};
+
 int Cvgd_get_int(vgrid_descriptor *vgd, char *key, int *value, int quiet)
 {
   vgrid::Cvgd_get_int(vgd, key, value, quiet);

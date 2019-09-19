@@ -73,7 +73,7 @@ end program level_withref_5001
 
 integer function chek_levels_withref(F_fst,F_ips) result(status)
 
-   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_putopt,vgd_levels,vgd_get,vgd_free,VGD_ERROR,VGD_OK, VGD_NO_REF_NOMVAR
+   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_putopt,vgd_levels,vgd_get,VGD_ERROR,VGD_OK, VGD_NO_REF_NOMVAR
    
 
    implicit none  
@@ -300,7 +300,7 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
    enddo
    deallocate(ip1s,px,p0,p0_8,pres,pres_8)
    
-   ier=vgd_free(vgd)
+   !ier=vgd_free(vgd)
 
    ier=fstfrm(lu)
    status=VGD_OK   
