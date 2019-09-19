@@ -40,6 +40,7 @@ module vGrid_Descriptors
    public :: vgd_get                             !get instance variable value
    public :: vgd_new                             !class constructor
    public :: vgd_putopt                          !set class variable value
+   public :: vgd_print                           !dump plain-text contents of instance
    public :: vgd_levels                          !compute physical level information
 
    ! Public class constants
@@ -167,6 +168,12 @@ module vGrid_Descriptors
          character(kind=c_char) :: valid_table_name(*)
        end function f_is_valid
 
+      integer(c_int) function f_print_desc(vgd_CP, stdout, convip) bind(c, name='Cvgd_print_desc')
+         use iso_c_binding, only : c_ptr, c_int
+         type(c_ptr), value :: vgd_CP
+         integer (c_int), value :: stdout, convip
+      end function f_print_desc
+
       integer(c_int) function f_new_read(vgd_ptr,unit,ip1,ip2,kind,version) bind(c, name='Cvgd_new_read')
          use iso_c_binding, only : c_ptr, c_int, c_char
          type(c_ptr) :: vgd_ptr
@@ -219,6 +226,10 @@ module vGrid_Descriptors
    interface vgd_putopt
       module procedure putopt_logical
    end interface vgd_putopt
+   
+   interface vgd_print
+      module procedure print_desc
+   end interface vgd_print
 
    interface vgd_levels
       module procedure levels_toplevel
@@ -505,6 +516,29 @@ contains
       status = VGD_OK
       return
    end function putopt_logical
+
+   integer function print_desc(self,stdout,convip_L) result(istat)      
+      type(vgrid_descriptor) :: self
+      integer, intent(in), optional :: stdout     !Output unit to write to [6]
+      logical, intent(in), optional :: convip_L
+
+      ! Internal variables
+      integer :: l_stdout, l_convip
+
+      istat = VGD_ERROR
+      if(.not.c_associated(self%cptr))then
+         print*,'(F_vgd) ERROR in print_descript, self%cptr not associated'
+         return
+      endif
+
+      l_stdout = -1
+      l_convip = -1
+      if(present(stdout)) l_stdout = stdout
+      if(present(convip_L))then
+         if(convip_L) l_convip = 1
+      endif
+      istat = f_print_desc(self%cptr,l_stdout, l_convip)
+   end function print_desc
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Compute vertical levelling
