@@ -139,3 +139,8 @@ void Cvgd_table_shape(vgrid_descriptor *vgd, int *tshape)
 {
   vgrid::Cvgd_table_shape(vgd, &tshape);
 };
+
+int Cvgd_write_desc(vgrid_descriptor *self, int unit)
+{
+  vgrid::Cvgd_write_desc(self, unit);
+};

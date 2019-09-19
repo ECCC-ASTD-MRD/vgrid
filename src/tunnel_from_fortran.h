@@ -53,4 +53,6 @@ int Cvgd_putopt_int(char *key, int value);
 int Cvgd_is_valid(vgrid_descriptor *vgd, char *valid_table_name);
 
 void Cvgd_table_shape(vgrid_descriptor *vgd, int *tshape);
+
+int Cvgd_write_desc(vgrid_descriptor *self, int unit);
 #endif

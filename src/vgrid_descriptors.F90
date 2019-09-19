@@ -41,6 +41,7 @@ module vGrid_Descriptors
    public :: vgd_new                             !class constructor
    public :: vgd_putopt                          !set class variable value
    public :: vgd_print                           !dump plain-text contents of instance
+   public :: vgd_write                           !write coordinates to a file
    public :: vgd_levels                          !compute physical level information
 
    ! Public class constants
@@ -203,6 +204,12 @@ module vGrid_Descriptors
          type(c_ptr), value :: vgd_CP
          type(c_ptr) :: tshape_CP
       end subroutine f_table_shape
+         
+      integer(c_int) function f_write_desc(vgd_CP,unit) bind(c, name='Cvgd_write_desc')
+         use iso_c_binding, only : c_ptr, c_int, c_char
+         type(c_ptr), value :: vgd_CP
+         integer (c_int), value :: unit
+      end function f_write_desc
 
    end interface
    
@@ -230,6 +237,10 @@ module vGrid_Descriptors
    interface vgd_print
       module procedure print_desc
    end interface vgd_print
+   
+   interface vgd_write
+      module procedure write_desc
+   end interface vgd_write
 
    interface vgd_levels
       module procedure levels_toplevel
@@ -1585,6 +1596,64 @@ contains
 #undef REAL_KIND
 #undef PROC_SUFF
    end function diag_withref_8
+   
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!! Write descriptors
+   
+   integer function write_desc(self,unit,format) result(status)     
+      use vgrid_utils, only: up, get_allocate
+      ! Write descriptors to the requested file
+      type(vgrid_descriptor), intent(in) :: self       !Vertical descriptor instance
+      integer, intent(in) :: unit                      !File unit to write to
+      character(len=*), optional, intent(in) :: format !File format ('fst' or 'bin' ) default is 'fst'
+
+      ! Local variables
+      integer ier
+      integer, target, dimension(3) :: tshape
+      real(kind=8), dimension(:,:,:), pointer :: table_8
+      type(c_ptr) :: tshape_CP      
+      character(len=100) :: myformat
+
+      nullify(table_8)
+
+      ! Set error status
+      status = VGD_ERROR
+      myformat='FST'
+      if (present(format)) myformat = trim(up(format))
+      
+      ! Write to the desired output file type
+      select case (trim(up(myformat)))
+         
+         ! Write to an RPN Standard file
+      case ('FST')         
+         if( f_write_desc(self%cptr,unit)  == VGD_ERROR )then
+            print*,'(F_vgd) ERROR: In write_desc, problem with f_write_desc'
+            return
+         endif
+      ! Write to a Fortran binary file
+      case ('BIN')
+         tshape_CP = c_loc(tshape)
+         call f_table_shape(self%cptr, tshape_CP)
+         ier = get_allocate('table_8',table_8,tshape,ALLOW_RESHAPE,'(BIN) in write_desc')         
+         if (ier /= 0) then
+            deallocate(table_8)
+            return
+         endif
+         if( get_real8_3d(self,'VTBL',table_8) == VGD_ERROR)then
+            print*,'(F_vgd) ERROR: In write_desc, problem with get_real8_3d'
+            return
+         endif
+         write(unit) tshape
+         write(unit) table_8
+      ! Warn user afor unknown format
+      case DEFAULT
+         write(for_msg,*) 'No write done for unknown format ',trim(myformat)
+         call msg(MSG_WARNING,VGD_PRFX//for_msg)
+      end select      
+     ! Set status and return
+      status = VGD_OK
+      return
+   end function write_desc   
 
    integer function get_int(self,key,value,quiet) result(status)
        use vgrid_utils, only: up
