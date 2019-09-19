@@ -38,6 +38,7 @@ module vGrid_Descriptors
    ! Public methods
    public :: vgrid_descriptor                    !vertical grid descriptor structure
    public :: vgd_get                             !get instance variable value
+   public :: vgd_put                             !set instance variable value
    public :: vgd_new                             !class constructor
    public :: vgd_putopt                          !set class variable value
    public :: vgd_print                           !dump plain-text contents of instance
@@ -163,6 +164,12 @@ module vGrid_Descriptors
          character(kind=c_char) :: key(*)
       end function f_putopt_int
 
+      integer(c_int) function f_put_char(vgd_CP, key, value) bind(c, name='Cvgd_put_char')
+         use iso_c_binding, only: c_ptr, c_char, c_char, c_int
+         type(c_ptr) :: vgd_CP
+         character(kind=c_char) :: key(*), value(*)
+      end function f_put_char
+
       integer(c_int) function f_is_valid(vgd_CP, valid_table_name) bind(c, name='Cvgd_is_valid')
          use iso_c_binding, only: c_ptr, c_char, c_int
          type(c_ptr), value :: vgd_CP
@@ -229,6 +236,10 @@ module vGrid_Descriptors
       module procedure get_char
       module procedure get_logical
    end interface vgd_get
+
+   interface vgd_put
+      module procedure put_char
+   end interface vgd_put
    
    interface vgd_putopt
       module procedure putopt_logical
@@ -2182,6 +2193,30 @@ contains
 
    end function get_logical
 
+   integer function put_char(self,key,value) result(status)
+      use vgrid_utils, only: up,put_error
+      ! Set the value of the requested instance variable
+      type(vgrid_descriptor), intent(in) :: self  !Descriptor instance
+      character(len=*), intent(in) :: key         !Descriptor key to set
+      character(len=*), intent(in) :: value       !Value to set
+      
+      ! Internal variables
+      character(len=KEY_LENGTH) :: my_key
+      
+      ! Set error status
+      status = VGD_ERROR
+      
+      if(.not.is_valid(self,'SELF'))then
+         write(for_msg,*) 'vgrid structure is not valid in put_char'
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+         return
+      endif
+    
+      my_key = up(key(1:KEY_LENGTH))      
+
+      status = f_put_char(self%cptr, trim(my_key)//C_NULL_CHAR, trim(value)//C_NULL_CHAR)
+
+   end function put_char
 
    logical function is_valid(self,element_valid_S) result(valid)
       ! Check for validity of the element

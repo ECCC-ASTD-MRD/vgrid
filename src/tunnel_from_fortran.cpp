@@ -125,6 +125,11 @@ int Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip)
   vgrid::Cvgd_print_desc(self, sout, convip);
 };
 
+int Cvgd_put_char(vgrid_descriptor **self, char *key, char *value)
+{
+  vgrid::Cvgd_put_char(self, key, value);
+};
+
 int Cvgd_putopt_int(char *key, int value)
 {
   vgrid::Cvgd_putopt_int(key, value);
