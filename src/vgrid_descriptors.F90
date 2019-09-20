@@ -46,6 +46,9 @@ module vGrid_Descriptors
    public :: vgd_write                           !write coordinates to a file
    public :: vgd_levels                          !compute physical level information
    public :: vgd_dpidpis                         !compute pressure derivative with respesct the sfc pressure
+   public :: vgd_standard_atmosphere_1976   !Get standard atmosphere 1976 variable for a given coordinate
+                                            ! Kept only for backward compatibility with vgrid 6.3
+   public :: vgd_stda76                     !Get standard atmosphere 1976 variable for a given coordinate
 
    ! Public class constants
 #include "vgrid_descriptors.hf"
@@ -233,6 +236,20 @@ module vGrid_Descriptors
          type(c_ptr), value :: vgd_CP
          integer (c_int), value :: unit
       end function f_write_desc
+      
+      integer(c_int) function f_stda76_temp(vgd_CP, ip1s_CP, nl, temp_CP) bind(c, name='Cvgd_stda76_temp')
+        use iso_c_binding, only : c_ptr, c_int
+        type(c_ptr), value :: vgd_CP, ip1s_CP
+        integer (c_int), value :: nl
+        type(c_ptr), value :: temp_CP
+      end function f_stda76_temp
+
+      integer(c_int) function f_stda76_pres(vgd_CP, ip1s_CP, nl, pres_CP, sfc_temp_CP, sfc_pres_CP) bind(c, name='Cvgd_stda76_pres')
+        use iso_c_binding, only : c_ptr, c_int
+        type(c_ptr), value :: vgd_CP, ip1s_CP
+        integer (c_int), value :: nl
+        type(c_ptr), value :: pres_CP, sfc_temp_CP, sfc_pres_CP
+      end function f_stda76_pres
 
    end interface
    
@@ -2520,5 +2537,86 @@ contains
     status = VGD_OK
 
  end function get_ref
+ integer function vgd_standard_atmosphere_1976(self, ip1s, val, var, sfc_temp, sfc_pres) result(status)
+    ! Kept only for backward compatibitity with vgrid 6.3
+    type(vgrid_descriptor), intent(in) :: self         !Vertical descriptor instance
+    integer, dimension(:), target, intent(in) :: ip1s  !ip1 list to get value for
+    real, dimension(:), pointer, intent(inout) :: val  !Standard Atmosphere 1976 value for ip1s
+    character(len=*), intent(in) :: var                !Variable name to get valid choice are "TEMPERATURE", "PRESSURE"
+    real, optional, target, intent(in) :: sfc_temp     !Use this surface temperature for standard atmosphere
+    real, optional, target, intent(in) :: sfc_pres     !Use this surface pressure for standard atmosphere
+    ! Local variables
+    if(present(sfc_temp) .and. present(sfc_pres))then
+       status=vgd_stda76(self, ip1s, val, var, sfc_temp=sfc_temp, sfc_pres=sfc_pres)
+       return
+    endif
+    if(present(sfc_temp))then
+       status=vgd_stda76(self, ip1s, val, var, sfc_temp=sfc_temp)
+       return
+    endif
+    if(present(sfc_pres))then
+       status=vgd_stda76(self, ip1s, val, var, sfc_pres=sfc_pres)
+       return
+    endif       
+ end function vgd_standard_atmosphere_1976
+ 
+ integer function vgd_stda76(self, ip1s, val, var, sfc_temp, sfc_pres) result(status)
+   use vgrid_utils, only: get_allocate, up
+   type(vgrid_descriptor), intent(in) :: self         !Vertical descriptor instance
+   integer, dimension(:), target, intent(in) :: ip1s  !ip1 list to get value for
+   real, dimension(:), pointer, intent(inout) :: val  !Standard Atmosphere 1976 value for ip1s
+   character(len=*), intent(in) :: var                !Variable name to get valid choice are "TEMPERATURE", "PRESSURE"
+   real, optional, target, intent(in) :: sfc_temp     !Use this surface temperature for standard atmosphere
+   real, optional, target, intent(in) :: sfc_pres     !Use this surface pressure for standard atmosphere
+   ! Local variables
+   type (c_ptr) :: ip1s_CP, val_CP, sfc_pres_CP, sfc_temp_CP
+   status = VGD_ERROR
+   if(.not.is_valid(self,'SELF'))then
+      write(for_msg,*) 'vgrid structure is not valid in stda76'
+      call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+      return
+   endif
+   if( get_allocate('val',val,size(ip1s),ALLOW_RESHAPE,'(in stda76)') /= 0) then
+      if(associated(val))deallocate(val)
+      return
+   endif
+   ip1s_CP = c_loc(ip1s)
+   val_CP = c_loc(val)
+   if( present(sfc_temp) )then
+      sfc_temp_CP = c_loc(sfc_temp)
+   else
+      sfc_temp_CP = C_NULL_PTR
+   endif
+   if( present(sfc_pres) )then
+      sfc_pres_CP = c_loc(sfc_pres)
+   else
+      sfc_pres_CP = C_NULL_PTR
+   endif
+   select case (trim(up(var)))
+   case ('TEMPERATURE')
+      if (present(sfc_temp) .or. present(sfc_pres) )then
+          write(for_msg,*) 'ERROR with vgd_stda76_temp, option sfc_temp and/or sfc_pres not implemented for TEMPERATURE.'&
+               //'Please contact the vgrid dev team.'
+          call msg(MSG_ERROR,VGD_PRFX//for_msg) 
+          return
+      endif
+      if( f_stda76_temp(self%cptr, ip1s_CP, size(val), val_CP) /= VGD_OK) then
+         write(for_msg,*) 'ERROR with vgd_stda76_temp'
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+         return
+      endif
+   case ('PRESSURE')
+      if( f_stda76_pres(self%cptr, ip1s_CP, size(val), val_CP, sfc_temp_CP, sfc_pres_CP ) /= VGD_OK) then
+         write(for_msg,*) 'ERROR with vgd_stda76_pres'
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+         return
+      endif
+   case DEFAULT
+      write(for_msg,*) 'invalid variable name given to vgd_stda76',trim(var)
+      call msg(MSG_ERROR,VGD_PRFX//for_msg)
+      return
+   end select
+   status = VGD_OK
+ end function vgd_stda76
 
 end module vGrid_Descriptors

@@ -150,6 +150,17 @@ int Cvgd_is_valid(vgrid_descriptor *vgd, char *valid_table_name)
   vgrid::Cvgd_is_valid(vgd, valid_table_name);
 };
 
+int Cvgd_stda76_pres(vgrid_descriptor *self, int *i_val, int nl, float *pres,
+                     float *sfc_temp, float *sfc_pres)
+{
+  vgrid::Cvgd_stda76_pres(self, i_val, nl, pres, sfc_temp, sfc_pres);
+}
+
+int Cvgd_stda76_temp(vgrid_descriptor *self, int *i_val, int nl, float *temp)
+{
+  vgrid::Cvgd_stda76_temp(self, i_val, nl, temp);
+};
+
 void Cvgd_table_shape(vgrid_descriptor *vgd, int *tshape)
 {
   vgrid::Cvgd_table_shape(vgd, &tshape);
