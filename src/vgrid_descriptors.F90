@@ -40,6 +40,7 @@ module vGrid_Descriptors
    public :: vgd_get                             !get instance variable value
    public :: vgd_put                             !set instance variable value
    public :: vgd_new                             !class constructor
+   public :: vgd_getopt                          !get class variable value
    public :: vgd_putopt                          !set class variable value
    public :: vgd_print                           !dump plain-text contents of instance
    public :: vgd_write                           !write coordinates to a file
@@ -106,6 +107,13 @@ module vGrid_Descriptors
          type(c_ptr), value :: nk_CP
          character(kind=c_char) :: key(*)
       end function f_get_int_1d
+   
+      integer(c_int) function f_getopt_int(key,value_CP,quiet) bind(c, name='Cvgd_getopt_int')
+         use iso_c_binding, only: c_char, c_ptr, c_int
+         character(kind=c_char) :: key(*)
+         type(c_ptr), value :: value_CP
+         integer (c_int), value :: quiet
+      end function f_getopt_int
 
       integer(c_int) function f_get_real(vgd_CP, key, value_CP, quiet) bind(c, name='Cvgd_get_float')
          use iso_c_binding, only: c_ptr, c_char, c_int
@@ -249,6 +257,9 @@ module vGrid_Descriptors
       module procedure put_real8_3d
       module procedure put_char
    end interface vgd_put
+   interface vgd_getopt
+      module procedure getopt_logical
+   end interface vgd_getopt
    
    interface vgd_putopt
       module procedure putopt_logical
@@ -512,6 +523,50 @@ contains
       status = VGD_OK
 
    end function new_build_vert
+
+   integer function getopt_logical(key,value,quiet) result(status)
+      use vgrid_utils, only: up
+      character(len=*), intent(in) :: key           !Descriptor key to retrieve
+      logical, intent(out) :: value                 !Retrieved value
+      logical, intent(in), optional :: quiet        !Do not generate messages
+
+      ! Local variables
+      integer :: level_msg, l_quiet
+      integer, target :: l_value
+      logical :: my_quiet
+      type(c_ptr) :: l_value_CP
+
+      ! Set error status
+      status=VGD_ERROR
+      
+      value=.false.
+      l_value_CP = c_loc(l_value)
+      
+      level_msg=MSG_ERROR
+      my_quiet=.false.
+      if (present(quiet))my_quiet = quiet
+      l_quiet = 0
+      if(my_quiet)then
+         level_msg=MSG_QUIET
+         l_quiet=1
+      endif
+      
+      select case(trim(key))
+      case ('ALLOW_RESHAPE')
+         value=ALLOW_RESHAPE
+      case ('ALLOW_SIGMA')
+         status = f_getopt_int(key//C_NULL_CHAR,l_value_CP,l_quiet)
+         if (status == VGD_ERROR) return
+         value = l_value /= 0
+      case DEFAULT
+         write(for_msg,*) 'invalid key in call to getopt_logical: ',trim(key)
+         call msg(level_msg,VGD_PRFX//for_msg)
+         return
+      end select
+      ! Set status and return
+      status = VGD_OK
+      return
+   end function getopt_logical
    
    integer function putopt_logical(key,value) result(status)
       character(len=*), intent(in) :: key           !Descriptor key to retrieve
