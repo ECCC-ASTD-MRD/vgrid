@@ -56,7 +56,7 @@ contains
 
 program constructor
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_free,vgd_get,vgd_write,VGD_ERROR
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_write,VGD_ERROR
   use Unit_Testing, only: ut_report
   use mod_constructor_4001, only: FSTD_ext, my_fstprm
   
@@ -241,7 +241,7 @@ program constructor
   stat = vgd_new(vgd,kind=1,version=1,hyb=hgts2)
   if(stat.ne.VGD_ERROR)OK=.false.
   deallocate(a_m_8,a_t_8,b_m_8,b_t_8,vipm,vipt,vcdm)
-  stat = vgd_free(vgd)
+  !stat = vgd_free(vgd)
 
   if(.true.) then
      ! Generate file to copy in data_Linux/dm_4001_from_model_run
@@ -283,7 +283,7 @@ program constructor
      ier = fstfrm(lu2)
   endif
   
-  stat = vgd_free(vgd)
+  !stat = vgd_free(vgd)
 
   call ut_report(OK,'Grid_Descriptors::vgd_new vertical generate initializer (4001) value')
 

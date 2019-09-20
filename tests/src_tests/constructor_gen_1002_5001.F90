@@ -18,7 +18,7 @@
 ! * Boston, MA 02111-1307, USA.
 program constructor
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_putopt, vgd_free,VGD_ERROR
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_putopt,VGD_ERROR
   use Unit_Testing, only: ut_report
   
    
@@ -154,7 +154,7 @@ program constructor
      print*,a_m_8(1),' should equal ',w1
   endif
 
-  stat = vgd_free(d)
+  !stat = vgd_free(d)
   deallocate(b_m_8,a_m_8)
 
   call ut_report(OK,'Grid_Descriptors::vgd_new vertical generate initializer (5001) value')

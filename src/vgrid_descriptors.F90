@@ -293,6 +293,7 @@ module vGrid_Descriptors
    
    interface vgd_new
       module procedure new_read
+      module procedure new_from_table
       module procedure new_build_vert
       module procedure new_gen      
    end interface vgd_new
@@ -393,6 +394,7 @@ contains
             l_version = -1
          endif
 
+         
          if( f_new_read(self%cptr, unit, l_ip1, l_ip2, l_kind, l_version) == VGD_ERROR )then
             print*,'(F_vgd) ERROR: In new_read, problem with f_new_read'
             return
