@@ -246,6 +246,7 @@ module vGrid_Descriptors
 
    interface vgd_put
       module procedure put_int
+      module procedure put_real8_3d
       module procedure put_char
    end interface vgd_put
    
@@ -2214,6 +2215,28 @@ contains
       if( f_put_int(self%cptr, trim(my_key)//C_NULL_CHAR, value) == VGD_ERROR ) return      
       status = VGD_OK      
    end function put_int
+   
+   integer function put_real8_3d(self, key, value) result(status)
+      use vgrid_utils, only : up
+      type(vgrid_descriptor), target, intent(inout) :: self !Vertical descriptor instance
+      character(len=*), intent(in) :: key           !Descriptor key to set
+      real(kind=8), dimension(:,:,:), pointer :: value !Value to set
+      type(c_ptr) :: my_value_CP
+      status = VGD_ERROR
+      print*,'(F_vgd) ERROR: in put_real8_3d, putint real8 3D array is not implemented in this librairy'
+      print*,'(F_vgd)        if you want to put the VGTB, you may do it by reconstructing a new '
+      print*,'(F_vgd)        vgrid_descriptor e.g. vgd_new(self,table_8)'
+      print*,'(F_vgd)        If you think you really need to vgd_put VGTB contact dev teem'
+      ! To silence the compiler warning
+      if(associated(value))then
+      endif
+      ! To silence the compiler warning
+      my_value_CP = c_loc(self%cptr)
+      ! To silence the compiler warning
+      if(key == "")then
+      endif
+      return     
+    end function put_real8_3d
 
    integer function put_char(self,key,value) result(status)
       use vgrid_utils, only: up,put_error
