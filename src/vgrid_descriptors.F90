@@ -51,6 +51,7 @@ module vGrid_Descriptors
    public :: vgd_stda76                     !Get standard atmosphere 1976 variable for a given coordinate
    public :: vgd_stda76_pres_from_hgts_list ! Get standard atmosphere 1976 pressure in Pa from a height list in m
    public :: vgd_stda76_hgts_from_pres_list ! Get standard atmosphere 1976 heights in m from a pressure list in Pa
+   public :: operator(==)                        !overload equivalence operator
 
    ! Public class constants
 #include "vgrid_descriptors.hf"
@@ -203,6 +204,11 @@ module vGrid_Descriptors
          integer (c_int), value :: stdout, convip
       end function f_print_desc
 
+      integer(c_int) function f_vgdcmp(vgd1_CP, vgd2_CP) bind(c, name='Cvgd_vgdcmp')
+         use iso_c_binding, only: c_ptr, c_int
+         type(c_ptr), value :: vgd1_CP, vgd2_CP
+      end function f_vgdcmp
+
       integer(c_int) function f_new_read(vgd_ptr,unit,ip1,ip2,kind,version) bind(c, name='Cvgd_new_read')
          use iso_c_binding, only : c_ptr, c_int, c_char
          type(c_ptr) :: vgd_ptr
@@ -319,6 +325,10 @@ module vGrid_Descriptors
       module procedure dpidpis_withref_prof
       module procedure dpidpis_withref_prof_8
    end interface vgd_dpidpis
+   
+   interface operator (==)
+      module procedure test_equality
+   end interface operator (==)
    
 contains
    
@@ -641,6 +651,26 @@ contains
       status = VGD_OK
       return
    end function putopt_logical
+   
+   logical function test_equality(vgd1,vgd2) result(equal)
+      type(vgrid_descriptor), intent(in) :: vgd1,vgd2      !vertical grid descriptors to compare
+
+      ! Local variables
+      integer :: ier
+
+      ! Assume that structures are not identical
+      equal = .false.
+      
+      ier = f_vgdcmp(vgd1%cptr, vgd2%cptr)
+      if( ier /= 0 )then
+         !print*,'Return code is',ier
+         return
+      end if
+
+      ! The full structure is equivalent
+      equal = .true.
+      return
+   end function test_equality
 
    integer function print_desc(self,stdout,convip_L) result(istat)      
       type(vgrid_descriptor) :: self
