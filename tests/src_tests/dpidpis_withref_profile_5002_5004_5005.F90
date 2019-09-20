@@ -63,7 +63,7 @@ end program tests
 
 integer function test_it(F_lu,F_ip1,F_ip2) result(stat)
    
-   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_dpidpis,vgd_free,VGD_ERROR,VGD_OK
+   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_dpidpis,VGD_ERROR,VGD_OK
    
    
    implicit none
@@ -156,7 +156,7 @@ integer function test_it(F_lu,F_ip1,F_ip2) result(stat)
    enddo
    
    deallocate(ip1_list,dpidpis_profil,dpidpis_profil_8,p0,px,coef_b)
-   stat=vgd_free(d)
+!   stat=vgd_free(d)
 
    stat=VGD_OK
        

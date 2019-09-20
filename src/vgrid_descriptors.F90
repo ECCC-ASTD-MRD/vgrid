@@ -45,6 +45,7 @@ module vGrid_Descriptors
    public :: vgd_print                           !dump plain-text contents of instance
    public :: vgd_write                           !write coordinates to a file
    public :: vgd_levels                          !compute physical level information
+   public :: vgd_dpidpis                         !compute pressure derivative with respesct the sfc pressure
 
    ! Public class constants
 #include "vgrid_descriptors.hf"
@@ -280,6 +281,10 @@ module vGrid_Descriptors
       module procedure levels_withref_prof
       module procedure levels_withref_prof_8
    end interface vgd_levels
+   interface vgd_dpidpis
+      module procedure dpidpis_withref_prof
+      module procedure dpidpis_withref_prof_8
+   end interface vgd_dpidpis
    
 contains
    
@@ -807,7 +812,6 @@ contains
 #undef REAL_KIND
 #undef PROC_SUFF
   end function levels_withref_prof_8
-
   integer function levels_withref(self,ip1_list,levels,sfc_field,in_log,sfc_field_ls) result(status)
 #undef REAL_8
 #define REAL_KIND 4
@@ -1104,6 +1108,88 @@ contains
     return
   end function levels_readref
 
+  integer function dpidpis_withref_prof(self,ip1_list,dpidpis,sfc_field) result(status)
+#undef REAL_8
+#define REAL_KIND 4
+#define PROC_SUFF ""
+     use vgrid_utils, only: up
+     type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
+     integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
+     real(kind=REAL_KIND), dimension(:), pointer :: dpidpis                      !Derivative values
+     real(kind=REAL_KIND), optional, intent(in) :: sfc_field                     !Surface field reference for coordinate [none]
+
+     ! Local variables
+     real(kind=REAL_KIND) :: my_sfc_field
+     integer :: stat
+
+     ! Set return value
+     status = VGD_ERROR
+     if(.not.is_valid(self,'SELF'))then
+        write(for_msg,*) 'vgrid structure is not valid in dpidpis_withref_prof'//PROC_SUFF
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+        return
+     endif
+
+     ! Set default values
+     my_sfc_field = VGD_MISSING
+     if (present(sfc_field)) my_sfc_field = sfc_field
+     ! Wrap call to level calculation
+#if defined(REAL_8)
+     stat = diag_withref_prof_8(self,ip1_list,dpidpis,sfc_field=my_sfc_field,dpidpis=.true.)
+#else
+     stat = diag_withref_prof(self,ip1_list,dpidpis,sfc_field=my_sfc_field,dpidpis=.true.)
+#endif
+     if(stat==VGD_ERROR)then
+        write(for_msg,*) 'ERROR with diag_withref_prof'//PROC_SUFF//' in dpidpis_withref_prof'//PROC_SUFF
+        return
+     endif
+     status = VGD_OK
+     return
+#undef REAL_KIND
+#undef PROC_SUFF
+  end function dpidpis_withref_prof
+
+  integer function dpidpis_withref_prof_8(self,ip1_list,dpidpis,sfc_field) result(status)
+#define REAL_8 1
+#define REAL_KIND 8
+#define PROC_SUFF "_8"
+     use vgrid_utils, only: up
+     type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
+     integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
+     real(kind=REAL_KIND), dimension(:), pointer :: dpidpis                      !Derivative values
+     real(kind=REAL_KIND), optional, intent(in) :: sfc_field                     !Surface field reference for coordinate [none]
+
+     ! Local variables
+     real(kind=REAL_KIND) :: my_sfc_field
+     integer :: stat
+
+     ! Set return value
+     status = VGD_ERROR
+     if(.not.is_valid(self,'SELF'))then
+        write(for_msg,*) 'vgrid structure is not valid in dpidpis_withref_prof'//PROC_SUFF
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+        return
+     endif
+
+     ! Set default values
+     my_sfc_field = VGD_MISSING
+     if (present(sfc_field)) my_sfc_field = sfc_field
+     ! Wrap call to level calculation
+#if defined(REAL_8)
+     stat = diag_withref_prof_8(self,ip1_list,dpidpis,sfc_field=my_sfc_field,dpidpis=.true.)
+#else
+     stat = diag_withref_prof(self,ip1_list,dpidpis,sfc_field=my_sfc_field,dpidpis=.true.)
+#endif
+     if(stat==VGD_ERROR)then
+        write(for_msg,*) 'ERROR with diag_withref_prof'//PROC_SUFF//' in dpidpis_withref_prof'//PROC_SUFF
+        return
+     endif
+     status = VGD_OK
+     return
+#undef REAL_8
+#undef REAL_KIND
+#undef PROC_SUFF
+  end function dpidpis_withref_prof_8
   integer function diag_withref_prof(self,ip1_list,levels,sfc_field,in_log,dpidpis,sfc_field_ls) result(status)
 #undef REAL_8
 #define REAL_KIND 4
