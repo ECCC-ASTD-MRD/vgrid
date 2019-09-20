@@ -20,7 +20,7 @@ program constructor
 
   ! Revision : Andre Plante test on B instead of A since A not sensitive to rcoefs
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_free,VGD_ERROR
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,VGD_ERROR
   use Unit_Testing, only: ut_report
   
 
@@ -56,7 +56,7 @@ program constructor
 
   print*,'DEBUG'
 
-  ier = vgd_free(vgd)
+  !ier = vgd_free(vgd)
 
   !Use wrong top pressure
 

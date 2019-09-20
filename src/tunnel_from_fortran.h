@@ -7,6 +7,10 @@ int Cvgd_new_read(vgrid_descriptor **vgd, int unit, int ip1,int ip2,
                   int kind, int version);
 int Cvgd_new_from_table(vgrid_descriptor **vgd, double *table, 
                         int ni, int nj, int nk);
+int Cvgd_new_gen2(vgrid_descriptor **self, int kind, int version, float *hyb,
+                  int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3,                      float *rcoef4, double *ptop_8, double *pref_8,
+                  double *ptop_out_8, int ip1, int ip2, float *dhm, float *dht,
+                  float *dhw, int avg);
 int Cvgd_new_build_vert2(vgrid_descriptor **vgd, int kind, int version, int nk,
                          int ip1, int ip2, double *ptop_8, double *pref_8,
                          float *rcoef1, float *rcoef2, float *rcoef3,

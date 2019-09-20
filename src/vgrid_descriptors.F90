@@ -226,6 +226,16 @@ module vGrid_Descriptors
          type(c_ptr), value :: table_CP
          integer (c_int), value :: ni, nj, nk
       end function f_new_from_table
+
+      integer(c_int) function f_new_gen(vgd,kind,version,hyb_CP,size_hyb,rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP, &
+           ip1,ip2,dhm_CP,dht_CP,dhw_CP,avg) bind(c, name='Cvgd_new_gen2')
+         use iso_c_binding, only : c_ptr, c_int
+         type(c_ptr) :: vgd
+         integer (c_int), value :: kind, version, size_hyb
+         type(c_ptr), value :: hyb_CP,rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP
+         type(c_ptr), value :: dhm_CP,dht_CP,dhw_CP
+         integer (c_int), value :: ip1,ip2,avg
+      end function f_new_gen
       
       integer(c_int) function f_new_build_vert(vgd,kind,version,nk,ip1,ip2, &
            ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, &
@@ -284,6 +294,7 @@ module vGrid_Descriptors
    interface vgd_new
       module procedure new_read
       module procedure new_build_vert
+      module procedure new_gen      
    end interface vgd_new
 
    interface vgd_get
@@ -435,6 +446,118 @@ contains
       
     end function new_from_table
 
+   integer function new_gen(self,kind,version,hyb,rcoef1,rcoef2,rcoef3,rcoef4,ptop_8,pref_8,ptop_out_8,ip1,ip2,stdout_unit,dhm,dht,dhw,avg_L) result(status)
+      implicit none
+
+      ! Coordinate constructor - build vertical descriptor from hybrid coordinate entries
+      type(vgrid_descriptor),target,intent(inout) :: self         !Vertical descriptor instance    
+      integer, intent(in) :: kind,version                  !Kind,version to create
+      real, target, dimension(:),intent(in) :: hyb         !List of hybrid levels
+      real, target, optional, intent(in) :: rcoef1,rcoef2,rcoef3,rcoef4 !R-coefficient values for rectification
+      real(kind=8), target, optional, intent(in) :: ptop_8       !Top-level pressure (Pa) inout
+      real(kind=8), target, optional, intent(out):: ptop_out_8   !Top-level pressure (Pa) output if ptop_8 < 0
+      real(kind=8), target, optional, intent(in) :: pref_8       !Reference-level pressure (Pa)
+      integer, target, optional, intent(in) :: ip1,ip2     !IP1,2 values for FST file record [0,0]
+      integer, target, optional, intent(in) :: stdout_unit !Unit number for verbose output [STDERR]
+      real, target, optional, intent(in) :: dhm,dht,dhw    !Diag levels Height for Momentum/Thermo/Vertical-Velocity vaiables
+      logical, optional :: avg_L                           !Obtain thermo A, B and C by averaging momentum ones (Temporary for Vcode 5100)
+                                                           !   If this option becoms permenant, some code will have to be added
+                                                           !   to check this option for vcode 5100 only.
+      ! Local variables
+      type(c_ptr) :: hyb_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, ptop_8_CP, ptop_out_8_CP, pref_8_CP
+      type(c_ptr) :: stdout_unit_CP, dhm_CP, dht_CP, dhw_CP
+      integer :: my_ip1, my_ip2, my_avg
+      hyb_CP = c_loc(hyb)
+
+      status = VGD_ERROR;
+      ! Assign optional argument to C_NULL_PTR
+      if(present(rcoef1))then
+         rcoef1_CP = c_loc(rcoef1)
+      else
+         rcoef1_CP = C_NULL_PTR
+      endif
+      if(present(rcoef2))then
+         rcoef2_CP = c_loc(rcoef2)
+      else
+         rcoef2_CP = C_NULL_PTR
+      endif
+      if(present(rcoef3))then
+         rcoef3_CP = c_loc(rcoef3)
+      else
+         rcoef3_CP = C_NULL_PTR
+      endif
+      if(present(rcoef4))then
+         rcoef4_CP = c_loc(rcoef4)
+      else
+         rcoef4_CP = C_NULL_PTR
+      endif
+      if(present(ptop_8))then
+         ptop_8_CP = c_loc(ptop_8)
+      else
+         ptop_8_CP = C_NULL_PTR
+      endif
+      if(present(ptop_out_8))then
+         ptop_out_8_CP = c_loc(ptop_out_8)
+      else
+         ptop_out_8_CP = C_NULL_PTR
+      endif
+      if(present(pref_8))then
+         pref_8_CP = c_loc(pref_8)
+      else
+         pref_8_CP = C_NULL_PTR
+      endif
+      if(present(ip1))then
+         my_ip1 = ip1
+      else
+         my_ip1 = -1
+      endif
+      if(present(ip2))then
+         my_ip2 = ip2
+      else
+         my_ip2 = -1
+      endif
+      if(present(stdout_unit))then
+         write(for_msg,*) 'ERROR: in new_gen, implement option stdout_unit'         
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         return
+         stdout_unit_CP = c_loc(stdout_unit)
+      else
+         stdout_unit_CP = C_NULL_PTR
+      endif
+      if(present(dhm))then
+         dhm_CP = c_loc(dhm)
+      else
+         dhm_CP = C_NULL_PTR
+      endif
+      if(present(dht))then
+         dht_CP = c_loc(dht)
+      else
+         dht_CP = C_NULL_PTR
+      endif
+      if(present(dhw))then
+         dhw_CP = c_loc(dhw)
+      else
+         dhw_CP = C_NULL_PTR
+      endif
+      my_avg=1
+      if(present(avg_L))then
+         if(avg_L)then
+            my_avg=1
+         else
+            my_avg=0
+         endif
+      endif
+      
+      if(.not.c_associated(self%cptr))then
+         self%cptr = C_NULL_PTR
+      endif
+
+      if(f_new_gen(self%cptr,kind,version,hyb_CP,size(hyb),rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP,my_ip1,my_ip2,dhm_CP,dht_CP,dhw_CP,my_avg) == VGD_ERROR)then
+         print*,'(F_vgd) ERROR in new_gen, problem with f_new_gen'
+         return
+      endif
+      status = VGD_OK
+   end function new_gen
    integer function new_build_vert(self,kind,version,nk,ip1,ip2, &
         ptop_8,pref_8,rcoef1,rcoef2,rcoef3,rcoef4,a_m_8,b_m_8,a_t_8,b_t_8, &
         ip1_m,ip1_t,c_m_8,c_t_8,a_w_8,b_w_8,c_w_8,ip1_w) result(status)
