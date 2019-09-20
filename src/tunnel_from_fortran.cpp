@@ -156,6 +156,11 @@ int Cvgd_stda76_pres(vgrid_descriptor *self, int *i_val, int nl, float *pres,
   vgrid::Cvgd_stda76_pres(self, i_val, nl, pres, sfc_temp, sfc_pres);
 }
 
+int Cvgd_stda76_pres_from_hgts_list(float *pres, float *hgts, int nb)
+{
+  vgrid::Cvgd_stda76_pres_from_hgts_list(pres, hgts, nb);
+};
+
 int Cvgd_stda76_temp(vgrid_descriptor *self, int *i_val, int nl, float *temp)
 {
   vgrid::Cvgd_stda76_temp(self, i_val, nl, temp);

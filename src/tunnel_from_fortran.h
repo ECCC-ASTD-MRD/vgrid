@@ -61,6 +61,8 @@ int Cvgd_is_valid(vgrid_descriptor *vgd, char *valid_table_name);
 int Cvgd_stda76_pres(vgrid_descriptor *self, int *i_val, int nl, float *pres,
                      float *sfc_temp, float *sfc_pres);
 
+int Cvgd_stda76_pres_from_hgts_list(float *pres, float *hgts, int nb);
+
 int Cvgd_stda76_temp(vgrid_descriptor *self, int *i_val, int nl, float *temp);
 
 void Cvgd_table_shape(vgrid_descriptor *vgd, int *tshape);

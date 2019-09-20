@@ -49,6 +49,7 @@ module vGrid_Descriptors
    public :: vgd_standard_atmosphere_1976   !Get standard atmosphere 1976 variable for a given coordinate
                                             ! Kept only for backward compatibility with vgrid 6.3
    public :: vgd_stda76                     !Get standard atmosphere 1976 variable for a given coordinate
+   public :: vgd_stda76_pres_from_hgts_list ! Get standard atmosphere 1976 pressure in Pa from a height list in m
 
    ! Public class constants
 #include "vgrid_descriptors.hf"
@@ -250,6 +251,14 @@ module vGrid_Descriptors
         integer (c_int), value :: nl
         type(c_ptr), value :: pres_CP, sfc_temp_CP, sfc_pres_CP
       end function f_stda76_pres
+      
+      integer(c_int) function f_stda76_pres_from_hgts_list( &
+           pres_CP, hgts_CP, nb) bind(c, name=&
+           'Cvgd_stda76_pres_from_hgts_list')
+        use iso_c_binding, only : c_ptr, c_int
+        type(c_ptr), value :: pres_CP, hgts_CP
+        integer (c_int), value :: nb
+      end function f_stda76_pres_from_hgts_list
 
    end interface
    
@@ -2618,5 +2627,22 @@ contains
    end select
    status = VGD_OK
  end function vgd_stda76
+ integer function vgd_stda76_pres_from_hgts_list(pres, hgts, nb) result(status)
+   implicit none
+   integer :: nb
+   real, dimension(nb), target :: pres, hgts
+   ! Local variables
+   type (c_ptr) :: pres_CP, hgts_CP
+
+   status = VGD_ERROR
+   
+   pres_CP = c_loc(pres)
+   hgts_CP = c_loc(hgts)   
+   if( f_stda76_pres_from_hgts_list(pres_CP, hgts_CP, nb) &
+        == VGD_ERROR)return
+   status = VGD_OK
+   return
+
+ end function vgd_stda76_pres_from_hgts_list
 
 end module vGrid_Descriptors
