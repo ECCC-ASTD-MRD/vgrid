@@ -1104,7 +1104,7 @@ int vgrid::Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip) {
   }
 }
 
-int Cvgd_print_vcode_description(int vcode){
+int vgrid::Cvgd_print_vcode_description(int vcode){
   
   // Create horizontal rule
   char *hr = {"-------------------------------------------------------"};

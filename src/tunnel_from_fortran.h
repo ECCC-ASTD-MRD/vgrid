@@ -50,6 +50,8 @@ int Cvgd_getopt_int(char *key, int *value, int quiet);
 
 int Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip);
 
+int Cvgd_print_vcode_description(int vcode);
+
 int Cvgd_put_char(vgrid_descriptor **self, char *key, char *value);
 
 int Cvgd_put_int(vgrid_descriptor **self, char *key, int value);

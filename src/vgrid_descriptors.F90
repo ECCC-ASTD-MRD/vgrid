@@ -204,6 +204,11 @@ module vGrid_Descriptors
          integer (c_int), value :: stdout, convip
       end function f_print_desc
 
+      integer(c_int) function f_print_vcode_description(vcode) bind(c, name='Cvgd_print_vcode_description')
+         use iso_c_binding, only : c_int
+         integer (c_int), value :: vcode
+      end function f_print_vcode_description
+
       integer(c_int) function f_vgdcmp(vgd1_CP, vgd2_CP) bind(c, name='Cvgd_vgdcmp')
          use iso_c_binding, only: c_ptr, c_int
          type(c_ptr), value :: vgd1_CP, vgd2_CP
@@ -308,6 +313,7 @@ module vGrid_Descriptors
    
    interface vgd_print
       module procedure print_desc
+      module procedure print_vcode_description
    end interface vgd_print
    
    interface vgd_write
@@ -695,6 +701,16 @@ contains
       istat = f_print_desc(self%cptr,l_stdout, l_convip)
    end function print_desc
 
+   integer function print_vcode_description(vcode) result(status)
+      ! Dump plain text vcode descriptor information to the requested file unit
+      integer, intent(in) :: vcode      
+
+      ! Set error status
+      status = VGD_ERROR
+      
+      status = f_print_vcode_description(vcode)
+    
+   end function print_vcode_description
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Compute vertical levelling
 
