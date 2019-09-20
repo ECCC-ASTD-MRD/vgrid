@@ -150,6 +150,11 @@ int Cvgd_is_valid(vgrid_descriptor *vgd, char *valid_table_name)
   vgrid::Cvgd_is_valid(vgd, valid_table_name);
 };
 
+int Cvgd_stda76_hgts_from_pres_list(float *hgts, float *pres, int nb)
+{
+  vgrid::Cvgd_stda76_hgts_from_pres_list(hgts, pres, nb);
+};
+
 int Cvgd_stda76_pres(vgrid_descriptor *self, int *i_val, int nl, float *pres,
                      float *sfc_temp, float *sfc_pres)
 {
