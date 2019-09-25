@@ -17,7 +17,7 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program tests
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_dpidpis,vgd_free,VGD_OK
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_dpidpis,VGD_OK
   use Unit_Testing, only: ut_report
   
 
@@ -164,7 +164,7 @@ program tests
   deallocate(dpidpis_profil,dpidpis_profil_8)
   deallocate(p0,p00,p0_8,P00_8,px,dpidpis_3d,dpidpis_3d_8,dpidpis_3d_from_prof,dpidpis_3d_from_prof_8,ip1_list,coef_b)
   
-  stat = vgd_free(d)
+!  stat = vgd_free(d)
   
   stat=fstfrm(lu)
 

@@ -18,7 +18,7 @@
 ! * Boston, MA 02111-1307, USA.
 program constructor
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_free,operator(==),vgd_putopt,VGD_OK,VGD_ERROR
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,operator(==),vgd_putopt,VGD_OK,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
@@ -69,8 +69,8 @@ program constructor
      if (.not. vgrid == vgrid_rebuilt) then
         stat = VGD_ERROR
      endif
-     ier = vgd_free(vgrid)
-     ier = vgd_free(vgrid_rebuilt)
+!     ier = vgd_free(vgrid)
+!     ier = vgd_free(vgrid_rebuilt)
      ier = fstfrm(lu+i)
 
   enddo

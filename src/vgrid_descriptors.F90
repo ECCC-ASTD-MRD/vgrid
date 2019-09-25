@@ -334,6 +334,7 @@ module vGrid_Descriptors
 
    interface vgd_levels
       module procedure levels_toplevel
+      module procedure levels_readref
       module procedure levels_withref
       module procedure levels_withref_8
       module procedure levels_withref_prof

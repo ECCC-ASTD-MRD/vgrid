@@ -17,7 +17,7 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program get_logp
-  use Vgrid_Descriptors, only: Vgrid_descriptor,Vgd_free,Vgd_new,Vgd_get,Vgd_print,VGD_OK,vgd_putopt
+  use Vgrid_Descriptors, only: Vgrid_descriptor,Vgd_new,Vgd_get,Vgd_print,VGD_OK,vgd_putopt
   use Unit_Testing, only: ut_report
 
   implicit none

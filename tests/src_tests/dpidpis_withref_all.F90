@@ -62,7 +62,7 @@ end program tests
 
 integer function test_dpidpis(F_lu) result(stat)
 
-   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_dpidpis,vgd_free,VGD_ERROR,VGD_OK
+   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_dpidpis,VGD_ERROR,VGD_OK
    
 
    implicit none
@@ -183,7 +183,7 @@ integer function test_dpidpis(F_lu) result(stat)
 
    deallocate(ip1_list,dpidpis_cube,dpidpis_cube_8,p0,px,p0_8,coef_b)
    
-   stat=vgd_free(d)
+!   stat=vgd_free(d)
 
    stat=VGD_OK
 

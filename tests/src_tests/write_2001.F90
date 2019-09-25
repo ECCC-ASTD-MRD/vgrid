@@ -17,7 +17,7 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program constructor
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_write,vgd_print,vgd_free,VGD_ERROR
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_write,vgd_print,VGD_ERROR
   use Unit_Testing, only: ut_report
   
 
@@ -72,8 +72,8 @@ program constructor
 
   stat = vgd_get(d_rtn,key='COFA - vertical A coefficient',value=pres_rtn)
 
-  stat = vgd_free(d)
-  stat = vgd_free(d_rtn)
+!  stat = vgd_free(d)
+!  stat = vgd_free(d_rtn)
 
   call ut_report(abs(pres_rtn(1)-pres_8(1)) < epsilon(pres_8),'Grid_Descriptors::vgd_new vertical build initializer (2001) value')
 

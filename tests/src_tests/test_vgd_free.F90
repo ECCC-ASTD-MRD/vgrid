@@ -17,7 +17,7 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program tests
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_getopt,vgd_putopt,vgd_print,vgd_free,vgd_get,VGD_ERROR,VGD_OK
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_getopt,vgd_putopt,vgd_print,vgd_get,VGD_ERROR,VGD_OK
   use Unit_Testing, only: ut_report
   
 
@@ -49,11 +49,11 @@ program tests
      call exit(1)    
   endif
 
-  stat = vgd_free(vgd)
-  if(stat==VGD_ERROR)then
-     print*,'This vgd_free error should not happen, please fixit'
-     call exit(1)
-  end if  
+!  stat = vgd_free(vgd)
+!  if(stat==VGD_ERROR)then
+!     print*,'This vgd_free error should not happen, please fixit'
+!     call exit(1)
+!  end if  
 
   stat = vgd_get(vgd,'PREF - reference pressure',value_8)
   if(stat==VGD_ERROR)then
