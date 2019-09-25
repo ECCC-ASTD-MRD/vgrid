@@ -188,9 +188,9 @@ int Cvgd_stda76_temp(vgrid_descriptor *self, int *i_val, int nl, float *temp)
   vgrid::Cvgd_stda76_temp(self, i_val, nl, temp);
 };
 
-void Cvgd_table_shape(vgrid_descriptor *vgd, int *tshape)
+void Cvgd_table_shape(vgrid_descriptor *vgd, int **tshape)
 {
-  vgrid::Cvgd_table_shape(vgd, &tshape);
+  vgrid::Cvgd_table_shape(vgd, tshape);
 };
 
 int Cvgd_vgdcmp(vgrid_descriptor *vgd1, vgrid_descriptor *vgd2)

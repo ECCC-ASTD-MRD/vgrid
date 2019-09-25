@@ -78,7 +78,7 @@ end program constructor
 integer function test_it(F_file_from_model_run) result(status)
  
    use mod_constructor_table, only:FSTD_ext,my_fstprm
-   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_free,operator(==),vgd_write,VGD_OK,VGD_ERROR
+   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,operator(==),vgd_write,VGD_OK,VGD_ERROR
    use Unit_Testing, only: ut_report
    
    implicit none
@@ -173,8 +173,8 @@ integer function test_it(F_file_from_model_run) result(status)
    endif
    
    deallocate(table)
-   ier = vgd_free(vgrid)
-   ier = vgd_free(vgrid_rebuilt)
+!   ier = vgd_free(vgrid)
+!   ier = vgd_free(vgrid_rebuilt)
 
    ier=fstfrm(lu)
    call fclos(lu)

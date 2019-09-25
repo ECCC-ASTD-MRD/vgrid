@@ -78,7 +78,7 @@ end program constructor
 !===============================================================================
 integer function test_hgts(F_d,F_file,F_write_control_L) result(istat)
    !
-   use vGrid_Descriptors, only: vgrid_descriptor,vgd_get,vgd_new,vgd_free,operator(==),VGD_ERROR,VGD_OK
+   use vGrid_Descriptors, only: vgrid_descriptor,vgd_get,vgd_new,operator(==),VGD_ERROR,VGD_OK
    
      
    implicit none
@@ -110,7 +110,7 @@ integer function test_hgts(F_d,F_file,F_write_control_L) result(istat)
       print*,'ERROR: rebuilding table'
       return
    endif
-   if(vgd_free(vgrid_rebuilt) ==  VGD_ERROR)return
+!   if(vgd_free(vgrid_rebuilt) ==  VGD_ERROR)return
    deallocate(table)
    
    if( vgd_get(F_d,key='KIND - vertical coordinate ip1 kind' ,value=kind)   == VGD_ERROR) return

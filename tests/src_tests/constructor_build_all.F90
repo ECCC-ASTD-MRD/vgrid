@@ -17,7 +17,7 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program constructor_build_all
-  use Vgrid_Descriptors, only: Vgrid_descriptor,Vgd_free,Vgd_new,VGD_ERROR,vgd_putopt
+  use Vgrid_Descriptors, only: Vgrid_descriptor,Vgd_new,VGD_ERROR,vgd_putopt
   use Unit_Testing, only: ut_report
 
   implicit none
@@ -72,10 +72,10 @@ program constructor_build_all
      stat=fstfrm(lu+i)  
      stat=fclos(lu+i)
      if( check_build(vgd) == VGD_ERROR) ok=.false.     
-     if( vgd_free(vgd) == VGD_ERROR)then
-        print*,'Error with vgd_free(vgd) on file ',trim(files(i))
-        call exit(1)
-     endif
+!     if( vgd_free(vgd) == VGD_ERROR)then
+!        print*,'Error with vgd_free(vgd) on file ',trim(files(i))
+!        call exit(1)
+!     endif
 
   end do
 
