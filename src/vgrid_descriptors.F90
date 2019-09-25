@@ -921,258 +921,6 @@ contains
     return
   end function levels_toplevel
 
-  integer function levels_withref_prof(self,ip1_list,levels,sfc_field,in_log,sfc_field_ls) result(status)
-#undef REAL_8
-#define REAL_KIND 4
-#define PROC_SUFF ""
-     type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
-     integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
-     real(kind=REAL_KIND), dimension(:), pointer :: levels                     !Physical level values
-     real(kind=REAL_KIND), optional, intent(in) :: sfc_field                   !Surface field reference for coordinate [none]
-     logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]          
-     real(kind=REAL_KIND), optional, intent(in) :: sfc_field_ls                !Surface field reference for coordinate [none]
-
-     ! Local variables
-     real(kind=REAL_KIND) :: my_sfc_field
-     logical :: my_in_log
-
-     ! Set return value
-     status = VGD_ERROR
-
-     if(.not.is_valid(self,'SELF'))then
-        write(for_msg,*) 'vgrid structure is not valid in levels_withref_prof'//PROC_SUFF
-        call msg(MSG_ERROR,VGD_PRFX//for_msg)       
-        return
-     endif
-     
-     ! Set default values
-     my_sfc_field = VGD_MISSING
-     if (present(sfc_field)) my_sfc_field = sfc_field
-     my_in_log = .false.
-     if (present(in_log)) my_in_log = in_log
-
-     ! Wrap call to level calculation
-     if(present(sfc_field_ls))then
-#if defined(REAL_8)
-        status = diag_withref_prof_8(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log,sfc_field_ls=sfc_field_ls)
-#else
-        status = diag_withref_prof(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log,sfc_field_ls=sfc_field_ls)
-#endif
-     else
-#if defined(REAL_8)
-        status = diag_withref_prof_8(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log)
-#else
-        status = diag_withref_prof(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log)
-#endif
-     endif
-     return
-#undef REAL_KIND
-#undef PROC_SUFF
-  end function levels_withref_prof
-
-  integer function levels_withref_prof_8(self,ip1_list,levels,sfc_field,in_log,sfc_field_ls) result(status)
-#define REAL_8 1
-#define REAL_KIND 8
-#define PROC_SUFF "_8"
-     type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
-     integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
-     real(kind=REAL_KIND), dimension(:), pointer :: levels                     !Physical level values
-     real(kind=REAL_KIND), optional, intent(in) :: sfc_field                   !Surface field reference for coordinate [none]
-     logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]          
-     real(kind=REAL_KIND), optional, intent(in) :: sfc_field_ls                !Surface field reference for coordinate [none]
-
-     ! Local variables
-     real(kind=REAL_KIND) :: my_sfc_field
-     logical :: my_in_log
-
-     ! Set return value
-     status = VGD_ERROR
-
-     if(.not.is_valid(self,'SELF'))then
-        write(for_msg,*) 'vgrid structure is not valid in levels_withref_prof'//PROC_SUFF
-        call msg(MSG_ERROR,VGD_PRFX//for_msg)       
-        return
-     endif
-     
-     ! Set default values
-     my_sfc_field = VGD_MISSING
-     if (present(sfc_field)) my_sfc_field = sfc_field
-     my_in_log = .false.
-     if (present(in_log)) my_in_log = in_log
-
-     ! Wrap call to level calculation
-     if(present(sfc_field_ls))then
-#if defined(REAL_8)
-        status = diag_withref_prof_8(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log,sfc_field_ls=sfc_field_ls)
-#else
-        status = diag_withref_prof(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log,sfc_field_ls=sfc_field_ls)
-#endif
-     else
-#if defined(REAL_8)
-        status = diag_withref_prof_8(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log)
-#else
-        status = diag_withref_prof(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log)
-#endif
-     endif
-     return
-#undef REAL_8
-#undef REAL_KIND
-#undef PROC_SUFF
-  end function levels_withref_prof_8
-  integer function levels_withref(self,ip1_list,levels,sfc_field,in_log,sfc_field_ls) result(status)
-#undef REAL_8
-#define REAL_KIND 4
-#define PROC_SUFF ""
-      use vgrid_utils, only: get_allocate
-      ! Given referent, compute physical levelling information from the vertical description
-      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
-      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
-      real(kind=REAL_KIND), dimension(:,:,:), pointer :: levels                   !Physical level values
-      real(kind=REAL_KIND), dimension(:,:), optional, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
-      real(kind=REAL_KIND), dimension(:,:), optional, intent(in) :: sfc_field_ls  !Surface field large scale reference for coordinate [none]
-      logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]
-
-      ! Local variables
-      integer :: error,ni,nj
-      real(kind=REAL_KIND), dimension(:,:), pointer :: my_sfc_field
-      logical :: my_in_log
-      
-      nullify(my_sfc_field)
-
-      ! Set return value
-      status = VGD_ERROR
-      
-      if(.not.is_valid(self,'SELF'))then
-         write(for_msg,*) 'vgrid structure is not valid in levels_withref'//PROC_SUFF
-         call msg(MSG_ERROR,VGD_PRFX//for_msg)       
-         return
-      endif
-      
-      ! Set default values
-      if (present(sfc_field)) then
-         ni = size(sfc_field,dim=1); nj = size(sfc_field,dim=2)
-      else
-         ni = 1; nj = 1
-      endif
-      allocate(my_sfc_field(ni,nj),stat=error)
-      if (error /= 0) then
-         write(for_msg,*) 'cannot allocate space for sfc_field in levels_withref'//PROC_SUFF
-         call msg(MSG_ERROR,VGD_PRFX//for_msg)
-         return
-      endif
-      if (present(sfc_field)) then
-         my_sfc_field = sfc_field
-      else
-         my_sfc_field = VGD_MISSING
-      endif
-      if (present(sfc_field_ls)) then
-         if( size(sfc_field_ls,dim=1) /= ni .or. size(sfc_field_ls,dim=2) /= nj )then
-            write(for_msg,*) 'size of sfc_field_ls not the same as sfc_field in levels_withref'//PROC_SUFF
-            call msg(MSG_ERROR,VGD_PRFX//for_msg)
-            return
-         endif
-      endif
-      my_in_log = .false.
-      if (present(in_log)) my_in_log = in_log
-      
-      ! Wrap call to level calculator
-      if( present(sfc_field_ls) )then
-#if defined(REAL_8)
-         status=diag_withref_8(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log,sfc_field_ls=sfc_field_ls)
-#else
-         status=diag_withref(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log,sfc_field_ls=sfc_field_ls)
-#endif
-      else
-#if defined(REAL_8)
-         status=diag_withref_8(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log)
-#else
-         status=diag_withref(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log)
-#endif
-      endif
-      deallocate(my_sfc_field)
-      return
-#undef REAL_KIND
-#undef PROC_SUFF
-  end function levels_withref
-
-  integer function levels_withref_8(self,ip1_list,levels,sfc_field,in_log, &
-       sfc_field_ls) result(status)
-#define REAL_8 1
-#define REAL_KIND 8
-#define PROC_SUFF "_8"
-      use vgrid_utils, only: get_allocate
-      ! Given referent, compute physical levelling information from the vertical description
-      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
-      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
-      real(kind=REAL_KIND), dimension(:,:,:), pointer :: levels                   !Physical level values
-      real(kind=REAL_KIND), dimension(:,:), optional, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
-      real(kind=REAL_KIND), dimension(:,:), optional, intent(in) :: sfc_field_ls  !Surface field large scale reference for coordinate [none]
-      logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]
-
-      ! Local variables
-      integer :: error,ni,nj
-      real(kind=REAL_KIND), dimension(:,:), pointer :: my_sfc_field
-      logical :: my_in_log
-      
-      nullify(my_sfc_field)
-
-      ! Set return value
-      status = VGD_ERROR
-      
-      if(.not.is_valid(self,'SELF'))then
-         write(for_msg,*) 'vgrid structure is not valid in levels_withref'//PROC_SUFF
-         call msg(MSG_ERROR,VGD_PRFX//for_msg)       
-         return
-      endif
-      
-      ! Set default values
-      if (present(sfc_field)) then
-         ni = size(sfc_field,dim=1); nj = size(sfc_field,dim=2)
-      else
-         ni = 1; nj = 1
-      endif
-      allocate(my_sfc_field(ni,nj),stat=error)
-      if (error /= 0) then
-         write(for_msg,*) 'cannot allocate space for sfc_field in levels_withref'//PROC_SUFF
-         call msg(MSG_ERROR,VGD_PRFX//for_msg)
-         return
-      endif
-      if (present(sfc_field)) then
-         my_sfc_field = sfc_field
-      else
-         my_sfc_field = VGD_MISSING
-      endif
-      if (present(sfc_field_ls)) then
-         if( size(sfc_field_ls,dim=1) /= ni .or. size(sfc_field_ls,dim=2) /= nj )then
-            write(for_msg,*) 'size of sfc_field_ls not the same as sfc_field in levels_withref'//PROC_SUFF
-            call msg(MSG_ERROR,VGD_PRFX//for_msg)
-            return
-         endif
-      endif
-      my_in_log = .false.
-      if (present(in_log)) my_in_log = in_log
-      
-      ! Wrap call to level calculator
-      if( present(sfc_field_ls) )then
-#if defined(REAL_8)
-         status=diag_withref_8(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log,sfc_field_ls=sfc_field_ls)
-#else
-         status=diag_withref(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log,sfc_field_ls=sfc_field_ls)
-#endif
-      else
-#if defined(REAL_8)
-         status=diag_withref_8(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log)
-#else
-         status=diag_withref(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log)
-#endif
-      endif
-      deallocate(my_sfc_field)
-      return
-#undef REAL_8
-#undef REAL_KIND
-#undef PROC_SUFF
-   end function levels_withref_8
-
   integer function levels_readref(self,unit,fstkeys,levels,in_log) result(status)
     ! Reading referent, compute physical levelling information from the vertical description
     type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
@@ -1314,6 +1062,106 @@ contains
     status = VGD_OK
     return
   end function levels_readref
+
+  integer function levels_withref_prof(self,ip1_list,levels,sfc_field,in_log,sfc_field_ls) result(status)
+#undef REAL_8
+#define REAL_KIND 4
+#define PROC_SUFF ""
+     type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
+     integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
+     real(kind=REAL_KIND), dimension(:), pointer :: levels                     !Physical level values
+     real(kind=REAL_KIND), optional, intent(in) :: sfc_field                   !Surface field reference for coordinate [none]
+     logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]          
+     real(kind=REAL_KIND), optional, intent(in) :: sfc_field_ls                !Surface field reference for coordinate [none]
+
+     ! Local variables
+     real(kind=REAL_KIND) :: my_sfc_field
+     logical :: my_in_log
+
+     ! Set return value
+     status = VGD_ERROR
+
+     if(.not.is_valid(self,'SELF'))then
+        write(for_msg,*) 'vgrid structure is not valid in levels_withref_prof'//PROC_SUFF
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+        return
+     endif
+     
+     ! Set default values
+     my_sfc_field = VGD_MISSING
+     if (present(sfc_field)) my_sfc_field = sfc_field
+     my_in_log = .false.
+     if (present(in_log)) my_in_log = in_log
+
+     ! Wrap call to level calculation
+     if(present(sfc_field_ls))then
+#if defined(REAL_8)
+        status = diag_withref_prof_8(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log,sfc_field_ls=sfc_field_ls)
+#else
+        status = diag_withref_prof(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log,sfc_field_ls=sfc_field_ls)
+#endif
+     else
+#if defined(REAL_8)
+        status = diag_withref_prof_8(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log)
+#else
+        status = diag_withref_prof(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log)
+#endif
+     endif
+     return
+#undef REAL_KIND
+#undef PROC_SUFF
+  end function levels_withref_prof
+
+  integer function levels_withref_prof_8(self,ip1_list,levels,sfc_field,in_log,sfc_field_ls) result(status)
+#define REAL_8 1
+#define REAL_KIND 8
+#define PROC_SUFF "_8"
+     type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
+     integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
+     real(kind=REAL_KIND), dimension(:), pointer :: levels                     !Physical level values
+     real(kind=REAL_KIND), optional, intent(in) :: sfc_field                   !Surface field reference for coordinate [none]
+     logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]          
+     real(kind=REAL_KIND), optional, intent(in) :: sfc_field_ls                !Surface field reference for coordinate [none]
+
+     ! Local variables
+     real(kind=REAL_KIND) :: my_sfc_field
+     logical :: my_in_log
+
+     ! Set return value
+     status = VGD_ERROR
+
+     if(.not.is_valid(self,'SELF'))then
+        write(for_msg,*) 'vgrid structure is not valid in levels_withref_prof'//PROC_SUFF
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+        return
+     endif
+     
+     ! Set default values
+     my_sfc_field = VGD_MISSING
+     if (present(sfc_field)) my_sfc_field = sfc_field
+     my_in_log = .false.
+     if (present(in_log)) my_in_log = in_log
+
+     ! Wrap call to level calculation
+     if(present(sfc_field_ls))then
+#if defined(REAL_8)
+        status = diag_withref_prof_8(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log,sfc_field_ls=sfc_field_ls)
+#else
+        status = diag_withref_prof(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log,sfc_field_ls=sfc_field_ls)
+#endif
+     else
+#if defined(REAL_8)
+        status = diag_withref_prof_8(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log)
+#else
+        status = diag_withref_prof(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log)
+#endif
+     endif
+     return
+#undef REAL_8
+#undef REAL_KIND
+#undef PROC_SUFF
+  end function levels_withref_prof_8
+
   integer function dpidpis_withref_prof(self,ip1_list,dpidpis,sfc_field) result(status)
 #undef REAL_8
 #define REAL_KIND 4
@@ -1568,6 +1416,161 @@ contains
 #undef REAL_KIND
 #undef PROC_SUFF
   end function diag_withref_prof_8
+
+
+  integer function levels_withref(self,ip1_list,levels,sfc_field,in_log,sfc_field_ls) result(status)
+#undef REAL_8
+#define REAL_KIND 4
+#define PROC_SUFF ""
+      use vgrid_utils, only: get_allocate
+      ! Given referent, compute physical levelling information from the vertical description
+      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
+      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
+      real(kind=REAL_KIND), dimension(:,:,:), pointer :: levels                   !Physical level values
+      real(kind=REAL_KIND), dimension(:,:), optional, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
+      real(kind=REAL_KIND), dimension(:,:), optional, intent(in) :: sfc_field_ls  !Surface field large scale reference for coordinate [none]
+      logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]
+
+      ! Local variables
+      integer :: error,ni,nj
+      real(kind=REAL_KIND), dimension(:,:), pointer :: my_sfc_field
+      logical :: my_in_log
+      
+      nullify(my_sfc_field)
+
+      ! Set return value
+      status = VGD_ERROR
+      
+      if(.not.is_valid(self,'SELF'))then
+         write(for_msg,*) 'vgrid structure is not valid in levels_withref'//PROC_SUFF
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+         return
+      endif
+      
+      ! Set default values
+      if (present(sfc_field)) then
+         ni = size(sfc_field,dim=1); nj = size(sfc_field,dim=2)
+      else
+         ni = 1; nj = 1
+      endif
+      allocate(my_sfc_field(ni,nj),stat=error)
+      if (error /= 0) then
+         write(for_msg,*) 'cannot allocate space for sfc_field in levels_withref'//PROC_SUFF
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         return
+      endif
+      if (present(sfc_field)) then
+         my_sfc_field = sfc_field
+      else
+         my_sfc_field = VGD_MISSING
+      endif
+      if (present(sfc_field_ls)) then
+         if( size(sfc_field_ls,dim=1) /= ni .or. size(sfc_field_ls,dim=2) /= nj )then
+            write(for_msg,*) 'size of sfc_field_ls not the same as sfc_field in levels_withref'//PROC_SUFF
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            return
+         endif
+      endif
+      my_in_log = .false.
+      if (present(in_log)) my_in_log = in_log
+      
+      ! Wrap call to level calculator
+      if( present(sfc_field_ls) )then
+#if defined(REAL_8)
+         status=diag_withref_8(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log,sfc_field_ls=sfc_field_ls)
+#else
+         status=diag_withref(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log,sfc_field_ls=sfc_field_ls)
+#endif
+      else
+#if defined(REAL_8)
+         status=diag_withref_8(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log)
+#else
+         status=diag_withref(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log)
+#endif
+      endif
+      deallocate(my_sfc_field)
+      return
+#undef REAL_KIND
+#undef PROC_SUFF
+  end function levels_withref
+
+  integer function levels_withref_8(self,ip1_list,levels,sfc_field,in_log, &
+       sfc_field_ls) result(status)
+#define REAL_8 1
+#define REAL_KIND 8
+#define PROC_SUFF "_8"
+      use vgrid_utils, only: get_allocate
+      ! Given referent, compute physical levelling information from the vertical description
+      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
+      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
+      real(kind=REAL_KIND), dimension(:,:,:), pointer :: levels                   !Physical level values
+      real(kind=REAL_KIND), dimension(:,:), optional, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
+      real(kind=REAL_KIND), dimension(:,:), optional, intent(in) :: sfc_field_ls  !Surface field large scale reference for coordinate [none]
+      logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]
+
+      ! Local variables
+      integer :: error,ni,nj
+      real(kind=REAL_KIND), dimension(:,:), pointer :: my_sfc_field
+      logical :: my_in_log
+      
+      nullify(my_sfc_field)
+
+      ! Set return value
+      status = VGD_ERROR
+      
+      if(.not.is_valid(self,'SELF'))then
+         write(for_msg,*) 'vgrid structure is not valid in levels_withref'//PROC_SUFF
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+         return
+      endif
+      
+      ! Set default values
+      if (present(sfc_field)) then
+         ni = size(sfc_field,dim=1); nj = size(sfc_field,dim=2)
+      else
+         ni = 1; nj = 1
+      endif
+      allocate(my_sfc_field(ni,nj),stat=error)
+      if (error /= 0) then
+         write(for_msg,*) 'cannot allocate space for sfc_field in levels_withref'//PROC_SUFF
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         return
+      endif
+      if (present(sfc_field)) then
+         my_sfc_field = sfc_field
+      else
+         my_sfc_field = VGD_MISSING
+      endif
+      if (present(sfc_field_ls)) then
+         if( size(sfc_field_ls,dim=1) /= ni .or. size(sfc_field_ls,dim=2) /= nj )then
+            write(for_msg,*) 'size of sfc_field_ls not the same as sfc_field in levels_withref'//PROC_SUFF
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            return
+         endif
+      endif
+      my_in_log = .false.
+      if (present(in_log)) my_in_log = in_log
+      
+      ! Wrap call to level calculator
+      if( present(sfc_field_ls) )then
+#if defined(REAL_8)
+         status=diag_withref_8(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log,sfc_field_ls=sfc_field_ls)
+#else
+         status=diag_withref(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log,sfc_field_ls=sfc_field_ls)
+#endif
+      else
+#if defined(REAL_8)
+         status=diag_withref_8(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log)
+#else
+         status=diag_withref(self,ip1_list,levels,sfc_field=my_sfc_field,in_log=my_in_log)
+#endif
+      endif
+      deallocate(my_sfc_field)
+      return
+#undef REAL_8
+#undef REAL_KIND
+#undef PROC_SUFF
+   end function levels_withref_8
 
    integer function dpidpis_withref(self,ip1_list,dpidpis,sfc_field) result(status)
 #undef REAL_8
