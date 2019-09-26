@@ -13,8 +13,7 @@ int Cvgd_diag_withref_2ref_8(vgrid_descriptor *vgd, int ni, int nj, int nk,
 
 int Cvgd_get_char(vgrid_descriptor *vgd, char *key, char *my_char, int quiet);
 
-int Cvgd_get_double(vgrid_descriptor *vgd, char *key, double *value,
-                    int quiet);
+int Cvgd_get_double(vgrid_descriptor *vgd, char *key, double *value, int quiet);
 
 int Cvgd_get_double_1d(vgrid_descriptor *vgd, char *key, double **value, 
                        int *nk, int quiet);

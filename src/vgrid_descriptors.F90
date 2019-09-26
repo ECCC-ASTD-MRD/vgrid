@@ -214,9 +214,9 @@ module vGrid_Descriptors
          type(c_ptr), value :: vgd1_CP, vgd2_CP
       end function f_vgdcmp
 
-      integer(c_int) function f_new_read(vgd_ptr,unit,ip1,ip2,kind,version) bind(c, name='Cvgd_new_read')
+      integer(c_int) function f_new_read(vgd,unit,ip1,ip2,kind,version) bind(c, name='Cvgd_new_read')
          use iso_c_binding, only : c_ptr, c_int, c_char
-         type(c_ptr) :: vgd_ptr
+         type(c_ptr) :: vgd
          integer (c_int), value :: unit, ip1, ip2, kind, version
       end function f_new_read
       
