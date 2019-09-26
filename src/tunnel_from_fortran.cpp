@@ -25,31 +25,76 @@
 #include "vgrid.hpp"
 #include "tunnel_from_fortran.hpp"
 
-int Cvgd_new_read(vgrid_descriptor **vgd, int unit, int ip1,int ip2, 
-                  int kind, int version)
+int Cvgd_diag_withref_2ref(vgrid_descriptor *vgd, int ni, int nj, int nk,
+                           int *ip1_list, float *levels, float *sfc_field,
+                           float *sfc_field_ls, int in_log, int dpidpis)
 {
-  vgrid::Cvgd_new_read(vgd, unit, ip1, ip2, kind, version);
-}
-
-
-int Cvgd_new_from_table(vgrid_descriptor **vgd, double *table,
-                        int ni, int nj, int nk)
-{
-  vgrid::Cvgd_new_from_table(vgd, table, ni, nj, nk);
+  vgrid::Cvgd_diag_withref_2ref(vgd, ni, nj, nk,
+                                ip1_list, levels, sfc_field,
+                                sfc_field_ls, in_log, dpidpis);
 };
 
-
-int Cvgd_new_gen2(vgrid_descriptor **self, int kind, int version, float *hyb,
-                  int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3,                      float *rcoef4, double *ptop_8, double *pref_8,
-                  double *ptop_out_8, int ip1, int ip2, float *dhm, float *dht,
-                  float *dhw, int avg)
+int Cvgd_diag_withref_2ref_8(vgrid_descriptor *vgd, int ni, int nj, int nk,
+                           int *ip1_list,double *levels_8,double *sfc_field_8,
+                           double *sfc_field_ls_8, int in_log, int dpidpis)
 {
-  vgrid::Cvgd_new_gen2(self, kind, version, hyb,
-                  size_hyb, rcoef1, rcoef2, rcoef3,
-                  rcoef4, ptop_8, pref_8,
-                  ptop_out_8, ip1, ip2, dhm, dht,
-                  dhw, avg);
-}
+   vgrid::Cvgd_diag_withref_2ref_8(vgd, ni, nj, nk,
+                                   ip1_list, levels_8, sfc_field_8,
+                                   sfc_field_ls_8, in_log, dpidpis);
+};
+
+int Cvgd_get_char(vgrid_descriptor *vgd, char *key, char *my_char, int quiet)
+{
+  vgrid::Cvgd_get_char(vgd, key, my_char, quiet);
+};
+
+int Cvgd_get_double(vgrid_descriptor *vgd, char *key, double *value, int quiet)
+{
+  vgrid::Cvgd_get_double(vgd, key, value, quiet);
+};
+
+int Cvgd_get_double_1d(vgrid_descriptor *vgd, char *key, double **value, 
+                       int *nk, int quiet)
+{
+  vgrid::Cvgd_get_double_1d(vgd, key, value, nk, quiet);
+};
+
+int Cvgd_get_double_3d(vgrid_descriptor *vgd, char *key, double **value, int *ni, int *nj, int *nk, int quiet)
+{
+  vgrid::Cvgd_get_double_3d(vgd, key, value, ni, nj, nk, quiet);
+};
+
+int Cvgd_get_float(vgrid_descriptor *vgd, char *key, float *value,
+                   int quiet)
+{
+  vgrid::Cvgd_get_float(vgd, key, value, quiet);
+};
+
+int Cvgd_get_float_1d(vgrid_descriptor *vgd, char *key, float **value, int *nk, int quiet)
+{
+  vgrid::Cvgd_get_float_1d(vgd, key, value, nk, quiet);
+};
+
+int Cvgd_get_int(vgrid_descriptor *vgd, char *key, int *value, int quiet)
+{
+  vgrid::Cvgd_get_int(vgd, key, value, quiet);
+};
+
+int Cvgd_get_int_1d(vgrid_descriptor *vgd, char *key, int **value, int *nk,
+                    int quiet)
+{
+  vgrid::Cvgd_get_int_1d(vgd, key, value, nk, quiet);
+};
+
+int Cvgd_getopt_int(char *key, int *value, int quiet)
+{
+  vgrid::Cvgd_getopt_int(key, value, quiet);
+};
+
+int Cvgd_is_valid(vgrid_descriptor *vgd, char *valid_table_name)
+{
+  vgrid::Cvgd_is_valid(vgd, valid_table_name);
+};
 
 int Cvgd_new_build_vert2(vgrid_descriptor **vgd, int kind, int version, int nk,
                          int ip1, int ip2, double *ptop_8, double *pref_8,
@@ -71,71 +116,31 @@ int Cvgd_new_build_vert2(vgrid_descriptor **vgd, int kind, int version, int nk,
                               nl_w);
 };
 
-int Cvgd_diag_withref_2ref(vgrid_descriptor *vgd, int ni, int nj, int nk,
-                           int *ip1_list, float *levels, float *sfc_field,
-                           float *sfc_field_ls, int in_log, int dpidpis)
+
+int Cvgd_new_from_table(vgrid_descriptor **vgd, double *table,
+                        int ni, int nj, int nk)
 {
-  vgrid::Cvgd_diag_withref_2ref(vgd, ni, nj, nk,
-                                ip1_list, levels, sfc_field,
-                                sfc_field_ls, in_log, dpidpis);
+  vgrid::Cvgd_new_from_table(vgd, table, ni, nj, nk);
 };
 
-int Cvgd_diag_withref_2ref_8(vgrid_descriptor *vgd, int ni, int nj, int nk,
-                           int *ip1_list,double *levels_8,double *sfc_field_8,
-                           double *sfc_field_ls_8, int in_log, int dpidpis)
-{
-   vgrid::Cvgd_diag_withref_2ref_8(vgd, ni, nj, nk,
-                                   ip1_list, levels_8, sfc_field_8,
-                                   sfc_field_ls_8, in_log, dpidpis);
-};
 
-int Cvgd_get_int(vgrid_descriptor *vgd, char *key, int *value, int quiet)
+int Cvgd_new_gen2(vgrid_descriptor **self, int kind, int version, float *hyb,
+                  int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3,                      float *rcoef4, double *ptop_8, double *pref_8,
+                  double *ptop_out_8, int ip1, int ip2, float *dhm, float *dht,
+                  float *dhw, int avg)
 {
-  vgrid::Cvgd_get_int(vgd, key, value, quiet);
-};
+  vgrid::Cvgd_new_gen2(self, kind, version, hyb,
+                  size_hyb, rcoef1, rcoef2, rcoef3,
+                  rcoef4, ptop_8, pref_8,
+                  ptop_out_8, ip1, ip2, dhm, dht,
+                  dhw, avg);
+}
 
-int Cvgd_get_int_1d(vgrid_descriptor *vgd, char *key, int **value, int *nk,
-                    int quiet)
+int Cvgd_new_read(vgrid_descriptor **vgd, int unit, int ip1,int ip2, 
+                  int kind, int version)
 {
-  vgrid::Cvgd_get_int_1d(vgd, key, value, nk, quiet);
-};
-
-int Cvgd_get_float(vgrid_descriptor *vgd, char *key, float *value,
-                   int quiet)
-{
-  vgrid::Cvgd_get_float(vgd, key, value, quiet);
-};
-
-int Cvgd_get_float_1d(vgrid_descriptor *vgd, char *key, float **value, int *nk, int quiet)
-{
-  vgrid::Cvgd_get_float_1d(vgd, key, value, nk, quiet);
-};
-
-int Cvgd_get_double(vgrid_descriptor *vgd, char *key, double *value, int quiet)
-{
-  vgrid::Cvgd_get_double(vgd, key, value, quiet);
-};
-
-int Cvgd_get_double_1d(vgrid_descriptor *vgd, char *key, double **value, 
-                       int *nk, int quiet)
-{
-  vgrid::Cvgd_get_double_1d(vgd, key, value, nk, quiet);
-};
-
-int Cvgd_get_double_3d(vgrid_descriptor *vgd, char *key, double **value, int *ni, int *nj, int *nk, int quiet)
-{
-  vgrid::Cvgd_get_double_3d(vgd, key, value, ni, nj, nk, quiet);
-};
-
-int Cvgd_get_char(vgrid_descriptor *vgd, char *key, char *my_char, int quiet)
-{
-  vgrid::Cvgd_get_char(vgd, key, my_char, quiet);
-};
-
-int Cvgd_getopt_int(char *key, int *value, int quiet)
-{
-  vgrid::Cvgd_getopt_int(key, value, quiet);
-};
+  vgrid::Cvgd_new_read(vgd, unit, ip1, ip2, kind, version);
+}
 
 int Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip)
 {
@@ -160,11 +165,6 @@ int Cvgd_put_int(vgrid_descriptor **self, char *key, int value)
 int Cvgd_putopt_int(char *key, int value)
 {
   vgrid::Cvgd_putopt_int(key, value);
-};
-
-int Cvgd_is_valid(vgrid_descriptor *vgd, char *valid_table_name)
-{
-  vgrid::Cvgd_is_valid(vgd, valid_table_name);
 };
 
 int Cvgd_stda76_hgts_from_pres_list(float *hgts, float *pres, int nb)
