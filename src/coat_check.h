@@ -24,8 +24,27 @@
 
 // make this a Singleton.  See https://stackoverflow.com/questions/1008019/c-singleton-design-pattern
 class coat_check
+// Context:  
+//           While this class does not check coats, its name is a metaphor for
+//           what it does with vgrid objects.
+//
+//           Coat_check is a tool that supports the interface to fortran.
+//           Because it is not a good idea to inject C objects into fortran
+//           code, coat_check allows the program to check those objects at the
+//           interface to fortran, and to obtain an integer tag, or handle, that
+//           the fortran code can use to refer to the C object, a vgrid in this
+//           case.  When the fortan code calls a C routine, with the tag as an
+//           argument, the C routine can go to the coat check with that tag and
+//           obtain the C objectin question.
+//
+// Purpose:
+//           To accept a vgrid object in exchange for a tag and, conversely, to
+//           provide the indicated vgrid object when a tag is presented.
 {
 public:
+  // Constructor
+  coat_check(void);
+
   // Obtain the vgrid, given the coat-check tag
   vgrid_descriptor* get_vgrid(int tag);
 
@@ -35,18 +54,21 @@ public:
   // Decrement the usage count on a particular vgrid
   void release_vgrid(int tag);
 
-  // Debugging Instrumentation:  return the number of tags issued for this grid
+  // Debugging Instrumentation:  return the number of tags outstanding for this
+  // grid
   int grid_count(int tag);
 
 private:
   // A coat_hanger holds all data relevant to one vertical grid
   struct coat_hanger{
-    vgrid_descriptor *vgrid;
+    vgrid_descriptor vgrid;
+    int num_tags_issued;
   };
 
   // The coat_closet hold all of the coat_hanger's (vgrids) together
   coat_hanger coat_closet[100];
 
+  int latest_hanger_filled;
 };
 
 #endif // COAT_CHECK_H

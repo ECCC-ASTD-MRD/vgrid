@@ -19,30 +19,65 @@
 
 #include "coat_check.h"
 
+
+coat_check::coat_check()
+{    
+  latest_hanger_filled=-1;
+}
+
 // Obtain the vgrid, given the coat-check tag
 vgrid_descriptor* coat_check::get_vgrid(int tag)
 {
-  tag=1;
+  return &coat_closet[tag].vgrid;
+  // Don't change num_tags_issued, because the client is still using the tag.
 };
+
 
 // Obtain a coat-check tag, given a vgrid
 int coat_check::get_tag(vgrid_descriptor* vgrid)
 {
-//  ==============
-//   Q:  Should the coat_check take a physical copy of vgrid, or just a pointer?
+  coat_hanger *hanger_p;
+  int hanger_index;
 
-//   A:  It must be a copy, because I expect to have multiple clients using the
-//       same vgrid.
-//  ==============
-  return 1;
+  // Search the occupied hangers for the submitted vgrid
+  for(hanger_index=0; hanger_index <= latest_hanger_filled; hanger_index++)
+    {
+      // TBD:  create and use vgrid operator ==
+      if(vgrid::Cvgd_vgdcmp(&coat_closet[hanger_index].vgrid, vgrid) == 0)
+        break;
+    }
+
+  if(hanger_index <= latest_hanger_filled)
+    {
+      // An identical vgrid is already in coat_closet at hanger_index
+      coat_closet[hanger_index].num_tags_issued++;
+      return hanger_index;
+    }
+  else
+    {
+      // Create a local copy of the submitted vgrid, in the coat_closet
+      //    (This is necessary, because one can expect to have multiple clients
+      //     using the same vgrid.  If one client deletes his vgrid, a copy must
+      //     be available for the other clients.)
+      hanger_p=&coat_closet[++latest_hanger_filled];
+      hanger_p->vgrid=*vgrid;
+      hanger_p->num_tags_issued=1;
+
+      return latest_hanger_filled;
+    }
 };
 
-// Obtain a coat-check tag, given a vgrid
+// Decrement the usage count on a particular vgrid
 void coat_check::release_vgrid(int tag)
 {
+  if(--coat_closet[tag].num_tags_issued < 0)
+    coat_closet[tag].num_tags_issued = 0;
+  // if(coat_closet[tag].num_tags_issued == 0)
+  //   could do something, like delete vgrid
 };
 
 // Debugging Instrumentation:  return the number of tags issued for this grid
 int coat_check::grid_count(int tag)
 {
+  return coat_closet[tag].num_tags_issued;
 };

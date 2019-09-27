@@ -29,13 +29,19 @@ extern "C" void c_coat_check() {
 
   coat_check my_coat_check;
 
-  vgrid_descriptor my_vgrid_a, my_vgrid_b, *checked_vgrid_p, *my_vgrid_a_p;
+  vgrid_descriptor *my_vgrid_a_p, *my_vgrid_b_p, *checked_vgrid_p;
+
+  status=VGD_OK;
 
 
   // Test 1:  If I put a second (different) grid in the coat check, I should get
   //          a tag that is different from the first one
-  tag1 = my_coat_check.get_tag(&my_vgrid_a);
-  tag2 = my_coat_check.get_tag(&my_vgrid_b);
+  my_vgrid_a_p = vgrid::c_vgd_construct();
+  my_vgrid_b_p = vgrid::c_vgd_construct(); // vgrid::c_vgd_construct();
+  my_vgrid_a_p->vcode = 768; // Leave a fingerprint
+  my_vgrid_b_p->vcode = 999; // Leave a fingerprint
+  tag1 = my_coat_check.get_tag(my_vgrid_a_p);
+  tag2 = my_coat_check.get_tag(my_vgrid_b_p);
 
   if(tag1 == tag2)
     {
@@ -51,7 +57,7 @@ extern "C" void c_coat_check() {
 
   // Test 2:  If I put a second identical grid in the coat check, I should get
   //          the same tag as the first one
-  tag2 = my_coat_check.get_tag(&my_vgrid_a);
+  tag2 = my_coat_check.get_tag(my_vgrid_a_p);
 
   if(tag1 != tag_a)
     {
@@ -64,8 +70,8 @@ extern "C" void c_coat_check() {
   //          the original grid (equal value)
   checked_vgrid_p = my_coat_check.get_vgrid(tag_a);
 
-  my_vgrid_a_p = &my_vgrid_a;
-  if(!(my_vgrid_a_p == checked_vgrid_p))
+  // TBD:  create and use vgrid operator ==
+  if(vgrid::Cvgd_vgdcmp(my_vgrid_a_p, checked_vgrid_p) != 0)
     {
       printf("Error:  get_vgrid does not give back the original vgrid\n");
       status = VGD_ERROR;
@@ -117,5 +123,5 @@ extern "C" void c_coat_check() {
       status = VGD_ERROR;
     }
 
-  ier = c_ut_report(status,"testing Cvgd_levels");
+  ier = c_ut_report(status,"testing coat_check");
 };
