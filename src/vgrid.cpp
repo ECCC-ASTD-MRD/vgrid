@@ -79,62 +79,6 @@ static int dhw_valid        [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    
 static int is_in_logp       [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005, 5100,    0,     0,    0};
 static int vcode_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 4001, 5001, 5002, 5003, 5004, 5005, 5100, 5999, 21001,21002};
 
-// int fstd_init(vgrid_descriptor *VGrid);
-// vgrid_descriptor* c_vgd_construct();
-// int c_encode_vert_0001(vgrid_descriptor **self,int nk);
-// int c_encode_vert_1001(vgrid_descriptor **self,int nk);
-// int c_encode_vert_1002(vgrid_descriptor **self,int nk);
-// int c_encode_vert_2001(vgrid_descriptor **self,int nk);
-// int c_encode_vert_4001(vgrid_descriptor **self,int nk);
-// int c_encode_vert_5001(vgrid_descriptor **self,int nk);
-// int c_encode_vert_5002_5003_5004_5005(vgrid_descriptor **self, char update);
-// int c_encode_vert_5100(vgrid_descriptor **self, char update);
-// int c_encode_vert_5999(vgrid_descriptor **self,int nk);
-// int c_encode_vert_21001(vgrid_descriptor **self, char update);
-// int c_encode_vert_21002(vgrid_descriptor **self, char update);
-
-  // This is the vgrid descriptor
-  VGD_TFSTD rec;          // RPN standard file header
-  double   ptop_8;        // Top level pressure (Pa)
-  double   pref_8;        // Reference pressure (Pa)
-  double   *table;        // Complete grid descriptor record
-  int      table_ni;      //    ni size of table
-  int      table_nj;      //    nj size of table
-  int      table_nk;      //    nk size of table
-  double   *a_m_8;        // A-coefficients for momentum levels  
-  double   *b_m_8;        // B-coefficients for momentum levels
-  double   *c_m_8;        // C-coefficients for momentum levels
-  double   *a_t_8;        // A-coefficients for thermodynamic levels
-  double   *b_t_8;        // B-coefficients for thermodynamic levels
-  double   *c_t_8;        // C-coefficients for thermodynamic levels
-  double   *a_w_8;        // A-coefficients for vertical-velocity levels
-  double   *b_w_8;        // B-coefficients for vertical-velocity levels
-  double   *c_w_8;        // C-coefficients for vertical-velocity levels
-  int      *ip1_m;        // ip1 values for momentum levels
-  int      *ip1_t;        // ip1 values for momentum levels
-  int      *ip1_w;        // ip1 values for momentum levels
-  int      nl_m;          // Number of momentum      level
-  int      nl_t;          // Number ot thermodynamic level
-  int      nl_w;          // Number ot vertical volocity level
-  float    dhm;           // Diag level Height (m) for Momentum variables UU,VV
-  float    dht;           // Diag level Height (t) for Thermo variables TT,HU, etc
-  float    dhw;           // Diag level Height (m) for vertical-velocity variables WT1 ZZ
-  char*    ref_name;      // Reference field name
-  char*    ref_namel;     // Reference field name
-  float    rcoef1;        // Rectification coefficient
-  float    rcoef2;        // Rectification coefficient
-  float    rcoef3;        // Rectification coefficient
-  float    rcoef4;        // Rectification coefficient
-  int      nk;            // Number of momentum levels
-  int      ip1;           // ip1 value given to the 3D descriptor
-  int      ip2;           // ip2 value given to the 3D descriptor
-  int      unit;          // file unit associated with this 3D descriptor
-  int      vcode;         // Vertical coordinate code
-  int      kind;          // Vertical coordinate code
-  int      version;       // Vertical coordinate code
-  char     match_ipig;    // do ip/ig matching for records
-  char     valid;         // Validity of structure
-
 
 // beginning of class vgrid
 
