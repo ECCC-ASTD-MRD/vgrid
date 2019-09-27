@@ -35,6 +35,9 @@ public:
   // Decrement the usage count on a particular vgrid
   void release_vgrid(int tag);
 
+  // Debugging Instrumentation:  return the number of tags issued for this grid
+  int grid_count(int tag);
+
 private:
   // A coat_hanger holds all data relevant to one vertical grid
   struct coat_hanger{

@@ -28,10 +28,21 @@ vgrid_descriptor* coat_check::get_vgrid(int tag)
 // Obtain a coat-check tag, given a vgrid
 int coat_check::get_tag(vgrid_descriptor* vgrid)
 {
+//  ==============
+//   Q:  Should the coat_check take a physical copy of vgrid, or just a pointer?
+
+//   A:  It must be a copy, because I expect to have multiple clients using the
+//       same vgrid.
+//  ==============
   return 1;
 };
 
 // Obtain a coat-check tag, given a vgrid
 void coat_check::release_vgrid(int tag)
+{
+};
+
+// Debugging Instrumentation:  return the number of tags issued for this grid
+int coat_check::grid_count(int tag)
 {
 };
