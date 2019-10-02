@@ -65,8 +65,9 @@ private:
     int num_tags_issued;
   };
 
-  // The coat_closet hold all of the coat_hanger's (vgrids) together
-  coat_hanger coat_closet[100];
+  // The coat_closet holds all of the coat_hangers (vgrids) together
+  static const int NUM_HANGERS=100;
+  coat_hanger coat_closet[NUM_HANGERS];
 
   int latest_hanger_filled;
 };

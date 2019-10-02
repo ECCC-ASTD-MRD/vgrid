@@ -18,6 +18,7 @@
 // Boston, MA 02111-1307, USA.
 
 #include "coat_check.h"
+#include <stdio.h>
 
 
 coat_check::coat_check()
@@ -59,11 +60,20 @@ int coat_check::get_tag(vgrid_descriptor* vgrid)
       //    (This is necessary, because one can expect to have multiple clients
       //     using the same vgrid.  If one client deletes his vgrid, a copy must
       //     be available for the other clients.)
-      hanger_p=&coat_closet[++latest_hanger_filled];
-      hanger_p->vgrid=*vgrid;
-      hanger_p->num_tags_issued=1;
+      if(latest_hanger_filled >= NUM_HANGERS-1)
+        {
+          printf("ERROR:  The number of vgrids has reached its maximum: %d\n",
+                 NUM_HANGERS);
+          return -999;
+        }
+      else
+        {
+          hanger_p=&coat_closet[++latest_hanger_filled];
+          hanger_p->vgrid=*vgrid;
+          hanger_p->num_tags_issued=1;
+          return latest_hanger_filled;
+        }
 
-      return latest_hanger_filled;
     }
 };
 
