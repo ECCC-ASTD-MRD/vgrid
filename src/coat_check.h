@@ -20,7 +20,7 @@
 #ifndef COAT_CHECK_H
 #define COAT_CHECK_H
 
-#include "vgrid.hpp"
+#include "vgrid_descriptor.h"
 
 // make this a Singleton.  See https://stackoverflow.com/questions/1008019/c-singleton-design-pattern
 class coat_check

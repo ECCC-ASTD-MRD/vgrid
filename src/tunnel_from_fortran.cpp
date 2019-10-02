@@ -23,6 +23,7 @@
 
 
 #include "vgrid.hpp"
+#include "vgrid_descriptor.h"
 #include "tunnel_from_fortran.hpp"
 
 int Cvgd_diag_withref_2ref(vgrid_descriptor *vgd, int ni, int nj, int nk,

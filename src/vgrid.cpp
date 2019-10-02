@@ -19,6 +19,7 @@
  */
 
 #include "vgrid.hpp"
+#include "vgrid_descriptor.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -7467,6 +7468,7 @@ int vgrid::Cvgd_new_read(vgrid_descriptor **self, int unit, int ip1, int ip2, in
     return(VGD_ERROR);
   }
   (*self)->match_ipig = match_ipig;  
+
   
   return(VGD_OK);
 }
