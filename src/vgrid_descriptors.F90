@@ -218,7 +218,7 @@ module vGrid_Descriptors
 
       integer(c_int) function f_new_read(vgdid,unit,ip1,ip2,kind,version) bind(c, name='Cvgd_new_read')
          use iso_c_binding, only : c_ptr, c_int, c_char
-         type(c_ptr) :: vgdid
+         integer :: vgdid
          integer (c_int), value :: unit, ip1, ip2, kind, version
       end function f_new_read
       
@@ -369,8 +369,6 @@ contains
       integer :: ni,nj,nk, istat, error, l_ip1, l_ip2, l_kind, l_version
       character(len=100) :: myformat
       real(kind=8), dimension(:,:,:), pointer :: table_8
-      type(c_ptr) :: vgdid_cp
-      integer, pointer :: vgdid_fp
 
       nullify(table_8)
 
@@ -401,13 +399,10 @@ contains
             l_version = -1
          endif
 
-         vgdid_cp = c_loc(self%vgdid)
-         if( f_new_read(vgdid_cp, unit, l_ip1, l_ip2, l_kind, l_version) == VGD_ERROR )then
+         if( f_new_read(self%vgdid, unit, l_ip1, l_ip2, l_kind, l_version) == VGD_ERROR )then
             print*,'(F_vgd) ERROR: In new_read, problem with f_new_read'
             return
          else
-            call c_f_pointer(vgdid_cp, vgdid_fp)
-            self%vgdid=vgdid_fp
             print*, "self%vgdid=", self%vgdid
          endif
       case ('BIN')

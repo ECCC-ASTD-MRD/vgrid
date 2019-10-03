@@ -137,7 +137,7 @@ int Cvgd_new_gen2(vgrid_descriptor **self, int kind, int version, float *hyb,
                   dhw, avg);
 }
 
-int Cvgd_new_read(int **vgdid, int unit, int ip1,int ip2, 
+int Cvgd_new_read(int *vgdid, int unit, int ip1,int ip2, 
                   int kind, int version)
 {
   vgrid::Cvgd_new_read(vgdid, unit, ip1, ip2, kind, version);

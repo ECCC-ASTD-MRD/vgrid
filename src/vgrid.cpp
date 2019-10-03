@@ -7358,12 +7358,11 @@ int vgrid::c_legacy(vgrid_descriptor **self, int unit, int F_kind) {
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_new_read(int **tag, int unit, int ip1, int ip2, int kind, int version) {
+int vgrid::Cvgd_new_read(int *tag, int unit, int ip1, int ip2, int kind, int version) {
 
   vgrid_descriptor *self;
   char  match_ipig;
   int error, i, ni, nj, nk;
-  int tag_temp;
   int toc_found = 0, count, nkeyList = MAX_DESC_REC;
   int keyList[nkeyList], status;
   VGD_TFSTD_ext var;
@@ -7471,8 +7470,7 @@ int vgrid::Cvgd_new_read(int **tag, int unit, int ip1, int ip2, int kind, int ve
   self->match_ipig = match_ipig;  
 
   coat_check_p=&grid_check;
-  tag_temp=coat_check_p->get_tag(self);
-  *tag=&tag_temp;
+  *tag=coat_check_p->get_tag(self);
   return(VGD_OK);
 }
 
