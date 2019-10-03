@@ -53,7 +53,7 @@ int Cvgd_new_gen2(vgrid_descriptor **self, int kind, int version, float *hyb,
                   double *ptop_out_8, int ip1, int ip2, float *dhm, float *dht,
                   float *dhw, int avg);
 
-int Cvgd_new_read(vgrid_descriptor **vgd, int unit, int ip1,int ip2,
+int Cvgd_new_read(int **vgd, int unit, int ip1,int ip2,
                   int kind, int version);
 
 int Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip);

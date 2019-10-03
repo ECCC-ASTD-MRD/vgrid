@@ -30,7 +30,7 @@ module vGrid_Descriptors
    ! var_L  is of type logical
    ! var_CP is of type type(c_ptr) from iso_c_binding
 
-   use iso_c_binding, only : c_ptr, C_NULL_PTR, C_CHAR, C_NULL_CHAR, c_int, C_FLOAT, c_associated, c_loc
+   use iso_c_binding, only : c_ptr, C_NULL_PTR, C_CHAR, C_NULL_CHAR, c_int, C_FLOAT, c_associated, c_loc, c_f_pointer
 
    implicit none
    private
@@ -78,6 +78,8 @@ module vGrid_Descriptors
    type :: vgrid_descriptor
       ! The only member of this type is a C pointer
       type(c_ptr) :: cptr = C_NULL_PTR
+      ! Start using a vgdid instead of a pointer
+      integer :: vgdid
    end type vgrid_descriptor
    
    interface
@@ -214,9 +216,9 @@ module vGrid_Descriptors
          type(c_ptr), value :: vgd1_CP, vgd2_CP
       end function f_vgdcmp
 
-      integer(c_int) function f_new_read(vgd,unit,ip1,ip2,kind,version) bind(c, name='Cvgd_new_read')
+      integer(c_int) function f_new_read(vgdid,unit,ip1,ip2,kind,version) bind(c, name='Cvgd_new_read')
          use iso_c_binding, only : c_ptr, c_int, c_char
-         type(c_ptr) :: vgd
+         type(c_ptr) :: vgdid
          integer (c_int), value :: unit, ip1, ip2, kind, version
       end function f_new_read
       
@@ -367,6 +369,8 @@ contains
       integer :: ni,nj,nk, istat, error, l_ip1, l_ip2, l_kind, l_version
       character(len=100) :: myformat
       real(kind=8), dimension(:,:,:), pointer :: table_8
+      type(c_ptr) :: vgdid_cp
+      integer, pointer :: vgdid_fp
 
       nullify(table_8)
 
@@ -397,10 +401,14 @@ contains
             l_version = -1
          endif
 
-         
-         if( f_new_read(self%cptr, unit, l_ip1, l_ip2, l_kind, l_version) == VGD_ERROR )then
+         vgdid_cp = c_loc(self%vgdid)
+         if( f_new_read(vgdid_cp, unit, l_ip1, l_ip2, l_kind, l_version) == VGD_ERROR )then
             print*,'(F_vgd) ERROR: In new_read, problem with f_new_read'
             return
+         else
+            call c_f_pointer(vgdid_cp, vgdid_fp)
+            self%vgdid=vgdid_fp
+            print*, "self%vgdid=", self%vgdid
          endif
       case ('BIN')
          read(unit) ni,nj,nk

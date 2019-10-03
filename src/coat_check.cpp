@@ -18,7 +18,7 @@
 // Boston, MA 02111-1307, USA.
 
 #include "coat_check.h"
-#include "vgrid.h"
+#include "vgrid.hpp"
 #include <stdio.h>
 
 
@@ -72,6 +72,7 @@ int coat_check::get_tag(vgrid_descriptor* vgrid)
           hanger_p=&coat_closet[++latest_hanger_filled];
           hanger_p->vgrid=*vgrid;
           hanger_p->num_tags_issued=1;
+          printf("In get_tag:  latest_hanger_filled=%d\n",latest_hanger_filled);
           return latest_hanger_filled;
         }
 

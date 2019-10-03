@@ -82,6 +82,7 @@ static int vcode_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 400
 
 
 // beginning of class vgrid
+static class coat_check grid_check;  // Object for checking in vgrids
 
 int vgrid::is_valid(vgrid_descriptor *self, int *table_valid)
 {
@@ -7357,21 +7358,21 @@ int vgrid::c_legacy(vgrid_descriptor **self, int unit, int F_kind) {
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_new_read(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind, int version) {
+int vgrid::Cvgd_new_read(int **tag, int unit, int ip1, int ip2, int kind, int version) {
 
+  vgrid_descriptor *self;
   char  match_ipig;
   int error, i, ni, nj, nk;
+  int tag_temp;
   int toc_found = 0, count, nkeyList = MAX_DESC_REC;
   int keyList[nkeyList], status;
   VGD_TFSTD_ext var;
   vgrid_descriptor *self2;
+  class coat_check *coat_check_p;
 
 
-  if(*self){
-    Cvgd_free(self);
-  }
-  *self = c_vgd_construct();
-  if(! *self){
+  self = c_vgd_construct();
+  if(! self){
     printf("(Cvgd) ERROR in Cvgd_new_read, null pointer returned by c_vgd_construct\n");
     return (VGD_ERROR);
   }
@@ -7402,15 +7403,15 @@ int vgrid::Cvgd_new_read(vgrid_descriptor **self, int unit, int ip1, int ip2, in
   if(count == 0){
     printf("(Cvgd) Cannot find %s with the following ips: ip1=%d, ip2=%d\n", ZNAME, ip1, ip2);
     if(match_ipig) {
-      (*self)->vcode = -1;
+      self->vcode = -1;
       return(VGD_ERROR);
     }
     printf("(Cvgd) Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)\n");
-    if(c_legacy(self,unit,kind) == VGD_ERROR){
+    if(c_legacy(&self,unit,kind) == VGD_ERROR){
       printf("(Cvgd) ERROR: failed to construct vgrid descriptor from legacy encoding\n");
       return(VGD_ERROR);
     }
-    if(fstd_init(*self) == VGD_ERROR) {
+    if(fstd_init(self) == VGD_ERROR) {
       printf("(Cvgd) ERROR in Cvgd_new_read, problem creating record information\n");
     }
     toc_found = 1;
@@ -7419,7 +7420,7 @@ int vgrid::Cvgd_new_read(vgrid_descriptor **self, int unit, int ip1, int ip2, in
     for( i=0; i < count; i++) {     
       // Check if kind and version match, skip the !! if not.
       if( correct_kind_and_version(keyList[i], kind, version, &var, &status) == VGD_ERROR) {
-	(*self)->valid = 0;
+	self->valid = 0;
 	return(VGD_ERROR);
       }
       if( status != 1) {
@@ -7428,13 +7429,13 @@ int vgrid::Cvgd_new_read(vgrid_descriptor **self, int unit, int ip1, int ip2, in
       // If we reached this stage then the toc satisfy the selection criteria but it may not be the only one.
       if(! toc_found) {
 	toc_found = 1;
-	if( C_load_toctoc(*self,var,keyList[i]) == VGD_ERROR ) {
+	if( C_load_toctoc(self,var,keyList[i]) == VGD_ERROR ) {
 	  printf("(Cvgd) ERROR in Cvgd_new_read, cannot load !!\n");
 	  return(VGD_ERROR);
 	}
-	ni=(*self)->table_ni;
-	nj=(*self)->table_nj;
-	nk=(*self)->table_nk;
+	ni=self->table_ni;
+	nj=self->table_nj;
+	nk=self->table_nk;
 	continue;
       }
       // If we get at this point this means that there are more than one toc satisfying the selection criteria.
@@ -7448,7 +7449,7 @@ int vgrid::Cvgd_new_read(vgrid_descriptor **self, int unit, int ip1, int ip2, in
 	printf("(Cvgd) ERROR in Cvgd_new_read, cannot load !!\n");
 	return(VGD_ERROR);
       }
-      status = Cvgd_vgdcmp(*self,self2);
+      status = Cvgd_vgdcmp(self,self2);
       if ( status != 0 ){
 	printf("(Cvgd) ERROR in Cvgd_new_read, found different entries in vertical descriptors after search on ip1 = %d, ip2 = %d, kind = %d, version = %d, status code is %d\n",ip1,ip2,kind,version,status);
 	return(VGD_ERROR);
@@ -7463,13 +7464,15 @@ int vgrid::Cvgd_new_read(vgrid_descriptor **self, int unit, int ip1, int ip2, in
     return(VGD_ERROR);
   }
   // Fill structure from input table
-  if( Cvgd_new_from_table(self, (*self)->table, (*self)->table_ni, (*self)->table_nj, (*self)->table_nk) == VGD_ERROR ) {
+  if( Cvgd_new_from_table(&self, self->table, self->table_ni, self->table_nj, self->table_nk) == VGD_ERROR ) {
     printf("(Cvgd) ERROR in Cvgd_new_read, unable to construct from table\n");
     return(VGD_ERROR);
   }
-  (*self)->match_ipig = match_ipig;  
+  self->match_ipig = match_ipig;  
 
-  
+  coat_check_p=&grid_check;
+  tag_temp=coat_check_p->get_tag(self);
+  *tag=&tag_temp;
   return(VGD_OK);
 }
 
