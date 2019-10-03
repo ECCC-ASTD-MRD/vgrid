@@ -1,7 +1,7 @@
 #ifndef TUNNEL_FROM_FORTRAN_H
 #define TUNNEL_FROM_FORTRAN_H
 
-#include "vgrid.h"
+#include "vgrid.hpp"
 
 int Cvgd_diag_withref_2ref(vgrid_descriptor *vgd, int ni, int nj, int nk,
                            int *ip1_list, float *levels, float *sfc_field,

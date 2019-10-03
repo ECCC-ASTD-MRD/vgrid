@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <vgrid.hpp>
+#include "vgrid.hpp"
 #include "c_ut_report.h"
 
 int c_ut_report(int status, char *message)
