@@ -82,7 +82,7 @@ static int vcode_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 400
 
 
 // beginning of class vgrid
-static class coat_check grid_check;  // Object for checking in vgrids
+coat_check vgrid::grid_check;  // Object for checking in vgrids
 
 int vgrid::is_valid(vgrid_descriptor *self, int *table_valid)
 {
@@ -7469,8 +7469,7 @@ int vgrid::Cvgd_new_read(int *tag, int unit, int ip1, int ip2, int kind, int ver
   }
   self->match_ipig = match_ipig;  
 
-  coat_check_p=&grid_check;
-  *tag=coat_check_p->get_tag(self);
+  *tag=grid_check.get_tag(self);
   return(VGD_OK);
 }
 

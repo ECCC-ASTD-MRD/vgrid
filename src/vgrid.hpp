@@ -34,12 +34,10 @@ extern float VGD_STDA76_SFC_T;
 extern float VGD_STDA76_SFC_P;
 
 
-
 class vgrid
 {
-  //private:
-  //public:
-  //  static class coat_check grid_check;  // Object for checking in vgrids
+private:
+  static coat_check grid_check;  // Object for checking in vgrids
 
 public:
 static int is_valid(vgrid_descriptor *self, int *table_valid);
@@ -175,4 +173,5 @@ static int Cvgd_stda76_pres(vgrid_descriptor *self, int *i_val, int nl_t, float 
 static int Cvgd_stda76_hgts_from_pres_list(float *hgts, float *pres, int nb);
 static int Cvgd_stda76_pres_from_hgts_list(float *pres, float *hgts, int nb);
 };
+
 #endif // VGRID_H
