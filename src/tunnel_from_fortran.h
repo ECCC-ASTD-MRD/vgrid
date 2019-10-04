@@ -36,7 +36,7 @@ int Cvgd_getopt_int(char *key, int *value, int quiet);
 
 int Cvgd_is_valid(vgrid_descriptor *vgd, char *valid_table_name);
 
-int Cvgd_new_build_vert2(vgrid_descriptor **vgd, int kind, int version, int nk,
+int Cvgd_new_build_vert2(int *vgdid, int kind, int version, int nk,
                          int ip1, int ip2, double *ptop_8, double *pref_8,
                          float *rcoef1, float *rcoef2, float *rcoef3,
                          float *rcoef4, double *a_m_8, double *b_m_8,

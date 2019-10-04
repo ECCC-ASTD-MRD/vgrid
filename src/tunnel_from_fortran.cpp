@@ -99,7 +99,7 @@ int Cvgd_is_valid(vgrid_descriptor *vgd, char *valid_table_name)
   vgrid::Cvgd_is_valid(vgd, valid_table_name);
 };
 
-int Cvgd_new_build_vert2(vgrid_descriptor **vgd, int kind, int version, int nk,
+int Cvgd_new_build_vert2(int *vgdid, int kind, int version, int nk,
                          int ip1, int ip2, double *ptop_8, double *pref_8,
                          float *rcoef1, float *rcoef2, float *rcoef3,
                          float *rcoef4, double *a_m_8, double *b_m_8,
@@ -108,7 +108,8 @@ int Cvgd_new_build_vert2(vgrid_descriptor **vgd, int kind, int version, int nk,
                          double *c_w_8, int *ip1_m, int *ip1_t, int *ip1_w,
                          int nl_m, int nl_t, int nl_w)
 {
-  vgrid::Cvgd_new_build_vert2(vgd, kind, version,
+  vgrid_descriptor self;
+  vgrid::Cvgd_new_build_vert2(&self, kind, version,
                               nk, ip1, ip2, ptop_8,
                               pref_8, rcoef1, rcoef2,
                               rcoef3, rcoef4, a_m_8,
@@ -117,6 +118,7 @@ int Cvgd_new_build_vert2(vgrid_descriptor **vgd, int kind, int version, int nk,
                               b_w_8, c_w_8, ip1_m,
                               ip1_t, ip1_w, nl_m, nl_t,
                               nl_w);
+  *vgdid=grid_check.get_tag(&self);
 };
 
 

@@ -239,11 +239,11 @@ module vGrid_Descriptors
          integer (c_int), value :: ip1,ip2,avg
       end function f_new_gen
       
-      integer(c_int) function f_new_build_vert(vgd,kind,version,nk,ip1,ip2, &
+      integer(c_int) function f_new_build_vert(vgdid,kind,version,nk,ip1,ip2, &
            ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, &
            a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, ip1_m_CP, ip1_t_CP, ip1_w_CP, nl_m, nl_t, nl_w) bind(c, name='Cvgd_new_build_vert2')
          use iso_c_binding, only : c_ptr, c_int
-         type(c_ptr) :: vgd
+         integer :: vgdid
          integer (c_int), value :: kind,version,nk,ip1,ip2
          type(c_ptr), value :: ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP
          type(c_ptr), value :: a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, ip1_m_CP, ip1_t_CP, ip1_w_CP
@@ -698,7 +698,7 @@ contains
       else
          ip1_w_CP = C_NULL_PTR
       endif
-      if( f_new_build_vert(self%cptr,kind,version,nk,l_ip1,l_ip2, &
+      if( f_new_build_vert(self%vgdid,kind,version,nk,l_ip1,l_ip2, &
            ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, &
            a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, &
            ip1_m_CP, ip1_t_CP, ip1_w_CP, nl_m, nl_t, nl_w) == VGD_ERROR )then
