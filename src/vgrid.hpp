@@ -21,7 +21,7 @@
 #ifndef VGRID_H
 #define VGRID_H
 
-#include "coat_check.h"
+#include "coat_check.hpp"
 #include "vgrid_descriptor.h"
 
 #define VGD_OK       0

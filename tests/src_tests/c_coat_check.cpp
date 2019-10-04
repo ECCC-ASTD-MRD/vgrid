@@ -19,7 +19,7 @@
 
 #include <stdio.h>
 #include "vgrid.hpp"
-#include "coat_check.h"
+#include "coat_check.hpp"
 #include "c_ut_report.h"
 
 extern "C" void c_coat_check() {

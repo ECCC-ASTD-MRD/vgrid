@@ -17,7 +17,7 @@
 // Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 // Boston, MA 02111-1307, USA.
 
-#include "coat_check.h"
+#include "coat_check.hpp"
 #include "vgrid.hpp"
 #include <stdio.h>
 

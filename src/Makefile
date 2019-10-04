@@ -36,11 +36,11 @@ OBJECTS = vgrid_utils.o vgrid.o vgrid_descriptors.o tunnel_from_fortran.o coat_c
 libvgrid.a: $(OBJECTS)
 	ar rcv libvgrid.a $(OBJECTS)
 
-vgrid.h:  coat_check.h vgrid_descriptor.h
+vgrid.h:  coat_check.hpp vgrid_descriptor.h
 
 vgrid.hpp:  vgrid.h
 
-coat_check.h:  vgrid_descriptor.h
+coat_check.hpp:  vgrid_descriptor.h
 
 tunnel_from_fortran.hpp: tunnel_from_fortran.h
 
@@ -52,7 +52,7 @@ vgrid_utils.o: vgrid_utils.F90 vgrid_descriptors.hf
 
 tunnel_from_fortran.o:  tunnel_from_fortran.cpp tunnel_from_fortran.hpp vgrid.hpp vgrid_descriptor.h tunnel_from_fortran.hpp
 
-coat_check.o:  coat_check.cpp coat_check.h vgrid.h
+coat_check.o:  coat_check.cpp coat_check.hpp vgrid.h
 
 
 genlib: $(OBJECTS)
