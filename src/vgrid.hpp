@@ -141,7 +141,7 @@ static int Cvgd_get_char(vgrid_descriptor *self, char *key, char out[], int quie
 static int Cvgd_put_char(vgrid_descriptor **self, char *key, char *value);
 static int Cvgd_putopt_int(char *key, int value);
 static int Cvgd_put_int(vgrid_descriptor **self, char *key, int value);
-static int Cvgd_new_gen2(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
+static int Cvgd_new_gen2(vgrid_descriptor *self, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
 	      double *ptop_8, double *pref_8, double *ptop_out_8,
 	      int ip1, int ip2, float *dhm, float *dht, float *dhw, int avg);
 static int C_get_consistent_pt_e1(int iun, float *val, char *nomvar);

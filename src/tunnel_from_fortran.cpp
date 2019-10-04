@@ -131,16 +131,18 @@ int Cvgd_new_from_table(int *vgdid, double *table,
 };
 
 
-int Cvgd_new_gen2(vgrid_descriptor **self, int kind, int version, float *hyb,
+int Cvgd_new_gen2(int *vgdid, int kind, int version, float *hyb,
                   int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3,                      float *rcoef4, double *ptop_8, double *pref_8,
                   double *ptop_out_8, int ip1, int ip2, float *dhm, float *dht,
                   float *dhw, int avg)
 {
-  vgrid::Cvgd_new_gen2(self, kind, version, hyb,
+  vgrid_descriptor self;
+  vgrid::Cvgd_new_gen2(&self, kind, version, hyb,
                   size_hyb, rcoef1, rcoef2, rcoef3,
                   rcoef4, ptop_8, pref_8,
                   ptop_out_8, ip1, ip2, dhm, dht,
                   dhw, avg);
+  *vgdid=grid_check.get_tag(&self);
 }
 
 int Cvgd_new_read(int *vgdid, int unit, int ip1,int ip2, 
