@@ -496,8 +496,11 @@ int test_it(char *filename, int ind) {
   int ier, iun, vcode;
   iun = 10 + ind;
   char mode[]="RND+R/O";
-  vgrid_descriptor *vgd = NULL;
+  vgrid_descriptor vgd;
+  vgrid_descriptor *vgd_p = NULL;
   vgrid my_vgrid;
+
+  vgd_p=&vgd;
 
   ier = c_fnom(&iun,filename,mode,0);
   if( ier < 0 ) {
@@ -510,11 +513,11 @@ int test_it(char *filename, int ind) {
     return(VGD_ERROR);
   }
 
-  if( my_vgrid.Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
+  if( my_vgrid.Cvgd_new_read(vgd_p, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_int(vgd, "VCOD", &vcode, 0) == VGD_ERROR ){
+  if( my_vgrid.Cvgd_get_int(vgd_p, "VCOD", &vcode, 0) == VGD_ERROR ){
     printf("ERROR with  Cvgd_get_int on VCOD\n");
     return(VGD_ERROR);
   }
@@ -522,40 +525,39 @@ int test_it(char *filename, int ind) {
   case 1001:
   case 2001:
   case 4001:
-    if( check_gen_1001_2001_4001(vgd, vcode) == VGD_ERROR){
+    if( check_gen_1001_2001_4001(vgd_p, vcode) == VGD_ERROR){
       return(VGD_ERROR);
     }
     break;
   case 1002:
-    if( check_gen_1002(vgd) == VGD_ERROR){
+    if( check_gen_1002(vgd_p) == VGD_ERROR){
       return(VGD_ERROR);
     }
     break;
   case 5001:
-    if( check_gen_5001(vgd) == VGD_ERROR){
+    if( check_gen_5001(vgd_p) == VGD_ERROR){
       return(VGD_ERROR);
     }
     break;
   case 5002:
-    if( check_gen_5002(vgd) == VGD_ERROR){
+    if( check_gen_5002(vgd_p) == VGD_ERROR){
       return(VGD_ERROR);
     }
     break;
   case 5005:
-    if( check_gen_5005(vgd) == VGD_ERROR){
+    if( check_gen_5005(vgd_p) == VGD_ERROR){
       return(VGD_ERROR);
     }
     break;
   case 5100:
-    if( check_gen_5100(vgd) == VGD_ERROR){
+    if( check_gen_5100(vgd_p) == VGD_ERROR){
       return(VGD_ERROR);
     }
     break;
   default:
     printf("In test ERROR unsupported Vcode %d\n",vcode);
     return(VGD_ERROR);
-  }	
-  my_vgrid.Cvgd_free(&vgd);
+  } 
   return(VGD_OK);
 }
 
