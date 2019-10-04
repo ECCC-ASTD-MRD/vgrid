@@ -82,7 +82,6 @@ static int vcode_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 400
 
 
 // beginning of class vgrid
-coat_check vgrid::grid_check;  // Object for checking in vgrids
 
 int vgrid::is_valid(vgrid_descriptor *self, int *table_valid)
 {
@@ -2501,6 +2500,7 @@ int vgrid::Cvgd_diag_withref_2ref(vgrid_descriptor *self, int ni, int nj, int nk
  *
  *----------------------------------------------------------------------------
  */
+
 vgrid_descriptor* vgrid::c_vgd_construct() {
 
    vgrid_descriptor *vgrid = (vgrid_descriptor*)malloc(sizeof(vgrid_descriptor));
@@ -2508,7 +2508,12 @@ vgrid_descriptor* vgrid::c_vgd_construct() {
      printf("(Cvgd) ERROR in c_vgd_construct, cannot allocate vgrid\n");
      return NULL;
    }
+   c_vgd_construct_jwb(vgrid);
+   return(vgrid);
+}
 
+void vgrid::c_vgd_construct_jwb(vgrid_descriptor *vgrid)
+{
    if( vgrid ) {
       vgrid->ptop_8        = VGD_MISSING;
       vgrid->pref_8        = VGD_MISSING;      
@@ -2569,7 +2574,7 @@ vgrid_descriptor* vgrid::c_vgd_construct() {
       strcpy(vgrid->rec.grtyp," ");
    }
 
-   return(vgrid);
+   return;
 }
 
 void vgrid::c_vgd_free_abci(vgrid_descriptor **self) {
@@ -7358,19 +7363,17 @@ int vgrid::c_legacy(vgrid_descriptor **self, int unit, int F_kind) {
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_new_read(int *tag, int unit, int ip1, int ip2, int kind, int version) {
+int vgrid::Cvgd_new_read(vgrid_descriptor *self, int unit, int ip1, int ip2, int kind, int version) {
 
-  vgrid_descriptor *self;
   char  match_ipig;
   int error, i, ni, nj, nk;
   int toc_found = 0, count, nkeyList = MAX_DESC_REC;
   int keyList[nkeyList], status;
   VGD_TFSTD_ext var;
   vgrid_descriptor *self2;
-  class coat_check *coat_check_p;
 
 
-  self = c_vgd_construct();
+  c_vgd_construct_jwb(self);
   if(! self){
     printf("(Cvgd) ERROR in Cvgd_new_read, null pointer returned by c_vgd_construct\n");
     return (VGD_ERROR);
@@ -7469,7 +7472,6 @@ int vgrid::Cvgd_new_read(int *tag, int unit, int ip1, int ip2, int kind, int ver
   }
   self->match_ipig = match_ipig;  
 
-  *tag=grid_check.get_tag(self);
   return(VGD_OK);
 }
 

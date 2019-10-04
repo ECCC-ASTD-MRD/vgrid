@@ -36,9 +36,6 @@ extern float VGD_STDA76_SFC_P;
 
 class vgrid
 {
-private:
-  static coat_check grid_check;  // Object for checking in vgrids
-
 public:
 static int is_valid(vgrid_descriptor *self, int *table_valid);
 static int is_option(vgrid_descriptor *self, int *table_option);
@@ -61,6 +58,7 @@ static int Cvgd_diag_withref_2ref(vgrid_descriptor *self, int ni, int nj, int nk
 			   int *ip1_list, float *levels, float *sfc_field,
 			   float *sfc_field_ls, int in_log, int dpidpis);
 static vgrid_descriptor* c_vgd_construct();
+static void c_vgd_construct_jwb(vgrid_descriptor *vgrid);
 static void c_vgd_free_abci(vgrid_descriptor **self);
 static int Cvgd_set_vcode_i(vgrid_descriptor *VGrid,int Kind,int Version);
 static int fstd_init(vgrid_descriptor *VGrid);
@@ -165,7 +163,7 @@ static int Cvgd_new_gen_5100(vgrid_descriptor **self, float *hyb, int size_hyb, 
 static int Cvgd_new_gen_21001(vgrid_descriptor **self, float *hyb, int size_hyb, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht);
 static int Cvgd_new_gen_21002(vgrid_descriptor **self, float *hyb, int size_hyb, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, float dhw);
 
-static int Cvgd_new_read(int *tag, int unit, int ip1, int ip2, int kind, int version);
+static int Cvgd_new_read(vgrid_descriptor *self, int unit, int ip1, int ip2, int kind, int version);
 static int Cvgd_write_desc (vgrid_descriptor *self, int unit);
 static int Cvgd_new_from_table(vgrid_descriptor **self, double *table, int ni, int nj, int nk);
 static int Cvgd_stda76_temp(vgrid_descriptor *self, int *i_val, int nl_t, float *temp);

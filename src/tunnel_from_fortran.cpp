@@ -26,6 +26,8 @@
 #include "vgrid_descriptor.h"
 #include "tunnel_from_fortran.hpp"
 
+static coat_check grid_check;  // Object for checking in vgrids
+
 int Cvgd_diag_withref_2ref(vgrid_descriptor *vgd, int ni, int nj, int nk,
                            int *ip1_list, float *levels, float *sfc_field,
                            float *sfc_field_ls, int in_log, int dpidpis)
@@ -140,7 +142,9 @@ int Cvgd_new_gen2(vgrid_descriptor **self, int kind, int version, float *hyb,
 int Cvgd_new_read(int *vgdid, int unit, int ip1,int ip2, 
                   int kind, int version)
 {
-  vgrid::Cvgd_new_read(vgdid, unit, ip1, ip2, kind, version);
+  vgrid_descriptor self;
+  vgrid::Cvgd_new_read(&self, unit, ip1, ip2, kind, version);
+  *vgdid=grid_check.get_tag(&self);
 }
 
 int Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip)
