@@ -4526,22 +4526,16 @@ int vgrid::C_genab_1001(float *hyb, int nk, double **a_m_8, double **b_m_8, int 
   
 }
 
-int vgrid::Cvgd_new_from_table(vgrid_descriptor **self, double *table, int ni, int nj, int nk) {
+int vgrid::Cvgd_new_from_table(vgrid_descriptor *self, double *table, int ni, int nj, int nk) {
   int table_size, i;
   double *ltable;
 
   // Coordinate constructor - build vertical descriptor from table input
   // Set internal vcode (if all above was successful)
 
-  if(! *self){
-    *self = c_vgd_construct();
-    if(! *self){
-      printf("(Cvgd) ERROR in Cvgd_new_from_table, null pointer returned by c_vgd_construct\n");
-      return (VGD_ERROR);
-    }
-  }
-  (*self)->valid = 0;
-  // Since table passed in argument may be the (*self)->table, we take a copy before the call to free
+  c_vgd_construct_jwb(self);
+  self->valid = 0;
+  // Since table passed in argument may be the self->table, we take a copy before the call to free
   table_size = ni * nj * nk;
   ltable = (double*)malloc ( table_size * sizeof(double) );
   if(! ltable ) {
@@ -4549,61 +4543,61 @@ int vgrid::Cvgd_new_from_table(vgrid_descriptor **self, double *table, int ni, i
     return(VGD_ERROR);
   }
   my_copy_double(table, &ltable, table_size);  
-  free((*self)->table);
-  (*self)->table_ni = ni;
-  (*self)->table_nj = nj;
-  (*self)->table_nk = nk;
-  (*self)->table = (double*)malloc ( ni * nj * nk * sizeof(double) );
-  if(! (*self)->table ) {
+  free(self->table);
+  self->table_ni = ni;
+  self->table_nj = nj;
+  self->table_nk = nk;
+  self->table = (double*)malloc ( ni * nj * nk * sizeof(double) );
+  if(! self->table ) {
     printf("(Cvgd) ERROR in Cvgd_new_from_table, cannot allocate table of bouble of size %d\n",table_size );
     return(VGD_ERROR);
   }
   for(i = 0; i < table_size; i++) {
-    (*self)->table[i] = ltable[i];
+    self->table[i] = ltable[i];
   }
   free(ltable);
-  (*self)->kind    = (int) (*self)->table[0];
-  (*self)->version = (int) (*self)->table[1];
+  self->kind    = (int) self->table[0];
+  self->version = (int) self->table[1];
   // Fill remainder of structure
-  if( Cvgd_set_vcode(*self) == VGD_ERROR ) {
+  if( Cvgd_set_vcode(self) == VGD_ERROR ) {
     printf("(Cvgd) ERROR in Cvgd_new_from_table, cannot set vcode\n");
     return(VGD_ERROR);
   }
 
-  switch((*self)->vcode) {
+  switch(self->vcode) {
   case 1:
-    if( c_decode_vert_0001(self) == VGD_ERROR ) {
+    if( c_decode_vert_0001(&self) == VGD_ERROR ) {
       printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode -0001\n");
       return(VGD_ERROR);
     }
     break;
   case 1001:
-    if( c_decode_vert_1001(self) == VGD_ERROR ) {
+    if( c_decode_vert_1001(&self) == VGD_ERROR ) {
       printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 1001\n");
       return(VGD_ERROR);
     }
     break;
   case 1002:
-    if( c_decode_vert_1002(self) == VGD_ERROR ) {
+    if( c_decode_vert_1002(&self) == VGD_ERROR ) {
       printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 1002\n");
       return(VGD_ERROR);
     }
     break;
   case 2001:
-    if( c_decode_vert_2001(self) == VGD_ERROR ) {
+    if( c_decode_vert_2001(&self) == VGD_ERROR ) {
       printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 2001\n");
       return(VGD_ERROR);
     }
     break;
   case 1003:
   case 5001:
-    if( c_decode_vert_1003_5001(self) == VGD_ERROR ) {
+    if( c_decode_vert_1003_5001(&self) == VGD_ERROR ) {
       printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 1003 or 5001\n");
       return(VGD_ERROR);
     }
     break;
   case 4001:
-    if( c_decode_vert_4001(self) == VGD_ERROR ) {
+    if( c_decode_vert_4001(&self) == VGD_ERROR ) {
       printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 4001\n");
       return(VGD_ERROR);
     }
@@ -4612,41 +4606,41 @@ int vgrid::Cvgd_new_from_table(vgrid_descriptor **self, double *table, int ni, i
   case 5003:
   case 5004:
   case 5005:
-    if( c_decode_vert_5002_5003_5004_5005(self) == VGD_ERROR ) {
+    if( c_decode_vert_5002_5003_5004_5005(&self) == VGD_ERROR ) {
       printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 5002,5003,5004 or 5005\n");
       return(VGD_ERROR);
     }
     break;
   case 5100:
-    if( c_decode_vert_5100(self) == VGD_ERROR ) {
+    if( c_decode_vert_5100(&self) == VGD_ERROR ) {
       printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 5100\n");
       return(VGD_ERROR);
     }
     break;    
   case 5999:
-    if( c_decode_vert_5999(self) == VGD_ERROR ) {
+    if( c_decode_vert_5999(&self) == VGD_ERROR ) {
       printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 5999\n");
       return(VGD_ERROR);
     }
     break;    
   case 21001:
-    if( c_decode_vert_21001(self) == VGD_ERROR ) {
+    if( c_decode_vert_21001(&self) == VGD_ERROR ) {
       printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 21001\n");
       return(VGD_ERROR);
     }
     break;    
   case 21002:
-    if( c_decode_vert_21002(self) == VGD_ERROR ) {
+    if( c_decode_vert_21002(&self) == VGD_ERROR ) {
       printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 21002\n");
       return(VGD_ERROR);
     }
     break;    
   default:
-    printf("(Cvgd) in Cvgd_new_from_table, invalid Vcode %d\n", (*self)->vcode);
+    printf("(Cvgd) in Cvgd_new_from_table, invalid Vcode %d\n", self->vcode);
     return(VGD_ERROR);
   }
-  (*self)->valid = 1;
-  if(fstd_init(*self) == VGD_ERROR) {
+  self->valid = 1;
+  if(fstd_init(self) == VGD_ERROR) {
     printf("(Cvgd) ERROR in Cvgd_new_from_table, problem creating record information\n");
   }
 
@@ -7463,7 +7457,7 @@ int vgrid::Cvgd_new_read(vgrid_descriptor *self, int unit, int ip1, int ip2, int
     return(VGD_ERROR);
   }
   // Fill structure from input table
-  if( Cvgd_new_from_table(&self, self->table, self->table_ni, self->table_nj, self->table_nk) == VGD_ERROR ) {
+  if( Cvgd_new_from_table(self, self->table, self->table_ni, self->table_nj, self->table_nk) == VGD_ERROR ) {
     printf("(Cvgd) ERROR in Cvgd_new_read, unable to construct from table\n");
     return(VGD_ERROR);
   }

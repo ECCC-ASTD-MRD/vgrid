@@ -222,9 +222,9 @@ module vGrid_Descriptors
          integer (c_int), value :: unit, ip1, ip2, kind, version
       end function f_new_read
       
-      integer(c_int) function f_new_from_table(vgd, table_CP, ni, nj, nk) bind(c, name='Cvgd_new_from_table')
+      integer(c_int) function f_new_from_table(vgdid, table_CP, ni, nj, nk) bind(c, name='Cvgd_new_from_table')
          use iso_c_binding, only : c_ptr, c_int
-         type(c_ptr) :: vgd
+         integer :: vgdid
          type(c_ptr), value :: table_CP
          integer (c_int), value :: ni, nj, nk
       end function f_new_from_table
@@ -445,7 +445,7 @@ contains
        
        status = VGD_ERROR
        
-       if ( f_new_from_table(self%cptr, table_CP, size(table,dim=1), size(table,dim=2), size(table,dim=3)) == VGD_ERROR )then
+       if ( f_new_from_table(self%vgdid, table_CP, size(table,dim=1), size(table,dim=2), size(table,dim=3)) == VGD_ERROR )then
          print*,'(F_vgd) ERROR: in new_from_table, problem with f_new_from_table'
          return
       endif      

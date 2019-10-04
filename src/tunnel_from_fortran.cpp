@@ -122,10 +122,12 @@ int Cvgd_new_build_vert2(int *vgdid, int kind, int version, int nk,
 };
 
 
-int Cvgd_new_from_table(vgrid_descriptor **vgd, double *table,
+int Cvgd_new_from_table(int *vgdid, double *table,
                         int ni, int nj, int nk)
 {
-  vgrid::Cvgd_new_from_table(vgd, table, ni, nj, nk);
+  vgrid_descriptor self;
+  vgrid::Cvgd_new_from_table(&self, table, ni, nj, nk);
+  *vgdid=grid_check.get_tag(&self);
 };
 
 

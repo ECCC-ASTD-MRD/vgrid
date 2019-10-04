@@ -44,9 +44,13 @@ int test_it(char *filename, int ind) {
 
   int ni, nj, nk, iun, ier;
   double *table = NULL;
-  vgrid_descriptor *vgd = NULL,  *vgd2 = NULL;
+  vgrid_descriptor vgd, vgd2;
+  vgrid_descriptor *vgd_p = NULL,  *vgd2_p = NULL;
   vgrid my_vgrid;
   void free (void* ptr);
+
+  vgd_p  = &vgd;
+  vgd2_p = &vgd2;
 
   iun = 10 + ind;
 
@@ -58,29 +62,27 @@ int test_it(char *filename, int ind) {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
     return (VGD_ERROR);
   }  
-  if( my_vgrid.Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
+  if( my_vgrid.Cvgd_new_read(vgd_p, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
     return (VGD_ERROR);
   }
   // Get table  
-  if( my_vgrid.Cvgd_get_double_3d(vgd, "VTBL", &table, &ni, &nj, &nk, 0) == VGD_ERROR ){
+  if( my_vgrid.Cvgd_get_double_3d(vgd_p, "VTBL", &table, &ni, &nj, &nk, 0) == VGD_ERROR ){
     printf("ERROR with Cvgd_get_double_3d on VTBL\n");
     return (VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_new_from_table(&vgd2, table, ni, nj, nk) == VGD_ERROR ){
+  if( my_vgrid.Cvgd_new_from_table(vgd2_p, table, ni, nj, nk) == VGD_ERROR ){
     printf("ERROR with Cvgd_new_from_table\n");
     return (VGD_ERROR);
   }
   // Test equality
-  ier = my_vgrid.Cvgd_vgdcmp(vgd, vgd2);
+  ier = my_vgrid.Cvgd_vgdcmp(vgd_p, vgd2_p);
   if( ier != 0 ){
     printf("     Descritors not equal, Cvgd_vgdcmp code is %d\n", ier);    
     return (VGD_ERROR);
   } else {
     printf("     Descritors are equal.\n");
   }
-  my_vgrid.Cvgd_free(&vgd);
-  my_vgrid.Cvgd_free(&vgd2);
   free((void*)table);
   return (VGD_OK);
 }

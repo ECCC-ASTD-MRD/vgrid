@@ -45,7 +45,7 @@ int Cvgd_new_build_vert2(int *vgdid, int kind, int version, int nk,
                          double *c_w_8, int *ip1_m, int *ip1_t, int *ip1_w,
                          int nl_m, int nl_t, int nl_2);
 
-int Cvgd_new_from_table(vgrid_descriptor **vgd, double *table, 
+int Cvgd_new_from_table(int *vgdid, double *table, 
                         int ni, int nj, int nk);
 
 int Cvgd_new_gen2(vgrid_descriptor **self, int kind, int version, float *hyb,
