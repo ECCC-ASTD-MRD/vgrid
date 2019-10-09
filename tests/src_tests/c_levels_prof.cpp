@@ -31,9 +31,10 @@ extern "C" void c_levels_prof() {
   char filename[]="data/dm_5005_from_model_run";
   char mode[]="RND";
   float *levels = NULL, p0;
-  vgrid_descriptor *vgd = NULL;
+  vgrid_descriptor vgd, *vgd_p;
   vgrid my_vgrid;
 
+  vgd_p = &vgd;
   status = VGD_OK;
 
   ier = c_fnom(&iun,filename,mode,0);
@@ -47,17 +48,17 @@ extern "C" void c_levels_prof() {
     return;
   }
   
-  if( my_vgrid.Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
+  if( my_vgrid.Cvgd_new_read(vgd_p, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
     return;
   }
 
-  if( my_vgrid.Cvgd_get_int_1d(vgd, "VIPT", &i_val, NULL, quiet) ==  VGD_ERROR ) {
+  if( my_vgrid.Cvgd_get_int_1d(vgd_p, "VIPT", &i_val, NULL, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_int for VIPT\n");
     return;
   }
 
-  ier = my_vgrid.Cvgd_get_int(vgd, "NL_T", &nl_t, quiet);
+  ier = my_vgrid.Cvgd_get_int(vgd_p, "NL_T", &nl_t, quiet);
   if(ier == VGD_ERROR){
     status = VGD_ERROR;
   }
@@ -68,7 +69,7 @@ extern "C" void c_levels_prof() {
     return;
   }
   p0=1000*100.;
-  ier = my_vgrid.Cvgd_levels(vgd, 1, 1, nl_t, i_val, levels, &p0, in_log);
+  ier = my_vgrid.Cvgd_levels(vgd_p, 1, 1, nl_t, i_val, levels, &p0, in_log);
   if(ier == VGD_ERROR){
     printf("Error with Cvgd_diag_withref\n");
     status = VGD_ERROR;
@@ -86,7 +87,6 @@ extern "C" void c_levels_prof() {
   ier = c_fstfrm(iun);
   ier = c_fclos(iun);
 
-  my_vgrid.Cvgd_free(&vgd);
   free(levels);
   free(i_val);
   

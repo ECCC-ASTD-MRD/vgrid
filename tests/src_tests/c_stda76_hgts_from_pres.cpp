@@ -41,9 +41,11 @@ extern "C" void c_stda76_hgts_from_pres() {
   char mode[]="RND";
   char *filename = "data/dm_5001_from_model_run";
   char *filename_c ="data/c_stda76_hgts_from_pres.txt";
-    char buff[255];
-  vgrid_descriptor *vgd = NULL;
+  char buff[255];
+  vgrid_descriptor vgd, *vgd_p;
   vgrid my_vgrid;
+
+  vgd_p = & vgd;
 
   // Get any pressure vertical descriptor
   if(c_fnom(&iun,filename,mode,0) < 0 ) {
@@ -54,11 +56,11 @@ extern "C" void c_stda76_hgts_from_pres() {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
     exit(1);
   }
-  if( my_vgrid.Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
+  if( my_vgrid.Cvgd_new_read(vgd_p, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read\n");
     exit(1);
   }
-  if( my_vgrid.Cvgd_get_int(vgd, "NL_M", &nl, quiet) == VGD_ERROR){
+  if( my_vgrid.Cvgd_get_int(vgd_p, "NL_M", &nl, quiet) == VGD_ERROR){
     printf("ERROR cannot Cvgd_get_int on NL_M\n");
     exit(1);
   }
@@ -68,7 +70,7 @@ extern "C" void c_stda76_hgts_from_pres() {
     printf("Problem allocating i_val of size %d\n",nl);
     exit(1);
   }
-  if(my_vgrid.Cvgd_get_int_1d(vgd, "VIPM", &i_val, NULL, quiet) ==  VGD_ERROR ) {
+  if(my_vgrid.Cvgd_get_int_1d(vgd_p, "VIPM", &i_val, NULL, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_int for VIPM\n");
     exit(1);
   }
@@ -82,7 +84,7 @@ extern "C" void c_stda76_hgts_from_pres() {
     printf("Problem allocating pres of size %d\n",nl);
     exit(1);
   }
-  if(my_vgrid.Cvgd_levels(vgd, 1, 1, nl, i_val, pres, &p0, in_log) == VGD_ERROR){
+  if(my_vgrid.Cvgd_levels(vgd_p, 1, 1, nl, i_val, pres, &p0, in_log) == VGD_ERROR){
     printf("Problem Computing pressure pres");
     exit(1);
   }

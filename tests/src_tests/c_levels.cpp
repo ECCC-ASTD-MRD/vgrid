@@ -35,9 +35,10 @@ extern "C" void c_levels() {
   char name[5];
   float *p0 = NULL, *levels = NULL;
   double *p0_8 = NULL, *levels_8 = NULL;
-  vgrid_descriptor *vgd = NULL;
+  vgrid_descriptor vgd, *vgd_p;
   vgrid my_vgrid;
 
+  vgd_p = &vgd;
   status = VGD_OK;
 
   ier = c_fnom(&iun,filename,mode,0);
@@ -51,17 +52,17 @@ extern "C" void c_levels() {
     return;
   }
   
-  if( my_vgrid.Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
+  if( my_vgrid.Cvgd_new_read(vgd_p, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
     return;
   }
 
-  if( my_vgrid.Cvgd_get_int_1d(vgd, "VIPT", &i_val, NULL, quiet) ==  VGD_ERROR ) {
+  if( my_vgrid.Cvgd_get_int_1d(vgd_p, "VIPT", &i_val, NULL, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_int for VIPT\n");
     return;
   }
 
-  ier = my_vgrid.Cvgd_get_int(vgd, "NL_T", &nl_t, quiet);
+  ier = my_vgrid.Cvgd_get_int(vgd_p, "NL_T", &nl_t, quiet);
   if(ier == VGD_ERROR){
     status = VGD_ERROR;
   }
@@ -103,18 +104,18 @@ extern "C" void c_levels() {
     p0_8[ij] = p0[ij];
   }
 
-  ier = my_vgrid.Cvgd_get_int(vgd, "NL_T", &nl_t, quiet);
+  ier = my_vgrid.Cvgd_get_int(vgd_p, "NL_T", &nl_t, quiet);
   if(ier == VGD_ERROR){
     status = VGD_ERROR;
   }
   printf("DANS TEST nl_t = %d\n", nl_t);
 
-  ier = my_vgrid.Cvgd_levels(vgd, ni2, nj2, nl_t, i_val, levels, p0, in_log);
+  ier = my_vgrid.Cvgd_levels(vgd_p, ni2, nj2, nl_t, i_val, levels, p0, in_log);
   if(ier == VGD_ERROR){
     printf("Error with Cvgd_diag_withref\n");
     status = VGD_ERROR;
   }
-  ier = my_vgrid.Cvgd_levels_8(vgd, ni2, nj2, nl_t, i_val, levels_8, p0_8, in_log);
+  ier = my_vgrid.Cvgd_levels_8(vgd_p, ni2, nj2, nl_t, i_val, levels_8, p0_8, in_log);
   if(ier == VGD_ERROR){
     printf("Error with Cvgd_diag_withref_8\n");
     status = VGD_ERROR;
@@ -147,7 +148,6 @@ extern "C" void c_levels() {
   ier = c_fstfrm(iun);
   ier = c_fclos(iun);
 
-  my_vgrid.Cvgd_free(&vgd);
   free(p0);
   free(p0_8);
   free(levels);
