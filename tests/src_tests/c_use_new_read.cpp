@@ -33,9 +33,12 @@ extern "C" void c_use_new_read() {
   char mode[]="RND";
   float *f_val = NULL, *p0 = NULL;
   double *a_8_t = NULL, *b_8_t = NULL, *table = NULL, *levels_8 = NULL, *p0_8 = NULL;
-  vgrid_descriptor *vgd = NULL, *vgd2 = NULL;
+  vgrid_descriptor vgd, vgd2;
   vgrid my_vgrid;
+  vgrid_descriptor *vgd_p = NULL, *vgd2_p = NULL;
 
+  vgd_p=&vgd;
+  vgd2_p=&vgd2;
   status = VGD_OK;
 
   ier = c_fnom(&iun,filename,mode,0);
@@ -49,29 +52,29 @@ extern "C" void c_use_new_read() {
     return;
   }
   
-  if( my_vgrid.Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
+  if( my_vgrid.Cvgd_new_read(vgd_p, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
     return;
   }
-  if( my_vgrid.Cvgd_get_int_1d(vgd, "VIPT", &i_val, NULL, quiet) ==  VGD_ERROR ) {
+  if( my_vgrid.Cvgd_get_int_1d(vgd_p, "VIPT", &i_val, NULL, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_int for VIPT\n");
     return;
   }
-  if( my_vgrid.Cvgd_get_float_1d(vgd, "VCDT", &f_val, NULL , quiet) ==  VGD_ERROR ) {
+  if( my_vgrid.Cvgd_get_float_1d(vgd_p, "VCDT", &f_val, NULL , quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_float_1d for VCDT\n");
     return;
   }
-  if( my_vgrid.Cvgd_get_double_1d(vgd, "CA_T", &a_8_t, NULL, quiet) ==  VGD_ERROR ) {
+  if( my_vgrid.Cvgd_get_double_1d(vgd_p, "CA_T", &a_8_t, NULL, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_double_1d for CA_T\n");
     return;
   }
-  if( my_vgrid.Cvgd_get_double_1d(vgd, "CB_T", &b_8_t, &nt, quiet) ==  VGD_ERROR ) {
+  if( my_vgrid.Cvgd_get_double_1d(vgd_p, "CB_T", &b_8_t, &nt, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_double_1d for CB_T\n");
     return;
   }
 
   // Size of thermo may also be obtained by this:
-  ier = my_vgrid.Cvgd_get_int(vgd, "NL_T", &nl_t, quiet);
+  ier = my_vgrid.Cvgd_get_int(vgd_p, "NL_T", &nl_t, quiet);
   if(nl_t != nt ) {
     printf("ERROR: nt and nl_t should be equal, got %d, %d\n",nt, nl_t);
     return;
@@ -85,19 +88,19 @@ extern "C" void c_use_new_read() {
 
   // Load table (this is the actual data in fst record !! which may also be
   // obtained with fstlir, but why do it if vgd already contains it!)
-  if ( my_vgrid.Cvgd_get_double_3d(vgd, "VTBL", &table, &ni, &nj, &nk, quiet) ==  VGD_ERROR ) {
+  if ( my_vgrid.Cvgd_get_double_3d(vgd_p, "VTBL", &table, &ni, &nj, &nk, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_double_3d for VTBL\n");
     return;
   }
   
   // Constructing new vgd with this table
-  if ( my_vgrid.Cvgd_new_from_table(&vgd2, table, ni, nj, nk) ==  VGD_ERROR ) {
+  if ( my_vgrid.Cvgd_new_from_table(vgd2_p, table, ni, nj, nk) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_new_from_table for VTBL\n");
     return;
   }
 
   // Comparing new table with original table, must be the same.
-  if( my_vgrid.Cvgd_vgdcmp(vgd, vgd2) != 0 ){
+  if( my_vgrid.Cvgd_vgdcmp(vgd_p, vgd2_p) != 0 ){
     printf("ERROR, vgd and vgd2 shouldne the same\n");
     return;
   }
@@ -114,7 +117,7 @@ extern "C" void c_use_new_read() {
     printf("ERROR with c_fstouv on iun2\n");
     return;
   }
-  if( my_vgrid.Cvgd_write_desc(vgd, iun2) == VGD_ERROR ){
+  if( my_vgrid.Cvgd_write_desc(vgd_p, iun2) == VGD_ERROR ){
     printf("ERROR with Cvgd_write_desc on iun2\n");
     return;
   }
@@ -148,7 +151,7 @@ extern "C" void c_use_new_read() {
   for( k = 0; k < ni2*nj2; k++){
     p0_8[k] = p0[k]*100.;
   }
-  ier = my_vgrid.Cvgd_diag_withref_8(vgd, ni2, nj2, nl_t, i_val, levels_8, p0_8, in_log, dpidpis);
+  ier = my_vgrid.Cvgd_diag_withref_8(vgd_p, ni2, nj2, nl_t, i_val, levels_8, p0_8, in_log, dpidpis);
   if(ier == VGD_ERROR){
     status=VGD_ERROR;
   }
@@ -188,17 +191,15 @@ extern "C" void c_use_new_read() {
     printf("ERROR with c_fstouv on iun2\n");
     return;
   }
-  if( my_vgrid.Cvgd_new_read(&vgd2, iun, -1, -1, -1, -1) == VGD_ERROR ) {
+  if( my_vgrid.Cvgd_new_read(vgd2_p, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read vgd2\n");
     return;
   }
-  if( my_vgrid.Cvgd_vgdcmp(vgd, vgd2) != 0 ){
+  if( my_vgrid.Cvgd_vgdcmp(vgd_p, vgd2_p) != 0 ){
     printf("ERROR, vgd and vgd2 shouldne the same after write in file, read from file\n");
     return;
   }
 
-  my_vgrid.Cvgd_free(&vgd);
-  my_vgrid.Cvgd_free(&vgd2);
   free(table);
   free(i_val);
   free(f_val);
