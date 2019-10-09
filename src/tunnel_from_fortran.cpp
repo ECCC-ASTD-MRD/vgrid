@@ -157,9 +157,11 @@ int Cvgd_new_read(int *vgdid, int unit, int ip1,int ip2,
   *vgdid=grid_check.get_tag(&self);
 }
 
-int Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip)
+int Cvgd_print_desc(int vgdid, int sout, int convip)
 {
-  vgrid::Cvgd_print_desc(self, sout, convip);
+  vgrid_descriptor *vgd;
+  vgd=grid_check.get_vgrid(vgdid);
+  return vgrid::Cvgd_print_desc(vgd, sout, convip);
 };
 
 int Cvgd_print_vcode_description(int vcode)

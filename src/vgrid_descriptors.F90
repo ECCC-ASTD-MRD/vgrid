@@ -200,9 +200,9 @@ module vGrid_Descriptors
          character(kind=c_char) :: valid_table_name(*)
        end function f_is_valid
 
-      integer(c_int) function f_print_desc(vgd_CP, stdout, convip) bind(c, name='Cvgd_print_desc')
+      integer(c_int) function f_print_desc(vgdid, stdout, convip) bind(c, name='Cvgd_print_desc')
          use iso_c_binding, only : c_ptr, c_int
-         type(c_ptr), value :: vgd_CP
+         integer (c_int), value :: vgdid
          integer (c_int), value :: stdout, convip
       end function f_print_desc
 
@@ -818,10 +818,6 @@ contains
       integer :: l_stdout, l_convip
 
       istat = VGD_ERROR
-      if(.not.c_associated(self%cptr))then
-         print*,'(F_vgd) ERROR in print_descript, self%cptr not associated'
-         return
-      endif
 
       l_stdout = -1
       l_convip = -1
@@ -829,7 +825,7 @@ contains
       if(present(convip_L))then
          if(convip_L) l_convip = 1
       endif
-      istat = f_print_desc(self%cptr,l_stdout, l_convip)
+      istat = f_print_desc(self%vgdid,l_stdout, l_convip)
    end function print_desc
 
    integer function print_vcode_description(vcode) result(status)
