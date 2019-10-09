@@ -206,6 +206,6 @@ extern "C" void c_use_new_read() {
   free(a_8_t);
   free(b_8_t);
 
-  ier = c_ut_report(status,"testing Cvgd_levels");
+  ier = c_ut_report(status,"testing new_read");
   
 }

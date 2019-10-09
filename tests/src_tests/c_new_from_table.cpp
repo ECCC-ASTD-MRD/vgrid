@@ -103,6 +103,6 @@ extern "C" void c_new_from_table() {
     }
   }  
   printf("status=%d, VGD_OK=%d, VGD_ERROR=%d\n",status, VGD_OK, VGD_ERROR);
-  ier = c_ut_report(status,"testing Cvgd_levels");  
+  ier = c_ut_report(status,"testing new_from_table");  
   
 }

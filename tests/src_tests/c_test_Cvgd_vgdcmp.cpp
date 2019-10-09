@@ -186,6 +186,6 @@ extern "C" void c_test_Cvgd_vgdcmp() {
   }
   vgd2_p->b_t_8[vgd2_p->nl_t-1]=vgd_p->b_t_8[vgd2_p->nl_t-1];
 
-  ier = c_ut_report(status,"testing Cvgd_levels");
+  ier = c_ut_report(status,"testing Cvgd_vgdcmp");
   
 }
