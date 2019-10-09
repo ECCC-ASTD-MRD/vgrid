@@ -6513,13 +6513,13 @@ int vgrid::Cvgd_get_char(vgrid_descriptor *self, char *key, char out[], int quie
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_put_char(vgrid_descriptor **self, char *key, char *value) {
-  if(! Cvgd_is_valid(*self,"SELF")){
+int vgrid::Cvgd_put_char(vgrid_descriptor *self, char *key, char *value) {
+  if(! Cvgd_is_valid(self,"SELF")){
     printf("(Cvgd) ERROR in Cvgd_put_char, invalid vgrid.\n");
     return(VGD_ERROR);
   }
   if( strcmp(key, "ETIK") == 0 ){
-    strcpy((*self)->rec.etiket,value);
+    strcpy(self->rec.etiket,value);
   } else {
     printf("(Cvgd) ERROR in Cvgd_put_char, invalid key -> '%s'\n",key);
     return(VGD_ERROR);

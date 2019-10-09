@@ -138,7 +138,7 @@ static int Cvgd_get_double(vgrid_descriptor *self, char *key, double *value_get,
 static int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *nk, int quiet);
 static int Cvgd_get_double_3d(vgrid_descriptor *self, char *key, double **value, int *ni, int *nj, int *nk, int quiet);
 static int Cvgd_get_char(vgrid_descriptor *self, char *key, char out[], int quiet);
-static int Cvgd_put_char(vgrid_descriptor **self, char *key, char *value);
+static int Cvgd_put_char(vgrid_descriptor *self, char *key, char *value);
 static int Cvgd_putopt_int(char *key, int value);
 static int Cvgd_put_int(vgrid_descriptor **self, char *key, int value);
 static int Cvgd_new_gen2(vgrid_descriptor *self, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,

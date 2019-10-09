@@ -11,7 +11,7 @@ int Cvgd_diag_withref_2ref_8(vgrid_descriptor *vgd, int ni, int nj, int nk,
                              int *ip1_list,double *levels_8,double *sfc_field_8,
                              double *sfc_field_ls_8, int in_log, int dpidpis);
 
-int Cvgd_get_char(vgrid_descriptor *vgd, char *key, char *my_char, int quiet);
+int Cvgd_get_char(int vgdid, char *key, char *my_char, int quiet);
 
 int Cvgd_get_double(vgrid_descriptor *vgd, char *key, double *value, int quiet);
 
@@ -34,7 +34,7 @@ int Cvgd_get_int_1d(vgrid_descriptor *vgd, char *key, int **value, int *nk,
 
 int Cvgd_getopt_int(char *key, int *value, int quiet);
 
-int Cvgd_is_valid(vgrid_descriptor *vgd, char *valid_table_name);
+int Cvgd_is_valid(int vgdid, char *valid_table_name);
 
 int Cvgd_new_build_vert2(int *vgdid, int kind, int version, int nk,
                          int ip1, int ip2, double *ptop_8, double *pref_8,
@@ -60,7 +60,7 @@ int Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip);
 
 int Cvgd_print_vcode_description(int vcode);
 
-int Cvgd_put_char(vgrid_descriptor **self, char *key, char *value);
+int Cvgd_put_char(int vgdid, char *key, char *value);
 
 int Cvgd_put_int(vgrid_descriptor **self, char *key, int value);
 

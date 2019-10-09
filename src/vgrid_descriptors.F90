@@ -167,9 +167,9 @@ module vGrid_Descriptors
          character(kind=c_char) :: key(*)
       end function f_get_real8_3d
 
-      integer(c_int) function f_get_char(vgd_CP, key, my_char, quiet) bind(c, name='Cvgd_get_char')
+      integer(c_int) function f_get_char(vgdid, key, my_char, quiet) bind(c, name='Cvgd_get_char')
          use iso_c_binding, only: c_ptr, c_char, c_int
-         type(c_ptr), value :: vgd_CP
+         integer(c_int), value :: vgdid
          integer (c_int), value :: quiet
          character(kind=c_char) :: key(*)
          character(kind=c_char) :: my_char(*)
@@ -188,15 +188,15 @@ module vGrid_Descriptors
          character(kind=c_char) :: key(*)
       end function f_put_int
 
-      integer(c_int) function f_put_char(vgd_CP, key, value) bind(c, name='Cvgd_put_char')
+      integer(c_int) function f_put_char(vgdid, key, value) bind(c, name='Cvgd_put_char')
          use iso_c_binding, only: c_ptr, c_char, c_char, c_int
-         type(c_ptr) :: vgd_CP
+         integer(c_int), value :: vgdid
          character(kind=c_char) :: key(*), value(*)
       end function f_put_char
 
-      integer(c_int) function f_is_valid(vgd_CP, valid_table_name) bind(c, name='Cvgd_is_valid')
+      integer(c_int) function f_is_valid(vgdid, valid_table_name) bind(c, name='Cvgd_is_valid')
          use iso_c_binding, only: c_ptr, c_char, c_int
-         type(c_ptr), value :: vgd_CP
+         integer(c_int), value :: vgdid
          character(kind=c_char) :: valid_table_name(*)
        end function f_is_valid
 
@@ -2615,7 +2615,7 @@ contains
          endif         
       endif
       my_key=up(key(1:KEY_LENGTH))
-      status = f_get_char(self%cptr, my_key//C_NULL_CHAR, my_char, l_quiet)
+      status = f_get_char(self%vgdid, my_key//C_NULL_CHAR, my_char, l_quiet)
       select case(trim(my_key))
       case ('ETIK')
          nchar=VGD_LEN_ETIK
@@ -2735,7 +2735,7 @@ contains
     
       my_key = up(key(1:KEY_LENGTH))      
 
-      status = f_put_char(self%cptr, trim(my_key)//C_NULL_CHAR, trim(value)//C_NULL_CHAR)
+      status = f_put_char(self%vgdid, trim(my_key)//C_NULL_CHAR, trim(value)//C_NULL_CHAR)
 
    end function put_char
 
@@ -2743,7 +2743,7 @@ contains
       ! Check for validity of the element
       type(vgrid_descriptor) :: self          !Vertical descriptor instance
       character(len=*) :: element_valid_S
-      valid =  f_is_valid(self%cptr,element_valid_S//C_NULL_CHAR) == 1
+      valid =  f_is_valid(self%vgdid,element_valid_S//C_NULL_CHAR) == 1
       return
    end function is_valid
 

@@ -46,9 +46,11 @@ int Cvgd_diag_withref_2ref_8(vgrid_descriptor *vgd, int ni, int nj, int nk,
                                    sfc_field_ls_8, in_log, dpidpis);
 };
 
-int Cvgd_get_char(vgrid_descriptor *vgd, char *key, char *my_char, int quiet)
+int Cvgd_get_char(int vgdid, char *key, char *my_char, int quiet)
 {
-  vgrid::Cvgd_get_char(vgd, key, my_char, quiet);
+  vgrid_descriptor *vgd;
+  vgd=grid_check.get_vgrid(vgdid);
+  return vgrid::Cvgd_get_char(vgd, key, my_char, quiet);
 };
 
 int Cvgd_get_double(vgrid_descriptor *vgd, char *key, double *value, int quiet)
@@ -94,9 +96,11 @@ int Cvgd_getopt_int(char *key, int *value, int quiet)
   vgrid::Cvgd_getopt_int(key, value, quiet);
 };
 
-int Cvgd_is_valid(vgrid_descriptor *vgd, char *valid_table_name)
+int Cvgd_is_valid(int vgdid, char *valid_table_name)
 {
-  vgrid::Cvgd_is_valid(vgd, valid_table_name);
+  vgrid_descriptor* vgd;
+  vgd=grid_check.get_vgrid(vgdid);
+  return vgrid::Cvgd_is_valid(vgd, valid_table_name);
 };
 
 int Cvgd_new_build_vert2(int *vgdid, int kind, int version, int nk,
@@ -163,9 +167,11 @@ int Cvgd_print_vcode_description(int vcode)
   vgrid::Cvgd_print_vcode_description(vcode);
 };
 
-int Cvgd_put_char(vgrid_descriptor **self, char *key, char *value)
+int Cvgd_put_char(int vgdid, char *key, char *value)
 {
-  vgrid::Cvgd_put_char(self, key, value);
+  vgrid_descriptor *vgd;
+  vgd=grid_check.get_vgrid(vgdid);
+  return vgrid::Cvgd_put_char(vgd, key, value);
 };
 
 int Cvgd_put_int(vgrid_descriptor **self, char *key, int value)
