@@ -123,16 +123,18 @@ int Cvgd_new_build_vert2(int *vgdid, int kind, int version, int nk,
                          int nl_m, int nl_t, int nl_w)
 {
   vgrid_descriptor self;
-  vgrid::Cvgd_new_build_vert2(&self, kind, version,
-                              nk, ip1, ip2, ptop_8,
-                              pref_8, rcoef1, rcoef2,
-                              rcoef3, rcoef4, a_m_8,
-                              b_m_8, c_m_8, a_t_8,
-                              b_t_8, c_t_8, a_w_8,
-                              b_w_8, c_w_8, ip1_m,
-                              ip1_t, ip1_w, nl_m, nl_t,
-                              nl_w);
+  int status;
+  status=vgrid::Cvgd_new_build_vert2(&self, kind, version,
+                                     nk, ip1, ip2, ptop_8,
+                                     pref_8, rcoef1, rcoef2,
+                                     rcoef3, rcoef4, a_m_8,
+                                     b_m_8, c_m_8, a_t_8,
+                                     b_t_8, c_t_8, a_w_8,
+                                     b_w_8, c_w_8, ip1_m,
+                                     ip1_t, ip1_w, nl_m, nl_t,
+                                     nl_w);
   *vgdid=grid_check.get_tag(&self);
+  return status;
 };
 
 
