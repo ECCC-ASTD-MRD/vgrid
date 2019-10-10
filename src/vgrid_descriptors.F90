@@ -229,10 +229,10 @@ module vGrid_Descriptors
          integer (c_int), value :: ni, nj, nk
       end function f_new_from_table
 
-      integer(c_int) function f_new_gen(vgd,kind,version,hyb_CP,size_hyb,rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP, &
+      integer(c_int) function f_new_gen(vgdid_p,kind,version,hyb_CP,size_hyb,rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP, &
            ip1,ip2,dhm_CP,dht_CP,dhw_CP,avg) bind(c, name='Cvgd_new_gen2')
          use iso_c_binding, only : c_ptr, c_int
-         type(c_ptr) :: vgd
+         type(c_ptr), value :: vgdid_p
          integer (c_int), value :: kind, version, size_hyb
          type(c_ptr), value :: hyb_CP,rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP
          type(c_ptr), value :: dhm_CP,dht_CP,dhw_CP
@@ -475,6 +475,8 @@ contains
       type(c_ptr) :: hyb_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, ptop_8_CP, ptop_out_8_CP, pref_8_CP
       type(c_ptr) :: stdout_unit_CP, dhm_CP, dht_CP, dhw_CP
       integer :: my_ip1, my_ip2, my_avg
+      type(c_ptr) :: vgdid_ptr
+
       hyb_CP = c_loc(hyb)
 
       status = VGD_ERROR;
@@ -560,7 +562,8 @@ contains
          self%cptr = C_NULL_PTR
       endif
 
-      if(f_new_gen(self%cptr,kind,version,hyb_CP,size(hyb),rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP,my_ip1,my_ip2,dhm_CP,dht_CP,dhw_CP,my_avg) == VGD_ERROR)then
+      vgdid_ptr=c_loc(self%vgdid)
+      if(f_new_gen(vgdid_ptr,kind,version,hyb_CP,size(hyb),rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP,my_ip1,my_ip2,dhm_CP,dht_CP,dhw_CP,my_avg) == VGD_ERROR)then
          print*,'(F_vgd) ERROR in new_gen, problem with f_new_gen'
          return
       endif
