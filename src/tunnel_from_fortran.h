@@ -15,21 +15,21 @@ int Cvgd_get_char(int vgdid, char *key, char *my_char, int quiet);
 
 int Cvgd_get_double(vgrid_descriptor *vgd, char *key, double *value, int quiet);
 
-int Cvgd_get_double_1d(vgrid_descriptor *vgd, char *key, double **value, 
+int Cvgd_get_double_1d(int vgdid, char *key, double **value, 
                        int *nk, int quiet);
 
-int Cvgd_get_double_3d(vgrid_descriptor *vgd, char *key, double **value,
+int Cvgd_get_double_3d(int vgdid, char *key, double **value,
                        int *ni, int *nj, int *nk, int quiet);
 
 int Cvgd_get_float(vgrid_descriptor *vgd, char *key, float *value_CP,
                    int quiet);
 
-int Cvgd_get_float_1d(vgrid_descriptor *vgd, char *key, float **value, int *nk,
+int Cvgd_get_float_1d(int vgdid, char *key, float **value, int *nk,
                       int quiet);
 
-int Cvgd_get_int(vgrid_descriptor *vgd, char *key, int *value, int quiet);
+int Cvgd_get_int(int vgdid, char *key, int *value, int quiet);
 
-int Cvgd_get_int_1d(vgrid_descriptor *vgd, char *key, int **value, int *nk,
+int Cvgd_get_int_1d(int vgdid, char *key, int **value, int *nk,
                     int quiet);
 
 int Cvgd_getopt_int(char *key, int *value, int quiet);
@@ -75,7 +75,7 @@ int Cvgd_stda76_pres_from_hgts_list(float *pres, float *hgts, int nb);
 
 int Cvgd_stda76_temp(vgrid_descriptor *self, int *i_val, int nl, float *temp);
 
-void Cvgd_table_shape(vgrid_descriptor *vgd, int **tshape);
+void Cvgd_table_shape(int vgdid, int **tshape);
 
 int Cvgd_vgdcmp(vgrid_descriptor *vgd1, vgrid_descriptor *vgd2);
 
