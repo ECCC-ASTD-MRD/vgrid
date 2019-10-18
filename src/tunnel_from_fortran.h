@@ -77,7 +77,7 @@ int Cvgd_stda76_temp(vgrid_descriptor *self, int *i_val, int nl, float *temp);
 
 void Cvgd_table_shape(int vgdid, int **tshape);
 
-int Cvgd_vgdcmp(vgrid_descriptor *vgd1, vgrid_descriptor *vgd2);
+int Cvgd_vgdcmp(int vgdid1, int vgdid2);
 
 int Cvgd_write_desc(int vgdid, int unit);
 #endif

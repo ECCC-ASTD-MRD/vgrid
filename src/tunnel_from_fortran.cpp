@@ -228,9 +228,12 @@ void Cvgd_table_shape(int vgdid, int **tshape)
   vgrid::Cvgd_table_shape(vgd, tshape);
 };
 
-int Cvgd_vgdcmp(vgrid_descriptor *vgd1, vgrid_descriptor *vgd2)
+int Cvgd_vgdcmp(int vgdid1, int vgdid2)
 {
-  vgrid::Cvgd_vgdcmp(vgd1, vgd2);
+  vgrid_descriptor *vgd1, *vgd2;
+  vgd1=grid_check.get_vgrid(vgdid1);
+  vgd2=grid_check.get_vgrid(vgdid2);
+  return vgrid::Cvgd_vgdcmp(vgd1, vgd2);
 };
 
 int Cvgd_write_desc(int vgdid, int unit)

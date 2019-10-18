@@ -211,9 +211,9 @@ module vGrid_Descriptors
          integer (c_int), value :: vcode
       end function f_print_vcode_description
 
-      integer(c_int) function f_vgdcmp(vgd1_CP, vgd2_CP) bind(c, name='Cvgd_vgdcmp')
+      integer(c_int) function f_vgdcmp(vgdid1, vgdid2) bind(c, name='Cvgd_vgdcmp')
          use iso_c_binding, only: c_ptr, c_int
-         type(c_ptr), value :: vgd1_CP, vgd2_CP
+         integer (c_int), value :: vgdid1, vgdid2
       end function f_vgdcmp
 
       integer(c_int) function f_new_read(vgdid,unit,ip1,ip2,kind,version) bind(c, name='Cvgd_new_read')
@@ -801,7 +801,7 @@ contains
       ! Assume that structures are not identical
       equal = .false.
       
-      ier = f_vgdcmp(vgd1%cptr, vgd2%cptr)
+      ier = f_vgdcmp(vgd1%vgdid, vgd2%vgdid)
       if( ier /= 0 )then
          !print*,'Return code is',ier
          return
