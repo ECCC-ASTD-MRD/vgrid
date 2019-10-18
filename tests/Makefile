@@ -39,6 +39,7 @@ help:
 	@echo '   make tests'
 	@echo '   make tests ONLY=HY_with_datev'
 	@echo '   make tests ONLY="c_get_put_get_all c_levels"'
+	@echo '   make tests ONLY=HY_with_datev EXECUTE=0'
 
 clean:
 	rm -f *.o *.mod *.out Makefile.test
