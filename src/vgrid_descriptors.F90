@@ -84,17 +84,19 @@ module vGrid_Descriptors
    
    interface
 
-      integer(c_int) function f_diag_withref(vgd_CP, ni, nj, nk, ip1_list_CP, levels_CP,sfc_field_CP,sfc_field_ls_CP, in_log, dpidpis) bind(c, name='Cvgd_diag_withref_2ref')
+      integer(c_int) function f_diag_withref(vgdid, ni, nj, nk, ip1_list_CP, levels_CP,sfc_field_CP,sfc_field_ls_CP, in_log, dpidpis) bind(c, name='Cvgd_diag_withref_2ref')
         use iso_c_binding, only: c_ptr, c_int
-        type(c_ptr), value :: vgd_CP, ip1_list_CP, sfc_field_CP, sfc_field_ls_CP
+        integer (c_int), value :: vgdid
+        type(c_ptr), value :: ip1_list_CP, sfc_field_CP, sfc_field_ls_CP
         integer (c_int), value :: in_log, dpidpis
         type(c_ptr), value  :: levels_CP
         integer (c_int), value :: ni, nj, nk
       end function f_diag_withref
       
-      integer(c_int) function f_diag_withref_8(vgd_CP, ni, nj, nk, ip1_list_CP, levels_CP,sfc_field_CP,sfc_field_ls_CP, in_log, dpidpis) bind(c, name='Cvgd_diag_withref_2ref_8')
+      integer(c_int) function f_diag_withref_8(vgdid, ni, nj, nk, ip1_list_CP, levels_CP,sfc_field_CP,sfc_field_ls_CP, in_log, dpidpis) bind(c, name='Cvgd_diag_withref_2ref_8')
          use iso_c_binding, only: c_ptr, c_int
-         type(c_ptr), value :: vgd_CP, ip1_list_CP, sfc_field_CP, sfc_field_ls_CP
+         integer (c_int), value :: vgdid
+         type(c_ptr), value :: ip1_list_CP, sfc_field_CP, sfc_field_ls_CP
          integer (c_int), value :: in_log, dpidpis
          type(c_ptr), value  :: levels_CP
          integer (c_int), value :: ni, nj, nk
@@ -1866,9 +1868,9 @@ contains
       sfc_field_ls_CP = C_NULL_PTR
       if (present(sfc_field_ls)) sfc_field_ls_CP = c_loc(my_sfc_field_ls(1,1))
 #if defined(REAL_8)
-      istat = f_diag_withref_8(self%cptr,ni,nj,nk,ip1_list_CP,levels_CP,sfc_field_CP,sfc_field_ls_CP,in_log_int,dpidpis_int)
+      istat = f_diag_withref_8(self%vgdid,ni,nj,nk,ip1_list_CP,levels_CP,sfc_field_CP,sfc_field_ls_CP,in_log_int,dpidpis_int)
 #else
-      istat = f_diag_withref(self%cptr,ni,nj,nk,ip1_list_CP,levels_CP,sfc_field_CP,sfc_field_ls_CP,in_log_int,dpidpis_int)
+      istat = f_diag_withref(self%vgdid,ni,nj,nk,ip1_list_CP,levels_CP,sfc_field_CP,sfc_field_ls_CP,in_log_int,dpidpis_int)
 #endif
       if (istat /= VGD_OK) then
          if(my_dpidpis)then
@@ -2063,9 +2065,9 @@ contains
       sfc_field_ls_CP = C_NULL_PTR
       if (present(sfc_field_ls)) sfc_field_ls_CP = c_loc(my_sfc_field_ls(1,1))
 #if defined(REAL_8)
-      istat = f_diag_withref_8(self%cptr,ni,nj,nk,ip1_list_CP,levels_CP,sfc_field_CP,sfc_field_ls_CP,in_log_int,dpidpis_int)
+      istat = f_diag_withref_8(self%vgdid,ni,nj,nk,ip1_list_CP,levels_CP,sfc_field_CP,sfc_field_ls_CP,in_log_int,dpidpis_int)
 #else
-      istat = f_diag_withref(self%cptr,ni,nj,nk,ip1_list_CP,levels_CP,sfc_field_CP,sfc_field_ls_CP,in_log_int,dpidpis_int)
+      istat = f_diag_withref(self%vgdid,ni,nj,nk,ip1_list_CP,levels_CP,sfc_field_CP,sfc_field_ls_CP,in_log_int,dpidpis_int)
 #endif
       if (istat /= VGD_OK) then
          if(my_dpidpis)then

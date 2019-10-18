@@ -28,22 +28,26 @@
 
 static coat_check grid_check;  // Object for checking in vgrids
 
-int Cvgd_diag_withref_2ref(vgrid_descriptor *vgd, int ni, int nj, int nk,
+int Cvgd_diag_withref_2ref(int vgdid, int ni, int nj, int nk,
                            int *ip1_list, float *levels, float *sfc_field,
                            float *sfc_field_ls, int in_log, int dpidpis)
 {
-  vgrid::Cvgd_diag_withref_2ref(vgd, ni, nj, nk,
-                                ip1_list, levels, sfc_field,
-                                sfc_field_ls, in_log, dpidpis);
+  vgrid_descriptor *vgd;
+  vgd=grid_check.get_vgrid(vgdid);
+  return vgrid::Cvgd_diag_withref_2ref(vgd, ni, nj, nk,
+                                       ip1_list, levels, sfc_field,
+                                       sfc_field_ls, in_log, dpidpis);
 };
 
-int Cvgd_diag_withref_2ref_8(vgrid_descriptor *vgd, int ni, int nj, int nk,
+int Cvgd_diag_withref_2ref_8(int vgdid, int ni, int nj, int nk,
                            int *ip1_list,double *levels_8,double *sfc_field_8,
                            double *sfc_field_ls_8, int in_log, int dpidpis)
 {
-   vgrid::Cvgd_diag_withref_2ref_8(vgd, ni, nj, nk,
-                                   ip1_list, levels_8, sfc_field_8,
-                                   sfc_field_ls_8, in_log, dpidpis);
+  vgrid_descriptor *vgd;
+  vgd=grid_check.get_vgrid(vgdid);
+  return vgrid::Cvgd_diag_withref_2ref_8(vgd, ni, nj, nk,
+                                         ip1_list, levels_8, sfc_field_8,
+                                         sfc_field_ls_8, in_log, dpidpis);
 };
 
 int Cvgd_get_char(int vgdid, char *key, char *my_char, int quiet)
