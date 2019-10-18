@@ -233,7 +233,9 @@ int Cvgd_vgdcmp(vgrid_descriptor *vgd1, vgrid_descriptor *vgd2)
   vgrid::Cvgd_vgdcmp(vgd1, vgd2);
 };
 
-int Cvgd_write_desc(vgrid_descriptor *self, int unit)
+int Cvgd_write_desc(int vgdid, int unit)
 {
-  vgrid::Cvgd_write_desc(self, unit);
+  vgrid_descriptor *vgd;
+  vgd=grid_check.get_vgrid(vgdid);
+  vgrid::Cvgd_write_desc(vgd, unit);
 };
