@@ -120,7 +120,7 @@ int test_it(char *filename, int ind) {
     }    
     value2 = value;
     value = value + 1;
-    if( my_vgrid.Cvgd_put_int(&vgd_p, key[i] , value) == VGD_ERROR ){
+    if( my_vgrid.Cvgd_put_int(vgd_p, key[i] , value) == VGD_ERROR ){
       return(VGD_ERROR);
     }
     if( my_vgrid.Cvgd_get_int(vgd_p, key[i] , &value2, quiet) == VGD_ERROR ){

@@ -62,7 +62,7 @@ int Cvgd_print_vcode_description(int vcode);
 
 int Cvgd_put_char(int vgdid, char *key, char *value);
 
-int Cvgd_put_int(vgrid_descriptor **self, char *key, int value);
+int Cvgd_put_int(int vgdid, char *key, int value);
 
 int Cvgd_putopt_int(char *key, int value);
 

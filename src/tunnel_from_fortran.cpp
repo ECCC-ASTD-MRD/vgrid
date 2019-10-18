@@ -150,8 +150,10 @@ int Cvgd_new_from_table(int *vgdid, double *table,
                         int ni, int nj, int nk)
 {
   vgrid_descriptor self;
-  vgrid::Cvgd_new_from_table(&self, table, ni, nj, nk);
+  int status;
+  status=vgrid::Cvgd_new_from_table(&self, table, ni, nj, nk);
   *vgdid=grid_check.get_tag(&self);
+  return status;
 };
 
 
@@ -200,9 +202,11 @@ int Cvgd_put_char(int vgdid, char *key, char *value)
   return vgrid::Cvgd_put_char(vgd, key, value);
 };
 
-int Cvgd_put_int(vgrid_descriptor **self, char *key, int value)
+int Cvgd_put_int(int vgdid, char *key, int value)
 {
-  vgrid::Cvgd_put_int(self, key, value);
+  vgrid_descriptor *vgd;
+  vgd=grid_check.get_vgrid(vgdid);
+  return vgrid::Cvgd_put_int(vgd, key, value);
 };
 
 int Cvgd_putopt_int(char *key, int value)

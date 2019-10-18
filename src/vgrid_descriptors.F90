@@ -183,9 +183,9 @@ module vGrid_Descriptors
          character(kind=c_char) :: key(*)
       end function f_putopt_int
 
-      integer(c_int) function f_put_int(vgd_CP, key, value) bind(c, name='Cvgd_put_int')
+      integer(c_int) function f_put_int(vgdid, key, value) bind(c, name='Cvgd_put_int')
          use iso_c_binding, only: c_ptr, c_char, c_int
-         type(c_ptr) :: vgd_CP
+         integer (c_int), value :: vgdid
          integer (c_int), value :: value
          character(kind=c_char) :: key(*)
       end function f_put_int
@@ -2689,7 +2689,7 @@ contains
       character(len=KEY_LENGTH) :: my_key
       status = VGD_ERROR
       my_key = up(key(1:KEY_LENGTH))
-      if( f_put_int(self%cptr, trim(my_key)//C_NULL_CHAR, value) == VGD_ERROR ) return      
+      if( f_put_int(self%vgdid, trim(my_key)//C_NULL_CHAR, value) == VGD_ERROR ) return      
       status = VGD_OK      
    end function put_int
    
