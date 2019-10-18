@@ -124,9 +124,9 @@ module vGrid_Descriptors
          integer (c_int), value :: quiet
       end function f_getopt_int
 
-      integer(c_int) function f_get_real(vgd_CP, key, value_CP, quiet) bind(c, name='Cvgd_get_float')
+      integer(c_int) function f_get_real(vgdid, key, value_CP, quiet) bind(c, name='Cvgd_get_float')
          use iso_c_binding, only: c_ptr, c_char, c_int
-         type(c_ptr), value :: vgd_CP
+         integer (c_int), value :: vgdid
          integer (c_int), value :: quiet
          type(c_ptr), value :: value_CP
          character(kind=c_char) :: key(*)
@@ -141,9 +141,9 @@ module vGrid_Descriptors
          character(kind=c_char) :: key(*)
       end function f_get_real_1d
 
-      integer(c_int) function f_get_real8(vgd_CP, key, value_CP, quiet) bind(c, name='Cvgd_get_double')
+      integer(c_int) function f_get_real8(vgdid, key, value_CP, quiet) bind(c, name='Cvgd_get_double')
          use iso_c_binding, only: c_ptr, c_char, c_int
-         type(c_ptr), value :: vgd_CP
+         integer (c_int), value :: vgdid
          integer (c_int), value :: quiet
          type(c_ptr), value :: value_CP
          character(kind=c_char) :: key(*)
@@ -2280,7 +2280,7 @@ contains
       
       value_CP = c_loc(value)
       my_key=up(key(1:KEY_LENGTH))
-      status = f_get_real(self%cptr,my_key//C_NULL_CHAR,value_CP,l_quiet)
+      status = f_get_real(self%vgdid,my_key//C_NULL_CHAR,value_CP,l_quiet)
       
       return
    end function get_real
@@ -2403,7 +2403,7 @@ contains
       
       value_CP = c_loc(value)
       my_key=up(key(1:KEY_LENGTH))
-      status = f_get_real8(self%cptr,my_key//C_NULL_CHAR,value_CP,l_quiet)
+      status = f_get_real8(self%vgdid,my_key//C_NULL_CHAR,value_CP,l_quiet)
       
    end function get_real8
 

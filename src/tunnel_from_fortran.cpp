@@ -53,9 +53,11 @@ int Cvgd_get_char(int vgdid, char *key, char *my_char, int quiet)
   return vgrid::Cvgd_get_char(vgd, key, my_char, quiet);
 };
 
-int Cvgd_get_double(vgrid_descriptor *vgd, char *key, double *value, int quiet)
+int Cvgd_get_double(int vgdid, char *key, double *value, int quiet)
 {
-  vgrid::Cvgd_get_double(vgd, key, value, quiet);
+  vgrid_descriptor *vgd;
+  vgd=grid_check.get_vgrid(vgdid);
+  return vgrid::Cvgd_get_double(vgd, key, value, quiet);
 };
 
 int Cvgd_get_double_1d(int vgdid, char *key, double **value, 
@@ -73,10 +75,12 @@ int Cvgd_get_double_3d(int vgdid, char *key, double **value, int *ni, int *nj, i
   vgrid::Cvgd_get_double_3d(vgd, key, value, ni, nj, nk, quiet);
 };
 
-int Cvgd_get_float(vgrid_descriptor *vgd, char *key, float *value,
+int Cvgd_get_float(int vgdid, char *key, float *value,
                    int quiet)
 {
-  vgrid::Cvgd_get_float(vgd, key, value, quiet);
+  vgrid_descriptor *vgd;
+  vgd=grid_check.get_vgrid(vgdid);
+  return vgrid::Cvgd_get_float(vgd, key, value, quiet);
 };
 
 int Cvgd_get_float_1d(int vgdid, char *key, float **value, int *nk, int quiet)

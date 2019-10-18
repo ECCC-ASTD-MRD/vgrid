@@ -13,7 +13,7 @@ int Cvgd_diag_withref_2ref_8(vgrid_descriptor *vgd, int ni, int nj, int nk,
 
 int Cvgd_get_char(int vgdid, char *key, char *my_char, int quiet);
 
-int Cvgd_get_double(vgrid_descriptor *vgd, char *key, double *value, int quiet);
+int Cvgd_get_double(int vgdid, char *key, double *value, int quiet);
 
 int Cvgd_get_double_1d(int vgdid, char *key, double **value, 
                        int *nk, int quiet);
@@ -21,7 +21,7 @@ int Cvgd_get_double_1d(int vgdid, char *key, double **value,
 int Cvgd_get_double_3d(int vgdid, char *key, double **value,
                        int *ni, int *nj, int *nk, int quiet);
 
-int Cvgd_get_float(vgrid_descriptor *vgd, char *key, float *value_CP,
+int Cvgd_get_float(int vgdid, char *key, float *value_CP,
                    int quiet);
 
 int Cvgd_get_float_1d(int vgdid, char *key, float **value, int *nk,
