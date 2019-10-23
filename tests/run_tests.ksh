@@ -126,7 +126,7 @@ if [ ${execute} = 1 ];then
       printf " * Failed ${failed}/${total} Tests\n"
       exit 1
    else
-      printf " * All Tests Succeeded\n"
+      printf " * All ${total} Tests Succeeded\n"
       rm -f Makefile.test
       rm -f compile.log
    fi
