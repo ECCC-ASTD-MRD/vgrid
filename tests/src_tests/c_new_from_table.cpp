@@ -52,6 +52,8 @@ int test_it(char *filename, int ind) {
   vgd_p  = &vgd;
   vgd2_p = &vgd2;
 
+  vgrid::c_vgd_construct_jwb(vgd2_p);
+
   iun = 10 + ind;
 
   if( c_fnom(&iun,filename,"RND+R/O",0) < 0 ) {

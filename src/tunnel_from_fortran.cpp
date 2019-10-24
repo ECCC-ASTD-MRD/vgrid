@@ -154,6 +154,8 @@ int Cvgd_new_from_table(int *vgdid, double *table,
 {
   vgrid_descriptor self;
   int status;
+
+  vgrid::c_vgd_construct_jwb(&self);
   status=vgrid::Cvgd_new_from_table(&self, table, ni, nj, nk);
   if(status != VGD_ERROR)
     {

@@ -41,6 +41,8 @@ extern "C" void c_use_new_read() {
   vgd2_p=&vgd2;
   status = VGD_OK;
 
+  vgrid::c_vgd_construct_jwb(vgd2_p);
+
   ier = c_fnom(&iun,filename,mode,0);
   if( ier < 0 ) {
     printf("ERROR with c_fnom on iun, file %s\n", filename);

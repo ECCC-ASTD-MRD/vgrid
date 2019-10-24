@@ -4533,7 +4533,6 @@ int vgrid::Cvgd_new_from_table(vgrid_descriptor *self, double *table, int ni, in
   // Coordinate constructor - build vertical descriptor from table input
   // Set internal vcode (if all above was successful)
 
-  //c_vgd_construct_jwb(self);
   self->valid = 0;
   // Since table passed in argument may be the self->table, we take a copy before the call to free
   table_size = ni * nj * nk;
