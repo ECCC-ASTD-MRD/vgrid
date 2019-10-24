@@ -141,7 +141,10 @@ int Cvgd_new_build_vert2(int *vgdid, int kind, int version, int nk,
                                      b_w_8, c_w_8, ip1_m,
                                      ip1_t, ip1_w, nl_m, nl_t,
                                      nl_w);
-  *vgdid=grid_check.get_tag(&self);
+  if(status != VGD_ERROR)
+    {
+      *vgdid=grid_check.get_tag(&self);
+    }
   return status;
 };
 
@@ -152,7 +155,10 @@ int Cvgd_new_from_table(int *vgdid, double *table,
   vgrid_descriptor self;
   int status;
   status=vgrid::Cvgd_new_from_table(&self, table, ni, nj, nk);
-  *vgdid=grid_check.get_tag(&self);
+  if(status != VGD_ERROR)
+    {
+      *vgdid=grid_check.get_tag(&self);
+    }
   return status;
 };
 
@@ -169,7 +175,10 @@ int Cvgd_new_gen2(int *vgdid, int kind, int version, float *hyb,
                               rcoef4, ptop_8, pref_8,
                               ptop_out_8, ip1, ip2, dhm, dht,
                               dhw, avg);
-  *vgdid=grid_check.get_tag(&self);
+  if(status != VGD_ERROR)
+    {
+      *vgdid=grid_check.get_tag(&self);
+    }
   return status;
 }
 
@@ -179,7 +188,10 @@ int Cvgd_new_read(int *vgdid, int unit, int ip1,int ip2,
   vgrid_descriptor self;
   int status;
   status=vgrid::Cvgd_new_read(&self, unit, ip1, ip2, kind, version);
-  *vgdid=grid_check.get_tag(&self);
+  if(status != VGD_ERROR)
+    {
+      *vgdid=grid_check.get_tag(&self);
+    }
   return status;
 }
 
