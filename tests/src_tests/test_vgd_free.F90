@@ -16,6 +16,10 @@
 ! * License along with this library; if not, write to the
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
+
+! N.B.:  vgd_free() has been disabled, because it does not work well
+!        That means that this test necessarily fails.
+
 program tests
   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_getopt,vgd_putopt,vgd_print,vgd_get,VGD_ERROR,VGD_OK
   use Unit_Testing, only: ut_report
