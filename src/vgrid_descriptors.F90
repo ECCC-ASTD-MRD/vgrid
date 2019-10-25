@@ -406,8 +406,6 @@ contains
          if( f_new_read(self%vgdid, unit, l_ip1, l_ip2, l_kind, l_version) == VGD_ERROR )then
             print*,'(F_vgd) ERROR: In new_read, problem with f_new_read'
             return
-         else
-            print*, "self%vgdid=", self%vgdid
          endif
       case ('BIN')
          read(unit) ni,nj,nk
