@@ -68,12 +68,12 @@ int Cvgd_putopt_int(char *key, int value);
 
 int Cvgd_stda76_hgts_from_pres_list(float *hgts, float *pres, int nb);
 
-int Cvgd_stda76_pres(vgrid_descriptor *self, int *i_val, int nl, float *pres,
+int Cvgd_stda76_pres(int vgdid, int *i_val, int nl, float *pres,
                      float *sfc_temp, float *sfc_pres);
 
 int Cvgd_stda76_pres_from_hgts_list(float *pres, float *hgts, int nb);
 
-int Cvgd_stda76_temp(vgrid_descriptor *self, int *i_val, int nl, float *temp);
+int Cvgd_stda76_temp(int vgdid, int *i_val, int nl, float *temp);
 
 void Cvgd_table_shape(int vgdid, int **tshape);
 

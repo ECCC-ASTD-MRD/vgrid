@@ -264,16 +264,18 @@ module vGrid_Descriptors
          integer (c_int), value :: unit
       end function f_write_desc
       
-      integer(c_int) function f_stda76_temp(vgd_CP, ip1s_CP, nl, temp_CP) bind(c, name='Cvgd_stda76_temp')
+      integer(c_int) function f_stda76_temp(vgdid, ip1s_CP, nl, temp_CP) bind(c, name='Cvgd_stda76_temp')
         use iso_c_binding, only : c_ptr, c_int
-        type(c_ptr), value :: vgd_CP, ip1s_CP
+        integer(c_int), value :: vgdid
+        type(c_ptr), value :: ip1s_CP
         integer (c_int), value :: nl
         type(c_ptr), value :: temp_CP
       end function f_stda76_temp
 
-      integer(c_int) function f_stda76_pres(vgd_CP, ip1s_CP, nl, pres_CP, sfc_temp_CP, sfc_pres_CP) bind(c, name='Cvgd_stda76_pres')
+      integer(c_int) function f_stda76_pres(vgdid, ip1s_CP, nl, pres_CP, sfc_temp_CP, sfc_pres_CP) bind(c, name='Cvgd_stda76_pres')
         use iso_c_binding, only : c_ptr, c_int
-        type(c_ptr), value :: vgd_CP, ip1s_CP
+        integer(c_int), value :: vgdid
+        type(c_ptr), value :: ip1s_CP
         integer (c_int), value :: nl
         type(c_ptr), value :: pres_CP, sfc_temp_CP, sfc_pres_CP
       end function f_stda76_pres
@@ -2919,13 +2921,13 @@ contains
           call msg(MSG_ERROR,VGD_PRFX//for_msg) 
           return
       endif
-      if( f_stda76_temp(self%cptr, ip1s_CP, size(val), val_CP) /= VGD_OK) then
+      if( f_stda76_temp(self%vgdid, ip1s_CP, size(val), val_CP) /= VGD_OK) then
          write(for_msg,*) 'ERROR with vgd_stda76_temp'
          call msg(MSG_ERROR,VGD_PRFX//for_msg)       
          return
       endif
    case ('PRESSURE')
-      if( f_stda76_pres(self%cptr, ip1s_CP, size(val), val_CP, sfc_temp_CP, sfc_pres_CP ) /= VGD_OK) then
+      if( f_stda76_pres(self%vgdid, ip1s_CP, size(val), val_CP, sfc_temp_CP, sfc_pres_CP ) /= VGD_OK) then
          write(for_msg,*) 'ERROR with vgd_stda76_pres'
          call msg(MSG_ERROR,VGD_PRFX//for_msg)       
          return

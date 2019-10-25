@@ -233,10 +233,12 @@ int Cvgd_stda76_hgts_from_pres_list(float *hgts, float *pres, int nb)
   vgrid::Cvgd_stda76_hgts_from_pres_list(hgts, pres, nb);
 };
 
-int Cvgd_stda76_pres(vgrid_descriptor *self, int *i_val, int nl, float *pres,
+int Cvgd_stda76_pres(int vgdid, int *i_val, int nl, float *pres,
                      float *sfc_temp, float *sfc_pres)
 {
-  vgrid::Cvgd_stda76_pres(self, i_val, nl, pres, sfc_temp, sfc_pres);
+  vgrid_descriptor *vgd;
+  vgd=grid_check.get_vgrid(vgdid);
+  return vgrid::Cvgd_stda76_pres(vgd, i_val, nl, pres, sfc_temp, sfc_pres);
 }
 
 int Cvgd_stda76_pres_from_hgts_list(float *pres, float *hgts, int nb)
@@ -244,9 +246,11 @@ int Cvgd_stda76_pres_from_hgts_list(float *pres, float *hgts, int nb)
   vgrid::Cvgd_stda76_pres_from_hgts_list(pres, hgts, nb);
 };
 
-int Cvgd_stda76_temp(vgrid_descriptor *self, int *i_val, int nl, float *temp)
+int Cvgd_stda76_temp(int vgdid, int *i_val, int nl, float *temp)
 {
-  vgrid::Cvgd_stda76_temp(self, i_val, nl, temp);
+  vgrid_descriptor *vgd;
+  vgd=grid_check.get_vgrid(vgdid);
+  return vgrid::Cvgd_stda76_temp(vgd, i_val, nl, temp);
 };
 
 void Cvgd_table_shape(int vgdid, int **tshape)
