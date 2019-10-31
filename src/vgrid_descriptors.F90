@@ -559,10 +559,6 @@ contains
             my_avg=0
          endif
       endif
-      
-      if(.not.c_associated(self%cptr))then
-         self%cptr = C_NULL_PTR
-      endif
 
       vgdid_ptr=c_loc(self%vgdid)
       if(f_new_gen(vgdid_ptr,kind,version,hyb_CP,size(hyb),rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP,my_ip1,my_ip2,dhm_CP,dht_CP,dhw_CP,my_avg) == VGD_ERROR)then
@@ -2707,8 +2703,6 @@ contains
       ! To silence the compiler warning
       if(associated(value))then
       endif
-      ! To silence the compiler warning
-      my_value_CP = c_loc(self%cptr)
       ! To silence the compiler warning
       if(key == "")then
       endif
