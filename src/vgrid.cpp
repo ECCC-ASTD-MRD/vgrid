@@ -5848,9 +5848,9 @@ int vgrid::c_vgrid_genab_21002(float *hybuser, int nk, int *nl_m, int *nl_t, int
 
   //Momentum levels
   // Note: hybuser at surface in not in the list but we know it is zero
-  pr1 = 1. / (double)hybuser[0];
+  pr1 = 1. / hybuser[0];
   for( k = 0; k < nk; k++ ){
-    lamda_8 = ( (double)hybuser[0] - (double)hybuser[k] ) * pr1;
+    lamda_8 = ( hybuser[0] - hybuser[k] ) * pr1;
     rcoef   = (float) (my_rcoef4 - ( my_rcoef4 - my_rcoef3 ) * lamda_8);
     a_m_8[k] = (double)hybuser[k];
     b_m_8[k] = pow(lamda_8, rcoef);
