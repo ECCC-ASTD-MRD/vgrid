@@ -1284,7 +1284,7 @@ int C_compute_pressure_1001_1002(vgrid_descriptor *self, int ni, int nj, int nk,
   // Compute pressure
   for( k = 0, ijk=0; k < nk; ++k ){
     for( ij = 0; ij < ni*nj; ++ij, ++ijk ){
-      lvl = self->a_m_8[ind[k]] + self->b_m_8[ind[k]] * sfc_field[ij];
+      lvl = self->a_m_8[ind[k]] + self->b_m_8[ind[k]] * (double)sfc_field[ij];
 #if defined(REAL_8)
       levels[ijk] = in_log ? log(lvl) : lvl;
 #else
@@ -2094,6 +2094,8 @@ int C_compute_heights_21001(vgrid_descriptor *self, int ni, int nj, int nk, int 
   float *my_sfc_field_ls;
 #undef REAL_8
   double *aa_8, *bb_8, *cc_8;
+  double temp;
+  float tempf;
   int ij, k, ijk, ind, kind;
   float hyb;
 
@@ -2153,7 +2155,14 @@ int C_compute_heights_21001(vgrid_descriptor *self, int ni, int nj, int nk, int 
 #if defined(REAL_8)
       levels[ijk] = aa_8[k] + bb_8[k]*sfc_field[ij] + cc_8[k]*my_sfc_field_ls[ij];
 #else
-      levels[ijk] = (float) ( aa_8[k] + bb_8[k]*sfc_field[ij] + cc_8[k]*my_sfc_field_ls[ij] );
+      if(ijk == 668216)
+	{
+	  printf("level 668216 has bee reached\n");
+	  temp=aa_8[k] + bb_8[k]*(double)sfc_field[ij] + cc_8[k]*(double)my_sfc_field_ls[ij];
+	  tempf=(float)aa_8[k] + (float)bb_8[k]*sfc_field[ij] + (float)cc_8[k]*my_sfc_field_ls[ij];
+	  printf("temp level = %.10f  float temp level = %.10f\n", temp, tempf);
+	}
+      levels[ijk] = (float) ( aa_8[k] + bb_8[k]*(double)sfc_field[ij] + cc_8[k]*(double)my_sfc_field_ls[ij] );
 #endif
     }
   }
