@@ -5440,9 +5440,9 @@ int vgrid::c_vgrid_genab_5100(float *hybuser, int nk, int *nl_m, int *nl_t, floa
   zsrf_8  = log(pref_8);
   
   // Auto compute ptop and make B(0) = 0
-  zeta1_8 = zsrf_8 + log((double)hybuser[0]);
-  zeta2_8 = zsrf_8 + log((double)hybuser[1]);
-  zetaN_8 = zsrf_8 + log((double)hybuser[nk-1]);
+  zeta1_8 = zsrf_8 + log(hybuser[0]);
+  zeta2_8 = zsrf_8 + log(hybuser[1]);
+  zetaN_8 = zsrf_8 + log(hybuser[nk-1]);
   ztop_8  = 0.5 * ( 3. * zeta1_8 - zeta2_8);
   (**ptop_out_8) = exp(ztop_8);
 
@@ -5482,7 +5482,7 @@ int vgrid::c_vgrid_genab_5100(float *hybuser, int nk, int *nl_m, int *nl_t, floa
     pr1 = 1. / (zetaN_8 - zeta1_8);
   }   
   for( k = 0; k < nk; k++ ) {
-    zeta_8  = zsrf_8 + log((double)hybuser[k]);
+    zeta_8  = zsrf_8 + log(hybuser[k]);
     lamba_8 = fmin(1.0, ( zeta_8 - zeta1_8 ) * pr1);
     rcoefL  = (float) (rcoef2 - ( rcoef2 - rcoef1 ) * lamba_8);
     rcoef   = (float) (rcoef4 - ( rcoef4 - rcoef3 ) * lamba_8);
