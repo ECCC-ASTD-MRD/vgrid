@@ -19,7 +19,6 @@
  */
 
 #include "vgrid.hpp"
-#include "vgrid_descriptor.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -5038,7 +5037,7 @@ int vgrid::C_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float
   // Momentum levels
   pr1 = 1. / (zsrf_8 - ztop_8);
   for( k = 0; k < nk; k++ ) {
-    zeta_8  = zsrf_8 + log(hybuser[k]);
+    zeta_8  = zsrf_8 + log((double)hybuser[k]);
     lamba_8  = ( zeta_8 - ztop_8 ) * pr1;
     rcoef  = (float) (rcoef2 - ( rcoef2 - rcoef1 ) * lamba_8);
     b_m_8[k] = pow(lamba_8, rcoef);
