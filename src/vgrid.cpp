@@ -4900,8 +4900,8 @@ int vgrid::C_genab_5001(float *hybuser, int nk, float rcoef, double ptop_8, doub
     return(VGD_ERROR);
   }
 
-  if( ( ptop_8 - hybuser[0] * pref_8 ) / ptop_8 > epsilon ) {
-    printf("(Cvgd) ERROR in C_genab_5001: ptop = %f is lower than first hyb level = %f\n", ptop_8, hybuser[0]*pref_8);
+  if( ( ptop_8 - (double)hybuser[0] * pref_8 ) / ptop_8 > epsilon ) {
+    printf("(Cvgd) ERROR in C_genab_5001: ptop = %f is lower than first hyb level = %f\n", ptop_8, (double)hybuser[0]*pref_8);
     return(VGD_ERROR);
   }
 
@@ -4911,7 +4911,7 @@ int vgrid::C_genab_5001(float *hybuser, int nk, float rcoef, double ptop_8, doub
   
   // Find out if first level is at top
   
-  if( fabs( ptop_8 - hybuser[0] * pref_8 ) / ptop_8 < epsilon) {
+  if( fabs( ptop_8 - (double)hybuser[0] * pref_8 ) / ptop_8 < epsilon) {
     complet = 1;
   } else{
     printf("(Cvgd) NOTE: First hyb level is not at model top\n");
@@ -4920,7 +4920,7 @@ int vgrid::C_genab_5001(float *hybuser, int nk, float rcoef, double ptop_8, doub
 
   for ( k = 0; k < nk; k++){
     ip1 = c_convip_Level2IP(hybuser[k],5);
-    hyb = c_convip_IP2Level(ip1,&kind2);
+    hyb = (double)c_convip_IP2Level(ip1,&kind2);
     (*ip1_m)[k] = ip1;
     (*b_m_8)[k] = pow( (hyb - hybtop) * pr1, rcoef);
     (*a_m_8)[k] = pref_8 * ( hyb - (*b_m_8)[k] );
@@ -5145,8 +5145,8 @@ int vgrid::C_genab_5004(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoe
 
   if ( lrint(ptop_8) == -2 || lrint(ptop_8) == -1 ) {
     // Auto compute ptop and make B(1) = 0
-    zetau_8 = zsrf_8 + log(hybuser[0]);
-    zeta2_8 = zsrf_8 + log(hybuser[1]);
+    zetau_8 = zsrf_8 + log((double)hybuser[0]);
+    zeta2_8 = zsrf_8 + log((double)hybuser[1]);
     ztop_8  = 0.5 * ( 3. * zetau_8 - zeta2_8);
     l_ptop_8 = exp(ztop_8);
     if( lrint(ptop_8) == -1 ) {
@@ -5195,7 +5195,7 @@ int vgrid::C_genab_5004(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoe
   // Momentum levels
   pr1 = 1. / (zsrf_8 - zetau_8);
   for( k = 0; k < nk; k++ ) {
-    zeta_8  = zsrf_8 + log(hybuser[k]);
+    zeta_8  = zsrf_8 + log((double)hybuser[k]);
     lamba_8  = ( zeta_8 - zetau_8 ) * pr1;
     rcoef  = (float) (rcoef2 - ( rcoef2 - rcoef1 ) * lamba_8);
     b_m_8[k] = pow(lamba_8, rcoef);
@@ -5286,8 +5286,8 @@ int vgrid::c_vgrid_genab_5005(float *hybuser, int nk, int *nl_m, int *nl_t, floa
   zsrf_8  = log(pref_8);
   
   // Auto compute ptop and make B(0) = 0
-  zetau_8 = zsrf_8 + log(hybuser[0]);
-  zeta2_8 = zsrf_8 + log(hybuser[1]);
+  zetau_8 = zsrf_8 + log((double)hybuser[0]);
+  zeta2_8 = zsrf_8 + log((double)hybuser[1]);
   ztop_8  = 0.5 * ( 3. * zetau_8 - zeta2_8);
   (**ptop_out_8) = exp(ztop_8);
 
@@ -5323,7 +5323,7 @@ int vgrid::c_vgrid_genab_5005(float *hybuser, int nk, int *nl_m, int *nl_t, floa
   // Momentum levels
   pr1 = 1. / (zsrf_8 - zetau_8);
   for( k = 0; k < nk; k++ ) {
-    zeta_8  = zsrf_8 + log(hybuser[k]);
+    zeta_8  = zsrf_8 + log((double)hybuser[k]);
     lamba_8  = ( zeta_8 - zetau_8 ) * pr1;
     rcoef  = (float) (rcoef2 - ( rcoef2 - rcoef1 ) * lamba_8);
     b_m_8[k] = pow(lamba_8, rcoef);
@@ -5440,9 +5440,9 @@ int vgrid::c_vgrid_genab_5100(float *hybuser, int nk, int *nl_m, int *nl_t, floa
   zsrf_8  = log(pref_8);
   
   // Auto compute ptop and make B(0) = 0
-  zeta1_8 = zsrf_8 + log(hybuser[0]);
-  zeta2_8 = zsrf_8 + log(hybuser[1]);
-  zetaN_8 = zsrf_8 + log(hybuser[nk-1]);
+  zeta1_8 = zsrf_8 + log((double)hybuser[0]);
+  zeta2_8 = zsrf_8 + log((double)hybuser[1]);
+  zetaN_8 = zsrf_8 + log((double)hybuser[nk-1]);
   ztop_8  = 0.5 * ( 3. * zeta1_8 - zeta2_8);
   (**ptop_out_8) = exp(ztop_8);
 
@@ -5482,7 +5482,7 @@ int vgrid::c_vgrid_genab_5100(float *hybuser, int nk, int *nl_m, int *nl_t, floa
     pr1 = 1. / (zetaN_8 - zeta1_8);
   }   
   for( k = 0; k < nk; k++ ) {
-    zeta_8  = zsrf_8 + log(hybuser[k]);
+    zeta_8  = zsrf_8 + log((double)hybuser[k]);
     lamba_8 = fmin(1.0, ( zeta_8 - zeta1_8 ) * pr1);
     rcoefL  = (float) (rcoef2 - ( rcoef2 - rcoef1 ) * lamba_8);
     rcoef   = (float) (rcoef4 - ( rcoef4 - rcoef3 ) * lamba_8);
@@ -5652,11 +5652,11 @@ int vgrid::c_vgrid_genab_21001(float *hybuser, int nk, int *nl_m, int *nl_t, flo
   }
   //Momentum levels
   // Note: hybuser at surface in not in the list but we know it is zero
-  pr1 = 1. / hybuser[0];
+  pr1 = 1. / (double)hybuser[0];
   for( k = 0; k < nk; k++ ){
-    lamda_8 = ( hybuser[0] - hybuser[k] ) * pr1;
+    lamda_8 = (double)( hybuser[0] - hybuser[k] ) * pr1;
     rcoef   = (float) (my_rcoef4 - ( my_rcoef4 - my_rcoef3 ) * lamda_8);
-    a_m_8[k] = hybuser[k];
+    a_m_8[k] = (double)hybuser[k];
     b_m_8[k] = pow(lamda_8, rcoef);
     rcoef   = (float) (rcoef2 - ( rcoef2 - rcoef1 ) * lamda_8);
     c_m_8[k] = pow(lamda_8, rcoef) - b_m_8[k];
@@ -5848,11 +5848,11 @@ int vgrid::c_vgrid_genab_21002(float *hybuser, int nk, int *nl_m, int *nl_t, int
 
   //Momentum levels
   // Note: hybuser at surface in not in the list but we know it is zero
-  pr1 = 1. / hybuser[0];
+  pr1 = 1. / (double)hybuser[0];
   for( k = 0; k < nk; k++ ){
-    lamda_8 = ( hybuser[0] - hybuser[k] ) * pr1;
+    lamda_8 = ( (double)hybuser[0] - (double)hybuser[k] ) * pr1;
     rcoef   = (float) (my_rcoef4 - ( my_rcoef4 - my_rcoef3 ) * lamda_8);
-    a_m_8[k] = hybuser[k];
+    a_m_8[k] = (double)hybuser[k];
     b_m_8[k] = pow(lamda_8, rcoef);
     rcoef   = (float) ( rcoef2 - ( rcoef2 - rcoef1 ) * lamda_8);
     c_m_8[k] = pow(lamda_8, rcoef) - b_m_8[k];
