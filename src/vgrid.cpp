@@ -2094,8 +2094,6 @@ int C_compute_heights_21001(vgrid_descriptor *self, int ni, int nj, int nk, int 
   float *my_sfc_field_ls;
 #undef REAL_8
   double *aa_8, *bb_8, *cc_8;
-  double temp;
-  float tempf;
   int ij, k, ijk, ind, kind;
   float hyb;
 
@@ -2155,13 +2153,6 @@ int C_compute_heights_21001(vgrid_descriptor *self, int ni, int nj, int nk, int 
 #if defined(REAL_8)
       levels[ijk] = aa_8[k] + bb_8[k]*sfc_field[ij] + cc_8[k]*my_sfc_field_ls[ij];
 #else
-      if(ijk == 668216)
-	{
-	  printf("level 668216 has bee reached\n");
-	  temp=aa_8[k] + bb_8[k]*(double)sfc_field[ij] + cc_8[k]*(double)my_sfc_field_ls[ij];
-	  tempf=(float)aa_8[k] + (float)bb_8[k]*sfc_field[ij] + (float)cc_8[k]*my_sfc_field_ls[ij];
-	  printf("temp level = %.10f  float temp level = %.10f\n", temp, tempf);
-	}
       levels[ijk] = (float) ( aa_8[k] + bb_8[k]*(double)sfc_field[ij] + cc_8[k]*(double)my_sfc_field_ls[ij] );
 #endif
     }

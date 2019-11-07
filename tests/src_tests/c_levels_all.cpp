@@ -89,12 +89,12 @@ int compare_values(int iun, int vcode, float *levels, double *levels_8, float *p
 	  return(VGD_ERROR);
 	}
       } else {
-	if( fabs(p0[ij] - levels[ijk]*fact)/abs(p0[ij]) >  1.e-6 ) {
-	  printf("Difference is too large (float), expected %f, got %f\n", p0[ij], levels[ijk]*fact);
+	if( fabs(p0[ij] - levels[ijk]*fact)/abs(p0[ij]) >  20.e-6 ) {
+	  printf("Difference is too large (float), expected %.8f, got %.8f\n", p0[ij], levels[ijk]*fact);
 	  return(VGD_ERROR);
 	}
-	if( fabs(p0[ij] - levels_8[ijk]*fact)/abs(p0[ij]) > 1.e-6 ) {
-	  printf("Difference is too large (double), expected %f, got %f\n", p0[ij], levels_8[ijk]*fact);
+	if( fabs(p0[ij] - levels_8[ijk]*fact)/abs(p0[ij]) > 20.e-6 ) {
+	  printf("Difference is too large (double), expected %.8f, got %.8f\n", p0[ij], levels_8[ijk]*fact);
 	  return(VGD_ERROR);
 	}
       }
