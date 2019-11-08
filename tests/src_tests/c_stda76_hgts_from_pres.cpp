@@ -123,7 +123,7 @@ extern "C" void c_stda76_hgts_from_pres() {
   }
   for( k=0; k<nl; k++){
     fscanf(fp,"%f", &ff);
-    if( fabs(ff - hgts[k]) > .01f ){
+    if( fabs(ff - hgts[k]) > .014f ){
       printf("ERROR differences found, expecting: %f, got %f\n", ff, hgts[k]);
       printf("ERROR TEST on file %s failled\n", filename_c);
       exit(1);
