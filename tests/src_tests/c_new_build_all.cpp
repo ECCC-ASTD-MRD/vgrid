@@ -74,7 +74,7 @@ int check_build_1001_2001_5999_4001(vgrid_descriptor *vgd, int vcode){
     return(VGD_ERROR);
   }
   printf("  Testing generic interface\n");
-  if( my_vgrid.Cvgd_new_build_vert(&vgd2_p, kind, version, nk, -1, -1, NULL, NULL, NULL, NULL,
+  if( my_vgrid.Cvgd_new_build_vert(vgd2_p, kind, version, nk, -1, -1, NULL, NULL, NULL, NULL,
   			  a_m_8, b_m_8, NULL, NULL, ip1_m, NULL, nk, 0) == VGD_ERROR) {
     return(VGD_ERROR);
   }
@@ -91,25 +91,25 @@ int check_build_1001_2001_5999_4001(vgrid_descriptor *vgd, int vcode){
   printf("  Testing specific interface\n");
   switch(vcode) {
   case 1001:
-    if( my_vgrid.Cvgd_new_build_vert_1001(&vgd2_p, -1, -1,
+    if( my_vgrid.Cvgd_new_build_vert_1001(vgd2_p, -1, -1,
 				 a_m_8, b_m_8, ip1_m, nk) == VGD_ERROR) {
       return(VGD_ERROR);
     }
     break;
   case 2001:
-    if( my_vgrid.Cvgd_new_build_vert_2001(&vgd2_p, -1, -1,
+    if( my_vgrid.Cvgd_new_build_vert_2001(vgd2_p, -1, -1,
 				 a_m_8, b_m_8, ip1_m, nk) == VGD_ERROR) {
       return(VGD_ERROR);
     }
     break;
   case 4001:
-    if( my_vgrid.Cvgd_new_build_vert_4001(&vgd2_p, -1, -1,
+    if( my_vgrid.Cvgd_new_build_vert_4001(vgd2_p, -1, -1,
 				 a_m_8, b_m_8, ip1_m, nk) == VGD_ERROR) {
       return(VGD_ERROR);
     }
     break;
   case 5999:
-    if( my_vgrid.Cvgd_new_build_vert_5999(&vgd2_p, -1, -1,
+    if( my_vgrid.Cvgd_new_build_vert_5999(vgd2_p, -1, -1,
 				 a_m_8, b_m_8, ip1_m, nk) == VGD_ERROR) {
       return(VGD_ERROR);
     }
@@ -167,7 +167,7 @@ int check_build_1002(vgrid_descriptor *vgd){
   }
   
   printf("  Testing generic interface\n");
-  if( my_vgrid.Cvgd_new_build_vert(&vgd2_p, kind, version, nk, -1, -1, &ptop_8, NULL, NULL, NULL,
+  if( my_vgrid.Cvgd_new_build_vert(vgd2_p, kind, version, nk, -1, -1, &ptop_8, NULL, NULL, NULL,
   			  a_m_8, b_m_8, NULL, NULL, ip1_m, NULL, nk, 0) == VGD_ERROR) {
     return(VGD_ERROR);
   }
@@ -181,7 +181,7 @@ int check_build_1002(vgrid_descriptor *vgd){
   }
   my_vgrid.c_vgd_construct_jwb(vgd2_p);
 
-  if( my_vgrid.Cvgd_new_build_vert_1002(&vgd2_p, -1, -1, ptop_8, a_m_8, b_m_8, ip1_m, nk) == VGD_ERROR) {
+  if( my_vgrid.Cvgd_new_build_vert_1002(vgd2_p, -1, -1, ptop_8, a_m_8, b_m_8, ip1_m, nk) == VGD_ERROR) {
     return(VGD_ERROR);
   }
   ier = my_vgrid.Cvgd_vgdcmp(vgd, vgd2_p);
@@ -239,7 +239,7 @@ int check_build_5001(vgrid_descriptor *vgd){
   }
   
   printf("  Testing generic interface\n");
-  if( my_vgrid.Cvgd_new_build_vert(&vgd2_p, kind, version, nk, -1, -1, &ptop_8, &pref_8, &rc_1, NULL,
+  if( my_vgrid.Cvgd_new_build_vert(vgd2_p, kind, version, nk, -1, -1, &ptop_8, &pref_8, &rc_1, NULL,
   			  a_m_8, b_m_8, NULL, NULL, ip1_m, NULL, nk, 0) == VGD_ERROR) {
     return(VGD_ERROR);
   }
@@ -254,7 +254,7 @@ int check_build_5001(vgrid_descriptor *vgd){
   my_vgrid.c_vgd_construct_jwb(vgd2_p);
 
   printf("  Testing specific interface\n");
-  if( my_vgrid.Cvgd_new_build_vert_5001(&vgd2_p, -1, -1, ptop_8, pref_8, rc_1, 
+  if( my_vgrid.Cvgd_new_build_vert_5001(vgd2_p, -1, -1, ptop_8, pref_8, rc_1, 
 			       a_m_8, b_m_8, ip1_m, nk) == VGD_ERROR) {
     return(VGD_ERROR);
   }
@@ -323,7 +323,7 @@ int check_build_5002(vgrid_descriptor *vgd){
   }
   
   printf("  Testing generic interface\n");
-  if( my_vgrid.Cvgd_new_build_vert(&vgd2_p, kind, version, 0, -1, -1, &ptop_8, &pref_8, &rc_1, &rc_2,
+  if( my_vgrid.Cvgd_new_build_vert(vgd2_p, kind, version, 0, -1, -1, &ptop_8, &pref_8, &rc_1, &rc_2,
   			  a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, ip1_t, nl_m, nl_t) == VGD_ERROR) {
     return(VGD_ERROR);
   }
@@ -339,7 +339,7 @@ int check_build_5002(vgrid_descriptor *vgd){
   my_vgrid.c_vgd_construct_jwb(vgd2_p);
 
   printf("  Testing specific interface\n");
-  if( my_vgrid.Cvgd_new_build_vert_5002(&vgd2_p, -1, -1, ptop_8, pref_8, rc_1, rc_2,
+  if( my_vgrid.Cvgd_new_build_vert_5002(vgd2_p, -1, -1, ptop_8, pref_8, rc_1, rc_2,
 			       a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, ip1_t, nl_m, nl_t) == VGD_ERROR) {
     return(VGD_ERROR);
   }
@@ -408,7 +408,7 @@ int check_build_5005(vgrid_descriptor *vgd){
   }
   
   printf("  Testing generic interface\n");
-  if( my_vgrid.Cvgd_new_build_vert(&vgd2_p, kind, version, -1, -1, -1, NULL, &pref_8, &rc_1, &rc_2,
+  if( my_vgrid.Cvgd_new_build_vert(vgd2_p, kind, version, -1, -1, -1, NULL, &pref_8, &rc_1, &rc_2,
   			  a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, ip1_t, nl, nl) == VGD_ERROR) {
     return(VGD_ERROR);
   }
@@ -424,7 +424,7 @@ int check_build_5005(vgrid_descriptor *vgd){
   my_vgrid.c_vgd_construct_jwb(vgd2_p);
 
   printf("  Testing specific interface\n");
-  if( my_vgrid.Cvgd_new_build_vert_5005(&vgd2_p, -1, -1, pref_8, rc_1, rc_2,
+  if( my_vgrid.Cvgd_new_build_vert_5005(vgd2_p, -1, -1, pref_8, rc_1, rc_2,
   			       a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, ip1_t, nl) == VGD_ERROR) {
     return(VGD_ERROR);
   }
@@ -508,7 +508,7 @@ int check_build_5100(vgrid_descriptor *vgd){
   // No generic interface for 5100
   my_vgrid.c_vgd_construct_jwb(vgd2_p);
   printf("  Testing specific interface\n");
-  if( my_vgrid.Cvgd_new_build_vert_5100(&vgd2_p, -1, -1, pref_8, rc_1, rc_2, rc_3, rc_4,
+  if( my_vgrid.Cvgd_new_build_vert_5100(vgd2_p, -1, -1, pref_8, rc_1, rc_2, rc_3, rc_4,
   			       a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8, ip1_m, ip1_t, nl) == VGD_ERROR) {
     return(VGD_ERROR);
   }
@@ -592,7 +592,7 @@ int check_build_21001(vgrid_descriptor *vgd){
   // No generic interface for 21001
   my_vgrid.c_vgd_construct_jwb(vgd2_p);
   printf("  Testing specific interface\n");
-  if( my_vgrid.Cvgd_new_build_vert_21001(&vgd2_p, -1, -1, rc_1, rc_2, rc_3, rc_4,
+  if( my_vgrid.Cvgd_new_build_vert_21001(vgd2_p, -1, -1, rc_1, rc_2, rc_3, rc_4,
   			       a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8, ip1_m, ip1_t, nl) == VGD_ERROR) {
     return(VGD_ERROR);
   }
@@ -690,7 +690,7 @@ int check_build_21002(vgrid_descriptor *vgd){
   // No generic interface for 21001
   my_vgrid.c_vgd_construct_jwb(vgd2_p);
   printf("  Testing specific interface\n");
-  if( my_vgrid.Cvgd_new_build_vert_21002(&vgd2_p, -1, -1, rc_1, rc_2, rc_3, rc_4,
+  if( my_vgrid.Cvgd_new_build_vert_21002(vgd2_p, -1, -1, rc_1, rc_2, rc_3, rc_4,
 				a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8, a_w_8, b_w_8, c_w_8,
 				ip1_m, ip1_t, ip1_w, nl) == VGD_ERROR) {
     return(VGD_ERROR);
