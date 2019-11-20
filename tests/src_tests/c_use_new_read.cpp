@@ -34,7 +34,8 @@ extern "C" void c_use_new_read() {
   float *f_val = NULL, *p0 = NULL;
   double *a_8_t = NULL, *b_8_t = NULL, *table = NULL, *levels_8 = NULL, *p0_8 = NULL;
   vgrid_descriptor vgd, vgd2;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
   vgrid_descriptor *vgd_p = NULL, *vgd2_p = NULL;
 
   vgd_p=&vgd;

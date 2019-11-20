@@ -36,7 +36,8 @@ extern "C" void c_levels() {
   float *p0 = NULL, *levels = NULL;
   double *p0_8 = NULL, *levels_8 = NULL;
   vgrid_descriptor vgd, *vgd_p;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
 
   vgd_p = &vgd;
   status = VGD_OK;

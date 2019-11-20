@@ -32,7 +32,8 @@ extern "C" void c_levels_prof() {
   char mode[]="RND";
   float *levels = NULL, p0;
   vgrid_descriptor vgd, *vgd_p;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
 
   vgd_p = &vgd;
   status = VGD_OK;

@@ -57,7 +57,8 @@ int check_gen_1001_2001_4001(vgrid_descriptor *vgd, int vcode){
   float *hyb;
   vgrid_descriptor vgd2;
   vgrid_descriptor *vgd2_p = NULL;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
 
   vgd2_p=&vgd2;
 
@@ -138,7 +139,8 @@ int check_gen_1002(vgrid_descriptor *vgd){
   double ptop_8;
   vgrid_descriptor vgd2;
   vgrid_descriptor *vgd2_p = NULL;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
 
   vgd2_p=&vgd2;
 
@@ -205,7 +207,8 @@ int check_gen_5001(vgrid_descriptor *vgd){
   double ptop_8, pref_8;
   vgrid_descriptor vgd2;
   vgrid_descriptor *vgd2_p = NULL;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
 
   vgd2_p=&vgd2;
 
@@ -282,7 +285,8 @@ int check_gen_5002(vgrid_descriptor *vgd){
   double ptop_8, pref_8;
   vgrid_descriptor vgd2;
   vgrid_descriptor *vgd2_p = NULL;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
 
   vgd2_p=&vgd2;
 
@@ -360,7 +364,8 @@ int check_gen_5005(vgrid_descriptor *vgd){
   double pref_8, ptop_out_8;
   vgrid_descriptor vgd2;
   vgrid_descriptor *vgd2_p = NULL;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
 
   vgd2_p=&vgd2;
 
@@ -441,7 +446,8 @@ int check_gen_5100(vgrid_descriptor *vgd){
   double pref_8, ptop_out_8;
   vgrid_descriptor vgd2;
   vgrid_descriptor *vgd2_p = NULL;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
 
   vgd2_p=&vgd2;
 
@@ -513,7 +519,8 @@ int test_it(char *filename, int ind) {
   char mode[]="RND+R/O";
   vgrid_descriptor vgd;
   vgrid_descriptor *vgd_p = NULL;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
 
   vgd_p=&vgd;
 
@@ -580,7 +587,8 @@ int test_it(char *filename, int ind) {
 extern "C" void c_new_gen_all() {
   
   int i, ier, status = VGD_OK;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
 
   ier = my_vgrid.Cvgd_putopt_int("ALLOW_SIGMA",1);
 

@@ -29,7 +29,8 @@ extern "C" int c_ref_nomvar_is_white_space() {
   char filename[]="data/dm_2001_from_editfst";
   char value[]="VGD_NO_REF_NOMVAR";
   vgrid_descriptor vgd, *vgd_p;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
 
   vgd_p = &vgd;
 

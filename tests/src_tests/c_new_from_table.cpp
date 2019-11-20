@@ -46,7 +46,8 @@ int test_it(char *filename, int ind) {
   double *table = NULL;
   vgrid_descriptor vgd, vgd2;
   vgrid_descriptor *vgd_p = NULL,  *vgd2_p = NULL;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
   void free (void* ptr);
 
   vgd_p  = &vgd;
@@ -92,7 +93,8 @@ int test_it(char *filename, int ind) {
 extern "C" void c_new_from_table() {
   
   int i, ier, status = VGD_OK;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
 
   ier = my_vgrid.Cvgd_putopt_int("ALLOW_SIGMA",1);
   

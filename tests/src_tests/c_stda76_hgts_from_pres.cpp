@@ -43,7 +43,8 @@ extern "C" void c_stda76_hgts_from_pres() {
   char *filename_c ="data/c_stda76_hgts_from_pres.txt";
   char buff[255];
   vgrid_descriptor vgd, *vgd_p;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
 
   vgd_p = & vgd;
 

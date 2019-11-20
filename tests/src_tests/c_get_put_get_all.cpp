@@ -63,7 +63,8 @@ int test_it(char *filename, int ind) {
   int value=0, value2=0;
   char mode[]="RND";
   vgrid_descriptor vgd, *vgd_p;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
   char key[11][5] = {"DATE","IG_1","IG_2","IG_3","IG_4","IP_1","IP_2","IP_3","DIPM", "DIPT", "DIPW"};
 
   vgd_p = &vgd;
@@ -146,7 +147,8 @@ int test_it(char *filename, int ind) {
 extern "C" void c_get_put_get_all() {
   
   int ier, i, status = VGD_OK;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
 
   if( my_vgrid.Cvgd_putopt_int("ALLOW_SIGMA",1) == VGD_ERROR){
     printf("ERROR with Cvgd_putopt_int on ALLOW_SIGMA)\n");

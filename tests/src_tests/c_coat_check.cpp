@@ -29,15 +29,19 @@ extern "C" void c_coat_check() {
 
   coat_check my_coat_check;
 
+  vgrid_descriptor my_vgrid_a, my_vgrid_b;
   vgrid_descriptor *my_vgrid_a_p, *my_vgrid_b_p, *checked_vgrid_p;
+
+  my_vgrid_a_p = &my_vgrid_a;
+  my_vgrid_b_p = &my_vgrid_b;
 
   status=VGD_OK;
 
 
   // Test 1:  If I put a second (different) grid in the coat check, I should get
   //          a tag that is different from the first one
-  my_vgrid_a_p = vgrid::c_vgd_construct();
-  my_vgrid_b_p = vgrid::c_vgd_construct(); // vgrid::c_vgd_construct();
+  vgrid::c_vgd_construct_jwb(my_vgrid_a_p);
+  vgrid::c_vgd_construct_jwb(my_vgrid_b_p);
   my_vgrid_a_p->vcode = 768; // Leave a fingerprint
   my_vgrid_b_p->vcode = 999; // Leave a fingerprint
   tag1 = my_coat_check.get_tag(my_vgrid_a_p);

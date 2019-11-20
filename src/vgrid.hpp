@@ -37,6 +37,7 @@ extern float VGD_STDA76_SFC_P;
 class vgrid
 {
 public:
+  vgrid_descriptor *self;
 static int is_valid(vgrid_descriptor *self, int *table_valid);
 static int is_option(vgrid_descriptor *self, int *table_option);
 static int Cvgd_is_valid(vgrid_descriptor *self, char *valid_table_name);
@@ -57,6 +58,7 @@ static int Cvgd_diag_withref_2ref_8(vgrid_descriptor *self, int ni, int nj, int 
 static int Cvgd_diag_withref_2ref(vgrid_descriptor *self, int ni, int nj, int nk,
 			   int *ip1_list, float *levels, float *sfc_field,
 			   float *sfc_field_ls, int in_log, int dpidpis);
+vgrid(vgrid_descriptor *self_in);
 static void c_vgd_construct_jwb(vgrid_descriptor *vgrid);
 static void c_vgd_free_abci(vgrid_descriptor **self);
 static int Cvgd_set_vcode_i(vgrid_descriptor *VGrid,int Kind,int Version);

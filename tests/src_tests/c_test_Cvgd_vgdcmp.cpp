@@ -34,7 +34,8 @@ extern "C" void c_test_Cvgd_vgdcmp() {
   char name[5];
   vgrid_descriptor vgd, vgd2;
   vgrid_descriptor vgd3, vgd4;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
 
   vgrid_descriptor *vgd_p, *vgd2_p, *vgd3_p, *vgd4_p;
 

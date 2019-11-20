@@ -2500,6 +2500,13 @@ int vgrid::Cvgd_diag_withref_2ref(vgrid_descriptor *self, int ni, int nj, int nk
  *----------------------------------------------------------------------------
  */
 
+vgrid::vgrid(vgrid_descriptor *self_in)
+{
+  this->self=self_in;
+  c_vgd_construct_jwb(this->self);
+  return;
+}
+
 void vgrid::c_vgd_construct_jwb(vgrid_descriptor *vgrid)
 {
    if( vgrid ) {
@@ -7344,7 +7351,7 @@ int vgrid::Cvgd_new_read(vgrid_descriptor *self, int unit, int ip1, int ip2, int
   int toc_found = 0, count, nkeyList = MAX_DESC_REC;
   int keyList[nkeyList], status;
   VGD_TFSTD_ext var;
-  vgrid_descriptor *self2;
+  vgrid_descriptor self2;
 
 
   c_vgd_construct_jwb(self);
@@ -7416,22 +7423,22 @@ int vgrid::Cvgd_new_read(vgrid_descriptor *self, int unit, int ip1, int ip2, int
       }
       // If we get at this point this means that there are more than one toc satisfying the selection criteria.
       // We load then all to check if they are the same. If not, we return with an error message.
-      c_vgd_construct_jwb(self2);
+      c_vgd_construct_jwb(&self2);
       if( my_fstprm(keyList[i], &var) == VGD_ERROR ) {
 	printf("(Cvgd) ERROR in Cvgd_new_read, with my_fstprm on keyList[i] = %d\n",keyList[i]);
 	return(VGD_ERROR);
       }
-      if( C_load_toctoc(self2,var,keyList[i]) == VGD_ERROR ) {
+      if( C_load_toctoc(&self2,var,keyList[i]) == VGD_ERROR ) {
 	printf("(Cvgd) ERROR in Cvgd_new_read, cannot load !!\n");
 	return(VGD_ERROR);
       }
-      status = Cvgd_vgdcmp(self,self2);
+      status = Cvgd_vgdcmp(self,&self2);
       if ( status != 0 ){
 	printf("(Cvgd) ERROR in Cvgd_new_read, found different entries in vertical descriptors after search on ip1 = %d, ip2 = %d, kind = %d, version = %d, status code is %d\n",ip1,ip2,kind,version,status);
 	return(VGD_ERROR);
       }
       // TODO verifier si ce Cvgd_free est correct 
-      Cvgd_free(&self2);
+      //Cvgd_free(&self2);
     } // Loop in !! 
   } //if(count == 0)
 

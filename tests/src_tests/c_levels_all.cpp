@@ -113,7 +113,8 @@ int test_it(char *filename, char *ip1_name, int ind) {
   float *p0 = NULL, *p0ls = NULL, *levels = NULL, fact;
   double *p0_8 = NULL, *p0ls_8 = NULL, *levels_8 = NULL;
   vgrid_descriptor vgd, *vgd_p;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
 
   vgd_p = &vgd;
   iun = 10 + ind;
@@ -326,7 +327,8 @@ int test_it(char *filename, char *ip1_name, int ind) {
 extern "C" void c_levels_all() {
   
   int i, ier, status = VGD_OK;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
 
   ier = my_vgrid.Cvgd_putopt_int("ALLOW_SIGMA",1);
   

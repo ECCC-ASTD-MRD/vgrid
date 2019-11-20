@@ -50,7 +50,8 @@ int check_build_1001_2001_5999_4001(vgrid_descriptor *vgd, int vcode){
   double *a_m_8 = NULL, *b_m_8 = NULL;
   vgrid_descriptor vgd2;
   vgrid_descriptor *vgd2_p = NULL;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
 
   vgd2_p=&vgd2;
 
@@ -138,7 +139,8 @@ int check_build_1002(vgrid_descriptor *vgd){
   double *a_m_8 = NULL, *b_m_8 = NULL, ptop_8;
   vgrid_descriptor vgd2;
   vgrid_descriptor *vgd2_p = NULL;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
 
   vgd2_p = &vgd2;
 
@@ -203,7 +205,8 @@ int check_build_5001(vgrid_descriptor *vgd){
   double *a_m_8 = NULL, *b_m_8 = NULL, ptop_8, pref_8;
   vgrid_descriptor vgd2;
   vgrid_descriptor *vgd2_p = NULL;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
 
   vgd2_p=&vgd2;
 
@@ -277,7 +280,8 @@ int check_build_5002(vgrid_descriptor *vgd){
   double *a_m_8 = NULL, *b_m_8 = NULL, *a_t_8 = NULL, *b_t_8 = NULL, ptop_8, pref_8;
   vgrid_descriptor vgd2;
   vgrid_descriptor *vgd2_p = NULL;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
 
   vgd2_p=&vgd2;
 
@@ -364,7 +368,8 @@ int check_build_5005(vgrid_descriptor *vgd){
   double *a_m_8 = NULL, *b_m_8 = NULL, *a_t_8 = NULL, *b_t_8 = NULL, pref_8;
   vgrid_descriptor vgd2;
   vgrid_descriptor *vgd2_p = NULL;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
 
   vgd2_p=&vgd2;
 
@@ -449,7 +454,8 @@ int check_build_5100(vgrid_descriptor *vgd){
     *b_t_8 = NULL, *c_t_8 = NULL, pref_8;
   vgrid_descriptor vgd2;
   vgrid_descriptor *vgd2_p = NULL;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
 
   vgd2_p=&vgd2;
 
@@ -535,7 +541,8 @@ int check_build_21001(vgrid_descriptor *vgd){
     *b_t_8 = NULL, *c_t_8 = NULL, pref_8;
   vgrid_descriptor vgd2;
   vgrid_descriptor *vgd2_p = NULL;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
 
   vgd2_p=&vgd2;
 
@@ -620,7 +627,8 @@ int check_build_21002(vgrid_descriptor *vgd){
     *a_w_8 = NULL, *b_w_8 = NULL, *c_w_8 = NULL;
   vgrid_descriptor vgd2;
   vgrid_descriptor *vgd2_p = NULL;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
 
   vgd2_p=&vgd2;
   
@@ -718,7 +726,8 @@ int test_it(char *filename, int ind) {
   char mode[]="RND";
   vgrid_descriptor vgd;
   vgrid_descriptor *vgd_p = NULL;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
 
   vgd_p=&vgd;
   my_vgrid.c_vgd_construct_jwb(vgd_p);
@@ -798,7 +807,8 @@ int test_it(char *filename, int ind) {
 extern "C" void c_new_build_all() {
   
   int i, ier, status = VGD_OK;
-  vgrid my_vgrid;
+  vgrid_descriptor my_vgd;
+  vgrid my_vgrid(&my_vgd);
 
   ier = my_vgrid.Cvgd_putopt_int("ALLOW_SIGMA",1);
 
