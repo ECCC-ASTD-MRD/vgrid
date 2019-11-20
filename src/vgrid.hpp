@@ -36,6 +36,49 @@ extern float VGD_STDA76_SFC_P;
 
 class vgrid
 {
+  // VARIABLES:
+public:
+  VGD_TFSTD rec;          // RPN standard file header
+  double   ptop_8;        // Top level pressure (Pa)
+  double   pref_8;        // Reference pressure (Pa)
+  double   *table;        // Complete grid descriptor record
+  int      table_ni;      //    ni size of table
+  int      table_nj;      //    nj size of table
+  int      table_nk;      //    nk size of table
+  double   *a_m_8;        // A-coefficients for momentum levels  
+  double   *b_m_8;        // B-coefficients for momentum levels
+  double   *c_m_8;        // C-coefficients for momentum levels
+  double   *a_t_8;        // A-coefficients for thermodynamic levels
+  double   *b_t_8;        // B-coefficients for thermodynamic levels
+  double   *c_t_8;        // C-coefficients for thermodynamic levels
+  double   *a_w_8;        // A-coefficients for vertical-velocity levels
+  double   *b_w_8;        // B-coefficients for vertical-velocity levels
+  double   *c_w_8;        // C-coefficients for vertical-velocity levels
+  int      *ip1_m;        // ip1 values for momentum levels
+  int      *ip1_t;        // ip1 values for momentum levels
+  int      *ip1_w;        // ip1 values for momentum levels
+  int      nl_m;          // Number of momentum      level
+  int      nl_t;          // Number ot thermodynamic level
+  int      nl_w;          // Number ot vertical volocity level
+  float    dhm;           // Diag level Height (m) for Momentum variables UU,VV
+  float    dht;           // Diag level Height (t) for Thermo variables TT,HU, etc
+  float    dhw;           // Diag level Height (m) for vertical-velocity variables WT1 ZZ
+  char*    ref_name;      // Reference field name
+  char*    ref_namel;     // Reference field name
+  float    rcoef1;        // Rectification coefficient
+  float    rcoef2;        // Rectification coefficient
+  float    rcoef3;        // Rectification coefficient
+  float    rcoef4;        // Rectification coefficient
+  int      nk;            // Number of momentum levels
+  int      ip1;           // ip1 value given to the 3D descriptor
+  int      ip2;           // ip2 value given to the 3D descriptor
+  int      unit;          // file unit associated with this 3D descriptor
+  int      vcode;         // Vertical coordinate code
+  int      kind;          // Vertical coordinate code
+  int      version;       // Vertical coordinate code
+  char     match_ipig;    // do ip/ig matching for records
+  char     valid;         // Validity of structure
+  // METHODS:
 public:
   vgrid_descriptor *self;
 static int is_valid(vgrid_descriptor *self, int *table_valid);
