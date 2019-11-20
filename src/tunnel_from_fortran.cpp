@@ -188,8 +188,9 @@ int Cvgd_new_read(int *vgdid, int unit, int ip1,int ip2,
                   int kind, int version)
 {
   vgrid_descriptor self;
+  vgrid my_vgd(&self);
   int status;
-  status=vgrid::Cvgd_new_read(&self, unit, ip1, ip2, kind, version);
+  status=my_vgd.Cvgd_new_read(&self, unit, ip1, ip2, kind, version);
   if(status != VGD_ERROR)
     {
       *vgdid=grid_check.get_tag(&self);

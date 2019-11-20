@@ -207,7 +207,7 @@ static int Cvgd_new_gen_5100(vgrid_descriptor **self, float *hyb, int size_hyb, 
 static int Cvgd_new_gen_21001(vgrid_descriptor **self, float *hyb, int size_hyb, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht);
 static int Cvgd_new_gen_21002(vgrid_descriptor **self, float *hyb, int size_hyb, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, float dhw);
 
-static int Cvgd_new_read(vgrid_descriptor *self, int unit, int ip1, int ip2, int kind, int version);
+  int Cvgd_new_read(vgrid_descriptor *self, int unit, int ip1, int ip2, int kind, int version);
 static int Cvgd_write_desc (vgrid_descriptor *self, int unit);
 static int Cvgd_new_from_table(vgrid_descriptor *self, double *table, int ni, int nj, int nk);
 static int Cvgd_stda76_temp(vgrid_descriptor *self, int *i_val, int nl_t, float *temp);

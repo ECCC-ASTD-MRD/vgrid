@@ -2502,8 +2502,8 @@ int vgrid::Cvgd_diag_withref_2ref(vgrid_descriptor *self, int ni, int nj, int nk
 
 vgrid::vgrid(vgrid_descriptor *self_in)
 {
-  this->self=self_in;
-  c_vgd_construct_jwb(this->self);
+  self=self_in;
+  c_vgd_construct_jwb(self);
 
   ptop_8        = VGD_MISSING;
   pref_8        = VGD_MISSING;  
