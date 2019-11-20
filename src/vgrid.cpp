@@ -2500,17 +2500,6 @@ int vgrid::Cvgd_diag_withref_2ref(vgrid_descriptor *self, int ni, int nj, int nk
  *----------------------------------------------------------------------------
  */
 
-vgrid_descriptor* vgrid::c_vgd_construct() {
-
-   vgrid_descriptor *vgrid = (vgrid_descriptor*)malloc(sizeof(vgrid_descriptor));
-   if( !vgrid ){
-     printf("(Cvgd) ERROR in c_vgd_construct, cannot allocate vgrid\n");
-     return NULL;
-   }
-   c_vgd_construct_jwb(vgrid);
-   return(vgrid);
-}
-
 void vgrid::c_vgd_construct_jwb(vgrid_descriptor *vgrid)
 {
    if( vgrid ) {
@@ -7427,7 +7416,7 @@ int vgrid::Cvgd_new_read(vgrid_descriptor *self, int unit, int ip1, int ip2, int
       }
       // If we get at this point this means that there are more than one toc satisfying the selection criteria.
       // We load then all to check if they are the same. If not, we return with an error message.
-      self2 = c_vgd_construct();
+      c_vgd_construct_jwb(self2);
       if( my_fstprm(keyList[i], &var) == VGD_ERROR ) {
 	printf("(Cvgd) ERROR in Cvgd_new_read, with my_fstprm on keyList[i] = %d\n",keyList[i]);
 	return(VGD_ERROR);
