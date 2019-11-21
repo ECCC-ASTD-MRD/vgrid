@@ -86,7 +86,7 @@ int vgrid::is_valid(vgrid_descriptor *self, int *table_valid)
 {
   int k;
   for( k = 0; k < VALID_TABLE_SIZE; k++){
-    if(self->vcode == table_valid[k]){
+    if(this->vcode == table_valid[k]){
       return(1);
     }
   }
@@ -106,12 +106,8 @@ int vgrid::is_option(vgrid_descriptor *self, int *table_option)
 
 int vgrid::Cvgd_is_valid(vgrid_descriptor *self, char *valid_table_name)
 {
-  if(! self){
-    printf("(Cvgd) ERROR in Cvgd_is_valid, vgrid descriptor not constructed\n");
-    return(0);
-  }
   if( strcmp(valid_table_name, "SELF") == 0 ){
-    return(self->valid);
+    return(this->valid);
   } else if( strcmp(valid_table_name, "ptop_out_8_valid") == 0 ){
     return(this->is_valid(self,              ptop_out_8_valid));
   } else if( strcmp(valid_table_name, "ptop_8_valid")     == 0 ){
@@ -494,37 +490,37 @@ void vgrid::Cvgd_table_shape(vgrid_descriptor *self, int **tshape) {
 }
 
 int vgrid::c_table_update(vgrid_descriptor *self) {
-  //printf("self->vcode)=%d\n",self->vcode);
-  switch(self->vcode) {
+  //printf("this->vcode)=%d\n",this->vcode);
+  switch(this->vcode) {
   case 5002:
   case 5003:
   case 5004:
   case 5005:
     if( this->c_encode_vert_5002_5003_5004_5005(self, 1) == VGD_ERROR ) {
-      printf("(Cvgd) ERROR in c_table_update, cannot encode Vcode %d\n",self->vcode);
+      printf("(Cvgd) ERROR in c_table_update, cannot encode Vcode %d\n",this->vcode);
       return(VGD_ERROR);
     }
     break;
   case 5100:
     if( this->c_encode_vert_5100(self, 1) == VGD_ERROR ) {
-      printf("(Cvgd) ERROR in c_table_update, cannot encode Vcode %d\n",self->vcode);
+      printf("(Cvgd) ERROR in c_table_update, cannot encode Vcode %d\n",this->vcode);
       return(VGD_ERROR);
     }
     break;
   case 21001:
     if( this->c_encode_vert_21001(self, 1) == VGD_ERROR ) {
-      printf("(Cvgd) ERROR in c_table_update, cannot encode Vcode %d\n",self->vcode);
+      printf("(Cvgd) ERROR in c_table_update, cannot encode Vcode %d\n",this->vcode);
       return(VGD_ERROR);
     }
     break;
   case 21002:
     if( this->c_encode_vert_21002(self, 1) == VGD_ERROR ) {
-      printf("(Cvgd) ERROR in c_table_update, cannot encode Vcode %d\n",self->vcode);
+      printf("(Cvgd) ERROR in c_table_update, cannot encode Vcode %d\n",this->vcode);
       return(VGD_ERROR);
     }
     break;
   default:
-    printf("(Cvgd) ERROR in c_table_update, unsupported Vcode %d\n",self->vcode);
+    printf("(Cvgd) ERROR in c_table_update, unsupported Vcode %d\n",this->vcode);
     return(VGD_ERROR);
   }	
   return(VGD_OK);  
@@ -718,47 +714,93 @@ int correct_kind_and_version(int key, int kind, int version, VGD_TFSTD_ext *var,
 
 int vgrid::C_load_toctoc(vgrid_descriptor *self, VGD_TFSTD_ext var, int key) {
 
-  int table_size, istat, ni, nj, nk;
+  int table_size, istat, ni, nj
+    , nk;
 
-  self->table_ni = var.ni;
-  self->table_nj = var.nj;
-  self->table_nk = var.nk;
+  this->table_ni = var.ni;
+  this->table_nj = var.nj;
+  this->table_nk = var.nk;
 
-  table_size = self->table_ni * self->table_nj * self->table_nk;
-  self->table = (double*)malloc ( table_size * sizeof(double) );
-  if(! self->table ) {
+  table_size = this->table_ni * this->table_nj * this->table_nk;
+  this->table = (double*)malloc ( table_size * sizeof(double) );
+  if(! this->table ) {
     printf("(Cvgd) ERROR in C_load_toctoc, cannot allocate table of bouble of size %d\n",table_size );
     return(VGD_ERROR);
   }
-  istat = c_fstluk(self->table, key, &ni, &nj, &nk);
+  istat = c_fstluk(this->table, key, &ni, &nj, &nk);
   if(istat < 0) {
     printf("(Cvgd) ERROR in C_load_toctoc, problem with fstluk\n");
-    free(self->table);
+    free(this->table);
     return(VGD_ERROR);
   }
-  self->kind             = (int) self->table[0];
-  self->version          = (int) self->table[1];
+  this->kind             = (int) this->table[0];
+  this->version          = (int) this->table[1];
   if(this->fstd_init(self) == VGD_ERROR) {
     printf("(Cvgd) ERROR in C_load_toctoc, problem creating record information\n");
     return(VGD_ERROR);
   }
-  self->rec.dateo        = var.dateo;
-  self->rec.deet         = var.deet;
-  self->rec.npas         = var.npas;
-  self->rec.nbits        = var.nbits;
-  self->rec.datyp        = var.datyp;
-  self->rec.ip1          = var.ip1;
-  self->rec.ip2          = var.ip2;
-  self->rec.ip3          = var.ip3;
-  strcpy(self->rec.typvar, var.typvar);
-  strcpy(self->rec.nomvar, var.nomvar);
-  strcpy(self->rec.etiket, var.etiket);
-  self->rec.ig1          = var.ig1;
-  self->rec.ig2          = var.ig2;
-  self->rec.ig3          = var.ig3;
-  self->rec.ig4          = var.ig4;
+  this->rec.dateo        = var.dateo;
+  this->rec.deet         = var.deet;
+  this->rec.npas         = var.npas;
+  this->rec.nbits        = var.nbits;
+  this->rec.datyp        = var.datyp;
+  this->rec.ip1          = var.ip1;
+  this->rec.ip2          = var.ip2;
+  this->rec.ip3          = var.ip3;
+  strcpy(this->rec.typvar, var.typvar);
+  strcpy(this->rec.nomvar, var.nomvar);
+  strcpy(this->rec.etiket, var.etiket);
+  this->rec.ig1          = var.ig1;
+  this->rec.ig2          = var.ig2;
+  this->rec.ig3          = var.ig3;
+  this->rec.ig4          = var.ig4;
 
   return(VGD_OK);
+}
+
+int vgrid::Cvgd_vgdcmp_jwb(vgrid *that) {
+
+  //int nt1, nt2;
+  // Check each element of the structure (except FST attributes) for equality
+
+  if (this->vcode != that->vcode)                   return(-1);
+  if (this->kind != that->kind)                     return(-2);
+  if (this->version != that->version)               return(-3);
+  if (strcmp(this->ref_name, that->ref_name) != 0 ) return(-4);
+  if (strcmp(this->ref_namel, that->ref_namel) != 0 )return(-20);
+  if (this->nl_w != that->nl_w) return(-23);
+  // Note, size nl_m and nl_t are tested in call to same_vec_i below
+  if (memcmp(&(this->ptop_8),&(that->ptop_8), sizeof(double)/sizeof(char) ))return(-5);
+  if (memcmp(&(this->pref_8),&(that->pref_8), sizeof(double)/sizeof(char) ))return(-6);
+  if (memcmp(&(this->rcoef1),&(that->rcoef1), sizeof(float) /sizeof(char) ))return(-7);
+  if (memcmp(&(this->rcoef2),&(that->rcoef2), sizeof(float) /sizeof(char) ))return(-8);
+  if (memcmp(&(this->rcoef3),&(that->rcoef3), sizeof(float) /sizeof(char) ))return(-16);
+  if (memcmp(&(this->rcoef4),&(that->rcoef4), sizeof(float) /sizeof(char) ))return(-17);
+
+   // Check pointer associations and values
+  if(same_vec_i (this->ip1_m, this->nl_m, that->ip1_m, that->nl_m) != 0) return (-9);
+  if(same_vec_i (this->ip1_t, this->nl_t, that->ip1_t, that->nl_t) != 0) return (-10);
+  if(same_vec_i (this->ip1_w, this->nl_w, that->ip1_w, that->nl_w) != 0) return (-24);
+  if(same_vec_r8(this->a_m_8, this->nl_m, that->a_m_8, that->nl_m) != 0) return (-11);
+  //if(same_vec_r8(this->b_m_8, this->nl_m, that->b_m_8, that->nl_m) != 0) return (-12);
+  if(similar_vec_r8(this->b_m_8, this->nl_m, that->b_m_8, that->nl_m) != 0) return (-12);
+  //if(same_vec_r8(this->c_m_8, this->nl_m, that->c_m_8, that->nl_m) != 0) return (-18);
+  if(same_vec_r8(this->a_t_8, this->nl_t, that->a_t_8, that->nl_t) != 0) return (-13);
+  //if(same_vec_r8(this->b_t_8, this->nl_t, that->b_t_8, that->nl_t) != 0) return (-14);
+  if(similar_vec_r8(this->b_t_8, this->nl_t, that->b_t_8, that->nl_t) != 0) return (-14);
+  //if(same_vec_r8(this->c_t_8, this->nl_t, that->c_t_8, that->nl_t) != 0) return (-19);
+  if(same_vec_r8(this->a_w_8, this->nl_w, that->a_w_8, that->nl_w) != 0) return (-25);
+  if(similar_vec_r8(this->b_w_8, this->nl_w, that->b_w_8, that->nl_w) != 0) return (-26);
+  //if(same_vec_r8(this->c_w_8, this->nl_w, that->c_w_8, that->nl_w) != 0) return (-27);
+ 
+  // Do not check table since all above parameters consist in a full check, at least it should.
+  // Also, the transfer from char to real(kind=8) do not always give same real8 value which
+  // made equality to be false even if above parameters are equal.
+  //nt1 = this->table_ni * this->table_nj * this->table_nk;
+  //nt2 = that->table_ni * that->table_nj * that->table_nk;
+  //if(same_vec_r8(this->table, nt1, that->table, nt2 )            != 0) return (-15);
+
+  return(0);
 }
 
 int vgrid::Cvgd_vgdcmp(vgrid_descriptor *vgd1, vgrid_descriptor *vgd2) {
@@ -2720,7 +2762,7 @@ int vgrid::Cvgd_set_vcode_i(vgrid_descriptor *VGrid,int Kind,int Version) {
       fprintf(stderr,"(Cvgd) ERROR in Cvgd_set_vcode_i, invalid kind or version kind=%d, version=%d\n",Kind,Version);
       return(VGD_ERROR);
    }
-   VGrid->vcode = Kind*1000 + Version;
+   this->vcode = Kind*1000 + Version;
    return(VGD_OK);
 }
 
@@ -2741,12 +2783,12 @@ int vgrid::Cvgd_set_vcode_i(vgrid_descriptor *VGrid,int Kind,int Version) {
  */
 int vgrid::Cvgd_set_vcode(vgrid_descriptor *VGrid) {
 
-   if( !VGrid->table ) {
+   if( !this->table ) {
       fprintf(stderr,"(Cvgd) ERROR: Cvgd_set_vcode called before constructor\n");
       return(VGD_ERROR);
    }
 
-   return this->Cvgd_set_vcode_i(VGrid,VGrid->kind,VGrid->version);
+   return this->Cvgd_set_vcode_i(VGrid,this->kind,this->version);
 }
 
 /*----------------------------------------------------------------------------
@@ -2766,7 +2808,7 @@ int vgrid::Cvgd_set_vcode(vgrid_descriptor *VGrid) {
  */
 int vgrid::fstd_init(vgrid_descriptor *VGrid) {
 
-   VGD_TFSTD *h = &VGrid->rec;
+   VGD_TFSTD *h = &this->rec;
 
    if( h->fstd_initialized )
       return(VGD_OK);
@@ -2777,7 +2819,7 @@ int vgrid::fstd_init(vgrid_descriptor *VGrid) {
      return(VGD_ERROR);
    }
 
-   switch(VGrid->vcode) {
+   switch(this->vcode) {
       case 1:
          strcpy(h->etiket,"HEIGHT_OCEAN");
          break;
@@ -2786,37 +2828,37 @@ int vgrid::fstd_init(vgrid_descriptor *VGrid) {
          break;
       case 1002:
          strcpy(h->etiket,"ETA_GEMV3");
-         h->ig2=(int)round(VGrid->ptop_8*10.0);
+         h->ig2=(int)round(this->ptop_8*10.0);
          break;
       case 2001:
          strcpy(h->etiket,"PRESSURE");
          break;
       case 1003:
          strcpy(h->etiket,"HYBNORM_GEM3");
-         h->ig2=(int)round(VGrid->ptop_8*10.0);
-         h->ig3=(int)roundf(VGrid->rcoef1*100.0f);
+         h->ig2=(int)round(this->ptop_8*10.0);
+         h->ig3=(int)roundf(this->rcoef1*100.0f);
          break;
       case 4001:
          strcpy(h->etiket,"M_ABOVE_SFC");
          break;
       case 5001:
          strcpy(h->etiket,"HYB_GEMV3");
-         h->ig2=(int)round(VGrid->ptop_8*10.0);
-         h->ig3=(int)roundf(VGrid->rcoef1*100.0f);
+         h->ig2=(int)round(this->ptop_8*10.0);
+         h->ig3=(int)roundf(this->rcoef1*100.0f);
          break;
       case 5002:
       case 5003:
       case 5004:
          strcpy(h->etiket,"STG_CP_GEMV4");
-         h->ig2=(int)round(VGrid->ptop_8*10.0);
-         h->ig3=(int)roundf(VGrid->rcoef1*100.0f);
-         h->ig4=(int)roundf(VGrid->rcoef2*100.0f);
+         h->ig2=(int)round(this->ptop_8*10.0);
+         h->ig3=(int)roundf(this->rcoef1*100.0f);
+         h->ig4=(int)roundf(this->rcoef2*100.0f);
          break;
       case 5005:
          strcpy(h->etiket,"STG_CP_GEMV4");
          h->ig2=0;
-         h->ig3=(int)roundf(VGrid->rcoef1*100.0f);
-         h->ig4=(int)roundf(VGrid->rcoef2*100.0f);
+         h->ig3=(int)roundf(this->rcoef1*100.0f);
+         h->ig4=(int)roundf(this->rcoef2*100.0f);
          break;
       case 5100:
          strcpy(h->etiket,"STG_CP_SLEVE");
@@ -2847,7 +2889,7 @@ int vgrid::fstd_init(vgrid_descriptor *VGrid) {
          h->ig4=0;
          break;
        default:
-         fprintf(stderr,"(Cvgd) ERROR in fstd_init, invalid kind or version: kind=%d, version=%d\n",VGrid->kind,VGrid->version);
+         fprintf(stderr,"(Cvgd) ERROR in fstd_init, invalid kind or version: kind=%d, version=%d\n",this->kind,this->version);
          return(VGD_ERROR);
    }
 
@@ -2861,7 +2903,7 @@ int vgrid::fstd_init(vgrid_descriptor *VGrid) {
    h->datyp       = 5;
    h->nbits       = 64;
    h->ip3         = 0;
-   h->ig1         = VGrid->vcode;
+   h->ig1         = this->vcode;
    h->fstd_initialized = 1;
 
    return(VGD_OK);
@@ -2994,35 +3036,31 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
   int errorInput = 0, ier;
 
   this->c_vgd_construct_jwb(self);
-  if(! self){
-    printf("(Cvgd) ERROR in Cvgd_new_build_vert2, null pointer returned by c_vgd_construct\n");
-    return (VGD_ERROR);
-  }
 
   // Initializations
-  self->valid      = 1;
-  self->kind       = kind;
-  self->version    = version;
-  self->unit       = -1;
-  self->match_ipig = 1;
-  self->nk         = nk;
-  self->nl_m       = nl_m;
-  // Note that self->nl_t and self->nl_w may be overwritten in c_encode_vert_* function below
-  self->nl_t       = nl_t;
-  self->nl_w       = nl_w;
-  self->rec.ip1    = (int) fmax(0,ip1);
-  self->rec.ip2    = (int) fmax(0,ip2);
-  strcpy(self->rec.nomvar,"!!  ");
+  this->valid      = 1;
+  this->kind       = kind;
+  this->version    = version;
+  this->unit       = -1;
+  this->match_ipig = 1;
+  this->nk         = nk;
+  this->nl_m       = nl_m;
+  // Note that this->nl_t and this->nl_w may be overwritten in c_encode_vert_* function below
+  this->nl_t       = nl_t;
+  this->nl_w       = nl_w;
+  this->rec.ip1    = (int) fmax(0,ip1);
+  this->rec.ip2    = (int) fmax(0,ip2);
+  strcpy(this->rec.nomvar,"!!  ");
   if(this->Cvgd_set_vcode_i(self, kind, version) == VGD_ERROR)  {
     printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem with Cvgd_set_vcode_i");
     return (VGD_ERROR);
   }
-  self->rec.ig1   = self->vcode;
+  this->rec.ig1   = this->vcode;
 
   // Check for required inputs
   if( this->is_valid( self, ptop_8_valid) ) {
     if(ptop_8) {
-      self->ptop_8 = *ptop_8;
+      this->ptop_8 = *ptop_8;
     } else {
       printf("(Cvgd) ptop_8 is a required constructor entry\n");
       errorInput = 1;
@@ -3030,7 +3068,7 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
   }
   if(this->is_valid( self, pref_8_valid)) {
     if(pref_8){
-      self->pref_8 = *pref_8;
+      this->pref_8 = *pref_8;
     } else {
       printf("(Cvgd) pref_8 is a required constructor entry\n");
       errorInput = 1;
@@ -3038,7 +3076,7 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
   }
   if(this->is_valid( self, rcoef1_valid)) {
     if(rcoef1){
-      self->rcoef1 = *rcoef1;
+      this->rcoef1 = *rcoef1;
     } else {
       printf("(Cvgd) rcoef1 is a required constructor entry\n");
       errorInput = 1;
@@ -3046,7 +3084,7 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
   }
   if(this->is_valid( self, rcoef2_valid)) {
     if(rcoef2){
-      self->rcoef2 = *rcoef2;
+      this->rcoef2 = *rcoef2;
     } else {
       printf("(Cvgd) rcoef2 is a required constructor entry\n");
       errorInput = 1;
@@ -3054,7 +3092,7 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
   }
   if(this->is_valid( self, rcoef3_valid)) {
     if(rcoef3){
-      self->rcoef3 = *rcoef3;
+      this->rcoef3 = *rcoef3;
     } else {
       printf("(Cvgd) rcoef3 is a required constructor entry\n");
       errorInput = 1;
@@ -3062,7 +3100,7 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
   }
   if(this->is_valid( self, rcoef4_valid)) {
     if(rcoef4){
-      self->rcoef4 = *rcoef4;
+      this->rcoef4 = *rcoef4;
     } else {
       printf("(Cvgd) rcoef4 is a required constructor entry\n");
       errorInput = 1;
@@ -3070,13 +3108,13 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
   }
   if(this->is_valid( self, a_m_8_valid)) {
     if(a_m_8){
-      free(self->a_m_8);
-      self->a_m_8 = (double*)malloc( nl_m * sizeof(double) );
-      if(! self->a_m_8){ 
+      free(this->a_m_8);
+      this->a_m_8 = (double*)malloc( nl_m * sizeof(double) );
+      if(! this->a_m_8){ 
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating a_m_8 of size = %d\n", nl_m);
 	return(VGD_ERROR);
       }
-      my_copy_double(a_m_8, &(self->a_m_8), nl_m);
+      my_copy_double(a_m_8, &(this->a_m_8), nl_m);
     } else {
       printf("(Cvgd) a_m_8 is a required constructor entry\n");
       errorInput = 1;
@@ -3084,13 +3122,13 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
   }
   if(this->is_valid( self, b_m_8_valid)) {
     if(b_m_8){
-      free(self->b_m_8);
-      self->b_m_8 = (double*)malloc( nl_m * sizeof(double) );
-      if(! self->b_m_8) {
+      free(this->b_m_8);
+      this->b_m_8 = (double*)malloc( nl_m * sizeof(double) );
+      if(! this->b_m_8) {
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating b_m_8\n");
 	return(VGD_ERROR);
       }
-      my_copy_double(b_m_8, &(self->b_m_8), nl_m);
+      my_copy_double(b_m_8, &(this->b_m_8), nl_m);
     } else {
       printf("(Cvgd) b_m_8 is a required constructor entry\n");
       errorInput = 1;
@@ -3098,13 +3136,13 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
   }
   if(this->is_valid( self, c_m_8_valid)) {
     if(c_m_8){
-      free(self->c_m_8);
-      self->c_m_8 = (double*)malloc( nl_m * sizeof(double) );
-      if(! self->c_m_8) {
+      free(this->c_m_8);
+      this->c_m_8 = (double*)malloc( nl_m * sizeof(double) );
+      if(! this->c_m_8) {
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating c_m_8\n");
 	return(VGD_ERROR);
       }
-      my_copy_double(c_m_8, &(self->c_m_8), nl_m);
+      my_copy_double(c_m_8, &(this->c_m_8), nl_m);
     } else {
       printf("(Cvgd) c_m_8 is a required constructor entry\n");
       errorInput = 1;
@@ -3112,13 +3150,13 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
   }
   if(this->is_valid( self, a_t_8_valid)) {
     if(a_t_8){
-      free(self->a_t_8);
-      self->a_t_8 = (double*)malloc( nl_t * sizeof(double) );
-      if(! self->a_t_8) {
+      free(this->a_t_8);
+      this->a_t_8 = (double*)malloc( nl_t * sizeof(double) );
+      if(! this->a_t_8) {
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating a_t_8\n");
 	return(VGD_ERROR);
       }
-      my_copy_double(a_t_8, &(self->a_t_8), nl_t);
+      my_copy_double(a_t_8, &(this->a_t_8), nl_t);
     } else {
       printf("(Cvgd) a_t_8 is a required constructor entry\n");
       errorInput = 1;
@@ -3126,13 +3164,13 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
   }
   if(this->is_valid( self, b_t_8_valid)) {
     if(b_t_8){
-      free(self->b_t_8);
-      self->b_t_8 = (double*)malloc( nl_t * sizeof(double) );
-      if(! self->b_t_8) {
+      free(this->b_t_8);
+      this->b_t_8 = (double*)malloc( nl_t * sizeof(double) );
+      if(! this->b_t_8) {
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating b_t_8\n");
 	return(VGD_ERROR);
       }
-      my_copy_double(b_t_8, &(self->b_t_8), nl_t);
+      my_copy_double(b_t_8, &(this->b_t_8), nl_t);
     } else {
       printf("(Cvgd) b_t_8 is a required constructor entry\n");
       errorInput = 1;
@@ -3140,13 +3178,13 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
   }
   if(this->is_valid( self, c_t_8_valid)) {
     if(c_t_8){
-      free(self->c_t_8);
-      self->c_t_8 = (double*)malloc( nl_t * sizeof(double) );
-      if(! self->c_t_8) {
+      free(this->c_t_8);
+      this->c_t_8 = (double*)malloc( nl_t * sizeof(double) );
+      if(! this->c_t_8) {
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating c_t_8\n");
 	return(VGD_ERROR);
       }
-      my_copy_double(c_t_8, &(self->c_t_8), nl_t);
+      my_copy_double(c_t_8, &(this->c_t_8), nl_t);
     } else {
       printf("(Cvgd) c_t_8 is a required constructor entry\n");
       errorInput = 1;
@@ -3154,13 +3192,13 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
   }
   if(this->is_valid( self, a_w_8_valid)) {
     if(a_w_8){
-      free(self->a_w_8);
-      self->a_w_8 = (double*)malloc( nl_w * sizeof(double) );
-      if(! self->a_w_8) {
+      free(this->a_w_8);
+      this->a_w_8 = (double*)malloc( nl_w * sizeof(double) );
+      if(! this->a_w_8) {
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating a_w_8\n");
 	return(VGD_ERROR);
       }
-      my_copy_double(a_w_8, &(self->a_w_8), nl_w);
+      my_copy_double(a_w_8, &(this->a_w_8), nl_w);
     } else {
       printf("(Cvgd) a_w_8 is a required constructor entry\n");
       errorInput = 1;
@@ -3168,13 +3206,13 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
   }
   if(this->is_valid( self, b_w_8_valid)) {
     if(b_w_8){
-      free(self->b_w_8);
-      self->b_w_8 = (double*)malloc( nl_w * sizeof(double) );
-      if(! self->b_w_8) {
+      free(this->b_w_8);
+      this->b_w_8 = (double*)malloc( nl_w * sizeof(double) );
+      if(! this->b_w_8) {
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating b_w_8\n");
 	return(VGD_ERROR);
       }
-      my_copy_double(b_w_8, &(self->b_w_8), nl_w);
+      my_copy_double(b_w_8, &(this->b_w_8), nl_w);
     } else {
       printf("(Cvgd) b_w_8 is a required constructor entry\n");
       errorInput = 1;
@@ -3182,13 +3220,13 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
   }
   if(this->is_valid( self, c_w_8_valid)) {
     if(c_w_8){
-      free(self->c_w_8);
-      self->c_w_8 = (double*)malloc( nl_w * sizeof(double) );
-      if(! self->c_w_8) {
+      free(this->c_w_8);
+      this->c_w_8 = (double*)malloc( nl_w * sizeof(double) );
+      if(! this->c_w_8) {
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating c_w_8\n");
 	return(VGD_ERROR);
       }
-      my_copy_double(c_w_8, &(self->c_w_8), nl_w);
+      my_copy_double(c_w_8, &(this->c_w_8), nl_w);
     } else {
       printf("(Cvgd) c_w_8 is a required constructor entry\n");
       errorInput = 1;
@@ -3197,13 +3235,13 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
 
   if(this->is_valid( self, ip1_m_valid)) {
     if(ip1_m){
-      free(self->ip1_m);
-      self->ip1_m = (int*)malloc( nl_m * sizeof(int) );
-      if(! self->ip1_m) {
+      free(this->ip1_m);
+      this->ip1_m = (int*)malloc( nl_m * sizeof(int) );
+      if(! this->ip1_m) {
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating ip1_m in Cvgd_new_build_vert2\n");
 	return(VGD_ERROR);
       }
-      my_copy_int(ip1_m, &(self->ip1_m), nl_m);
+      my_copy_int(ip1_m, &(this->ip1_m), nl_m);
     } else {
       printf("(Cvgd) ip1_m is a required constructor entry\n");
       errorInput = 1;
@@ -3211,13 +3249,13 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
   }
   if(this->is_valid( self, ip1_t_valid)) {
     if(ip1_t){
-      free(self->ip1_t);
-      self->ip1_t = (int*)malloc( nl_t * sizeof(int) );
-      if(! self->ip1_t) {
+      free(this->ip1_t);
+      this->ip1_t = (int*)malloc( nl_t * sizeof(int) );
+      if(! this->ip1_t) {
 	printf("(Cvgd) ERROR: in Cvgd_new_build_vert2, problem allocating ip1_t\n");
 	return(VGD_ERROR);
       }
-      my_copy_int(ip1_t, &(self->ip1_t), nl_t);
+      my_copy_int(ip1_t, &(this->ip1_t), nl_t);
     } else {
       printf("(Cvgd) ip1_t is a required constructor entry\n");
       errorInput = 1;
@@ -3225,13 +3263,13 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
   }
   if(this->is_valid( self, ip1_w_valid)) {
     if(ip1_w){
-      free(self->ip1_w);
-      self->ip1_w = (int*)malloc( nl_w * sizeof(int) );
-      if(! self->ip1_w) {
+      free(this->ip1_w);
+      this->ip1_w = (int*)malloc( nl_w * sizeof(int) );
+      if(! this->ip1_w) {
 	printf("(Cvgd) ERROR: in Cvgd_new_build_vert2, problem allocating ip1_w\n");
 	return(VGD_ERROR);
       }
-      my_copy_int(ip1_w, &(self->ip1_w), nl_w);
+      my_copy_int(ip1_w, &(this->ip1_w), nl_w);
     } else {
       printf("(Cvgd) ip1_w is a required constructor entry\n");
       errorInput = 1;
@@ -3242,7 +3280,7 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
   }  
 
   // Fill table with version-specific encoder
-  switch(self->vcode) {
+  switch(this->vcode) {
   case 1:
     strcpy(cvcode,"1");
     ier = this->c_encode_vert_0001(self,nk);
@@ -3308,7 +3346,7 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
     return(VGD_ERROR);
   }
 
-  self->valid = 1;
+  this->valid = 1;
   if(this->fstd_init(self) == VGD_ERROR) {
     printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem with fstd_init\n");
   }
@@ -3321,45 +3359,45 @@ int vgrid::c_encode_vert_0001(vgrid_descriptor *self,int nk){
   
   int skip = 1, table_size;
   
-  if( self->table )
-    free( self->table );
-  self->table_ni = 3;
-  self->table_nj = 2*nk+skip;
-  self->table_nk = 1;
-  table_size = self->table_ni * self->table_nj * self->table_nk;
-  self->table = (double*)malloc ( table_size * sizeof(double) );
-  if(! self->table ) {
+  if( this->table )
+    free( this->table );
+  this->table_ni = 3;
+  this->table_nj = 2*nk+skip;
+  this->table_nk = 1;
+  table_size = this->table_ni * this->table_nj * this->table_nk;
+  this->table = (double*)malloc ( table_size * sizeof(double) );
+  if(! this->table ) {
     printf("(Cvgd) ERROR in c_encode_vert_0001, cannot allocate table of bouble of size %d\n",table_size );
     return(VGD_ERROR);
   }
-  strcpy(self->ref_name,VGD_NO_REF_NOMVAR);
-  strcpy(self->ref_namel,VGD_NO_REF_NOMVAR);
+  strcpy(this->ref_name,VGD_NO_REF_NOMVAR);
+  strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
 
   //Fill header
-  self->table[0] = self->kind;
-  self->table[1] = self->version;
-  self->table[2] = skip;
+  this->table[0] = this->kind;
+  this->table[1] = this->version;
+  this->table[2] = skip;
   
   int k, ind = 3;
   for ( k = 0; k < nk; k++){
-    self->table[ind  ] = self->ip1_m[k];
-    self->table[ind+1] = self->a_m_8[k];
-    self->table[ind+2] = 0;
+    this->table[ind  ] = this->ip1_m[k];
+    this->table[ind+1] = this->a_m_8[k];
+    this->table[ind+2] = 0;
     ind = ind + 3;
   }
   for ( k = 0; k < nk; k++){
-    self->table[ind  ] = self->ip1_w[k];
-    self->table[ind+1] = self->a_w_8[k];
-    self->table[ind+2] = 0;
+    this->table[ind  ] = this->ip1_w[k];
+    this->table[ind+1] = this->a_w_8[k];
+    this->table[ind+2] = 0;
     ind = ind + 3;
   }
-  self->nl_w = self->nl_w;
-  self->a_t_8 = self->a_m_8;
-  self->b_t_8 = self->b_m_8;
-  self->c_t_8 = self->c_m_8;
-  self->ip1_t = self->ip1_m;
+  this->nl_w = this->nl_w;
+  this->a_t_8 = this->a_m_8;
+  this->b_t_8 = this->b_m_8;
+  this->c_t_8 = this->c_m_8;
+  this->ip1_t = this->ip1_m;
 
-  self->valid = 1;
+  this->valid = 1;
 
   return(VGD_OK);
 }
@@ -3368,51 +3406,51 @@ int vgrid::c_encode_vert_1001(vgrid_descriptor *self,int nk){
   
   int skip = 2, table_size;
 
-  if( self->table )
-    free( self->table );
-  self->table_ni = 3;
-  self->table_nj = nk+skip;
-  self->table_nk = 1;
-  table_size = self->table_ni * self->table_nj * self->table_nk;
-  self->table = (double*)malloc ( table_size * sizeof(double) );
-  if(! self->table ) {
+  if( this->table )
+    free( this->table );
+  this->table_ni = 3;
+  this->table_nj = nk+skip;
+  this->table_nk = 1;
+  table_size = this->table_ni * this->table_nj * this->table_nk;
+  this->table = (double*)malloc ( table_size * sizeof(double) );
+  if(! this->table ) {
     printf("(Cvgd) ERROR in c_encode_vert_1001, cannot allocate table of bouble of size %d\n",table_size );
     return(VGD_ERROR);
   }
 
-  strcpy(self->ref_name,"P0  ");
-  strcpy(self->ref_namel,VGD_NO_REF_NOMVAR);
+  strcpy(this->ref_name,"P0  ");
+  strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
 
 
   //Fill header
-  self->table[0] = self->kind;
-  self->table[1] = self->version;
-  self->table[2] = skip;
-  flip_transfer_c2d(self->ref_name, &(self->table[3]));
+  this->table[0] = this->kind;
+  this->table[1] = this->version;
+  this->table[2] = skip;
+  flip_transfer_c2d(this->ref_name, &(this->table[3]));
 
-  self->table[4] = 0.;
-  self->table[5] = 0.;
+  this->table[4] = 0.;
+  this->table[5] = 0.;
   
 
   int k, ind = 6;
   for ( k = 0; k < nk; k++){
-    self->table[ind  ] = self->ip1_m[k];
-    self->table[ind+1] = self->a_m_8[k];
-    self->table[ind+2] = self->b_m_8[k];
+    this->table[ind  ] = this->ip1_m[k];
+    this->table[ind+1] = this->a_m_8[k];
+    this->table[ind+2] = this->b_m_8[k];
     ind = ind + 3;
   }
-  self->nl_t = self->nl_m;
-  self->nl_w = self->nl_m;
-  self->a_t_8 = self->a_m_8;
-  self->b_t_8 = self->b_m_8;
-  self->c_t_8 = self->c_m_8;
-  self->a_w_8 = self->a_m_8;
-  self->b_w_8 = self->b_m_8;
-  self->c_w_8 = self->c_m_8;
-  self->ip1_t = self->ip1_m;
-  self->ip1_w = self->ip1_m;
+  this->nl_t = this->nl_m;
+  this->nl_w = this->nl_m;
+  this->a_t_8 = this->a_m_8;
+  this->b_t_8 = this->b_m_8;
+  this->c_t_8 = this->c_m_8;
+  this->a_w_8 = this->a_m_8;
+  this->b_w_8 = this->b_m_8;
+  this->c_w_8 = this->c_m_8;
+  this->ip1_t = this->ip1_m;
+  this->ip1_w = this->ip1_m;
 
-  self->valid = 1;
+  this->valid = 1;
   return(VGD_OK);
 }
 
@@ -3420,47 +3458,47 @@ int vgrid::c_encode_vert_1002(vgrid_descriptor *self,int nk){
   
   int skip = 2, table_size;
   
-  if( self->table )
-    free( self->table );
-  self->table_ni = 3;
-  self->table_nj = nk+skip;
-  self->table_nk = 1;
-  table_size = self->table_ni * self->table_nj * self->table_nk;
-  self->table = (double*)malloc ( table_size * sizeof(double) );
-  if(! self->table ) {
+  if( this->table )
+    free( this->table );
+  this->table_ni = 3;
+  this->table_nj = nk+skip;
+  this->table_nk = 1;
+  table_size = this->table_ni * this->table_nj * this->table_nk;
+  this->table = (double*)malloc ( table_size * sizeof(double) );
+  if(! this->table ) {
     printf("(Cvgd) ERROR in c_encode_vert_1002, cannot allocate table of bouble of size %d\n",table_size );
     return(VGD_ERROR);
   }
-  strcpy(self->ref_name,"P0  ");
-  strcpy(self->ref_namel,VGD_NO_REF_NOMVAR);
+  strcpy(this->ref_name,"P0  ");
+  strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
 
   //Fill header
-  self->table[0] = self->kind;
-  self->table[1] = self->version;
-  self->table[2] = skip;
-  self->table[3] = self->ptop_8;
-  flip_transfer_c2d(self->ref_name, &(self->table[4]));
-  self->table[5] = 0.;
+  this->table[0] = this->kind;
+  this->table[1] = this->version;
+  this->table[2] = skip;
+  this->table[3] = this->ptop_8;
+  flip_transfer_c2d(this->ref_name, &(this->table[4]));
+  this->table[5] = 0.;
   
   int k, ind = 6;
   for ( k = 0; k < nk; k++){
-    self->table[ind  ] = self->ip1_m[k];
-    self->table[ind+1] = self->a_m_8[k];
-    self->table[ind+2] = self->b_m_8[k];
+    this->table[ind  ] = this->ip1_m[k];
+    this->table[ind+1] = this->a_m_8[k];
+    this->table[ind+2] = this->b_m_8[k];
     ind = ind + 3;
   }
-  self->nl_t = self->nl_m;
-  self->nl_w = self->nl_m;
-  self->a_t_8 = self->a_m_8;
-  self->b_t_8 = self->b_m_8;
-  self->c_t_8 = self->c_m_8;
-  self->a_w_8 = self->a_m_8;
-  self->b_w_8 = self->b_m_8;
-  self->c_w_8 = self->c_m_8;
-  self->ip1_t = self->ip1_m;
-  self->ip1_w = self->ip1_m;
+  this->nl_t = this->nl_m;
+  this->nl_w = this->nl_m;
+  this->a_t_8 = this->a_m_8;
+  this->b_t_8 = this->b_m_8;
+  this->c_t_8 = this->c_m_8;
+  this->a_w_8 = this->a_m_8;
+  this->b_w_8 = this->b_m_8;
+  this->c_w_8 = this->c_m_8;
+  this->ip1_t = this->ip1_m;
+  this->ip1_w = this->ip1_m;
 
-  self->valid = 1;
+  this->valid = 1;
   return(VGD_OK);
 }
 
@@ -3468,44 +3506,44 @@ int vgrid::c_encode_vert_2001(vgrid_descriptor *self,int nk){
   
   int skip = 1, table_size;
   
-  if( self->table )
-    free( self->table );
-  self->table_ni = 3;
-  self->table_nj = nk+skip;
-  self->table_nk = 1;
-  table_size = self->table_ni * self->table_nj * self->table_nk;
-  self->table = (double*)malloc ( table_size * sizeof(double) );
-  if(! self->table ) {
+  if( this->table )
+    free( this->table );
+  this->table_ni = 3;
+  this->table_nj = nk+skip;
+  this->table_nk = 1;
+  table_size = this->table_ni * this->table_nj * this->table_nk;
+  this->table = (double*)malloc ( table_size * sizeof(double) );
+  if(! this->table ) {
     printf("(Cvgd) ERROR in c_encode_vert_2001, cannot allocate table of bouble of size %d\n",table_size );
     return(VGD_ERROR);
   }
-  strcpy(self->ref_name,VGD_NO_REF_NOMVAR);
-  strcpy(self->ref_namel,VGD_NO_REF_NOMVAR);
+  strcpy(this->ref_name,VGD_NO_REF_NOMVAR);
+  strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
 
   //Fill header
-  self->table[0] = self->kind;
-  self->table[1] = self->version;
-  self->table[2] = skip;
+  this->table[0] = this->kind;
+  this->table[1] = this->version;
+  this->table[2] = skip;
   
   int k, ind = 3;
   for ( k = 0; k < nk; k++){
-    self->table[ind  ] = self->ip1_m[k];
-    self->table[ind+1] = self->a_m_8[k];
-    self->table[ind+2] = self->b_m_8[k];
+    this->table[ind  ] = this->ip1_m[k];
+    this->table[ind+1] = this->a_m_8[k];
+    this->table[ind+2] = this->b_m_8[k];
     ind = ind + 3;
   }
-  self->nl_t = self->nl_m;
-  self->nl_w = self->nl_m;
-  self->a_t_8 = self->a_m_8;
-  self->b_t_8 = self->b_m_8;
-  self->c_t_8 = self->c_m_8;
-  self->a_w_8 = self->a_m_8;
-  self->b_w_8 = self->b_m_8;
-  self->c_w_8 = self->c_m_8;
-  self->ip1_t = self->ip1_m;
-  self->ip1_w = self->ip1_m;
+  this->nl_t = this->nl_m;
+  this->nl_w = this->nl_m;
+  this->a_t_8 = this->a_m_8;
+  this->b_t_8 = this->b_m_8;
+  this->c_t_8 = this->c_m_8;
+  this->a_w_8 = this->a_m_8;
+  this->b_w_8 = this->b_m_8;
+  this->c_w_8 = this->c_m_8;
+  this->ip1_t = this->ip1_m;
+  this->ip1_w = this->ip1_m;
 
-  self->valid = 1;
+  this->valid = 1;
 
   return(VGD_OK);
 }
@@ -3514,44 +3552,44 @@ int vgrid::c_encode_vert_4001(vgrid_descriptor *self,int nk){
   
   int skip = 1, table_size;
   
-  if( self->table )
-    free( self->table );
-  self->table_ni = 3;
-  self->table_nj = nk+skip;
-  self->table_nk = 1;
-  table_size = self->table_ni * self->table_nj * self->table_nk;
-  self->table = (double*)malloc ( table_size * sizeof(double) );
-  if(! self->table ) {
+  if( this->table )
+    free( this->table );
+  this->table_ni = 3;
+  this->table_nj = nk+skip;
+  this->table_nk = 1;
+  table_size = this->table_ni * this->table_nj * this->table_nk;
+  this->table = (double*)malloc ( table_size * sizeof(double) );
+  if(! this->table ) {
     printf("(Cvgd) ERROR in c_encode_vert_4001, cannot allocate table of bouble of size %d\n",table_size );
     return(VGD_ERROR);
   }
-  strcpy(self->ref_name,VGD_NO_REF_NOMVAR);
-  strcpy(self->ref_namel,VGD_NO_REF_NOMVAR);
+  strcpy(this->ref_name,VGD_NO_REF_NOMVAR);
+  strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
 
   //Fill header
-  self->table[0] = self->kind;
-  self->table[1] = self->version;
-  self->table[2] = skip;
+  this->table[0] = this->kind;
+  this->table[1] = this->version;
+  this->table[2] = skip;
   
   int k, ind = 3;
   for ( k = 0; k < nk; k++){
-    self->table[ind  ] = self->ip1_m[k];
-    self->table[ind+1] = self->a_m_8[k];
-    self->table[ind+2] = 0.;
+    this->table[ind  ] = this->ip1_m[k];
+    this->table[ind+1] = this->a_m_8[k];
+    this->table[ind+2] = 0.;
     ind = ind + 3;
   }
-  self->nl_t = self->nl_m;
-  self->nl_w = self->nl_m;
-  self->a_t_8 = self->a_m_8;
-  self->b_t_8 = self->b_m_8;
-  self->c_t_8 = self->c_m_8;
-  self->a_w_8 = self->a_m_8;
-  self->b_w_8 = self->b_m_8;
-  self->c_w_8 = self->c_m_8;
-  self->ip1_t = self->ip1_m;
-  self->ip1_w = self->ip1_m;
+  this->nl_t = this->nl_m;
+  this->nl_w = this->nl_m;
+  this->a_t_8 = this->a_m_8;
+  this->b_t_8 = this->b_m_8;
+  this->c_t_8 = this->c_m_8;
+  this->a_w_8 = this->a_m_8;
+  this->b_w_8 = this->b_m_8;
+  this->c_w_8 = this->c_m_8;
+  this->ip1_t = this->ip1_m;
+  this->ip1_w = this->ip1_m;
 
-  self->valid = 1;
+  this->valid = 1;
 
   return(VGD_OK);
 }
@@ -3559,168 +3597,160 @@ int vgrid::c_encode_vert_4001(vgrid_descriptor *self,int nk){
 int vgrid::c_encode_vert_5001(vgrid_descriptor *self,int nk){
   int skip = 3, table_size;
 
-  if( self->table )
-    free( self->table );
-  self->table_ni = 3;
-  self->table_nj = nk+skip;
-  self->table_nk = 1;
-  table_size = self->table_ni * self->table_nj * self->table_nk;
-  self->table = (double*)malloc ( table_size * sizeof(double) );
-  if(! self->table ) {
+  if( this->table )
+    free( this->table );
+  this->table_ni = 3;
+  this->table_nj = nk+skip;
+  this->table_nk = 1;
+  table_size = this->table_ni * this->table_nj * this->table_nk;
+  this->table = (double*)malloc ( table_size * sizeof(double) );
+  if(! this->table ) {
     printf("(Cvgd) ERROR in c_encode_vert_5001, cannot allocate table of bouble of size %d\n",table_size );
     return(VGD_ERROR);
   }
-  strcpy(self->ref_name,"P0  ");
-  strcpy(self->ref_namel,VGD_NO_REF_NOMVAR);
+  strcpy(this->ref_name,"P0  ");
+  strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
   
   //Fill header
-  self->table[0] = self->kind;
-  self->table[1] = self->version;
-  self->table[2] = skip;
+  this->table[0] = this->kind;
+  this->table[1] = this->version;
+  this->table[2] = skip;
 
-  self->table[3] = self->ptop_8;
-  self->table[4] = self->pref_8;
-  self->table[5] = self->rcoef1;
+  this->table[3] = this->ptop_8;
+  this->table[4] = this->pref_8;
+  this->table[5] = this->rcoef1;
   
-  flip_transfer_c2d(self->ref_name, &(self->table[6]));
-  self->table[7] = 0.;
-  self->table[8] = 0.;
+  flip_transfer_c2d(this->ref_name, &(this->table[6]));
+  this->table[7] = 0.;
+  this->table[8] = 0.;
 
   int k, ind = 9;
   for ( k = 0; k < nk; k++){
-    self->table[ind  ] = self->ip1_m[k];
-    self->table[ind+1] = self->a_m_8[k];
-    self->table[ind+2] = self->b_m_8[k];
+    this->table[ind  ] = this->ip1_m[k];
+    this->table[ind+1] = this->a_m_8[k];
+    this->table[ind+2] = this->b_m_8[k];
     ind = ind + 3;
   }
-  self->nl_t = self->nl_m;
-  self->nl_w = self->nl_m;
-  self->a_t_8 = self->a_m_8;
-  self->b_t_8 = self->b_m_8;
-  self->c_t_8 = self->c_m_8;
-  self->a_w_8 = self->a_m_8;
-  self->b_w_8 = self->b_m_8;
-  self->c_w_8 = self->c_m_8;
-  self->ip1_t = self->ip1_m;
-  self->ip1_w = self->ip1_m;
+  this->nl_t = this->nl_m;
+  this->nl_w = this->nl_m;
+  this->a_t_8 = this->a_m_8;
+  this->b_t_8 = this->b_m_8;
+  this->c_t_8 = this->c_m_8;
+  this->a_w_8 = this->a_m_8;
+  this->b_w_8 = this->b_m_8;
+  this->c_w_8 = this->c_m_8;
+  this->ip1_t = this->ip1_m;
+  this->ip1_w = this->ip1_m;
   
-  self->valid = 1;
+  this->valid = 1;
 
   return(VGD_OK);
 }
 
 int vgrid::c_encode_vert_5002_5003_5004_5005(vgrid_descriptor *self, char update){
   int skip = 3, table_size;
-  if(! self ) {
-    printf("(Cvgd) ERROR in c_encode_vert_5002_5003_5004_5005, vgrid descriptor not constructed\n");
-    return(VGD_ERROR);
-  }
   if(! update) {    
-    if( self->table )
-      free( self->table );
-    self->table_ni = 3;
-    self->table_nj = self->nl_m + self->nl_t + skip;
-    self->table_nk = 1;
-    table_size = self->table_ni * self->table_nj * self->table_nk;
-    self->table = (double*)malloc ( table_size * sizeof(double) );
-    if(! self->table ) {
+    if( this->table )
+      free( this->table );
+    this->table_ni = 3;
+    this->table_nj = this->nl_m + this->nl_t + skip;
+    this->table_nk = 1;
+    table_size = this->table_ni * this->table_nj * this->table_nk;
+    this->table = (double*)malloc ( table_size * sizeof(double) );
+    if(! this->table ) {
       printf("(Cvgd) ERROR in c_encode_vert_5002_5003_5004_5005, cannot allocate table of bouble of size %d\n", table_size);
       return(VGD_ERROR);
     }
-    strcpy(self->ref_name,"P0  ");
-    strcpy(self->ref_namel,VGD_NO_REF_NOMVAR);
+    strcpy(this->ref_name,"P0  ");
+    strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
   }
   //Fill header
-  self->table[0] = self->kind;
-  self->table[1] = self->version;
-  self->table[2] = skip;
-  self->table[3] = self->ptop_8;
-  self->table[4] = self->pref_8;
-  self->table[5] = self->rcoef1;  
-  self->table[6] = self->rcoef2;
-  flip_transfer_c2d(self->ref_name, &(self->table[7]));
-  self->table[8] = 0.;
+  this->table[0] = this->kind;
+  this->table[1] = this->version;
+  this->table[2] = skip;
+  this->table[3] = this->ptop_8;
+  this->table[4] = this->pref_8;
+  this->table[5] = this->rcoef1;  
+  this->table[6] = this->rcoef2;
+  flip_transfer_c2d(this->ref_name, &(this->table[7]));
+  this->table[8] = 0.;
 
   int k, ind = 9;
-  for ( k = 0; k < self->nl_m; k++){
-    self->table[ind  ] = self->ip1_m[k];
-    self->table[ind+1] = self->a_m_8[k];
-    self->table[ind+2] = self->b_m_8[k];
+  for ( k = 0; k < this->nl_m; k++){
+    this->table[ind  ] = this->ip1_m[k];
+    this->table[ind+1] = this->a_m_8[k];
+    this->table[ind+2] = this->b_m_8[k];
     ind = ind + 3;
   }
-  for ( k = 0; k < self->nl_t; k++){
-    self->table[ind  ] = self->ip1_t[k];
-    self->table[ind+1] = self->a_t_8[k];
-    self->table[ind+2] = self->b_t_8[k];
+  for ( k = 0; k < this->nl_t; k++){
+    this->table[ind  ] = this->ip1_t[k];
+    this->table[ind+1] = this->a_t_8[k];
+    this->table[ind+2] = this->b_t_8[k];
     ind = ind + 3;
   }
-  self->nl_w = self->nl_t;
-  self->a_w_8 = self->a_t_8;
-  self->b_w_8 = self->b_t_8;
-  self->c_w_8 = self->c_t_8;
-  self->ip1_w = self->ip1_t;
+  this->nl_w = this->nl_t;
+  this->a_w_8 = this->a_t_8;
+  this->b_w_8 = this->b_t_8;
+  this->c_w_8 = this->c_t_8;
+  this->ip1_w = this->ip1_t;
 
-  self->valid = 1;
+  this->valid = 1;
 
   return(VGD_OK);
 }
 int vgrid::c_encode_vert_5100(vgrid_descriptor *self, char update){
   int skip = 3, table_size;
-  if(! self ) {
-    printf("(Cvgd) ERROR in c_encode_vert_5100, vgrid descriptor not constructed\n");
-    return(VGD_ERROR);
-  }
   if(! update) {    
-    if( self->table )
-      free( self->table );
-    self->table_ni = 4;
-    self->table_nj = self->nl_m + self->nl_t + skip;
-    self->table_nk = 1;
-    table_size = self->table_ni * self->table_nj * self->table_nk;
-    self->table = (double*)malloc ( table_size * sizeof(double) );
-    if(! self->table ) {
+    if( this->table )
+      free( this->table );
+    this->table_ni = 4;
+    this->table_nj = this->nl_m + this->nl_t + skip;
+    this->table_nk = 1;
+    table_size = this->table_ni * this->table_nj * this->table_nk;
+    this->table = (double*)malloc ( table_size * sizeof(double) );
+    if(! this->table ) {
       printf("(Cvgd) ERROR in c_encode_vert_5100, cannot allocate table of bouble of size %d\n", table_size);
       return(VGD_ERROR);
     }
-    strcpy(self->ref_name,"P0  ");
-    strcpy(self->ref_namel,"P0LS");
+    strcpy(this->ref_name,"P0  ");
+    strcpy(this->ref_namel,"P0LS");
   }
   //Fill header
-  self->table[0] = self->kind;
-  self->table[1] = self->version;
-  self->table[2] = skip;
-  self->table[3] = self->ptop_8;
-  self->table[4] = self->pref_8;
-  self->table[5] = self->rcoef1;  
-  self->table[6] = self->rcoef2;
-  self->table[7] = self->rcoef3;
-  self->table[8] = self->rcoef4;
-  flip_transfer_c2d(self->ref_name, &(self->table[9]));
-  flip_transfer_c2d(self->ref_namel, &(self->table[10]));
-  self->table[11] = 0.;
+  this->table[0] = this->kind;
+  this->table[1] = this->version;
+  this->table[2] = skip;
+  this->table[3] = this->ptop_8;
+  this->table[4] = this->pref_8;
+  this->table[5] = this->rcoef1;  
+  this->table[6] = this->rcoef2;
+  this->table[7] = this->rcoef3;
+  this->table[8] = this->rcoef4;
+  flip_transfer_c2d(this->ref_name, &(this->table[9]));
+  flip_transfer_c2d(this->ref_namel, &(this->table[10]));
+  this->table[11] = 0.;
 
   int k, ind = 12;
-  for ( k = 0; k < self->nl_m; k++){
-    self->table[ind  ] = self->ip1_m[k];
-    self->table[ind+1] = self->a_m_8[k];
-    self->table[ind+2] = self->b_m_8[k];
-    self->table[ind+3] = self->c_m_8[k];
+  for ( k = 0; k < this->nl_m; k++){
+    this->table[ind  ] = this->ip1_m[k];
+    this->table[ind+1] = this->a_m_8[k];
+    this->table[ind+2] = this->b_m_8[k];
+    this->table[ind+3] = this->c_m_8[k];
     ind = ind + 4;
   }
-  for ( k = 0; k < self->nl_t; k++){
-    self->table[ind  ] = self->ip1_t[k];
-    self->table[ind+1] = self->a_t_8[k];
-    self->table[ind+2] = self->b_t_8[k];
-    self->table[ind+3] = self->c_t_8[k];
+  for ( k = 0; k < this->nl_t; k++){
+    this->table[ind  ] = this->ip1_t[k];
+    this->table[ind+1] = this->a_t_8[k];
+    this->table[ind+2] = this->b_t_8[k];
+    this->table[ind+3] = this->c_t_8[k];
     ind = ind + 4;
   }
-  self->nl_w = self->nl_t;
-  self->a_w_8 = self->a_t_8;
-  self->b_w_8 = self->b_t_8;
-  self->c_w_8 = self->c_t_8;
-  self->ip1_w = self->ip1_t;
+  this->nl_w = this->nl_t;
+  this->a_w_8 = this->a_t_8;
+  this->b_w_8 = this->b_t_8;
+  this->c_w_8 = this->c_t_8;
+  this->ip1_w = this->ip1_t;
 
-  self->valid = 1;
+  this->valid = 1;
 
   return(VGD_OK);
 }
@@ -3734,445 +3764,437 @@ int vgrid::c_encode_vert_5999(vgrid_descriptor *self,int nk){
 
   // Check ip1 validity
   for( k=0; k < nk; k++){
-    hyb = c_convip_IP2Level(self->ip1_m[k],&kind);
+    hyb = c_convip_IP2Level(this->ip1_m[k],&kind);
     hyb = hyb*2.f; // To silence the compiler warning
     // Even if hyb is kind 5, kind 4 may be present due to diag level in m AGL
     if( kind != 5 && kind != 4 ) {
-      printf("Error in encode_vert_5999, ip1 kind must be 5 or 4 but got %d, for ip1 = %d\n", kind, self->ip1_m[k]);
+      printf("Error in encode_vert_5999, ip1 kind must be 5 or 4 but got %d, for ip1 = %d\n", kind, this->ip1_m[k]);
       return(VGD_ERROR);
     }
     for( i=k+1; i < nk; i++) {
-      if( self->ip1_m[i] == self->ip1_m[k]) {
-	printf("Error in encode_vert_5999, repetition present in ip1 list for at least ip1 = %d\n", self->ip1_m[i]);
+      if( this->ip1_m[i] == this->ip1_m[k]) {
+	printf("Error in encode_vert_5999, repetition present in ip1 list for at least ip1 = %d\n", this->ip1_m[i]);
 	return(VGD_ERROR);
       }
     }
   }
   
-  if( self->table )
-    free( self->table );
-  self->table_ni = 3;
-  self->table_nj = nk+skip;
-  self->table_nk = 1;
-  table_size = self->table_ni * self->table_nj * self->table_nk;
-  self->table = (double*)malloc ( table_size * sizeof(double) );
-  if(! self->table ) {
+  if( this->table )
+    free( this->table );
+  this->table_ni = 3;
+  this->table_nj = nk+skip;
+  this->table_nk = 1;
+  table_size = this->table_ni * this->table_nj * this->table_nk;
+  this->table = (double*)malloc ( table_size * sizeof(double) );
+  if(! this->table ) {
     printf("(Cvgd) ERROR in c_encode_vert_5999, cannot allocate table of bouble of size %d\n",table_size );
     return(VGD_ERROR);
   }
-  strcpy(self->ref_name,"P0  ");
-  strcpy(self->ref_namel,VGD_NO_REF_NOMVAR);
+  strcpy(this->ref_name,"P0  ");
+  strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
 
   //Fill header
-  self->table[0] = self->kind;
-  self->table[1] = self->version;
-  self->table[2] = skip;
-  flip_transfer_c2d(self->ref_name, &(self->table[3]));
-  self->table[4] = 0.;
-  self->table[5] = 0.;
+  this->table[0] = this->kind;
+  this->table[1] = this->version;
+  this->table[2] = skip;
+  flip_transfer_c2d(this->ref_name, &(this->table[3]));
+  this->table[4] = 0.;
+  this->table[5] = 0.;
 
   int ind = 6;
   for ( k = 0; k < nk; k++){
-    self->table[ind  ] = self->ip1_m[k];
-    self->table[ind+1] = self->a_m_8[k];
-    self->table[ind+2] = self->b_m_8[k];
+    this->table[ind  ] = this->ip1_m[k];
+    this->table[ind+1] = this->a_m_8[k];
+    this->table[ind+2] = this->b_m_8[k];
     ind = ind + 3;
   }
-  self->nl_t = self->nl_m;
-  self->nl_w = self->nl_m;
-  self->a_t_8 = self->a_m_8;
-  self->b_t_8 = self->b_m_8;
-  self->c_t_8 = self->c_m_8;
-  self->a_w_8 = self->a_m_8;
-  self->b_w_8 = self->b_m_8;
-  self->c_w_8 = self->c_m_8;
-  self->ip1_t = self->ip1_m;
-  self->ip1_w = self->ip1_m;
+  this->nl_t = this->nl_m;
+  this->nl_w = this->nl_m;
+  this->a_t_8 = this->a_m_8;
+  this->b_t_8 = this->b_m_8;
+  this->c_t_8 = this->c_m_8;
+  this->a_w_8 = this->a_m_8;
+  this->b_w_8 = this->b_m_8;
+  this->c_w_8 = this->c_m_8;
+  this->ip1_t = this->ip1_m;
+  this->ip1_w = this->ip1_m;
 
-  self->valid = 1;
+  this->valid = 1;
 
   return(VGD_OK);
 }
 
 int vgrid::c_encode_vert_21001(vgrid_descriptor *self, char update){
   int skip = 3, table_size;
-  if(! self ) {
-    printf("(Cvgd) ERROR in c_encode_vert_21001, vgrid descriptor not constructed\n");
-    return(VGD_ERROR);
-  }
   if(! update) {    
-    if( self->table )
-      free( self->table );
-    self->table_ni = 4;
-    self->table_nj = self->nl_m + self->nl_t + skip;
-    self->table_nk = 1;
-    table_size = self->table_ni * self->table_nj * self->table_nk;
-    self->table = (double*)malloc ( table_size * sizeof(double) );
-    if(! self->table ) {
+    if( this->table )
+      free( this->table );
+    this->table_ni = 4;
+    this->table_nj = this->nl_m + this->nl_t + skip;
+    this->table_nk = 1;
+    table_size = this->table_ni * this->table_nj * this->table_nk;
+    this->table = (double*)malloc ( table_size * sizeof(double) );
+    if(! this->table ) {
       printf("(Cvgd) ERROR in c_encode_vert_21001, cannot allocate table of bouble of size %d\n", table_size);
       return(VGD_ERROR);
     }
-    strcpy(self->ref_name,"ME  ");
-    strcpy(self->ref_namel,"MELS");
-    if ( fabs( self->rcoef3 - self->rcoef1 ) < 1.0e-6 && fabs( self->rcoef4 - self->rcoef2 ) < 1.0e-6) {
-      strcpy(self->ref_namel,VGD_NO_REF_NOMVAR);
+    strcpy(this->ref_name,"ME  ");
+    strcpy(this->ref_namel,"MELS");
+    if ( fabs( this->rcoef3 - this->rcoef1 ) < 1.0e-6 && fabs( this->rcoef4 - this->rcoef2 ) < 1.0e-6) {
+      strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
     }
-    if ( self->rcoef3 < 0. || self->rcoef4 < 0. ) {
-      strcpy(self->ref_namel,VGD_NO_REF_NOMVAR);
+    if ( this->rcoef3 < 0. || this->rcoef4 < 0. ) {
+      strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
     }
   }
 
   //Fill header
-  self->table[0] = self->kind;
-  self->table[1] = self->version;
-  self->table[2] = skip;
-  self->table[3] = self->rcoef1;  
-  self->table[4] = self->rcoef2;
-  self->table[5] = self->rcoef3;  
-  self->table[6] = self->rcoef4;
-  flip_transfer_c2d(self->ref_name,  &(self->table[7]));
-  flip_transfer_c2d(self->ref_namel, &(self->table[8]));
-  self->table[9] = 0.; 
-  self->table[10]= 0.; 
-  self->table[11]= 0.; 
+  this->table[0] = this->kind;
+  this->table[1] = this->version;
+  this->table[2] = skip;
+  this->table[3] = this->rcoef1;  
+  this->table[4] = this->rcoef2;
+  this->table[5] = this->rcoef3;  
+  this->table[6] = this->rcoef4;
+  flip_transfer_c2d(this->ref_name,  &(this->table[7]));
+  flip_transfer_c2d(this->ref_namel, &(this->table[8]));
+  this->table[9] = 0.; 
+  this->table[10]= 0.; 
+  this->table[11]= 0.; 
 
   int k, ind = 12;
-  for ( k = 0; k < self->nl_m; k++){
-    self->table[ind  ] = self->ip1_m[k];
-    self->table[ind+1] = self->a_m_8[k];
-    self->table[ind+2] = self->b_m_8[k];
-    self->table[ind+3] = self->c_m_8[k];
+  for ( k = 0; k < this->nl_m; k++){
+    this->table[ind  ] = this->ip1_m[k];
+    this->table[ind+1] = this->a_m_8[k];
+    this->table[ind+2] = this->b_m_8[k];
+    this->table[ind+3] = this->c_m_8[k];
     ind = ind + 4;
   }
-  for ( k = 0; k < self->nl_t; k++){
-    self->table[ind  ] = self->ip1_t[k];
-    self->table[ind+1] = self->a_t_8[k];
-    self->table[ind+2] = self->b_t_8[k];
-    self->table[ind+3] = self->c_t_8[k];
+  for ( k = 0; k < this->nl_t; k++){
+    this->table[ind  ] = this->ip1_t[k];
+    this->table[ind+1] = this->a_t_8[k];
+    this->table[ind+2] = this->b_t_8[k];
+    this->table[ind+3] = this->c_t_8[k];
     ind = ind + 4;
   }
-  self->nl_w = self->nl_t;
-  self->a_w_8 = self->a_t_8;
-  self->b_w_8 = self->b_t_8;
-  self->c_w_8 = self->c_t_8;
-  self->ip1_w = self->ip1_t;
+  this->nl_w = this->nl_t;
+  this->a_w_8 = this->a_t_8;
+  this->b_w_8 = this->b_t_8;
+  this->c_w_8 = this->c_t_8;
+  this->ip1_w = this->ip1_t;
 
-  self->valid = 1;
+  this->valid = 1;
 
   return(VGD_OK);
 }
 int vgrid::c_encode_vert_21002(vgrid_descriptor *self, char update){
   int skip = 3, table_size;
-  if(! self ) {
-    printf("(Cvgd) ERROR in c_encode_vert_21002, vgrid descriptor not constructed\n");
-    return(VGD_ERROR);
-  }
   if(! update) {    
-    if( self->table )
-      free( self->table );
-    self->table_ni = 4;
+    if( this->table )
+      free( this->table );
+    this->table_ni = 4;
     // To have a complete set of levels parameters, we need all momentum and Vertical-Velocity
     // levels, the thermo levels set only differs for the diag level. Therefor we only write
     // Momentum, Vertical-Velocity and the thermo diag level
-    self->table_nj = self->nl_m + self->nl_w + 1 + skip;
-    self->table_nk = 1;
-    table_size = self->table_ni * self->table_nj * self->table_nk;
-    self->table = (double*)malloc ( table_size * sizeof(double) );
-    if(! self->table ) {
+    this->table_nj = this->nl_m + this->nl_w + 1 + skip;
+    this->table_nk = 1;
+    table_size = this->table_ni * this->table_nj * this->table_nk;
+    this->table = (double*)malloc ( table_size * sizeof(double) );
+    if(! this->table ) {
       printf("(Cvgd) ERROR in c_encode_vert_21002, cannot allocate table of bouble of size %d\n", table_size);
       return(VGD_ERROR);
     }
-    strcpy(self->ref_name,"ME  ");
-     strcpy(self->ref_namel,"MELS");
-    if ( fabs( self->rcoef3 - self->rcoef1 ) < 1.0e-6 && fabs( self->rcoef4 - self->rcoef2 ) < 1.0e-6) {
-      strcpy(self->ref_namel,VGD_NO_REF_NOMVAR);
+    strcpy(this->ref_name,"ME  ");
+     strcpy(this->ref_namel,"MELS");
+    if ( fabs( this->rcoef3 - this->rcoef1 ) < 1.0e-6 && fabs( this->rcoef4 - this->rcoef2 ) < 1.0e-6) {
+      strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
     }
-    if ( self->rcoef3 < 0. || self->rcoef4 < 0. ) {
-      strcpy(self->ref_namel,VGD_NO_REF_NOMVAR);
+    if ( this->rcoef3 < 0. || this->rcoef4 < 0. ) {
+      strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
     }
   }
 
   //Fill header
-  self->table[0] = self->kind;
-  self->table[1] = self->version;
-  self->table[2] = skip;
-  self->table[3] = self->rcoef1;  
-  self->table[4] = self->rcoef2;
-  self->table[5] = self->rcoef3;  
-  self->table[6] = self->rcoef4;
-  flip_transfer_c2d(self->ref_name, &(self->table[7]));
-  flip_transfer_c2d(self->ref_namel, &(self->table[8]));
-  self->table[9] = 0.; 
-  self->table[10]= 0.; 
-  self->table[11]= 0.; 
+  this->table[0] = this->kind;
+  this->table[1] = this->version;
+  this->table[2] = skip;
+  this->table[3] = this->rcoef1;  
+  this->table[4] = this->rcoef2;
+  this->table[5] = this->rcoef3;  
+  this->table[6] = this->rcoef4;
+  flip_transfer_c2d(this->ref_name, &(this->table[7]));
+  flip_transfer_c2d(this->ref_namel, &(this->table[8]));
+  this->table[9] = 0.; 
+  this->table[10]= 0.; 
+  this->table[11]= 0.; 
 
   int k, ind = 12;
-  for ( k = 0; k < self->nl_m; k++){
-    self->table[ind  ] = self->ip1_m[k];
-    self->table[ind+1] = self->a_m_8[k];
-    self->table[ind+2] = self->b_m_8[k];
-    self->table[ind+3] = self->c_m_8[k];
+  for ( k = 0; k < this->nl_m; k++){
+    this->table[ind  ] = this->ip1_m[k];
+    this->table[ind+1] = this->a_m_8[k];
+    this->table[ind+2] = this->b_m_8[k];
+    this->table[ind+3] = this->c_m_8[k];
     ind = ind + 4;
   }
-  for ( k = 0; k < self->nl_w; k++){
-    self->table[ind  ] = self->ip1_w[k];
-    self->table[ind+1] = self->a_w_8[k];
-    self->table[ind+2] = self->b_w_8[k];
-    self->table[ind+3] = self->c_w_8[k];
+  for ( k = 0; k < this->nl_w; k++){
+    this->table[ind  ] = this->ip1_w[k];
+    this->table[ind+1] = this->a_w_8[k];
+    this->table[ind+2] = this->b_w_8[k];
+    this->table[ind+3] = this->c_w_8[k];
     ind = ind + 4;
   }
   // Thermo diag level
-  self->table[ind  ] = self->ip1_t[self->nl_t-1];
-  self->table[ind+1] = self->a_t_8[self->nl_t-1];
-  self->table[ind+2] = self->b_t_8[self->nl_t-1];
-  self->table[ind+3] = self->c_t_8[self->nl_t-1];
+  this->table[ind  ] = this->ip1_t[this->nl_t-1];
+  this->table[ind+1] = this->a_t_8[this->nl_t-1];
+  this->table[ind+2] = this->b_t_8[this->nl_t-1];
+  this->table[ind+3] = this->c_t_8[this->nl_t-1];
   
-  self->valid = 1;
+  this->valid = 1;
 
   return(VGD_OK);
 }
 int vgrid::c_decode_vert_0001(vgrid_descriptor *self) {
   int skip, nk, k, ind;
-  self->kind    = (int) self->table[0];
-  self->version = (int) self->table[1];
-  skip             = (int) self->table[2];
+  this->kind    = (int) this->table[0];
+  this->version = (int) this->table[1];
+  skip             = (int) this->table[2];
   ind = 3;
   
-  nk = (self->table_nj - skip)/2;
+  nk = (this->table_nj - skip)/2;
   // Free A, B and Ip1 vectors for momentum and thermo.
   this->c_vgd_free_abci(self);
   // Allocate and assign level data, there are nk of them
-  self->nl_m = nk;
-  self->nl_t = nk;
-  self->nl_w = nk;
-  self->ip1_m = (int*)malloc( nk * sizeof(int) );
-  self->a_m_8 = (double*)malloc( nk * sizeof(double) );
-  self->b_m_8 = (double*)malloc( nk * sizeof(double) );
-  if( !self->ip1_m || !self->a_m_8 || !self->b_m_8 ){
+  this->nl_m = nk;
+  this->nl_t = nk;
+  this->nl_w = nk;
+  this->ip1_m = (int*)malloc( nk * sizeof(int) );
+  this->a_m_8 = (double*)malloc( nk * sizeof(double) );
+  this->b_m_8 = (double*)malloc( nk * sizeof(double) );
+  if( !this->ip1_m || !this->a_m_8 || !this->b_m_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_0001, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nk);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nk; k++){      
-    self->ip1_m[k] = (int) self->table[ind  ];
-    self->a_m_8[k] =       self->table[ind+1];
-    self->b_m_8[k] =       self->table[ind+2];
+    this->ip1_m[k] = (int) this->table[ind  ];
+    this->a_m_8[k] =       this->table[ind+1];
+    this->b_m_8[k] =       this->table[ind+2];
     ind = ind + 3;
   }
-  self->ip1_t = (int*)malloc( nk * sizeof(int) );
-  self->a_t_8 = (double*)malloc( nk * sizeof(double) );
-  self->b_t_8 = (double*)malloc( nk * sizeof(double) );
-  if( !self->ip1_t || !self->a_t_8 || !self->b_t_8 ){
+  this->ip1_t = (int*)malloc( nk * sizeof(int) );
+  this->a_t_8 = (double*)malloc( nk * sizeof(double) );
+  this->b_t_8 = (double*)malloc( nk * sizeof(double) );
+  if( !this->ip1_t || !this->a_t_8 || !this->b_t_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_0001, cannot allocate,  ip1_t, a_t_8 and b_t_8 of size %d\n", nk);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nk; k++){      
-    self->ip1_t[k] = (int) self->table[ind  ];
-    self->a_t_8[k] =       self->table[ind+1];
-    self->b_t_8[k] =       self->table[ind+2];
+    this->ip1_t[k] = (int) this->table[ind  ];
+    this->a_t_8[k] =       this->table[ind+1];
+    this->b_t_8[k] =       this->table[ind+2];
     ind = ind + 3;
   }
-  self->ip1_w = self->ip1_m;
-  self->a_w_8 = self->a_m_8;
-  self->b_w_8 = self->b_m_8;
-  self->valid = 1;
+  this->ip1_w = this->ip1_m;
+  this->a_w_8 = this->a_m_8;
+  this->b_w_8 = this->b_m_8;
+  this->valid = 1;
   return(VGD_OK);
 }
 int vgrid::c_decode_vert_1001(vgrid_descriptor *self) {
   int skip, nk, k, ind;
-  self->kind    = (int) self->table[0];
-  self->version = (int) self->table[1];
-  skip             = (int) self->table[2];
-  flip_transfer_d2c(self->ref_name,self->table[3]);
+  this->kind    = (int) this->table[0];
+  this->version = (int) this->table[1];
+  skip             = (int) this->table[2];
+  flip_transfer_d2c(this->ref_name,this->table[3]);
   // The next two values in table are not used, so we continue with ind = 6
   ind = 6;
   
-  nk = self->table_nj - skip;
+  nk = this->table_nj - skip;
   // Free A, B and Ip1 vectors for momentum and thermo.
   this->c_vgd_free_abci(self);
   // Allocate and assign level data, there are nk of them
-  self->nl_m = nk;
-  self->nl_t = nk;
-  self->nl_w = nk;
-  self->ip1_m = (int*)malloc( nk * sizeof(int) );
-  self->a_m_8 = (double*)malloc( nk * sizeof(double) );
-  self->b_m_8 = (double*)malloc( nk * sizeof(double) );
-  if( !self->ip1_m || !self->a_m_8 || !self->b_m_8 ){
+  this->nl_m = nk;
+  this->nl_t = nk;
+  this->nl_w = nk;
+  this->ip1_m = (int*)malloc( nk * sizeof(int) );
+  this->a_m_8 = (double*)malloc( nk * sizeof(double) );
+  this->b_m_8 = (double*)malloc( nk * sizeof(double) );
+  if( !this->ip1_m || !this->a_m_8 || !this->b_m_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_1001, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nk);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nk; k++){      
-    self->ip1_m[k] = (int) self->table[ind  ];
-    self->a_m_8[k] =       self->table[ind+1];
-    self->b_m_8[k] =       self->table[ind+2];
+    this->ip1_m[k] = (int) this->table[ind  ];
+    this->a_m_8[k] =       this->table[ind+1];
+    this->b_m_8[k] =       this->table[ind+2];
     ind = ind + 3;
   }  
-  self->ip1_t = self->ip1_m;
-  self->a_t_8 = self->a_m_8;
-  self->b_t_8 = self->b_m_8;
-  self->ip1_w = self->ip1_m;
-  self->a_w_8 = self->a_m_8;
-  self->b_w_8 = self->b_m_8;
-  self->valid = 1;
+  this->ip1_t = this->ip1_m;
+  this->a_t_8 = this->a_m_8;
+  this->b_t_8 = this->b_m_8;
+  this->ip1_w = this->ip1_m;
+  this->a_w_8 = this->a_m_8;
+  this->b_w_8 = this->b_m_8;
+  this->valid = 1;
   return(VGD_OK);
 }
 
 int vgrid::c_decode_vert_1002(vgrid_descriptor *self) {
   int skip, nk, k, ind;
-  self->kind    = (int) self->table[0];
-  self->version = (int) self->table[1];
-  skip             = (int) self->table[2];
-  self->ptop_8  = self->table[3];
-  flip_transfer_d2c(self->ref_name,self->table[4]);
+  this->kind    = (int) this->table[0];
+  this->version = (int) this->table[1];
+  skip             = (int) this->table[2];
+  this->ptop_8  = this->table[3];
+  flip_transfer_d2c(this->ref_name,this->table[4]);
   // The next value in table is not used, so we continue with ind = 6
   ind = 6;
-  nk = self->table_nj - skip;
+  nk = this->table_nj - skip;
   
   // Free A, B and Ip1 vectors for momentum and thermo.
   this->c_vgd_free_abci(self);
   // Allocate and assign level data, there are nk of them
-  self->nl_m = nk;
-  self->nl_t = nk;
-  self->nl_w = nk;
-  self->ip1_m = (int*)malloc( nk * sizeof(int) );
-  self->a_m_8 = (double*)malloc( nk * sizeof(double) );
-  self->b_m_8 = (double*)malloc( nk * sizeof(double) );
-  if( !self->ip1_m || !self->a_m_8 || !self->b_m_8 ){
+  this->nl_m = nk;
+  this->nl_t = nk;
+  this->nl_w = nk;
+  this->ip1_m = (int*)malloc( nk * sizeof(int) );
+  this->a_m_8 = (double*)malloc( nk * sizeof(double) );
+  this->b_m_8 = (double*)malloc( nk * sizeof(double) );
+  if( !this->ip1_m || !this->a_m_8 || !this->b_m_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_1002, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nk);
     return(VGD_ERROR);
   }
    for ( k = 0; k < nk; k++){      
-    self->ip1_m[k] = (int) self->table[ind  ];
-    self->a_m_8[k] =       self->table[ind+1];
-    self->b_m_8[k] =       self->table[ind+2];
+    this->ip1_m[k] = (int) this->table[ind  ];
+    this->a_m_8[k] =       this->table[ind+1];
+    this->b_m_8[k] =       this->table[ind+2];
     ind = ind + 3;
   }
-  self->ip1_t = self->ip1_m;
-  self->a_t_8 = self->a_m_8;
-  self->b_t_8 = self->b_m_8;
-  self->ip1_w = self->ip1_m;
-  self->a_w_8 = self->a_m_8;
-  self->b_w_8 = self->b_m_8;
-  self->valid = 1;
+  this->ip1_t = this->ip1_m;
+  this->a_t_8 = this->a_m_8;
+  this->b_t_8 = this->b_m_8;
+  this->ip1_w = this->ip1_m;
+  this->a_w_8 = this->a_m_8;
+  this->b_w_8 = this->b_m_8;
+  this->valid = 1;
   return(VGD_OK);
 }
 
 int vgrid::c_decode_vert_2001(vgrid_descriptor *self) {
   int skip, nk, k, ind;
-  self->kind    = (int) self->table[0];
-  self->version = (int) self->table[1];
-  skip             = (int) self->table[2];
+  this->kind    = (int) this->table[0];
+  this->version = (int) this->table[1];
+  skip             = (int) this->table[2];
   ind = 3;
 
-  nk = self->table_nj - skip;
+  nk = this->table_nj - skip;
 
   // Free A, B and Ip1 vectors for momentum and thermo.
   this->c_vgd_free_abci(self);
   // Allocate and assign level data, there are nk of them
-  self->nl_m = nk;
-  self->nl_t = nk;
-  self->nl_w = nk;
-  self->ip1_m = (int*)malloc( nk * sizeof(int) );
-  self->a_m_8 = (double*)malloc( nk * sizeof(double) );
-  self->b_m_8 = (double*)malloc( nk * sizeof(double) );
-  if( !self->ip1_m || !self->a_m_8 || !self->b_m_8 ){
+  this->nl_m = nk;
+  this->nl_t = nk;
+  this->nl_w = nk;
+  this->ip1_m = (int*)malloc( nk * sizeof(int) );
+  this->a_m_8 = (double*)malloc( nk * sizeof(double) );
+  this->b_m_8 = (double*)malloc( nk * sizeof(double) );
+  if( !this->ip1_m || !this->a_m_8 || !this->b_m_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_2001, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nk);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nk; k++){      
-    self->ip1_m[k] = (int) self->table[ind  ];
-    self->a_m_8[k] =       self->table[ind+1];
-    self->b_m_8[k] =       self->table[ind+2];
+    this->ip1_m[k] = (int) this->table[ind  ];
+    this->a_m_8[k] =       this->table[ind+1];
+    this->b_m_8[k] =       this->table[ind+2];
     ind = ind + 3;
   }
-  self->ip1_t = self->ip1_m;
-  self->a_t_8 = self->a_m_8;
-  self->b_t_8 = self->b_m_8;
-  self->ip1_w = self->ip1_m;
-  self->a_w_8 = self->a_m_8;
-  self->b_w_8 = self->b_m_8;
-  self->valid = 1;
+  this->ip1_t = this->ip1_m;
+  this->a_t_8 = this->a_m_8;
+  this->b_t_8 = this->b_m_8;
+  this->ip1_w = this->ip1_m;
+  this->a_w_8 = this->a_m_8;
+  this->b_w_8 = this->b_m_8;
+  this->valid = 1;
   return(VGD_OK);
 }
 
 int vgrid::c_decode_vert_4001(vgrid_descriptor *self) {
   int skip, nk, k, ind;
-  self->kind    = (int) self->table[0];
-  self->version = (int) self->table[1];
-  skip             = (int) self->table[2];
+  this->kind    = (int) this->table[0];
+  this->version = (int) this->table[1];
+  skip             = (int) this->table[2];
   ind = 3;
 
-  nk = self->table_nj - skip;
+  nk = this->table_nj - skip;
 
   // Free A, B and Ip1 vectors for momentum and thermo.
   this->c_vgd_free_abci(self);
   // Allocate and assign level data, there are nk of them
-  self->nl_m = nk;
-  self->nl_t = nk;
-  self->nl_w = nk;
-  self->ip1_m = (int*)malloc( nk * sizeof(int) );
-  self->a_m_8 = (double*)malloc( nk * sizeof(double) );
-  self->b_m_8 = (double*)malloc( nk * sizeof(double) );
-  if( !self->ip1_m || !self->a_m_8 || !self->b_m_8 ){
+  this->nl_m = nk;
+  this->nl_t = nk;
+  this->nl_w = nk;
+  this->ip1_m = (int*)malloc( nk * sizeof(int) );
+  this->a_m_8 = (double*)malloc( nk * sizeof(double) );
+  this->b_m_8 = (double*)malloc( nk * sizeof(double) );
+  if( !this->ip1_m || !this->a_m_8 || !this->b_m_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_4001, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nk);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nk; k++){      
-    self->ip1_m[k] = (int) self->table[ind  ];
-    self->a_m_8[k] =       self->table[ind+1];
-    self->b_m_8[k] =       self->table[ind+2];
+    this->ip1_m[k] = (int) this->table[ind  ];
+    this->a_m_8[k] =       this->table[ind+1];
+    this->b_m_8[k] =       this->table[ind+2];
     ind = ind + 3;
   }
-  self->ip1_t = self->ip1_m;
-  self->a_t_8 = self->a_m_8;
-  self->b_t_8 = self->b_m_8;
-  self->ip1_w = self->ip1_m;
-  self->a_w_8 = self->a_m_8;
-  self->b_w_8 = self->b_m_8;
-  self->valid = 1;
+  this->ip1_t = this->ip1_m;
+  this->a_t_8 = this->a_m_8;
+  this->b_t_8 = this->b_m_8;
+  this->ip1_w = this->ip1_m;
+  this->a_w_8 = this->a_m_8;
+  this->b_w_8 = this->b_m_8;
+  this->valid = 1;
   return(VGD_OK);
 }
 
 int vgrid::c_decode_vert_1003_5001(vgrid_descriptor *self) {
   int skip, k, ind, nk;
   
-  self->kind    = (int) self->table[0];
-  self->version = (int) self->table[1];
-  skip             = (int) self->table[2];
-  self->ptop_8  = self->table[3];
-  self->pref_8  = self->table[4];
-  self->rcoef1  = (float) self->table[5];
-  flip_transfer_d2c(self->ref_name,self->table[6]);
+  this->kind    = (int) this->table[0];
+  this->version = (int) this->table[1];
+  skip             = (int) this->table[2];
+  this->ptop_8  = this->table[3];
+  this->pref_8  = this->table[4];
+  this->rcoef1  = (float) this->table[5];
+  flip_transfer_d2c(this->ref_name,this->table[6]);
   // The next two values in table are not used, so we continue with ind = 9
   ind = 9;
-  nk = self->table_nj - skip;
+  nk = this->table_nj - skip;
 
   // Free A, B and Ip1 vectors for momentum and thermo.
   this->c_vgd_free_abci(self);
 
   // Allocate and assign momentum level data, there are nk of them
-  self->nl_m = nk;
-  self->nl_t = nk;
-  self->nl_w = nk;
-  self->ip1_m = (int*)malloc( nk * sizeof(int) );
-  self->a_m_8 = (double*)malloc( nk * sizeof(double) );
-  self->b_m_8 = (double*)malloc( nk * sizeof(double) );
-  if( !self->ip1_m || !self->a_m_8 || !self->b_m_8 ){
+  this->nl_m = nk;
+  this->nl_t = nk;
+  this->nl_w = nk;
+  this->ip1_m = (int*)malloc( nk * sizeof(int) );
+  this->a_m_8 = (double*)malloc( nk * sizeof(double) );
+  this->b_m_8 = (double*)malloc( nk * sizeof(double) );
+  if( !this->ip1_m || !this->a_m_8 || !this->b_m_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_1003_5001, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nk);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nk; k++){    
-    self->ip1_m[k] = (int) self->table[ind  ];
-    self->a_m_8[k] =       self->table[ind+1];
-    self->b_m_8[k] =       self->table[ind+2];
+    this->ip1_m[k] = (int) this->table[ind  ];
+    this->a_m_8[k] =       this->table[ind+1];
+    this->b_m_8[k] =       this->table[ind+2];
     ind = ind + 3;
   }
-  self->ip1_t = self->ip1_m;
-  self->a_t_8 = self->a_m_8;
-  self->b_t_8 = self->b_m_8;
-  self->ip1_w = self->ip1_m;
-  self->a_w_8 = self->a_m_8;
-  self->b_w_8 = self->b_m_8;
-  self->valid = 1;
+  this->ip1_t = this->ip1_m;
+  this->a_t_8 = this->a_m_8;
+  this->b_t_8 = this->b_m_8;
+  this->ip1_w = this->ip1_m;
+  this->a_w_8 = this->a_m_8;
+  this->b_w_8 = this->b_m_8;
+  this->valid = 1;
   
   return(VGD_OK);
 }
@@ -4180,72 +4202,72 @@ int vgrid::c_decode_vert_1003_5001(vgrid_descriptor *self) {
 int vgrid::c_decode_vert_5100(vgrid_descriptor *self) {
   int skip, k, ind, nb, kind;
 
-  self->kind    = (int) self->table[0];
-  self->version = (int) self->table[1];
-  skip             = (int) self->table[2];
-  self->ptop_8  = self->table[3];
-  self->pref_8  = self->table[4];
-  self->rcoef1  = (float) self->table[5];
-  self->rcoef2  = (float) self->table[6];
-  self->rcoef3  = (float) self->table[7];
-  self->rcoef4  = (float) self->table[8];
-  flip_transfer_d2c(self->ref_name ,self->table[9]);
-  flip_transfer_d2c(self->ref_namel,self->table[10]);
+  this->kind    = (int) this->table[0];
+  this->version = (int) this->table[1];
+  skip             = (int) this->table[2];
+  this->ptop_8  = this->table[3];
+  this->pref_8  = this->table[4];
+  this->rcoef1  = (float) this->table[5];
+  this->rcoef2  = (float) this->table[6];
+  this->rcoef3  = (float) this->table[7];
+  this->rcoef4  = (float) this->table[8];
+  flip_transfer_d2c(this->ref_name ,this->table[9]);
+  flip_transfer_d2c(this->ref_namel,this->table[10]);
 
-  if( this->Cvgd_set_vcode_i(self, self->kind, self->version) == VGD_ERROR ) {
+  if( this->Cvgd_set_vcode_i(self, this->kind, this->version) == VGD_ERROR ) {
     printf("(Cvgd) ERROR in c_decode_vert_5100, cannot set vcode\n");
     return(VGD_ERROR);
   }
 
   // The next value in table is not used, so we continue with ind = 12
   ind = 12;
-  nb = ( self->table_nj - skip ) / 2;
+  nb = ( this->table_nj - skip ) / 2;
 
   // Free A, B, C and Ip1 vectors for momentum and thermo.
   this->c_vgd_free_abci(self);
 
   // Allocate and assign momentum level data, there are nb of them nk + hyb=1 and possibly the diag in m
-  self->nl_m = nb;
-  self->ip1_m = (int*)malloc( nb * sizeof(int) );
-  self->a_m_8 = (double*)malloc( nb * sizeof(double) );
-  self->b_m_8 = (double*)malloc( nb * sizeof(double) );
-  self->c_m_8 = (double*)malloc( nb * sizeof(double) );
-  if( !self->ip1_m || !self->a_m_8 || !self->b_m_8 || !self->c_m_8){
+  this->nl_m = nb;
+  this->ip1_m = (int*)malloc( nb * sizeof(int) );
+  this->a_m_8 = (double*)malloc( nb * sizeof(double) );
+  this->b_m_8 = (double*)malloc( nb * sizeof(double) );
+  this->c_m_8 = (double*)malloc( nb * sizeof(double) );
+  if( !this->ip1_m || !this->a_m_8 || !this->b_m_8 || !this->c_m_8){
     printf("(Cvgd) ERROR in c_decode_vert_5100, cannot allocate,  ip1_m, a_m_8, b_m_8 and c_m_8 of size %d\n", nb);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nb; k++){
-    self->ip1_m[k] = (int) self->table[ind  ];
-    self->a_m_8[k] =       self->table[ind+1];
-    self->b_m_8[k] =       self->table[ind+2];
-    self->c_m_8[k] =       self->table[ind+3];
+    this->ip1_m[k] = (int) this->table[ind  ];
+    this->a_m_8[k] =       this->table[ind+1];
+    this->b_m_8[k] =       this->table[ind+2];
+    this->c_m_8[k] =       this->table[ind+3];
     ind = ind + 4;
   }
-  self->dhm = c_convip_IP2Level( self->ip1_m[nb-1], &kind );
+  this->dhm = c_convip_IP2Level( this->ip1_m[nb-1], &kind );
 
   // Allocate and assign thermodynamic level data
-  self->nl_t = nb;
-  self->nl_w = nb;
-  self->ip1_t = (int*)malloc( nb * sizeof(int) );
-  self->a_t_8 = (double*)malloc( nb * sizeof(double) );
-  self->b_t_8 = (double*)malloc( nb * sizeof(double) );
-  self->c_t_8 = (double*)malloc( nb * sizeof(double) );
-  if( !self->ip1_t || !self->a_t_8 || !self->b_t_8 || !self->c_t_8 ){
+  this->nl_t = nb;
+  this->nl_w = nb;
+  this->ip1_t = (int*)malloc( nb * sizeof(int) );
+  this->a_t_8 = (double*)malloc( nb * sizeof(double) );
+  this->b_t_8 = (double*)malloc( nb * sizeof(double) );
+  this->c_t_8 = (double*)malloc( nb * sizeof(double) );
+  if( !this->ip1_t || !this->a_t_8 || !this->b_t_8 || !this->c_t_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_5100, cannot allocate,  ip1_t, a_t_8, b_t_8 and c_t_8 of size %d\n", nb);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nb; k++){
-    self->ip1_t[k] = (int) self->table[ind  ];
-    self->a_t_8[k] =       self->table[ind+1];
-    self->b_t_8[k] =       self->table[ind+2];
-    self->c_t_8[k] =       self->table[ind+3];
+    this->ip1_t[k] = (int) this->table[ind  ];
+    this->a_t_8[k] =       this->table[ind+1];
+    this->b_t_8[k] =       this->table[ind+2];
+    this->c_t_8[k] =       this->table[ind+3];
     ind = ind + 4;
   }
-  self->dht= c_convip_IP2Level( self->ip1_t[nb-1], &kind );
-  self->ip1_w = self->ip1_t;
-  self->a_w_8 = self->a_t_8;
-  self->b_w_8 = self->b_t_8;
-  self->valid = 1;
+  this->dht= c_convip_IP2Level( this->ip1_t[nb-1], &kind );
+  this->ip1_w = this->ip1_t;
+  this->a_w_8 = this->a_t_8;
+  this->b_w_8 = this->b_t_8;
+  this->valid = 1;
 
   return(VGD_OK);  
 
@@ -4254,19 +4276,19 @@ int vgrid::c_decode_vert_5002_5003_5004_5005(vgrid_descriptor *self) {
   int skip, k, ind, k_plus_top, k_plus_diag, nk, nb, kind;
   
   k_plus_top = 1;
-  self->kind    = (int) self->table[0];
-  self->version = (int) self->table[1];
-  skip             = (int) self->table[2];
-  self->ptop_8  = self->table[3];
-  self->pref_8  = self->table[4];
-  self->rcoef1  = (float) self->table[5];
-  self->rcoef2  = (float) self->table[6];
-  flip_transfer_d2c(self->ref_name,self->table[7]);
-  if( this->Cvgd_set_vcode_i(self, self->kind, self->version) == VGD_ERROR ) {
+  this->kind    = (int) this->table[0];
+  this->version = (int) this->table[1];
+  skip             = (int) this->table[2];
+  this->ptop_8  = this->table[3];
+  this->pref_8  = this->table[4];
+  this->rcoef1  = (float) this->table[5];
+  this->rcoef2  = (float) this->table[6];
+  flip_transfer_d2c(this->ref_name,this->table[7]);
+  if( this->Cvgd_set_vcode_i(self, this->kind, this->version) == VGD_ERROR ) {
     printf("(Cvgd) ERROR in c_decode_vert_5002_5003_5004_5005, cannot set vcode\n");
     return(VGD_ERROR);
   }
-  switch(self->vcode) {
+  switch(this->vcode) {
   case 5002:
   case 5003:
     k_plus_top=1;
@@ -4276,7 +4298,7 @@ int vgrid::c_decode_vert_5002_5003_5004_5005(vgrid_descriptor *self) {
     k_plus_top=0;
     break;
   default:
-    printf("(Cvgd) ERROR in c_decode_vert_5002_5003_5004_5005, Vcode %d not supported\n", self->vcode);
+    printf("(Cvgd) ERROR in c_decode_vert_5002_5003_5004_5005, Vcode %d not supported\n", this->vcode);
     return(VGD_ERROR);
   }
 
@@ -4288,51 +4310,51 @@ int vgrid::c_decode_vert_5002_5003_5004_5005(vgrid_descriptor *self) {
   // The next value in table is not used, so we continue with ind = 9
   ind = 9;
   // nk is the number of momentum level without hyb=1.0 and the diag level in m
-  nk = ( self->table_nj - k_plus_top - skip ) / 2 -1 -k_plus_diag;
+  nk = ( this->table_nj - k_plus_top - skip ) / 2 -1 -k_plus_diag;
 
   // Free A, B and Ip1 vectors for momentum and thermo.
   this->c_vgd_free_abci(self);
 
   // Allocate and assign momentum level data, there are nb of them nk + hyb=1 and possibly the diag in m
   nb = nk + 1 + k_plus_diag;
-  self->nl_m = nb;
-  self->ip1_m = (int*)malloc( nb * sizeof(int) );
-  self->a_m_8 = (double*)malloc( nb * sizeof(double) );
-  self->b_m_8 = (double*)malloc( nb * sizeof(double) );
-  if( !self->ip1_m || !self->a_m_8 || !self->b_m_8 ){
+  this->nl_m = nb;
+  this->ip1_m = (int*)malloc( nb * sizeof(int) );
+  this->a_m_8 = (double*)malloc( nb * sizeof(double) );
+  this->b_m_8 = (double*)malloc( nb * sizeof(double) );
+  if( !this->ip1_m || !this->a_m_8 || !this->b_m_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_5002_5003_5004_5005, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nb);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nb; k++){
-    self->ip1_m[k] = (int) self->table[ind  ];
-    self->a_m_8[k] =       self->table[ind+1];
-    self->b_m_8[k] =       self->table[ind+2];
+    this->ip1_m[k] = (int) this->table[ind  ];
+    this->a_m_8[k] =       this->table[ind+1];
+    this->b_m_8[k] =       this->table[ind+2];
     ind = ind + 3;
   }
-  if(this->is_valid(self,dhm_valid)) self->dhm = c_convip_IP2Level( self->ip1_m[nb-1], &kind );
+  if(this->is_valid(self,dhm_valid)) this->dhm = c_convip_IP2Level( this->ip1_m[nb-1], &kind );
 
   // Allocate and assign thermodynamic level data
   nb = nb + k_plus_top;
-  self->nl_t = nb;
-  self->nl_w = nb;
-  self->ip1_t = (int*)malloc( nb * sizeof(int) );
-  self->a_t_8 = (double*)malloc( nb * sizeof(double) );
-  self->b_t_8 = (double*)malloc( nb * sizeof(double) );
-  if( !self->ip1_t || !self->a_t_8 || !self->b_t_8 ){
+  this->nl_t = nb;
+  this->nl_w = nb;
+  this->ip1_t = (int*)malloc( nb * sizeof(int) );
+  this->a_t_8 = (double*)malloc( nb * sizeof(double) );
+  this->b_t_8 = (double*)malloc( nb * sizeof(double) );
+  if( !this->ip1_t || !this->a_t_8 || !this->b_t_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_5002_5003_5004_5005, cannot allocate,  ip1_t, a_t_8 and b_t_8 of size %d\n", nb);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nb; k++){
-    self->ip1_t[k] = (int) self->table[ind  ];
-    self->a_t_8[k] =       self->table[ind+1];
-    self->b_t_8[k] =       self->table[ind+2];
+    this->ip1_t[k] = (int) this->table[ind  ];
+    this->a_t_8[k] =       this->table[ind+1];
+    this->b_t_8[k] =       this->table[ind+2];
     ind = ind + 3;
   }
-  if(this->is_valid(self,dht_valid)) self->dht= c_convip_IP2Level( self->ip1_t[nb-1], &kind );
-  self->ip1_w = self->ip1_t;
-  self->a_w_8 = self->a_t_8;
-  self->b_w_8 = self->b_t_8;
-  self->valid = 1;
+  if(this->is_valid(self,dht_valid)) this->dht= c_convip_IP2Level( this->ip1_t[nb-1], &kind );
+  this->ip1_w = this->ip1_t;
+  this->a_w_8 = this->a_t_8;
+  this->b_w_8 = this->b_t_8;
+  this->valid = 1;
   return(VGD_OK);  
 
 }
@@ -4340,57 +4362,57 @@ int vgrid::c_decode_vert_5002_5003_5004_5005(vgrid_descriptor *self) {
 int vgrid::c_decode_vert_5999(vgrid_descriptor *self) {
   int skip, k, ind, nk;
   
-  self->kind    = (int) self->table[0];
-  self->version = (int) self->table[1];
-  skip             = (int) self->table[2];
-  flip_transfer_d2c(self->ref_name,self->table[3]);
+  this->kind    = (int) this->table[0];
+  this->version = (int) this->table[1];
+  skip             = (int) this->table[2];
+  flip_transfer_d2c(this->ref_name,this->table[3]);
 
   // The next two values in table are not used, so we continue with ind = 6
   ind = 6;
-  nk = self->table_nj - skip;
+  nk = this->table_nj - skip;
 
   // Free A, B and Ip1 vectors for momentum and thermo.
   this->c_vgd_free_abci(self);
 
   // Allocate and assign momentum level data, there are nk of them
-  self->nl_m = nk;
-  self->nl_t = nk;
-  self->nl_w = nk;
-  self->ip1_m = (int*)malloc( nk * sizeof(int) );
-  self->a_m_8 = (double*)malloc( nk * sizeof(double) );
-  self->b_m_8 = (double*)malloc( nk * sizeof(double) );
-  if( !self->ip1_m || !self->a_m_8 || !self->b_m_8 ){
+  this->nl_m = nk;
+  this->nl_t = nk;
+  this->nl_w = nk;
+  this->ip1_m = (int*)malloc( nk * sizeof(int) );
+  this->a_m_8 = (double*)malloc( nk * sizeof(double) );
+  this->b_m_8 = (double*)malloc( nk * sizeof(double) );
+  if( !this->ip1_m || !this->a_m_8 || !this->b_m_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_1003_5001, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nk);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nk; k++){    
-    self->ip1_m[k] = (int) self->table[ind  ];
-    self->a_m_8[k] =       self->table[ind+1];
-    self->b_m_8[k] =       self->table[ind+2];
+    this->ip1_m[k] = (int) this->table[ind  ];
+    this->a_m_8[k] =       this->table[ind+1];
+    this->b_m_8[k] =       this->table[ind+2];
     ind = ind + 3;
   }
-  self->ip1_t = self->ip1_m;
-  self->a_t_8 = self->a_m_8;
-  self->b_t_8 = self->b_m_8;
-  self->ip1_w = self->ip1_m;
-  self->a_w_8 = self->a_m_8;
-  self->b_w_8 = self->b_m_8;
+  this->ip1_t = this->ip1_m;
+  this->a_t_8 = this->a_m_8;
+  this->b_t_8 = this->b_m_8;
+  this->ip1_w = this->ip1_m;
+  this->a_w_8 = this->a_m_8;
+  this->b_w_8 = this->b_m_8;
   
   return(VGD_OK);
 }
 int vgrid::c_decode_vert_21001(vgrid_descriptor *self) {
   int skip, k, ind, nb, kind;
   
-  self->kind    = (int) self->table[0];
-  self->version = (int) self->table[1];
-  skip             = (int) self->table[2];
-  self->rcoef1  = (float) self->table[3];
-  self->rcoef2  = (float) self->table[4];
-  self->rcoef3  = (float) self->table[5];
-  self->rcoef4  = (float) self->table[6];
-  flip_transfer_d2c(self->ref_name, self->table[7]);
-  flip_transfer_d2c(self->ref_namel,self->table[8]);
-  if( this->Cvgd_set_vcode_i(self, self->kind, self->version) == VGD_ERROR ) {
+  this->kind    = (int) this->table[0];
+  this->version = (int) this->table[1];
+  skip             = (int) this->table[2];
+  this->rcoef1  = (float) this->table[3];
+  this->rcoef2  = (float) this->table[4];
+  this->rcoef3  = (float) this->table[5];
+  this->rcoef4  = (float) this->table[6];
+  flip_transfer_d2c(this->ref_name, this->table[7]);
+  flip_transfer_d2c(this->ref_namel,this->table[8]);
+  if( this->Cvgd_set_vcode_i(self, this->kind, this->version) == VGD_ERROR ) {
     printf("(Cvgd) ERROR in c_decode_vert_21001, cannot set vcode\n");
     return(VGD_ERROR);
   }
@@ -4398,49 +4420,49 @@ int vgrid::c_decode_vert_21001(vgrid_descriptor *self) {
   this->c_vgd_free_abci(self);
 
   // nb is the number of momentum level with hyb=1.0 and the diag level
-  nb = ( self->table_nj - skip ) / 2;
-  self->nl_m = nb;
-  self->ip1_m = (int*)malloc( nb * sizeof(int) );
-  self->a_m_8 = (double*)malloc( nb * sizeof(double) );
-  self->b_m_8 = (double*)malloc( nb * sizeof(double) );
-  self->c_m_8 = (double*)malloc( nb * sizeof(double) );
-  if( !self->ip1_m || !self->a_m_8 || !self->b_m_8 || !self->c_m_8 ){
+  nb = ( this->table_nj - skip ) / 2;
+  this->nl_m = nb;
+  this->ip1_m = (int*)malloc( nb * sizeof(int) );
+  this->a_m_8 = (double*)malloc( nb * sizeof(double) );
+  this->b_m_8 = (double*)malloc( nb * sizeof(double) );
+  this->c_m_8 = (double*)malloc( nb * sizeof(double) );
+  if( !this->ip1_m || !this->a_m_8 || !this->b_m_8 || !this->c_m_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_21001, cannot allocate,  ip1_m, a_m_8, b_m_8 and c_m_8 of size %d\n", nb);
     return(VGD_ERROR);
   }
   ind = 12;
   for ( k = 0; k < nb; k++){
-    self->ip1_m[k] = (int) self->table[ind  ];
-    self->a_m_8[k] =       self->table[ind+1];
-    self->b_m_8[k] =       self->table[ind+2];
-    self->c_m_8[k] =       self->table[ind+3];
+    this->ip1_m[k] = (int) this->table[ind  ];
+    this->a_m_8[k] =       this->table[ind+1];
+    this->b_m_8[k] =       this->table[ind+2];
+    this->c_m_8[k] =       this->table[ind+3];
     ind = ind + 4;
   }
-  self->dhm = c_convip_IP2Level( self->ip1_m[nb-1], &kind );
+  this->dhm = c_convip_IP2Level( this->ip1_m[nb-1], &kind );
 
   // Allocate and assign thermodynamic level data
-  self->nl_t = nb;
-  self->nl_w = nb;
-  self->ip1_t = (int*)malloc( nb * sizeof(int) );
-  self->a_t_8 = (double*)malloc( nb * sizeof(double) );
-  self->b_t_8 = (double*)malloc( nb * sizeof(double) );
-  self->c_t_8 = (double*)malloc( nb * sizeof(double) );
-  if( !self->ip1_t || !self->a_t_8 || !self->b_t_8 || !self->c_t_8 ){
+  this->nl_t = nb;
+  this->nl_w = nb;
+  this->ip1_t = (int*)malloc( nb * sizeof(int) );
+  this->a_t_8 = (double*)malloc( nb * sizeof(double) );
+  this->b_t_8 = (double*)malloc( nb * sizeof(double) );
+  this->c_t_8 = (double*)malloc( nb * sizeof(double) );
+  if( !this->ip1_t || !this->a_t_8 || !this->b_t_8 || !this->c_t_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_2101, cannot allocate,  ip1_t, a_t_8, b_t_8 and c_t_8 of size %d\n", nb);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nb; k++){
-    self->ip1_t[k] = (int) self->table[ind  ];
-    self->a_t_8[k] =       self->table[ind+1];
-    self->b_t_8[k] =       self->table[ind+2];
-    self->c_t_8[k] =       self->table[ind+3];
+    this->ip1_t[k] = (int) this->table[ind  ];
+    this->a_t_8[k] =       this->table[ind+1];
+    this->b_t_8[k] =       this->table[ind+2];
+    this->c_t_8[k] =       this->table[ind+3];
     ind = ind + 4;
   }
-  self->dht= c_convip_IP2Level( self->ip1_t[nb-1], &kind );
-  self->valid = 1;
-  self->ip1_w = self->ip1_t;
-  self->a_w_8 = self->a_t_8;
-  self->b_w_8 = self->b_t_8;
+  this->dht= c_convip_IP2Level( this->ip1_t[nb-1], &kind );
+  this->valid = 1;
+  this->ip1_w = this->ip1_t;
+  this->a_w_8 = this->a_t_8;
+  this->b_w_8 = this->b_t_8;
   return(VGD_OK);  
 
 }
@@ -4448,16 +4470,16 @@ int vgrid::c_decode_vert_21001(vgrid_descriptor *self) {
 int vgrid::c_decode_vert_21002(vgrid_descriptor *self) {
   int skip, k, ind, nb, kind;
   
-  self->kind    = (int) self->table[0];
-  self->version = (int) self->table[1];
-  skip             = (int) self->table[2];
-  self->rcoef1  = (float) self->table[3];
-  self->rcoef2  = (float) self->table[4];
-  self->rcoef3  = (float) self->table[5];
-  self->rcoef4  = (float) self->table[6];
-  flip_transfer_d2c(self->ref_name,self->table[7]);
-  flip_transfer_d2c(self->ref_namel,self->table[8]);
-  if( this->Cvgd_set_vcode_i(self, self->kind, self->version) == VGD_ERROR ) {
+  this->kind    = (int) this->table[0];
+  this->version = (int) this->table[1];
+  skip             = (int) this->table[2];
+  this->rcoef1  = (float) this->table[3];
+  this->rcoef2  = (float) this->table[4];
+  this->rcoef3  = (float) this->table[5];
+  this->rcoef4  = (float) this->table[6];
+  flip_transfer_d2c(this->ref_name,this->table[7]);
+  flip_transfer_d2c(this->ref_namel,this->table[8]);
+  if( this->Cvgd_set_vcode_i(self, this->kind, this->version) == VGD_ERROR ) {
     printf("(Cvgd) ERROR in c_decode_vert_21002, cannot set vcode\n");
     return(VGD_ERROR);
   }
@@ -4465,70 +4487,70 @@ int vgrid::c_decode_vert_21002(vgrid_descriptor *self) {
   this->c_vgd_free_abci(self);
 
   // nb is the number of momentum level with hyb=1.0 and the diag level
-  nb = ( self->table_nj - skip - 1 ) / 2;
+  nb = ( this->table_nj - skip - 1 ) / 2;
   // Allocate and assign momentum arrays
-  self->nl_m = nb;
-  self->ip1_m = (int*)malloc( nb * sizeof(int) );
-  self->a_m_8 = (double*)malloc( nb * sizeof(double) );
-  self->b_m_8 = (double*)malloc( nb * sizeof(double) );
-  self->c_m_8 = (double*)malloc( nb * sizeof(double) );
-  if( !self->ip1_m || !self->a_m_8 || !self->b_m_8 || !self->c_m_8 ){
+  this->nl_m = nb;
+  this->ip1_m = (int*)malloc( nb * sizeof(int) );
+  this->a_m_8 = (double*)malloc( nb * sizeof(double) );
+  this->b_m_8 = (double*)malloc( nb * sizeof(double) );
+  this->c_m_8 = (double*)malloc( nb * sizeof(double) );
+  if( !this->ip1_m || !this->a_m_8 || !this->b_m_8 || !this->c_m_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_21002, cannot allocate,  ip1_m, a_m_8, b_m_8 and c_m_8 of size %d\n", nb);
     return(VGD_ERROR);
   }
   ind = 12;
   for ( k = 0; k < nb; k++){
-    self->ip1_m[k] = (int) self->table[ind  ];
-    self->a_m_8[k] =       self->table[ind+1];
-    self->b_m_8[k] =       self->table[ind+2];
-    self->c_m_8[k] =       self->table[ind+3];
+    this->ip1_m[k] = (int) this->table[ind  ];
+    this->a_m_8[k] =       this->table[ind+1];
+    this->b_m_8[k] =       this->table[ind+2];
+    this->c_m_8[k] =       this->table[ind+3];
     ind = ind + 4;
   }
-  self->dhm = c_convip_IP2Level( self->ip1_m[nb-1], &kind );
+  this->dhm = c_convip_IP2Level( this->ip1_m[nb-1], &kind );
 
   // Allocate and assign Vertical-Velocity arrays
-  self->nl_w = nb;
-  self->ip1_w = (int*)malloc( nb * sizeof(int) );
-  self->a_w_8 = (double*)malloc( nb * sizeof(double) );
-  self->b_w_8 = (double*)malloc( nb * sizeof(double) );
-  self->c_w_8 = (double*)malloc( nb * sizeof(double) );
-  if( !self->ip1_w || !self->a_w_8 || !self->b_w_8 || !self->c_w_8 ){
+  this->nl_w = nb;
+  this->ip1_w = (int*)malloc( nb * sizeof(int) );
+  this->a_w_8 = (double*)malloc( nb * sizeof(double) );
+  this->b_w_8 = (double*)malloc( nb * sizeof(double) );
+  this->c_w_8 = (double*)malloc( nb * sizeof(double) );
+  if( !this->ip1_w || !this->a_w_8 || !this->b_w_8 || !this->c_w_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_21002, cannot allocate,  ip1_w, a_w_8, b_w_8 and c_w_8 of size %d\n", nb);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nb; k++){
-    self->ip1_w[k] = (int) self->table[ind  ];
-    self->a_w_8[k] =       self->table[ind+1];
-    self->b_w_8[k] =       self->table[ind+2];
-    self->c_w_8[k] =       self->table[ind+3];
+    this->ip1_w[k] = (int) this->table[ind  ];
+    this->a_w_8[k] =       this->table[ind+1];
+    this->b_w_8[k] =       this->table[ind+2];
+    this->c_w_8[k] =       this->table[ind+3];
     ind = ind + 4;
   }
-  self->dhw = c_convip_IP2Level( self->ip1_w[nb-1], &kind );
+  this->dhw = c_convip_IP2Level( this->ip1_w[nb-1], &kind );
 
   // Allocate and assign thermo arrays
-  self->nl_t = nb;
-  self->ip1_t = (int*)malloc( nb * sizeof(int) );
-  self->a_t_8 = (double*)malloc( nb * sizeof(double) );
-  self->b_t_8 = (double*)malloc( nb * sizeof(double) );
-  self->c_t_8 = (double*)malloc( nb * sizeof(double) );
-  if( !self->ip1_t || !self->a_t_8 || !self->b_t_8 || !self->c_t_8 ){
+  this->nl_t = nb;
+  this->ip1_t = (int*)malloc( nb * sizeof(int) );
+  this->a_t_8 = (double*)malloc( nb * sizeof(double) );
+  this->b_t_8 = (double*)malloc( nb * sizeof(double) );
+  this->c_t_8 = (double*)malloc( nb * sizeof(double) );
+  if( !this->ip1_t || !this->a_t_8 || !this->b_t_8 || !this->c_t_8 ){
     printf("(Cvgd) ERROR in c_decode_vert_21002, cannot allocate,  ip1_t, a_t_8, b_t_8 and c_t_8 of size %d\n", nb);
     return(VGD_ERROR);
   }
   // For Lorenz, thermo is momentum, except for diag level (see below)
   // This is why we must allocate arrays and not just point to momentum like the other Vcode do.
   for ( k = 0; k < nb-1; k++){
-    self->ip1_t[k] = self->ip1_m[k];
-    self->a_t_8[k] = self->a_m_8[k];
-    self->b_t_8[k] = self->b_m_8[k];
-    self->c_t_8[k] = self->c_m_8[k];
+    this->ip1_t[k] = this->ip1_m[k];
+    this->a_t_8[k] = this->a_m_8[k];
+    this->b_t_8[k] = this->b_m_8[k];
+    this->c_t_8[k] = this->c_m_8[k];
   }
   // Diag level is specific to thermo
-  self->ip1_t[nb-1] = (int) self->table[ind  ];
-  self->a_t_8[nb-1] = self->table[ind+1];
-  self->b_t_8[nb-1] = self->table[ind+2];
-  self->c_t_8[nb-1] = self->table[ind+3];
-  self->dht = c_convip_IP2Level( self->ip1_t[nb-1], &kind );
+  this->ip1_t[nb-1] = (int) this->table[ind  ];
+  this->a_t_8[nb-1] = this->table[ind+1];
+  this->b_t_8[nb-1] = this->table[ind+2];
+  this->c_t_8[nb-1] = this->table[ind+3];
+  this->dht = c_convip_IP2Level( this->ip1_t[nb-1], &kind );
 
   return(VGD_OK);  
 
@@ -4587,8 +4609,8 @@ int vgrid::Cvgd_new_from_table(vgrid_descriptor *self, double *table, int ni, in
   // Coordinate constructor - build vertical descriptor from table input
   // Set internal vcode (if all above was successful)
 
-  self->valid = 0;
-  // Since table passed in argument may be the self->table, we take a copy before the call to free
+  this->valid = 0;
+  // Since table passed in argument may be the this->table, we take a copy before the call to free
   table_size = ni * nj * nk;
   ltable = (double*)malloc ( table_size * sizeof(double) );
   if(! ltable ) {
@@ -4596,30 +4618,30 @@ int vgrid::Cvgd_new_from_table(vgrid_descriptor *self, double *table, int ni, in
     return(VGD_ERROR);
   }
   my_copy_double(table, &ltable, table_size);  
-  free(self->table);
-  self->table_ni = ni;
-  self->table_nj = nj;
-  self->table_nk = nk;
-  self->table = (double*)malloc ( ni * nj * nk * sizeof(double) );
-  if(! self->table ) {
+  free(this->table);
+  this->table_ni = ni;
+  this->table_nj = nj;
+  this->table_nk = nk;
+  this->table = (double*)malloc ( ni * nj * nk * sizeof(double) );
+  if(! this->table ) {
     printf("(Cvgd) ERROR in Cvgd_new_from_table, cannot allocate table of bouble of size %d\n",table_size );
     return(VGD_ERROR);
   }
   for(i = 0; i < table_size; i++) {
-    self->table[i] = ltable[i];
+    this->table[i] = ltable[i];
   }
   free(ltable);
-  self->kind    = (int) self->table[0];
-  self->version = (int) self->table[1];
+  this->kind    = (int) this->table[0];
+  this->version = (int) this->table[1];
   // Fill remainder of structure
   if( this->Cvgd_set_vcode(self) == VGD_ERROR ) {
     printf("(Cvgd) ERROR in Cvgd_new_from_table, cannot set vcode\n");
     return(VGD_ERROR);
   }
 
-  switch(self->vcode) {
+  switch(this->vcode) {
   case 1:
-    if( this->c_decode_vert_0001(self) == VGD_ERROR ) {
+ if( this->c_decode_vert_0001(self) == VGD_ERROR ) {
       printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode -0001\n");
       return(VGD_ERROR);
     }
@@ -4689,10 +4711,10 @@ int vgrid::Cvgd_new_from_table(vgrid_descriptor *self, double *table, int ni, in
     }
     break;    
   default:
-    printf("(Cvgd) in Cvgd_new_from_table, invalid Vcode %d\n", self->vcode);
+    printf("(Cvgd) in Cvgd_new_from_table, invalid Vcode %d\n", this->vcode);
     return(VGD_ERROR);
   }
-  self->valid = 1;
+  this->valid = 1;
   if(this->fstd_init(self) == VGD_ERROR) {
     printf("(Cvgd) ERROR in Cvgd_new_from_table, problem creating record information\n");
   }
@@ -6007,43 +6029,43 @@ int vgrid::Cvgd_getopt_int(char *key, int *value, int quiet)
 
 int vgrid::Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet)
 {  
-  if(! this->Cvgd_is_valid(self,"SELF")){
-    printf("(Cvgd) ERROR in Cvgd_get_int, invalid vgrid.\n");
-    return(VGD_ERROR);
-  }
+  // if(! this->Cvgd_is_valid(self,"SELF")){
+  //   printf("(Cvgd) ERROR in Cvgd_get_int, invalid vgrid.\n");
+  //   return(VGD_ERROR);
+  // }
   if(! value){
     printf("(Cvgd) ERROR in Cvgd_get_int, value is a NULL pointer\n");
     return(VGD_ERROR);
   }
   *value = VGD_MISSING;
   if (strcmp(key, "NL_M") == 0){
-    *value = self->nl_m;
+    *value = this->nl_m;
   } else if (strcmp(key, "NL_T") == 0){
-    *value = self->nl_t;
+    *value = this->nl_t;
   } else if (strcmp(key, "NL_W") == 0){
-    *value = self->nl_w;
+    *value = this->nl_w;
   } else if (strcmp(key, "KIND") == 0){
-    *value = self->kind;
+    *value = this->kind;
   } else if (strcmp(key, "VERS") == 0){
-    *value = self->version;
+    *value = this->version;
   } else if (strcmp(key, "VCOD") == 0){
-    *value = self->vcode;
+    *value = this->vcode;
   } else if( strcmp(key, "DATE") == 0){
-    *value = self->rec.dateo;
+    *value = this->rec.dateo;
   } else if (strcmp(key, "IG_1") == 0){
-    *value = self->rec.ig1;
+    *value = this->rec.ig1;
   } else if (strcmp(key, "IG_2") == 0){
-    *value = self->rec.ig2;
+    *value = this->rec.ig2;
   } else if (strcmp(key, "IG_3") == 0){
-    *value = self->rec.ig3;
+    *value = this->rec.ig3;
   } else if (strcmp(key, "IG_4") == 0){
-    *value = self->rec.ig4;
+    *value = this->rec.ig4;
   } else if (strcmp(key, "IP_1") == 0){
-    *value = self->rec.ip1;
+    *value = this->rec.ip1;
   } else if (strcmp(key, "IP_2") == 0){
-    *value = self->rec.ip2;
+    *value = this->rec.ip2;
   } else if (strcmp(key, "IP_3") == 0){
-    *value = self->rec.ip3;
+    *value = this->rec.ip3;
   } else if (strcmp(key, "DIPM") == 0){
     if( ! this->Cvgd_is_valid(self,"dhm_valid") ){      
       if(! quiet) {
@@ -6052,7 +6074,7 @@ int vgrid::Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet
       }
       return(VGD_ERROR);
     }
-    *value = self->ip1_m[self->nl_m -1];
+    *value = this->ip1_m[this->nl_m -1];
   } else if (strcmp(key, "DIPT") == 0){
     if( ! this->Cvgd_is_valid(self,"dht_valid") ){      
       if(! quiet) {
@@ -6061,7 +6083,7 @@ int vgrid::Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet
       }
       return(VGD_ERROR);
     }
-    *value = self->ip1_t[self->nl_t -1];
+    *value = this->ip1_t[this->nl_t -1];
   } else if (strcmp(key, "DIPW") == 0){
     if( ! this->Cvgd_is_valid(self,"dhw_valid") ){      
       if(! quiet) {
@@ -6070,9 +6092,9 @@ int vgrid::Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet
       }
       return(VGD_ERROR);
     }
-    *value = self->ip1_w[self->nl_w -1];
+    *value = this->ip1_w[this->nl_w -1];
   } else if (strcmp(key, "MIPG") == 0){
-    *value = self->match_ipig;
+    *value = this->match_ipig;
   } else if (strcmp(key, "LOGP") == 0){
     *value = this->is_valid(self,is_in_logp);
   } else {
@@ -6592,80 +6614,76 @@ int vgrid::Cvgd_putopt_int(char *key, int value) {
     
 int vgrid::Cvgd_put_int(vgrid_descriptor *self, char *key, int value) {
   int kind;
-  if(! self) {
-    printf("(Cvgd) ERROR in Cvgd_put_int, vgrid is a null pointer.\n");
-    return(VGD_ERROR);
-  }
   
   if(! this->Cvgd_is_valid((self),"SELF")){
     printf("(Cvgd) ERROR in Cvgd_put_int, invalid vgrid.\n");
     return(VGD_ERROR);
   }
   if( strcmp(key, "DATE") == 0 ) {
-    self->rec.dateo = value;
+    this->rec.dateo = value;
   } else if( strcmp(key, "IG_1") == 0 ) {
-    self->rec.ig1 = value;
+    this->rec.ig1 = value;
   } else if( strcmp(key, "IG_2") == 0 ) {
-    self->rec.ig2 = value;
+    this->rec.ig2 = value;
   } else if( strcmp(key, "IG_3") == 0 ) {
-    self->rec.ig3 = value;
+    this->rec.ig3 = value;
   } else if( strcmp(key, "IG_4") == 0 ) {
-    self->rec.ig4 = value;
+    this->rec.ig4 = value;
   } else if( strcmp(key, "IP_1") == 0 ) {
-    self->rec.ip1 = value;
+    this->rec.ip1 = value;
   } else if( strcmp(key, "IP_2") == 0 ) {
-    self->rec.ip2 = value;
+    this->rec.ip2 = value;
   } else if( strcmp(key, "IP_3") == 0 ) {
-    self->rec.ip3 = value;
+    this->rec.ip3 = value;
   } else if( strcmp(key, "DIPM") == 0 ) {
     if ( this->is_valid(self, dhm_valid)) {
-      self->ip1_m[self->nl_m -1 ] = value;
+      this->ip1_m[this->nl_m -1 ] = value;
       if ( this->is_valid(self, pref_8_valid)) {
-	self->a_m_8[self->nl_m -1 ] = c_comp_diag_a_ip1(self->pref_8, value);
+	this->a_m_8[this->nl_m -1 ] = c_comp_diag_a_ip1(this->pref_8, value);
       } else {
 	// Height coordinate
-	self->a_m_8[self->nl_m -1 ] = c_convip_IP2Level(value, &kind);
+	this->a_m_8[this->nl_m -1 ] = c_convip_IP2Level(value, &kind);
       }
-      if( c_table_update(self) == VGD_ERROR) {
+      if( this->c_table_update(self) == VGD_ERROR) {
 	printf("(Cvgd) ERROR in Cvgd_put_int, problem with c_table_update for key %s\n",key);
 	return(VGD_ERROR);
       }
     } else {
-      printf("(Cvgd) ERROR in Cvgd_put_int, DIPM cannot be put for Vcode %d\n", self->vcode);
+      printf("(Cvgd) ERROR in Cvgd_put_int, DIPM cannot be put for Vcode %d\n", this->vcode);
       return(VGD_ERROR);
     }
   } else if( strcmp(key, "DIPT") == 0 ) {
     if ( this->is_valid(self, dht_valid)) {
-      self->ip1_t[self->nl_t - 1] = value;
+      this->ip1_t[this->nl_t - 1] = value;
       if ( this->is_valid(self, pref_8_valid)) {
-	self->a_t_8[self->nl_t - 1] = c_comp_diag_a_ip1(self->pref_8, value);
+	this->a_t_8[this->nl_t - 1] = c_comp_diag_a_ip1(this->pref_8, value);
       } else {
 	// Height coordinate
-	self->a_t_8[self->nl_t -1 ] =  c_convip_IP2Level(value, &kind);
+	this->a_t_8[this->nl_t -1 ] =  c_convip_IP2Level(value, &kind);
       }
-      if( c_table_update(self) == VGD_ERROR) {
+      if( this->c_table_update(self) == VGD_ERROR) {
 	printf("(Cvgd) ERROR in Cvgd_put_int, problem with c_table_update for key %s\n", key);
 	return(VGD_ERROR);
       }
     } else {
-      printf("(Cvgd) ERROR in Cvgd_put_int, DIPT cannot be put for Vcode %d\n", self->vcode);
+      printf("(Cvgd) ERROR in Cvgd_put_int, DIPT cannot be put for Vcode %d\n", this->vcode);
       return(VGD_ERROR);
     }
   } else if( strcmp(key, "DIPW") == 0 ) {
     if ( this->is_valid(self, dhw_valid)) {
-      self->ip1_w[self->nl_w - 1] = value;
+      this->ip1_w[this->nl_w - 1] = value;
       if ( this->is_valid(self, pref_8_valid)) {
-	self->a_w_8[self->nl_w - 1] = c_comp_diag_a_ip1(self->pref_8, value);
+	this->a_w_8[this->nl_w - 1] = c_comp_diag_a_ip1(this->pref_8, value);
       } else {
 	// Height coordinate
-	self->a_w_8[self->nl_w -1 ] =  c_convip_IP2Level(value, &kind);
+	this->a_w_8[this->nl_w -1 ] =  c_convip_IP2Level(value, &kind);
       }
-      if( c_table_update(self) == VGD_ERROR) {
+      if( this->c_table_update(self) == VGD_ERROR) {
 	printf("(Cvgd) ERROR in Cvgd_put_int, problem with c_table_update for key %s\n", key);
 	return(VGD_ERROR);
       }
     } else {
-      printf("(Cvgd) ERROR in Cvgd_put_int, DIPW cannot be put for Vcode %d\n", self->vcode);
+      printf("(Cvgd) ERROR in Cvgd_put_int, DIPW cannot be put for Vcode %d\n", this->vcode);
       return(VGD_ERROR);
     }
   } else {
@@ -7411,13 +7429,10 @@ int vgrid::Cvgd_new_read(vgrid_descriptor *self, int unit, int ip1, int ip2, int
   int keyList[nkeyList], status;
   VGD_TFSTD_ext var;
   vgrid_descriptor self2;
+  vgrid that(&self2);
 
 
   this->c_vgd_construct_jwb(self);
-  if(! self){
-    printf("(Cvgd) ERROR in Cvgd_new_read, null pointer returned by c_vgd_construct\n");
-    return (VGD_ERROR);
-  }
   
   if(ip1 >= 0 && ip2 < 0) {
     printf("(Cvgd) ERROR in Cvgd_new_read, expecting optional value ip2\n");      
@@ -7445,7 +7460,7 @@ int vgrid::Cvgd_new_read(vgrid_descriptor *self, int unit, int ip1, int ip2, int
   if(count == 0){
     printf("(Cvgd) Cannot find %s with the following ips: ip1=%d, ip2=%d\n", ZNAME, ip1, ip2);
     if(match_ipig) {
-      self->vcode = -1;
+      this->vcode = -1;
       return(VGD_ERROR);
     }
     printf("(Cvgd) Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)\n");
@@ -7462,7 +7477,7 @@ int vgrid::Cvgd_new_read(vgrid_descriptor *self, int unit, int ip1, int ip2, int
     for( i=0; i < count; i++) {     
       // Check if kind and version match, skip the !! if not.
       if( correct_kind_and_version(keyList[i], kind, version, &var, &status) == VGD_ERROR) {
-	self->valid = 0;
+	this->valid = 0;
 	return(VGD_ERROR);
       }
       if( status != 1) {
@@ -7471,27 +7486,27 @@ int vgrid::Cvgd_new_read(vgrid_descriptor *self, int unit, int ip1, int ip2, int
       // If we reached this stage then the toc satisfy the selection criteria but it may not be the only one.
       if(! toc_found) {
 	toc_found = 1;
-	if( C_load_toctoc(self,var,keyList[i]) == VGD_ERROR ) {
+	if( this->C_load_toctoc(self,var,keyList[i]) == VGD_ERROR ) {
 	  printf("(Cvgd) ERROR in Cvgd_new_read, cannot load !!\n");
 	  return(VGD_ERROR);
 	}
-	ni=self->table_ni;
-	nj=self->table_nj;
-	nk=self->table_nk;
+	ni=this->table_ni;
+	nj=this->table_nj;
+	nk=this->table_nk;
 	continue;
       }
       // If we get at this point this means that there are more than one toc satisfying the selection criteria.
       // We load then all to check if they are the same. If not, we return with an error message.
-      this->c_vgd_construct_jwb(&self2);
+      that.c_vgd_construct_jwb(&self2);
       if( my_fstprm(keyList[i], &var) == VGD_ERROR ) {
 	printf("(Cvgd) ERROR in Cvgd_new_read, with my_fstprm on keyList[i] = %d\n",keyList[i]);
 	return(VGD_ERROR);
       }
-      if( C_load_toctoc(&self2,var,keyList[i]) == VGD_ERROR ) {
+      if( that.C_load_toctoc(&self2,var,keyList[i]) == VGD_ERROR ) {
 	printf("(Cvgd) ERROR in Cvgd_new_read, cannot load !!\n");
 	return(VGD_ERROR);
       }
-      status = this->Cvgd_vgdcmp(self,&self2);
+      status = this->Cvgd_vgdcmp_jwb(&that);
       if ( status != 0 ){
 	printf("(Cvgd) ERROR in Cvgd_new_read, found different entries in vertical descriptors after search on ip1 = %d, ip2 = %d, kind = %d, version = %d, status code is %d\n",ip1,ip2,kind,version,status);
 	return(VGD_ERROR);
@@ -7506,11 +7521,11 @@ int vgrid::Cvgd_new_read(vgrid_descriptor *self, int unit, int ip1, int ip2, int
     return(VGD_ERROR);
   }
   // Fill structure from input table
-  if( this->Cvgd_new_from_table(self, self->table, self->table_ni, self->table_nj, self->table_nk) == VGD_ERROR ) {
+  if( this->Cvgd_new_from_table(self, this->table, this->table_ni, this->table_nj, this->table_nk) == VGD_ERROR ) {
     printf("(Cvgd) ERROR in Cvgd_new_read, unable to construct from table\n");
     return(VGD_ERROR);
   }
-  self->match_ipig = match_ipig;  
+  this->match_ipig = match_ipig;  
 
   return(VGD_OK);
 }
