@@ -157,6 +157,7 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
    if(kind .eq. 2)then
       ! pressure levels do not have reference surface fields
       allocate(p0(ni,nj),px(ni,nj),p0ls(ni,nj))
+      p0ls(:,:)=0.0
       factor = 100.
       p0=0.
    else
@@ -167,6 +168,7 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
       endif
       key = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',rfld)
       allocate(p0(ni,nj),px(ni,nj),p0ls(ni,nj))
+      p0ls(:,:)=0.0
       ier = fstluk(p0,key,ni,nj,nk)
       if(ier.lt.0)then
          print*,'(Test) Problem with fstluk on ',rfld

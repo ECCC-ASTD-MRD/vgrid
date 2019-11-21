@@ -36,16 +36,17 @@ vgrid_descriptor* coat_check::get_vgrid(int tag)
 
 
 // Obtain a coat-check tag, given a vgrid
-int coat_check::get_tag(vgrid_descriptor* vgrid)
+int coat_check::get_tag(vgrid_descriptor* vgrid_p)
 {
   coat_hanger *hanger_p;
   int hanger_index;
+  vgrid my_vgd(vgrid_p);
 
   // Search the occupied hangers for the submitted vgrid
   for(hanger_index=0; hanger_index <= latest_hanger_filled; hanger_index++)
     {
       // TBD:  create and use vgrid operator ==
-      if(vgrid::Cvgd_vgdcmp(&coat_closet[hanger_index].vgrid, vgrid) == 0)
+      if(my_vgd.Cvgd_vgdcmp(&coat_closet[hanger_index].vgrid, vgrid_p) == 0)
         break;
     }
 
@@ -70,7 +71,7 @@ int coat_check::get_tag(vgrid_descriptor* vgrid)
       else
         {
           hanger_p=&coat_closet[++latest_hanger_filled];
-          hanger_p->vgrid=*vgrid;
+          hanger_p->vgrid=*vgrid_p;
           hanger_p->num_tags_issued=1;
           return latest_hanger_filled;
         }

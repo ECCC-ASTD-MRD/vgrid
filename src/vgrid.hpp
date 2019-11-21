@@ -75,19 +75,18 @@ public:
   int      unit;          // file unit associated with this 3D descriptor
   int      vcode;         // Vertical coordinate code
   int      kind;          // Vertical coordinate code
-  int      versi
-  on;       // Vertical coordinate code
+  int      version;       // Vertical coordinate code
   char     match_ipig;    // do ip/ig matching for records
   char     valid;         // Validity of structure
   // METHODS:
 public:
   vgrid_descriptor *self;
-  int is_valid(vgrid_escriptor *self, int *table_valid);
+  int is_valid(vgrid_descriptor *self, int *table_valid);
   int is_option(vgrid_descriptor *self, int *table_option);
   int Cvgd_is_valid(vgrid_descriptor *self, char *valid_table_name);
   int is_required_double(vgrid_descriptor *self, double *ptr, int *table_valid, char *message);
   int is_required_float(vgrid_descriptor *self, float *ptr, int *table_valid, char *message);
-  int c_stda76_temp_from_press(vgrid_descriptor *self, int set_stda*i_val, int nl, float *temp);
+  int c_stda76_temp_from_press(vgrid_descriptor *self, int *i_val, int nl, float *temp);
   int c_stda76_temp_pres_from_heights(vgrid_descriptor *self, int *i_val, int nl, float *temp, float *pres, float *sfc_temp, float *sfc_pres);
   void Cvgd_table_shape(vgrid_descriptor *self, int **tshape);
   int Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip);
@@ -167,6 +166,8 @@ vgrid(vgrid_descriptor *self_in);
   int C_genab_5001(float *hybuser, int nk, float rcoef, double ptop_8, double pref_8, double **a_m_8, double **b_m_8, int **ip1_m);
   int C_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t, int tlift);
   int C_genab_5004(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t);
+  int C_load_toctoc(vgrid_descriptor *self, VGD_TFSTD_ext var, int key);
+  int c_table_update(vgrid_descriptor *self);
   int c_vgrid_genab_5005(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double **ptop_out_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t, float dhm, float dht);
   int c_vgrid_genab_5100(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **ptop_out_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, float dhm, float dht, int avg);
   int c_vgrid_genab_21001(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, float dhm, float dht);

@@ -52,8 +52,9 @@ int test_it(char *filename, int ind) {
 
   vgd_p  = &vgd;
   vgd2_p = &vgd2;
+  vgrid my_vgd2(vgd2_p);
 
-  vgrid::c_vgd_construct_jwb(vgd2_p);
+  my_vgd2.c_vgd_construct_jwb(vgd2_p);
 
   iun = 10 + ind;
 

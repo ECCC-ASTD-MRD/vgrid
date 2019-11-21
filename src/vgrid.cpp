@@ -1,4 +1,4 @@
-* libdescrip - Vertical grid descriptor library for FORTRAN programming
+/* libdescrip - Vertical grid descriptor library for FORTRAN programming
  * Copyright (C) 2016  Direction du developpement des previsions nationales
  *                     Centre meteorologique canadien
  *
@@ -493,7 +493,7 @@ void vgrid::Cvgd_table_shape(vgrid_descriptor *self, int **tshape) {
   (*tshape)[2] = self->table_nk;
 }
 
-int c_table_update(vgrid_descriptor *self) {
+int vgrid::c_table_update(vgrid_descriptor *self) {
   //printf("self->vcode)=%d\n",self->vcode);
   switch(self->vcode) {
   case 5002:
@@ -716,7 +716,7 @@ int correct_kind_and_version(int key, int kind, int version, VGD_TFSTD_ext *var,
 
 }
 
-int C_load_toctoc(vgrid_descriptor *self, VGD_TFSTD_ext var, int key) {
+int vgrid::C_load_toctoc(vgrid_descriptor *self, VGD_TFSTD_ext var, int key) {
 
   int table_size, istat, ni, nj, nk;
 
@@ -2503,7 +2503,7 @@ int vgrid::Cvgd_diag_withref_2ref(vgrid_descriptor *self, int ni, int nj, int nk
 vgrid::vgrid(vgrid_descriptor *self_in)
 {
   self=self_in;
-  this->c_vgd_construct_jwb(self);
+  //this->c_vgd_construct_jwb(self);
 
   ptop_8        = VGD_MISSING;
   pref_8        = VGD_MISSING;  
@@ -2529,6 +2529,7 @@ vgrid::vgrid(vgrid_descriptor *self_in)
   dhm           = VGD_MISSING;
   dht           = VGD_MISSING;
   dhw           = VGD_MISSING;
+  
   ref_name      = strdup(VGD_NO_REF_NOMVAR);
   ref_namel     = strdup(VGD_NO_REF_NOMVAR);
   rcoef1        = VGD_MISSING;
