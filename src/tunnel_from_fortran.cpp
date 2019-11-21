@@ -97,8 +97,9 @@ int Cvgd_get_float_1d(int vgdid, char *key, float **value, int *nk, int quiet)
 int Cvgd_get_int(int vgdid, char *key, int *value, int quiet)
 {
   vgrid_descriptor *vgd;
+  vgrid my_vgd(vgd);
   vgd=grid_check.get_vgrid(vgdid);
-  return vgrid::Cvgd_get_int(vgd, key, value, quiet);
+  return my_vgd.Cvgd_get_int(vgd, key, value, quiet);
 };
 
 int Cvgd_get_int_1d(int vgdid, char *key, int **value, int *nk,
@@ -117,8 +118,9 @@ int Cvgd_getopt_int(char *key, int *value, int quiet)
 int Cvgd_is_valid(int vgdid, char *valid_table_name)
 {
   vgrid_descriptor* vgd;
+  vgrid my_vgd(vgd);
   vgd=grid_check.get_vgrid(vgdid);
-  return vgrid::Cvgd_is_valid(vgd, valid_table_name);
+  return my_vgd.Cvgd_is_valid(vgd, valid_table_name);
 };
 
 int Cvgd_new_build_vert2(int *vgdid, int kind, int version, int nk,
@@ -131,8 +133,9 @@ int Cvgd_new_build_vert2(int *vgdid, int kind, int version, int nk,
                          int nl_m, int nl_t, int nl_w)
 {
   vgrid_descriptor self;
+  vgrid my_vgd(&self);
   int status;
-  status=vgrid::Cvgd_new_build_vert2(&self, kind, version,
+  status=my_vgd.Cvgd_new_build_vert2(&self, kind, version,
                                      nk, ip1, ip2, ptop_8,
                                      pref_8, rcoef1, rcoef2,
                                      rcoef3, rcoef4, a_m_8,
@@ -153,10 +156,11 @@ int Cvgd_new_from_table(int *vgdid, double *table,
                         int ni, int nj, int nk)
 {
   vgrid_descriptor self;
+  vgrid my_vgd(&self);
   int status;
 
   vgrid::c_vgd_construct_jwb(&self);
-  status=vgrid::Cvgd_new_from_table(&self, table, ni, nj, nk);
+  status=my_vgd.Cvgd_new_from_table(&self, table, ni, nj, nk);
   if(status != VGD_ERROR)
     {
       *vgdid=grid_check.get_tag(&self);
@@ -171,8 +175,9 @@ int Cvgd_new_gen2(int *vgdid, int kind, int version, float *hyb,
                   float *dhw, int avg)
 {
   vgrid_descriptor self;
+  vgrid my_vgd(&self);
   int status;
-  status=vgrid::Cvgd_new_gen2(&self, kind, version, hyb,
+  status=my_vgd.Cvgd_new_gen2(&self, kind, version, hyb,
                               size_hyb, rcoef1, rcoef2, rcoef3,
                               rcoef4, ptop_8, pref_8,
                               ptop_out_8, ip1, ip2, dhm, dht,
@@ -220,8 +225,9 @@ int Cvgd_put_char(int vgdid, char *key, char *value)
 int Cvgd_put_int(int vgdid, char *key, int value)
 {
   vgrid_descriptor *vgd;
+  vgrid my_vgd(vgd);
   vgd=grid_check.get_vgrid(vgdid);
-  return vgrid::Cvgd_put_int(vgd, key, value);
+  return my_vgd.Cvgd_put_int(vgd, key, value);
 };
 
 int Cvgd_putopt_int(char *key, int value)
@@ -238,8 +244,9 @@ int Cvgd_stda76_pres(int vgdid, int *i_val, int nl, float *pres,
                      float *sfc_temp, float *sfc_pres)
 {
   vgrid_descriptor *vgd;
+  vgrid my_vgd(vgd);
   vgd=grid_check.get_vgrid(vgdid);
-  return vgrid::Cvgd_stda76_pres(vgd, i_val, nl, pres, sfc_temp, sfc_pres);
+  return my_vgd.Cvgd_stda76_pres(vgd, i_val, nl, pres, sfc_temp, sfc_pres);
 }
 
 int Cvgd_stda76_pres_from_hgts_list(float *pres, float *hgts, int nb)
@@ -250,8 +257,9 @@ int Cvgd_stda76_pres_from_hgts_list(float *pres, float *hgts, int nb)
 int Cvgd_stda76_temp(int vgdid, int *i_val, int nl, float *temp)
 {
   vgrid_descriptor *vgd;
+  vgrid my_vgd(vgd);
   vgd=grid_check.get_vgrid(vgdid);
-  return vgrid::Cvgd_stda76_temp(vgd, i_val, nl, temp);
+  return my_vgd.Cvgd_stda76_temp(vgd, i_val, nl, temp);
 };
 
 void Cvgd_table_shape(int vgdid, int **tshape)
@@ -264,9 +272,10 @@ void Cvgd_table_shape(int vgdid, int **tshape)
 int Cvgd_vgdcmp(int vgdid1, int vgdid2)
 {
   vgrid_descriptor *vgd1, *vgd2;
+  vgrid my_vgd(vgd1);
   vgd1=grid_check.get_vgrid(vgdid1);
   vgd2=grid_check.get_vgrid(vgdid2);
-  return vgrid::Cvgd_vgdcmp(vgd1, vgd2);
+  return my_vgd.Cvgd_vgdcmp(vgd1, vgd2);
 };
 
 int Cvgd_write_desc(int vgdid, int unit)
