@@ -21,7 +21,6 @@
 #ifndef VGRID_H
 #define VGRID_H
 
-#include "coat_check.hpp"
 #include "vgrid_descriptor.h"
 
 #define VGD_OK       0
@@ -136,6 +135,22 @@ vgrid(vgrid_descriptor *self_in);
 			      int *ip1_m, int *ip1_t, int *ip1_w, int nl);
   int Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, int nk, int ip1, int ip2, double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
 		     double *a_m_8, double *b_m_8, double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8, double *a_w_8, double *b_w_8, double *c_w_8, int *ip1_m, int *ip1_t, int *ip1_w, int nl_m, int nl_t, int nl_w);
+  int C_compute_heights_0001(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels);
+  int C_compute_heights_0001_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels);
+  int C_compute_heights_4001(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels);
+  int C_compute_heights_4001_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels);
+  int C_compute_heights_21001(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, float *sfc_field_ls);
+  int C_compute_heights_21001_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, double *sfc_field_ls);
+  int C_compute_pressure_1001_1002(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log);
+  int C_compute_pressure_1001_1002_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log);
+  int C_compute_pressure_1003_5001(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log, int dpidpis );
+  int C_compute_pressure_1003_5001_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log, int dpidpis );
+  int C_compute_pressure_2001(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, int in_log);
+  int C_compute_pressure_2001_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, int in_log);
+  int C_compute_pressure_5002_5003_5004_5005(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log, int dpidpis);
+  int C_compute_pressure_5002_5003_5004_5005_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log, int dpidpis);
+  int C_compute_pressure_5100(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, float *sfc_field_ls, int in_log, int dpidpis);
+  int C_compute_pressure_5100_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, double *sfc_field_ls, int in_log, int dpidpis);
   int c_encode_vert_0001(vgrid_descriptor *self,int nk);
   int c_encode_vert_1001(vgrid_descriptor *self,int nk);
   int c_encode_vert_1002(vgrid_descriptor *self,int nk);

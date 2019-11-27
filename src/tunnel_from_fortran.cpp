@@ -22,6 +22,7 @@
 // Being C style, this interface is callable from fortran.
 
 
+#include "coat_check.hpp"
 #include "vgrid.hpp"
 #include "vgrid_descriptor.h"
 #include "tunnel_from_fortran.hpp"
@@ -32,10 +33,10 @@ int Cvgd_diag_withref_2ref(int vgdid, int ni, int nj, int nk,
                            int *ip1_list, float *levels, float *sfc_field,
                            float *sfc_field_ls, int in_log, int dpidpis)
 {
-  vgrid_descriptor *vgd;
-  vgrid my_vgd(vgd);
+  vgrid_descriptor *self;
+  vgrid *vgd;
   vgd=grid_check.get_vgrid(vgdid);
-  return my_vgd.Cvgd_diag_withref_2ref(vgd, ni, nj, nk,
+  return vgd->Cvgd_diag_withref_2ref(self, ni, nj, nk,
                                        ip1_list, levels, sfc_field,
                                        sfc_field_ls, in_log, dpidpis);
 };
@@ -44,79 +45,79 @@ int Cvgd_diag_withref_2ref_8(int vgdid, int ni, int nj, int nk,
                            int *ip1_list,double *levels_8,double *sfc_field_8,
                            double *sfc_field_ls_8, int in_log, int dpidpis)
 {
-  vgrid_descriptor *vgd;
-  vgrid my_vgd(vgd);
+  vgrid_descriptor *self;
+  vgrid *vgd;
   vgd=grid_check.get_vgrid(vgdid);
-  return my_vgd.Cvgd_diag_withref_2ref_8(vgd, ni, nj, nk,
+  return vgd->Cvgd_diag_withref_2ref_8(self, ni, nj, nk,
                                          ip1_list, levels_8, sfc_field_8,
                                          sfc_field_ls_8, in_log, dpidpis);
 };
 
 int Cvgd_get_char(int vgdid, char *key, char *my_char, int quiet)
 {
-  vgrid_descriptor *vgd;
-  vgrid my_vgd(vgd);
+  vgrid_descriptor *self;
+  vgrid *vgd;
   vgd=grid_check.get_vgrid(vgdid);
-  return my_vgd.Cvgd_get_char(vgd, key, my_char, quiet);
+  return vgd->Cvgd_get_char(self, key, my_char, quiet);
 };
 
 int Cvgd_get_double(int vgdid, char *key, double *value, int quiet)
 {
-  vgrid_descriptor *vgd;
-  vgrid my_vgd(vgd);
+  vgrid_descriptor *self;
+  vgrid *vgd;
   vgd=grid_check.get_vgrid(vgdid);
-  return my_vgd.Cvgd_get_double(vgd, key, value, quiet);
+  return vgd->Cvgd_get_double(self, key, value, quiet);
 };
 
 int Cvgd_get_double_1d(int vgdid, char *key, double **value, 
                        int *nk, int quiet)
 {
-  vgrid_descriptor *vgd;
-  vgrid my_vgd(vgd);
+  vgrid_descriptor *self;
+  vgrid *vgd;
   vgd=grid_check.get_vgrid(vgdid);
-  return my_vgd.Cvgd_get_double_1d(vgd, key, value, nk, quiet);
+  return vgd->Cvgd_get_double_1d(self, key, value, nk, quiet);
 };
 
 int Cvgd_get_double_3d(int vgdid, char *key, double **value, int *ni, int *nj, int *nk, int quiet)
 {
-  vgrid_descriptor *vgd;
-  vgrid my_vgd(vgd);
+  vgrid_descriptor *self;
+  vgrid *vgd;
   vgd=grid_check.get_vgrid(vgdid);
-  my_vgd.Cvgd_get_double_3d(vgd, key, value, ni, nj, nk, quiet);
+  vgd->Cvgd_get_double_3d(self, key, value, ni, nj, nk, quiet);
 };
 
 int Cvgd_get_float(int vgdid, char *key, float *value,
                    int quiet)
 {
-  vgrid_descriptor *vgd;
-  vgrid my_vgd(vgd);
+  vgrid_descriptor *self;
+  vgrid *vgd;
   vgd=grid_check.get_vgrid(vgdid);
-  return my_vgd.Cvgd_get_float(vgd, key, value, quiet);
+  return vgd->Cvgd_get_float(self, key, value, quiet);
 };
 
 int Cvgd_get_float_1d(int vgdid, char *key, float **value, int *nk, int quiet)
 {
-  vgrid_descriptor *vgd;
-  vgrid my_vgd(vgd);
+  vgrid_descriptor *self;
+  vgrid *vgd;
   vgd=grid_check.get_vgrid(vgdid);
-  return my_vgd.Cvgd_get_float_1d(vgd, key, value, nk, quiet);
+  return vgd->Cvgd_get_float_1d(self, key, value, nk, quiet);
 };
 
 int Cvgd_get_int(int vgdid, char *key, int *value, int quiet)
 {
-  vgrid_descriptor *vgd;
-  vgrid my_vgd(vgd);
+  vgrid_descriptor *self;
+  vgrid *vgd;
   vgd=grid_check.get_vgrid(vgdid);
-  return my_vgd.Cvgd_get_int(vgd, key, value, quiet);
+  return vgd->Cvgd_get_int(self, key, value, quiet);
 };
 
 int Cvgd_get_int_1d(int vgdid, char *key, int **value, int *nk,
                     int quiet)
 {
-  vgrid_descriptor *vgd;
-  vgrid my_vgd(vgd);
+  vgrid_descriptor *self;
+  vgrid *vgd;
   vgd=grid_check.get_vgrid(vgdid);
-  return my_vgd.Cvgd_get_int_1d(vgd, key, value, nk, quiet);
+  return vgd->Cvgd_get_int_1d(self, key, value, nk, quiet);
 };
 
 int Cvgd_getopt_int(char *key, int *value, int quiet)
@@ -126,10 +127,10 @@ int Cvgd_getopt_int(char *key, int *value, int quiet)
 
 int Cvgd_is_valid(int vgdid, char *valid_table_name)
 {
-  vgrid_descriptor* vgd;
-  vgrid my_vgd(vgd);
+  vgrid_descriptor *self;
+  vgrid *vgd;
   vgd=grid_check.get_vgrid(vgdid);
-  return my_vgd.Cvgd_is_valid(vgd, valid_table_name);
+  return vgd->Cvgd_is_valid(self, valid_table_name);
 };
 
 int Cvgd_new_build_vert2(int *vgdid, int kind, int version, int nk,
@@ -155,7 +156,7 @@ int Cvgd_new_build_vert2(int *vgdid, int kind, int version, int nk,
                                      nl_w);
   if(status != VGD_ERROR)
     {
-      *vgdid=grid_check.get_tag(&self);
+      *vgdid=grid_check.get_tag(&my_vgd);
     }
   return status;
 };
@@ -172,7 +173,7 @@ int Cvgd_new_from_table(int *vgdid, double *table,
   status=my_vgd.Cvgd_new_from_table(&self, table, ni, nj, nk);
   if(status != VGD_ERROR)
     {
-      *vgdid=grid_check.get_tag(&self);
+      *vgdid=grid_check.get_tag(&my_vgd);
     }
   return status;
 };
@@ -193,7 +194,7 @@ int Cvgd_new_gen2(int *vgdid, int kind, int version, float *hyb,
                               dhw, avg);
   if(status != VGD_ERROR)
     {
-      *vgdid=grid_check.get_tag(&self);
+      *vgdid=grid_check.get_tag(&my_vgd);
     }
   return status;
 }
@@ -207,17 +208,17 @@ int Cvgd_new_read(int *vgdid, int unit, int ip1,int ip2,
   status=my_vgd.Cvgd_new_read(&self, unit, ip1, ip2, kind, version);
   if(status != VGD_ERROR)
     {
-      *vgdid=grid_check.get_tag(&self);
+      *vgdid=grid_check.get_tag(&my_vgd);
     }
   return status;
 }
 
 int Cvgd_print_desc(int vgdid, int sout, int convip)
 {
-  vgrid_descriptor *vgd;
-  vgrid my_vgd(vgd);
+  vgrid_descriptor *self;
+  vgrid *vgd;
   vgd=grid_check.get_vgrid(vgdid);
-  return my_vgd.Cvgd_print_desc(vgd, sout, convip);
+  return vgd->Cvgd_print_desc(self, sout, convip);
 };
 
 int Cvgd_print_vcode_description(int vcode)
@@ -227,18 +228,18 @@ int Cvgd_print_vcode_description(int vcode)
 
 int Cvgd_put_char(int vgdid, char *key, char *value)
 {
-  vgrid_descriptor *vgd;
-  vgrid my_vgd(vgd);
+  vgrid_descriptor *self;
+  vgrid *vgd;
   vgd=grid_check.get_vgrid(vgdid);
-  return my_vgd.Cvgd_put_char(vgd, key, value);
+  return vgd->Cvgd_put_char(self, key, value);
 };
 
 int Cvgd_put_int(int vgdid, char *key, int value)
 {
-  vgrid_descriptor *vgd;
-  vgrid my_vgd(vgd);
+  vgrid_descriptor *self;
+  vgrid *vgd;
   vgd=grid_check.get_vgrid(vgdid);
-  return my_vgd.Cvgd_put_int(vgd, key, value);
+  return vgd->Cvgd_put_int(self, key, value);
 };
 
 int Cvgd_putopt_int(char *key, int value)
@@ -254,10 +255,10 @@ int Cvgd_stda76_hgts_from_pres_list(float *hgts, float *pres, int nb)
 int Cvgd_stda76_pres(int vgdid, int *i_val, int nl, float *pres,
                      float *sfc_temp, float *sfc_pres)
 {
-  vgrid_descriptor *vgd;
-  vgrid my_vgd(vgd);
+  vgrid_descriptor *self;
+  vgrid *vgd;
   vgd=grid_check.get_vgrid(vgdid);
-  return my_vgd.Cvgd_stda76_pres(vgd, i_val, nl, pres, sfc_temp, sfc_pres);
+  return vgd->Cvgd_stda76_pres(self, i_val, nl, pres, sfc_temp, sfc_pres);
 }
 
 int Cvgd_stda76_pres_from_hgts_list(float *pres, float *hgts, int nb)
@@ -267,33 +268,32 @@ int Cvgd_stda76_pres_from_hgts_list(float *pres, float *hgts, int nb)
 
 int Cvgd_stda76_temp(int vgdid, int *i_val, int nl, float *temp)
 {
-  vgrid_descriptor *vgd;
-  vgrid my_vgd(vgd);
+  vgrid_descriptor *self;
+  vgrid *vgd;
   vgd=grid_check.get_vgrid(vgdid);
-  return my_vgd.Cvgd_stda76_temp(vgd, i_val, nl, temp);
+  return vgd->Cvgd_stda76_temp(self, i_val, nl, temp);
 };
 
 void Cvgd_table_shape(int vgdid, int **tshape)
 {
-  vgrid_descriptor *vgd;
-  vgrid my_vgd(vgd);
+  vgrid_descriptor *self;
+  vgrid *vgd;
   vgd=grid_check.get_vgrid(vgdid);
-  my_vgd.Cvgd_table_shape(vgd, tshape);
+  vgd->Cvgd_table_shape(self, tshape);
 };
 
 int Cvgd_vgdcmp(int vgdid1, int vgdid2)
 {
-  vgrid_descriptor *vgd1, *vgd2;
-  vgrid my_vgd(vgd1);
+  vgrid *vgd1, *vgd2;
   vgd1=grid_check.get_vgrid(vgdid1);
   vgd2=grid_check.get_vgrid(vgdid2);
-  return my_vgd.Cvgd_vgdcmp(vgd1, vgd2);
+  return vgd1->Cvgd_vgdcmp_jwb(vgd2);
 };
 
 int Cvgd_write_desc(int vgdid, int unit)
 {
-  vgrid_descriptor *vgd;
-  vgrid my_vgd(vgd);
+  vgrid_descriptor *self;
+  vgrid *vgd;
   vgd=grid_check.get_vgrid(vgdid);
-  my_vgd.Cvgd_write_desc(vgd, unit);
+  vgd->Cvgd_write_desc(self, unit);
 };

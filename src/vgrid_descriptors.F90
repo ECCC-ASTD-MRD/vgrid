@@ -567,11 +567,11 @@ contains
       endif
       status = VGD_OK
    end function new_gen
-   integer function new_build_vert(self,kind,version,nk,ip1,ip2, &
+   integer function new_build_vert(vgdid,kind,version,nk,ip1,ip2, &
         ptop_8,pref_8,rcoef1,rcoef2,rcoef3,rcoef4,a_m_8,b_m_8,a_t_8,b_t_8, &
         ip1_m,ip1_t,c_m_8,c_t_8,a_w_8,b_w_8,c_w_8,ip1_w) result(status)
       ! Coordinate constructor - build vertical descriptor from arguments
-      type(vgrid_descriptor) :: self                    !Vertical descriptor instance    
+      integer :: vgdid                    !Vertical descriptor id
       integer, intent(in) :: kind,version               !Kind,version to create
       integer, intent(in) :: nk                         !Number of levels
       integer,target , optional, intent(in) :: ip1,ip2          !IP1,2 values for FST file record [0,0]
@@ -699,7 +699,7 @@ contains
       else
          ip1_w_CP = C_NULL_PTR
       endif
-      if( f_new_build_vert(self%vgdid,kind,version,nk,l_ip1,l_ip2, &
+      if( f_new_build_vert(vgdid,kind,version,nk,l_ip1,l_ip2, &
            ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, &
            a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, &
            ip1_m_CP, ip1_t_CP, ip1_w_CP, nl_m, nl_t, nl_w) == VGD_ERROR )then
@@ -810,8 +810,9 @@ contains
       return
    end function test_equality
 
-   integer function print_desc(self,stdout,convip_L) result(istat)      
-      type(vgrid_descriptor) :: self
+   integer function print_desc(vgdid,dummy,stdout,convip_L) result(istat)      
+      integer :: vgdid
+      integer :: dummy ! makes print_desc distinguishable from print_vcode_description
       integer, intent(in), optional :: stdout     !Output unit to write to [6]
       logical, intent(in), optional :: convip_L
 
@@ -826,7 +827,7 @@ contains
       if(present(convip_L))then
          if(convip_L) l_convip = 1
       endif
-      istat = f_print_desc(self%vgdid,l_stdout, l_convip)
+      istat = f_print_desc(vgdid,l_stdout, l_convip)
    end function print_desc
 
    integer function print_vcode_description(vcode) result(status)
