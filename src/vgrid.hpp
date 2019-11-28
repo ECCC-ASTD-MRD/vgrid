@@ -100,7 +100,8 @@ public:
   int Cvgd_diag_withref_2ref(vgrid_descriptor *self, int ni, int nj, int nk,
 			   int *ip1_list, float *levels, float *sfc_field,
 			   float *sfc_field_ls, int in_log, int dpidpis);
-vgrid(vgrid_descriptor *self_in);
+  vgrid();
+  vgrid(vgrid_descriptor *self_in);
   void c_vgd_construct_jwb(vgrid_descriptor *vgrid);
   void c_vgd_free_abci(vgrid_descriptor *self);
   int Cvgd_set_vcode_i(vgrid_descriptor *VGrid,int Kind,int Version);

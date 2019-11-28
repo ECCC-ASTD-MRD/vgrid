@@ -21,32 +21,34 @@
 #include "vgrid.hpp"
 #include <stdio.h>
 
+// COAT_CHECK METHODS:
+// COAT_CHECK METHODS:
 
+// Constructor
 coat_check::coat_check()
 {    
   latest_hanger_filled=-1;
 }
 
 // Obtain the vgrid, given the coat-check tag
-vgrid_descriptor* coat_check::get_vgrid(int tag)
+vgrid* coat_check::get_vgrid(int tag)
 {
-  return &coat_closet[tag].vgrid;
+  return &coat_closet[tag].vgd;
   // Don't change num_tags_issued, because the client is still using the tag.
 };
 
 
 // Obtain a coat-check tag, given a vgrid
-int coat_check::get_tag(vgrid_descriptor* vgrid_p)
-{
+int coat_check::get_tag(vgrid *vgrid_p)
+ {
   coat_hanger *hanger_p;
   int hanger_index;
-  vgrid my_vgd(vgrid_p);
 
   // Search the occupied hangers for the submitted vgrid
   for(hanger_index=0; hanger_index <= latest_hanger_filled; hanger_index++)
     {
       // TBD:  create and use vgrid operator ==
-      if(my_vgd.Cvgd_vgdcmp(&coat_closet[hanger_index].vgrid, vgrid_p) == 0)
+      if(vgrid_p->Cvgd_vgdcmp_jwb(&coat_closet[hanger_index].vgd) == 0)
         break;
     }
 
@@ -71,7 +73,7 @@ int coat_check::get_tag(vgrid_descriptor* vgrid_p)
       else
         {
           hanger_p=&coat_closet[++latest_hanger_filled];
-          hanger_p->vgrid=*vgrid_p;
+          hanger_p->vgd=*vgrid_p;
           hanger_p->num_tags_issued=1;
           return latest_hanger_filled;
         }
@@ -92,4 +94,14 @@ void coat_check::release_vgrid(int tag)
 int coat_check::grid_count(int tag)
 {
   return coat_closet[tag].num_tags_issued;
+};
+
+
+// COAT_HANGER METHODS:
+// COAT_HANGER METHODS:
+
+// Constructor
+coat_hanger::coat_hanger()
+{
+  num_tags_issued = 0;
 };

@@ -2537,6 +2537,69 @@ int vgrid::Cvgd_diag_withref_2ref(vgrid_descriptor *self, int ni, int nj, int nk
  *----------------------------------------------------------------------------
  */
 
+vgrid::vgrid()
+{
+  ptop_8        = VGD_MISSING;
+  pref_8        = VGD_MISSING;  
+  table         = NULL;
+  table_ni      = 0;
+  table_nj      = 0;
+  table_nk      = 0;
+  a_m_8         = NULL;
+  b_m_8         = NULL;
+  c_m_8         = NULL;
+  a_t_8         = NULL;
+  b_t_8         = NULL;
+  c_t_8         = NULL;
+  a_w_8         = NULL;
+  b_w_8         = NULL;
+  c_w_8         = NULL;
+  ip1_m         = NULL;
+  ip1_t         = NULL;  
+  ip1_w         = NULL;  
+  nl_m          = 0;
+  nl_t          = 0;
+  nl_w          = 0;
+  dhm           = VGD_MISSING;
+  dht           = VGD_MISSING;
+  dhw           = VGD_MISSING;
+  
+  ref_name      = strdup(VGD_NO_REF_NOMVAR);
+  ref_namel     = strdup(VGD_NO_REF_NOMVAR);
+  rcoef1        = VGD_MISSING;
+  rcoef2        = VGD_MISSING;
+  rcoef3        = VGD_MISSING;
+  rcoef4        = VGD_MISSING;
+  nk            = 0;
+  ip1           = 0;
+  ip2           = 0;
+  unit          = 0;
+  vcode         = 0;
+  kind          = 0;
+  version       = 0;
+  match_ipig    = 0;
+  valid         = 0;
+
+  rec.fstd_initialized = 0;
+  rec.dateo = 0;
+  rec.deet = 0;
+  rec.npas = 0;
+  rec.nbits = -64;
+  rec.datyp = 0;
+  rec.ip1 = 0;
+  rec.ip2 = 0;
+  rec.ip3 = 0;
+  rec.ig1 = 0;
+  rec.ig2 = 0;
+  rec.ig3 = 0;
+  rec.ig4 = 0;
+  strcpy(rec.typvar,"  ");
+  strcpy(rec.nomvar,"    ");
+  strcpy(rec.etiket,"            ");
+  strcpy(rec.grtyp," ");
+  return;
+}
+
 vgrid::vgrid(vgrid_descriptor *self_in)
 {
   self=self_in;

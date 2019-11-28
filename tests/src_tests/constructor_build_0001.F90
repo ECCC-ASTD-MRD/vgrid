@@ -24,7 +24,7 @@ program constructor
 
   implicit none
 
-  type(vgrid_descriptor) :: vgd
+  integer :: vgdid
   integer :: k
   integer, parameter :: nk = 50
   integer :: stat
@@ -60,11 +60,11 @@ program constructor
   enddo
 
   ! Build a new set of vertical coordinate descriptors Vcode 0001
-  if( vgd_new(vgd,0,1,nk,0,0,a_m_8=hgt_m,a_w_8=hgt_w,b_m_8=b_m_8,b_w_8=b_w_8,ip1_m=ip1_m,ip1_w=ip1_w) == VGD_ERROR )then
+  if( vgd_new(vgdid,0,1,nk,0,0,a_m_8=hgt_m,a_w_8=hgt_w,b_m_8=b_m_8,b_w_8=b_w_8,ip1_m=ip1_m,ip1_w=ip1_w) == VGD_ERROR )then
      print*,'ERROR in tests with vgd_new'
      stop
   endif
-  if( vgd_print(vgd,convip_L=.true.) == VGD_ERROR )then
+  if( vgd_print(vgdid,vgdid,convip_L=.true.) == VGD_ERROR )then
      print*,'ERROR in tests with vgd_print'
      stop
   endif

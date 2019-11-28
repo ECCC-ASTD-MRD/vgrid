@@ -20,7 +20,18 @@
 #ifndef COAT_CHECK_H
 #define COAT_CHECK_H
 
-#include "vgrid_descriptor.h"
+#include "vgrid.hpp"
+
+class coat_hanger{
+public:
+  // A coat_hanger holds all data relevant to one vertical grid
+    vgrid vgd;
+    int num_tags_issued;
+
+public:
+  // Constructor of class coat_hanger
+  coat_hanger();
+};
 
 // make this a Singleton.  See https://stackoverflow.com/questions/1008019/c-singleton-design-pattern
 class coat_check
@@ -43,13 +54,13 @@ class coat_check
 {
 public:
   // Constructor
-  coat_check(void);
+  coat_check();
 
   // Obtain the vgrid, given the coat-check tag
-  vgrid_descriptor* get_vgrid(int tag);
+  vgrid* get_vgrid(int tag);
 
   // Obtain a coat-check tag, given a vgrid
-  int get_tag(vgrid_descriptor* vgrid);
+  int get_tag(vgrid* vgrid);
 
   // Decrement the usage count on a particular vgrid
   void release_vgrid(int tag);
@@ -58,18 +69,10 @@ public:
   // grid
   int grid_count(int tag);
 
-private:
-  // A coat_hanger holds all data relevant to one vertical grid
-  struct coat_hanger{
-    vgrid_descriptor vgrid;
-    int num_tags_issued;
-  };
-
   // The coat_closet holds all of the coat_hangers (vgrids) together
   static const int NUM_HANGERS=100;
-  coat_hanger coat_closet[NUM_HANGERS];
-
   int latest_hanger_filled;
+  coat_hanger coat_closet[NUM_HANGERS];
 };
 
 #endif // COAT_CHECK_H
