@@ -69,10 +69,9 @@ public:
   // grid
   int grid_count(int tag);
 
-  // The coat_closet holds all of the coat_hangers (vgrids) together
   static const int NUM_HANGERS=100;
   int latest_hanger_filled;
-  coat_hanger coat_closet[NUM_HANGERS];
+  coat_hanger hangers[NUM_HANGERS];
 };
 
 #endif // COAT_CHECK_H

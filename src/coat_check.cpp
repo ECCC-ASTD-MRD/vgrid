@@ -33,7 +33,7 @@ coat_check::coat_check()
 // Obtain the vgrid, given the coat-check tag
 vgrid* coat_check::get_vgrid(int tag)
 {
-  return &coat_closet[tag].vgd;
+  return &hangers[tag].vgd;
   // Don't change num_tags_issued, because the client is still using the tag.
 };
 
@@ -48,19 +48,19 @@ int coat_check::get_tag(vgrid *vgrid_p)
   for(hanger_index=0; hanger_index <= latest_hanger_filled; hanger_index++)
     {
       // TBD:  create and use vgrid operator ==
-      if(vgrid_p->Cvgd_vgdcmp_jwb(&coat_closet[hanger_index].vgd) == 0)
+      if(vgrid_p->Cvgd_vgdcmp_jwb(&hangers[hanger_index].vgd) == 0)
         break;
     }
 
   if(hanger_index <= latest_hanger_filled)
     {
-      // An identical vgrid is already in coat_closet at hanger_index
-      coat_closet[hanger_index].num_tags_issued++;
+      // An identical vgrid is already in hangers at hanger_index
+      hangers[hanger_index].num_tags_issued++;
       return hanger_index;
     }
   else
     {
-      // Create a local copy of the submitted vgrid, in the coat_closet
+      // Create a local copy of the submitted vgrid, in the hangers
       //    (This is necessary, because one can expect to have multiple clients
       //     using the same vgrid.  If one client deletes his vgrid, a copy must
       //     be available for the other clients.)
@@ -72,7 +72,7 @@ int coat_check::get_tag(vgrid *vgrid_p)
         }
       else
         {
-          hanger_p=&coat_closet[++latest_hanger_filled];
+          hanger_p=&hangers[++latest_hanger_filled];
           hanger_p->vgd=*vgrid_p;
           hanger_p->num_tags_issued=1;
           return latest_hanger_filled;
@@ -84,16 +84,16 @@ int coat_check::get_tag(vgrid *vgrid_p)
 // Decrement the usage count on a particular vgrid
 void coat_check::release_vgrid(int tag)
 {
-  if(--coat_closet[tag].num_tags_issued < 0)
-    coat_closet[tag].num_tags_issued = 0;
-  // if(coat_closet[tag].num_tags_issued == 0)
+  if(--hangers[tag].num_tags_issued < 0)
+    hangers[tag].num_tags_issued = 0;
+  // if(hangers[tag].num_tags_issued == 0)
   //   could do something, like delete vgrid
 };
 
 // Debugging Instrumentation:  return the number of tags issued for this grid
 int coat_check::grid_count(int tag)
 {
-  return coat_closet[tag].num_tags_issued;
+  return hangers[tag].num_tags_issued;
 };
 
 
