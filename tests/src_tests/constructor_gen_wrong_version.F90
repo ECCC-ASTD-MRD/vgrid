@@ -18,13 +18,13 @@
 ! * Boston, MA 02111-1307, USA.
 program constructor
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,VGD_OK
+  use vGrid_Descriptors, only: vgd_new,VGD_OK
   use Unit_Testing, only: ut_report
   
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   integer :: stat
   real :: epsilon=1.e-6
   real, dimension(57) :: hyb=(/0.0134575, 0.0203980, 0.0333528, 0.0472815, 0.0605295, 0.0720790, &
@@ -46,7 +46,7 @@ program constructor
   nullify(b_t_8)
 
   print*,'Test on wrong version ====='
-  stat = vgd_new(d,kind=5,version=-1,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
+  stat = vgd_new(vgdid,kind=5,version=-1,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
   if(stat.eq.VGD_OK)then
      print*,'should have reported error on version'
      test_OK=.false.
@@ -55,7 +55,7 @@ program constructor
   endif
     
   print*,'Test on wrong kind ======'
-  stat = vgd_new(d,kind=-1,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
+  stat = vgd_new(vgdid,kind=-1,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
   if(stat.eq.VGD_OK)then
      print*,'should have reported error on kind'
      test_OK=.false.
@@ -64,7 +64,7 @@ program constructor
   endif
 
   print*,'Test on wrong rcoef2 ======'
-  stat = vgd_new(d,kind=5,version=1,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
+  stat = vgd_new(vgdid,kind=5,version=1,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
   if(stat.eq.VGD_OK)then
      print*,'should have reported error on rcoef2'
      test_OK=.false.
@@ -73,7 +73,7 @@ program constructor
   endif
 
   print*,'Test on missing rcoef2 ===='
-  stat = vgd_new(d,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
+  stat = vgd_new(vgdid,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
   if(stat.eq.VGD_OK)then
      print*,'should have reported error on mising rcoef2'
      test_OK=.false.

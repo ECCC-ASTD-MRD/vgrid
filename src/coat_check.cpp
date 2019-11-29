@@ -33,6 +33,11 @@ coat_check::coat_check()
 // Obtain the vgrid, given the coat-check tag
 vgrid* coat_check::get_vgrid(int tag)
 {
+  if(tag < 0 || tag > latest_hanger_filled)
+    {
+      printf("ERROR in coat_check:  invalid tag=%d\n",tag);
+      throw tag;
+    }
   return &hangers[tag].vgd;
   // Don't change num_tags_issued, because the client is still using the tag.
 };

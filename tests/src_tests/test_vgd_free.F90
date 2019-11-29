@@ -21,13 +21,13 @@
 !        That means that this test necessarily fails.
 
 program tests
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_getopt,vgd_putopt,vgd_print,vgd_get,VGD_ERROR,VGD_OK
+  use vGrid_Descriptors, only: vgd_new,vgd_getopt,vgd_putopt,vgd_print,vgd_get,VGD_ERROR,VGD_OK
   use Unit_Testing, only: ut_report
   
 
   implicit none
 
-  type(vgrid_descriptor) :: vgd
+  integer :: vgdid
   integer :: stat
   logical :: ok=.true.
 
@@ -38,12 +38,12 @@ program tests
   real(kind=8) :: ptop_8=1000d0,pref_8=100000d0,value_8
   
   print*,'First build';call flush(6)
-  stat = vgd_new(vgd,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop_8,pref_8=pref_8)
+  stat = vgd_new(vgdid,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop_8,pref_8=pref_8)
   if(stat==VGD_ERROR)then
      print*,'This vgd_new error should not happen, please fixit'
      call exit(1)
   end if  
-  stat = vgd_get(vgd,'PREF - reference pressure',value_8)
+  stat = vgd_get(vgdid,'PREF - reference pressure',value_8)
   if(stat==VGD_ERROR)then
      print*,'This vgd_get error should not happen, please fixit'
      call exit(1)
@@ -53,13 +53,13 @@ program tests
      call exit(1)    
   endif
 
-!  stat = vgd_free(vgd)
+!  stat = vgd_free(vgdid)
 !  if(stat==VGD_ERROR)then
 !     print*,'This vgd_free error should not happen, please fixit'
 !     call exit(1)
 !  end if  
 
-  stat = vgd_get(vgd,'PREF - reference pressure',value_8)
+  stat = vgd_get(vgdid,'PREF - reference pressure',value_8)
   if(stat==VGD_ERROR)then
      print*,'The above error in normal'
   else

@@ -17,12 +17,12 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program constructor
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_print,vgd_putopt,VGD_ERROR
+  use vGrid_Descriptors, only: vgd_new,vgd_print,vgd_putopt,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   integer, parameter :: lu=10
   integer :: i, stat
   integer :: fnom,fstouv,fstfrm
@@ -57,11 +57,11 @@ program constructor
         call exit(1)
      endif
      ! Construct a new set of 3D coordinate descriptors
-     if( vgd_new(d,unit=lu+i,format="fst") == VGD_ERROR )then
+     if( vgd_new(vgdid,unit=lu+i,format="fst") == VGD_ERROR )then
         print*,'ERROR: problem with vgd_new on file ',trim(files(i))
         call exit(1)
      endif
-     if( vgd_print(d) == VGD_ERROR) ok = .false.
+     if( vgd_print(vgdid) == VGD_ERROR) ok = .false.
      stat=fstfrm(lu+i)
   enddo
   call ut_report(ok,'Grid_Descriptors, vgd_new, vgd_print')

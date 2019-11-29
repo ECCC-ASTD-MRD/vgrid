@@ -17,12 +17,12 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program constructor
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,VGD_ERROR
+  use vGrid_Descriptors, only: vgd_new,vgd_get,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   integer :: stat,i,ip1
   integer, dimension(:), allocatable :: ip1s
   real(kind=8), dimension(4) :: pres=(/1000.,925.,850.,700./),b=(/0.,0.,0.,0./)
@@ -33,8 +33,8 @@ program constructor
   do i=1,size(ip1s)
      call convip(ip1s(i),pres(i),2,2,'',.false.)
   enddo
-  stat = vgd_new(d,kind=2,version=1,nk=size(pres),ip1=999,ip1_m=ip1s,a_m_8=pres,b_m_8=b)
-  stat = vgd_get(d,key='IP_1',value=ip1)
+  stat = vgd_new(vgdid,kind=2,version=1,nk=size(pres),ip1=999,ip1_m=ip1s,a_m_8=pres,b_m_8=b)
+  stat = vgd_get(vgdid,key='IP_1',value=ip1)
   call ut_report(ip1==999,'Grid_Descriptors::vgd_new vertical build initializer (2001) value')
 
 end program constructor

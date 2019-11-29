@@ -18,12 +18,12 @@
 ! * Boston, MA 02111-1307, USA.
 program constructor
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,VGD_ERROR
+  use vGrid_Descriptors, only: vgd_new,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   integer :: fnom,fstouv
   integer :: stat,lu=10
 
@@ -40,7 +40,7 @@ program constructor
      call abort
   endif
   print*,'The following should produce an error since there is no levels in file'
-  stat=vgd_new(d,lu)
+  stat=vgd_new(vgdid,lu)
   OK=stat.eq.VGD_ERROR
 
   call ut_report(OK,'Grid_Descriptors::legacy no levels in file')

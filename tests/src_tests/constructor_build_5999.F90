@@ -28,7 +28,7 @@ program constructor_build_5999
   !
   implicit none
   !
-  type(vgrid_descriptor) :: vgd,vgd2
+  integer :: vgdid,vgdid2
   integer :: stat,lui=10,luo=11,fnom,fstouv,ier,fstfrm,i,j,fstinl,fstluk,fstprm,fstecr
   integer, dimension(:), pointer :: ip1_m
   real(kind=8), dimension(:), pointer :: a_m_8,b_m_8
@@ -62,12 +62,12 @@ program constructor_build_5999
      print*,'No record in RPN file ',file
      call exit(1)
   endif
-  if(vgd_new(vgd,unit=lui,format="fst") == VGD_ERROR)OK=.false.  
+  if(vgd_new(vgdid,unit=lui,format="fst") == VGD_ERROR)OK=.false.  
 
   ! Retrieve A, B and ip1
-  if(vgd_get(vgd,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8) == VGD_ERROR)OK=.false.
-  if(vgd_get(vgd,key='CB_M - vertical A coefficient (m)'   ,value=b_m_8) == VGD_ERROR)OK=.false.
-  if(vgd_get(vgd,key='VIPM - ip1 momentun'                 ,value=ip1_m) == VGD_ERROR)OK=.false.
+  if(vgd_get(vgdid,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8) == VGD_ERROR)OK=.false.
+  if(vgd_get(vgdid,key='CB_M - vertical A coefficient (m)'   ,value=b_m_8) == VGD_ERROR)OK=.false.
+  if(vgd_get(vgdid,key='VIPM - ip1 momentun'                 ,value=ip1_m) == VGD_ERROR)OK=.false.
 
   ! Try create with ip1 not of kind 5
   print*,'TEST build with wrong ip1 kind'
@@ -75,7 +75,7 @@ program constructor_build_5999
   do i=1,size(ip1_m)
      ip1_m(i)=1000+i
   enddo
-  stat=vgd_new(vgd2,kind=5,version=999,nk=size(a_m_8),ip1=1,ip2=2,&
+  stat=vgd_new(vgdid2,kind=5,version=999,nk=size(a_m_8),ip1=1,ip2=2,&
        a_m_8=a_m_8,b_m_8=b_m_8,ip1_m=ip1_m)
   if(stat==VGD_OK)then
      print*,'Error with test on wrong ip1 kind, vgd_new should have return error but did not'
@@ -85,7 +85,7 @@ program constructor_build_5999
   print*,'TEST build with wrong ip1 list'
   print*,'   The following error message on wronf ip1 list is expected'
   ip1_m=93423264
-  stat=vgd_new(vgd2,kind=5,version=999,nk=size(a_m_8),ip1=1,ip2=2,&
+  stat=vgd_new(vgdid2,kind=5,version=999,nk=size(a_m_8),ip1=1,ip2=2,&
        a_m_8=a_m_8,b_m_8=b_m_8,ip1_m=ip1_m)
   if(stat==VGD_OK)then
      print*,'Error with test on wrong ip1 list, vgd_new should have return error but did not'
@@ -93,8 +93,8 @@ program constructor_build_5999
   endif   
   ! Build 5999  
   print*,'TEST build with correct parameter'
-  if(vgd_get(vgd,key='VIPM - ip1 momentun'                 ,value=ip1_m) == VGD_ERROR)OK=.false.
-  stat=vgd_new(vgd2,kind=5,version=999,nk=size(a_m_8),ip1=1,ip2=2,&
+  if(vgd_get(vgdid,key='VIPM - ip1 momentun'                 ,value=ip1_m) == VGD_ERROR)OK=.false.
+  stat=vgd_new(vgdid2,kind=5,version=999,nk=size(a_m_8),ip1=1,ip2=2,&
        a_m_8=a_m_8,b_m_8=b_m_8,ip1_m=ip1_m)
   if(stat==VGD_ERROR)OK=.false.
   !
@@ -106,7 +106,7 @@ program constructor_build_5999
         print*,'ERROR with fnom on file ',file
         call exit(1)
      endif
-     ier=vgd_print(vgd2)     
+     ier=vgd_print(vgdid2)     
      ier=fstouv(luo,'RND')
      if(ier.lt.0)then
         print*,'No record in RPN file ',file
@@ -137,9 +137,9 @@ program constructor_build_5999
            enddo LOOP_ON_LEVELS
         endif
      enddo LOOP_ON_NOMVAR
-     if(vgd_put(vgd2,key="IP_1",value=ig1) == VGD_ERROR)OK=.false.
-     if(vgd_put(vgd2,key="IP_2",value=ig2) == VGD_ERROR)OK=.false.  
-     if(vgd_write(vgd2,luo) == VGD_ERROR)OK=.false.
+     if(vgd_put(vgdid2,key="IP_1",value=ig1) == VGD_ERROR)OK=.false.
+     if(vgd_put(vgdid2,key="IP_2",value=ig2) == VGD_ERROR)OK=.false.  
+     if(vgd_write(vgdid2,luo) == VGD_ERROR)OK=.false.
      ier=fstfrm(luo)
      
      stop

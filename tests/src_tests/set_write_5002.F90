@@ -18,13 +18,13 @@
 ! * Boston, MA 02111-1307, USA.
 program constructor
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_put,vgd_write
+  use vGrid_Descriptors, only: vgd_new,vgd_put,vgd_write
   use Unit_Testing, only: ut_report
   
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   integer, parameter :: lu=10,nk=3
   integer :: stat,ip1,k,ni,nj,nkk
   integer, external :: fnom,fstouv,fstfrm,fstinf
@@ -84,7 +84,7 @@ program constructor
   enddo
   
   stat=vgd_new(&
-       d,                  &
+       vgdid,                  &
        kind    = 5,        &
        version = 2,        &
        nk      = nk,       &
@@ -102,10 +102,10 @@ program constructor
        ip1_t   = ip1_t)
 
   ! Set a new IP2 value
-  stat = vgd_put(d,'IP_2',801)
+  stat = vgd_put(vgdid,'IP_2',801)
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = vgd_write(d,lu,format='fst')
+  stat = vgd_write(vgdid,lu,format='fst')
 
   ! Ensure that the correct ip2 value was written
   stat = fstinf(lu,ni,nj,nkk,-1,'',-1,801,-1,'','!!')

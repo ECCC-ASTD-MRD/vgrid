@@ -26,6 +26,7 @@
 #include "vgrid.hpp"
 #include "vgrid_descriptor.h"
 #include "tunnel_from_fortran.hpp"
+#include <stdio.h>
 
 static coat_check grid_check;  // Object for checking in vgrids
 
@@ -217,7 +218,15 @@ int Cvgd_print_desc(int vgdid, int sout, int convip)
 {
   vgrid_descriptor *self;
   vgrid *vgd;
-  vgd=grid_check.get_vgrid(vgdid);
+  try
+    {
+      vgd=grid_check.get_vgrid(vgdid);
+    }
+  catch (int x )
+    {
+      printf("\n(Cvgd_print_desc) ERROR from grid_check:  null grid for vgdid=%d\n\n",x);
+      return VGD_ERROR;
+    }
   return vgd->Cvgd_print_desc(self, sout, convip);
 };
 
@@ -230,7 +239,15 @@ int Cvgd_put_char(int vgdid, char *key, char *value)
 {
   vgrid_descriptor *self;
   vgrid *vgd;
-  vgd=grid_check.get_vgrid(vgdid);
+  try
+    {
+      vgd=grid_check.get_vgrid(vgdid);
+    }
+  catch (int x )
+    {
+      printf("\n(Cvgd_put_char) ERROR from grid_check:  null grid for vgdid=%d\n\n",x);
+      return VGD_ERROR;
+    }
   return vgd->Cvgd_put_char(self, key, value);
 };
 
@@ -238,7 +255,15 @@ int Cvgd_put_int(int vgdid, char *key, int value)
 {
   vgrid_descriptor *self;
   vgrid *vgd;
-  vgd=grid_check.get_vgrid(vgdid);
+  try
+    {
+    vgd=grid_check.get_vgrid(vgdid);
+    }
+  catch (int x )
+    {
+      printf("\n(Cvgd_put_int) ERROR from grid_check:  null grid for vgdid=%d\n\n",x);
+      return VGD_ERROR;
+    }
   return vgd->Cvgd_put_int(self, key, value);
 };
 
@@ -294,6 +319,20 @@ int Cvgd_write_desc(int vgdid, int unit)
 {
   vgrid_descriptor *self;
   vgrid *vgd;
-  vgd=grid_check.get_vgrid(vgdid);
+  try
+    {
+      vgd=grid_check.get_vgrid(vgdid);
+  // if((int)vgd == 0)
+  //   {
+  //     printf("\n(Cvgd_write_desc) ERROR from grid_check:  null grid for vgdid=%d\n\n",
+  // 	     vgdid);
+  //     return VGD_ERROR;
+  //   }
+    }
+  catch (int x )
+    {
+      printf("\n(Cvgd_write_desc) ERROR from grid_check:  null grid for vgdid=%d\n\n",x);
+      return VGD_ERROR;
+    }
   vgd->Cvgd_write_desc(self, unit);
 };

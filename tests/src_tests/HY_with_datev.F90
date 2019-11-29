@@ -20,12 +20,12 @@ program constructor
 
   ! Object: construct vgrid_descriptor
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new, VGD_OK
+  use vGrid_Descriptors, only: vgd_new, VGD_OK
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   integer :: lu=10,lutxt=69
   integer :: stat,ip1,ip2
   integer :: fnom,fstouv,fstfrm
@@ -44,7 +44,7 @@ program constructor
 
   ! Construct a new set of 3D coordinate descriptors
   print*,'The following error on optional ip2 is expected'
-  stat = vgd_new(d,lu,"fst")
+  stat = vgd_new(vgdid,lu,"fst")
   
   call ut_report(stat,'Grid_Descriptors, vgd_new, vgd_get CA')
 

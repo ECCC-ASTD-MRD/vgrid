@@ -17,7 +17,7 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program tests
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_levels,VGD_OK
+  use vGrid_Descriptors, only: vgd_new,vgd_levels,VGD_OK
   use Unit_Testing, only: ut_report
 
   implicit none
@@ -30,7 +30,7 @@ program tests
   real, dimension(:,:), pointer :: p0,px
   real, dimension(:,:,:), pointer :: lev
   real :: local_pres
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   logical :: ok
 
   nullify(ip1_list,pres_profil,p0,px,lev)
@@ -50,7 +50,7 @@ program tests
   close(lutxt)
 
   ! Get physical levelling information
-  stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
+  stat = vgd_new(vgdid,unit=lu,format="fst",ip1=ip1,ip2=ip2)
   
   stat = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',"UU")
 
@@ -63,7 +63,7 @@ program tests
   
   local_pres=p0(i0,j0)  
 
-  stat = vgd_levels(d,sfc_field=local_pres,ip1_list=ip1_list,levels=pres_profil)
+  stat = vgd_levels(vgdid,sfc_field=local_pres,ip1_list=ip1_list,levels=pres_profil)
   if(stat.ne.VGD_OK)then
      print*,'ERROR: problem with vgd_levels'
      stat=fstfrm(lu)

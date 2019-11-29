@@ -17,7 +17,7 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program tests
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_levels
+  use vGrid_Descriptors, only: vgd_new,vgd_levels
   use Unit_Testing, only: ut_report
 
   implicit none
@@ -26,7 +26,7 @@ program tests
   real :: epsilon=0.01
   real, dimension(:,:), pointer :: p0,px
   real, dimension(:,:,:), pointer :: lev
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
 
   nullify(p0,px,lev)
 
@@ -45,14 +45,14 @@ program tests
   close(lutxt)
 
   ! Get physical levelling information
-  stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
+  stat = vgd_new(vgdid,unit=lu,format="fst",ip1=ip1,ip2=ip2)
   fstkey = fstinf(lu,ni,nj,nk,-1,'',93423264,-1,-1,'','TT')
   allocate(p0(ni,nj))
   stat = fstlir(p0,lu,ni,nj,nk,-1,'',-1,-1,-1,'','P0')
   p0 = p0*100. !mb to Pa
   allocate(px(ni,nj))
   stat = fstlir(px,lu,ni,nj,nk,-1,'',93423264,-1,-1,'','PX')
-  stat = vgd_levels(d,sfc_field=p0,ip1_list=(/93423264/),levels=lev,in_log=.true.)
+  stat = vgd_levels(vgdid,vgdid,sfc_field=p0,ip1_list=(/93423264/),levels=lev,in_log=.true.)
   call ut_report(abs(lev(2,5,1)-log(px(2,5)*100.))<epsilon,message='Grid_Descriptors::vgd_levels level calculation status')
 
   stat=fstfrm(lu)

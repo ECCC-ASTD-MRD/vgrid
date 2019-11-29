@@ -18,13 +18,13 @@
 ! * Boston, MA 02111-1307, USA.
 program constructor
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_putopt,VGD_ERROR
+  use vGrid_Descriptors, only: vgd_new,vgd_get,vgd_putopt,VGD_ERROR
   use Unit_Testing, only: ut_report
   
    
   implicit none
 
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   integer :: stat
   real :: my_epsilon=1.e-6
   !From /home/binops/afsi/sio/datafiles/constants/modeles/GEMDM/glb_033L80_g1_20090922/gem_settings.nml
@@ -64,20 +64,20 @@ program constructor
   !
   print*,''
   print*,'===== 1002 Test on Error ptop<0, error message is normal ===='
-  stat = vgd_new(d,kind=1,version=2,hyb=hyb_N,ptop_8=-1.d0)
+  stat = vgd_new(vgdid,kind=1,version=2,hyb=hyb_N,ptop_8=-1.d0)
   if(stat.ne.VGD_ERROR)OK=.false.  
   !
   print*,''  
   print*,'===== 1002 Test on complete level set ===='
-  stat = vgd_new(d,kind=1,version=2,hyb=hyb_N,ptop_8=ptop_N)
+  stat = vgd_new(vgdid,kind=1,version=2,hyb=hyb_N,ptop_8=ptop_N)
   file='data/data_constructor_gen_1002.txt'
-  stat = test_1002_5001(d,file,write_control_L)
+  stat = test_1002_5001(vgdid,file,write_control_L)
   if(stat.eq.VGD_ERROR)OK=.false.
   print*,''  
   print*,'===== 1002 Test on incomplete level set ===='
-  stat = vgd_new(d,kind=1,version=2,hyb=hyb_N(10:28),ptop_8=ptop_N)
-  stat = vgd_get(d,key='CB_M - vertical B coefficient',value=b_m_8)
-  stat = vgd_get(d,key='CA_M - vertical A coefficient',value=a_m_8)
+  stat = vgd_new(vgdid,kind=1,version=2,hyb=hyb_N(10:28),ptop_8=ptop_N)
+  stat = vgd_get(vgdid,key='CB_M - vertical B coefficient',value=b_m_8)
+  stat = vgd_get(vgdid,key='CA_M - vertical A coefficient',value=a_m_8)
   w1=0.2189999967813492
   if(.not.(abs(b_m_8(1)-w1)/w1<my_epsilon))then
      OK=.false.
@@ -97,36 +97,36 @@ program constructor
   print*,'===== Test on Error ptop>hyb(1), error message is normal ===='
   ptop=100000.
 
-  stat = vgd_new(d,kind=5,version=1,hyb=hyb,rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
+  stat = vgd_new(vgdid,kind=5,version=1,hyb=hyb,rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
   if(stat.ne.VGD_ERROR)OK=.false.
   print*,''
   print*,'===== Test on Error last hyb not equal 1.0, error message is normal ===='  
-  stat = vgd_new(d,kind=5,version=1,hyb=hyb(1:size(hyb)-1),rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
+  stat = vgd_new(vgdid,kind=5,version=1,hyb=hyb(1:size(hyb)-1),rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
   if(stat.ne.VGD_ERROR)OK=.false.
   print*,''
   print*,'===== hyb not monotone, error message is normal ===='  
   hyb2=hyb
   hyb2(size(hyb)-3)=hyb(size(hyb)-2) 
-  stat = vgd_new(d,kind=5,version=1,hyb=hyb2,rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
+  stat = vgd_new(vgdid,kind=5,version=1,hyb=hyb2,rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
   if(stat.ne.VGD_ERROR)OK=.false.
 
   print*,''
   print*,'===== Test on Error ptop<=0, error message is normal ===='
   ptop=-1.
-  stat = vgd_new(d,kind=5,version=1,hyb=hyb,rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
+  stat = vgd_new(vgdid,kind=5,version=1,hyb=hyb,rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
   if(stat.ne.VGD_ERROR)OK=.false.
   !
   print*,''
   print*,'===== Test on Error ptop lower than first level error message is normal ===='
   ptop=hyb(1)*pref+10.
-  stat = vgd_new(d,kind=5,version=1,hyb=hyb,rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
+  stat = vgd_new(vgdid,kind=5,version=1,hyb=hyb,rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
   if(stat.ne.VGD_ERROR)OK=.false.
   !
   print*,''
   print*,'===== Test complete level set ===='
   ptop=hyb(1)*pref
   w1=ptop
-  stat = vgd_new(d,kind=5,version=1,hyb=hyb,rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
+  stat = vgd_new(vgdid,kind=5,version=1,hyb=hyb,rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
   if(stat .eq. VGD_ERROR)OK=.false.
   if(.not.(abs(ptop-w1)/w1<my_epsilon))then
      OK=.false.
@@ -134,13 +134,13 @@ program constructor
      print*,ptop,' should equal ',w1
   endif
   file='data/data_constructor_gen_5001.txt'
-  stat = test_1002_5001(d,file,write_control_L)
+  stat = test_1002_5001(vgdid,file,write_control_L)
   if(stat.eq.VGD_ERROR)OK=.false.
   print*,''
   print*,'===== Test incomplete level set ===='
-  stat = vgd_new(d,kind=5,version=1,hyb=hyb(10:28),rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
-  stat = vgd_get(d,key='CB_M - vertical B coefficient',value=b_m_8)
-  stat = vgd_get(d,key='CA_M - vertical A coefficient',value=a_m_8)
+  stat = vgd_new(vgdid,kind=5,version=1,hyb=hyb(10:28),rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
+  stat = vgd_get(vgdid,key='CB_M - vertical B coefficient',value=b_m_8)
+  stat = vgd_get(vgdid,key='CA_M - vertical A coefficient',value=a_m_8)
   w1=8.8046513497829437E-002
   if(.not.(abs(b_m_8(1)-w1)/w1<my_epsilon))then
      OK=.false.
@@ -163,14 +163,14 @@ end program constructor
 !==============================================================================
 !===============================================================================
 !===============================================================================
-integer function test_1002_5001(F_d,F_file,F_write_control_L) result(istat)
+integer function test_1002_5001(vgdid,F_file,F_write_control_L) result(istat)
    !
-   use vGrid_Descriptors, only: vgrid_descriptor,vgd_get,VGD_ERROR,VGD_OK
+   use vGrid_Descriptors, only: vgd_get,VGD_ERROR,VGD_OK
    
 
    implicit none
    !
-   type (vgrid_descriptor) :: F_d
+   integer :: vgdid
    logical :: F_write_control_L
    character (len=256) :: F_file
    !
@@ -186,18 +186,18 @@ integer function test_1002_5001(F_d,F_file,F_write_control_L) result(istat)
 
    nullify(vcdm,vcdt,work,b_m_8,a_m_8,b_t_8,a_t_8,work_8,vipm,vipt,work_i)
 
-   stat = vgd_get(F_d,key='KIND - vertical coordinate ip1 kind' ,value=kind)
-   stat = vgd_get(F_d,key='VERS - vertical coordinate version'  ,value=vers)   
-   stat = vgd_get(F_d,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8)
-   stat = vgd_get(F_d,key='CA_T - vertical A coefficient (t)'   ,value=a_t_8)
-   stat = vgd_get(F_d,key='CB_M - vertical B coefficient (m)'   ,value=b_m_8)
-   stat = vgd_get(F_d,key='CB_T - vertical B coefficient (t)'   ,value=b_t_8)
-   stat = vgd_get(F_d,key='VIPM - level ip1 list (m)'           ,value=vipm)
-   stat = vgd_get(F_d,key='VIPT - level ip1 list (t)'           ,value=vipt)
-   stat = vgd_get(F_d,key='VCDM - vertical coordinate (m)'      ,value=vcdm)
-   stat = vgd_get(F_d,key='VCDT - vertical coordinate (t)'      ,value=vcdt)
-   stat = vgd_get(F_d,key='NL_M - Number of vertical levels (m)',value=nl_m)
-   stat = vgd_get(F_d,key='NL_T - Number of vertical levels (t)',value=nl_t)
+   stat = vgd_get(vgdid,key='KIND - vertical coordinate ip1 kind' ,value=kind)
+   stat = vgd_get(vgdid,key='VERS - vertical coordinate version'  ,value=vers)   
+   stat = vgd_get(vgdid,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8)
+   stat = vgd_get(vgdid,key='CA_T - vertical A coefficient (t)'   ,value=a_t_8)
+   stat = vgd_get(vgdid,key='CB_M - vertical B coefficient (m)'   ,value=b_m_8)
+   stat = vgd_get(vgdid,key='CB_T - vertical B coefficient (t)'   ,value=b_t_8)
+   stat = vgd_get(vgdid,key='VIPM - level ip1 list (m)'           ,value=vipm)
+   stat = vgd_get(vgdid,key='VIPT - level ip1 list (t)'           ,value=vipt)
+   stat = vgd_get(vgdid,key='VCDM - vertical coordinate (m)'      ,value=vcdm)
+   stat = vgd_get(vgdid,key='VCDT - vertical coordinate (t)'      ,value=vcdt)
+   stat = vgd_get(vgdid,key='NL_M - Number of vertical levels (m)',value=nl_m)
+   stat = vgd_get(vgdid,key='NL_T - Number of vertical levels (t)',value=nl_t)
    
    print*,'TESTING ',kind*1000+vers
 

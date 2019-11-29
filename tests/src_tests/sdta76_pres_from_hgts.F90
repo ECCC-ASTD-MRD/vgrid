@@ -21,7 +21,7 @@
 program stda76_pres_from_hgts
 #include <msg.h>
   use Unit_Testing, only: ut_report
-  use vGrid_Descriptors, only: vgrid_descriptor, vgd_new, vgd_get, vgd_levels, &
+  use vGrid_Descriptors, only: vgd_new, vgd_get, vgd_levels, &
        vgd_stda76_pres_from_hgts_list, VGD_ERROR
   implicit none
   integer :: fnom, fstouv, nl, k
@@ -30,7 +30,7 @@ program stda76_pres_from_hgts
   real :: me, ff
   real, dimension(:), pointer :: hgts, pres
   character(len=100) :: file
-  type(vgrid_descriptor) :: vgd
+  integer :: vgdid
   
   nullify(ip1s, hgts, pres)
 
@@ -45,16 +45,16 @@ program stda76_pres_from_hgts
      print*,'(Test) No record in RPN file ',file
      call exit(1)
   endif
-  if(vgd_new(vgd,lu) == VGD_ERROR)then
+  if(vgd_new(vgdid,lu) == VGD_ERROR)then
      print*,'(Test) Problem with vgd_new'
      call exit(1)
   endif
-  if( vgd_get(vgd, "VIPM", ip1s) ==  VGD_ERROR )then
+  if( vgd_get(vgdid, "VIPM", ip1s) ==  VGD_ERROR )then
      print*,"ERROR with Cvgd_get_int for VIPT"
      call exit(1)
   end if
   me = -100.
-  if(vgd_levels(vgd,sfc_field=me,ip1_list=ip1s,levels=hgts) ==&
+  if(vgd_levels(vgdid,sfc_field=me,ip1_list=ip1s,levels=hgts) ==&
        VGD_ERROR)then
      print*,"ERROR with vgd_levels"
      call exit(1)

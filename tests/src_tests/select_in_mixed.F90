@@ -53,12 +53,12 @@ end module mod_constructor_table
 
 program constructor
   use mod_constructor_table, only: FSTD_ext,my_fstprm
-  use Vgrid_Descriptors, only: Vgrid_descriptor,Vgd_new,Vgd_get,Vgd_print,VGD_OK,VGD_ERROR
+  use Vgrid_Descriptors, only: Vgd_new,Vgd_get,Vgd_print,VGD_OK,VGD_ERROR
   use Unit_Testing, only: ut_report
   !
   implicit none
   !
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   type(FSTD_ext) :: prm
   integer, parameter :: nliste=2
   integer,dimension(nliste) :: lu=(/10,11/), &
@@ -102,31 +102,31 @@ program constructor
   stat = fstlnk(lu,nliste)
   !
   ! Test that an error is return if no !! are found with ips
-  !stat = vgd_new(d,unit=lu(1),format="fst",ip1=1234,ip2=5678)
+  !stat = vgd_new(vgdid,unit=lu(1),format="fst",ip1=1234,ip2=5678)
   !print*,'The above error is normal since there is not !! with these ips'
   !if(stat/=VGD_ERROR)ok=.false.
   !
   ! Test that an error is return if wild card are passed and there are more than on !! 
-  !stat = vgd_new(d,unit=lu(1),format="fst",ip1=-1,ip2=-1)
+  !stat = vgd_new(vgdid,unit=lu(1),format="fst",ip1=-1,ip2=-1)
   !print*,'The above error is normal with ips=-1 since there are 2 differents !! in linked files'
   !if(stat/=VGD_ERROR)ok=.false.
   !
   ! Test that an error is return if no ips is passed and there are more than on !!
-  !stat = vgd_new(d,unit=lu(1),format="fst")
+  !stat = vgd_new(vgdid,unit=lu(1),format="fst")
   !print*,'The above error is normal with no ips passed since there are 2 differents !! in linked files'
   !if(stat/=VGD_ERROR)ok=.false.
   !
   do i=1,nliste
      ! Construct a new set of 3D coordinate descriptors
      print*,'i, ip1(i),ip2(i)',i, ip1(i),ip2(i)
-     stat = vgd_new(d,unit=lu(1),format="fst",ip1=ip1(i),ip2=ip2(i))
+     stat = vgd_new(vgdid,unit=lu(1),format="fst",ip1=ip1(i),ip2=ip2(i))
      if(stat.ne.VGD_OK)then
         print*,'ERROR: problem with vgd_new'
         call abort
      endif
      ! Get vcode to check if whats is read is ok
-     stat = vgd_get(d,'KIND - vertical coordinate ip1 kind',kind)
-     stat = vgd_get(d,'VERS - vertical coordinate version',vers)
+     stat = vgd_get(vgdid,'KIND - vertical coordinate ip1 kind',kind)
+     stat = vgd_get(vgdid,'VERS - vertical coordinate version',vers)
      if(kind*1000+vers/=vcode(i))ok=.false.
   enddo
   !

@@ -17,7 +17,7 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program tests
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_dpidpis,VGD_OK
+  use vGrid_Descriptors, only: vgd_new,vgd_get,vgd_dpidpis,VGD_OK
   use Unit_Testing, only: ut_report
   
 
@@ -38,7 +38,7 @@ program tests
   real, dimension(:), pointer :: p00
   real(kind=8), dimension(:), pointer :: p00_8
   real :: w1
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   logical :: ok
   real(kind=8), dimension(:), pointer :: coef_b
 
@@ -59,11 +59,11 @@ program tests
   close(lutxt)
 
   ! Get dpidpis
-  stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
+  stat = vgd_new(vgdid,unit=lu,format="fst",ip1=ip1,ip2=ip2)
 
-  stat = vgd_get(d,key='CB_T - vertical B coefficient (t)',value=coef_b)
+  stat = vgd_get(vgdid,key='CB_T - vertical B coefficient (t)',value=coef_b)
 
-  stat = vgd_get(d,key='VIPT - level ip1 list (t)'        ,value=ip1_list)
+  stat = vgd_get(vgdid,key='VIPT - level ip1 list (t)'        ,value=ip1_list)
 
   stat = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',"UU")
 
@@ -77,10 +77,10 @@ program tests
   p00 = p00*100. !mb to Pa
   p00_8=p00
 
-  stat = vgd_dpidpis(d,sfc_field=p0  ,ip1_list=ip1_list,dpidpis=dpidpis_3d)  
-  stat = vgd_dpidpis(d,sfc_field=p0_8,ip1_list=ip1_list,dpidpis=dpidpis_3d_8)  
+  stat = vgd_dpidpis(vgdid,sfc_field=p0  ,ip1_list=ip1_list,dpidpis=dpidpis_3d)  
+  stat = vgd_dpidpis(vgdid,sfc_field=p0_8,ip1_list=ip1_list,dpidpis=dpidpis_3d_8)  
 
-!$omp parallel private(tid,dpidpis_profil,dpidpis_profil_8,ii,jj,i,k,stat) shared(ni,nj,nk,d,p00,ip1_list,lu)
+!$omp parallel private(tid,dpidpis_profil,dpidpis_profil_8,ii,jj,i,k,stat) shared(ni,nj,nk,vgdid,p00,ip1_list,lu)
   tid=omp_get_thread_num()
   if (tid .eq. 0) then
      print*,'number of threads=',omp_get_num_threads()
@@ -90,13 +90,13 @@ program tests
 !$omp do
   do i=1,ni*nj
      !print*,'i=',i
-     stat = vgd_dpidpis(d,sfc_field=p00(i),ip1_list=ip1_list,dpidpis=dpidpis_profil)         
+     stat = vgd_dpidpis(vgdid,sfc_field=p00(i),ip1_list=ip1_list,dpidpis=dpidpis_profil)         
      if(stat.ne.VGD_OK)then
         print*,'ERROR: problem with vgd_dpidpis profil for i=',i
         stat=fstfrm(lu)
         call exit(1)
      endif
-     stat = vgd_dpidpis(d,sfc_field=p00_8(i),ip1_list=ip1_list,dpidpis=dpidpis_profil_8)         
+     stat = vgd_dpidpis(vgdid,sfc_field=p00_8(i),ip1_list=ip1_list,dpidpis=dpidpis_profil_8)         
      if(stat.ne.VGD_OK)then
         print*,'ERROR: problem with vgd_dpidpis profil real(kind=8) for i=',i
         stat=fstfrm(lu)
@@ -116,7 +116,7 @@ program tests
 !$omp end parallel
 
   if(associated(dpidpis_profil))deallocate(dpidpis_profil)
-  stat = vgd_dpidpis(d,sfc_field=p0(i0,j0),ip1_list=ip1_list,dpidpis=dpidpis_profil)
+  stat = vgd_dpidpis(vgdid,sfc_field=p0(i0,j0),ip1_list=ip1_list,dpidpis=dpidpis_profil)
   if(stat.ne.VGD_OK)then
      print*,'ERROR: problem with vgd_dpidpis'
      stat=fstfrm(lu)
@@ -124,7 +124,7 @@ program tests
   endif
   
   if(associated(dpidpis_profil_8))deallocate(dpidpis_profil_8)
-  stat = vgd_dpidpis(d,sfc_field=p0_8(i0,j0),ip1_list=ip1_list,dpidpis=dpidpis_profil_8)
+  stat = vgd_dpidpis(vgdid,sfc_field=p0_8(i0,j0),ip1_list=ip1_list,dpidpis=dpidpis_profil_8)
   if(stat.ne.VGD_OK)then
      print*,'ERROR: problem with vgd_dpidpis real(kind=8)'
      stat=fstfrm(lu)

@@ -17,7 +17,7 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program tests
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_levels, VGD_ERROR
+  use vGrid_Descriptors, only: vgd_new,vgd_levels, VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
@@ -31,7 +31,7 @@ program tests
   real, dimension(:,:), allocatable :: px
   real, dimension(:,:,:), pointer :: lev
   character(len=12) :: typvar,nomvar,etiket,grtyp
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
 
   nullify(lev)
   
@@ -47,7 +47,7 @@ program tests
   endif
 
   ! Get physical levelling information
-  stat = vgd_new(d,unit=lu,format="fst",ip1=-1,ip2=-1)
+  stat = vgd_new(vgdid,unit=lu,format="fst",ip1=-1,ip2=-1)
   stat = fstinl(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ','TT',fstkeys,count,size(fstkeys))
   allocate(ip1s(count))
   do i=1,count
@@ -57,7 +57,7 @@ program tests
   enddo
   allocate(px(ni,nj))
   stat = fstlir(px,lu,ni,nj,nk,-1,'',ip1s(testLev),-1,-1,'','PX')
-  stat = vgd_levels(d,unit=lu,fstkeys=fstkeys(1:count),levels=lev)
+  stat = vgd_levels(vgdid,vgdid,unit=lu,fstkeys=fstkeys(1:count),levels=lev)
   if(stat == VGD_ERROR)then
      print*,'ERROR with vgd_levels'
      call exit(1)

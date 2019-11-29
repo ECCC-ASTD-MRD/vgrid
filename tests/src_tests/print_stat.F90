@@ -17,12 +17,12 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program tests
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_print
+  use vGrid_Descriptors, only: vgd_new,vgd_print
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   integer :: stat
   integer :: fnom,fstouv,lu=10
 
@@ -38,10 +38,10 @@ program tests
   endif
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = vgd_new(d,unit=10,format='fst')
+  stat = vgd_new(vgdid,unit=10,format='fst')
 
   ! Print information about the instance
-  stat = vgd_print(d)
+  stat = vgd_print(vgdid)
   call ut_report(stat,message='Grid_Descriptors::vgd_print dump output')
 
 end program tests

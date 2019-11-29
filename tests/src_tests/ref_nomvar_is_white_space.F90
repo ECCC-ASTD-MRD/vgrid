@@ -18,12 +18,12 @@
 ! * Boston, MA 02111-1307, USA.
 program ref_nomvar_is_white_space
 
-   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,VGD_LEN_RFLD,VGD_LEN_RFLS, VGD_OK, VGD_ERROR
+   use vGrid_Descriptors, only: vgd_new,vgd_get,VGD_LEN_RFLD,VGD_LEN_RFLS, VGD_OK, VGD_ERROR
    use Unit_Testing, only: ut_report
 
    implicit none
    
-   type(vgrid_descriptor) :: vgd
+   integer :: vgdid
    integer :: lu=10, stat
    integer :: fnom,fstouv,fstfrm
    character(len=VGD_LEN_RFLD) :: rfld
@@ -38,15 +38,15 @@ program ref_nomvar_is_white_space
       print*,'No record in RPN file'
       call exit(1)
    endif
-   if( vgd_new(vgd,unit=lu,format="fst") == VGD_ERROR) call exit(1)
+   if( vgd_new(vgdid,unit=lu,format="fst") == VGD_ERROR) call exit(1)
 
-   if( vgd_get(vgd,"RFLD", rfld, .true.) == VGD_OK )then
+   if( vgd_get(vgdid,"RFLD", rfld, .true.) == VGD_OK )then
       print*,"RFLD='",rfls,"'"
       print*,'In test, problem with vgd_get on "RFLD", should have returned an error but returned VGD_OK'
       ok = .false.
    endif
 
-   if( vgd_get(vgd,"RFLS", rfls, .true.) == VGD_OK )then
+   if( vgd_get(vgdid,"RFLS", rfls, .true.) == VGD_OK )then
       print*,"RFLS='",rfls,"'"
       print*,'In test, problem with vgd_get on "RFLS", should have returned an error but returned VGD_OK'
       ok = .false.

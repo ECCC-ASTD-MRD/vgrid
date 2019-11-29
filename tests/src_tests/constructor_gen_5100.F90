@@ -18,13 +18,13 @@
 ! * Boston, MA 02111-1307, USA.
 program constructor
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_levels,vgd_get,vgd_print,VGD_ERROR
+  use vGrid_Descriptors, only: vgd_new,vgd_levels,vgd_get,vgd_print,VGD_ERROR
   use Unit_Testing, only: ut_report
   
 
   implicit none
 
-  type(vgrid_descriptor) :: vgd
+  integer :: vgdid
   integer, pointer, dimension(:) :: ip1s
   integer :: stat
   real, dimension(57) :: hyb= &
@@ -57,32 +57,32 @@ program constructor
 
   ! Call with missing rcoef3 and rcoef4
   print*,'Following error on rcoef3 and rcoef4 is expected'
-  if( vgd_new(vgd,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,avg_L=.true.) /= VGD_ERROR)OK=.false.
+  if( vgd_new(vgdid,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,avg_L=.true.) /= VGD_ERROR)OK=.false.
 
   ! Construct a new set of vertical coordinate descriptors 5100
-  stat = vgd_new(vgd,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,rcoef3=rcoef3,rcoef4=rcoef4,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,avg_L=.true.)
-  stat = vgd_print(vgd)
+  stat = vgd_new(vgdid,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,rcoef3=rcoef3,rcoef4=rcoef4,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,avg_L=.true.)
+  stat = vgd_print(vgdid)
   file='data/data_constructor_gen_5100_avg.txt'
-  stat = test_5100(vgd,file,write_control_L,stat)
+  stat = test_5100(vgdid,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
 
-  stat = vgd_new(vgd,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,rcoef3=rcoef3,rcoef4=rcoef4,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,avg_L=.false.)
-  stat = vgd_print(vgd)
+  stat = vgd_new(vgdid,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,rcoef3=rcoef3,rcoef4=rcoef4,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,avg_L=.false.)
+  stat = vgd_print(vgdid)
   file='data/data_constructor_gen_5100.txt'
-  stat = test_5100(vgd,file,write_control_L,stat)
+  stat = test_5100(vgdid,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.  
 
   if(.false.)then
-     stat = vgd_get(vgd,'VIPM',ip1s)
+     stat = vgd_get(vgdid,'VIPM',ip1s)
      print*,'ip1s=',ip1s
-     stat = vgd_levels(vgd,ip1s,levels,sfc_field=100000.,in_log=.false.,sfc_field_ls=100000.)
+     stat = vgd_levels(vgdid,ip1s,levels,sfc_field=100000.,in_log=.false.,sfc_field_ls=100000.)
      print*,'levels=',levels
      
-     stat = vgd_get(vgd,'VIPT',ip1s)
+     stat = vgd_get(vgdid,'VIPT',ip1s)
      print*,'ip1s=',ip1s
-     stat = vgd_levels(vgd,ip1s,levels,sfc_field=100000.,in_log=.false.,sfc_field_ls=100000.)
+     stat = vgd_levels(vgdid,ip1s,levels,sfc_field=100000.,in_log=.false.,sfc_field_ls=100000.)
      print*,'levels=',levels
-     stat = vgd_levels(vgd,ip1s,levels_3d,sfc_field=p0,in_log=.false.,sfc_field_ls=p0l)
+     stat = vgd_levels(vgdid,vgdid,ip1s,levels_3d,sfc_field=p0,in_log=.false.,sfc_field_ls=p0l)
      print*,'levels_3d(1,1,1:size(levels_3d,dim=3))=',levels_3d(1,1,1:size(levels_3d,dim=3))
      print*,'levels_3d(2,1,1:size(levels_3d,dim=3))=',levels_3d(2,1,1:size(levels_3d,dim=3))
   endif
@@ -92,14 +92,14 @@ end program constructor
 !==============================================================================
 !===============================================================================
 !===============================================================================
-integer function test_5100(F_d,F_file,F_write_control_L,F_stat) result(istat)
+integer function test_5100(vgdid,F_file,F_write_control_L,F_stat) result(istat)
    !
-   use vGrid_Descriptors, only: vgrid_descriptor,vgd_get,VGD_ERROR,VGD_OK
+   use vGrid_Descriptors, only: vgd_get,VGD_ERROR,VGD_OK
    
 
    implicit none
    !
-   type (vgrid_descriptor) :: F_d
+   integer :: vgdid
    logical :: F_write_control_L
    character (len=256) :: F_file
    integer :: F_stat
@@ -123,21 +123,21 @@ integer function test_5100(F_d,F_file,F_write_control_L,F_stat) result(istat)
 
    nullify(vcdm,vcdt,work,b_m_8,c_m_8,a_m_8,b_t_8,c_t_8,a_t_8,work_8,vipm,vipt,work_i)
 
-   if( vgd_get(F_d,key='KIND - vertical coordinate ip1 kind' ,value=kind)   == VGD_ERROR) return
-   if( vgd_get(F_d,key='VERS - vertical coordinate version'  ,value=vers)   == VGD_ERROR) return
-   if( vgd_get(F_d,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8)  == VGD_ERROR) return
-   if( vgd_get(F_d,key='CA_T - vertical A coefficient (t)'   ,value=a_t_8)  == VGD_ERROR) return
-   if( vgd_get(F_d,key='CB_M - vertical B coefficient (m)'   ,value=b_m_8)  == VGD_ERROR) return
-   if( vgd_get(F_d,key='CC_M - vertical C coefficient (m)'   ,value=c_m_8)  == VGD_ERROR) return
-   if( vgd_get(F_d,key='CB_T - vertical B coefficient (t)'   ,value=b_t_8)  == VGD_ERROR) return
-   if( vgd_get(F_d,key='CC_T - vertical C coefficient (t)'   ,value=c_t_8)  == VGD_ERROR) return
-   if( vgd_get(F_d,key='VIPM - level ip1 list (m)'           ,value=vipm)   == VGD_ERROR) return
-   if( vgd_get(F_d,key='VIPT - level ip1 list (t)'           ,value=vipt)   == VGD_ERROR) return
-   if( vgd_get(F_d,key='VCDM - vertical coordinate (m)'      ,value=vcdm)   == VGD_ERROR) return
-   if( vgd_get(F_d,key='VCDT - vertical coordinate (t)'      ,value=vcdt)   == VGD_ERROR) return
-   if( vgd_get(F_d,key='NL_M - Number of vertical levels (m)',value=nl_m)   == VGD_ERROR) return
-   if( vgd_get(F_d,key='NL_T - Number of vertical levels (t)',value=nl_t)   == VGD_ERROR) return
-   if( vgd_get(F_d,key='IP_1 - record ip1'                   ,value=ip1)    == VGD_ERROR) return
+   if( vgd_get(vgdid,key='KIND - vertical coordinate ip1 kind' ,value=kind)   == VGD_ERROR) return
+   if( vgd_get(vgdid,key='VERS - vertical coordinate version'  ,value=vers)   == VGD_ERROR) return
+   if( vgd_get(vgdid,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8)  == VGD_ERROR) return
+   if( vgd_get(vgdid,key='CA_T - vertical A coefficient (t)'   ,value=a_t_8)  == VGD_ERROR) return
+   if( vgd_get(vgdid,key='CB_M - vertical B coefficient (m)'   ,value=b_m_8)  == VGD_ERROR) return
+   if( vgd_get(vgdid,key='CC_M - vertical C coefficient (m)'   ,value=c_m_8)  == VGD_ERROR) return
+   if( vgd_get(vgdid,key='CB_T - vertical B coefficient (t)'   ,value=b_t_8)  == VGD_ERROR) return
+   if( vgd_get(vgdid,key='CC_T - vertical C coefficient (t)'   ,value=c_t_8)  == VGD_ERROR) return
+   if( vgd_get(vgdid,key='VIPM - level ip1 list (m)'           ,value=vipm)   == VGD_ERROR) return
+   if( vgd_get(vgdid,key='VIPT - level ip1 list (t)'           ,value=vipt)   == VGD_ERROR) return
+   if( vgd_get(vgdid,key='VCDM - vertical coordinate (m)'      ,value=vcdm)   == VGD_ERROR) return
+   if( vgd_get(vgdid,key='VCDT - vertical coordinate (t)'      ,value=vcdt)   == VGD_ERROR) return
+   if( vgd_get(vgdid,key='NL_M - Number of vertical levels (m)',value=nl_m)   == VGD_ERROR) return
+   if( vgd_get(vgdid,key='NL_T - Number of vertical levels (t)',value=nl_t)   == VGD_ERROR) return
+   if( vgd_get(vgdid,key='IP_1 - record ip1'                   ,value=ip1)    == VGD_ERROR) return
    print*,'TESTING ',kind*1000+vers
 
    if(F_write_control_L)then

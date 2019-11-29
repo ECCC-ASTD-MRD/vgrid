@@ -17,12 +17,12 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program tests
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_put,VGD_LEN_NAME
+  use vGrid_Descriptors, only: vgd_new,vgd_get,vgd_put,VGD_LEN_NAME
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   integer :: stat,fstkey,lu=0,fnom,fstouv,fstfrm,fclos,lutxt=69,ip1,ip2
   real, dimension(:,:,:), allocatable :: lev
   character(len=12) :: rfld_ETIK
@@ -43,11 +43,11 @@ program tests
   close(lutxt)
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
+  stat = vgd_new(vgdid,unit=lu,format="fst",ip1=ip1,ip2=ip2)
 
   ! Change an element of the structure
-  stat = vgd_put(d,key='ETIK',value='123456789012')
-  stat = vgd_get(d,key='ETIK',value=rfld_ETIK)
+  stat = vgd_put(vgdid,key='ETIK',value='123456789012')
+  stat = vgd_get(vgdid,key='ETIK',value=rfld_ETIK)
   if(rfld_ETIK /= '123456789012') ok = .false.
 
   call ut_report(ok,message='Grid_Descriptors::vgd_put put character value')

@@ -100,7 +100,7 @@ end program levels_withref_profile_all
 
 integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
 
-   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_levels,vgd_get,vgd_print,VGD_LEN_RFLD,VGD_NO_REF_NOMVAR,VGD_ERROR,VGD_OK
+   use vGrid_Descriptors, only: vgd_new,vgd_levels,vgd_get,vgd_print,VGD_LEN_RFLD,VGD_NO_REF_NOMVAR,VGD_ERROR,VGD_OK
    
   
    implicit none  
@@ -110,7 +110,7 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
    ! Local variables
    integer, save :: lu=10   
    integer :: fnom,fstouv,fstfrm,lutxt=69,kind
-   type(vgrid_descriptor) :: vgd
+   integer :: vgdid
    integer, parameter :: nmax=1000
    integer, dimension(nmax) :: liste
    integer :: ier,fstinl,fstprm,fstinf,fstluk,infon,k,i,j,i0,j0,vcode
@@ -159,8 +159,8 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
    endif
 
    ! Get vertical grid descriptor
-   ier = vgd_new(vgd,unit=lu,format="fst",ip1=ip1,ip2=ip2)
-   ier = vgd_print(vgd)
+   ier = vgd_new(vgdid,unit=lu,format="fst",ip1=ip1,ip2=ip2)
+   ier = vgd_print(vgdid)
    if(ier == VGD_ERROR )then
       print*,'ERROR in test: Problem getting vertical grid descriptor'
       print*,'FILE: ',trim(F_fst)
@@ -185,9 +185,9 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
       ip1s(k)=ip1
    end do
    
-   ier = vgd_get(vgd, "RFLD", rfld_S, .true.);
+   ier = vgd_get(vgdid, "RFLD", rfld_S, .true.);
    if( rfld_S == VGD_NO_REF_NOMVAR )then
-      ier = vgd_get(vgd, "VCOD", vcode);
+      ier = vgd_get(vgdid, "VCOD", vcode);
       if(vcode == 4001)then         
          ! Allocate P0, used only to get horizontale size         
          key = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ','GZ')
@@ -236,7 +236,7 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
    endif
    
    two_refs_L = .false.
-   ier = vgd_get(vgd, "RFLS", rfls_S, .true.);
+   ier = vgd_get(vgdid, "RFLS", rfls_S, .true.);
    if( rfls_S /= VGD_NO_REF_NOMVAR )then      
       two_refs_L = .true.
       key = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',rfls_S)
@@ -256,9 +256,9 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
    endif
    ! Test 32 bits interface
    if(two_refs_L)then
-      ier = vgd_levels(vgd,ip1s,pres,p0_point,sfc_field_ls=p0ls_point)
+      ier = vgd_levels(vgdid,ip1s,pres,p0_point,sfc_field_ls=p0ls_point)
    else
-      ier = vgd_levels(vgd,ip1s,pres,p0_point)
+      ier = vgd_levels(vgdid,ip1s,pres,p0_point)
    endif
    if(ier == VGD_ERROR )then
       print*,'ERROR in test: Problem with vgd_levels 32 bits'
@@ -295,7 +295,7 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
          fact=.1
          fact_8=.1d0
       elseif(trim(rfld_S) == trim(VGD_NO_REF_NOMVAR))then
-         ier = vgd_get(vgd, "VCOD", vcode);
+         ier = vgd_get(vgdid, "VCOD", vcode);
          if(vcode == 4001)then
             nomvar_metric="GZ"
             fact=.1
@@ -339,9 +339,9 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
 
    ! Test 64 bits interface
    if(two_refs_L)then
-      ier = vgd_levels(vgd,ip1s,pres_8,p0_point_8,sfc_field_ls=p0ls_point_8)
+      ier = vgd_levels(vgdid,ip1s,pres_8,p0_point_8,sfc_field_ls=p0ls_point_8)
    else
-      ier = vgd_levels(vgd,ip1s,pres_8,p0_point_8)
+      ier = vgd_levels(vgdid,ip1s,pres_8,p0_point_8)
    endif
    if(ier == VGD_ERROR )then
       print*,'ERROR in test: Problem with vgd_levels 64 bits'

@@ -20,12 +20,12 @@ program constructor
 
   ! Revision : Andre Plante test on B instead of A since A not sensitive to rcoefs
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_print,VGD_ERROR, operator(==)
+  use vGrid_Descriptors, only: vgd_new,vgd_get,vgd_print,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: vgd1, vgd2
+  integer :: vgdid1, vgdid2
   integer :: test_hgts, stat
   real, dimension(80) :: hgts= &
 (/ 6.62078E+04, 6.29395E+04, 5.95406E+04, 5.60645E+04, 5.26367E+04, 4.93408E+04, 4.63244E+04, 4.35656E+04, 4.10827E+04, 3.88781E+04,&
@@ -46,18 +46,18 @@ program constructor
 
   ! Construct a new set of vertical coordinate descriptors 21002 hyb heights on Lorenz grid
   ! Call without rcoef3 and 4
-  if( vgd_new(vgd1,kind=21,version=2,hyb=hgts,rcoef1=rcoef1,rcoef2=rcoef2,dhm=10.0,dht=1.5,dhw=0.) == VGD_ERROR )OK=.false.
+  if( vgd_new(vgdid1,kind=21,version=2,hyb=hgts,rcoef1=rcoef1,rcoef2=rcoef2,dhm=10.0,dht=1.5,dhw=0.) == VGD_ERROR )OK=.false.
 
   ! Construct a new set of vertical coordinate descriptors 21002 hyb heights on Lorenz grid
   ! Call with rcoef3 and 4 but set to -1, should be the same as above
-  if( vgd_new(vgd2,kind=21,version=2,hyb=hgts,rcoef1=rcoef1,rcoef2=rcoef2,rcoef3=-1.,rcoef4=-1.,dhm=10.0,dht=1.5,dhw=0.) == VGD_ERROR )OK=.false.
+  if( vgd_new(vgdid2,kind=21,version=2,hyb=hgts,rcoef1=rcoef1,rcoef2=rcoef2,rcoef3=-1.,rcoef4=-1.,dhm=10.0,dht=1.5,dhw=0.) == VGD_ERROR )OK=.false.
   
-  if(.not. vgd1 == vgd2)then
-     print*,'ERROR vgd1, vgd2 should be equal and are not'
+  if(.not. vgdid1 == vgdid2)then
+     print*,'ERROR vgdid1, vgdid2 should be equal and are not'
      stop
   endif
 
-  if( vgd_print(vgd1,convip_L=.true.) == VGD_ERROR )then
+  if( vgd_print(vgdid1,vgdid1,convip_L=.true.) == VGD_ERROR )then
      print*,'ERROR'
      stop
   endif
@@ -67,7 +67,7 @@ program constructor
   endif
 
   file='data/data_constructor_gen_21002.txt'
-  stat = test_hgts(vgd1,file,write_control_L)
+  stat = test_hgts(vgdid1,file,write_control_L)
   if(stat.eq.VGD_ERROR)OK=.false.
 
   call ut_report(OK,'Grid_Descriptors::vgd_new vertical generate initializer Lorenz coordinate')
@@ -75,14 +75,14 @@ end program constructor
 !==============================================================================
 !===============================================================================
 !===============================================================================
-integer function test_hgts(F_d,F_file,F_write_control_L) result(istat)
+integer function test_hgts(vgdid,F_file,F_write_control_L) result(istat)
    !
-   use vGrid_Descriptors, only: vgrid_descriptor,vgd_get,vgd_new,operator(==),VGD_ERROR,VGD_OK
+   use vGrid_Descriptors, only: vgd_get,vgd_new,VGD_ERROR,VGD_OK
    
 
    implicit none
    !
-   type (vgrid_descriptor) :: F_d
+   integer :: vgdid
    logical :: F_write_control_L
    character (len=256) :: F_file
    !
@@ -93,7 +93,7 @@ integer function test_hgts(F_d,F_file,F_write_control_L) result(istat)
    integer, dimension(:), pointer :: vipm,vipt,vipw,work_i
    integer :: nl_m,nl_t,nl_w,k,nk,kind,vers,ip1,my_ip1
    real(kind=8), dimension(:,:,:), pointer :: table
-   type (vgrid_descriptor) :: vgrid_rebuilt
+   integer :: vgrid_rebuilt
 
    nullify(vcdm,vcdt,vcdw,work,a_m_8,b_m_8,a_t_8,b_t_8,a_w_8,b_w_8,work_8,vipm,vipt,vipw,work_i,table)
 
@@ -101,9 +101,9 @@ integer function test_hgts(F_d,F_file,F_write_control_L) result(istat)
 
    call flush(6)
 
-   if(vgd_get(F_d,'VTBL',table) == VGD_ERROR)return
+   if(vgd_get(vgdid,'VTBL',table) == VGD_ERROR)return
    if(vgd_new(vgrid_rebuilt,table) ==  VGD_ERROR)return
-   if (vgrid_rebuilt == F_d) then
+   if (vgrid_rebuilt == vgdid) then
       ! Ok do noting
    else
       print*,'ERROR: rebuilding table'
@@ -112,24 +112,24 @@ integer function test_hgts(F_d,F_file,F_write_control_L) result(istat)
    !if(vgd_free(vgrid_rebuilt) ==  VGD_ERROR)return
    deallocate(table)
    
-   if( vgd_get(F_d,key='KIND - vertical coordinate ip1 kind' ,value=kind)   == VGD_ERROR) return
-   if( vgd_get(F_d,key='VERS - vertical coordinate version'  ,value=vers)   == VGD_ERROR) return
-   if( vgd_get(F_d,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8)  == VGD_ERROR) return
-   if( vgd_get(F_d,key='CA_T - vertical A coefficient (t)'   ,value=a_t_8)  == VGD_ERROR) return
-   if( vgd_get(F_d,key='CA_W - vertical A coefficient (w)'   ,value=a_w_8)  == VGD_ERROR) return
-   if( vgd_get(F_d,key='CB_M - vertical B coefficient (m)'   ,value=b_m_8)  == VGD_ERROR) return
-   if( vgd_get(F_d,key='CB_T - vertical B coefficient (t)'   ,value=b_t_8)  == VGD_ERROR) return
-   if( vgd_get(F_d,key='CB_W - vertical B coefficient (w)'   ,value=b_w_8)  == VGD_ERROR) return
-   if( vgd_get(F_d,key='VIPM - level ip1 list (m)'           ,value=vipm)   == VGD_ERROR) return
-   if( vgd_get(F_d,key='VIPT - level ip1 list (t)'           ,value=vipt)   == VGD_ERROR) return
-   if( vgd_get(F_d,key='VIPW - level ip1 list (w)'           ,value=vipw)   == VGD_ERROR) return
-   if( vgd_get(F_d,key='VCDM - vertical coordinate (m)'      ,value=vcdm)   == VGD_ERROR) return
-   if( vgd_get(F_d,key='VCDT - vertical coordinate (t)'      ,value=vcdt)   == VGD_ERROR) return
-   if( vgd_get(F_d,key='VCDW - vertical coordinate (w)'      ,value=vcdw)   == VGD_ERROR) return
-   if( vgd_get(F_d,key='NL_M - Number of vertical levels (m)',value=nl_m)   == VGD_ERROR) return
-   if( vgd_get(F_d,key='NL_T - Number of vertical levels (t)',value=nl_t)   == VGD_ERROR) return
-   if( vgd_get(F_d,key='NL_W - Number of vertical levels (w)',value=nl_w)   == VGD_ERROR) return
-   if( vgd_get(F_d,key='IP_1 - record ip1'                   ,value=ip1)    == VGD_ERROR) return
+   if( vgd_get(vgdid,key='KIND - vertical coordinate ip1 kind' ,value=kind)   == VGD_ERROR) return
+   if( vgd_get(vgdid,key='VERS - vertical coordinate version'  ,value=vers)   == VGD_ERROR) return
+   if( vgd_get(vgdid,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8)  == VGD_ERROR) return
+   if( vgd_get(vgdid,key='CA_T - vertical A coefficient (t)'   ,value=a_t_8)  == VGD_ERROR) return
+   if( vgd_get(vgdid,key='CA_W - vertical A coefficient (w)'   ,value=a_w_8)  == VGD_ERROR) return
+   if( vgd_get(vgdid,key='CB_M - vertical B coefficient (m)'   ,value=b_m_8)  == VGD_ERROR) return
+   if( vgd_get(vgdid,key='CB_T - vertical B coefficient (t)'   ,value=b_t_8)  == VGD_ERROR) return
+   if( vgd_get(vgdid,key='CB_W - vertical B coefficient (w)'   ,value=b_w_8)  == VGD_ERROR) return
+   if( vgd_get(vgdid,key='VIPM - level ip1 list (m)'           ,value=vipm)   == VGD_ERROR) return
+   if( vgd_get(vgdid,key='VIPT - level ip1 list (t)'           ,value=vipt)   == VGD_ERROR) return
+   if( vgd_get(vgdid,key='VIPW - level ip1 list (w)'           ,value=vipw)   == VGD_ERROR) return
+   if( vgd_get(vgdid,key='VCDM - vertical coordinate (m)'      ,value=vcdm)   == VGD_ERROR) return
+   if( vgd_get(vgdid,key='VCDT - vertical coordinate (t)'      ,value=vcdt)   == VGD_ERROR) return
+   if( vgd_get(vgdid,key='VCDW - vertical coordinate (w)'      ,value=vcdw)   == VGD_ERROR) return
+   if( vgd_get(vgdid,key='NL_M - Number of vertical levels (m)',value=nl_m)   == VGD_ERROR) return
+   if( vgd_get(vgdid,key='NL_T - Number of vertical levels (t)',value=nl_t)   == VGD_ERROR) return
+   if( vgd_get(vgdid,key='NL_W - Number of vertical levels (w)',value=nl_w)   == VGD_ERROR) return
+   if( vgd_get(vgdid,key='IP_1 - record ip1'                   ,value=ip1)    == VGD_ERROR) return
    print*,'TESTING ',kind*1000+vers
 
    if(F_write_control_L)then

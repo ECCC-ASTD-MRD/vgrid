@@ -63,7 +63,7 @@ end program tests
 
 integer function test_it(F_lu,F_ip1,F_ip2) result(stat)
    
-   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_dpidpis,VGD_ERROR,VGD_OK
+   use vGrid_Descriptors, only: vgd_new,vgd_get,vgd_dpidpis,VGD_ERROR,VGD_OK
    
    
    implicit none
@@ -80,7 +80,7 @@ integer function test_it(F_lu,F_ip1,F_ip2) result(stat)
    real, dimension(:,:), pointer :: p0,px
    real :: local_pres,w1,pres
    real(kind=8) :: local_pres_8
-   type(vgrid_descriptor) :: d
+   integer :: vgdid
    real(kind=8), dimension(:), pointer :: coef_b   
 
    nullify(ip1_list,dpidpis_profil,dpidpis_profil_8,p0,px,coef_b)
@@ -88,13 +88,13 @@ integer function test_it(F_lu,F_ip1,F_ip2) result(stat)
    stat=VGD_ERROR
 
    ! Get dpidpis
-   stat = vgd_new(d,unit=F_lu,format="fst",ip1=F_ip1,ip2=F_ip2)
+   stat = vgd_new(vgdid,unit=F_lu,format="fst",ip1=F_ip1,ip2=F_ip2)
    if(stat /= VGD_OK)return
 
-   stat = vgd_get(d,key='CB_T - vertical B coefficient (t)',value=coef_b)
+   stat = vgd_get(vgdid,key='CB_T - vertical B coefficient (t)',value=coef_b)
    if(stat /= VGD_OK)return
 
-   stat = vgd_get(d,key='VIPT - level ip1 list (t)'        ,value=ip1_list)
+   stat = vgd_get(vgdid,key='VIPT - level ip1 list (t)'        ,value=ip1_list)
    if(stat /= VGD_OK)return
 
    stat = fstinf(F_lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',"UU")
@@ -112,7 +112,7 @@ integer function test_it(F_lu,F_ip1,F_ip2) result(stat)
    !===============
    ! Real interface
    
-   stat = vgd_dpidpis(d,sfc_field=local_pres,ip1_list=ip1_list,dpidpis=dpidpis_profil)
+   stat = vgd_dpidpis(vgdid,sfc_field=local_pres,ip1_list=ip1_list,dpidpis=dpidpis_profil)
    if(stat.ne.VGD_OK)then
       print*,'ERROR: problem with vgd_dpidpis'
       return
@@ -135,7 +135,7 @@ integer function test_it(F_lu,F_ip1,F_ip2) result(stat)
    !=================
    ! Real*8 interface
    
-   stat = vgd_dpidpis(d,sfc_field=local_pres_8,ip1_list=ip1_list,dpidpis=dpidpis_profil_8)
+   stat = vgd_dpidpis(vgdid,sfc_field=local_pres_8,ip1_list=ip1_list,dpidpis=dpidpis_profil_8)
    if(stat.ne.VGD_OK)then
       print*,'ERROR: problem with vgd_dpidpis real(kind=8)'
       return

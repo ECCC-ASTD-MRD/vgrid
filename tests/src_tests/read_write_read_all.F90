@@ -53,7 +53,7 @@ program constructor
 end program constructor
 
 integer function test_it(F_file,F_index) result(istat)
-   use vGrid_Descriptors, only: vgrid_descriptor,vgd_get,vgd_new,vgd_print,vgd_write,VGD_OK,VGD_ERROR,operator(==),vgd_put,vgd_print
+   use vGrid_Descriptors, only: vgd_get,vgd_new,vgd_print,vgd_write,VGD_OK,VGD_ERROR,vgd_put,vgd_print
    implicit none
 
    integer :: F_index
@@ -61,7 +61,7 @@ integer function test_it(F_file,F_index) result(istat)
    
    ! Local variables
    
-   type(vgrid_descriptor) :: vgd,vgd2
+   integer :: vgdid,vgdid2
    integer :: stat, kind,version,lu1,lu2,lu3
    integer :: fnom,fstouv,fstfrm
    character(len=128) :: my_file
@@ -87,11 +87,11 @@ integer function test_it(F_file,F_index) result(istat)
    endif
    
    ! Construct a new set of 3D coordinate descriptors
-   if(vgd_new(vgd,unit=lu1,format="fst") == VGD_ERROR)return
+   if(vgd_new(vgdid,unit=lu1,format="fst") == VGD_ERROR)return
    stat=fstfrm(lu1)
 
-   if(vgd_get(vgd,key="KIND",value=kind)    == VGD_ERROR)return
-   if(vgd_get(vgd,key="VERS",value=version) == VGD_ERROR)return
+   if(vgd_get(vgdid,key="KIND",value=kind)    == VGD_ERROR)return
+   if(vgd_get(vgdid,key="VERS",value=version) == VGD_ERROR)return
    write(my_file,*)kind*1000+version   
    my_file=adjustl(my_file)
    my_file="data/toctoc_"//trim(my_file)//".fst"
@@ -106,7 +106,7 @@ integer function test_it(F_file,F_index) result(istat)
       print*,'ERROR on fstouv with ',my_file
       call abort
    endif
-   if(vgd_write(vgd,unit=lu2,format="fst") == VGD_ERROR)return
+   if(vgd_write(vgdid,unit=lu2,format="fst") == VGD_ERROR)return
    stat=fstfrm(lu2)
    
    stat=fnom(lu3,my_file,"RND+R/O",0)
@@ -120,12 +120,12 @@ integer function test_it(F_file,F_index) result(istat)
       call abort
    endif
     
-   if(vgd_new(vgd2,unit=lu3,format="fst") == VGD_ERROR)return
+   if(vgd_new(vgdid2,unit=lu3,format="fst") == VGD_ERROR)return
    stat=fstfrm(lu3)
       
-   if (.not. (vgd2 == vgd) )then
+   if (.not. (vgdid2 == vgdid) )then
       print*,'In test read_write_read_all, !! do not match'
-      stat=vgd_print(vgd2)
+      stat=vgd_print(vgdid2)
       return
    else
       print*,'!! matched'

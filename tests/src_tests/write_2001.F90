@@ -17,13 +17,13 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program constructor
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_write,vgd_print,VGD_ERROR
+  use vGrid_Descriptors, only: vgd_new,vgd_get,vgd_write,vgd_print,VGD_ERROR
   use Unit_Testing, only: ut_report
   
 
   implicit none
 
-  type(vgrid_descriptor) :: d,d_rtn
+  integer :: vgdid,vgdid_rtn
   integer :: stat,lu=0,fnom,fstouv,fstfrm,fclos,k,ip1,ip2
   integer, parameter :: LEVS=4
   integer, dimension(LEVS) :: ip1s
@@ -54,26 +54,26 @@ program constructor
   enddo
 
   pres_8 = pres_8*100. !convert mb to Pa
-  stat = vgd_new(d,kind=2,version=1,nk=size(pres_8),ip1_m=ip1s,a_m_8=pres_8,b_m_8=bb,ip1=111,ip2=222)
+  stat = vgd_new(vgdid,kind=2,version=1,nk=size(pres_8),ip1_m=ip1s,a_m_8=pres_8,b_m_8=bb,ip1=111,ip2=222)
 
-  stat = vgd_print(d)
+  stat = vgd_print(vgdid)
   if(stat==VGD_ERROR)then
      call system('rm -f test.fst')
      call exit(1)
   endif
-  stat = vgd_write(d,unit=lu,format='fst')
-  stat = vgd_get(d,'IP_1 - record ip1',ip1)
-  stat = vgd_get(d,'IP_2 - record ip2',ip2)
-  stat = vgd_new(d_rtn,unit=lu,format='fst',ip1=ip1,ip2=ip2)
+  stat = vgd_write(vgdid,unit=lu,format='fst')
+  stat = vgd_get(vgdid,'IP_1 - record ip1',ip1)
+  stat = vgd_get(vgdid,'IP_2 - record ip2',ip2)
+  stat = vgd_new(vgdid_rtn,unit=lu,format='fst',ip1=ip1,ip2=ip2)
   if(stat==VGD_ERROR)then
      call system('rm -f test.fst')
      call exit(1)
   endif
 
-  stat = vgd_get(d_rtn,key='COFA - vertical A coefficient',value=pres_rtn)
+  stat = vgd_get(vgdid_rtn,key='COFA - vertical A coefficient',value=pres_rtn)
 
-!  stat = vgd_free(d)
-!  stat = vgd_free(d_rtn)
+!  stat = vgd_free(vgdid)
+!  stat = vgd_free(vgdid_rtn)
 
   call ut_report(abs(pres_rtn(1)-pres_8(1)) < epsilon(pres_8),'Grid_Descriptors::vgd_new vertical build initializer (2001) value')
 

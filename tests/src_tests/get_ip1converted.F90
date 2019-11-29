@@ -17,12 +17,12 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program tests
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,VGD_LEN_NAME
+  use vGrid_Descriptors, only: vgd_new,vgd_get,VGD_LEN_NAME
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   integer :: stat,lu=10,lutxt=69,ip1,ip2
   real :: epsilon=0.0001
   real, dimension(:), pointer :: hybm
@@ -47,10 +47,10 @@ program tests
   close(lutxt)
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
+  stat = vgd_new(vgdid,unit=lu,format="fst",ip1=ip1,ip2=ip2)
 
   ! Get information about the coordinate
-  stat = vgd_get(d,key='VCDM - vertical coordinate (M)',value=hybm)
+  stat = vgd_get(vgdid,key='VCDM - vertical coordinate (M)',value=hybm)
   call ut_report(abs(hybm(6)-0.106844)<epsilon,message='Grid_Descriptors::vgd_get IP1 retrieved coordinate')
 
   ! Close files

@@ -17,12 +17,12 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program tests
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_put,VGD_LEN_NAME,VGD_ERROR
+  use vGrid_Descriptors, only: vgd_new,vgd_put,VGD_LEN_NAME,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   integer :: stat,fnom,fstouv,lu=10
   real, dimension(:,:,:), allocatable :: lev
   logical :: ok = .true.
@@ -39,14 +39,14 @@ program tests
   endif
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = vgd_new(d,lu,format='fst')
+  stat = vgd_new(vgdid,lu,format='fst')
   if(stat == VGD_ERROR)then
      ok = .false.
      print*,'Error with vgd_put'
   end if
 
   ! Change an element of the structure
-  stat = vgd_put(d,key='ETIKE',value='123456789123')
+  stat = vgd_put(vgdid,key='ETIKE',value='123456789123')
   if(stat == VGD_ERROR)then
      ok = .false.
      print*,'Error with vgd_put'

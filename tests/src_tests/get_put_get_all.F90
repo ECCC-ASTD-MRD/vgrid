@@ -63,7 +63,7 @@ end program get_put_get_all
 !=======================================================================
 
 integer function test_it(F_file, ind) result(status)
-  use vGrid_Descriptors, only: vgrid_descriptor, vgd_new, vgd_get, &
+  use vGrid_Descriptors, only:  vgd_new, vgd_get, &
        vgd_put, vgd_get, VGD_OK, VGD_ERROR, VGD_LEN_ETIK
    implicit none
    integer, intent(in) :: ind
@@ -72,7 +72,7 @@ integer function test_it(F_file, ind) result(status)
    integer :: lu, fnom, fstouv, fstfrm, fclos
    integer :: i,intA,intB, ier
    integer, dimension(:), pointer :: intA_1d,intB_1d
-   type (vgrid_descriptor) :: vgd
+   integer :: vgdid
    character(len=4):: key_S
    character(len=4), dimension(10) :: key_int_S = (/'DATE','IG_1','IG_2','IG_3','IG_4','IP_1','IP_2','IP_3','DIPM','DIPT'/)
    character(len=VGD_LEN_ETIK) :: etikA_S, etikB_S
@@ -91,7 +91,7 @@ integer function test_it(F_file, ind) result(status)
       print*,'ERROR: no record in file ', trim(F_file)
       return
    endif   
-   if( vgd_new(vgd, lu, 'fst') == VGD_ERROR )then
+   if( vgd_new(vgdid, lu, 'fst') == VGD_ERROR )then
       print*,'Error with vgd_new on file ', trim(F_file)
       call exit(1)
    endif
@@ -99,7 +99,7 @@ integer function test_it(F_file, ind) result(status)
    !put_int
    do i=1,size(key_int_S)
       key_S=key_int_S(i)
-      if( vgd_get(vgd,key_S,intA) == VGD_ERROR )then
+      if( vgd_get(vgdid,key_S,intA) == VGD_ERROR )then
          ! Key DIPM and DIPT are not there for all Vcode
          if(key_S == "DIPM" .or. key_S == "DIPT")then
             print*,'Error on Cvgd_get_int on DIPM or DIPT is normal for some Vcode'
@@ -110,8 +110,8 @@ integer function test_it(F_file, ind) result(status)
       endif
       intA = intA + 1
       intB = intA - 1
-      if( vgd_put(vgd,key_S,intA) == VGD_ERROR ) return
-      if( vgd_get(vgd,key_S,intB) == VGD_ERROR ) return
+      if( vgd_put(vgdid,key_S,intA) == VGD_ERROR ) return
+      if( vgd_get(vgdid,key_S,intB) == VGD_ERROR ) return
       if( intA /= intB)then
          print*,'ERROR with get int on key',key_S
          return
@@ -122,10 +122,10 @@ integer function test_it(F_file, ind) result(status)
    
    !int_char
    key_S="ETIK"
-   if( vgd_get(vgd,key_S,etikA_S) == VGD_ERROR ) return
+   if( vgd_get(vgdid,key_S,etikA_S) == VGD_ERROR ) return
    etikA_S="TEST"
-   if( vgd_put(vgd,key_S,etikA_S) == VGD_ERROR ) return
-   if( vgd_get(vgd,key_S,etikB_S) == VGD_ERROR ) return
+   if( vgd_put(vgdid,key_S,etikA_S) == VGD_ERROR ) return
+   if( vgd_get(vgdid,key_S,etikB_S) == VGD_ERROR ) return
    if(trim(etikA_S) /= trim(etikB_S) )then
       print*,'ERROR with get char on key',key_S
       return
@@ -136,7 +136,7 @@ integer function test_it(F_file, ind) result(status)
    if(associated(intA_1d))deallocate(intA_1d)
    if(associated(intB_1d))deallocate(intB_1d)
    
-   !ier = vgd_free(vgd)
+   !ier = vgd_free(vgdid)
    status = fstfrm(lu)
    status = fclos(lu)
    status = VGD_OK

@@ -29,22 +29,20 @@ extern "C" void c_coat_check() {
 
   coat_check my_coat_check;
 
-  vgrid_descriptor my_vgrid_a, my_vgrid_b;
-  vgrid_descriptor *my_vgrid_a_p, *my_vgrid_b_p, *checked_vgrid_p;
+  vgrid my_vgrid_a, my_vgrid_b;
+  vgrid *my_vgrid_a_p, *my_vgrid_b_p, *checked_vgrid_p;
+  vgrid_descriptor dummy;
 
   my_vgrid_a_p = &my_vgrid_a;
   my_vgrid_b_p = &my_vgrid_b;
-
-  vgrid my_vgd_a(my_vgrid_a_p);
-  vgrid my_vgd_b(my_vgrid_b_p);
 
   status=VGD_OK;
 
 
   // Test 1:  If I put a second (different) grid in the coat check, I should get
   //          a tag that is different from the first one
-  my_vgd_a.c_vgd_construct_jwb(my_vgrid_a_p);
-  my_vgd_b.c_vgd_construct_jwb(my_vgrid_b_p);
+  my_vgrid_a.c_vgd_construct_jwb(&dummy);
+  my_vgrid_b.c_vgd_construct_jwb(&dummy);
   my_vgrid_a_p->vcode = 768; // Leave a fingerprint
   my_vgrid_b_p->vcode = 999; // Leave a fingerprint
   tag1 = my_coat_check.get_tag(my_vgrid_a_p);
@@ -78,7 +76,7 @@ extern "C" void c_coat_check() {
   checked_vgrid_p = my_coat_check.get_vgrid(tag_a);
 
   // TBD:  create and use vgrid operator ==
-  if(my_vgd_a.Cvgd_vgdcmp(my_vgrid_a_p, checked_vgrid_p) != 0)
+  if(my_vgrid_a.Cvgd_vgdcmp_jwb(checked_vgrid_p) != 0)
     {
       printf("Error:  get_vgrid does not give back the original vgrid\n");
       status = VGD_ERROR;

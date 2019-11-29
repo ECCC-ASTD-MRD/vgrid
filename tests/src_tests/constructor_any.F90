@@ -18,12 +18,12 @@
 ! * Boston, MA 02111-1307, USA.
 program constructor
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_write,operator(==),VGD_ERROR
+  use vGrid_Descriptors, only: vgd_new,vgd_write,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: d,d2
+  integer :: vgdid,vgdid2
   integer :: lu=0,lu2=0,lutxt=69
   integer :: stat,ip1,ip2
   integer :: fnom,fstouv,fstfrm,fclos
@@ -52,10 +52,10 @@ program constructor
   close(lutxt)
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = vgd_new(d,unit=lu,format="fst",ip1=-1,ip2=-1)
-  stat = vgd_write(d,unit=lu2,format="fst")
-  stat = vgd_new(d2,unit=lu2,format="fst",ip1=ip1,ip2=ip2)
-  if(.not.d2==d)stat=vgd_ERROR
+  stat = vgd_new(vgdid,unit=lu,format="fst",ip1=-1,ip2=-1)
+  stat = vgd_write(vgdid,unit=lu2,format="fst")
+  stat = vgd_new(vgdid2,unit=lu2,format="fst",ip1=ip1,ip2=ip2)
+  if(.not.vgdid2==vgdid)stat=vgd_ERROR
 
   call ut_report(stat,'Grid_Descriptors, vgd_new, vgd_get CA')
 

@@ -18,12 +18,12 @@
 ! * Boston, MA 02111-1307, USA.
 program get_levels_from_keys
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_levels,VGD_ERROR
+  use vGrid_Descriptors, only: vgd_new,vgd_levels,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   integer, parameter :: lu=10, nmax=1000, lutxt=69
   integer, dimension(nmax) :: liste
   integer :: stat,infon,ier,i,j,k
@@ -56,7 +56,7 @@ program get_levels_from_keys
   endif
 
   ! Get vertical grid descriptor
-  stat = vgd_new(d,unit=lu,format="fst")
+  stat = vgd_new(vgdid,unit=lu,format="fst")
   if(stat < 0 )then
      print*,'Problem getting vertical grid descriptor'
      stop
@@ -69,7 +69,7 @@ program get_levels_from_keys
      stop
   endif
 
-  stat = vgd_levels(d,unit=lu,fstkeys=liste(1:infon),levels=pres)
+  stat = vgd_levels(vgdid,vgdid,unit=lu,fstkeys=liste(1:infon),levels=pres)
   if(stat < 0 )then
      print*,'Problem with vgd_levels'
      stop

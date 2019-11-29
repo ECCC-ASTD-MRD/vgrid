@@ -24,7 +24,7 @@ program constructor
   !
   implicit none
   !
-  type(vgrid_descriptor) :: d,d2
+  integer :: vgdid,vgdid2
   integer :: stat,i,nl_m,nl_t,k,nk,test_2001
   integer, dimension(:), pointer :: ip1s
   integer, dimension(:), pointer :: vipm,vipt,work_i
@@ -48,18 +48,18 @@ program constructor
      call convip(ip1s(i),my_real,2,2,dum_S,.false.)
   enddo
   !
-  stat = vgd_new(d,kind=2,version=1,nk=size(pres),ip1_m=ip1s,a_m_8=pres,b_m_8=b)
-  stat = vgd_get(d,key='VTBL - vertical coordinate table',value=tbl)
+  stat = vgd_new(vgdid,kind=2,version=1,nk=size(pres),ip1_m=ip1s,a_m_8=pres,b_m_8=b)
+  stat = vgd_get(vgdid,key='VTBL - vertical coordinate table',value=tbl)
   OK=abs(tbl(2,2,1)-pres(1)) < epsilon(pres)
   !
   file='data_Linux/data_constructor_build_2001.txt'
-  stat = test_2001(d,file,write_control_L)
+  stat = test_2001(vgdid,file,write_control_L)
   if(stat.eq.VGD_ERROR)OK=.false.
   !
   allocate(hyb(size(pres)))
   hyb=pres/100.
   !
-  stat = vgd_new(d2,kind=2,version=1,hyb=hyb)
+  stat = vgd_new(vgdid2,kind=2,version=1,hyb=hyb)
   !
   if(stat == VGD_ERROR)then
      print*,'Error avec vgd_new'
@@ -67,7 +67,7 @@ program constructor
   endif
   !
   file='data_Linux/data_constructor_build_2001.txt'
-  stat = test_2001(d,file,.false.)
+  stat = test_2001(vgdid,file,.false.)
   if(stat.eq.VGD_ERROR)OK=.false.  
   !
   call ut_report(OK,'Grid_Descriptors::vgd_new vertical build initializer (2001) value')
@@ -76,14 +76,14 @@ end program constructor
 !==============================================================================
 !===============================================================================
 !===============================================================================
-integer function test_2001(F_d,F_file,F_write_control_L) result(istat)
+integer function test_2001(vgdid,F_file,F_write_control_L) result(istat)
    !
    use vGrid_Descriptors, only: vgrid_descriptor,vgd_get,VGD_ERROR,VGD_OK
    
 
    implicit none
    !
-   type (vgrid_descriptor) :: F_d
+   integer :: vgdid
    logical :: F_write_control_L
    character (len=256) :: F_file
    !
@@ -97,16 +97,16 @@ integer function test_2001(F_d,F_file,F_write_control_L) result(istat)
    istat=VGD_ERROR
    !
    nullify(vcdm,vcdt,work,b_m_8,a_m_8,b_t_8,a_t_8,work_8,vipm,vipt,work_i)
-   stat = vgd_get(F_d,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8)
-   stat = vgd_get(F_d,key='CA_T - vertical A coefficient (t)'   ,value=a_t_8)
-   stat = vgd_get(F_d,key='CB_M - vertical B coefficient (m)'   ,value=b_m_8)
-   stat = vgd_get(F_d,key='CB_T - vertical B coefficient (t)'   ,value=b_t_8)
-   stat = vgd_get(F_d,key='VIPM - level ip1 list (m)'           ,value=vipm)
-   stat = vgd_get(F_d,key='VIPT - level ip1 list (t)'           ,value=vipt)
-   stat = vgd_get(F_d,key='VCDM - vertical coordinate (m)'      ,value=vcdm)
-   stat = vgd_get(F_d,key='VCDT - vertical coordinate (t)'      ,value=vcdt)
-   stat = vgd_get(F_d,key='NL_M - Number of vertical levels (m)',value=nl_m)
-   stat = vgd_get(F_d,key='NL_T - Number of vertical levels (t)',value=nl_t)
+   stat = vgd_get(vgdid,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8)
+   stat = vgd_get(vgdid,key='CA_T - vertical A coefficient (t)'   ,value=a_t_8)
+   stat = vgd_get(vgdid,key='CB_M - vertical B coefficient (m)'   ,value=b_m_8)
+   stat = vgd_get(vgdid,key='CB_T - vertical B coefficient (t)'   ,value=b_t_8)
+   stat = vgd_get(vgdid,key='VIPM - level ip1 list (m)'           ,value=vipm)
+   stat = vgd_get(vgdid,key='VIPT - level ip1 list (t)'           ,value=vipt)
+   stat = vgd_get(vgdid,key='VCDM - vertical coordinate (m)'      ,value=vcdm)
+   stat = vgd_get(vgdid,key='VCDT - vertical coordinate (t)'      ,value=vcdt)
+   stat = vgd_get(vgdid,key='NL_M - Number of vertical levels (m)',value=nl_m)
+   stat = vgd_get(vgdid,key='NL_T - Number of vertical levels (t)',value=nl_t)
    !
    if(F_write_control_L)then
       open(unit=10,file=F_file)

@@ -17,13 +17,13 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program constructor
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_print,vgd_get,VGD_OK
+  use vGrid_Descriptors, only: vgd_new,vgd_print,vgd_get,VGD_OK
   use Unit_Testing, only: ut_report
   
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   integer, parameter :: lu=10
   integer :: stat,i
   integer :: fnom,fstouv,fstfrm
@@ -47,17 +47,17 @@ program constructor
   endif
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = vgd_new(d,unit=lu,format="fst",ip1=2009,ip2=1000)
+  stat = vgd_new(vgdid,unit=lu,format="fst",ip1=2009,ip2=1000)
   if(stat.ne.VGD_OK)then
      print*,'ERROR: problem with vgd_new'
      stat=fstfrm(lu)
      call abort
   endif
 
-  stat = vgd_get(d,key='VIP1',value=vip1)
+  stat = vgd_get(vgdid,key='VIP1',value=vip1)
   if(stat.eq.VGD_OK)ok=.false.  
 
-  stat = vgd_get(d,key='VCRD',value=vcr)
+  stat = vgd_get(vgdid,key='VCRD',value=vcr)
   if(stat.eq.VGD_OK)ok=.false.  
 
   call ut_report(ok,'Grid_Descriptors, vgd_new, vgd_print 5001')

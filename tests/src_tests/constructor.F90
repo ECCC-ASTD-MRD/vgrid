@@ -20,12 +20,12 @@ program constructor
 
   ! Object: construct vgrid_descriptor
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new, VGD_OK
+  use vGrid_Descriptors, only: vgd_new, VGD_OK
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   integer :: lu=10,lutxt=69
   integer :: stat,ip1,ip2
   integer :: fnom,fstouv,fstfrm
@@ -47,22 +47,22 @@ program constructor
 
   ! Construct a new set of 3D coordinate descriptors
   print*,'The following error on optional ip2 is expected'
-  stat = vgd_new(d,unit=lu,format="fst",ip1=ip1)
+  stat = vgd_new(vgdid,unit=lu,format="fst",ip1=ip1)
   if(stat.eq.VGD_OK)ok=.false.
 
   print*,'The following error on optional ip1 is expected'
-  stat = vgd_new(d,unit=lu,format="fst",ip2=ip2)
+  stat = vgd_new(vgdid,unit=lu,format="fst",ip2=ip2)
   if(stat.eq.VGD_OK)ok=.false.
 
   print*,'The following error on format is expected'
-  stat = vgd_new(d,unit=lu,format="toto")
+  stat = vgd_new(vgdid,unit=lu,format="toto")
   if(stat.eq.VGD_OK)ok=.false.  
 
   print*,'The following error matching ip1 ip2 is expected'
-  stat = vgd_new(d,unit=lu,format="fst",ip1=123,ip2=456)
+  stat = vgd_new(vgdid,unit=lu,format="fst",ip1=123,ip2=456)
   if(stat.eq.VGD_OK)ok=.false.  
   
-  stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
+  stat = vgd_new(vgdid,unit=lu,format="fst",ip1=ip1,ip2=ip2)
   call ut_report(stat,'Grid_Descriptors, vgd_new, vgd_get CA')
 
   stat=fstfrm(lu)

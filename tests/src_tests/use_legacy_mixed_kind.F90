@@ -21,12 +21,12 @@ program constructor
    ! Object : try to construct the descriptor but there are many different vertical structures
    !          in the link file, this should produce an error.
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,VGD_ERROR
+  use vGrid_Descriptors, only: vgd_new,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   integer :: fnom,fstouv,fstlnk,i
   integer :: stat,lu1=10,lu2=20
   integer, parameter :: nfiles=3
@@ -55,7 +55,7 @@ program constructor
 
   stat=fstlnk(iun,nfiles)
 
-  stat=vgd_new(d,iun(1))
+  stat=vgd_new(vgdid,iun(1))
   OK=stat.eq.VGD_ERROR
 
   call ut_report(OK,'Grid_Descriptors::vgd_vintage (5001)')

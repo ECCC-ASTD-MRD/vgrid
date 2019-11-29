@@ -17,12 +17,12 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program constructor
-  use Vgrid_Descriptors, only: Vgrid_descriptor,Vgd_new,Vgd_print,VGD_OK
+  use Vgrid_Descriptors, only: Vgd_new,Vgd_print,VGD_OK
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   integer, parameter :: lu=10
   integer :: stat
   integer :: fnom,fstouv,fstfrm
@@ -42,7 +42,7 @@ program constructor
   ! Construct a new set of 3D coordinate descriptors
   print*,'=========================================================================='
   print*,'0) The folling should produce an error because there are many !! in file' 
-  stat = vgd_new(d,unit=lu,format="fst",ip1=-1,ip2=-1)
+  stat = vgd_new(vgdid,unit=lu,format="fst",ip1=-1,ip2=-1)
   if(stat.eq.VGD_OK)then
      ok=.false.
      print*,'Test failed'
@@ -51,7 +51,7 @@ program constructor
   print*,'=========================================================================='
   print*,'1) The folling should produce an error since there are more than one !!'
   print*,'satisfying the selection'
-  stat = vgd_new(d,unit=lu,format="fst",ip1=2009,ip2=1000)
+  stat = vgd_new(vgdid,unit=lu,format="fst",ip1=2009,ip2=1000)
   if(stat.eq.VGD_OK)then
      ok=.false.
      print*,'Test failed'
@@ -60,7 +60,7 @@ program constructor
   print*,'=========================================================================='
   print*,'2) The folling should produce an error since there more than one !! with '
   print*,'kind 1 but having a different version'
-  stat = vgd_new(d,unit=lu,format="fst",ip1=2009,ip2=1000,kind=1)
+  stat = vgd_new(vgdid,unit=lu,format="fst",ip1=2009,ip2=1000,kind=1)
   if(stat.eq.VGD_OK)then
      ok=.false.
      print*,'Test failed'
@@ -68,7 +68,7 @@ program constructor
 
   print*,'=========================================================================='
   print*,'3) The folling should NOT produce an error since there is only one !!'
-  stat = vgd_new(d,unit=lu,format="fst",ip1=2009,ip2=1000,kind=1,version=1)
+  stat = vgd_new(vgdid,unit=lu,format="fst",ip1=2009,ip2=1000,kind=1,version=1)
   if(stat.ne.VGD_OK)then
      ok=.false.
      print*,'Test failed'
@@ -76,7 +76,7 @@ program constructor
 
   print*,'=========================================================================='
   print*,'4) The folling should NOT produce an error since there is only one !!'
-  stat = vgd_new(d,unit=lu,format="fst",kind=2)
+  stat = vgd_new(vgdid,unit=lu,format="fst",kind=2)
   if(stat.ne.VGD_OK)then
      ok=.false.  
      print*,'Test failed'
@@ -84,7 +84,7 @@ program constructor
 
   print*,'=========================================================================='
   print*,'5) The folling should produce an error since option kind must be used with option version'
-  stat = vgd_new(d,unit=lu,format="fst",version=1)
+  stat = vgd_new(vgdid,unit=lu,format="fst",version=1)
   if(stat.eq.VGD_OK)then
      ok=.false.  
      print*,'Test failed'
@@ -92,7 +92,7 @@ program constructor
 
   print*,'=========================================================================='
   print*,'6) The folling should produce an error since vcode doesnt exist'
-  stat = vgd_new(d,unit=lu,format="fst",kind=5,version=10)
+  stat = vgd_new(vgdid,unit=lu,format="fst",kind=5,version=10)
   if(stat.eq.VGD_OK)then
      ok=.false.  
      print*,'Test failed'

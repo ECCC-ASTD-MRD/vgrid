@@ -73,7 +73,7 @@ end program level_withref_5001
 
 integer function chek_levels_withref(F_fst,F_ips) result(status)
 
-   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_putopt,vgd_levels,vgd_get,VGD_ERROR,VGD_OK, VGD_NO_REF_NOMVAR
+   use vGrid_Descriptors, only: vgd_new,vgd_putopt,vgd_levels,vgd_get,VGD_ERROR,VGD_OK, VGD_NO_REF_NOMVAR
    
 
    implicit none  
@@ -83,7 +83,7 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
    ! Local variables
    integer, save :: lu=10   
    integer :: fnom,fstouv,fstfrm,lutxt=69,kind
-   type(vgrid_descriptor) :: vgd
+   integer :: vgdid
    integer, parameter :: nmax=1000
    integer, dimension(nmax) :: liste
    integer :: ier,fstinl,fstprm,fstinf,fstluk,infon,i,j,k
@@ -133,7 +133,7 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
    endif
 
    ! Get vertical grid descriptor
-   ier = vgd_new(vgd,unit=lu,format="fst",ip1=ip1,ip2=ip2)
+   ier = vgd_new(vgdid,unit=lu,format="fst",ip1=ip1,ip2=ip2)
    if(ier == VGD_ERROR )then
       print*,'(Test) Problem getting vertical grid descriptor'
       return
@@ -161,7 +161,7 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
       factor = 100.
       p0=0.
    else
-      ier = vgd_get(vgd,'RFLD',rfld)
+      ier = vgd_get(vgdid,'RFLD',rfld)
       if(ier == VGD_ERROR)then
          print*,'(Test) Problem with vgd_get "RFLD" for file ',F_fst
          return
@@ -182,7 +182,7 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
          nomvar_metric = "GZ"
          factor = 10.
       endif
-      ier = vgd_get(vgd,'RFLS',rfld,quiet=.true.)
+      ier = vgd_get(vgdid,'RFLS',rfld,quiet=.true.)
       if(rfld /= VGD_NO_REF_NOMVAR)sfc_field_ls_L=.true.
       if(sfc_field_ls_L)then
          key = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',rfld)
@@ -201,9 +201,9 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
    p0ls_8=p0ls
    ! Test 32 bits interface
    if(sfc_field_ls_L)then
-      ier = vgd_levels(vgd,ip1s,pres,p0,sfc_field_ls=p0ls)
+      ier = vgd_levels(vgdid,vgdid,ip1s,pres,p0,sfc_field_ls=p0ls)
    else
-      ier = vgd_levels(vgd,ip1s,pres,p0)
+      ier = vgd_levels(vgdid,vgdid,ip1s,pres,p0)
    endif
    if(ier == VGD_ERROR )then
       print*,'(Test) Problem with vgd_levels 32 bits'
@@ -252,9 +252,9 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
 
    ! Test 64 bits interface
    if(sfc_field_ls_L)then
-      ier = vgd_levels(vgd,ip1s,pres_8,p0_8,sfc_field_ls=p0ls_8)
+      ier = vgd_levels(vgdid,ip1s,pres_8,p0_8,sfc_field_ls=p0ls_8)
    else
-      ier = vgd_levels(vgd,ip1s,pres_8,p0_8)
+      ier = vgd_levels(vgdid,ip1s,pres_8,p0_8)
    endif
    if(ier == VGD_ERROR )then
       print*,'(Test) Problem with vgd_levels 64 bits'
@@ -302,7 +302,7 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
    enddo
    deallocate(ip1s,px,p0,p0_8,pres,pres_8)
    
-   !ier=vgd_free(vgd)
+   !ier=vgd_free(vgdid)
 
    ier=fstfrm(lu)
    status=VGD_OK   

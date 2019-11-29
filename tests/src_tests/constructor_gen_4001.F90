@@ -56,14 +56,14 @@ contains
 
 program constructor
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_write,VGD_ERROR
+  use vGrid_Descriptors, only: vgd_new,vgd_get,vgd_write,VGD_ERROR
   use Unit_Testing, only: ut_report
   use mod_constructor_4001, only: FSTD_ext, my_fstprm
   
 
   implicit none
 
-  type(vgrid_descriptor) :: vgd
+  integer :: vgdid
   integer, parameter :: nk=10
   integer :: stat,k,i,nl_m=-1,nl_t=-1,nl_w=-1
   integer :: fnom,fstouv,fstfrm,fstluk,fstecr,ier,lu1=11,lu2=12,key,fstinf,ni,nj,nkk
@@ -83,23 +83,23 @@ program constructor
 
   hgts=(/0.,20.,25.,40.,50.,80.,100.,120.,150.,200./)
 
-  if( vgd_new(vgd,kind=4,version=1,hyb=hgts) == VGD_ERROR)call exit(1)
+  if( vgd_new(vgdid,kind=4,version=1,hyb=hgts) == VGD_ERROR)call exit(1)
 
-  if( vgd_get(vgd,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='CA_T - vertical A coefficient (t)'   ,value=a_t_8) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='CA_W - vertical A coefficient (w)'   ,value=a_w_8) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='CB_M - vertical B coefficient (m)'   ,value=b_m_8) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='CB_T - vertical B coefficient (t)'   ,value=b_t_8) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='CB_W - vertical B coefficient (w)'   ,value=b_w_8) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='VIPM - level ip1 list (m)'           ,value=vipm) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='VIPT - level ip1 list (t)'           ,value=vipt) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='VIPW - level ip1 list (w)'           ,value=vipw) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='VCDM - vertical coordinate (m)'      ,value=vcdm) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='VCDT - vertical coordinate (t)'      ,value=vcdt) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='VCDW - vertical coordinate (w)'      ,value=vcdw) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='NL_M - Number of vertical levels (m)',value=nl_m) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='NL_T - Number of vertical levels (t)',value=nl_t) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='NL_W - Number of vertical levels (w)',value=nl_w) == VGD_ERROR )call exit(1)
+  if( vgd_get(vgdid,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8) == VGD_ERROR )call exit(1)
+  if( vgd_get(vgdid,key='CA_T - vertical A coefficient (t)'   ,value=a_t_8) == VGD_ERROR )call exit(1)
+  if( vgd_get(vgdid,key='CA_W - vertical A coefficient (w)'   ,value=a_w_8) == VGD_ERROR )call exit(1)
+  if( vgd_get(vgdid,key='CB_M - vertical B coefficient (m)'   ,value=b_m_8) == VGD_ERROR )call exit(1)
+  if( vgd_get(vgdid,key='CB_T - vertical B coefficient (t)'   ,value=b_t_8) == VGD_ERROR )call exit(1)
+  if( vgd_get(vgdid,key='CB_W - vertical B coefficient (w)'   ,value=b_w_8) == VGD_ERROR )call exit(1)
+  if( vgd_get(vgdid,key='VIPM - level ip1 list (m)'           ,value=vipm) == VGD_ERROR )call exit(1)
+  if( vgd_get(vgdid,key='VIPT - level ip1 list (t)'           ,value=vipt) == VGD_ERROR )call exit(1)
+  if( vgd_get(vgdid,key='VIPW - level ip1 list (w)'           ,value=vipw) == VGD_ERROR )call exit(1)
+  if( vgd_get(vgdid,key='VCDM - vertical coordinate (m)'      ,value=vcdm) == VGD_ERROR )call exit(1)
+  if( vgd_get(vgdid,key='VCDT - vertical coordinate (t)'      ,value=vcdt) == VGD_ERROR )call exit(1)
+  if( vgd_get(vgdid,key='VCDW - vertical coordinate (w)'      ,value=vcdw) == VGD_ERROR )call exit(1)
+  if( vgd_get(vgdid,key='NL_M - Number of vertical levels (m)',value=nl_m) == VGD_ERROR )call exit(1)
+  if( vgd_get(vgdid,key='NL_T - Number of vertical levels (t)',value=nl_t) == VGD_ERROR )call exit(1)
+  if( vgd_get(vgdid,key='NL_W - Number of vertical levels (w)',value=nl_w) == VGD_ERROR )call exit(1)
 
   file='data/data_constructor_gen_4001.txt'
   if(write_control_L)then
@@ -231,24 +231,24 @@ program constructor
   
   print*,'The following error is normal'
   print*,'Testing height not positive'
-  stat = vgd_new(vgd,kind=4,version=1,hyb=-hgts)
+  stat = vgd_new(vgdid,kind=4,version=1,hyb=-hgts)
   if(stat.ne.VGD_ERROR)OK=.false.
 
   print*,'The following error is normal'
   print*,'Testing sig levels not in order'
   hgts2=hgts
   hgts2(size(hgts)-3)=hgts2(size(hgts)-2)
-  stat = vgd_new(vgd,kind=1,version=1,hyb=hgts2)
+  stat = vgd_new(vgdid,kind=1,version=1,hyb=hgts2)
   if(stat.ne.VGD_ERROR)OK=.false.
   deallocate(a_m_8,a_t_8,b_m_8,b_t_8,vipm,vipt,vcdm)
-  !stat = vgd_free(vgd)
+  !stat = vgd_free(vgdid)
 
   if(.true.) then
      ! Generate file to copy in data_Linux/dm_4001_from_model_run
-     if( vgd_new(vgd,kind=4,version=1,hyb=hgts) == VGD_ERROR)call exit(1)
-     if( vgd_get(vgd,key='NL_M - Number of vertical levels (m)',value=nl_m) == VGD_ERROR )call exit(1)
-     if( vgd_get(vgd,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8) == VGD_ERROR )call exit(1)
-      if( vgd_get(vgd,key='VIPM - level ip1 list (m)'           ,value=vipm) == VGD_ERROR )call exit(1)
+     if( vgd_new(vgdid,kind=4,version=1,hyb=hgts) == VGD_ERROR)call exit(1)
+     if( vgd_get(vgdid,key='NL_M - Number of vertical levels (m)',value=nl_m) == VGD_ERROR )call exit(1)
+     if( vgd_get(vgdid,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8) == VGD_ERROR )call exit(1)
+      if( vgd_get(vgdid,key='VIPM - level ip1 list (m)'           ,value=vipm) == VGD_ERROR )call exit(1)
      file="data/to_copy_in_dm_4001_from_model_run"
      if( fnom(lu1,file,"RND",0) < 0 )then
         print*,'ERROR with fnom on file ',trim(file)
@@ -278,12 +278,12 @@ program constructor
              ni,nj,nkk,vipm(k),fst%ip2,fst%ip3,fst%typvar,fst%nomvar,fst%etiket,fst%grtyp, &
              fst%ig1,fst%ig2,fst%ig3,fst%ig4,fst%datyp,.true.)
      enddo
-     if( vgd_write(vgd,lu1,format='fst') == VGD_ERROR )call exit(1)
+     if( vgd_write(vgdid,lu1,format='fst') == VGD_ERROR )call exit(1)
      ier = fstfrm(lu1)
      ier = fstfrm(lu2)
   endif
   
-  !stat = vgd_free(vgd)
+  !stat = vgd_free(vgdid)
 
   call ut_report(OK,'Grid_Descriptors::vgd_new vertical generate initializer (4001) value')
 

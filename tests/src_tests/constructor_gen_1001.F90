@@ -18,13 +18,13 @@
 ! * Boston, MA 02111-1307, USA.
 program constructor
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,VGD_ERROR
+  use vGrid_Descriptors, only: vgd_new,vgd_get,VGD_ERROR
   use Unit_Testing, only: ut_report
   
 
   implicit none
 
-  type(vgrid_descriptor) :: vgd
+  integer :: vgdid
   integer, parameter :: nk=27
   integer :: stat,k,i,nl_m=-1,nl_t=-1
   integer, dimension(:), pointer :: vipm,vipt,work_i
@@ -45,18 +45,18 @@ program constructor
        0.744000, 0.796000, 0.842000, 0.884000, 0.922000, 0.955000,&
        0.980000, 0.993000, 1.000000/)
 
-  stat = vgd_new(vgd,kind=1,version=1,hyb=sigma)
+  stat = vgd_new(vgdid,kind=1,version=1,hyb=sigma)
 
-  stat = vgd_get(vgd,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8)
-  stat = vgd_get(vgd,key='CA_T - vertical A coefficient (t)'   ,value=a_t_8)
-  stat = vgd_get(vgd,key='CB_M - vertical B coefficient (m)'   ,value=b_m_8)
-  stat = vgd_get(vgd,key='CB_T - vertical B coefficient (t)'   ,value=b_t_8)
-  stat = vgd_get(vgd,key='VIPM - level ip1 list (m)'           ,value=vipm)
-  stat = vgd_get(vgd,key='VIPT - level ip1 list (t)'           ,value=vipt)
-  stat = vgd_get(vgd,key='VCDM - vertical coordinate (m)'      ,value=vcdm)
-  stat = vgd_get(vgd,key='VCDT - vertical coordinate (t)'      ,value=vcdt)
-  stat = vgd_get(vgd,key='NL_M - Number of vertical levels (m)',value=nl_m)
-  stat = vgd_get(vgd,key='NL_T - Number of vertical levels (t)',value=nl_t)
+  stat = vgd_get(vgdid,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8)
+  stat = vgd_get(vgdid,key='CA_T - vertical A coefficient (t)'   ,value=a_t_8)
+  stat = vgd_get(vgdid,key='CB_M - vertical B coefficient (m)'   ,value=b_m_8)
+  stat = vgd_get(vgdid,key='CB_T - vertical B coefficient (t)'   ,value=b_t_8)
+  stat = vgd_get(vgdid,key='VIPM - level ip1 list (m)'           ,value=vipm)
+  stat = vgd_get(vgdid,key='VIPT - level ip1 list (t)'           ,value=vipt)
+  stat = vgd_get(vgdid,key='VCDM - vertical coordinate (m)'      ,value=vcdm)
+  stat = vgd_get(vgdid,key='VCDT - vertical coordinate (t)'      ,value=vcdt)
+  stat = vgd_get(vgdid,key='NL_M - Number of vertical levels (m)',value=nl_m)
+  stat = vgd_get(vgdid,key='NL_T - Number of vertical levels (t)',value=nl_t)
 
   file='data/data_constructor_gen_1001.txt'
   if(write_control_L)then
@@ -144,17 +144,17 @@ program constructor
   
   print*,'The following error is normal'
   print*,'Testing last sig level not at 1.0'
-  stat = vgd_new(vgd,kind=1,version=1,hyb=sigma(1:size(sigma)-1))
+  stat = vgd_new(vgdid,kind=1,version=1,hyb=sigma(1:size(sigma)-1))
   if(stat.ne.VGD_ERROR)OK=.false.
 
   print*,'The following error is normal'
   print*,'Testing sig levels not in order'
   sigma2=sigma
   sigma2(size(sigma)-3)=sigma2(size(sigma)-2)
-  stat = vgd_new(vgd,kind=1,version=1,hyb=sigma2)
+  stat = vgd_new(vgdid,kind=1,version=1,hyb=sigma2)
   if(stat.ne.VGD_ERROR)OK=.false.
   deallocate(a_m_8,a_t_8,b_m_8,b_t_8,vipm,vipt,vcdm)
-  !stat = vgd_free(vgd)
+  !stat = vgd_free(vgdid)
 
   call ut_report(OK,'Grid_Descriptors::vgd_new vertical generate initializer (1001) value')
 

@@ -18,12 +18,12 @@
 ! * Boston, MA 02111-1307, USA.
 program test_allow_sigma
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_putopt,vgd_getopt,VGD_ERROR
+  use vGrid_Descriptors, only: vgd_new,vgd_putopt,vgd_getopt,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   integer :: lu=0
   integer :: stat
   integer :: fnom,fstouv,fstfrm
@@ -56,7 +56,7 @@ program test_allow_sigma
   ! Construct a new set of 3D coordinate descriptors
   print*,'==========================================================================='
   print*,'The following error message telling that "sigma coordinate construction is not ALLOWED" is normal'
-  stat = vgd_new(d,unit=lu,format="fst")
+  stat = vgd_new(vgdid,unit=lu,format="fst")
   if(stat/=VGD_ERROR)then
      print*,'ERROR in test, should not be allowed to construct a new sigma coordinate since ALLOW_SIGMA should be false by default'
      ok=.false.
@@ -67,7 +67,7 @@ program test_allow_sigma
      print*, "ERROR in test, cannot put option ALLOW_SIGMA"
      stop
   endif
-  stat = vgd_new(d,unit=lu,format="fst")
+  stat = vgd_new(vgdid,unit=lu,format="fst")
   if(stat==VGD_ERROR)then
      print*,'ERROR in test, with vgd_new. Constructing sigma should be possible.'
      ok=.false.

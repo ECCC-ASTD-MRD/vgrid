@@ -18,12 +18,12 @@
 ! * Boston, MA 02111-1307, USA.
 program constructor
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,VGD_OK
+  use vGrid_Descriptors, only: vgd_new,VGD_OK
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   integer :: fnom,fstouv,fstlnk,i
   integer :: stat,lu1=10,lu2=20
   integer, parameter :: nfiles=2
@@ -50,7 +50,7 @@ program constructor
 
   stat=fstlnk(iun,nfiles)
 
-  stat=vgd_new(d,iun(1),kind=5)
+  stat=vgd_new(vgdid,iun(1),kind=5)
 
   OK=stat.eq.VGD_OK
 

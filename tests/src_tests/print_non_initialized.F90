@@ -17,17 +17,17 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program main
-  use vGrid_Descriptors, only : vgrid_descriptor, vgd_print,VGD_ERROR
+  use vGrid_Descriptors, only : vgd_print,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
 
   integer :: ier
-  type(vgrid_descriptor) :: vgd
+  integer :: vgdid
   logical :: ok=.false.
 
   print*,'The following error is expected since vgd is not initiaized'
-  ier = vgd_print(vgd)
+  ier = vgd_print(vgdid,vgdid)
   if(ier.eq.VGD_ERROR)then
      ok=.true.
      print*,'Problem printing vgd'

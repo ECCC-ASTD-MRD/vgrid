@@ -65,7 +65,7 @@ end program stda76
 !=========================================================================
 !=========================================================================
 integer function stda_do_it(lu,file) result(status)
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_stda76,vgd_standard_atmosphere_1976,VGD_OK,VGD_ERROR
+  use vGrid_Descriptors, only: vgd_new,vgd_get,vgd_stda76,vgd_standard_atmosphere_1976,VGD_OK,VGD_ERROR
   implicit none
   integer :: lu
   character(len=*) :: file
@@ -74,7 +74,7 @@ integer function stda_do_it(lu,file) result(status)
   integer :: ier,fnom,fstouv,fstfrm,fclos,compare
   real, dimension(:), pointer :: temp, pres
   character(len=4) :: nomvar
-  type(vgrid_descriptor) :: vgd
+  integer :: vgdid
   status=VGD_ERROR
   nullify(ip1s,temp,pres)
   print*,'===================================================='
@@ -89,19 +89,19 @@ integer function stda_do_it(lu,file) result(status)
      print*,'(Test) No record in RPN file ',file
      return
   endif
-  ier = vgd_new(vgd,lu)
+  ier = vgd_new(vgdid,lu)
   if(ier==VGD_ERROR)then
      print*,'(Test) Problem with vgd_new'
      return
   endif
-  if( vgd_get(vgd, "VIPT", ip1s) ==  VGD_ERROR )then
+  if( vgd_get(vgdid, "VIPT", ip1s) ==  VGD_ERROR )then
      print*,"ERROR with vgd_get for VIPT"
      return
   end if
   !==============================
   print*,"   Testing temperature"
   !------------------------------
-  if( vgd_stda76(vgd, ip1s, temp, 'TEMPERATURE') == VGD_ERROR )then
+  if( vgd_stda76(vgdid, ip1s, temp, 'TEMPERATURE') == VGD_ERROR )then
      print*,"In test : ERROR with vgd_stda76_temp on TEMPERATURE"
      return
   endif
@@ -110,7 +110,7 @@ integer function stda_do_it(lu,file) result(status)
      return
   endif
   ! Testing compatibility wrapper
-  if( vgd_standard_atmosphere_1976(vgd, ip1s, temp, 'TEMPERATURE') == VGD_ERROR )then
+  if( vgd_standard_atmosphere_1976(vgdid, ip1s, temp, 'TEMPERATURE') == VGD_ERROR )then
      print*,"In test : ERROR with vgd_standard_atmosphere_1976 on TEMPERATURE"
      return
   endif
@@ -119,12 +119,12 @@ integer function stda_do_it(lu,file) result(status)
      return
   endif
 
-  ier = vgd_get(vgd, "RFLD", nomvar)
+  ier = vgd_get(vgdid, "RFLD", nomvar)
   if( trim(nomvar) == "ME" ) then
      !===========================
      print*,"   Testing pressure"
      !---------------------------
-     if( vgd_stda76(vgd, ip1s, pres, 'PRESSURE') == VGD_ERROR )then
+     if( vgd_stda76(vgdid, ip1s, pres, 'PRESSURE') == VGD_ERROR )then
         print*,"In test : ERROR with vgd_stda76 on PRESSURE with hgts"
         return
      endif
@@ -133,7 +133,7 @@ integer function stda_do_it(lu,file) result(status)
         return
      endif
      ! Testing compatibility wrapper
-     if( vgd_standard_atmosphere_1976(vgd, ip1s, pres, 'PRESSURE') == VGD_ERROR )then
+     if( vgd_standard_atmosphere_1976(vgdid, ip1s, pres, 'PRESSURE') == VGD_ERROR )then
         print*,"In test : ERROR with vgd_standard_atmosphere_1976 on PRESSURE with hgts"
         return
      endif
@@ -145,7 +145,7 @@ integer function stda_do_it(lu,file) result(status)
      !============================================
      print*,"   Testing pressure, option sfc_pres"
      !--------------------------------------------
-     if( vgd_stda76(vgd, ip1s, pres, 'PRESSURE', sfc_pres=100000.) == VGD_ERROR )then
+     if( vgd_stda76(vgdid, ip1s, pres, 'PRESSURE', sfc_pres=100000.) == VGD_ERROR )then
         print*,"In test : ERROR with vgd_stda76 on PRESSURE with hgts with sfc_pres"
         return
      endif
@@ -154,7 +154,7 @@ integer function stda_do_it(lu,file) result(status)
         return
      endif
      ! Testing compatibility wrapper
-      if( vgd_standard_atmosphere_1976(vgd, ip1s, pres, 'PRESSURE', sfc_pres=100000.) == VGD_ERROR )then
+      if( vgd_standard_atmosphere_1976(vgdid, ip1s, pres, 'PRESSURE', sfc_pres=100000.) == VGD_ERROR )then
         print*,"In test : ERROR with vgd_standard_atmosphere_1976 on PRESSURE with hgts with sfc_pres"
         return
      endif
@@ -165,7 +165,7 @@ integer function stda_do_it(lu,file) result(status)
      !============================================
      print*,"   Testing pressure, option sfc_temp"
      !--------------------------------------------
-     if( vgd_stda76(vgd, ip1s, pres, 'PRESSURE', sfc_temp=273.) == VGD_ERROR )then
+     if( vgd_stda76(vgdid, ip1s, pres, 'PRESSURE', sfc_temp=273.) == VGD_ERROR )then
         print*,"In test : ERROR with vgd_stda76 on PRESSURE with hgts with sfc_temp"
         return
      endif
@@ -174,7 +174,7 @@ integer function stda_do_it(lu,file) result(status)
         return
      endif
      ! Testing compatibility wrapper
-     if( vgd_standard_atmosphere_1976(vgd, ip1s, pres, 'PRESSURE', sfc_temp=273.) == VGD_ERROR )then
+     if( vgd_standard_atmosphere_1976(vgdid, ip1s, pres, 'PRESSURE', sfc_temp=273.) == VGD_ERROR )then
         print*,"In test : ERROR with vgd_standard_atmosphere_1976 on PRESSURE with hgts with sfc_temp"
         return
      endif

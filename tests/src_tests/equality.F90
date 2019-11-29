@@ -18,12 +18,12 @@
 ! * Boston, MA 02111-1307, USA.
 program constructor
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,operator(==),vgd_putopt,VGD_OK,VGD_ERROR
+  use vGrid_Descriptors, only: vgd_new,vgd_putopt,VGD_OK,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: vgrid,vgrid_rebuilt
+  integer :: vgdid,vgdid_rebuilt
   integer :: lu=10,i,ier
   integer :: stat
   integer :: fnom,fstouv,fstfrm
@@ -64,13 +64,13 @@ program constructor
         call abort
      endif
      ! Construct a new set of 3D coordinate descriptors
-     ier = vgd_new(vgrid        ,unit=lu+i,format="fst")
-     ier = vgd_new(vgrid_rebuilt,unit=lu+i,format="fst")
-     if (.not. vgrid == vgrid_rebuilt) then
+     ier = vgd_new(vgdid        ,unit=lu+i,format="fst")
+     ier = vgd_new(vgdid_rebuilt,unit=lu+i,format="fst")
+     if (.not. vgdid == vgdid_rebuilt) then
         stat = VGD_ERROR
      endif
-!     ier = vgd_free(vgrid)
-!     ier = vgd_free(vgrid_rebuilt)
+!     ier = vgd_free(vgdid)
+!     ier = vgd_free(vgdid_rebuilt)
      ier = fstfrm(lu+i)
 
   enddo

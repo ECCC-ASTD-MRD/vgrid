@@ -78,7 +78,7 @@ end program constructor
 integer function test_it(F_file_from_model_run) result(status)
  
    use mod_constructor_table, only:FSTD_ext,my_fstprm
-   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,operator(==),vgd_write,VGD_OK,VGD_ERROR
+   use vGrid_Descriptors, only: vgd_new,vgd_get,vgd_write,VGD_OK,VGD_ERROR
    use Unit_Testing, only: ut_report
    
    implicit none
@@ -87,7 +87,7 @@ integer function test_it(F_file_from_model_run) result(status)
 
    ! Local variables
 
-   type(vgrid_descriptor) :: vgrid,vgrid_rebuilt
+   integer :: vgdid,vgrid_rebuilt
    integer, parameter :: nmax = 1000
    integer, dimension(nmax) :: liste
    integer :: lu=0,lu2=0,lutxt=69
@@ -114,10 +114,10 @@ integer function test_it(F_file_from_model_run) result(status)
    
    ! Construct a new set of 3D coordinate descriptors
    stat=0  
-   if(VGD_OK.ne.vgd_new(vgrid,unit=lu,format="fst"))return
-   if(VGD_OK.ne.vgd_get(vgrid,'VTBL',table))return
+   if(VGD_OK.ne.vgd_new(vgdid,unit=lu,format="fst"))return
+   if(VGD_OK.ne.vgd_get(vgdid,'VTBL',table))return
    if(VGD_OK.ne.vgd_new(vgrid_rebuilt,table))return
-   if (vgrid_rebuilt == vgrid) then
+   if (vgrid_rebuilt == vgdid) then
       ! Ok do noting
    else
       print*,'ERROR: rebuilding table'
@@ -173,7 +173,7 @@ integer function test_it(F_file_from_model_run) result(status)
    endif
    
    deallocate(table)
-!   ier = vgd_free(vgrid)
+!   ier = vgd_free(vgdid)
 !   ier = vgd_free(vgrid_rebuilt)
 
    ier=fstfrm(lu)

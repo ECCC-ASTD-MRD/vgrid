@@ -17,16 +17,16 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program constructor
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,VGD_ERROR
+  use vGrid_Descriptors, only: vgd_new,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   integer :: stat
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = vgd_new(d,kind=5,version=1,nk=10)
+  stat = vgd_new(vgdid,kind=5,version=1,nk=10)
   call ut_report(stat == VGD_ERROR,'Grid_Descriptors::vgd_new vertical build initializer')
 
 end program constructor

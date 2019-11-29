@@ -17,20 +17,20 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program constructor
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_put,VGD_ERROR
+  use vGrid_Descriptors, only: vgd_new,vgd_put,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   integer :: stat
   real(kind=8), dimension(:,:,:), pointer :: tbl
 
   nullify(tbl)
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = vgd_new(d,unit=10,format='fst',ip1=100,ip2=200)
-  stat = vgd_put(d,key='VT - vertical coordinate table',value=tbl)
+  stat = vgd_new(vgdid,unit=10,format='fst',ip1=100,ip2=200)
+  stat = vgd_put(vgdid,key='VT - vertical coordinate table',value=tbl)
   call ut_report(stat==VGD_ERROR,'Grid_Descriptors::vgd_new constructor')
 
 end program constructor

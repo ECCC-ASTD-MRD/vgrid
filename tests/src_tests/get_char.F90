@@ -17,12 +17,12 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program tests
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,VGD_LEN_NAME
+  use vGrid_Descriptors, only: vgd_new,vgd_get,VGD_LEN_NAME
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   integer :: stat,lu=0,fnom,fstouv,fstfrm,fclos,lutxt=69,ip1,ip2
   character(len=VGD_LEN_NAME) :: rfld
   logical :: ok=.true.
@@ -42,14 +42,14 @@ program tests
   close(lutxt)
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
+  stat = vgd_new(vgdid,unit=lu,format="fst",ip1=ip1,ip2=ip2)
 
   ! Get information about the coordinate
-  stat = vgd_get(d,key='RFLD - reference field name',value=rfld)
+  stat = vgd_get(vgdid,key='RFLD - reference field name',value=rfld)
   if(rfld/='P0')ok=.false.
-  stat = vgd_get(d,key='RFLD - reference field name',value=rfld,quiet=.true.)
+  stat = vgd_get(vgdid,key='RFLD - reference field name',value=rfld,quiet=.true.)
   if(rfld/='P0')ok=.false.
-  stat = vgd_get(d,key='RFLD - reference field name',value=rfld,quiet=.false.)
+  stat = vgd_get(vgdid,key='RFLD - reference field name',value=rfld,quiet=.false.)
   if(rfld/='P0')ok=.false.
 
   call ut_report(ok,message='Grid_Descriptors::vgd_get get character value')

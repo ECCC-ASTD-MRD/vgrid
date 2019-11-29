@@ -18,13 +18,13 @@
 ! * Boston, MA 02111-1307, USA.
 program constructor
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_print,VGD_ERROR
+  use vGrid_Descriptors, only: vgd_new,vgd_get,vgd_print,VGD_ERROR
   use Unit_Testing, only: ut_report
   
 
   implicit none
 
-  type(vgrid_descriptor) :: vgd
+  integer :: vgdid
   integer, parameter :: nk=27
   integer :: stat,k,i,nl_m=-1,nl_t=-1
   integer, dimension(:), pointer :: vipm,vipt,work_i
@@ -44,9 +44,9 @@ program constructor
  0.574000, 0.631000, 0.688000, 0.744000, 0.796000, 0.842000, 0.884000, 0.922000,&
  0.955000, 0.980000, 0.993000, 1.000000/)
 
-  stat = vgd_new(vgd,kind=1,version=1,hyb=sigma)
+  stat = vgd_new(vgdid,kind=1,version=1,hyb=sigma)
   
-  stat = vgd_print(vgd)
+  stat = vgd_print(vgdid)
 
   call ut_report(OK,'Grid_Descriptors::vgd_new vertical generate initializer (1001) value')
 

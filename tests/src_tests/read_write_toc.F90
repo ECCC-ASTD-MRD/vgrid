@@ -17,13 +17,13 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program constructor
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_write, VGD_OK, VGD_ERROR
+  use vGrid_Descriptors, only: vgd_new,vgd_write, VGD_OK, VGD_ERROR
   use Unit_Testing, only: ut_report
   
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   integer, parameter :: lu=10,lu2=20,lutxt=69
   integer :: stat,ip1,ip2
   integer :: fnom,fstouv,fstfrm
@@ -55,13 +55,13 @@ program constructor
 
   ! Try to write unconstructed
   print*,'The following error on vgrid descriptor not constructed is normal '
-  stat = vgd_write(d,unit=lu2,format="fst")
+  stat = vgd_write(vgdid,unit=lu2,format="fst")
   if(stat /= VGD_ERROR) ok=.false.
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
+  stat = vgd_new(vgdid,unit=lu,format="fst",ip1=ip1,ip2=ip2)
   if(stat /= VGD_OK)ok=.false.
-  stat = vgd_write(d,unit=lu2,format="fst")
+  stat = vgd_write(vgdid,unit=lu2,format="fst")
   if(stat /= VGD_OK)ok=.false.
 
   call ut_report(stat,'Grid_Descriptors, vgd_new, vgd_get CA')

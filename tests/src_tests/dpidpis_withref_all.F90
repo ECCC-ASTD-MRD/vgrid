@@ -62,7 +62,7 @@ end program tests
 
 integer function test_dpidpis(F_lu) result(stat)
 
-   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_dpidpis,VGD_ERROR,VGD_OK
+   use vGrid_Descriptors, only: vgd_new,vgd_get,vgd_dpidpis,VGD_ERROR,VGD_OK
    
 
    implicit none
@@ -79,7 +79,7 @@ integer function test_dpidpis(F_lu) result(stat)
    real, dimension(:,:), pointer :: p0,px
    real(kind=8), dimension(:,:), pointer :: p0_8
    real   :: w1,pres
-   type(vgrid_descriptor) :: d
+   integer :: vgdid
    logical :: ok
    real(kind=8), dimension(:), pointer :: coef_b
   
@@ -88,13 +88,13 @@ integer function test_dpidpis(F_lu) result(stat)
    stat=VGD_ERROR
 
    ! Get dpidpis
-   stat = vgd_new(d,unit=F_lu,format="fst")
+   stat = vgd_new(vgdid,unit=F_lu,format="fst")
    if(stat /= VGD_OK)return
 
-   stat = vgd_get(d,key='CB_T - vertical B coefficient (t)',value=coef_b)
+   stat = vgd_get(vgdid,key='CB_T - vertical B coefficient (t)',value=coef_b)
    if(stat /= VGD_OK)return
    
-   stat = vgd_get(d,key='VIPT - level ip1 list (t)'        ,value=ip1_list)
+   stat = vgd_get(vgdid,key='VIPT - level ip1 list (t)'        ,value=ip1_list)
    if(stat /= VGD_OK)return
    
    stat = fstinf(F_lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',"UU")
@@ -111,7 +111,7 @@ integer function test_dpidpis(F_lu) result(stat)
    !===============
    ! Real interface
    
-   stat = vgd_dpidpis(d,sfc_field=p0,ip1_list=ip1_list,dpidpis=dpidpis_cube)
+   stat = vgd_dpidpis(vgdid,sfc_field=p0,ip1_list=ip1_list,dpidpis=dpidpis_cube)
    if(stat.ne.VGD_OK)then
       print*,'ERROR: problem with vgd_dpidpis real'
       return
@@ -149,7 +149,7 @@ integer function test_dpidpis(F_lu) result(stat)
    !=================
    ! Real*8 interface
    
-   stat = vgd_dpidpis(d,sfc_field=p0_8,ip1_list=ip1_list,dpidpis=dpidpis_cube_8)
+   stat = vgd_dpidpis(vgdid,sfc_field=p0_8,ip1_list=ip1_list,dpidpis=dpidpis_cube_8)
    if(stat.ne.VGD_OK)then
       print*,'ERROR: problem with vgd_dpidpis real(kind=8)'
       return

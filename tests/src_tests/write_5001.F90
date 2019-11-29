@@ -18,13 +18,13 @@
 ! * Boston, MA 02111-1307, USA.
 program constructor
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_write,VGD_OK
+  use vGrid_Descriptors, only: vgd_new,vgd_write,VGD_OK
   use Unit_Testing, only: ut_report
   
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   integer, parameter :: lui=10,luo=20,nmax=1000
   integer, dimension(nmax) :: liste
   integer :: stat,k,infon,ind,kind,keyhy,nii,njj,nkk,ig1tt,ig2tt
@@ -122,7 +122,7 @@ program constructor
   enddo
 
   stat=vgd_new(&
-       d,                  &
+       vgdid,              &
        kind    = 5,        &
        version = 1,        &
        nk      = nk,       &
@@ -142,7 +142,7 @@ program constructor
   endif
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = vgd_write(d,luo,format='fst')
+  stat = vgd_write(vgdid,luo,format='fst')
   if(stat.ne.VGD_OK)then
      print*,'ERROR: problem with vgd_write'
      call close_fst(lui,luo)

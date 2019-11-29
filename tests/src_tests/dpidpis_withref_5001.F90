@@ -17,7 +17,7 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program tests
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_dpidpis,VGD_OK
+  use vGrid_Descriptors, only: vgd_new,vgd_get,vgd_dpidpis,VGD_OK
   use Unit_Testing, only: ut_report
   
 
@@ -30,7 +30,7 @@ program tests
   real(kind=8), dimension(:,:,:), pointer :: dpidpis_cube_8
   real :: eps=1.e-6
   real :: w1
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   logical :: ok
   real(kind=8), dimension(:), pointer :: coef_b
   
@@ -48,19 +48,19 @@ program tests
   endif
 
   ! Get dpidpis
-  stat = vgd_new(d,unit=lu,format="fst")
+  stat = vgd_new(vgdid,unit=lu,format="fst")
   if(stat/=VGD_OK)then
      print*,'ERROR with vgd_new'
      call exit(1)
   endif  
 
-  stat = vgd_get(d,key='CB_M - vertical B coefficient (m)',value=coef_b)
-  stat = vgd_get(d,key='VIPM - level ip1 list (m)'        ,value=ip1_list)
+  stat = vgd_get(vgdid,key='CB_M - vertical B coefficient (m)',value=coef_b)
+  stat = vgd_get(vgdid,key='VIPM - level ip1 list (m)'        ,value=ip1_list)
 
   !===============
   ! Real interface
   
-  stat = vgd_dpidpis(d,ip1_list=ip1_list,dpidpis=dpidpis_cube)
+  stat = vgd_dpidpis(vgdid,ip1_list=ip1_list,dpidpis=dpidpis_cube)
   if(stat.ne.VGD_OK)then
      print*,'ERROR: problem with vgd_dpidpis'
      stat=fstfrm(lu)
@@ -90,7 +90,7 @@ program tests
   !=================
   ! Real*8 interface
   
-  stat = vgd_dpidpis(d,ip1_list=ip1_list,dpidpis=dpidpis_cube_8)
+  stat = vgd_dpidpis(vgdid,ip1_list=ip1_list,dpidpis=dpidpis_cube_8)
   if(stat.ne.VGD_OK)then
      print*,'ERROR: problem with vgd_dpidpis real(kind=8)'
      stat=fstfrm(lu)

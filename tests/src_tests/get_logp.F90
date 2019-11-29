@@ -17,12 +17,12 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program get_logp
-  use Vgrid_Descriptors, only: Vgrid_descriptor,Vgd_new,Vgd_get,Vgd_print,VGD_OK,vgd_putopt
+  use Vgrid_Descriptors, only: Vgd_new,Vgd_get,Vgd_print,VGD_OK,vgd_putopt
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   integer, parameter :: lu=10
   integer :: stat,i
   integer :: fnom,fstouv,fstfrm,fclos
@@ -82,13 +82,13 @@ program get_logp
         print*,'No record in RPN file ',trim(files(i))
         call abort
      endif     
-     stat = vgd_new(d,unit=lu+i,format="fst",ip1=-1,ip2=-1)
+     stat = vgd_new(vgdid,unit=lu+i,format="fst",ip1=-1,ip2=-1)
      if(stat.ne.VGD_OK)then
         print*,'ERROR: problem with vgd_new on file ',trim(files(i))
         stat=fstfrm(lu+i)
         call abort
      endif
-     stat = vgd_get(d,key='LOGP',value=logp_L)
+     stat = vgd_get(vgdid,key='LOGP',value=logp_L)
      if(stat /= VGD_OK )then
         print*,'Error with vgd_get on LOGP on file ',trim(files(i))
         ok=.false.

@@ -18,12 +18,12 @@
 ! * Boston, MA 02111-1307, USA.
 program defaults
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_putopt,VGD_MISSING,VGD_ERROR
+  use vGrid_Descriptors, only: vgd_new,vgd_get,vgd_putopt,VGD_MISSING,VGD_ERROR
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: vgrid
+  integer :: vgdid
   integer :: lu=0
   integer :: stat
   integer :: fnom,fstouv,fstfrm
@@ -42,13 +42,13 @@ program defaults
 
   ! Construct a new set of 3D coordinate descriptors
   stat = vgd_putopt("ALLOW_SIGMA",.true.)
-  stat = vgd_new(vgrid,unit=lu,format="fst")
+  stat = vgd_new(vgdid,unit=lu,format="fst")
   if(stat.eq.VGD_ERROR)then
      print*,'In test error with vgd_new'
      stop
   endif
 
-  stat = vgd_get(vgrid,'PTOP',ptop)
+  stat = vgd_get(vgdid,'PTOP',ptop)
   if (abs(ptop-dble(VGD_MISSING))<10.*epsilon(ptop)) then
      stat = 0
   else

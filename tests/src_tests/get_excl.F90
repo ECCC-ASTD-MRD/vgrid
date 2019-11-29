@@ -17,13 +17,13 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program constructor
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get
+  use vGrid_Descriptors, only: vgd_new,vgd_get
   use Unit_Testing, only: ut_report
   
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   integer, parameter :: lu=10,lutxt=69
   integer :: stat,ip1,ip2
   integer :: fnom,fstouv,fstfrm
@@ -47,9 +47,9 @@ program constructor
   close(lutxt)
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = vgd_new(d,unit=lu,format="fst",ip1=ip1,ip2=ip2)
+  stat = vgd_new(vgdid,unit=lu,format="fst",ip1=ip1,ip2=ip2)
 
-  stat = vgd_get(d,key='CA_M - vertical A coefficient (m)',value=my_a)
+  stat = vgd_get(vgdid,key='CA_M - vertical A coefficient (m)',value=my_a)
   ok=.false.
   if(size(my_a).gt.0)ok=.true.
   

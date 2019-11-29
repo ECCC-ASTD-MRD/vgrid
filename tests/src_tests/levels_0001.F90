@@ -18,13 +18,13 @@
 ! * Boston, MA 02111-1307, USA.
 program constructor
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_print,vgd_levels,VGD_ERROR
+  use vGrid_Descriptors, only: vgd_new,vgd_get,vgd_print,vgd_levels,VGD_ERROR
   use Unit_Testing, only: ut_report
   
 
   implicit none
 
-  type(vgrid_descriptor) :: vgd
+  integer :: vgdid
   integer :: k
   integer, dimension(:), pointer :: ip1_list
   integer, parameter :: nk = 50
@@ -65,19 +65,19 @@ program constructor
   enddo
 
   ! Build a new set of vertical coordinate descriptors Vcode 0001
-  if( vgd_new(vgd,0,1,nk,0,0,a_m_8=hgt_m,a_w_8=hgt_w,b_m_8=b_m_8,b_w_8=b_w_8,ip1_m=ip1_m,ip1_w=ip1_w) == VGD_ERROR )then
+  if( vgd_new(vgdid,0,1,nk,0,0,a_m_8=hgt_m,a_w_8=hgt_w,b_m_8=b_m_8,b_w_8=b_w_8,ip1_m=ip1_m,ip1_w=ip1_w) == VGD_ERROR )then
      print*,'ERROR in tests with vgd_new'
      stop
   endif
 
-  k = vgd_print(vgd)
+  k = vgd_print(vgdid)
 
   print*,'Testing A M'
-  if( vgd_get(vgd,key="VIPM",value=ip1_list) == VGD_ERROR )then
+  if( vgd_get(vgdid,key="VIPM",value=ip1_list) == VGD_ERROR )then
      print*,'ERROR in test with vgd_get on key VIPM'
      stop
   endif  
-  if( vgd_levels(vgd,ip1_list,levels) == VGD_ERROR )then
+  if( vgd_levels(vgdid,vgdid,ip1_list,levels) == VGD_ERROR )then
      print*,'ERROR in test with vgd_levels'
      stop
   endif
@@ -96,11 +96,11 @@ program constructor
   enddo
   
   print*,'Testing A W'
-  if( vgd_get(vgd,key="VIPW",value=ip1_list) == VGD_ERROR )then
+  if( vgd_get(vgdid,key="VIPW",value=ip1_list) == VGD_ERROR )then
      print*,'ERROR in test with vgd_get on key VIPW'
      stop
   endif  
-  if( vgd_levels(vgd,ip1_list,levels) == VGD_ERROR )then
+  if( vgd_levels(vgdid,vgdid,ip1_list,levels) == VGD_ERROR )then
      print*,'ERROR in test with vgd_levels'
      stop
   endif

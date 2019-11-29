@@ -75,7 +75,7 @@ contains
 end module mod_levels_withref_sub_array
 !========================================================
 program levels_withref_sub_array
-   use vgrid_descriptors, only: vgrid_descriptor, vgd_new, vgd_get, &
+   use vgrid_descriptors, only:  vgd_new, vgd_get, &
         vgd_levels, VGD_ERROR
    use mod_levels_withref_sub_array, only : test_levels
    use Unit_Testing, only: ut_report
@@ -91,7 +91,7 @@ program levels_withref_sub_array
    real, dimension(:,:,:), pointer :: levels, levels_p
    character(len=128) :: fst_S
    character(len=4) :: rfld_S, rfld_ls_S
-   type(vgrid_descriptor) :: vgd
+   integer :: vgdid
    ! Variable for fstprm, sorry...
    integer ::dateo, datyp, deet, dltf, extra1, extra2, extra3, ig1,&
         ig2, ig3, ig4, ip1, ip2, ip3, key, lng, nbits,&
@@ -132,12 +132,12 @@ program levels_withref_sub_array
    !allocate(wk(l_ni,l_nj),p0(l_ni,l_nj),p0ls(l_ni,l_nj), &
    !     levels(l_ni,l_nj,G_nk))
 
-   if(vgd_new(vgd,unit=lu,format="fst") == VGD_ERROR )then
+   if(vgd_new(vgdid,unit=lu,format="fst") == VGD_ERROR )then
       print*,'(Test) Problem getting vertical grid descriptor'
       call exit(1)
    endif        
-   ier = vgd_get(vgd,'RFLD',rfld_S)
-   ier = vgd_get(vgd,'RFLS',rfld_ls_S)   
+   ier = vgd_get(vgdid,'RFLD',rfld_S)
+   ier = vgd_get(vgdid,'RFLS',rfld_ls_S)   
    print*,"rfld_S='",rfld_S,"'"
    print*,"rfld_ls_S='",rfld_ls_S,"'"
    
@@ -167,7 +167,7 @@ program levels_withref_sub_array
    p0_p => p0(1:l_ni,1:l_nj)
    p0ls_p => p0ls(1:l_ni,1:l_nj)
    levels_p => levels(1:l_ni,1:l_nj,1:G_nk)
-   if( vgd_levels(vgd,ip1s,levels_p,p0_p,sfc_field_ls=p0ls_p) == VGD_ERROR)then
+   if( vgd_levels(vgdid,vgdid,ip1s,levels_p,p0_p,sfc_field_ls=p0ls_p) == VGD_ERROR)then
       call exit(1)
    endif
    if( test_levels(levels_p,l_ni,l_nj,G_nk,liste,infon,lu) == VGD_ERROR)then
@@ -178,7 +178,7 @@ program levels_withref_sub_array
    p0_p => p0(1:1,1:1)
    p0ls_p => p0ls(1:1,1:1)
    levels_p => levels(1:1,1:1,1:G_nk)
-   if( vgd_levels(vgd,ip1s,levels_p,p0_p,sfc_field_ls=p0ls_p) == VGD_ERROR)then
+   if( vgd_levels(vgdid,vgdid,ip1s,levels_p,p0_p,sfc_field_ls=p0ls_p) == VGD_ERROR)then
       call exit(1)
    endif
    if( test_levels(levels_p,1,1,G_nk,liste,infon,lu) == VGD_ERROR)then
@@ -192,7 +192,7 @@ program levels_withref_sub_array
    ! Test mix sub array and array
    deallocate(levels)
    allocate(levels(l_ni,l_nj,G_nk))
-   if( vgd_levels(vgd,ip1s,levels,p0_p,sfc_field_ls=p0ls_p) == VGD_ERROR)then
+   if( vgd_levels(vgdid,vgdid,ip1s,levels,p0_p,sfc_field_ls=p0ls_p) == VGD_ERROR)then
       call exit(1)
    endif
    if( test_levels(levels,l_ni,l_nj,G_nk,liste,infon,lu) == VGD_ERROR)then
@@ -200,7 +200,7 @@ program levels_withref_sub_array
       call exit
    endif   
    wk(1:l_ni,1:l_nj)=p0(1:l_ni,1:l_nj)
-   if( vgd_levels(vgd,ip1s,levels,wk,sfc_field_ls=p0ls_p) == VGD_ERROR)then
+   if( vgd_levels(vgdid,vgdid,ip1s,levels,wk,sfc_field_ls=p0ls_p) == VGD_ERROR)then
       call exit(1)
    endif   
    if( test_levels(levels,l_ni,l_nj,G_nk,liste,infon,lu) == VGD_ERROR)then
@@ -208,7 +208,7 @@ program levels_withref_sub_array
       call exit
    endif
    wk(1:l_ni,1:l_nj)=p0ls(1:l_ni,1:l_nj)
-   if( vgd_levels(vgd,ip1s,levels,p0_p,sfc_field_ls=wk) == VGD_ERROR)then
+   if( vgd_levels(vgdid,vgdid,ip1s,levels,p0_p,sfc_field_ls=wk) == VGD_ERROR)then
       call exit(1)
    endif   
    if( test_levels(levels,l_ni,l_nj,G_nk,liste,infon,lu) == VGD_ERROR)then

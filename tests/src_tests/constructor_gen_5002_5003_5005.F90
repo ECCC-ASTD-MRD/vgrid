@@ -20,13 +20,13 @@ program constructor
 
   ! Revision : Andre Plante test on B instead of A since A not sensitive to rcoefs
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,VGD_ERROR
+  use vGrid_Descriptors, only: vgd_new,vgd_get,VGD_ERROR
   use Unit_Testing, only: ut_report
   
 
   implicit none
 
-  type(vgrid_descriptor) :: vgd
+  integer :: vgdid
   integer :: stat,nl_m,nl_t
   real :: epsilon=1.e-6
   real, dimension(57) :: hyb= &
@@ -56,7 +56,7 @@ program constructor
 
   print*,'DEBUG'
 
-  !ier = vgd_free(vgd)
+  !ier = vgd_free(vgdid)
 
   !Use wrong top pressure
 
@@ -66,60 +66,60 @@ if(.false.)then
   print*,'================== EXPECTED ERROR SECTION BEGINGS================='
   print*,'The following 3 error messages on F_ptop_8 less than zero are normal'
   call flush(6)
-  stat = vgd_new(vgd,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=0.d0,pref_8=pref)
+  stat = vgd_new(vgdid,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=0.d0,pref_8=pref)
   if(stat.ne.VGD_ERROR)OK=.false.  
-  stat = vgd_new(vgd,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-1.d0,pref_8=pref)
+  stat = vgd_new(vgdid,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-1.d0,pref_8=pref)
   if(stat.ne.VGD_ERROR)OK=.false.  
-  stat = vgd_new(vgd,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-2.d0,pref_8=pref)
+  stat = vgd_new(vgdid,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-2.d0,pref_8=pref)
   if(stat.ne.VGD_ERROR)OK=.false.  
   print*,'The following 3 errors on hyb values are normal'
   call flush(6)
-  stat = vgd_new(vgd,kind=5,version=2,hyb=hyb_wrong1,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
-  stat = vgd_new(vgd,kind=5,version=2,hyb=hyb_wrong2,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
-  stat = vgd_new(vgd,kind=5,version=2,hyb=hyb_wrong3,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
+  stat = vgd_new(vgdid,kind=5,version=2,hyb=hyb_wrong1,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
+  stat = vgd_new(vgdid,kind=5,version=2,hyb=hyb_wrong2,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
+  stat = vgd_new(vgdid,kind=5,version=2,hyb=hyb_wrong3,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
   print*,'The following error on hyb values order is normal'
   hyb_wrong3=(/.1,.9,.5/)
-  stat = vgd_new(vgd,kind=5,version=2,hyb=hyb_wrong3,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
+  stat = vgd_new(vgdid,kind=5,version=2,hyb=hyb_wrong3,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
   print*,'================== EXPECTED ERROR SECTION ENDS  ================='
   print*,'================== EXPECTED ERROR SECTION ENDS  ================='
   print*,'================== EXPECTED ERROR SECTION ENDS  ================='
   call flush(6)
 endif
   ! Construct a new set of vertical coordinate descriptors 5002
-  stat = vgd_new(vgd,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref,ip1=0)
+  stat = vgd_new(vgdid,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref,ip1=0)
 
   file='data/data_constructor_gen_5002.txt'
-  stat = test_5002(vgd,file,write_control_L,stat)
+  stat = test_5002(vgdid,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
 
   ! Construct a new set of vertical coordinate descriptors 5003
-  stat = vgd_new(vgd,kind=5,version=3,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref,ip1=0)
+  stat = vgd_new(vgdid,kind=5,version=3,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref,ip1=0)
   file='data/data_constructor_gen_5003.txt'
-  stat = test_5002(vgd,file,write_control_L,stat)
+  stat = test_5002(vgdid,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
 
   ! Construct a new set of vertical coordinate descriptors 5004
   !
-  stat = vgd_new(vgd,kind=5,version=4,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-1.d0,pref_8=pref,ptop_out_8=ptop,ip1=0)
+  stat = vgd_new(vgdid,kind=5,version=4,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-1.d0,pref_8=pref,ptop_out_8=ptop,ip1=0)
   
   file='data/data_constructor_gen_5004.txt'
-  stat = test_5002(vgd,file,write_control_L,stat)
+  stat = test_5002(vgdid,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
   print*,'ptop',ptop
 
   ! Construct a new set of vertical coordinate descriptors 5004 with flat Momentum(1) level B(1)=0.
   ! 
-  stat = vgd_new(vgd,kind=5,version=4,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-2.d0,pref_8=pref,ptop_out_8=ptop,ip1=0)
+  stat = vgd_new(vgdid,kind=5,version=4,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-2.d0,pref_8=pref,ptop_out_8=ptop,ip1=0)
   file='data/data_constructor_gen_5004_B_0.txt'
-  stat = test_5002(vgd,file,write_control_L,stat)
+  stat = test_5002(vgdid,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
   print*,'ptop',ptop
  
   ! Construct a new set of vertical coordinate descriptors 5005
   !
-  stat = vgd_new(vgd,kind=5,version=5,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,ip1=0)
+  stat = vgd_new(vgdid,kind=5,version=5,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,ip1=0)
   file='data/data_constructor_gen_5005.txt'
-  stat = test_5002(vgd,file,write_control_L,stat)
+  stat = test_5002(vgdid,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
   print*,'ptop',ptop
  
@@ -128,14 +128,14 @@ end program constructor
 !==============================================================================
 !===============================================================================
 !===============================================================================
-integer function test_5002(F_d,F_file,F_write_control_L,F_stat) result(istat)
+integer function test_5002(vgdid,F_file,F_write_control_L,F_stat) result(istat)
    !
-   use vGrid_Descriptors, only: vgrid_descriptor,vgd_get,VGD_ERROR,VGD_OK
+   use vGrid_Descriptors, only: vgd_get,VGD_ERROR,VGD_OK
    
 
    implicit none
    !
-   type (vgrid_descriptor) :: F_d
+   integer :: vgdid
    logical :: F_write_control_L
    character (len=256) :: F_file
    integer :: F_stat
@@ -161,19 +161,19 @@ integer function test_5002(F_d,F_file,F_write_control_L,F_stat) result(istat)
 
    nullify(vcdm,vcdt,work,b_m_8,a_m_8,b_t_8,a_t_8,work_8,vipm,vipt,work_i)
 
-   stat = vgd_get(F_d,key='KIND - vertical coordinate ip1 kind' ,value=kind)
-   stat = vgd_get(F_d,key='VERS - vertical coordinate version'  ,value=vers)   
-   stat = vgd_get(F_d,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8)
-   stat = vgd_get(F_d,key='CA_T - vertical A coefficient (t)'   ,value=a_t_8)
-   stat = vgd_get(F_d,key='CB_M - vertical B coefficient (m)'   ,value=b_m_8)
-   stat = vgd_get(F_d,key='CB_T - vertical B coefficient (t)'   ,value=b_t_8)
-   stat = vgd_get(F_d,key='VIPM - level ip1 list (m)'           ,value=vipm)
-   stat = vgd_get(F_d,key='VIPT - level ip1 list (t)'           ,value=vipt)
-   stat = vgd_get(F_d,key='VCDM - vertical coordinate (m)'      ,value=vcdm)
-   stat = vgd_get(F_d,key='VCDT - vertical coordinate (t)'      ,value=vcdt)
-   stat = vgd_get(F_d,key='NL_M - Number of vertical levels (m)',value=nl_m)
-   stat = vgd_get(F_d,key='NL_T - Number of vertical levels (t)',value=nl_t)
-   stat = vgd_get(F_d,key='IP_1 - record ip1'                   ,value=ip1)
+   stat = vgd_get(vgdid,key='KIND - vertical coordinate ip1 kind' ,value=kind)
+   stat = vgd_get(vgdid,key='VERS - vertical coordinate version'  ,value=vers)   
+   stat = vgd_get(vgdid,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8)
+   stat = vgd_get(vgdid,key='CA_T - vertical A coefficient (t)'   ,value=a_t_8)
+   stat = vgd_get(vgdid,key='CB_M - vertical B coefficient (m)'   ,value=b_m_8)
+   stat = vgd_get(vgdid,key='CB_T - vertical B coefficient (t)'   ,value=b_t_8)
+   stat = vgd_get(vgdid,key='VIPM - level ip1 list (m)'           ,value=vipm)
+   stat = vgd_get(vgdid,key='VIPT - level ip1 list (t)'           ,value=vipt)
+   stat = vgd_get(vgdid,key='VCDM - vertical coordinate (m)'      ,value=vcdm)
+   stat = vgd_get(vgdid,key='VCDT - vertical coordinate (t)'      ,value=vcdt)
+   stat = vgd_get(vgdid,key='NL_M - Number of vertical levels (m)',value=nl_m)
+   stat = vgd_get(vgdid,key='NL_T - Number of vertical levels (t)',value=nl_t)
+   stat = vgd_get(vgdid,key='IP_1 - record ip1'                   ,value=ip1)
 
    print*,'TESTING ',kind*1000+vers
 

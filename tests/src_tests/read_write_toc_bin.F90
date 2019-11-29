@@ -17,13 +17,13 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program constructor
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_write,VGD_ERROR
+  use vGrid_Descriptors, only: vgd_new,vgd_get,vgd_write,VGD_ERROR
   use Unit_Testing, only: ut_report
   
 
   implicit none
 
-  type(vgrid_descriptor) :: d,d_rtn
+  integer :: vgdid,vgdid_rtn
   integer :: stat,lu=0,fnom,fstouv,fstfrm,fclos,k
   integer, parameter :: LEVS=4
   integer, dimension(LEVS) :: ip1s
@@ -40,11 +40,11 @@ program constructor
      call convip(ip1s(k),pres(k),2,2,'',.false.)
   enddo
   pres = pres*100. !convert mb to Pa
-  stat = vgd_new(d,kind=2,version=1,nk=size(pres),ip1_m=ip1s,a_m_8=pres,b_m_8=b)
-  stat = vgd_write(d,unit=lu,format='bin')
+  stat = vgd_new(vgdid,kind=2,version=1,nk=size(pres),ip1_m=ip1s,a_m_8=pres,b_m_8=b)
+  stat = vgd_write(vgdid,unit=lu,format='bin')
   rewind(lu)
-  stat = vgd_new(d_rtn,unit=lu,format='bin',ip1=0,ip2=0)
-  stat = vgd_get(d_rtn,key='COFA - vertical A coefficient',value=pres_rtn)
+  stat = vgd_new(vgdid_rtn,unit=lu,format='bin',ip1=0,ip2=0)
+  stat = vgd_get(vgdid_rtn,key='COFA - vertical A coefficient',value=pres_rtn)
   call ut_report(abs(pres_rtn(1)-pres(1)) < epsilon(pres),'Grid_Descriptors::vgd_new vertical build initializer (2001) value')
 
   close(10)

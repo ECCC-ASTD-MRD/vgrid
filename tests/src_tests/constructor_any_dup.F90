@@ -21,12 +21,12 @@ program constructor
   ! Objetc: The constructor vgd_new shoul produce an error since there 
   ! are more than one !! matching
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,VGD_ERROR,VGD_OK
+  use vGrid_Descriptors, only: vgd_new,VGD_ERROR,VGD_OK
   use Unit_Testing, only: ut_report
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   integer :: lu=0,ier,fstinl, ni, nj, nk
   integer :: stat
   integer :: fnom,fstouv,fstfrm,infon
@@ -45,7 +45,7 @@ program constructor
      call abort
   endif
   
-  stat = vgd_new(d,unit=lu,format="fst",ip1=-1,ip2=-1)
+  stat = vgd_new(vgdid,unit=lu,format="fst",ip1=-1,ip2=-1)
 
   call ut_report(stat==VGD_ERROR,'Grid_Descriptors, vgd_new, vgd_get CA')
 

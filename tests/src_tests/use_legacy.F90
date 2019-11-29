@@ -43,13 +43,13 @@ end program use_legacy
 !=========================================================================
 integer function test_it(F_file) result(istat)
    
-   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_write,vgd_print,vgd_levels,VGD_OK,VGD_ERROR
+   use vGrid_Descriptors, only: vgd_new,vgd_write,vgd_print,vgd_levels,VGD_OK,VGD_ERROR
 
    implicit none
    character(len=*), intent(in) :: F_file
 
    ! Local Variables
-   type(vgrid_descriptor) :: vgd
+   integer :: vgdid
    integer, parameter :: nmax=1000
    integer, dimension(nmax) :: liste
    integer :: fnom,fstouv,fstfrm,fstinl,ni,nj,nk,infon,fstluk,k,fclos
@@ -83,17 +83,17 @@ integer function test_it(F_file) result(istat)
       return
    endif
    
-   stat=vgd_new(vgd,lu)
+   stat=vgd_new(vgdid,lu)
    if(stat.eq.VGD_ERROR)return
   
-   stat=vgd_print(vgd,-1)  
+   stat=vgd_print(vgdid,-1)  
    if(stat.eq.VGD_ERROR)return
 
    stat=fstinl(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ','PX',liste,infon,nmax)
   
    allocate(levels(ni,nj,infon),px(ni,nj,infon))
 
-   stat=vgd_levels(vgd,lu,liste(1:infon),levels)
+   stat=vgd_levels(vgdid, vgdid,lu,liste(1:infon),levels)
    if(stat.eq.VGD_ERROR)return
    
    do k=1,infon

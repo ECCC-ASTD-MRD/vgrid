@@ -17,13 +17,13 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program constructor
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_print,vgd_get,VGD_OK
+  use vGrid_Descriptors, only: vgd_new,vgd_print,vgd_get,VGD_OK
   use Unit_Testing, only: ut_report
   
 
   implicit none
 
-  type(vgrid_descriptor) :: d
+  integer :: vgdid
   integer, parameter :: lu=10
   integer :: stat,i
   integer :: fnom,fstouv,fstfrm
@@ -46,21 +46,21 @@ program constructor
   endif
 
   ! Construct a new set of 3D coordinate descriptors
-  stat = vgd_new(d,unit=lu,format="fst",ip1=2009,ip2=1000)
+  stat = vgd_new(vgdid,unit=lu,format="fst",ip1=2009,ip2=1000)
   if(stat.ne.VGD_OK)then
      print*,'ERROR: problem with vgd_new'
      stat=fstfrm(lu)
      call abort
   endif
-  stat = vgd_print(d)
+  stat = vgd_print(vgdid)
 
-  stat = vgd_get(d,key='VIPM - level ip1 list',value=vip1)
+  stat = vgd_get(vgdid,key='VIPM - level ip1 list',value=vip1)
   print*,'vip1'
   print*,vip1
-  stat = vgd_get(d,key='CA_M - vertical A coefficient (m)',value=cam)
+  stat = vgd_get(vgdid,key='CA_M - vertical A coefficient (m)',value=cam)
   print*,'cam'
   print*,cam
-  stat = vgd_get(d,key='CB_M - vertical B coefficient (m)',value=cbm)
+  stat = vgd_get(vgdid,key='CB_M - vertical B coefficient (m)',value=cbm)
   print*,'cbm'
   print*,cbm
 
