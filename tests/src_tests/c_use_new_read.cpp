@@ -42,8 +42,6 @@ extern "C" void c_use_new_read() {
   vgd2_p=&vgd2;
   status = VGD_OK;
 
-  my_vgd2.c_vgd_construct_jwb(vgd2_p);
-
   ier = c_fnom(&iun,filename,mode,0);
   if( ier < 0 ) {
     printf("ERROR with c_fnom on iun, file %s\n", filename);
@@ -103,7 +101,7 @@ extern "C" void c_use_new_read() {
   }
 
   // Comparing new table with original table, must be the same.
-  if( my_vgd.Cvgd_vgdcmp(vgd_p, vgd2_p) != 0 ){
+  if( my_vgd.Cvgd_vgdcmp(&my_vgd2) != 0 ){
     printf("ERROR, vgd and vgd2 shouldne the same\n");
     return;
   }
@@ -198,7 +196,7 @@ extern "C" void c_use_new_read() {
     printf("ERROR with Cvgd_new_read vgd2\n");
     return;
   }
-  if( my_vgd.Cvgd_vgdcmp(vgd_p, vgd2_p) != 0 ){
+  if( my_vgd.Cvgd_vgdcmp(&my_vgd2) != 0 ){
     printf("ERROR, vgd and vgd2 shouldne the same after write in file, read from file\n");
     return;
   }

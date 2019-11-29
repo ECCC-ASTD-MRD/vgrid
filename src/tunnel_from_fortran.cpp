@@ -170,7 +170,6 @@ int Cvgd_new_from_table(int *vgdid, double *table,
   vgrid my_vgd(&self);
   int status;
 
-  my_vgd.c_vgd_construct_jwb(&self);
   status=my_vgd.Cvgd_new_from_table(&self, table, ni, nj, nk);
   if(status != VGD_ERROR)
     {
@@ -312,7 +311,7 @@ int Cvgd_vgdcmp(int vgdid1, int vgdid2)
   vgrid *vgd1, *vgd2;
   vgd1=grid_check.get_vgrid(vgdid1);
   vgd2=grid_check.get_vgrid(vgdid2);
-  return vgd1->Cvgd_vgdcmp_jwb(vgd2);
+  return vgd1->Cvgd_vgdcmp(vgd2);
 };
 
 int Cvgd_write_desc(int vgdid, int unit)

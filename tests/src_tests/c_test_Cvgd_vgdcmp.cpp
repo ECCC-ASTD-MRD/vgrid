@@ -86,104 +86,104 @@ extern "C" void c_test_Cvgd_vgdcmp() {
   }
 
   // Comparing all
-  if( my_vgrid.Cvgd_vgdcmp_jwb(&my_vgrid2) != 0 ){
+  if( my_vgrid.Cvgd_vgdcmp(&my_vgrid2) != 0 ){
     printf("ERROR, vgd and vgd2 should be the same\n");
     return;
   }
 
   my_vgrid.vcode=0;
-  if( my_vgrid.Cvgd_vgdcmp_jwb(&my_vgrid2) == 0 ){
+  if( my_vgrid.Cvgd_vgdcmp(&my_vgrid2) == 0 ){
     printf("ERROR, vgd and vgd2 should not be the same due to vcode\n");
     status = VGD_ERROR;
   }
   my_vgrid2.vcode=my_vgrid.vcode;
   
   my_vgrid2.kind=0;
-  if( my_vgrid.Cvgd_vgdcmp_jwb(&my_vgrid2) == 0 ){
+  if( my_vgrid.Cvgd_vgdcmp(&my_vgrid2) == 0 ){
     printf("ERROR, vgd and vgd2 should not be the same due to kind\n");
     status = VGD_ERROR;
   }
   my_vgrid2.kind=my_vgrid.kind;
 
   my_vgrid2.version=0;
-  if( my_vgrid.Cvgd_vgdcmp_jwb(&my_vgrid2) == 0 ){
+  if( my_vgrid.Cvgd_vgdcmp(&my_vgrid2) == 0 ){
     printf("ERROR, vgd and vgd2 should not be the same due to version\n");
     status = VGD_ERROR;
   }
   my_vgrid2.version=my_vgrid.version;
  
   strncpy(my_vgrid2.ref_name,"NULL",4);
-  if( my_vgrid.Cvgd_vgdcmp_jwb(&my_vgrid2) == 0 ){
+  if( my_vgrid.Cvgd_vgdcmp(&my_vgrid2) == 0 ){
     printf("ERROR, vgd and vgd2 should not be the same due to ref_name\n");
     status = VGD_ERROR;
   }
   strncpy(my_vgrid2.ref_name,my_vgrid.ref_name,4);
 
   my_vgrid4.ptop_8=0.;
-  if( my_vgrid3.Cvgd_vgdcmp_jwb(&my_vgrid4) == 0 ){
+  if( my_vgrid3.Cvgd_vgdcmp(&my_vgrid4) == 0 ){
     printf("ERROR, vgd3 and vgd4 should not be the same due to ptop_8\n");
     status = VGD_ERROR;
   }
   my_vgrid4.ptop_8=my_vgrid3.ptop_8;
 
   my_vgrid4.pref_8=0.;
-  if( my_vgrid3.Cvgd_vgdcmp_jwb(&my_vgrid4) == 0 ){
+  if( my_vgrid3.Cvgd_vgdcmp(&my_vgrid4) == 0 ){
     printf("ERROR, vgd3 and vgd4 should not be the same due to pref_8\n");
     status = VGD_ERROR;
   }
   my_vgrid4.pref_8=my_vgrid3.pref_8;
 
   my_vgrid4.rcoef1=0.;
-  if( my_vgrid3.Cvgd_vgdcmp_jwb(&my_vgrid4) == 0 ){
+  if( my_vgrid3.Cvgd_vgdcmp(&my_vgrid4) == 0 ){
     printf("ERROR, vgd3 and vgd4 should not be the same due to rcoef1\n");
     status = VGD_ERROR;
   }
   my_vgrid4.rcoef1=my_vgrid3.rcoef1;
 
   my_vgrid4.rcoef2=0.;
-  if( my_vgrid3.Cvgd_vgdcmp_jwb(&my_vgrid4) == 0 ){
+  if( my_vgrid3.Cvgd_vgdcmp(&my_vgrid4) == 0 ){
     printf("ERROR, vgd3 and vgd4 should not be the same due to rcoef2\n");
     status = VGD_ERROR;
   }
   my_vgrid4.rcoef2=my_vgrid3.rcoef2;
 
   my_vgrid2.ip1_m[my_vgrid2.nl_m-1]=my_vgrid.ip1_m[my_vgrid.nl_m-1]+1.;
-  if( my_vgrid.Cvgd_vgdcmp_jwb(&my_vgrid2) == 0 ){
+  if( my_vgrid.Cvgd_vgdcmp(&my_vgrid2) == 0 ){
     printf("ERROR, vgd and vgd2 should not be the same due to ip1_m\n");
     status = VGD_ERROR;
   }
   my_vgrid2.ip1_m[my_vgrid2.nl_m-1]=my_vgrid.ip1_m[my_vgrid2.nl_m-1];
   
   my_vgrid2.ip1_t[my_vgrid2.nl_t-1]=my_vgrid.ip1_t[my_vgrid.nl_t-1]+1.;
-  if( my_vgrid.Cvgd_vgdcmp_jwb(&my_vgrid2) == 0 ){
+  if( my_vgrid.Cvgd_vgdcmp(&my_vgrid2) == 0 ){
     printf("ERROR, vgd and vgd2 should not be the same due to ip1_t\n");
     status = VGD_ERROR;
   }
   my_vgrid2.ip1_t[my_vgrid2.nl_t-1]=my_vgrid.ip1_t[my_vgrid2.nl_t-1];
   
   my_vgrid2.a_m_8[my_vgrid2.nl_m-1]=my_vgrid.a_m_8[my_vgrid.nl_m-1]+1.;
-  if( my_vgrid.Cvgd_vgdcmp_jwb(&my_vgrid2) == 0 ){
+  if( my_vgrid.Cvgd_vgdcmp(&my_vgrid2) == 0 ){
     printf("ERROR, vgd and vgd2 should not be the same due to a_m_8\n");
     status = VGD_ERROR;
   }
   my_vgrid2.a_m_8[my_vgrid2.nl_m-1]=my_vgrid.a_m_8[my_vgrid2.nl_m-1];
 
   my_vgrid2.b_m_8[my_vgrid2.nl_m-1]=my_vgrid.b_m_8[my_vgrid.nl_m-1]+1.;
-  if( my_vgrid.Cvgd_vgdcmp_jwb(&my_vgrid2) == 0 ){
+  if( my_vgrid.Cvgd_vgdcmp(&my_vgrid2) == 0 ){
     printf("ERROR, vgd and vgd2 should not be the same due to b_m_8\n");
     status = VGD_ERROR;
   }
   my_vgrid2.b_m_8[my_vgrid2.nl_m-1]=my_vgrid.b_m_8[my_vgrid2.nl_m-1];
 
   my_vgrid2.a_t_8[my_vgrid2.nl_t-1]=my_vgrid.a_t_8[my_vgrid.nl_t-1]+1.;
-  if( my_vgrid.Cvgd_vgdcmp_jwb(&my_vgrid2) == 0 ){
+  if( my_vgrid.Cvgd_vgdcmp(&my_vgrid2) == 0 ){
     printf("ERROR, vgd and vgd2 should not be the same due to a_t_8\n");
     status = VGD_ERROR;
   }
   my_vgrid2.a_t_8[my_vgrid2.nl_t-1]=my_vgrid.a_t_8[my_vgrid2.nl_t-1];
 
   my_vgrid2.b_t_8[my_vgrid2.nl_t-1]=my_vgrid.b_t_8[my_vgrid.nl_t-1]+1.;
-  if( my_vgrid.Cvgd_vgdcmp_jwb(&my_vgrid2) == 0 ){
+  if( my_vgrid.Cvgd_vgdcmp(&my_vgrid2) == 0 ){
     printf("ERROR, vgd and vgd2 should not be the same due to b_t_8\n");
     status = VGD_ERROR;
   }

@@ -53,7 +53,7 @@ int coat_check::get_tag(vgrid *vgrid_p)
   for(hanger_index=0; hanger_index <= latest_hanger_filled; hanger_index++)
     {
       // TBD:  create and use vgrid operator ==
-      if(vgrid_p->Cvgd_vgdcmp_jwb(&hangers[hanger_index].vgd) == 0)
+      if(vgrid_p->Cvgd_vgdcmp(&hangers[hanger_index].vgd) == 0)
         break;
     }
 

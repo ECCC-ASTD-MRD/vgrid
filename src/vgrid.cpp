@@ -758,98 +758,47 @@ int vgrid::C_load_toctoc(vgrid_descriptor *self, VGD_TFSTD_ext var, int key) {
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_vgdcmp_jwb(vgrid *that) {
+int vgrid::Cvgd_vgdcmp(vgrid *vgd2) {
 
   //int nt1, nt2;
   // Check each element of the structure (except FST attributes) for equality
 
-  if (this->vcode != that->vcode)                   return(-1);
-  if (this->kind != that->kind)                     return(-2);
-  if (this->version != that->version)               return(-3);
-  if (strcmp(this->ref_name, that->ref_name) != 0 ) return(-4);
-  if (strcmp(this->ref_namel, that->ref_namel) != 0 )return(-20);
-  if (this->nl_w != that->nl_w) return(-23);
+  if (vcode != vgd2->vcode)                   return(-1);
+  if (kind != vgd2->kind)                     return(-2);
+  if (version != vgd2->version)               return(-3);
+  if (strcmp(ref_name, vgd2->ref_name) != 0 ) return(-4);
+  if (strcmp(ref_namel, vgd2->ref_namel) != 0 )return(-20);
+  if (nl_w != vgd2->nl_w) return(-23);
   // Note, size nl_m and nl_t are tested in call to same_vec_i below
-  if (memcmp(&(this->ptop_8),&(that->ptop_8), sizeof(double)/sizeof(char) ))return(-5);
-  if (memcmp(&(this->pref_8),&(that->pref_8), sizeof(double)/sizeof(char) ))return(-6);
-  if (memcmp(&(this->rcoef1),&(that->rcoef1), sizeof(float) /sizeof(char) ))return(-7);
-  if (memcmp(&(this->rcoef2),&(that->rcoef2), sizeof(float) /sizeof(char) ))return(-8);
-  if (memcmp(&(this->rcoef3),&(that->rcoef3), sizeof(float) /sizeof(char) ))return(-16);
-  if (memcmp(&(this->rcoef4),&(that->rcoef4), sizeof(float) /sizeof(char) ))return(-17);
+  if (memcmp(&(ptop_8),&(vgd2->ptop_8), sizeof(double)/sizeof(char) ))return(-5);
+  if (memcmp(&(pref_8),&(vgd2->pref_8), sizeof(double)/sizeof(char) ))return(-6);
+  if (memcmp(&(rcoef1),&(vgd2->rcoef1), sizeof(float) /sizeof(char) ))return(-7);
+  if (memcmp(&(rcoef2),&(vgd2->rcoef2), sizeof(float) /sizeof(char) ))return(-8);
+  if (memcmp(&(rcoef3),&(vgd2->rcoef3), sizeof(float) /sizeof(char) ))return(-16);
+  if (memcmp(&(rcoef4),&(vgd2->rcoef4), sizeof(float) /sizeof(char) ))return(-17);
 
    // Check pointer associations and values
-  if(same_vec_i (this->ip1_m, this->nl_m, that->ip1_m, that->nl_m) != 0) return (-9);
-  if(same_vec_i (this->ip1_t, this->nl_t, that->ip1_t, that->nl_t) != 0) return (-10);
-  if(same_vec_i (this->ip1_w, this->nl_w, that->ip1_w, that->nl_w) != 0) return (-24);
-  if(same_vec_r8(this->a_m_8, this->nl_m, that->a_m_8, that->nl_m) != 0) return (-11);
-  //if(same_vec_r8(this->b_m_8, this->nl_m, that->b_m_8, that->nl_m) != 0) return (-12);
-  if(similar_vec_r8(this->b_m_8, this->nl_m, that->b_m_8, that->nl_m) != 0) return (-12);
-  //if(same_vec_r8(this->c_m_8, this->nl_m, that->c_m_8, that->nl_m) != 0) return (-18);
-  if(same_vec_r8(this->a_t_8, this->nl_t, that->a_t_8, that->nl_t) != 0) return (-13);
-  //if(same_vec_r8(this->b_t_8, this->nl_t, that->b_t_8, that->nl_t) != 0) return (-14);
-  if(similar_vec_r8(this->b_t_8, this->nl_t, that->b_t_8, that->nl_t) != 0) return (-14);
-  //if(same_vec_r8(this->c_t_8, this->nl_t, that->c_t_8, that->nl_t) != 0) return (-19);
-  if(same_vec_r8(this->a_w_8, this->nl_w, that->a_w_8, that->nl_w) != 0) return (-25);
-  if(similar_vec_r8(this->b_w_8, this->nl_w, that->b_w_8, that->nl_w) != 0) return (-26);
-  //if(same_vec_r8(this->c_w_8, this->nl_w, that->c_w_8, that->nl_w) != 0) return (-27);
+  if(same_vec_i (ip1_m, nl_m, vgd2->ip1_m, vgd2->nl_m) != 0) return (-9);
+  if(same_vec_i (ip1_t, nl_t, vgd2->ip1_t, vgd2->nl_t) != 0) return (-10);
+  if(same_vec_i (ip1_w, nl_w, vgd2->ip1_w, vgd2->nl_w) != 0) return (-24);
+  if(same_vec_r8(a_m_8, nl_m, vgd2->a_m_8, vgd2->nl_m) != 0) return (-11);
+  //if(same_vec_r8(b_m_8, nl_m, vgd2->b_m_8, vgd2->nl_m) != 0) return (-12);
+  if(similar_vec_r8(b_m_8, nl_m, vgd2->b_m_8, vgd2->nl_m) != 0) return (-12);
+  //if(same_vec_r8(c_m_8, nl_m, vgd2->c_m_8, vgd2->nl_m) != 0) return (-18);
+  if(same_vec_r8(a_t_8, nl_t, vgd2->a_t_8, vgd2->nl_t) != 0) return (-13);
+  //if(same_vec_r8(b_t_8, nl_t, vgd2->b_t_8, vgd2->nl_t) != 0) return (-14);
+  if(similar_vec_r8(b_t_8, nl_t, vgd2->b_t_8, vgd2->nl_t) != 0) return (-14);
+  //if(same_vec_r8(c_t_8, nl_t, vgd2->c_t_8, vgd2->nl_t) != 0) return (-19);
+  if(same_vec_r8(a_w_8, nl_w, vgd2->a_w_8, vgd2->nl_w) != 0) return (-25);
+  if(similar_vec_r8(b_w_8, nl_w, vgd2->b_w_8, vgd2->nl_w) != 0) return (-26);
+  //if(same_vec_r8(c_w_8, nl_w, vgd2->c_w_8, vgd2->nl_w) != 0) return (-27);
  
   // Do not check table since all above parameters consist in a full check, at least it should.
   // Also, the transfer from char to real(kind=8) do not always give same real8 value which
   // made equality to be false even if above parameters are equal.
-  //nt1 = this->table_ni * this->table_nj * this->table_nk;
-  //nt2 = that->table_ni * that->table_nj * that->table_nk;
-  //if(same_vec_r8(this->table, nt1, that->table, nt2 )            != 0) return (-15);
-
-  return(0);
-}
-
-int vgrid::Cvgd_vgdcmp(vgrid_descriptor *vgd1, vgrid_descriptor *vgd2) {
-
-  //int nt1, nt2;
-  // Check each element of the structure (except FST attributes) for equality
-
-  if(! vgd1){
-    return(-21);
-  }
-  if(! vgd2){
-    return(-22);
-  }
-  if (vgd1->vcode != vgd2->vcode)                   return(-1);
-  if (vgd1->kind != vgd2->kind)                     return(-2);
-  if (vgd1->version != vgd2->version)               return(-3);
-  if (strcmp(vgd1->ref_name, vgd2->ref_name) != 0 ) return(-4);
-  if (strcmp(vgd1->ref_namel, vgd2->ref_namel) != 0 )return(-20);
-  if (vgd1->nl_w != vgd2->nl_w) return(-23);
-  // Note, size nl_m and nl_t are tested in call to same_vec_i below
-  if (memcmp(&(vgd1->ptop_8),&(vgd2->ptop_8), sizeof(double)/sizeof(char) ))return(-5);
-  if (memcmp(&(vgd1->pref_8),&(vgd2->pref_8), sizeof(double)/sizeof(char) ))return(-6);
-  if (memcmp(&(vgd1->rcoef1),&(vgd2->rcoef1), sizeof(float) /sizeof(char) ))return(-7);
-  if (memcmp(&(vgd1->rcoef2),&(vgd2->rcoef2), sizeof(float) /sizeof(char) ))return(-8);
-  if (memcmp(&(vgd1->rcoef3),&(vgd2->rcoef3), sizeof(float) /sizeof(char) ))return(-16);
-  if (memcmp(&(vgd1->rcoef4),&(vgd2->rcoef4), sizeof(float) /sizeof(char) ))return(-17);
-
-   // Check pointer associations and values
-  if(same_vec_i (vgd1->ip1_m, vgd1->nl_m, vgd2->ip1_m, vgd2->nl_m) != 0) return (-9);
-  if(same_vec_i (vgd1->ip1_t, vgd1->nl_t, vgd2->ip1_t, vgd2->nl_t) != 0) return (-10);
-  if(same_vec_i (vgd1->ip1_w, vgd1->nl_w, vgd2->ip1_w, vgd2->nl_w) != 0) return (-24);
-  if(same_vec_r8(vgd1->a_m_8, vgd1->nl_m, vgd2->a_m_8, vgd2->nl_m) != 0) return (-11);
-  //if(same_vec_r8(vgd1->b_m_8, vgd1->nl_m, vgd2->b_m_8, vgd2->nl_m) != 0) return (-12);
-  if(similar_vec_r8(vgd1->b_m_8, vgd1->nl_m, vgd2->b_m_8, vgd2->nl_m) != 0) return (-12);
-  //if(same_vec_r8(vgd1->c_m_8, vgd1->nl_m, vgd2->c_m_8, vgd2->nl_m) != 0) return (-18);
-  if(same_vec_r8(vgd1->a_t_8, vgd1->nl_t, vgd2->a_t_8, vgd2->nl_t) != 0) return (-13);
-  //if(same_vec_r8(vgd1->b_t_8, vgd1->nl_t, vgd2->b_t_8, vgd2->nl_t) != 0) return (-14);
-  if(similar_vec_r8(vgd1->b_t_8, vgd1->nl_t, vgd2->b_t_8, vgd2->nl_t) != 0) return (-14);
-  //if(same_vec_r8(vgd1->c_t_8, vgd1->nl_t, vgd2->c_t_8, vgd2->nl_t) != 0) return (-19);
-  if(same_vec_r8(vgd1->a_w_8, vgd1->nl_w, vgd2->a_w_8, vgd2->nl_w) != 0) return (-25);
-  if(similar_vec_r8(vgd1->b_w_8, vgd1->nl_w, vgd2->b_w_8, vgd2->nl_w) != 0) return (-26);
-  //if(same_vec_r8(vgd1->c_w_8, vgd1->nl_w, vgd2->c_w_8, vgd2->nl_w) != 0) return (-27);
- 
-  // Do not check table since all above parameters consist in a full check, at least it should.
-  // Also, the transfer from char to real(kind=8) do not always give same real8 value which
-  // made equality to be false even if above parameters are equal.
-  //nt1 = vgd1->table_ni * vgd1->table_nj * vgd1->table_nk;
+  //nt1 = table_ni * table_nj * table_nk;
   //nt2 = vgd2->table_ni * vgd2->table_nj * vgd2->table_nk;
-  //if(same_vec_r8(vgd1->table, nt1, vgd2->table, nt2 )            != 0) return (-15);
+  //if(same_vec_r8(table, nt1, vgd2->table, nt2 )            != 0) return (-15);
 
   return(0);
 }
@@ -2603,7 +2552,6 @@ vgrid::vgrid()
 vgrid::vgrid(vgrid_descriptor *self_in)
 {
   self=self_in;
-  //this->c_vgd_construct_jwb(self);
 
   ptop_8        = VGD_MISSING;
   pref_8        = VGD_MISSING;  
@@ -2664,71 +2612,6 @@ vgrid::vgrid(vgrid_descriptor *self_in)
   strcpy(rec.etiket,"            ");
   strcpy(rec.grtyp," ");
   return;
-}
-
-void vgrid::c_vgd_construct_jwb(vgrid_descriptor *vgrid)
-{
-   if( vgrid ) {
-      vgrid->ptop_8        = VGD_MISSING;
-      vgrid->pref_8        = VGD_MISSING;      
-      vgrid->table         = NULL;
-      vgrid->table_ni      = 0;
-      vgrid->table_nj      = 0;
-      vgrid->table_nk      = 0;
-      vgrid->a_m_8         = NULL;
-      vgrid->b_m_8         = NULL;
-      vgrid->c_m_8         = NULL;
-      vgrid->a_t_8         = NULL;
-      vgrid->b_t_8         = NULL;
-      vgrid->c_t_8         = NULL;
-      vgrid->a_w_8         = NULL;
-      vgrid->b_w_8         = NULL;
-      vgrid->c_w_8         = NULL;
-      vgrid->ip1_m         = NULL;
-      vgrid->ip1_t         = NULL;      
-      vgrid->ip1_w         = NULL;      
-      vgrid->nl_m          = 0;
-      vgrid->nl_t          = 0;
-      vgrid->nl_w          = 0;
-      vgrid->dhm           = VGD_MISSING;
-      vgrid->dht           = VGD_MISSING;
-      vgrid->dhw           = VGD_MISSING;
-      vgrid->ref_name      = strdup(VGD_NO_REF_NOMVAR);
-      vgrid->ref_namel     = strdup(VGD_NO_REF_NOMVAR);
-      vgrid->rcoef1        = VGD_MISSING;
-      vgrid->rcoef2        = VGD_MISSING;
-      vgrid->rcoef3        = VGD_MISSING;
-      vgrid->rcoef4        = VGD_MISSING;
-      vgrid->nk            = 0;
-      vgrid->ip1           = 0;
-      vgrid->ip2           = 0;
-      vgrid->unit          = 0;
-      vgrid->vcode         = 0;
-      vgrid->kind          = 0;
-      vgrid->version       = 0;
-      vgrid->match_ipig    = 0;
-      vgrid->valid         = 0;
-
-      vgrid->rec.fstd_initialized = 0;
-      vgrid->rec.dateo = 0;
-      vgrid->rec.deet = 0;
-      vgrid->rec.npas = 0;
-      vgrid->rec.nbits = -64;
-      vgrid->rec.datyp = 0;
-      vgrid->rec.ip1 = 0;
-      vgrid->rec.ip2 = 0;
-      vgrid->rec.ip3 = 0;
-      vgrid->rec.ig1 = 0;
-      vgrid->rec.ig2 = 0;
-      vgrid->rec.ig3 = 0;
-      vgrid->rec.ig4 = 0;
-      strcpy(vgrid->rec.typvar,"  ");
-      strcpy(vgrid->rec.nomvar,"    ");
-      strcpy(vgrid->rec.etiket,"            ");
-      strcpy(vgrid->rec.grtyp," ");
-   }
-
-   return;
 }
 
 void vgrid::c_vgd_free_abci(vgrid_descriptor *self) {
@@ -3089,8 +2972,6 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
 {
   char cvcode[6];
   int errorInput = 0, ier;
-
-  this->c_vgd_construct_jwb(self);
 
   // Initializations
   this->valid      = 1;
@@ -6857,8 +6738,6 @@ int vgrid::Cvgd_new_gen2(vgrid_descriptor *self, int kind, int version, float *h
   double *a_m_8 = NULL, *b_m_8 = NULL, *c_m_8 = NULL, *a_t_8 = NULL, *b_t_8 = NULL, *c_t_8 = NULL, *a_w_8 = NULL, *b_w_8 = NULL, *c_w_8 = NULL;
   int *ip1_m = NULL, *ip1_t = NULL, *ip1_w = NULL, tlift, OKInput;
 
-  this->c_vgd_construct_jwb(self);
-
   if(this->Cvgd_set_vcode_i(self, kind, version) == VGD_ERROR)  {
     printf("(Cvgd) ERROR in Cvgd_new_gen2, ERROR with Cvgd_set_vcode_i");
     return (VGD_ERROR);
@@ -7481,9 +7360,6 @@ int vgrid::Cvgd_new_read(vgrid_descriptor *self, int unit, int ip1, int ip2, int
   VGD_TFSTD_ext var;
   vgrid_descriptor self2;
   vgrid that(&self2);
-
-
-  this->c_vgd_construct_jwb(self);
   
   if(ip1 >= 0 && ip2 < 0) {
     printf("(Cvgd) ERROR in Cvgd_new_read, expecting optional value ip2\n");      
@@ -7548,7 +7424,6 @@ int vgrid::Cvgd_new_read(vgrid_descriptor *self, int unit, int ip1, int ip2, int
       }
       // If we get at this point this means that there are more than one toc satisfying the selection criteria.
       // We load then all to check if they are the same. If not, we return with an error message.
-      that.c_vgd_construct_jwb(&self2);
       if( my_fstprm(keyList[i], &var) == VGD_ERROR ) {
 	printf("(Cvgd) ERROR in Cvgd_new_read, with my_fstprm on keyList[i] = %d\n",keyList[i]);
 	return(VGD_ERROR);
@@ -7557,7 +7432,7 @@ int vgrid::Cvgd_new_read(vgrid_descriptor *self, int unit, int ip1, int ip2, int
 	printf("(Cvgd) ERROR in Cvgd_new_read, cannot load !!\n");
 	return(VGD_ERROR);
       }
-      status = this->Cvgd_vgdcmp_jwb(&that);
+      status = this->Cvgd_vgdcmp(&that);
       if ( status != 0 ){
 	printf("(Cvgd) ERROR in Cvgd_new_read, found different entries in vertical descriptors after search on ip1 = %d, ip2 = %d, kind = %d, version = %d, status code is %d\n",ip1,ip2,kind,version,status);
 	return(VGD_ERROR);

@@ -54,8 +54,6 @@ int test_it(char *filename, int ind) {
   vgd2_p = &vgd2;
   vgrid my_vgd2(vgd2_p);
 
-  my_vgd2.c_vgd_construct_jwb(vgd2_p);
-
   iun = 10 + ind;
 
   if( c_fnom(&iun,filename,"RND+R/O",0) < 0 ) {
@@ -75,12 +73,12 @@ int test_it(char *filename, int ind) {
     printf("ERROR with Cvgd_get_double_3d on VTBL\n");
     return (VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_new_from_table(vgd2_p, table, ni, nj, nk) == VGD_ERROR ){
+  if( my_vgd2.Cvgd_new_from_table(vgd2_p, table, ni, nj, nk) == VGD_ERROR ){
     printf("ERROR with Cvgd_new_from_table\n");
     return (VGD_ERROR);
   }
   // Test equality
-  ier = my_vgrid.Cvgd_vgdcmp(vgd_p, vgd2_p);
+  ier = my_vgrid.Cvgd_vgdcmp(&my_vgd2);
   if( ier != 0 ){
     printf("     Descritors not equal, Cvgd_vgdcmp code is %d\n", ier);    
     return (VGD_ERROR);
