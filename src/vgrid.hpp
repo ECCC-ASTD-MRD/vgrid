@@ -78,6 +78,8 @@ public:
   char     match_ipig;    // do ip/ig matching for records
   char     valid;         // Validity of structure
   // METHODS:
+private:
+  int correct_kind_and_version(int key, int kind, int version, VGD_TFSTD_ext *var, int *status);
 public:
   int is_valid(int *table_valid);
   int is_option(int *table_option);
@@ -100,6 +102,7 @@ public:
 			   int *ip1_list, float *levels, float *sfc_field,
 			   float *sfc_field_ls, int in_log, int dpidpis);
   vgrid();
+  vgrid(int unit, int ip1, int ip2, int kind, int version);
   void c_vgd_free_abci();
   int Cvgd_set_vcode_i(int Kind,int Version);
   int fstd_init();

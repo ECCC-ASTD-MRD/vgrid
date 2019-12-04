@@ -185,6 +185,21 @@ int Cvgd_new_gen2(int *vgdid, int kind, int version, float *hyb,
   return status;
 }
 
+int Cvgd_read_vgrid_from_file(int *vgdid, int unit, int ip1,int ip2, 
+                              int kind, int version)
+{
+  try
+    {
+      vgrid my_vgd(unit, ip1, ip2, kind, version);
+      *vgdid=grid_check.get_tag(&my_vgd);
+    }
+  catch(int x)
+    {
+      printf("(Cvgd_read_vgrid_from_file) ERROR from vgrid constructor\n");
+    }
+  return VGD_OK;
+}
+
 int Cvgd_new_read(int *vgdid, int unit, int ip1,int ip2, 
                   int kind, int version)
 {

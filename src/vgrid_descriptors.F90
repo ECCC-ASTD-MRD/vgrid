@@ -38,6 +38,7 @@ module vGrid_Descriptors
    ! Public methods
    public :: vgd_get                             !get instance variable value
    public :: vgd_put                             !set instance variable value
+   public :: read_vgrid_from_file                !class constructor
    public :: vgd_new                             !class constructor
    public :: vgd_getopt                          !get class variable value
    public :: vgd_putopt                          !set class variable value
@@ -210,6 +211,12 @@ module vGrid_Descriptors
          integer (c_int), value :: vgdid1, vgdid2
       end function f_vgdcmp
 
+      integer(c_int) function f_read_vgrid_from_file(vgdid,unit,ip1,ip2,kind,version) bind(c, name='Cvgd_read_vgrid_from_file')
+         use iso_c_binding, only : c_ptr, c_int, c_char
+         integer :: vgdid
+         integer (c_int), value :: unit, ip1, ip2, kind, version
+      end function f_read_vgrid_from_file
+
       integer(c_int) function f_new_read(vgdid,unit,ip1,ip2,kind,version) bind(c, name='Cvgd_new_read')
          use iso_c_binding, only : c_ptr, c_int, c_char
          integer :: vgdid
@@ -346,7 +353,65 @@ module vGrid_Descriptors
    end interface vgd_dpidpis
    
 contains
-   
+   integer function read_vgrid_from_file(vgdid,unit,format,ip1,ip2,kind,version) result(status)
+      use vgrid_utils, only: up
+      ! Coordinate constructor - read from a file and initialize instance
+      integer, intent(inout) :: vgdid             !Vertical descriptor id
+      integer, intent(in) :: unit                 !File unit to read descriptor information from
+      character(len=*), target, optional, intent(in) :: format !File format ('fst' or 'bin') default is 'fst'
+      integer, target,optional :: ip1,ip2                 !ip1,2 values of the desired descriptors
+      integer, target,optional, intent(in) :: kind        ! Level kind requested by user.
+      integer, target,optional, intent(in) :: version     ! Level version requested by user.
+      
+      ! Local variables
+      integer :: ni,nj,nk, istat, error, l_ip1, l_ip2, l_kind, l_version
+      character(len=100) :: myformat
+      real(kind=8), dimension(:,:,:), pointer :: table_8
+
+      nullify(table_8)
+
+      status = VGD_ERROR
+
+      myformat='FST'
+      if (present(format)) myformat = trim(up(format))
+      select case (trim(up(myformat)))
+      case ('FST')      
+         if(present(ip1))then
+            l_ip1 = ip1
+         else
+            l_ip1 = -1
+         endif
+         if(present(ip2))then
+            l_ip2 = ip2
+         else
+            l_ip2 = -1
+         endif
+         if(present(kind))then
+            l_kind = kind
+         else
+            l_kind = -1
+         endif
+         if(present(version))then
+            l_version = version
+         else
+            l_version = -1
+         endif
+
+         print*,'JWB:  kind=',l_kind,'      version=',l_version
+         if( f_new_read(vgdid, unit, l_ip1, l_ip2, l_kind, l_version) == VGD_ERROR )then
+            print*,'(F_vgd) ERROR: In new_read, problem with f_new_read'
+            return
+         endif
+      case DEFAULT
+         write(for_msg,*) 'invalid constructor format request ',trim(myformat)
+         call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         return
+      end select
+
+      status = VGD_OK
+
+   end function read_vgrid_from_file
+  
    integer function new_read(vgdid,unit,format,ip1,ip2,kind,version) result(status)
       use vgrid_utils, only: up
       ! Coordinate constructor - read from a file and initialize instance
