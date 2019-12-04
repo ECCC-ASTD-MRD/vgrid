@@ -44,15 +44,10 @@ int test_it(char *filename, int ind) {
 
   int ni, nj, nk, iun, ier;
   double *table = NULL;
-  vgrid_descriptor vgd, vgd2;
-  vgrid_descriptor *vgd_p = NULL,  *vgd2_p = NULL;
-  vgrid_descriptor my_vgd;
-  vgrid my_vgrid(&my_vgd);
+  vgrid my_vgrid;
   void free (void* ptr);
 
-  vgd_p  = &vgd;
-  vgd2_p = &vgd2;
-  vgrid my_vgd2(vgd2_p);
+  vgrid my_vgd2;
 
   iun = 10 + ind;
 
@@ -64,16 +59,16 @@ int test_it(char *filename, int ind) {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
     return (VGD_ERROR);
   }  
-  if( my_vgrid.Cvgd_new_read(vgd_p, iun, -1, -1, -1, -1) == VGD_ERROR ) {
+  if( my_vgrid.Cvgd_new_read(iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
     return (VGD_ERROR);
   }
   // Get table  
-  if( my_vgrid.Cvgd_get_double_3d(vgd_p, "VTBL", &table, &ni, &nj, &nk, 0) == VGD_ERROR ){
+  if( my_vgrid.Cvgd_get_double_3d("VTBL", &table, &ni, &nj, &nk, 0) == VGD_ERROR ){
     printf("ERROR with Cvgd_get_double_3d on VTBL\n");
     return (VGD_ERROR);
   }
-  if( my_vgd2.Cvgd_new_from_table(vgd2_p, table, ni, nj, nk) == VGD_ERROR ){
+  if( my_vgd2.Cvgd_new_from_table(table, ni, nj, nk) == VGD_ERROR ){
     printf("ERROR with Cvgd_new_from_table\n");
     return (VGD_ERROR);
   }
@@ -92,8 +87,7 @@ int test_it(char *filename, int ind) {
 extern "C" void c_new_from_table() {
   
   int i, ier, status = VGD_OK;
-  vgrid_descriptor my_vgd;
-  vgrid my_vgrid(&my_vgd);
+  vgrid my_vgrid;
 
   ier = my_vgrid.Cvgd_putopt_int("ALLOW_SIGMA",1);
   

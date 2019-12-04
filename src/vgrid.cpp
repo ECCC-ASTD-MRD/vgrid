@@ -82,7 +82,7 @@ static int vcode_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 400
 
 // beginning of class vgrid
 
-int vgrid::is_valid(vgrid_descriptor *self, int *table_valid)
+int vgrid::is_valid(int *table_valid)
 {
   int k;
   for( k = 0; k < VALID_TABLE_SIZE; k++){
@@ -93,7 +93,7 @@ int vgrid::is_valid(vgrid_descriptor *self, int *table_valid)
   return 0;
 }
 
-int vgrid::is_option(vgrid_descriptor *self, int *table_option)
+int vgrid::is_option(int *table_option)
 {
   int k;
   for( k = 0; k < VALID_TABLE_SIZE; k++){
@@ -104,40 +104,40 @@ int vgrid::is_option(vgrid_descriptor *self, int *table_option)
   return 0;
 }
 
-int vgrid::Cvgd_is_valid(vgrid_descriptor *self, char *valid_table_name)
+int vgrid::Cvgd_is_valid(char *valid_table_name)
 {
   if( strcmp(valid_table_name, "SELF") == 0 ){
     return(this->valid);
   } else if( strcmp(valid_table_name, "ptop_out_8_valid") == 0 ){
-    return(this->is_valid(self,              ptop_out_8_valid));
+    return(this->is_valid(ptop_out_8_valid));
   } else if( strcmp(valid_table_name, "ptop_8_valid")     == 0 ){
-    return(this->is_valid(self,              ptop_8_valid));
+    return(this->is_valid(ptop_8_valid));
   } else if( strcmp(valid_table_name, "pref_8_valid")     == 0 ){
-    return(this->is_valid(self,              pref_8_valid));
+    return(this->is_valid(pref_8_valid));
   } else if( strcmp(valid_table_name, "rcoef1_valid")     == 0 ){
-    return(this->is_valid(self,              rcoef1_valid));
+    return(this->is_valid(rcoef1_valid));
   } else if( strcmp(valid_table_name, "rcoef2_valid")     == 0 ){
-    return(this->is_valid(self,              rcoef2_valid));
+    return(this->is_valid(rcoef2_valid));
   } else if( strcmp(valid_table_name, "rcoef3_valid")     == 0 ){
-    return(this->is_valid(self,              rcoef3_valid));
+    return(this->is_valid(rcoef3_valid));
   } else if( strcmp(valid_table_name, "rcoef4_valid")     == 0 ){
-    return(this->is_valid(self,              rcoef4_valid));
+    return(this->is_valid(rcoef4_valid));
   } else if( strcmp(valid_table_name, "a_m_8_valid")      == 0 ){
-    return(this->is_valid(self,              a_m_8_valid));
+    return(this->is_valid(a_m_8_valid));
   } else if( strcmp(valid_table_name, "b_m_8_valid")      == 0 ){
-    return(this->is_valid(self,              b_m_8_valid));
+    return(this->is_valid(b_m_8_valid));
   } else if( strcmp(valid_table_name, "c_m_8_valid")      == 0 ){
-    return(this->is_valid(self,              c_m_8_valid));
+    return(this->is_valid(c_m_8_valid));
   } else if( strcmp(valid_table_name, "a_t_8_valid")      == 0 ){
-    return(this->is_valid(self,              a_t_8_valid));
+    return(this->is_valid( a_t_8_valid));
   } else if( strcmp(valid_table_name, "b_t_8_valid")      == 0 ){
-    return(this->is_valid(self,              b_t_8_valid));
+    return(this->is_valid(b_t_8_valid));
   } else if( strcmp(valid_table_name, "c_t_8_valid")      == 0 ){
-    return(this->is_valid(self,              c_t_8_valid));
+    return(this->is_valid(c_t_8_valid));
   } else if( strcmp(valid_table_name, "ip1_m_valid")      == 0 ){
-    return(this->is_valid(self,              ip1_m_valid));
+    return(this->is_valid(ip1_m_valid));
   } else if( strcmp(valid_table_name, "ip1_t_valid")      == 0 ){
-    return(this->is_valid(self,              ip1_t_valid));
+    return(this->is_valid(ip1_t_valid));
   } else if( strcmp(valid_table_name, "ref_name_valid")   == 0 ){
     if( strcmp(this->ref_name,VGD_NO_REF_NOMVAR) == 0 ){
       return 0;
@@ -151,21 +151,21 @@ int vgrid::Cvgd_is_valid(vgrid_descriptor *self, char *valid_table_name)
       return 1;
     }
   } else if( strcmp(valid_table_name, "dhm_valid")        == 0 ){
-    return(this->is_valid(self,              dhm_valid));
+    return(this->is_valid(dhm_valid));
   } else if( strcmp(valid_table_name, "dht_valid")        == 0 ){
-    return(this->is_valid(self,              dht_valid));
+    return(this->is_valid(dht_valid));
   } else if( strcmp(valid_table_name, "dhw_valid")        == 0 ){
-    return(this->is_valid(self,              dhw_valid));
+    return(this->is_valid(dhw_valid));
   } else if( strcmp(valid_table_name, "is_in_logp")       == 0 ){
-    return(this->is_valid(self,              is_in_logp));
+    return(this->is_valid(is_in_logp));
   } else {
     printf("(Cvgd) Warning : in Cvgd_is_valid, valid_table_name '%s' does not exist\n",valid_table_name);
     return(0);
   }
 }
 
-int vgrid::is_required_double(vgrid_descriptor *self, double *ptr, int *table_valid, char *message) {
-  if( this->is_valid(self,table_valid)) {
+int vgrid::is_required_double( double *ptr, int *table_valid, char *message) {
+  if( this->is_valid(table_valid)) {
     if (! ptr) {
       printf("(Cvgd) ERROR: %s is a required constructor entry\n", message);
       return(0);
@@ -178,8 +178,8 @@ int vgrid::is_required_double(vgrid_descriptor *self, double *ptr, int *table_va
   }
   return(1);
 }
-int vgrid::is_required_float(vgrid_descriptor *self, float *ptr, int *table_valid, char *message) {
-  if( this->is_valid(self,table_valid)) {
+int vgrid::is_required_float(float *ptr, int *table_valid, char *message) {
+  if( this->is_valid(table_valid)) {
     if (! ptr) {
       printf("(Cvgd) ERROR: %s is a required constructor entry\n", message);
       return(0);
@@ -371,7 +371,7 @@ int c_get_stda76(float *Tk, float *pk, float *zk, float *gammaT,
   return(VGD_OK);
 }
 
-int vgrid::c_stda76_temp_from_press(vgrid_descriptor *self, int *i_val, int nl, float *temp){
+int vgrid::c_stda76_temp_from_press(int *i_val, int nl, float *temp){
   int k, ind, zero_lapse_rate;
   float pkp, Tk, pk, hgts_stda, zk, zkp, gammaT;
   float *levs = NULL;
@@ -383,13 +383,13 @@ int vgrid::c_stda76_temp_from_press(vgrid_descriptor *self, int *i_val, int nl, 
     return(VGD_ERROR);
   }
   
-  if(! this->Cvgd_is_valid(self,"ref_namel_valid") ){    
-    if( this->Cvgd_levels(self, 1, 1, nl, i_val, levs, &VGD_STDA76_SFC_P, 0) == VGD_ERROR){
+  if(! this->Cvgd_is_valid("ref_namel_valid") ){    
+    if( this->Cvgd_levels(1, 1, nl, i_val, levs, &VGD_STDA76_SFC_P, 0) == VGD_ERROR){
       printf("(Cvgd) ERROR in c_stda76_temp_from_press, problem with Cvgd_levels (computing pressure profile with one ref)\n");
       return(VGD_ERROR);
     }
   } else {
-    if( this->Cvgd_levels_2ref(self, 1, 1, nl, i_val, levs, &VGD_STDA76_SFC_P, &VGD_STDA76_SFC_P, 0) == VGD_ERROR){
+    if( this->Cvgd_levels_2ref(1, 1, nl, i_val, levs, &VGD_STDA76_SFC_P, &VGD_STDA76_SFC_P, 0) == VGD_ERROR){
       printf("(Cvgd) ERROR in c_stda76_temp_from_press, problem with Cvgd_levels (computing pressure profile with two refs)\n");
       return(VGD_ERROR);
     }
@@ -424,7 +424,7 @@ int vgrid::c_stda76_temp_from_press(vgrid_descriptor *self, int *i_val, int nl, 
   return(VGD_OK);
 }
 
-int vgrid::c_stda76_temp_pres_from_heights(vgrid_descriptor *self, int *i_val, int nl, float *temp, float *pres, float *sfc_temp, float *sfc_pres){
+int vgrid::c_stda76_temp_pres_from_heights(int *i_val, int nl, float *temp, float *pres, float *sfc_temp, float *sfc_pres){
   int ind = 0, k, zero_lapse_rate;
   float *levs = NULL;
   float zero = 0.f, pk, pkp, Tk, zk, zkp, gammaT;
@@ -436,13 +436,13 @@ int vgrid::c_stda76_temp_pres_from_heights(vgrid_descriptor *self, int *i_val, i
     return(VGD_ERROR);
   }
   
-  if(! this->Cvgd_is_valid(self,"ref_namel_valid") ){    
-    if( this->Cvgd_levels(self, 1, 1, nl, i_val, levs, &zero, 0) == VGD_ERROR){
+  if(! this->Cvgd_is_valid("ref_namel_valid") ){    
+    if( this->Cvgd_levels(1, 1, nl, i_val, levs, &zero, 0) == VGD_ERROR){
       printf("(Cvgd) ERROR in c_stda76_temp_pres_from_heights, problem with Cvgd_levels (computing heights profile with one ref)\n");
       return(VGD_ERROR);
     }
   } else {
-    if( this->Cvgd_levels_2ref(self, 1, 1, nl, i_val, levs, &zero, &zero, 0) == VGD_ERROR){
+    if( this->Cvgd_levels_2ref(1, 1, nl, i_val, levs, &zero, &zero, 0) == VGD_ERROR){
       printf("(Cvgd) ERROR in c_stda76_temp_pres_from_heights, problem with Cvgd_levels (computing heights profile with two refs)\n");
       return(VGD_ERROR);
     }
@@ -483,38 +483,38 @@ int vgrid::c_stda76_temp_pres_from_heights(vgrid_descriptor *self, int *i_val, i
 
 }
 
-void vgrid::Cvgd_table_shape(vgrid_descriptor *self, int **tshape) {
+void vgrid::Cvgd_table_shape(int **tshape) {
   (*tshape)[0] = this->table_ni;
   (*tshape)[1] = this->table_nj;
   (*tshape)[2] = this->table_nk;
 }
 
-int vgrid::c_table_update(vgrid_descriptor *self) {
+int vgrid::c_table_update() {
   //printf("this->vcode)=%d\n",this->vcode);
   switch(this->vcode) {
   case 5002:
   case 5003:
   case 5004:
   case 5005:
-    if( this->c_encode_vert_5002_5003_5004_5005(self, 1) == VGD_ERROR ) {
+    if( this->c_encode_vert_5002_5003_5004_5005(1) == VGD_ERROR ) {
       printf("(Cvgd) ERROR in c_table_update, cannot encode Vcode %d\n",this->vcode);
       return(VGD_ERROR);
     }
     break;
   case 5100:
-    if( this->c_encode_vert_5100(self, 1) == VGD_ERROR ) {
+    if( this->c_encode_vert_5100(1) == VGD_ERROR ) {
       printf("(Cvgd) ERROR in c_table_update, cannot encode Vcode %d\n",this->vcode);
       return(VGD_ERROR);
     }
     break;
   case 21001:
-    if( this->c_encode_vert_21001(self, 1) == VGD_ERROR ) {
+    if( this->c_encode_vert_21001(1) == VGD_ERROR ) {
       printf("(Cvgd) ERROR in c_table_update, cannot encode Vcode %d\n",this->vcode);
       return(VGD_ERROR);
     }
     break;
   case 21002:
-    if( this->c_encode_vert_21002(self, 1) == VGD_ERROR ) {
+    if( this->c_encode_vert_21002(1) == VGD_ERROR ) {
       printf("(Cvgd) ERROR in c_table_update, cannot encode Vcode %d\n",this->vcode);
       return(VGD_ERROR);
     }
@@ -712,7 +712,7 @@ int correct_kind_and_version(int key, int kind, int version, VGD_TFSTD_ext *var,
 
 }
 
-int vgrid::C_load_toctoc(vgrid_descriptor *self, VGD_TFSTD_ext var, int key) {
+int vgrid::C_load_toctoc( VGD_TFSTD_ext var, int key) {
 
   int table_size, istat, ni, nj
     , nk;
@@ -735,7 +735,7 @@ int vgrid::C_load_toctoc(vgrid_descriptor *self, VGD_TFSTD_ext var, int key) {
   }
   this->kind             = (int) this->table[0];
   this->version          = (int) this->table[1];
-  if(this->fstd_init(self) == VGD_ERROR) {
+  if(this->fstd_init() == VGD_ERROR) {
     printf("(Cvgd) ERROR in C_load_toctoc, problem creating record information\n");
     return(VGD_ERROR);
   }
@@ -839,7 +839,7 @@ int VGD_FindIp1Idx(int Ip1,int *Lst,int Size) {
    return(-1);
 }
 
-int vgrid::Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip) {
+int vgrid::Cvgd_print_desc(int sout, int convip) {
   int k, ip1, kind, my_int;
   char pres_S[] = " p,";
   if(! this->valid) {
@@ -861,21 +861,21 @@ int vgrid::Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip) {
     printf(" Vcode = %d\n",this->vcode);
     printf("   Descriptor Nomvar: %s\n",this->rec.nomvar);
     printf("   level kind = %d, level version = %d\n", this->kind, this->version);
-    if( this->is_valid(self, ptop_8_valid) )
+    if( this->is_valid(ptop_8_valid) )
       printf("   ptop=%f Pa\n",this->ptop_8);
-    if( this->is_valid(self, pref_8_valid) )
+    if( this->is_valid(pref_8_valid) )
       printf("   pref=%f Pa\n",this->pref_8);
-    if( this->is_valid(self, rcoef1_valid) )
+    if( this->is_valid(rcoef1_valid) )
       printf("   rcoef1=%f\n",this->rcoef1);
-    if( this->is_valid(self, rcoef2_valid) )
+    if( this->is_valid(rcoef2_valid) )
       printf("   rcoef2=%f\n",this->rcoef2);
-    if( this->is_valid(self, rcoef3_valid) && this->Cvgd_is_valid(self,"ref_namel_valid" ) )
+    if( this->is_valid( rcoef3_valid) && this->Cvgd_is_valid("ref_namel_valid" ) )
       printf("   rcoef3=%f\n",this->rcoef3);
-    if( this->is_valid(self, rcoef4_valid) && this->Cvgd_is_valid(self,"ref_namel_valid" ) )
+    if( this->is_valid(rcoef4_valid) && this->Cvgd_is_valid("ref_namel_valid" ) )
       printf("   rcoef4=%f\n",this->rcoef4);
-    if( this->Cvgd_is_valid(self,"ref_name_valid") )
+    if( this->Cvgd_is_valid("ref_name_valid") )
       printf("   Surface field nomvar %s\n",this->ref_name);
-    if( this->Cvgd_is_valid(self,"ref_namel_valid") )
+    if( this->Cvgd_is_valid("ref_namel_valid") )
       printf("   Surface field nomvar large scale %s\n",this->ref_namel);
     
     switch(this->vcode) {
@@ -933,7 +933,7 @@ int vgrid::Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip) {
       printf("   Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref) + C * ln(P0LS*100/pref)\n");
       break;
     case 21001:
-      if( this->Cvgd_is_valid(self,"ref_namel_valid") ){
+      if( this->Cvgd_is_valid("ref_namel_valid") ){
 	printf("   Number of hybrid height levels (Gal-Chen) (SLEVE momentum/thermo levels) %d\n", this->nl_m-2 );
       } else {
 	printf("   Number of hybrid height levels (Gal-Chen) (momentum/thermo levels) %d\n", this->nl_m-2 );
@@ -942,14 +942,14 @@ int vgrid::Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip) {
       printf("   Diagnostic momentum level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
       ip1=this->ip1_t[this->nl_t-1];
       printf("   Diagnostic thermo   level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
-      if( this->Cvgd_is_valid(self,"ref_namel_valid") ){
+      if( this->Cvgd_is_valid("ref_namel_valid") ){
 	printf("   Equation to compute heights z = A + B * ME + C * MELS\n");
       } else {
 	printf("   Equation to compute heights z = A + B * ME\n");
       }
       break;
     case 21002:
-      if( this->Cvgd_is_valid(self,"ref_namel_valid") ){
+      if( this->Cvgd_is_valid("ref_namel_valid") ){
 	printf("   Number of hybrid height levels on Lorenz grid (SLEVE momentum-thermo/vertical-velocity levels) %d\n", this->nl_m-2 );
       } else {
 	printf("   Number of hybrid height levels on Lorenz grid (momentum-thermo/vertical-velocity levels) %d\n", this->nl_m-2 );
@@ -960,7 +960,7 @@ int vgrid::Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip) {
       printf("   Diagnostic thermo   level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
       ip1=this->ip1_w[this->nl_w-1];
       printf("   Diagnostic Vertical-Velocity level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
-      if( this->Cvgd_is_valid(self,"ref_namel_valid") ){
+      if( this->Cvgd_is_valid("ref_namel_valid") ){
 	printf("   Equation to compute heights z = A + B * ME + C * MELS\n");
       } else {
 	printf("   Equation to compute heights z = A + B * ME\n");
@@ -971,9 +971,9 @@ int vgrid::Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip) {
       return(VGD_ERROR);
     }
 
-    if (this->is_valid(self, ip1_m_valid) ) {
+    if (this->is_valid(ip1_m_valid) ) {
       printf("   Momentum levels ip1,%s A, B",pres_S);
-      if( this->is_valid(self, c_m_8_valid) && this->Cvgd_is_valid(self,"ref_namel_valid" ) ) {
+      if( this->is_valid( c_m_8_valid) && this->Cvgd_is_valid("ref_namel_valid" ) ) {
 	printf(", C:\n");
       }else{
 	printf(":\n");
@@ -984,16 +984,16 @@ int vgrid::Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip) {
 	} else {
 	  printf("%12d %-# 25.15G %-# 25.15G",this->ip1_m[k],this->a_m_8[k],this->b_m_8[k]);
 	}
-	if( this->is_valid(self, c_m_8_valid) && this->Cvgd_is_valid(self,"ref_namel_valid" ) ) {
+	if( this->is_valid(c_m_8_valid) && this->Cvgd_is_valid("ref_namel_valid" ) ) {
 	  printf(" %-# 25.15G\n",this->c_m_8[k]);
 	}else{
 	  printf("\n");
 	}
       }
     }
-    if (this->is_valid(self, ip1_t_valid) ) {
+    if (this->is_valid(ip1_t_valid) ) {
       printf("   Thermodynamic levels ip1,%s A, B",pres_S);
-      if( this->is_valid(self, c_t_8_valid) && this->Cvgd_is_valid(self,"ref_namel_valid" ) ) {
+      if( this->is_valid(c_t_8_valid) && this->Cvgd_is_valid("ref_namel_valid" ) ) {
 	printf(", C:\n");
       }else{
 	printf(":\n");
@@ -1004,16 +1004,16 @@ int vgrid::Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip) {
 	} else {
 	  printf("%12d %-# 25.15G %-# 25.15G",this->ip1_t[k],this->a_t_8[k],this->b_t_8[k]);
 	}
-	if( this->is_valid(self, c_t_8_valid) && this->Cvgd_is_valid(self,"ref_namel_valid" ) ) {
+	if( this->is_valid(c_t_8_valid) && this->Cvgd_is_valid("ref_namel_valid" ) ) {
 	  printf(" %-# 25.15G\n",this->c_t_8[k]);
 	}else{
 	  printf("\n");
 	}
       }
     }
-    if (this->is_valid(self, ip1_w_valid) ) {
+    if (this->is_valid(ip1_w_valid) ) {
       printf("   Vertical-Velocity levels ip1,%s A, B",pres_S);
-      if( this->is_valid(self, c_w_8_valid) && this->Cvgd_is_valid(self,"ref_namel_valid") ) {
+      if( this->is_valid(c_w_8_valid) && this->Cvgd_is_valid("ref_namel_valid") ) {
 	printf(", C:\n");
       }else{
 	printf(":\n");
@@ -1024,7 +1024,7 @@ int vgrid::Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip) {
 	} else {
 	  printf("%12d %-# 25.15G %-# 25.15G",this->ip1_w[k],this->a_w_8[k],this->b_w_8[k]);
 	}
-	if( this->is_valid(self, c_w_8_valid) && this->Cvgd_is_valid(self,"ref_namel_valid") ) {
+	if( this->is_valid(c_w_8_valid) && this->Cvgd_is_valid("ref_namel_valid") ) {
 	  printf(" %-# 25.15G\n",this->c_w_8[k]);
 	}else{
 	  printf("\n");
@@ -1122,7 +1122,7 @@ int vgrid::Cvgd_print_vcode_description(int vcode){
 
 }
 
-int vgrid::C_compute_heights_0001_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels) {
+int vgrid::C_compute_heights_0001_8(int ni, int nj, int nk, int *ip1_list, double *levels) {
   char proc_name[] = "C_compute_heights_0001_8";
 #define REAL_8 1
   double *aa_8;
@@ -1164,7 +1164,7 @@ int vgrid::C_compute_heights_0001_8(vgrid_descriptor *self, int ni, int nj, int 
 #undef REAL_8 
 }
 
-int vgrid::C_compute_heights_0001(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels) {
+int vgrid::C_compute_heights_0001(int ni, int nj, int nk, int *ip1_list, float *levels) {
   char proc_name[] = "C_compute_heights_0001";
 #undef REAL_8
   double *aa_8;
@@ -1205,7 +1205,7 @@ int vgrid::C_compute_heights_0001(vgrid_descriptor *self, int ni, int nj, int nk
   return(VGD_OK);
 }
 
-int vgrid::C_compute_pressure_1001_1002_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log) {
+int vgrid::C_compute_pressure_1001_1002_8(int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log) {
   char proc_name[] = "C_compute_pressure_1001_1002_8";
 #define REAL_8 1
   int k,*ind,ij,ijk;
@@ -1244,7 +1244,7 @@ int vgrid::C_compute_pressure_1001_1002_8(vgrid_descriptor *self, int ni, int nj
 #undef REAL_8 
 }
 
-int vgrid::C_compute_pressure_1001_1002(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log) {
+int vgrid::C_compute_pressure_1001_1002(int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log) {
   char proc_name[] = "C_compute_pressure_1001_1002";
 #undef REAL_8
   int k,*ind,ij,ijk;
@@ -1282,7 +1282,7 @@ int vgrid::C_compute_pressure_1001_1002(vgrid_descriptor *self, int ni, int nj, 
   return(VGD_OK);
 }
 
-int vgrid::C_compute_pressure_2001_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, int in_log) {
+int vgrid::C_compute_pressure_2001_8(int ni, int nj, int nk, int *ip1_list, double *levels, int in_log) {
   char proc_name[] = "C_compute_pressure_2001_8";
 #define REAL_8 1
   int k,*ind,ij,ijk;
@@ -1320,7 +1320,7 @@ if( my_alloc_int(&ind, nk, message) == VGD_ERROR )
   return(VGD_OK);
 #undef REAL_8
 }
-int vgrid::C_compute_pressure_2001(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, int in_log) {
+int vgrid::C_compute_pressure_2001(int ni, int nj, int nk, int *ip1_list, float *levels, int in_log) {
   char proc_name[] = "C_compute_pressure_2001";
 #undef REAL_8
   int k,*ind,ij,ijk;
@@ -1358,7 +1358,7 @@ if( my_alloc_int(&ind, nk, message) == VGD_ERROR )
   return(VGD_OK);
 }
 
-int vgrid::C_compute_heights_4001_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels) {
+int vgrid::C_compute_heights_4001_8(int ni, int nj, int nk, int *ip1_list, double *levels) {
   char proc_name[] = "C_compute_heights_4001_8";
 #define REAL_8 1
   int k,*ind,ij,ijk;
@@ -1396,7 +1396,7 @@ int vgrid::C_compute_heights_4001_8(vgrid_descriptor *self, int ni, int nj, int 
   return(VGD_OK);
 #undef REAL_8
 }
-int vgrid::C_compute_heights_4001(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels) {
+int vgrid::C_compute_heights_4001(int ni, int nj, int nk, int *ip1_list, float *levels) {
   char proc_name[] = "C_compute_heights_4001";
 #undef REAL_8
   int k,*ind,ij,ijk;
@@ -1434,7 +1434,7 @@ int vgrid::C_compute_heights_4001(vgrid_descriptor *self, int ni, int nj, int nk
   return(VGD_OK);
 }
 
-int vgrid::C_compute_pressure_1003_5001_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log, int dpidpis ){
+int vgrid::C_compute_pressure_1003_5001_8(int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log, int dpidpis ){
   char proc_name[] = "C_compute_pressure_1003_5001_8";
 #define REAL_8 1
   int k,*ind,ij,ijk;
@@ -1490,7 +1490,7 @@ int vgrid::C_compute_pressure_1003_5001_8(vgrid_descriptor *self, int ni, int nj
 #undef REAL_8
 }
 
-int vgrid::C_compute_pressure_1003_5001(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log, int dpidpis ){
+int vgrid::C_compute_pressure_1003_5001(int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log, int dpidpis ){
   char proc_name[] = "C_compute_pressure_1003_5001";
 #undef REAL_8
   int k,*ind,ij,ijk;
@@ -1545,7 +1545,7 @@ int vgrid::C_compute_pressure_1003_5001(vgrid_descriptor *self, int ni, int nj, 
   return(VGD_OK);
 }
 
-int vgrid::C_compute_pressure_5002_5003_5004_5005_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log, int dpidpis) {
+int vgrid::C_compute_pressure_5002_5003_5004_5005_8(int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log, int dpidpis) {
   char proc_name[] = "C_compute_pressure_5002_5003_5004_5005_8";
 #define REAL_8 1
   double *aa_8, *bb_8, *s_8, lvl;
@@ -1642,7 +1642,7 @@ int vgrid::C_compute_pressure_5002_5003_5004_5005_8(vgrid_descriptor *self, int 
 #undef REAL_8
 }
 
-int vgrid::C_compute_pressure_5002_5003_5004_5005(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log, int dpidpis) {
+int vgrid::C_compute_pressure_5002_5003_5004_5005(int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log, int dpidpis) {
   char proc_name[] = "C_compute_pressure_5002_5003_5004_5005";
 #undef REAL_8
   double *aa_8, *bb_8, *s_8, lvl;
@@ -1738,7 +1738,7 @@ int vgrid::C_compute_pressure_5002_5003_5004_5005(vgrid_descriptor *self, int ni
   return(VGD_OK);
 }
 
-int vgrid::C_compute_pressure_5100_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, double *sfc_field_ls, int in_log, int dpidpis) {
+int vgrid::C_compute_pressure_5100_8(int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, double *sfc_field_ls, int in_log, int dpidpis) {
   char proc_name[] = "C_compute_pressure_5100_8";
 #define REAL_8 1
   double *aa_8, *bb_8, *cc_8, *s_8, *sl_8, lvl;
@@ -1863,7 +1863,7 @@ int vgrid::C_compute_pressure_5100_8(vgrid_descriptor *self, int ni, int nj, int
 #undef REAL_8
 }
 
-int vgrid::C_compute_pressure_5100(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, float *sfc_field_ls, int in_log, int dpidpis) {
+int vgrid::C_compute_pressure_5100(int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, float *sfc_field_ls, int in_log, int dpidpis) {
   char proc_name[] = "C_compute_pressure_5100";
 #undef REAL_8
   double *aa_8, *bb_8, *cc_8, *s_8, *sl_8, lvl;
@@ -1987,7 +1987,7 @@ int vgrid::C_compute_pressure_5100(vgrid_descriptor *self, int ni, int nj, int n
   return(VGD_OK);
 }
 
-int vgrid::C_compute_heights_21001_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, double *sfc_field_ls) {
+int vgrid::C_compute_heights_21001_8(int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, double *sfc_field_ls) {
   char proc_name[] = "C_compute_heights_21001_8";
   double *my_sfc_field_ls;
 #define REAL_8 1
@@ -2075,7 +2075,7 @@ int vgrid::C_compute_heights_21001_8(vgrid_descriptor *self, int ni, int nj, int
 #undef REAL_8
 }
 
-int vgrid::C_compute_heights_21001(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, float *sfc_field_ls) {
+int vgrid::C_compute_heights_21001(int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, float *sfc_field_ls) {
   char proc_name[] = "C_compute_heights_21001";
   float *my_sfc_field_ls;
 #undef REAL_8
@@ -2162,51 +2162,51 @@ int vgrid::C_compute_heights_21001(vgrid_descriptor *self, int ni, int nj, int n
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_levels_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8, int in_log) {
-  if(this->Cvgd_diag_withref_2ref_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, NULL, in_log, 0) == VGD_ERROR )
+int vgrid::Cvgd_levels_8(int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8, int in_log) {
+  if(this->Cvgd_diag_withref_2ref_8(ni, nj, nk, ip1_list, levels_8, sfc_field_8, NULL, in_log, 0) == VGD_ERROR )
     return(VGD_ERROR);
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_levels(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log) {
-  if(this->Cvgd_diag_withref_2ref(self, ni, nj, nk, ip1_list, levels, sfc_field, NULL, in_log, 0) == VGD_ERROR )
+int vgrid::Cvgd_levels(int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log) {
+  if(this->Cvgd_diag_withref_2ref(ni, nj, nk, ip1_list, levels, sfc_field, NULL, in_log, 0) == VGD_ERROR )
     return(VGD_ERROR);
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_levels_2ref_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8, double *sfc_field_ls_8, int in_log) {
-  if(this->Cvgd_diag_withref_2ref_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, sfc_field_ls_8, in_log, 0) == VGD_ERROR )
+int vgrid::Cvgd_levels_2ref_8(int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8, double *sfc_field_ls_8, int in_log) {
+  if(this->Cvgd_diag_withref_2ref_8(ni, nj, nk, ip1_list, levels_8, sfc_field_8, sfc_field_ls_8, in_log, 0) == VGD_ERROR )
     return(VGD_ERROR);
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_levels_2ref(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, float *sfc_field_ls, int in_log) {
-  if(this->Cvgd_diag_withref_2ref(self, ni, nj, nk, ip1_list, levels, sfc_field, sfc_field_ls, in_log, 0) == VGD_ERROR )
+int vgrid::Cvgd_levels_2ref(int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, float *sfc_field_ls, int in_log) {
+  if(this->Cvgd_diag_withref_2ref(ni, nj, nk, ip1_list, levels, sfc_field, sfc_field_ls, in_log, 0) == VGD_ERROR )
     return(VGD_ERROR);
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_diag_withref_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8,int in_log, int dpidpis) {
-  if( this->Cvgd_diag_withref_2ref_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, NULL, in_log, dpidpis) ){
-    return(VGD_ERROR);
-  }
-  return(VGD_OK);
-}
-
-int vgrid::Cvgd_diag_withref(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log, int dpidpis) {
-  if( this->Cvgd_diag_withref_2ref(self, ni, nj, nk, ip1_list, levels, sfc_field, NULL, in_log, dpidpis) ){
+int vgrid::Cvgd_diag_withref_8(int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8,int in_log, int dpidpis) {
+  if( this->Cvgd_diag_withref_2ref_8(ni, nj, nk, ip1_list, levels_8, sfc_field_8, NULL, in_log, dpidpis) ){
     return(VGD_ERROR);
   }
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_diag_withref_2ref_8(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8, double *sfc_field_ls_8,int in_log, int dpidpis) {
+int vgrid::Cvgd_diag_withref(int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log, int dpidpis) {
+  if( this->Cvgd_diag_withref_2ref(ni, nj, nk, ip1_list, levels, sfc_field, NULL, in_log, dpidpis) ){
+    return(VGD_ERROR);
+  }
+  return(VGD_OK);
+}
+
+int vgrid::Cvgd_diag_withref_2ref_8(int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8, double *sfc_field_ls_8,int in_log, int dpidpis) {
   char proc_name[] = "Cvgd_diag_withref_2ref_8";
   char double_interface = 1;
   // The following pointers will never be used but they are needed to compile
   float *levels = NULL, *sfc_field = NULL, *sfc_field_ls = NULL;
 #define REAL_8 1
-  if(! this->Cvgd_is_valid(self,"SELF")){
+  if(! this->Cvgd_is_valid("SELF")){
     printf("(Cvgd) ERROR in %s, invalid vgrid.\n",proc_name);
     return(VGD_ERROR);
   }
@@ -2218,19 +2218,19 @@ int vgrid::Cvgd_diag_withref_2ref_8(vgrid_descriptor *self, int ni, int nj, int 
       return(VGD_ERROR);
     }
     if(double_interface){
-      if( C_compute_heights_0001_8(self, ni, nj, nk, ip1_list, levels_8) == VGD_ERROR)
+      if( C_compute_heights_0001_8(ni, nj, nk, ip1_list, levels_8) == VGD_ERROR)
 	return(VGD_ERROR);
     } else {
-      if( C_compute_heights_0001(self, ni, nj, nk, ip1_list, levels) == VGD_ERROR)
+      if( C_compute_heights_0001(ni, nj, nk, ip1_list, levels) == VGD_ERROR)
 	return(VGD_ERROR);
     }
     break;    
   case 1001:
     if(double_interface){
-      if( C_compute_pressure_1001_1002_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log) == VGD_ERROR)
+      if( C_compute_pressure_1001_1002_8(ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log) == VGD_ERROR)
 	return(VGD_ERROR);
     } else {
-      if( C_compute_pressure_1001_1002(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log) == VGD_ERROR)
+      if( C_compute_pressure_1001_1002(ni, nj, nk, ip1_list, levels, sfc_field, in_log) == VGD_ERROR)
 	return(VGD_ERROR);
     }
     break;
@@ -2240,10 +2240,10 @@ int vgrid::Cvgd_diag_withref_2ref_8(vgrid_descriptor *self, int ni, int nj, int 
       return(VGD_ERROR);
     }
     if(double_interface){
-      if( C_compute_pressure_1001_1002_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log) == VGD_ERROR)
+      if( C_compute_pressure_1001_1002_8(ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log) == VGD_ERROR)
 	return(VGD_ERROR);
     } else {
-      if( C_compute_pressure_1001_1002(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log) == VGD_ERROR)
+      if( C_compute_pressure_1001_1002(ni, nj, nk, ip1_list, levels, sfc_field, in_log) == VGD_ERROR)
 	return(VGD_ERROR);
     }
     break;
@@ -2253,10 +2253,10 @@ int vgrid::Cvgd_diag_withref_2ref_8(vgrid_descriptor *self, int ni, int nj, int 
       return(VGD_ERROR);
     }
     if(double_interface){
-      if( C_compute_pressure_2001_8(self, ni, nj, nk, ip1_list, levels_8, in_log) == VGD_ERROR)
+      if( C_compute_pressure_2001_8(ni, nj, nk, ip1_list, levels_8, in_log) == VGD_ERROR)
 	return(VGD_ERROR);
     } else {
-      if( C_compute_pressure_2001(self, ni, nj, nk, ip1_list, levels, in_log) == VGD_ERROR)
+      if( C_compute_pressure_2001(ni, nj, nk, ip1_list, levels, in_log) == VGD_ERROR)
 	return(VGD_ERROR);
     }
     break;
@@ -2270,20 +2270,20 @@ int vgrid::Cvgd_diag_withref_2ref_8(vgrid_descriptor *self, int ni, int nj, int 
       return(VGD_ERROR);
     }
     if(double_interface){
-      if( C_compute_heights_4001_8(self, ni, nj, nk, ip1_list, levels_8) == VGD_ERROR)
+      if( C_compute_heights_4001_8(ni, nj, nk, ip1_list, levels_8) == VGD_ERROR)
 	return(VGD_ERROR);
     } else {
-      if( C_compute_heights_4001(self, ni, nj, nk, ip1_list, levels) == VGD_ERROR)
+      if( C_compute_heights_4001(ni, nj, nk, ip1_list, levels) == VGD_ERROR)
 	return(VGD_ERROR);
     }
     break;
   case 1003:
   case 5001:
     if(double_interface){
-      if( C_compute_pressure_1003_5001_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log, dpidpis) == VGD_ERROR )
+      if( C_compute_pressure_1003_5001_8(ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log, dpidpis) == VGD_ERROR )
 	return(VGD_ERROR);
     } else {
-      if( C_compute_pressure_1003_5001(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log, dpidpis) == VGD_ERROR )
+      if( C_compute_pressure_1003_5001(ni, nj, nk, ip1_list, levels, sfc_field, in_log, dpidpis) == VGD_ERROR )
 	return(VGD_ERROR);
     }
     break;
@@ -2292,38 +2292,38 @@ int vgrid::Cvgd_diag_withref_2ref_8(vgrid_descriptor *self, int ni, int nj, int 
   case 5004:
   case 5005:
     if(double_interface){
-      if( C_compute_pressure_5002_5003_5004_5005_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log, dpidpis) == VGD_ERROR)
+      if( C_compute_pressure_5002_5003_5004_5005_8(ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log, dpidpis) == VGD_ERROR)
 	return(VGD_ERROR);
     } else {
-      if( C_compute_pressure_5002_5003_5004_5005(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log, dpidpis) == VGD_ERROR)
+      if( C_compute_pressure_5002_5003_5004_5005(ni, nj, nk, ip1_list, levels, sfc_field, in_log, dpidpis) == VGD_ERROR)
 	return(VGD_ERROR);
     }
     break;
   case 5100:
     if(double_interface){
-      if( C_compute_pressure_5100_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, sfc_field_ls_8, in_log, dpidpis) == VGD_ERROR)
+      if( C_compute_pressure_5100_8(ni, nj, nk, ip1_list, levels_8, sfc_field_8, sfc_field_ls_8, in_log, dpidpis) == VGD_ERROR)
 	return(VGD_ERROR);
     } else {
-      if( C_compute_pressure_5100(self, ni, nj, nk, ip1_list, levels, sfc_field, sfc_field_ls, in_log, dpidpis) == VGD_ERROR)
+      if( C_compute_pressure_5100(ni, nj, nk, ip1_list, levels, sfc_field, sfc_field_ls, in_log, dpidpis) == VGD_ERROR)
 	return(VGD_ERROR);
     }
     break;
   case 5999:
     if(double_interface){
-      if( C_compute_pressure_1001_1002_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log) == VGD_ERROR)
+      if( C_compute_pressure_1001_1002_8(ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log) == VGD_ERROR)
 	return(VGD_ERROR);
     } else {
-      if( C_compute_pressure_1001_1002(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log) == VGD_ERROR)
+      if( C_compute_pressure_1001_1002(ni, nj, nk, ip1_list, levels, sfc_field, in_log) == VGD_ERROR)
 	return(VGD_ERROR);
     }
     break;
   case 21001:
   case 21002:
     if(double_interface){
-      if( C_compute_heights_21001_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, sfc_field_ls_8) == VGD_ERROR)
+      if( C_compute_heights_21001_8(ni, nj, nk, ip1_list, levels_8, sfc_field_8, sfc_field_ls_8) == VGD_ERROR)
 	return(VGD_ERROR);
     } else {
-      if( C_compute_heights_21001(self, ni, nj, nk, ip1_list, levels, sfc_field, sfc_field_ls) == VGD_ERROR)
+      if( C_compute_heights_21001(ni, nj, nk, ip1_list, levels, sfc_field, sfc_field_ls) == VGD_ERROR)
 	return(VGD_ERROR);
     }
     break;
@@ -2336,13 +2336,13 @@ int vgrid::Cvgd_diag_withref_2ref_8(vgrid_descriptor *self, int ni, int nj, int 
 #undef REAL_8
 }
 
-int vgrid::Cvgd_diag_withref_2ref(vgrid_descriptor *self, int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, float *sfc_field_ls, int in_log, int dpidpis) {
+int vgrid::Cvgd_diag_withref_2ref(int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, float *sfc_field_ls, int in_log, int dpidpis) {
   char proc_name[] = "Cvgd_diag_withref_2ref";
   char double_interface = 0;
   // The following pointers will never be used but they are needed to compile
   double *levels_8 = NULL, *sfc_field_8 = NULL, *sfc_field_ls_8 = NULL;
 #undef REAL_8
-  if(! this->Cvgd_is_valid(self,"SELF")){
+  if(! this->Cvgd_is_valid("SELF")){
     printf("(Cvgd) ERROR in %s, invalid vgrid.\n",proc_name);
     return(VGD_ERROR);
   }
@@ -2354,19 +2354,19 @@ int vgrid::Cvgd_diag_withref_2ref(vgrid_descriptor *self, int ni, int nj, int nk
       return(VGD_ERROR);
     }
     if(double_interface){
-      if( C_compute_heights_0001_8(self, ni, nj, nk, ip1_list, levels_8) == VGD_ERROR)
+      if( C_compute_heights_0001_8(ni, nj, nk, ip1_list, levels_8) == VGD_ERROR)
 	return(VGD_ERROR);
     } else {
-      if( C_compute_heights_0001(self, ni, nj, nk, ip1_list, levels) == VGD_ERROR)
+      if( C_compute_heights_0001(ni, nj, nk, ip1_list, levels) == VGD_ERROR)
 	return(VGD_ERROR);
     }
     break;    
   case 1001:
     if(double_interface){
-      if( C_compute_pressure_1001_1002_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log) == VGD_ERROR)
+      if( C_compute_pressure_1001_1002_8(ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log) == VGD_ERROR)
 	return(VGD_ERROR);
     } else {
-      if( C_compute_pressure_1001_1002(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log) == VGD_ERROR)
+      if( C_compute_pressure_1001_1002(ni, nj, nk, ip1_list, levels, sfc_field, in_log) == VGD_ERROR)
 	return(VGD_ERROR);
     }
     break;
@@ -2376,10 +2376,10 @@ int vgrid::Cvgd_diag_withref_2ref(vgrid_descriptor *self, int ni, int nj, int nk
       return(VGD_ERROR);
     }
     if(double_interface){
-      if( C_compute_pressure_1001_1002_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log) == VGD_ERROR)
+      if( C_compute_pressure_1001_1002_8(ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log) == VGD_ERROR)
 	return(VGD_ERROR);
     } else {
-      if( C_compute_pressure_1001_1002(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log) == VGD_ERROR)
+      if( C_compute_pressure_1001_1002(ni, nj, nk, ip1_list, levels, sfc_field, in_log) == VGD_ERROR)
 	return(VGD_ERROR);
     }
     break;
@@ -2389,10 +2389,10 @@ int vgrid::Cvgd_diag_withref_2ref(vgrid_descriptor *self, int ni, int nj, int nk
       return(VGD_ERROR);
     }
     if(double_interface){
-      if( C_compute_pressure_2001_8(self, ni, nj, nk, ip1_list, levels_8, in_log) == VGD_ERROR)
+      if( C_compute_pressure_2001_8(ni, nj, nk, ip1_list, levels_8, in_log) == VGD_ERROR)
 	return(VGD_ERROR);
     } else {
-      if( C_compute_pressure_2001(self, ni, nj, nk, ip1_list, levels, in_log) == VGD_ERROR)
+      if( C_compute_pressure_2001(ni, nj, nk, ip1_list, levels, in_log) == VGD_ERROR)
 	return(VGD_ERROR);
     }
     break;
@@ -2406,20 +2406,20 @@ int vgrid::Cvgd_diag_withref_2ref(vgrid_descriptor *self, int ni, int nj, int nk
       return(VGD_ERROR);
     }
     if(double_interface){
-      if( C_compute_heights_4001_8(self, ni, nj, nk, ip1_list, levels_8) == VGD_ERROR)
+      if( C_compute_heights_4001_8(ni, nj, nk, ip1_list, levels_8) == VGD_ERROR)
 	return(VGD_ERROR);
     } else {
-      if( C_compute_heights_4001(self, ni, nj, nk, ip1_list, levels) == VGD_ERROR)
+      if( C_compute_heights_4001(ni, nj, nk, ip1_list, levels) == VGD_ERROR)
 	return(VGD_ERROR);
     }
     break;
   case 1003:
   case 5001:
     if(double_interface){
-      if( C_compute_pressure_1003_5001_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log, dpidpis) == VGD_ERROR )
+      if( C_compute_pressure_1003_5001_8(ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log, dpidpis) == VGD_ERROR )
 	return(VGD_ERROR);
     } else {
-      if( C_compute_pressure_1003_5001(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log, dpidpis) == VGD_ERROR )
+      if( C_compute_pressure_1003_5001(ni, nj, nk, ip1_list, levels, sfc_field, in_log, dpidpis) == VGD_ERROR )
 	return(VGD_ERROR);
     }
     break;
@@ -2428,38 +2428,38 @@ int vgrid::Cvgd_diag_withref_2ref(vgrid_descriptor *self, int ni, int nj, int nk
   case 5004:
   case 5005:
     if(double_interface){
-      if( C_compute_pressure_5002_5003_5004_5005_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log, dpidpis) == VGD_ERROR)
+      if( C_compute_pressure_5002_5003_5004_5005_8(ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log, dpidpis) == VGD_ERROR)
 	return(VGD_ERROR);
     } else {
-      if( C_compute_pressure_5002_5003_5004_5005(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log, dpidpis) == VGD_ERROR)
+      if( C_compute_pressure_5002_5003_5004_5005(ni, nj, nk, ip1_list, levels, sfc_field, in_log, dpidpis) == VGD_ERROR)
 	return(VGD_ERROR);
     }
     break;
   case 5100:
     if(double_interface){
-      if( C_compute_pressure_5100_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, sfc_field_ls_8, in_log, dpidpis) == VGD_ERROR)
+      if( C_compute_pressure_5100_8(ni, nj, nk, ip1_list, levels_8, sfc_field_8, sfc_field_ls_8, in_log, dpidpis) == VGD_ERROR)
 	return(VGD_ERROR);
     } else {
-      if( C_compute_pressure_5100(self, ni, nj, nk, ip1_list, levels, sfc_field, sfc_field_ls, in_log, dpidpis) == VGD_ERROR)
+      if( C_compute_pressure_5100(ni, nj, nk, ip1_list, levels, sfc_field, sfc_field_ls, in_log, dpidpis) == VGD_ERROR)
 	return(VGD_ERROR);
     }
     break;
   case 5999:
     if(double_interface){
-      if( C_compute_pressure_1001_1002_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log) == VGD_ERROR)
+      if( C_compute_pressure_1001_1002_8(ni, nj, nk, ip1_list, levels_8, sfc_field_8, in_log) == VGD_ERROR)
 	return(VGD_ERROR);
     } else {
-      if( C_compute_pressure_1001_1002(self, ni, nj, nk, ip1_list, levels, sfc_field, in_log) == VGD_ERROR)
+      if( C_compute_pressure_1001_1002(ni, nj, nk, ip1_list, levels, sfc_field, in_log) == VGD_ERROR)
 	return(VGD_ERROR);
     }
     break;
   case 21001:
   case 21002:
     if(double_interface){
-      if( C_compute_heights_21001_8(self, ni, nj, nk, ip1_list, levels_8, sfc_field_8, sfc_field_ls_8) == VGD_ERROR)
+      if( C_compute_heights_21001_8(ni, nj, nk, ip1_list, levels_8, sfc_field_8, sfc_field_ls_8) == VGD_ERROR)
 	return(VGD_ERROR);
     } else {
-      if( C_compute_heights_21001(self, ni, nj, nk, ip1_list, levels, sfc_field, sfc_field_ls) == VGD_ERROR)
+      if( C_compute_heights_21001(ni, nj, nk, ip1_list, levels, sfc_field, sfc_field_ls) == VGD_ERROR)
 	return(VGD_ERROR);
     }
     break;
@@ -2549,72 +2549,7 @@ vgrid::vgrid()
   return;
 }
 
-vgrid::vgrid(vgrid_descriptor *self_in)
-{
-  self=self_in;
-
-  ptop_8        = VGD_MISSING;
-  pref_8        = VGD_MISSING;  
-  table         = NULL;
-  table_ni      = 0;
-  table_nj      = 0;
-  table_nk      = 0;
-  a_m_8         = NULL;
-  b_m_8         = NULL;
-  c_m_8         = NULL;
-  a_t_8         = NULL;
-  b_t_8         = NULL;
-  c_t_8         = NULL;
-  a_w_8         = NULL;
-  b_w_8         = NULL;
-  c_w_8         = NULL;
-  ip1_m         = NULL;
-  ip1_t         = NULL;  
-  ip1_w         = NULL;  
-  nl_m          = 0;
-  nl_t          = 0;
-  nl_w          = 0;
-  dhm           = VGD_MISSING;
-  dht           = VGD_MISSING;
-  dhw           = VGD_MISSING;
-  
-  ref_name      = strdup(VGD_NO_REF_NOMVAR);
-  ref_namel     = strdup(VGD_NO_REF_NOMVAR);
-  rcoef1        = VGD_MISSING;
-  rcoef2        = VGD_MISSING;
-  rcoef3        = VGD_MISSING;
-  rcoef4        = VGD_MISSING;
-  nk            = 0;
-  ip1           = 0;
-  ip2           = 0;
-  unit          = 0;
-  vcode         = 0;
-  kind          = 0;
-  version       = 0;
-  match_ipig    = 0;
-  valid         = 0;
-
-  rec.fstd_initialized = 0;
-  rec.dateo = 0;
-  rec.deet = 0;
-  rec.npas = 0;
-  rec.nbits = -64;
-  rec.datyp = 0;
-  rec.ip1 = 0;
-  rec.ip2 = 0;
-  rec.ip3 = 0;
-  rec.ig1 = 0;
-  rec.ig2 = 0;
-  rec.ig3 = 0;
-  rec.ig4 = 0;
-  strcpy(rec.typvar,"  ");
-  strcpy(rec.nomvar,"    ");
-  strcpy(rec.etiket,"            ");
-  strcpy(rec.grtyp," ");
-  return;
-}
-
-void vgrid::c_vgd_free_abci(vgrid_descriptor *self) {
+void vgrid::c_vgd_free_abci() {
     // Thermo pointers may be pointing to momentum or velocity for certain Vcode, only nullify them if this is the case.    
     if( this->a_t_8 == this->a_m_8 || this->a_t_8 == this->a_w_8 ) {
       this->a_t_8 = NULL;
@@ -2665,7 +2600,7 @@ void vgrid::c_vgd_free_abci(vgrid_descriptor *self) {
     FREE(this->c_m_8);
 }
 
-void vgrid::Cvgd_free(vgrid_descriptor *self) {
+void vgrid::Cvgd_free() {
 // Avoid crashing:  don't free
 //    if( *self ) {
 //       FREE((*self)->table);
@@ -2694,7 +2629,7 @@ void vgrid::Cvgd_free(vgrid_descriptor *self) {
  *
  *----------------------------------------------------------------------------
  */
-int vgrid::Cvgd_set_vcode_i(vgrid_descriptor *VGrid,int Kind,int Version) {
+int vgrid::Cvgd_set_vcode_i(int Kind,int Version) {
 
    if( Kind>MAX_VKIND || Kind<0 || Version>999 || Version<0 ) {
       fprintf(stderr,"(Cvgd) ERROR in Cvgd_set_vcode_i, invalid kind or version kind=%d, version=%d\n",Kind,Version);
@@ -2719,14 +2654,14 @@ int vgrid::Cvgd_set_vcode_i(vgrid_descriptor *VGrid,int Kind,int Version) {
  *
  *----------------------------------------------------------------------------
  */
-int vgrid::Cvgd_set_vcode(vgrid_descriptor *VGrid) {
+int vgrid::Cvgd_set_vcode() {
 
    if( !this->table ) {
       fprintf(stderr,"(Cvgd) ERROR: Cvgd_set_vcode called before constructor\n");
       return(VGD_ERROR);
    }
 
-   return this->Cvgd_set_vcode_i(VGrid,this->kind,this->version);
+   return this->Cvgd_set_vcode_i(this->kind,this->version);
 }
 
 /*----------------------------------------------------------------------------
@@ -2744,7 +2679,7 @@ int vgrid::Cvgd_set_vcode(vgrid_descriptor *VGrid) {
  *
  *----------------------------------------------------------------------------
  */
-int vgrid::fstd_init(vgrid_descriptor *VGrid) {
+int vgrid::fstd_init() {
 
    VGD_TFSTD *h = &this->rec;
 
@@ -2753,7 +2688,7 @@ int vgrid::fstd_init(vgrid_descriptor *VGrid) {
 
    h->ig2=h->ig3=h->ig4=0;
 
-   if( this->Cvgd_set_vcode(VGrid) == VGD_ERROR ){
+   if( this->Cvgd_set_vcode() == VGD_ERROR ){
      return(VGD_ERROR);
    }
 
@@ -2811,7 +2746,7 @@ int vgrid::fstd_init(vgrid_descriptor *VGrid) {
          h->ig4=0;
          break;
       case 21001:
-	 if( this->Cvgd_is_valid(VGrid,"ref_namel_valid" ) ){
+	 if( this->Cvgd_is_valid("ref_namel_valid" ) ){
 	    strcpy(h->etiket,"HYB_H_CP_SLV");
 	 } else {
             strcpy(h->etiket,"HYB_H_CP");
@@ -2847,9 +2782,9 @@ int vgrid::fstd_init(vgrid_descriptor *VGrid) {
    return(VGD_OK);
 }
 
-int vgrid::Cvgd_new_build_vert(vgrid_descriptor *self, int kind, int version, int nk, int ip1, int ip2, double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2,
+int vgrid::Cvgd_new_build_vert(int kind, int version, int nk, int ip1, int ip2, double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2,
 			double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int nl_m, int nl_t){
-  if( this->Cvgd_new_build_vert2(self, kind, version, nk, ip1, ip2, ptop_8, pref_8, rcoef1, rcoef2, NULL, NULL,
+  if( this->Cvgd_new_build_vert2(kind, version, nk, ip1, ip2, ptop_8, pref_8, rcoef1, rcoef2, NULL, NULL,
 		       a_m_8, b_m_8, NULL, a_t_8, b_t_8, NULL, NULL, NULL, NULL, ip1_m, ip1_t, NULL, nl_m, nl_t, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR with Cvgd_new_build_vert see details above\n");
     return(VGD_ERROR);
@@ -2857,9 +2792,9 @@ int vgrid::Cvgd_new_build_vert(vgrid_descriptor *self, int kind, int version, in
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_new_build_vert_1001(vgrid_descriptor *self, int ip1, int ip2, 
+int vgrid::Cvgd_new_build_vert_1001(int ip1, int ip2, 
 			     double *a_m_8, double *b_m_8, int *ip1_m, int nk){
-  if( this->Cvgd_new_build_vert2(self, 1, 1, nk, ip1, ip2, NULL, NULL, NULL, NULL, NULL, NULL,
+  if( this->Cvgd_new_build_vert2(1, 1, nk, ip1, ip2, NULL, NULL, NULL, NULL, NULL, NULL,
 		       a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1_m, NULL, NULL, nk, 0, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR with Cvgd_new_build_vert_1001 see details above\n");
     return(VGD_ERROR);
@@ -2867,9 +2802,9 @@ int vgrid::Cvgd_new_build_vert_1001(vgrid_descriptor *self, int ip1, int ip2,
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_new_build_vert_1002(vgrid_descriptor *self, int ip1, int ip2, double ptop_8,
+int vgrid::Cvgd_new_build_vert_1002(int ip1, int ip2, double ptop_8,
 			     double *a_m_8, double *b_m_8, int *ip1_m, int nk){
-  if( this->Cvgd_new_build_vert2(self, 1, 2, nk, ip1, ip2, &ptop_8, NULL, NULL, NULL, NULL, NULL,
+  if( this->Cvgd_new_build_vert2(1, 2, nk, ip1, ip2, &ptop_8, NULL, NULL, NULL, NULL, NULL,
 		       a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1_m, NULL, NULL, nk, 0, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR with Cvgd_new_build_vert_1001 see details above\n");
     return(VGD_ERROR);
@@ -2877,27 +2812,27 @@ int vgrid::Cvgd_new_build_vert_1002(vgrid_descriptor *self, int ip1, int ip2, do
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_new_build_vert_2001(vgrid_descriptor *self, int ip1, int ip2, 
+int vgrid::Cvgd_new_build_vert_2001(int ip1, int ip2, 
 			     double *a_m_8, double *b_m_8, int *ip1_m, int nk){
-  if( this->Cvgd_new_build_vert2(self, 2, 1, nk, ip1, ip2, NULL, NULL, NULL, NULL, NULL, NULL,
+  if( this->Cvgd_new_build_vert2(2, 1, nk, ip1, ip2, NULL, NULL, NULL, NULL, NULL, NULL,
 		       a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1_m, NULL, NULL, nk, 0, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR with Cvgd_new_build_vert_2001 see details above\n");
     return(VGD_ERROR);
   }
   return(VGD_OK);
 }
-int vgrid::Cvgd_new_build_vert_4001(vgrid_descriptor *self, int ip1, int ip2, 
+int vgrid::Cvgd_new_build_vert_4001(int ip1, int ip2, 
 			     double *a_m_8, double *b_m_8, int *ip1_m, int nk){
-  if( this->Cvgd_new_build_vert2(self, 4, 1, nk, ip1, ip2, NULL, NULL, NULL, NULL, NULL, NULL,
+  if( this->Cvgd_new_build_vert2(4, 1, nk, ip1, ip2, NULL, NULL, NULL, NULL, NULL, NULL,
 		       a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1_m, NULL, NULL, nk, 0, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR with Cvgd_new_build_vert_4001 see details above\n");
     return(VGD_ERROR);
   }
   return(VGD_OK);
 }
-int vgrid::Cvgd_new_build_vert_5999(vgrid_descriptor *self, int ip1, int ip2, 
+int vgrid::Cvgd_new_build_vert_5999(int ip1, int ip2, 
 			     double *a_m_8, double *b_m_8, int *ip1_m, int nk){
-  if( this->Cvgd_new_build_vert2(self, 5, 999, nk, ip1, ip2, NULL, NULL, NULL, NULL, NULL, NULL,
+  if( this->Cvgd_new_build_vert2(5, 999, nk, ip1, ip2, NULL, NULL, NULL, NULL, NULL, NULL,
 		       a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1_m, NULL, NULL, nk, 0, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR with Cvgd_new_build_vert_5999 see details above\n");
     return(VGD_ERROR);
@@ -2905,9 +2840,9 @@ int vgrid::Cvgd_new_build_vert_5999(vgrid_descriptor *self, int ip1, int ip2,
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_new_build_vert_5001(vgrid_descriptor *self, int ip1, int ip2, double ptop_8, double pref_8, float rcoef1,
+int vgrid::Cvgd_new_build_vert_5001(int ip1, int ip2, double ptop_8, double pref_8, float rcoef1,
 			     double *a_m_8, double *b_m_8, int *ip1_m, int nk){
-  if( this->Cvgd_new_build_vert2(self, 5, 1, 0, ip1, ip2, &ptop_8, &pref_8, &rcoef1, NULL, NULL, NULL,
+  if( this->Cvgd_new_build_vert2(5, 1, 0, ip1, ip2, &ptop_8, &pref_8, &rcoef1, NULL, NULL, NULL,
 		       a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1_m, NULL, NULL, nk, 0, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR with Cvgd_new_build_vert_5001 see details above\n");
     return(VGD_ERROR);
@@ -2915,9 +2850,9 @@ int vgrid::Cvgd_new_build_vert_5001(vgrid_descriptor *self, int ip1, int ip2, do
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_new_build_vert_5002(vgrid_descriptor *self, int ip1, int ip2, double ptop_8, double pref_8, float rcoef1, float rcoef2,
+int vgrid::Cvgd_new_build_vert_5002(int ip1, int ip2, double ptop_8, double pref_8, float rcoef1, float rcoef2,
 			     double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int nl_m, int nl_t){
-  if( this->Cvgd_new_build_vert2(self, 5, 2, 0, ip1, ip2, &ptop_8, &pref_8, &rcoef1, &rcoef2, NULL, NULL,
+  if( this->Cvgd_new_build_vert2(5, 2, 0, ip1, ip2, &ptop_8, &pref_8, &rcoef1, &rcoef2, NULL, NULL,
 		       a_m_8, b_m_8, NULL, a_t_8, b_t_8, NULL, NULL, NULL, NULL, ip1_m, ip1_t, NULL, nl_m, nl_t, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR with Cvgd_new_build_vert_5002 see details above\n");
     return(VGD_ERROR);
@@ -2925,9 +2860,9 @@ int vgrid::Cvgd_new_build_vert_5002(vgrid_descriptor *self, int ip1, int ip2, do
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_new_build_vert_5005(vgrid_descriptor *self, int ip1, int ip2, double pref_8, float rcoef1, float rcoef2,
+int vgrid::Cvgd_new_build_vert_5005(int ip1, int ip2, double pref_8, float rcoef1, float rcoef2,
 			     double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int nl){
-  if( this->Cvgd_new_build_vert2(self, 5, 5, 0, ip1, ip2, NULL, &pref_8, &rcoef1, &rcoef2, NULL, NULL,
+  if( this->Cvgd_new_build_vert2(5, 5, 0, ip1, ip2, NULL, &pref_8, &rcoef1, &rcoef2, NULL, NULL,
 		       a_m_8, b_m_8, NULL, a_t_8, b_t_8, NULL, NULL, NULL, NULL, ip1_m, ip1_t, NULL, nl, nl, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR with Cvgd_new_build_vert_5005 see details above\n");
     return(VGD_ERROR);
@@ -2935,9 +2870,9 @@ int vgrid::Cvgd_new_build_vert_5005(vgrid_descriptor *self, int ip1, int ip2, do
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_new_build_vert_5100(vgrid_descriptor *self, int ip1, int ip2, double pref_8, float rcoef1, float rcoef2, float rcoef3, float rcoef4,
+int vgrid::Cvgd_new_build_vert_5100(int ip1, int ip2, double pref_8, float rcoef1, float rcoef2, float rcoef3, float rcoef4,
 			     double *a_m_8, double *b_m_8, double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8, int *ip1_m, int *ip1_t, int nl){
-  if( this->Cvgd_new_build_vert2(self, 5, 100, 0, ip1, ip2, NULL, &pref_8, &rcoef1, &rcoef2, &rcoef3, &rcoef4 ,
+  if( this->Cvgd_new_build_vert2(5, 100, 0, ip1, ip2, NULL, &pref_8, &rcoef1, &rcoef2, &rcoef3, &rcoef4 ,
 		       a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8, NULL, NULL, NULL, ip1_m, ip1_t, NULL, nl, nl, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR with Cvgd_new_build_vert_5100 see details above\n");
     return(VGD_ERROR);
@@ -2945,9 +2880,9 @@ int vgrid::Cvgd_new_build_vert_5100(vgrid_descriptor *self, int ip1, int ip2, do
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_new_build_vert_21001(vgrid_descriptor *self, int ip1, int ip2, float rcoef1, float rcoef2, float rcoef3, float rcoef4, 
+int vgrid::Cvgd_new_build_vert_21001(int ip1, int ip2, float rcoef1, float rcoef2, float rcoef3, float rcoef4, 
 			      double *a_m_8, double *b_m_8, double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8, int *ip1_m, int *ip1_t, int nl){
-  if( this->Cvgd_new_build_vert2(self, 21, 1, 0, ip1, ip2, NULL, NULL, &rcoef1, &rcoef2, &rcoef3, &rcoef4,
+  if( this->Cvgd_new_build_vert2(21, 1, 0, ip1, ip2, NULL, NULL, &rcoef1, &rcoef2, &rcoef3, &rcoef4,
 		       a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8, NULL, NULL, NULL, ip1_m, ip1_t, NULL, nl, nl, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR with Cvgd_new_build_vert_21001 see details above\n");
     return(VGD_ERROR);
@@ -2955,19 +2890,19 @@ int vgrid::Cvgd_new_build_vert_21001(vgrid_descriptor *self, int ip1, int ip2, f
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_new_build_vert_21002(vgrid_descriptor *self, int ip1, int ip2, float rcoef1, float rcoef2, float rcoef3, float rcoef4, 
+int vgrid::Cvgd_new_build_vert_21002(int ip1, int ip2, float rcoef1, float rcoef2, float rcoef3, float rcoef4, 
 			      double *a_m_8, double *b_m_8, double *c_m_8,
 			      double *a_t_8, double *b_t_8, double *c_t_8,
 			      double *a_w_8, double *b_w_8, double *c_w_8,
 			      int *ip1_m, int *ip1_t, int *ip1_w, int nl){
-  if( this->Cvgd_new_build_vert2(self, 21, 2, 0, ip1, ip2, NULL, NULL, &rcoef1, &rcoef2, &rcoef3, &rcoef4,
+  if( this->Cvgd_new_build_vert2(21, 2, 0, ip1, ip2, NULL, NULL, &rcoef1, &rcoef2, &rcoef3, &rcoef4,
 		       a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8, a_w_8, b_w_8, c_w_8, ip1_m, ip1_t, ip1_w, nl, nl, nl) == VGD_ERROR ){
     printf("(Cvgd) ERROR with Cvgd_new_build_vert_21002 see details above\n");
     return(VGD_ERROR);
   }
   return(VGD_OK);
 }
-int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, int nk, int ip1, int ip2, double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
+int vgrid::Cvgd_new_build_vert2(int kind, int version, int nk, int ip1, int ip2, double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
 		     double *a_m_8, double *b_m_8, double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8, double *a_w_8, double *b_w_8, double *c_w_8, int *ip1_m, int *ip1_t, int *ip1_w, int nl_m, int nl_t, int nl_w)
 {
   char cvcode[6];
@@ -2987,14 +2922,14 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
   this->rec.ip1    = (int) fmax(0,ip1);
   this->rec.ip2    = (int) fmax(0,ip2);
   strcpy(this->rec.nomvar,"!!  ");
-  if(this->Cvgd_set_vcode_i(self, kind, version) == VGD_ERROR)  {
+  if(this->Cvgd_set_vcode_i(kind, version) == VGD_ERROR)  {
     printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem with Cvgd_set_vcode_i");
     return (VGD_ERROR);
   }
   this->rec.ig1   = this->vcode;
 
   // Check for required inputs
-  if( this->is_valid( self, ptop_8_valid) ) {
+  if( this->is_valid( ptop_8_valid) ) {
     if(ptop_8) {
       this->ptop_8 = *ptop_8;
     } else {
@@ -3002,7 +2937,7 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
       errorInput = 1;
     }
   }
-  if(this->is_valid( self, pref_8_valid)) {
+  if(this->is_valid( pref_8_valid)) {
     if(pref_8){
       this->pref_8 = *pref_8;
     } else {
@@ -3010,7 +2945,7 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
       errorInput = 1;
     }
   }
-  if(this->is_valid( self, rcoef1_valid)) {
+  if(this->is_valid( rcoef1_valid)) {
     if(rcoef1){
       this->rcoef1 = *rcoef1;
     } else {
@@ -3018,7 +2953,7 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
       errorInput = 1;
     }
   }
-  if(this->is_valid( self, rcoef2_valid)) {
+  if(this->is_valid( rcoef2_valid)) {
     if(rcoef2){
       this->rcoef2 = *rcoef2;
     } else {
@@ -3026,7 +2961,7 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
       errorInput = 1;
     }
   }
-  if(this->is_valid( self, rcoef3_valid)) {
+  if(this->is_valid( rcoef3_valid)) {
     if(rcoef3){
       this->rcoef3 = *rcoef3;
     } else {
@@ -3034,7 +2969,7 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
       errorInput = 1;
     }
   }
-  if(this->is_valid( self, rcoef4_valid)) {
+  if(this->is_valid( rcoef4_valid)) {
     if(rcoef4){
       this->rcoef4 = *rcoef4;
     } else {
@@ -3042,7 +2977,7 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
       errorInput = 1;
     }
   }
-  if(this->is_valid( self, a_m_8_valid)) {
+  if(this->is_valid( a_m_8_valid)) {
     if(a_m_8){
       free(this->a_m_8);
       this->a_m_8 = (double*)malloc( nl_m * sizeof(double) );
@@ -3056,7 +2991,7 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
       errorInput = 1;
     }
   }
-  if(this->is_valid( self, b_m_8_valid)) {
+  if(this->is_valid( b_m_8_valid)) {
     if(b_m_8){
       free(this->b_m_8);
       this->b_m_8 = (double*)malloc( nl_m * sizeof(double) );
@@ -3070,7 +3005,7 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
       errorInput = 1;
     }
   }
-  if(this->is_valid( self, c_m_8_valid)) {
+  if(this->is_valid( c_m_8_valid)) {
     if(c_m_8){
       free(this->c_m_8);
       this->c_m_8 = (double*)malloc( nl_m * sizeof(double) );
@@ -3084,7 +3019,7 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
       errorInput = 1;
     }
   }
-  if(this->is_valid( self, a_t_8_valid)) {
+  if(this->is_valid( a_t_8_valid)) {
     if(a_t_8){
       free(this->a_t_8);
       this->a_t_8 = (double*)malloc( nl_t * sizeof(double) );
@@ -3098,7 +3033,7 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
       errorInput = 1;
     }
   }
-  if(this->is_valid( self, b_t_8_valid)) {
+  if(this->is_valid( b_t_8_valid)) {
     if(b_t_8){
       free(this->b_t_8);
       this->b_t_8 = (double*)malloc( nl_t * sizeof(double) );
@@ -3112,7 +3047,7 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
       errorInput = 1;
     }
   }
-  if(this->is_valid( self, c_t_8_valid)) {
+  if(this->is_valid( c_t_8_valid)) {
     if(c_t_8){
       free(this->c_t_8);
       this->c_t_8 = (double*)malloc( nl_t * sizeof(double) );
@@ -3126,7 +3061,7 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
       errorInput = 1;
     }
   }
-  if(this->is_valid( self, a_w_8_valid)) {
+  if(this->is_valid( a_w_8_valid)) {
     if(a_w_8){
       free(this->a_w_8);
       this->a_w_8 = (double*)malloc( nl_w * sizeof(double) );
@@ -3140,7 +3075,7 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
       errorInput = 1;
     }
   }
-  if(this->is_valid( self, b_w_8_valid)) {
+  if(this->is_valid( b_w_8_valid)) {
     if(b_w_8){
       free(this->b_w_8);
       this->b_w_8 = (double*)malloc( nl_w * sizeof(double) );
@@ -3154,7 +3089,7 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
       errorInput = 1;
     }
   }
-  if(this->is_valid( self, c_w_8_valid)) {
+  if(this->is_valid( c_w_8_valid)) {
     if(c_w_8){
       free(this->c_w_8);
       this->c_w_8 = (double*)malloc( nl_w * sizeof(double) );
@@ -3169,7 +3104,7 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
     }
   }
 
-  if(this->is_valid( self, ip1_m_valid)) {
+  if(this->is_valid( ip1_m_valid)) {
     if(ip1_m){
       free(this->ip1_m);
       this->ip1_m = (int*)malloc( nl_m * sizeof(int) );
@@ -3183,7 +3118,7 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
       errorInput = 1;
     }
   }
-  if(this->is_valid( self, ip1_t_valid)) {
+  if(this->is_valid( ip1_t_valid)) {
     if(ip1_t){
       free(this->ip1_t);
       this->ip1_t = (int*)malloc( nl_t * sizeof(int) );
@@ -3197,7 +3132,7 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
       errorInput = 1;
     }
   }
-  if(this->is_valid( self, ip1_w_valid)) {
+  if(this->is_valid( ip1_w_valid)) {
     if(ip1_w){
       free(this->ip1_w);
       this->ip1_w = (int*)malloc( nl_w * sizeof(int) );
@@ -3219,58 +3154,58 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
   switch(this->vcode) {
   case 1:
     strcpy(cvcode,"1");
-    ier = this->c_encode_vert_0001(self,nk);
+    ier = this->c_encode_vert_0001(nk);
     break;
   case 1001:
     strcpy(cvcode,"1001");
-    ier = this->c_encode_vert_1001(self,nk);
+    ier = this->c_encode_vert_1001(nk);
     break;
   case 1002:
     strcpy(cvcode,"1002");
-    ier = this->c_encode_vert_1002(self,nk);
+    ier = this->c_encode_vert_1002(nk);
     break;
   case 2001:
-    ier = this->c_encode_vert_2001(self,nk);
+    ier = this->c_encode_vert_2001(nk);
     break;
   case 4001:
-    ier = this->c_encode_vert_4001(self,nk);
+    ier = this->c_encode_vert_4001(nk);
     break;
   case 1003:
   case 5001:
     strcpy(cvcode,"5001");
-    ier = this->c_encode_vert_5001(self,nk);
+    ier = this->c_encode_vert_5001(nk);
     break;
   case 5002:
     strcpy(cvcode,"5002");
-    ier = this->c_encode_vert_5002_5003_5004_5005(self, 0);
+    ier = this->c_encode_vert_5002_5003_5004_5005(0);
     break;
   case 5003:
     strcpy(cvcode,"5003");
-    ier = this->c_encode_vert_5002_5003_5004_5005(self, 0);
+    ier = this->c_encode_vert_5002_5003_5004_5005(0);
     break;
   case 5004:
     strcpy(cvcode,"5004");
-    ier = this->c_encode_vert_5002_5003_5004_5005(self, 0);
+    ier = this->c_encode_vert_5002_5003_5004_5005(0);
     break;
   case 5005:
     strcpy(cvcode,"5005");
-    ier = this->c_encode_vert_5002_5003_5004_5005(self, 0);
+    ier = this->c_encode_vert_5002_5003_5004_5005(0);
     break;
   case 5100:
     strcpy(cvcode,"5100");
-    ier = this->c_encode_vert_5100(self, 0);
+    ier = this->c_encode_vert_5100(0);
     break;
   case 5999:
     strcpy(cvcode,"5999");
-    ier = this->c_encode_vert_5999(self, nk);
+    ier = this->c_encode_vert_5999(nk);
     break;
   case 21001:
     strcpy(cvcode,"21001");
-    ier = this->c_encode_vert_21001(self, 0);
+    ier = this->c_encode_vert_21001(0);
     break;
   case 21002:
     strcpy(cvcode,"21002");
-    ier = this->c_encode_vert_21002(self, 0);
+    ier = this->c_encode_vert_21002(0);
     break;
   default:
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_new_build_vert2, invalid kind or version : kind=%d, version=%d\n",kind,version);
@@ -3283,7 +3218,7 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
   }
 
   this->valid = 1;
-  if(this->fstd_init(self) == VGD_ERROR) {
+  if(this->fstd_init() == VGD_ERROR) {
     printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem with fstd_init\n");
   }
 
@@ -3291,7 +3226,7 @@ int vgrid::Cvgd_new_build_vert2(vgrid_descriptor *self, int kind, int version, i
 
 }
 
-int vgrid::c_encode_vert_0001(vgrid_descriptor *self,int nk){
+int vgrid::c_encode_vert_0001(int nk){
   
   int skip = 1, table_size;
   
@@ -3338,7 +3273,7 @@ int vgrid::c_encode_vert_0001(vgrid_descriptor *self,int nk){
   return(VGD_OK);
 }
 
-int vgrid::c_encode_vert_1001(vgrid_descriptor *self,int nk){
+int vgrid::c_encode_vert_1001(int nk){
   
   int skip = 2, table_size;
 
@@ -3390,7 +3325,7 @@ int vgrid::c_encode_vert_1001(vgrid_descriptor *self,int nk){
   return(VGD_OK);
 }
 
-int vgrid::c_encode_vert_1002(vgrid_descriptor *self,int nk){
+int vgrid::c_encode_vert_1002(int nk){
   
   int skip = 2, table_size;
   
@@ -3438,7 +3373,7 @@ int vgrid::c_encode_vert_1002(vgrid_descriptor *self,int nk){
   return(VGD_OK);
 }
 
-int vgrid::c_encode_vert_2001(vgrid_descriptor *self,int nk){
+int vgrid::c_encode_vert_2001(int nk){
   
   int skip = 1, table_size;
   
@@ -3484,7 +3419,7 @@ int vgrid::c_encode_vert_2001(vgrid_descriptor *self,int nk){
   return(VGD_OK);
 }
 
-int vgrid::c_encode_vert_4001(vgrid_descriptor *self,int nk){
+int vgrid::c_encode_vert_4001(int nk){
   
   int skip = 1, table_size;
   
@@ -3530,7 +3465,7 @@ int vgrid::c_encode_vert_4001(vgrid_descriptor *self,int nk){
   return(VGD_OK);
 }
 
-int vgrid::c_encode_vert_5001(vgrid_descriptor *self,int nk){
+int vgrid::c_encode_vert_5001(int nk){
   int skip = 3, table_size;
 
   if( this->table )
@@ -3583,7 +3518,7 @@ int vgrid::c_encode_vert_5001(vgrid_descriptor *self,int nk){
   return(VGD_OK);
 }
 
-int vgrid::c_encode_vert_5002_5003_5004_5005(vgrid_descriptor *self, char update){
+int vgrid::c_encode_vert_5002_5003_5004_5005(char update){
   int skip = 3, table_size;
   if(! update) {    
     if( this->table )
@@ -3634,7 +3569,7 @@ int vgrid::c_encode_vert_5002_5003_5004_5005(vgrid_descriptor *self, char update
 
   return(VGD_OK);
 }
-int vgrid::c_encode_vert_5100(vgrid_descriptor *self, char update){
+int vgrid::c_encode_vert_5100(char update){
   int skip = 3, table_size;
   if(! update) {    
     if( this->table )
@@ -3691,7 +3626,7 @@ int vgrid::c_encode_vert_5100(vgrid_descriptor *self, char update){
   return(VGD_OK);
 }
 
-int vgrid::c_encode_vert_5999(vgrid_descriptor *self,int nk){
+int vgrid::c_encode_vert_5999(int nk){
   int i, k, kind, skip = 2, table_size;
   float hyb;
 
@@ -3760,7 +3695,7 @@ int vgrid::c_encode_vert_5999(vgrid_descriptor *self,int nk){
   return(VGD_OK);
 }
 
-int vgrid::c_encode_vert_21001(vgrid_descriptor *self, char update){
+int vgrid::c_encode_vert_21001(char update){
   int skip = 3, table_size;
   if(! update) {    
     if( this->table )
@@ -3823,7 +3758,7 @@ int vgrid::c_encode_vert_21001(vgrid_descriptor *self, char update){
 
   return(VGD_OK);
 }
-int vgrid::c_encode_vert_21002(vgrid_descriptor *self, char update){
+int vgrid::c_encode_vert_21002(char update){
   int skip = 3, table_size;
   if(! update) {    
     if( this->table )
@@ -3889,7 +3824,7 @@ int vgrid::c_encode_vert_21002(vgrid_descriptor *self, char update){
 
   return(VGD_OK);
 }
-int vgrid::c_decode_vert_0001(vgrid_descriptor *self) {
+int vgrid::c_decode_vert_0001() {
   int skip, nk, k, ind;
   this->kind    = (int) this->table[0];
   this->version = (int) this->table[1];
@@ -3898,7 +3833,7 @@ int vgrid::c_decode_vert_0001(vgrid_descriptor *self) {
   
   nk = (this->table_nj - skip)/2;
   // Free A, B and Ip1 vectors for momentum and thermo.
-  this->c_vgd_free_abci(self);
+  this->c_vgd_free_abci();
   // Allocate and assign level data, there are nk of them
   this->nl_m = nk;
   this->nl_t = nk;
@@ -3935,7 +3870,7 @@ int vgrid::c_decode_vert_0001(vgrid_descriptor *self) {
   this->valid = 1;
   return(VGD_OK);
 }
-int vgrid::c_decode_vert_1001(vgrid_descriptor *self) {
+int vgrid::c_decode_vert_1001() {
   int skip, nk, k, ind;
   this->kind    = (int) this->table[0];
   this->version = (int) this->table[1];
@@ -3946,7 +3881,7 @@ int vgrid::c_decode_vert_1001(vgrid_descriptor *self) {
   
   nk = this->table_nj - skip;
   // Free A, B and Ip1 vectors for momentum and thermo.
-  this->c_vgd_free_abci(self);
+  this->c_vgd_free_abci();
   // Allocate and assign level data, there are nk of them
   this->nl_m = nk;
   this->nl_t = nk;
@@ -3974,7 +3909,7 @@ int vgrid::c_decode_vert_1001(vgrid_descriptor *self) {
   return(VGD_OK);
 }
 
-int vgrid::c_decode_vert_1002(vgrid_descriptor *self) {
+int vgrid::c_decode_vert_1002() {
   int skip, nk, k, ind;
   this->kind    = (int) this->table[0];
   this->version = (int) this->table[1];
@@ -3986,7 +3921,7 @@ int vgrid::c_decode_vert_1002(vgrid_descriptor *self) {
   nk = this->table_nj - skip;
   
   // Free A, B and Ip1 vectors for momentum and thermo.
-  this->c_vgd_free_abci(self);
+  this->c_vgd_free_abci();
   // Allocate and assign level data, there are nk of them
   this->nl_m = nk;
   this->nl_t = nk;
@@ -4014,7 +3949,7 @@ int vgrid::c_decode_vert_1002(vgrid_descriptor *self) {
   return(VGD_OK);
 }
 
-int vgrid::c_decode_vert_2001(vgrid_descriptor *self) {
+int vgrid::c_decode_vert_2001() {
   int skip, nk, k, ind;
   this->kind    = (int) this->table[0];
   this->version = (int) this->table[1];
@@ -4024,7 +3959,7 @@ int vgrid::c_decode_vert_2001(vgrid_descriptor *self) {
   nk = this->table_nj - skip;
 
   // Free A, B and Ip1 vectors for momentum and thermo.
-  this->c_vgd_free_abci(self);
+  this->c_vgd_free_abci();
   // Allocate and assign level data, there are nk of them
   this->nl_m = nk;
   this->nl_t = nk;
@@ -4052,7 +3987,7 @@ int vgrid::c_decode_vert_2001(vgrid_descriptor *self) {
   return(VGD_OK);
 }
 
-int vgrid::c_decode_vert_4001(vgrid_descriptor *self) {
+int vgrid::c_decode_vert_4001() {
   int skip, nk, k, ind;
   this->kind    = (int) this->table[0];
   this->version = (int) this->table[1];
@@ -4062,7 +3997,7 @@ int vgrid::c_decode_vert_4001(vgrid_descriptor *self) {
   nk = this->table_nj - skip;
 
   // Free A, B and Ip1 vectors for momentum and thermo.
-  this->c_vgd_free_abci(self);
+  this->c_vgd_free_abci();
   // Allocate and assign level data, there are nk of them
   this->nl_m = nk;
   this->nl_t = nk;
@@ -4090,7 +4025,7 @@ int vgrid::c_decode_vert_4001(vgrid_descriptor *self) {
   return(VGD_OK);
 }
 
-int vgrid::c_decode_vert_1003_5001(vgrid_descriptor *self) {
+int vgrid::c_decode_vert_1003_5001() {
   int skip, k, ind, nk;
   
   this->kind    = (int) this->table[0];
@@ -4105,7 +4040,7 @@ int vgrid::c_decode_vert_1003_5001(vgrid_descriptor *self) {
   nk = this->table_nj - skip;
 
   // Free A, B and Ip1 vectors for momentum and thermo.
-  this->c_vgd_free_abci(self);
+  this->c_vgd_free_abci();
 
   // Allocate and assign momentum level data, there are nk of them
   this->nl_m = nk;
@@ -4135,7 +4070,7 @@ int vgrid::c_decode_vert_1003_5001(vgrid_descriptor *self) {
   return(VGD_OK);
 }
 
-int vgrid::c_decode_vert_5100(vgrid_descriptor *self) {
+int vgrid::c_decode_vert_5100() {
   int skip, k, ind, nb, kind;
 
   this->kind    = (int) this->table[0];
@@ -4150,7 +4085,7 @@ int vgrid::c_decode_vert_5100(vgrid_descriptor *self) {
   flip_transfer_d2c(this->ref_name ,this->table[9]);
   flip_transfer_d2c(this->ref_namel,this->table[10]);
 
-  if( this->Cvgd_set_vcode_i(self, this->kind, this->version) == VGD_ERROR ) {
+  if( this->Cvgd_set_vcode_i(this->kind, this->version) == VGD_ERROR ) {
     printf("(Cvgd) ERROR in c_decode_vert_5100, cannot set vcode\n");
     return(VGD_ERROR);
   }
@@ -4160,7 +4095,7 @@ int vgrid::c_decode_vert_5100(vgrid_descriptor *self) {
   nb = ( this->table_nj - skip ) / 2;
 
   // Free A, B, C and Ip1 vectors for momentum and thermo.
-  this->c_vgd_free_abci(self);
+  this->c_vgd_free_abci();
 
   // Allocate and assign momentum level data, there are nb of them nk + hyb=1 and possibly the diag in m
   this->nl_m = nb;
@@ -4208,7 +4143,7 @@ int vgrid::c_decode_vert_5100(vgrid_descriptor *self) {
   return(VGD_OK);  
 
 }
-int vgrid::c_decode_vert_5002_5003_5004_5005(vgrid_descriptor *self) {
+int vgrid::c_decode_vert_5002_5003_5004_5005() {
   int skip, k, ind, k_plus_top, k_plus_diag, nk, nb, kind;
   
   k_plus_top = 1;
@@ -4220,7 +4155,7 @@ int vgrid::c_decode_vert_5002_5003_5004_5005(vgrid_descriptor *self) {
   this->rcoef1  = (float) this->table[5];
   this->rcoef2  = (float) this->table[6];
   flip_transfer_d2c(this->ref_name,this->table[7]);
-  if( this->Cvgd_set_vcode_i(self, this->kind, this->version) == VGD_ERROR ) {
+  if( this->Cvgd_set_vcode_i(this->kind, this->version) == VGD_ERROR ) {
     printf("(Cvgd) ERROR in c_decode_vert_5002_5003_5004_5005, cannot set vcode\n");
     return(VGD_ERROR);
   }
@@ -4239,7 +4174,7 @@ int vgrid::c_decode_vert_5002_5003_5004_5005(vgrid_descriptor *self) {
   }
 
   k_plus_diag = 0;
-  if(this->is_valid(self,dhm_valid)) {
+  if(this->is_valid(dhm_valid)) {
     k_plus_diag=1;
   }
 
@@ -4249,7 +4184,7 @@ int vgrid::c_decode_vert_5002_5003_5004_5005(vgrid_descriptor *self) {
   nk = ( this->table_nj - k_plus_top - skip ) / 2 -1 -k_plus_diag;
 
   // Free A, B and Ip1 vectors for momentum and thermo.
-  this->c_vgd_free_abci(self);
+  this->c_vgd_free_abci();
 
   // Allocate and assign momentum level data, there are nb of them nk + hyb=1 and possibly the diag in m
   nb = nk + 1 + k_plus_diag;
@@ -4267,7 +4202,7 @@ int vgrid::c_decode_vert_5002_5003_5004_5005(vgrid_descriptor *self) {
     this->b_m_8[k] =       this->table[ind+2];
     ind = ind + 3;
   }
-  if(this->is_valid(self,dhm_valid)) this->dhm = c_convip_IP2Level( this->ip1_m[nb-1], &kind );
+  if(this->is_valid(dhm_valid)) this->dhm = c_convip_IP2Level( this->ip1_m[nb-1], &kind );
 
   // Allocate and assign thermodynamic level data
   nb = nb + k_plus_top;
@@ -4286,7 +4221,7 @@ int vgrid::c_decode_vert_5002_5003_5004_5005(vgrid_descriptor *self) {
     this->b_t_8[k] =       this->table[ind+2];
     ind = ind + 3;
   }
-  if(this->is_valid(self,dht_valid)) this->dht= c_convip_IP2Level( this->ip1_t[nb-1], &kind );
+  if(this->is_valid(dht_valid)) this->dht= c_convip_IP2Level( this->ip1_t[nb-1], &kind );
   this->ip1_w = this->ip1_t;
   this->a_w_8 = this->a_t_8;
   this->b_w_8 = this->b_t_8;
@@ -4295,7 +4230,7 @@ int vgrid::c_decode_vert_5002_5003_5004_5005(vgrid_descriptor *self) {
 
 }
 
-int vgrid::c_decode_vert_5999(vgrid_descriptor *self) {
+int vgrid::c_decode_vert_5999() {
   int skip, k, ind, nk;
   
   this->kind    = (int) this->table[0];
@@ -4308,7 +4243,7 @@ int vgrid::c_decode_vert_5999(vgrid_descriptor *self) {
   nk = this->table_nj - skip;
 
   // Free A, B and Ip1 vectors for momentum and thermo.
-  this->c_vgd_free_abci(self);
+  this->c_vgd_free_abci();
 
   // Allocate and assign momentum level data, there are nk of them
   this->nl_m = nk;
@@ -4336,7 +4271,7 @@ int vgrid::c_decode_vert_5999(vgrid_descriptor *self) {
   
   return(VGD_OK);
 }
-int vgrid::c_decode_vert_21001(vgrid_descriptor *self) {
+int vgrid::c_decode_vert_21001() {
   int skip, k, ind, nb, kind;
   
   this->kind    = (int) this->table[0];
@@ -4348,12 +4283,12 @@ int vgrid::c_decode_vert_21001(vgrid_descriptor *self) {
   this->rcoef4  = (float) this->table[6];
   flip_transfer_d2c(this->ref_name, this->table[7]);
   flip_transfer_d2c(this->ref_namel,this->table[8]);
-  if( this->Cvgd_set_vcode_i(self, this->kind, this->version) == VGD_ERROR ) {
+  if( this->Cvgd_set_vcode_i(this->kind, this->version) == VGD_ERROR ) {
     printf("(Cvgd) ERROR in c_decode_vert_21001, cannot set vcode\n");
     return(VGD_ERROR);
   }
   // Free A, B, C and Ip1 vectors for momentum and thermo.
-  this->c_vgd_free_abci(self);
+  this->c_vgd_free_abci();
 
   // nb is the number of momentum level with hyb=1.0 and the diag level
   nb = ( this->table_nj - skip ) / 2;
@@ -4403,7 +4338,7 @@ int vgrid::c_decode_vert_21001(vgrid_descriptor *self) {
 
 }
 
-int vgrid::c_decode_vert_21002(vgrid_descriptor *self) {
+int vgrid::c_decode_vert_21002() {
   int skip, k, ind, nb, kind;
   
   this->kind    = (int) this->table[0];
@@ -4415,12 +4350,12 @@ int vgrid::c_decode_vert_21002(vgrid_descriptor *self) {
   this->rcoef4  = (float) this->table[6];
   flip_transfer_d2c(this->ref_name,this->table[7]);
   flip_transfer_d2c(this->ref_namel,this->table[8]);
-  if( this->Cvgd_set_vcode_i(self, this->kind, this->version) == VGD_ERROR ) {
+  if( this->Cvgd_set_vcode_i(this->kind, this->version) == VGD_ERROR ) {
     printf("(Cvgd) ERROR in c_decode_vert_21002, cannot set vcode\n");
     return(VGD_ERROR);
   }
   // Free A, B, C and Ip1 vectors for momentum and thermo.
-  this->c_vgd_free_abci(self);
+  this->c_vgd_free_abci();
 
   // nb is the number of momentum level with hyb=1.0 and the diag level
   nb = ( this->table_nj - skip - 1 ) / 2;
@@ -4538,7 +4473,7 @@ int vgrid::C_genab_1001(float *hyb, int nk, double **a_m_8, double **b_m_8, int 
   
 }
 
-int vgrid::Cvgd_new_from_table(vgrid_descriptor *self, double *table, int ni, int nj, int nk) {
+int vgrid::Cvgd_new_from_table(double *table, int ni, int nj, int nk) {
   int table_size, i;
   double *ltable;
 
@@ -4570,45 +4505,45 @@ int vgrid::Cvgd_new_from_table(vgrid_descriptor *self, double *table, int ni, in
   this->kind    = (int) this->table[0];
   this->version = (int) this->table[1];
   // Fill remainder of structure
-  if( this->Cvgd_set_vcode(self) == VGD_ERROR ) {
+  if( this->Cvgd_set_vcode() == VGD_ERROR ) {
     printf("(Cvgd) ERROR in Cvgd_new_from_table, cannot set vcode\n");
     return(VGD_ERROR);
   }
 
   switch(this->vcode) {
   case 1:
- if( this->c_decode_vert_0001(self) == VGD_ERROR ) {
+ if( this->c_decode_vert_0001() == VGD_ERROR ) {
       printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode -0001\n");
       return(VGD_ERROR);
     }
     break;
   case 1001:
-    if( this->c_decode_vert_1001(self) == VGD_ERROR ) {
+    if( this->c_decode_vert_1001() == VGD_ERROR ) {
       printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 1001\n");
       return(VGD_ERROR);
     }
     break;
   case 1002:
-    if( this->c_decode_vert_1002(self) == VGD_ERROR ) {
+    if( this->c_decode_vert_1002() == VGD_ERROR ) {
       printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 1002\n");
       return(VGD_ERROR);
     }
     break;
   case 2001:
-    if( this->c_decode_vert_2001(self) == VGD_ERROR ) {
+    if( this->c_decode_vert_2001() == VGD_ERROR ) {
       printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 2001\n");
       return(VGD_ERROR);
     }
     break;
   case 1003:
   case 5001:
-    if( this->c_decode_vert_1003_5001(self) == VGD_ERROR ) {
+    if( this->c_decode_vert_1003_5001() == VGD_ERROR ) {
       printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 1003 or 5001\n");
       return(VGD_ERROR);
     }
     break;
   case 4001:
-    if( this->c_decode_vert_4001(self) == VGD_ERROR ) {
+    if( this->c_decode_vert_4001() == VGD_ERROR ) {
       printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 4001\n");
       return(VGD_ERROR);
     }
@@ -4617,31 +4552,31 @@ int vgrid::Cvgd_new_from_table(vgrid_descriptor *self, double *table, int ni, in
   case 5003:
   case 5004:
   case 5005:
-    if( this->c_decode_vert_5002_5003_5004_5005(self) == VGD_ERROR ) {
+    if( this->c_decode_vert_5002_5003_5004_5005() == VGD_ERROR ) {
       printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 5002,5003,5004 or 5005\n");
       return(VGD_ERROR);
     }
     break;
   case 5100:
-    if( this->c_decode_vert_5100(self) == VGD_ERROR ) {
+    if( this->c_decode_vert_5100() == VGD_ERROR ) {
       printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 5100\n");
       return(VGD_ERROR);
     }
     break;    
   case 5999:
-    if( this->c_decode_vert_5999(self) == VGD_ERROR ) {
+    if( this->c_decode_vert_5999() == VGD_ERROR ) {
       printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 5999\n");
       return(VGD_ERROR);
     }
     break;    
   case 21001:
-    if( this->c_decode_vert_21001(self) == VGD_ERROR ) {
+    if( this->c_decode_vert_21001() == VGD_ERROR ) {
       printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 21001\n");
       return(VGD_ERROR);
     }
     break;    
   case 21002:
-    if( this->c_decode_vert_21002(self) == VGD_ERROR ) {
+    if( this->c_decode_vert_21002() == VGD_ERROR ) {
       printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 21002\n");
       return(VGD_ERROR);
     }
@@ -4651,7 +4586,7 @@ int vgrid::Cvgd_new_from_table(vgrid_descriptor *self, double *table, int ni, in
     return(VGD_ERROR);
   }
   this->valid = 1;
-  if(this->fstd_init(self) == VGD_ERROR) {
+  if(this->fstd_init() == VGD_ERROR) {
     printf("(Cvgd) ERROR in Cvgd_new_from_table, problem creating record information\n");
   }
 
@@ -5963,9 +5898,9 @@ int vgrid::Cvgd_getopt_int(char *key, int *value, int quiet)
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet)
+int vgrid::Cvgd_get_int(char *key, int *value, int quiet)
 {  
-  // if(! this->Cvgd_is_valid(self,"SELF")){
+  // if(! this->Cvgd_is_valid("SELF")){
   //   printf("(Cvgd) ERROR in Cvgd_get_int, invalid vgrid.\n");
   //   return(VGD_ERROR);
   // }
@@ -6003,7 +5938,7 @@ int vgrid::Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet
   } else if (strcmp(key, "IP_3") == 0){
     *value = this->rec.ip3;
   } else if (strcmp(key, "DIPM") == 0){
-    if( ! this->Cvgd_is_valid(self,"dhm_valid") ){      
+    if( ! this->Cvgd_is_valid("dhm_valid") ){      
       if(! quiet) {
 	printf("(Cvgd) ERROR in Cvgd_get_int, cannot get key %s\n",key);
 	fflush(stdout);
@@ -6012,7 +5947,7 @@ int vgrid::Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet
     }
     *value = this->ip1_m[this->nl_m -1];
   } else if (strcmp(key, "DIPT") == 0){
-    if( ! this->Cvgd_is_valid(self,"dht_valid") ){      
+    if( ! this->Cvgd_is_valid("dht_valid") ){      
       if(! quiet) {
 	printf("(Cvgd) ERROR in Cvgd_get_int, cannot get key %s\n",key);
 	fflush(stdout);
@@ -6021,7 +5956,7 @@ int vgrid::Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet
     }
     *value = this->ip1_t[this->nl_t -1];
   } else if (strcmp(key, "DIPW") == 0){
-    if( ! this->Cvgd_is_valid(self,"dhw_valid") ){      
+    if( ! this->Cvgd_is_valid("dhw_valid") ){      
       if(! quiet) {
 	printf("(Cvgd) ERROR in Cvgd_get_int, cannot get key %s\n",key);
 	fflush(stdout);
@@ -6032,7 +5967,7 @@ int vgrid::Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet
   } else if (strcmp(key, "MIPG") == 0){
     *value = this->match_ipig;
   } else if (strcmp(key, "LOGP") == 0){
-    *value = this->is_valid(self,is_in_logp);
+    *value = this->is_valid(is_in_logp);
   } else {
     if(! quiet) {
       printf("(Cvgd) ERROR in Cvgd_get_int, invalid key %s\n",key);
@@ -6045,11 +5980,11 @@ int vgrid::Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet
 
 }
 
-int vgrid::Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk, int quiet)
+int vgrid::Cvgd_get_int_1d(char *key, int **value, int *nk, int quiet)
 {
   int OK = 1;
   if(nk) *nk = -1;
-  // if(! this->Cvgd_is_valid(self,"SELF")){
+  // if(! this->Cvgd_is_valid("SELF")){
   //   printf("(Cvgd) ERROR in Cvgd_get_int_1d, invalid vgrid.\n");
   //   return(VGD_ERROR);
   // }
@@ -6057,7 +5992,7 @@ int vgrid::Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *
   // VIP1
   // ----
   if(strcmp(key, "VIP1") == 0 ){
-    if( this->is_valid(self,ip1_m_valid) ){
+    if( this->is_valid(ip1_m_valid) ){
       printf("(Cvgd) ERROR in Cvgd_get_int_1d, depricated key '%s' use VIPM instead.\n", key);
       fflush(stdout);
       return(VGD_ERROR);
@@ -6069,7 +6004,7 @@ int vgrid::Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *
     // ====
     // VIPM
     // ----
-    if( this->is_valid(self,ip1_m_valid) ){
+    if( this->is_valid(ip1_m_valid) ){
       if(! *value){
         (*value) = (int*)malloc(this->nl_m * sizeof(int));
 	if(! *value){
@@ -6122,9 +6057,9 @@ int vgrid::Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *
 
 }
 
-int vgrid::Cvgd_get_float(vgrid_descriptor *self, char *key, float *value, int quiet) {
+int vgrid::Cvgd_get_float(char *key, float *value, int quiet) {
 
-  // if(! this->Cvgd_is_valid(self,"SELF")){
+  // if(! this->Cvgd_is_valid("SELF")){
   //   printf("(Cvgd) ERROR in Cvgd_get_float, invalid vgrid.\n");
   //   return(VGD_ERROR);
   // }
@@ -6134,43 +6069,43 @@ int vgrid::Cvgd_get_float(vgrid_descriptor *self, char *key, float *value, int q
   }  
 
   if( strcmp(key, "RC_1" ) == 0 ){    
-    if( this->is_valid(self,rcoef1_valid) ){
+    if( this->is_valid(rcoef1_valid) ){
       *value = this->rcoef1;
     } else {
       *value = (float) c_get_error(key,quiet);
     }
   } else  if( strcmp(key, "RC_2" ) == 0 ){
-    if( this->is_valid(self,rcoef2_valid) ){
+    if( this->is_valid(rcoef2_valid) ){
       *value = this->rcoef2;
     } else {
       *value = (float) c_get_error(key,quiet);
     }
   } else  if( strcmp(key, "RC_3" ) == 0 ){
-    if( this->is_valid(self,rcoef3_valid) ){
+    if( this->is_valid(rcoef3_valid) ){
       *value = this->rcoef3;
     } else {
       *value = (float) c_get_error(key,quiet);
     }
   } else  if( strcmp(key, "RC_4" ) == 0 ){
-    if( this->is_valid(self,rcoef4_valid) ){
+    if( this->is_valid(rcoef4_valid) ){
       *value = this->rcoef4;
     } else {
       *value = (float) c_get_error(key,quiet);
     }
   } else  if( strcmp(key, "DHM " ) == 0 ){
-    if( this->is_valid(self,dhm_valid) ){
+    if( this->is_valid(dhm_valid) ){
       *value = this->dhm;
     } else {
       *value = (float) c_get_error(key,quiet);
     }
   } else  if( strcmp(key, "DHT " ) == 0 ){
-    if( this->is_valid(self,dht_valid) ){
+    if( this->is_valid(dht_valid) ){
       *value = this->dht;
     } else {
       *value = (float) c_get_error(key,quiet);
     }
   } else  if( strcmp(key, "DHW " ) == 0 ){
-    if( this->is_valid(self,dhw_valid) ){
+    if( this->is_valid(dhw_valid) ){
       *value = this->dhw;
     } else {
       *value = (float) c_get_error(key,quiet);
@@ -6186,17 +6121,17 @@ int vgrid::Cvgd_get_float(vgrid_descriptor *self, char *key, float *value, int q
 
 }
 
-int vgrid::Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk, int quiet)
+int vgrid::Cvgd_get_float_1d(char *key, float **value, int *nk, int quiet)
 {
   char key2[5];
   int *vip1=NULL, kind, k, OK = 1;
   if(nk) *nk = -1;
-  // if(! this->Cvgd_is_valid(self,"SELF")){
+  // if(! this->Cvgd_is_valid("SELF")){
   //   printf("(Cvgd) ERROR in Cvgd_get_float_1d, invalid vgrid.\n");
   //   return(VGD_ERROR);
   // }
   if( strcmp(key, "VCDM") == 0 ){
-    if (this->is_valid(self,ip1_m_valid)) {
+    if (this->is_valid(ip1_m_valid)) {
       if(! *value){
         (*value) = (float*)malloc(this->nl_m * sizeof(float));
 	if(! *value){
@@ -6205,7 +6140,7 @@ int vgrid::Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, i
 	}
       }    
       strcpy(key2,"VIPM");
-      this->Cvgd_get_int_1d(self, key2, &vip1, NULL, quiet);
+      this->Cvgd_get_int_1d(key2, &vip1, NULL, quiet);
       for(k = 0; k < this->nl_m; k++){
 	(*value)[k] = c_convip_IP2Level(vip1[k], &kind);
       }
@@ -6223,7 +6158,7 @@ int vgrid::Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, i
       }
     }  
     strcpy(key2,"VIPT");
-    this->Cvgd_get_int_1d(self, key2, &vip1, NULL, quiet);
+    this->Cvgd_get_int_1d(key2, &vip1, NULL, quiet);
     for(k = 0; k < this->nl_t; k++){
       (*value)[k] = c_convip_IP2Level(vip1[k], &kind);
     }    
@@ -6238,7 +6173,7 @@ int vgrid::Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, i
       }
     }  
     strcpy(key2,"VIPW");
-    this->Cvgd_get_int_1d(self, key2, &vip1, NULL, quiet);
+    this->Cvgd_get_int_1d(key2, &vip1, NULL, quiet);
     for(k = 0; k < this->nl_w; k++){
       (*value)[k] = c_convip_IP2Level(vip1[k], &kind);
     }    
@@ -6257,29 +6192,29 @@ int vgrid::Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, i
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_get_double(vgrid_descriptor *self, char *key, double *value_get, int quiet) {
+int vgrid::Cvgd_get_double(char *key, double *value_get, int quiet) {
   int OK = 1;
-  // if(! this->Cvgd_is_valid(self,"SELF")){
+  // if(! this->Cvgd_is_valid("SELF")){
   //   printf("(Cvgd) ERROR in Cvgd_get_double, invalid vgrid.\n");
   //   return(VGD_ERROR);
   // }
   if( strcmp(key, "PTOP") == 0 ) {
-    if(! this->is_valid(self, ptop_8_valid)) OK = 0;
+    if(! this->is_valid(ptop_8_valid)) OK = 0;
     *value_get = this->ptop_8;
   } else if ( strcmp(key, "PREF") == 0 ) {
-    if(! this->is_valid(self, pref_8_valid)) OK = 0;
+    if(! this->is_valid(pref_8_valid)) OK = 0;
     *value_get = this->pref_8;
   } else if ( strcmp(key, "RC_1") == 0 ) {
-    if(! this->is_valid(self, rcoef1_valid)) OK = 0;
+    if(! this->is_valid(rcoef1_valid)) OK = 0;
     *value_get = this->rcoef1;
   } else if ( strcmp(key, "RC_2") == 0 ) {
-    if(! this->is_valid(self, rcoef2_valid)) OK = 0;
+    if(! this->is_valid(rcoef2_valid)) OK = 0;
     *value_get = this->rcoef2;
   } else if ( strcmp(key, "RC_3") == 0 ) {
-    if(! this->is_valid(self, rcoef3_valid)) OK = 0;
+    if(! this->is_valid(rcoef3_valid)) OK = 0;
     *value_get = this->rcoef3;
   } else if ( strcmp(key, "RC_4") == 0 ) {
-    if(! this->is_valid(self, rcoef4_valid)) OK = 0;
+    if(! this->is_valid(rcoef4_valid)) OK = 0;
     *value_get = this->rcoef4;
   } else {
     if(! quiet) {
@@ -6300,11 +6235,11 @@ int vgrid::Cvgd_get_double(vgrid_descriptor *self, char *key, double *value_get,
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *nk, int quiet)
+int vgrid::Cvgd_get_double_1d(char *key, double **value, int *nk, int quiet)
 {
   int OK = 1;
   if(nk) *nk = -1;
-  // if(! this->Cvgd_is_valid(self,"SELF")){
+  // if(! this->Cvgd_is_valid("SELF")){
   //   printf("(Cvgd) ERROR in Cvgd_get_double_1d, invalid vgrid.\n");
   //   return(VGD_ERROR);
   // }
@@ -6312,7 +6247,7 @@ int vgrid::Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value,
     //=====
     // CA_M
     //-----
-    if( this->is_valid(self,a_m_8_valid) ) {
+    if( this->is_valid(a_m_8_valid) ) {
       if(! *value){
 	(*value) = (double*)malloc(this->nl_m * sizeof(double));
 	if(! *value){
@@ -6329,7 +6264,7 @@ int vgrid::Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value,
     //=====
     // CB_M
     //-----
-    if( this->is_valid(self,b_m_8_valid) ) {
+    if( this->is_valid(b_m_8_valid) ) {
       if(! *value){
 	(*value) = (double*)malloc(this->nl_m * sizeof(double));
 	if(! *value){
@@ -6346,7 +6281,7 @@ int vgrid::Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value,
     //=====
     // CC_M
     //-----
-    if( this->is_valid(self,c_m_8_valid) ) {
+    if( this->is_valid(c_m_8_valid) ) {
       if(! *value){
 	(*value) = (double*)malloc(this->nl_m * sizeof(double));
 	if(! *value){
@@ -6455,12 +6390,12 @@ int vgrid::Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value,
 
 }
 
-int vgrid::Cvgd_get_double_3d(vgrid_descriptor *self, char *key, double **value, int *ni, int *nj, int *nk, int quiet)
+int vgrid::Cvgd_get_double_3d(char *key, double **value, int *ni, int *nj, int *nk, int quiet)
 {
   if(ni) *ni = -1;
   if(nj) *nj = -1;
   if(nk) *nk = -1;    
-  // if(! this->Cvgd_is_valid(self,"SELF")){
+  // if(! this->Cvgd_is_valid("SELF")){
   //   printf("(Cvgd) ERROR in Cvgd_get_double_3d, invalid vgrid.\n");
   //   return(VGD_ERROR);
   // }
@@ -6488,9 +6423,9 @@ int vgrid::Cvgd_get_double_3d(vgrid_descriptor *self, char *key, double **value,
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_get_char(vgrid_descriptor *self, char *key, char out[], int quiet) {
+int vgrid::Cvgd_get_char(char *key, char out[], int quiet) {
   char ok = 1;
-  // if(! this->Cvgd_is_valid(self,"SELF")){
+  // if(! this->Cvgd_is_valid("SELF")){
   //   printf("(Cvgd) ERROR in Cvgd_get_char, invalid vgrid structure.\n");
   //   return(VGD_ERROR);
   // }
@@ -6499,14 +6434,14 @@ int vgrid::Cvgd_get_char(vgrid_descriptor *self, char *key, char out[], int quie
   } else if( strcmp(key, "NAME") == 0 ){
     strcpy(out,this->rec.nomvar);
   } else if( strcmp(key, "RFLD") == 0 ){
-    if( this->Cvgd_is_valid(self,"ref_name_valid") ){
+    if( this->Cvgd_is_valid("ref_name_valid") ){
       strcpy(out,this->ref_name);
     } else {
       ok = 0;
       strcpy(out,VGD_NO_REF_NOMVAR);
     }
   } else if( strcmp(key, "RFLS") == 0 ){
-    if( this->Cvgd_is_valid(self,"ref_namel_valid") ){
+    if( this->Cvgd_is_valid("ref_namel_valid") ){
       strcpy(out,this->ref_namel);
     } else {
       ok = 0;
@@ -6524,8 +6459,8 @@ int vgrid::Cvgd_get_char(vgrid_descriptor *self, char *key, char out[], int quie
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_put_char(vgrid_descriptor *self, char *key, char *value) {
-  // if(! this->Cvgd_is_valid(self,"SELF")){
+int vgrid::Cvgd_put_char(char *key, char *value) {
+  // if(! this->Cvgd_is_valid("SELF")){
   //   printf("(Cvgd) ERROR in Cvgd_put_char, invalid vgrid.\n");
   //   return(VGD_ERROR);
   // }
@@ -6548,10 +6483,10 @@ int vgrid::Cvgd_putopt_int(char *key, int value) {
   return(VGD_OK);
 }
     
-int vgrid::Cvgd_put_int(vgrid_descriptor *self, char *key, int value) {
+int vgrid::Cvgd_put_int(char *key, int value) {
   int kind;
   
-  // if(! this->Cvgd_is_valid((self),"SELF")){
+  // if(! this->Cvgd_is_valid(,"SELF")){
   //   printf("(Cvgd) ERROR in Cvgd_put_int, invalid vgrid.\n");
   //   return(VGD_ERROR);
   // }
@@ -6572,15 +6507,15 @@ int vgrid::Cvgd_put_int(vgrid_descriptor *self, char *key, int value) {
   } else if( strcmp(key, "IP_3") == 0 ) {
     this->rec.ip3 = value;
   } else if( strcmp(key, "DIPM") == 0 ) {
-    if ( this->is_valid(self, dhm_valid)) {
+    if ( this->is_valid(dhm_valid)) {
       this->ip1_m[this->nl_m -1 ] = value;
-      if ( this->is_valid(self, pref_8_valid)) {
+      if ( this->is_valid(pref_8_valid)) {
 	this->a_m_8[this->nl_m -1 ] = c_comp_diag_a_ip1(this->pref_8, value);
       } else {
 	// Height coordinate
 	this->a_m_8[this->nl_m -1 ] = c_convip_IP2Level(value, &kind);
       }
-      if( this->c_table_update(self) == VGD_ERROR) {
+      if( this->c_table_update() == VGD_ERROR) {
 	printf("(Cvgd) ERROR in Cvgd_put_int, problem with c_table_update for key %s\n",key);
 	return(VGD_ERROR);
       }
@@ -6589,15 +6524,15 @@ int vgrid::Cvgd_put_int(vgrid_descriptor *self, char *key, int value) {
       return(VGD_ERROR);
     }
   } else if( strcmp(key, "DIPT") == 0 ) {
-    if ( this->is_valid(self, dht_valid)) {
+    if ( this->is_valid(dht_valid)) {
       this->ip1_t[this->nl_t - 1] = value;
-      if ( this->is_valid(self, pref_8_valid)) {
+      if ( this->is_valid(pref_8_valid)) {
 	this->a_t_8[this->nl_t - 1] = c_comp_diag_a_ip1(this->pref_8, value);
       } else {
 	// Height coordinate
 	this->a_t_8[this->nl_t -1 ] =  c_convip_IP2Level(value, &kind);
       }
-      if( this->c_table_update(self) == VGD_ERROR) {
+      if( this->c_table_update() == VGD_ERROR) {
 	printf("(Cvgd) ERROR in Cvgd_put_int, problem with c_table_update for key %s\n", key);
 	return(VGD_ERROR);
       }
@@ -6606,15 +6541,15 @@ int vgrid::Cvgd_put_int(vgrid_descriptor *self, char *key, int value) {
       return(VGD_ERROR);
     }
   } else if( strcmp(key, "DIPW") == 0 ) {
-    if ( this->is_valid(self, dhw_valid)) {
+    if ( this->is_valid(dhw_valid)) {
       this->ip1_w[this->nl_w - 1] = value;
-      if ( this->is_valid(self, pref_8_valid)) {
+      if ( this->is_valid(pref_8_valid)) {
 	this->a_w_8[this->nl_w - 1] = c_comp_diag_a_ip1(this->pref_8, value);
       } else {
 	// Height coordinate
 	this->a_w_8[this->nl_w -1 ] =  c_convip_IP2Level(value, &kind);
       }
-      if( this->c_table_update(self) == VGD_ERROR) {
+      if( this->c_table_update() == VGD_ERROR) {
 	printf("(Cvgd) ERROR in Cvgd_put_int, problem with c_table_update for key %s\n", key);
 	return(VGD_ERROR);
       }
@@ -6628,10 +6563,10 @@ int vgrid::Cvgd_put_int(vgrid_descriptor *self, char *key, int value) {
   }
   return(VGD_OK);
 }
-int vgrid::Cvgd_new_gen(vgrid_descriptor *self, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2, 
+int vgrid::Cvgd_new_gen(int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2, 
 	      double *ptop_8, double *pref_8, double *ptop_out_8,
 		 int ip1, int ip2, float *dhm, float *dht, int avg){
-  if( this->Cvgd_new_gen2(self, kind, version, hyb, size_hyb, rcoef1, rcoef2, NULL, NULL,
+  if( this->Cvgd_new_gen2(kind, version, hyb, size_hyb, rcoef1, rcoef2, NULL, NULL,
 		   ptop_8, pref_8, ptop_out_8,
 		ip1, ip2, dhm, dht, NULL, avg) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen, see details above\n");
@@ -6639,72 +6574,72 @@ int vgrid::Cvgd_new_gen(vgrid_descriptor *self, int kind, int version, float *hy
   }
   return(VGD_OK);
 }
-int vgrid::Cvgd_new_gen_1001(vgrid_descriptor *self, float *hyb, int size_hyb, int ip1, int ip2) {
-  if( this->Cvgd_new_gen2(self, 1, 1, hyb, size_hyb, NULL, NULL, NULL, NULL,
+int vgrid::Cvgd_new_gen_1001(float *hyb, int size_hyb, int ip1, int ip2) {
+  if( this->Cvgd_new_gen2(1, 1, hyb, size_hyb, NULL, NULL, NULL, NULL,
 		NULL, NULL, NULL, ip1, ip2, NULL, NULL, NULL, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen_1001, see details above\n");
     return(VGD_ERROR);
   }
   return(VGD_OK);
 }
-int vgrid::Cvgd_new_gen_2001(vgrid_descriptor *self, float *hyb, int size_hyb, int ip1, int ip2) {
-  if( this->Cvgd_new_gen2(self, 2, 1, hyb, size_hyb, NULL, NULL, NULL, NULL,
+int vgrid::Cvgd_new_gen_2001(float *hyb, int size_hyb, int ip1, int ip2) {
+  if( this->Cvgd_new_gen2(2, 1, hyb, size_hyb, NULL, NULL, NULL, NULL,
 		NULL, NULL, NULL, ip1, ip2, NULL, NULL, NULL, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen_2001, see details above\n");
     return(VGD_ERROR);
   }
   return(VGD_OK);
 }
-int vgrid::Cvgd_new_gen_5999(vgrid_descriptor *self, float *hyb, int size_hyb, int ip1, int ip2) {
-  if( this->Cvgd_new_gen2(self, 5, 999, hyb, size_hyb, NULL, NULL, NULL, NULL,
+int vgrid::Cvgd_new_gen_5999(float *hyb, int size_hyb, int ip1, int ip2) {
+  if( this->Cvgd_new_gen2(5, 999, hyb, size_hyb, NULL, NULL, NULL, NULL,
 		NULL, NULL, NULL, ip1, ip2, NULL, NULL, NULL, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen_5999, see details above\n");
     return(VGD_ERROR);
   }
   return(VGD_OK);
 }
-int vgrid::Cvgd_new_gen_1002(vgrid_descriptor *self, float *hyb, int size_hyb, double ptop_8, int ip1, int ip2) {
-  if( this->Cvgd_new_gen2(self, 1, 2, hyb, size_hyb, NULL, NULL, NULL, NULL,
+int vgrid::Cvgd_new_gen_1002(float *hyb, int size_hyb, double ptop_8, int ip1, int ip2) {
+  if( this->Cvgd_new_gen2(1, 2, hyb, size_hyb, NULL, NULL, NULL, NULL,
 		&ptop_8, NULL, NULL, ip1, ip2, NULL, NULL, NULL, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen_1002, see details above\n");
     return(VGD_ERROR);
   }
   return(VGD_OK);
 }
-int vgrid::Cvgd_new_gen_4001(vgrid_descriptor *self, float *hyb, int size_hyb, int ip1, int ip2) {  
-  if( this->Cvgd_new_gen2(self, 4, 1, hyb, size_hyb, NULL, NULL, NULL, NULL,
+int vgrid::Cvgd_new_gen_4001(float *hyb, int size_hyb, int ip1, int ip2) {  
+  if( this->Cvgd_new_gen2(4, 1, hyb, size_hyb, NULL, NULL, NULL, NULL,
 		NULL, NULL, NULL, ip1, ip2, NULL, NULL, NULL, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen_4001, see details above\n");
     return(VGD_ERROR);
   }
   return(VGD_OK);
 }
-int vgrid::Cvgd_new_gen_5001(vgrid_descriptor *self, float *hyb, int size_hyb, double ptop_8, double pref_8, float rcoef1, int ip1, int ip2) {
-  if( this->Cvgd_new_gen2(self, 5, 1, hyb, size_hyb, &rcoef1, NULL, NULL, NULL,
+int vgrid::Cvgd_new_gen_5001(float *hyb, int size_hyb, double ptop_8, double pref_8, float rcoef1, int ip1, int ip2) {
+  if( this->Cvgd_new_gen2(5, 1, hyb, size_hyb, &rcoef1, NULL, NULL, NULL,
 		&ptop_8, &pref_8, NULL, ip1, ip2, NULL, NULL, NULL, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen_5001, see details above\n");
     return(VGD_ERROR);
   }
   return(VGD_OK);
 }
-int vgrid::Cvgd_new_gen_5002(vgrid_descriptor *self, float *hyb, int size_hyb, double ptop_8, double pref_8, float rcoef1, float rcoef2, int ip1, int ip2) {
-  if( this->Cvgd_new_gen2(self, 5, 2, hyb, size_hyb, &rcoef1, &rcoef2, NULL, NULL,
+int vgrid::Cvgd_new_gen_5002(float *hyb, int size_hyb, double ptop_8, double pref_8, float rcoef1, float rcoef2, int ip1, int ip2) {
+  if( this->Cvgd_new_gen2(5, 2, hyb, size_hyb, &rcoef1, &rcoef2, NULL, NULL,
 		&ptop_8, &pref_8, NULL, ip1, ip2, NULL, NULL, NULL, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen_5002, see details above\n");
     return(VGD_ERROR);
   }
   return(VGD_OK);
 }
-int vgrid::Cvgd_new_gen_5005(vgrid_descriptor *self, float *hyb, int size_hyb, double pref_8, double *ptop_out_8, float rcoef1, float rcoef2, int ip1, int ip2, float dhm, float dht) {
-  if( this->Cvgd_new_gen2(self, 5, 5, hyb, size_hyb, &rcoef1, &rcoef2, NULL, NULL,
+int vgrid::Cvgd_new_gen_5005(float *hyb, int size_hyb, double pref_8, double *ptop_out_8, float rcoef1, float rcoef2, int ip1, int ip2, float dhm, float dht) {
+  if( this->Cvgd_new_gen2(5, 5, hyb, size_hyb, &rcoef1, &rcoef2, NULL, NULL,
 		NULL, &pref_8, ptop_out_8, ip1, ip2, &dhm, &dht, NULL, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen_5005, see details above\n");
     return(VGD_ERROR);
   }
   return(VGD_OK);
 }
-int vgrid::Cvgd_new_gen_5100(vgrid_descriptor *self, float *hyb, int size_hyb, double pref_8, double *ptop_out_8, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, int avg) {
-  if( this->Cvgd_new_gen2(self, 5, 100, hyb, size_hyb, &rcoef1, &rcoef2,  &rcoef3, &rcoef4,
+int vgrid::Cvgd_new_gen_5100(float *hyb, int size_hyb, double pref_8, double *ptop_out_8, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, int avg) {
+  if( this->Cvgd_new_gen2(5, 100, hyb, size_hyb, &rcoef1, &rcoef2,  &rcoef3, &rcoef4,
 		NULL, &pref_8, ptop_out_8, ip1, ip2, &dhm, &dht, NULL, avg) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen_5100, see details above\n");
     return(VGD_ERROR);
@@ -6712,8 +6647,8 @@ int vgrid::Cvgd_new_gen_5100(vgrid_descriptor *self, float *hyb, int size_hyb, d
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_new_gen_21001(vgrid_descriptor *self, float *hyb, int size_hyb, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht) {
-  if( this->Cvgd_new_gen2(self, 21, 1, hyb, size_hyb, &rcoef1, &rcoef2, &rcoef3, &rcoef4,
+int vgrid::Cvgd_new_gen_21001(float *hyb, int size_hyb, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht) {
+  if( this->Cvgd_new_gen2(21, 1, hyb, size_hyb, &rcoef1, &rcoef2, &rcoef3, &rcoef4,
 		NULL, NULL, NULL, ip1, ip2, &dhm, &dht, NULL, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen_21001, see details above\n");
     return(VGD_ERROR);
@@ -6721,8 +6656,8 @@ int vgrid::Cvgd_new_gen_21001(vgrid_descriptor *self, float *hyb, int size_hyb, 
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_new_gen_21002(vgrid_descriptor *self, float *hyb, int size_hyb, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, float dhw) {
-  if( this->Cvgd_new_gen2(self, 21, 2, hyb, size_hyb, &rcoef1, &rcoef2, &rcoef3, &rcoef4,
+int vgrid::Cvgd_new_gen_21002(float *hyb, int size_hyb, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, float dhw) {
+  if( this->Cvgd_new_gen2(21, 2, hyb, size_hyb, &rcoef1, &rcoef2, &rcoef3, &rcoef4,
 		NULL, NULL, NULL, ip1, ip2, &dhm, &dht, &dhw, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen_21002, see details above\n");
     return(VGD_ERROR);
@@ -6730,7 +6665,7 @@ int vgrid::Cvgd_new_gen_21002(vgrid_descriptor *self, float *hyb, int size_hyb, 
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_new_gen2(vgrid_descriptor *self, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
+int vgrid::Cvgd_new_gen2(int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
 	      double *ptop_8, double *pref_8, double *ptop_out_8,
 	      int ip1, int ip2, float *dhm, float *dht, float *dhw, int avg){
 
@@ -6738,48 +6673,48 @@ int vgrid::Cvgd_new_gen2(vgrid_descriptor *self, int kind, int version, float *h
   double *a_m_8 = NULL, *b_m_8 = NULL, *c_m_8 = NULL, *a_t_8 = NULL, *b_t_8 = NULL, *c_t_8 = NULL, *a_w_8 = NULL, *b_w_8 = NULL, *c_w_8 = NULL;
   int *ip1_m = NULL, *ip1_t = NULL, *ip1_w = NULL, tlift, OKInput;
 
-  if(this->Cvgd_set_vcode_i(self, kind, version) == VGD_ERROR)  {
+  if(this->Cvgd_set_vcode_i(kind, version) == VGD_ERROR)  {
     printf("(Cvgd) ERROR in Cvgd_new_gen2, ERROR with Cvgd_set_vcode_i");
     return (VGD_ERROR);
   }
-  if( ! this->is_valid(self, vcode_valid) ){
+  if( ! this->is_valid(vcode_valid) ){
     printf("(Cvgd) ERROR in Cvgd_new_gen2, vcode %d is not valid.\n",this->vcode);
     return (VGD_ERROR);
   }
   
   //TODO get better error handling like in new_build
   OKInput = 0;
-  OKInput = OKInput + this->is_required_double(self, ptop_8,     ptop_8_valid,     "ptop_8"    );
-  OKInput = OKInput + this->is_required_double(self, ptop_out_8, ptop_out_8_valid, "ptop_out_8");
-  OKInput = OKInput + this->is_required_double(self, pref_8,     pref_8_valid,     "pref_8"    );
-  OKInput = OKInput + this->is_required_float (self, rcoef1,     rcoef1_valid,     "rcoef1"    );
-  OKInput = OKInput + this->is_required_float (self, rcoef2,     rcoef2_valid,     "rcoef2"    );
-  OKInput = OKInput + this->is_required_float (self, dhm,        dhm_valid,        "dhm"       );
-  OKInput = OKInput + this->is_required_float (self, dht,        dht_valid,        "dht"       );  
-  OKInput = OKInput + this->is_required_float (self, dhw,        dhw_valid,        "dhw"       );  
+  OKInput = OKInput + this->is_required_double(ptop_8,     ptop_8_valid,     "ptop_8"    );
+  OKInput = OKInput + this->is_required_double(ptop_out_8, ptop_out_8_valid, "ptop_out_8");
+  OKInput = OKInput + this->is_required_double(pref_8,     pref_8_valid,     "pref_8"    );
+  OKInput = OKInput + this->is_required_float (rcoef1,     rcoef1_valid,     "rcoef1"    );
+  OKInput = OKInput + this->is_required_float (rcoef2,     rcoef2_valid,     "rcoef2"    );
+  OKInput = OKInput + this->is_required_float (dhm,        dhm_valid,        "dhm"       );
+  OKInput = OKInput + this->is_required_float (dht,        dht_valid,        "dht"       );  
+  OKInput = OKInput + this->is_required_float (dhw,        dhw_valid,        "dhw"       );  
 
   if (OKInput != 8 ) {
     return(VGD_ERROR);
   }
   OKInput = 0;
-  if(this->is_option(self,rcoef3_option)) {
+  if(this->is_option(rcoef3_option)) {
     OKInput++;
     l_rcoef3 = &minus_one;
     if(rcoef3){
       l_rcoef3 = rcoef3;
     }
   } else {    
-    OKInput = OKInput + this->is_required_float (self, rcoef3, rcoef3_valid, "rcoef3");
+    OKInput = OKInput + this->is_required_float (rcoef3, rcoef3_valid, "rcoef3");
     l_rcoef3 = rcoef3;
   }
-  if(this->is_option(self,rcoef4_option)) {
+  if(this->is_option(rcoef4_option)) {
     OKInput++;
     l_rcoef4 = &minus_one;
     if(rcoef4){
       l_rcoef4 = rcoef4;
     }
   } else {    
-    OKInput = OKInput + this->is_required_float (self, rcoef4, rcoef4_valid, "rcoef4");
+    OKInput = OKInput + this->is_required_float (rcoef4, rcoef4_valid, "rcoef4");
     l_rcoef4 = rcoef4;
   }  
   if (OKInput != 2 ) {
@@ -6955,7 +6890,7 @@ int vgrid::Cvgd_new_gen2(vgrid_descriptor *self, int kind, int version, float *h
     printf("(Cvgd) ERROR in Cvgd_new_gen2, invalid kind or version, kind = %d, version = %d\n",kind,version);
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_new_build_vert2(self,kind,version,nk,ip1,ip2,ptop_8,pref_8,rcoef1,rcoef2,l_rcoef3,l_rcoef4,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,a_w_8,b_w_8,c_w_8,ip1_m,ip1_t,ip1_w,nl_m,nl_t,nl_w) ) {
+  if( VGD_ERROR == this->Cvgd_new_build_vert2(kind,version,nk,ip1,ip2,ptop_8,pref_8,rcoef1,rcoef2,l_rcoef3,l_rcoef4,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,a_w_8,b_w_8,c_w_8,ip1_m,ip1_t,ip1_w,nl_m,nl_t,nl_w) ) {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_new_gen2, problem with new_build_vert for kind = %d, version = %d\n",kind,version);
     return(VGD_ERROR);
   }
@@ -7068,7 +7003,7 @@ int vgrid::C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, c
   return(VGD_OK);
 }
 
-int vgrid::C_gen_legacy_desc(vgrid_descriptor *self, int unit, int *keylist , int nb ){
+int vgrid::C_gen_legacy_desc(int unit, int *keylist , int nb ){
   
   int *ip1 = NULL;
   int kind, origkind, k, ni, nj, nk, hy_key, pt_key, e1_key;
@@ -7152,7 +7087,7 @@ int vgrid::C_gen_legacy_desc(vgrid_descriptor *self, int unit, int *keylist , in
 	if( this->C_genab_1002(hyb, nb, &ptop_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ){	  
 	  goto bomb;
 	}
-	if( this->Cvgd_new_build_vert2(self, kind, 2, nb, var.ig1, var.ig2, &ptop_8, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR ){
+	if( this->Cvgd_new_build_vert2(kind, 2, nb, var.ig1, var.ig2, &ptop_8, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR ){
 	  goto bomb;
 	}
       }
@@ -7169,7 +7104,7 @@ int vgrid::C_gen_legacy_desc(vgrid_descriptor *self, int unit, int *keylist , in
       if( this->C_genab_1003(hyb, nb, rcoef, ptop_8, pref_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ) {      
 	goto bomb;
       }
-      if( this->Cvgd_new_build_vert2(self, 1, 3, nb, var.ig1, var.ig2, &ptop_8, &pref_8, &rcoef, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR ){
+      if( this->Cvgd_new_build_vert2(1, 3, nb, var.ig1, var.ig2, &ptop_8, &pref_8, &rcoef, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR ){
 	goto bomb;
       }      
     } else {
@@ -7182,7 +7117,7 @@ int vgrid::C_gen_legacy_desc(vgrid_descriptor *self, int unit, int *keylist , in
       if( this->C_genab_1001(hyb, nb, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ){
 	goto bomb;
       }
-      if( this->Cvgd_new_build_vert2(self, kind, 1, nb, var.ig1, var.ig2, NULL, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR ){
+      if( this->Cvgd_new_build_vert2(kind, 1, nb, var.ig1, var.ig2, NULL, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR ){
 	goto bomb;
       }
     }
@@ -7192,7 +7127,7 @@ int vgrid::C_gen_legacy_desc(vgrid_descriptor *self, int unit, int *keylist , in
     if( this->C_genab_2001(hyb, nb, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ){
       goto bomb;
     }
-    if( this->Cvgd_new_build_vert2(self, kind, 1, nb, var.ig1, var.ig2, NULL, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR ){
+    if( this->Cvgd_new_build_vert2(kind, 1, nb, var.ig1, var.ig2, NULL, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR ){
       goto bomb;
     }	
   } else if ( kind == 5 ){
@@ -7205,7 +7140,7 @@ int vgrid::C_gen_legacy_desc(vgrid_descriptor *self, int unit, int *keylist , in
     if( this->C_genab_5001(hyb, nb, rcoef, ptop_8, pref_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ){
       goto bomb;
     }
-    if( this->Cvgd_new_build_vert2(self, kind, 1, nb, var.ig1, var.ig2, &ptop_8, &pref_8, &rcoef, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR ){
+    if( this->Cvgd_new_build_vert2(kind, 1, nb, var.ig1, var.ig2, &ptop_8, &pref_8, &rcoef, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR ){
       goto bomb;
     }	
   } else {
@@ -7229,7 +7164,7 @@ int vgrid::C_gen_legacy_desc(vgrid_descriptor *self, int unit, int *keylist , in
 
 }
 
-int vgrid::c_legacy(vgrid_descriptor *self, int unit, int F_kind) {
+int vgrid::c_legacy(int unit, int F_kind) {
   // Construct vertical structure from legacy encoding (PT,HY...)
 
   int error, ni, nj, nk, nip1, i, j, k, kind, nb_kind=100, aa, nb;
@@ -7341,7 +7276,7 @@ int vgrid::c_legacy(vgrid_descriptor *self, int unit, int F_kind) {
     return(VGD_ERROR);
   }
   printf("(Cvgd)   Found %d unique ip1 of kind %d among the %d records in file to construct the vertical descriptor\n", nb, valid_kind, count);
-  error = this->C_gen_legacy_desc(self, unit, keylist , nb);
+  error = this->C_gen_legacy_desc(unit, keylist , nb);
 
   if( error == VGD_ERROR ){
     printf("(Cvgd) ERROR: problem with C_gen_legacy_desc\n");
@@ -7351,15 +7286,14 @@ int vgrid::c_legacy(vgrid_descriptor *self, int unit, int F_kind) {
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_new_read(vgrid_descriptor *self, int unit, int ip1, int ip2, int kind, int version) {
+int vgrid::Cvgd_new_read(int unit, int ip1, int ip2, int kind, int version) {
 
   char  match_ipig;
   int error, i, ni, nj, nk;
   int toc_found = 0, count, nkeyList = MAX_DESC_REC;
   int keyList[nkeyList], status;
   VGD_TFSTD_ext var;
-  vgrid_descriptor self2;
-  vgrid that(&self2);
+  vgrid self2;
   
   if(ip1 >= 0 && ip2 < 0) {
     printf("(Cvgd) ERROR in Cvgd_new_read, expecting optional value ip2\n");      
@@ -7391,11 +7325,11 @@ int vgrid::Cvgd_new_read(vgrid_descriptor *self, int unit, int ip1, int ip2, int
       return(VGD_ERROR);
     }
     printf("(Cvgd) Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)\n");
-    if(this->c_legacy(self,unit,kind) == VGD_ERROR){
+    if(this->c_legacy(unit,kind) == VGD_ERROR){
       printf("(Cvgd) ERROR: failed to construct vgrid descriptor from legacy encoding\n");
       return(VGD_ERROR);
     }
-    if(this->fstd_init(self) == VGD_ERROR) {
+    if(this->fstd_init() == VGD_ERROR) {
       printf("(Cvgd) ERROR in Cvgd_new_read, problem creating record information\n");
     }
     toc_found = 1;
@@ -7413,7 +7347,7 @@ int vgrid::Cvgd_new_read(vgrid_descriptor *self, int unit, int ip1, int ip2, int
       // If we reached this stage then the toc satisfy the selection criteria but it may not be the only one.
       if(! toc_found) {
 	toc_found = 1;
-	if( this->C_load_toctoc(self,var,keyList[i]) == VGD_ERROR ) {
+	if( this->C_load_toctoc(var,keyList[i]) == VGD_ERROR ) {
 	  printf("(Cvgd) ERROR in Cvgd_new_read, cannot load !!\n");
 	  return(VGD_ERROR);
 	}
@@ -7422,23 +7356,21 @@ int vgrid::Cvgd_new_read(vgrid_descriptor *self, int unit, int ip1, int ip2, int
 	nk=this->table_nk;
 	continue;
       }
-      // If we get at this point this means that there are more than one toc satisfying the selection criteria.
+ // If we get at this point this means that there are more than one toc satisfying the selection criteria.
       // We load then all to check if they are the same. If not, we return with an error message.
       if( my_fstprm(keyList[i], &var) == VGD_ERROR ) {
 	printf("(Cvgd) ERROR in Cvgd_new_read, with my_fstprm on keyList[i] = %d\n",keyList[i]);
 	return(VGD_ERROR);
       }
-      if( that.C_load_toctoc(&self2,var,keyList[i]) == VGD_ERROR ) {
+      if( self2.C_load_toctoc(var,keyList[i]) == VGD_ERROR ) {
 	printf("(Cvgd) ERROR in Cvgd_new_read, cannot load !!\n");
 	return(VGD_ERROR);
       }
-      status = this->Cvgd_vgdcmp(&that);
+      status = this->Cvgd_vgdcmp(&self2);
       if ( status != 0 ){
 	printf("(Cvgd) ERROR in Cvgd_new_read, found different entries in vertical descriptors after search on ip1 = %d, ip2 = %d, kind = %d, version = %d, status code is %d\n",ip1,ip2,kind,version,status);
 	return(VGD_ERROR);
       }
-      // TODO verifier si ce Cvgd_free est correct 
-      //Cvgd_free(&self2);
     } // Loop in !! 
   } //if(count == 0)
 
@@ -7447,7 +7379,7 @@ int vgrid::Cvgd_new_read(vgrid_descriptor *self, int unit, int ip1, int ip2, int
     return(VGD_ERROR);
   }
   // Fill structure from input table
-  if( this->Cvgd_new_from_table(self, this->table, this->table_ni, this->table_nj, this->table_nk) == VGD_ERROR ) {
+  if( this->Cvgd_new_from_table(this->table, this->table_ni, this->table_nj, this->table_nk) == VGD_ERROR ) {
     printf("(Cvgd) ERROR in Cvgd_new_read, unable to construct from table\n");
     return(VGD_ERROR);
   }
@@ -7456,7 +7388,7 @@ int vgrid::Cvgd_new_read(vgrid_descriptor *self, int unit, int ip1, int ip2, int
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_write_desc (vgrid_descriptor *self, int unit) {
+int vgrid::Cvgd_write_desc (int unit) {
   int ip1, ip2;
   float work[1];
 
@@ -7484,7 +7416,7 @@ int vgrid::Cvgd_write_desc (vgrid_descriptor *self, int unit) {
 
 }
 
-int vgrid::Cvgd_stda76_temp(vgrid_descriptor *self, int *i_val, int nl, float *temp){
+int vgrid::Cvgd_stda76_temp(int *i_val, int nl, float *temp){
   int vcode;
   float *pres;
   pres = (float*)malloc( nl * sizeof(float) );
@@ -7497,15 +7429,15 @@ int vgrid::Cvgd_stda76_temp(vgrid_descriptor *self, int *i_val, int nl, float *t
     return(VGD_ERROR);
   }
   
-  if( this->Cvgd_get_int(self, "VCOD", &vcode, 1) == VGD_ERROR ){
+  if( this->Cvgd_get_int("VCOD", &vcode, 1) == VGD_ERROR ){
     return(VGD_ERROR);
   };
   if(! strcmp(this->ref_name,"ME  ") || vcode == 4001 ){
-    if( this->c_stda76_temp_pres_from_heights(self, i_val, nl, temp, pres, NULL, NULL) == VGD_ERROR ){
+    if( this->c_stda76_temp_pres_from_heights(i_val, nl, temp, pres, NULL, NULL) == VGD_ERROR ){
       return(VGD_ERROR);
     }
   } else {
-    if( this->c_stda76_temp_from_press(self, i_val, nl, temp) == VGD_ERROR ){
+    if( this->c_stda76_temp_from_press(i_val, nl, temp) == VGD_ERROR ){
       return(VGD_ERROR);
     }
   }
@@ -7513,7 +7445,7 @@ int vgrid::Cvgd_stda76_temp(vgrid_descriptor *self, int *i_val, int nl, float *t
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_stda76_pres(vgrid_descriptor *self, int *i_val, int nl, float *pres, float *sfc_temp, float *sfc_pres){
+int vgrid::Cvgd_stda76_pres(int *i_val, int nl, float *pres, float *sfc_temp, float *sfc_pres){
 
   float *temp;
   temp = (float*)malloc( nl * sizeof(float) );
@@ -7526,13 +7458,13 @@ int vgrid::Cvgd_stda76_pres(vgrid_descriptor *self, int *i_val, int nl, float *p
     return(VGD_ERROR);
   }
   if(! strcmp(this->ref_name,"ME  ")){
-    if( this->c_stda76_temp_pres_from_heights(self, i_val, nl, temp, pres, sfc_temp, sfc_pres) == VGD_ERROR ){
+    if( this->c_stda76_temp_pres_from_heights(i_val, nl, temp, pres, sfc_temp, sfc_pres) == VGD_ERROR ){
       return(VGD_ERROR);
     }
   } else {
     printf("ERROR: please contact the vgrid developpers to add c_stda76_pres_from_pres\n");
     return(VGD_ERROR);
-    //if( c_stda76_pres_from_press(self, i_val, nl, pres) == VGD_ERROR ){
+    //if( c_stda76_pres_from_press(i_val, nl, pres) == VGD_ERROR ){
     //  return(VGD_ERROR);
     //}
   }

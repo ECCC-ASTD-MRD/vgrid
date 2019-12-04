@@ -42,11 +42,7 @@ extern "C" void c_stda76_pres_from_hgts() {
   char *filename = "data/dm_21001_from_model_run_NON_SLEVE";
   char *filename_c ="data/c_stda76_pres_from_ghts.txt";
   char buff[255];
-  vgrid_descriptor vgd, *vgd_p;
-  vgrid_descriptor my_vgd;
-  vgrid my_vgrid(&my_vgd);
-
-  vgd_p = &vgd;
+  vgrid my_vgrid;
 
   // Get any heights vertical descriptor
   if(c_fnom(&iun,filename,mode,0) < 0 ) {
@@ -57,11 +53,11 @@ extern "C" void c_stda76_pres_from_hgts() {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
     exit(1);
   }
-  if( my_vgrid.Cvgd_new_read(vgd_p, iun, -1, -1, -1, -1) == VGD_ERROR ) {
+  if( my_vgrid.Cvgd_new_read(iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read\n");
     exit(1);
   }
-  if( my_vgrid.Cvgd_get_int(vgd_p, "NL_M", &nl, quiet) == VGD_ERROR){
+  if( my_vgrid.Cvgd_get_int("NL_M", &nl, quiet) == VGD_ERROR){
     printf("ERROR cannot Cvgd_get_int on NL_M\n");
     exit(1);
   }
@@ -72,7 +68,7 @@ extern "C" void c_stda76_pres_from_hgts() {
     printf("Problem allocating i_val of size %d\n",nl);
     exit(1);
   }
-  if(my_vgrid.Cvgd_get_int_1d(vgd_p, "VIPM", &i_val, NULL, quiet) ==  VGD_ERROR ) {
+  if(my_vgrid.Cvgd_get_int_1d("VIPM", &i_val, NULL, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_int for VIPM\n");
     exit(1);
   }
@@ -87,7 +83,7 @@ extern "C" void c_stda76_pres_from_hgts() {
     printf("Problem allocating hgts of size %d\n",nl);
     exit(1);
   }
-  if(my_vgrid.Cvgd_levels(vgd_p, 1, 1, nl, i_val, hgts, &me, 0) == VGD_ERROR){
+  if(my_vgrid.Cvgd_levels(1, 1, nl, i_val, hgts, &me, 0) == VGD_ERROR){
     printf("Problem Computing heights");
     exit(1);
   }

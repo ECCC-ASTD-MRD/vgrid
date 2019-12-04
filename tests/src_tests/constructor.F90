@@ -18,7 +18,7 @@
 ! * Boston, MA 02111-1307, USA.
 program constructor
 
-  ! Object: construct vgrid_descriptor
+  ! Object: construct vgrid object
 
   use vGrid_Descriptors, only: vgd_new, VGD_OK
   use Unit_Testing, only: ut_report

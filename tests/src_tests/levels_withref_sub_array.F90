@@ -19,7 +19,7 @@
 module mod_levels_withref_sub_array
 contains 
    integer function test_levels(levels,l_ni,l_nj,G_nk,liste,infon,lu) result(status)
-      use vgrid_descriptors, only: VGD_ERROR, VGD_OK
+      use Vgrid_descriptors, only: VGD_ERROR, VGD_OK
       implicit none
       real, dimension(:,:,:), pointer :: levels
       integer :: l_ni,l_nj,G_nk,lu, liste(infon), datev
@@ -75,7 +75,7 @@ contains
 end module mod_levels_withref_sub_array
 !========================================================
 program levels_withref_sub_array
-   use vgrid_descriptors, only:  vgd_new, vgd_get, &
+   use Vgrid_descriptors, only:  vgd_new, vgd_get, &
         vgd_levels, VGD_ERROR
    use mod_levels_withref_sub_array, only : test_levels
    use Unit_Testing, only: ut_report

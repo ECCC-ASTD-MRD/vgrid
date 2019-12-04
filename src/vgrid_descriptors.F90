@@ -36,7 +36,6 @@ module vGrid_Descriptors
    private
 
    ! Public methods
-   public :: vgrid_descriptor                    !vertical grid descriptor structure
    public :: vgd_get                             !get instance variable value
    public :: vgd_put                             !set instance variable value
    public :: vgd_new                             !class constructor
@@ -74,12 +73,6 @@ module vGrid_Descriptors
       character(len=KEY_LENGTH) :: nomvar
       character(len=VGD_LEN_ETIK) :: etiket
    end type FSTD_ext
-   type :: vgrid_descriptor
-      ! The only member of this type is a C pointer
-      type(c_ptr) :: cptr = C_NULL_PTR
-      ! Start using a vgdid instead of a pointer
-      integer :: vgdid
-   end type vgrid_descriptor
    
    interface
 

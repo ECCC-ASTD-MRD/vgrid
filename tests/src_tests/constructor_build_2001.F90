@@ -17,7 +17,7 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program constructor
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_print,VGD_ERROR
+  use vGrid_Descriptors, only: vgd_new,vgd_get,vgd_print,VGD_ERROR
   use Unit_Testing, only: ut_report
   
 
@@ -78,7 +78,7 @@ end program constructor
 !===============================================================================
 integer function test_2001(vgdid,F_file,F_write_control_L) result(istat)
    !
-   use vGrid_Descriptors, only: vgrid_descriptor,vgd_get,VGD_ERROR,VGD_OK
+   use vGrid_Descriptors, only: vgd_get,VGD_ERROR,VGD_OK
    
 
    implicit none

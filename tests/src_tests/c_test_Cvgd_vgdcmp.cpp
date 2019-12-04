@@ -32,19 +32,11 @@ extern "C" void c_test_Cvgd_vgdcmp() {
   char mode[]="RND";
   char format[] = "FST";
   char name[5];
-  vgrid_descriptor vgd, vgd2;
-  vgrid_descriptor vgd3, vgd4;
-  vgrid my_vgrid(&vgd);
-  vgrid my_vgrid2(&vgd2);
-  vgrid my_vgrid3(&vgd3);
-  vgrid my_vgrid4(&vgd4);
+  vgrid my_vgrid;
+  vgrid my_vgrid2;
+  vgrid my_vgrid3;
+  vgrid my_vgrid4;
 
-  vgrid_descriptor *vgd_p, *vgd2_p, *vgd3_p, *vgd4_p;
-
-  vgd_p  = &vgd;
-  vgd2_p = &vgd2;
-  vgd3_p = &vgd3;
-  vgd4_p = &vgd4;
   status = VGD_OK;
 
   ier = c_fnom(&iun,filename,mode,0);
@@ -57,11 +49,11 @@ extern "C" void c_test_Cvgd_vgdcmp() {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
     return;
   }
-  if( my_vgrid.Cvgd_new_read(vgd_p, iun, -1, -1, -1, -1) == VGD_ERROR ) {
+  if( my_vgrid.Cvgd_new_read(iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
     return;
   }
-  if( my_vgrid2.Cvgd_new_read(vgd2_p, iun, -1, -1, -1, -1) == VGD_ERROR ) {
+  if( my_vgrid2.Cvgd_new_read(iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
     return;
   }
@@ -76,11 +68,11 @@ extern "C" void c_test_Cvgd_vgdcmp() {
     printf("ERROR with c_fstouv on iun2, file %s\n", filename2);
     return;
   }
-  if( my_vgrid3.Cvgd_new_read(vgd3_p, iun2, -1, -1, -1, -1) == VGD_ERROR ) {
+  if( my_vgrid3.Cvgd_new_read(iun2, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun2\n");
     return;
   }
-  if( my_vgrid4.Cvgd_new_read(vgd4_p, iun2, -1, -1, -1, -1) == VGD_ERROR ) {
+  if( my_vgrid4.Cvgd_new_read(iun2, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun2\n");
     return;
   }

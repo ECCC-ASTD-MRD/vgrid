@@ -21,7 +21,7 @@ program constructor_build_5999
    ! Note
    ! This program was used to create the dm_5999_from_model_run file from data/dm_5002_from_model_run
 
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_print,vgd_write,vgd_put,VGD_ERROR,VGD_OK
+  use vGrid_Descriptors, only: vgd_new,vgd_get,vgd_print,vgd_write,vgd_put,VGD_ERROR,VGD_OK
   use Unit_Testing, only: ut_report
   
 
