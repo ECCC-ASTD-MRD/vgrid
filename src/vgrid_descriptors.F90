@@ -213,7 +213,7 @@ module vGrid_Descriptors
 
       integer(c_int) function f_read_vgrid_from_file(vgdid,unit,ip1,ip2,kind,version) bind(c, name='Cvgd_read_vgrid_from_file')
          use iso_c_binding, only : c_ptr, c_int, c_char
-         integer :: vgdid
+         type(c_ptr), value :: vgdid
          integer (c_int), value :: unit, ip1, ip2, kind, version
       end function f_read_vgrid_from_file
 
@@ -356,7 +356,7 @@ contains
    integer function read_vgrid_from_file(vgdid,unit,format,ip1,ip2,kind,version) result(status)
       use vgrid_utils, only: up
       ! Coordinate constructor - read from a file and initialize instance
-      integer, intent(inout) :: vgdid             !Vertical descriptor id
+      integer, target, intent(inout) :: vgdid     !Vertical descriptor id
       integer, intent(in) :: unit                 !File unit to read descriptor information from
       character(len=*), target, optional, intent(in) :: format !File format ('fst' or 'bin') default is 'fst'
       integer, target,optional :: ip1,ip2                 !ip1,2 values of the desired descriptors
@@ -364,11 +364,13 @@ contains
       integer, target,optional, intent(in) :: version     ! Level version requested by user.
       
       ! Local variables
+      type(c_ptr) :: vgdid_p
       integer :: ni,nj,nk, istat, error, l_ip1, l_ip2, l_kind, l_version
       character(len=100) :: myformat
       real(kind=8), dimension(:,:,:), pointer :: table_8
 
       nullify(table_8)
+      vgdid_p = c_loc(vgdid)
 
       status = VGD_ERROR
 
@@ -397,8 +399,7 @@ contains
             l_version = -1
          endif
 
-         print*,'JWB:  kind=',l_kind,'      version=',l_version
-         if( f_new_read(vgdid, unit, l_ip1, l_ip2, l_kind, l_version) == VGD_ERROR )then
+         if( f_read_vgrid_from_file(vgdid_p, unit, l_ip1, l_ip2, l_kind, l_version) == VGD_ERROR )then
             print*,'(F_vgd) ERROR: In new_read, problem with f_new_read'
             return
          endif

@@ -190,16 +190,14 @@ int Cvgd_read_vgrid_from_file(int *vgdid, int unit, int ip1,int ip2,
 {
   vgrid *my_vgd;
   vgrid dummy;
-  try
+  int status;
+
+  status=dummy.Cvgd_read_vgrid_from_file(&my_vgd, unit, ip1, ip2, kind, version);
+  if(status != VGD_ERROR)
     {
-      dummy.Cvgd_read_vgrid_from_file(my_vgd, unit, ip1, ip2, kind, version);
       *vgdid=grid_check.get_tag(my_vgd);
     }
-  catch(int x)
-    {
-      printf("(Cvgd_read_vgrid_from_file) ERROR from vgrid constructor\n");
-    }
-  return VGD_OK;
+  return status;
 }
 
 int Cvgd_new_read(int *vgdid, int unit, int ip1,int ip2, 

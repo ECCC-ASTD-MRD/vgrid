@@ -80,4 +80,9 @@ void Cvgd_table_shape(int vgdid, int **tshape);
 int Cvgd_vgdcmp(int vgdid1, int vgdid2);
 
 int Cvgd_write_desc(int vgdid, int unit);
+
+
+// ########## N E W   I N T E R F A C E ##########
+int Cvgd_read_vgrid_from_file(int *vgdid, int unit, int ip1,int ip2, 
+                              int kind, int version);
 #endif
