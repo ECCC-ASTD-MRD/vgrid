@@ -188,10 +188,12 @@ int Cvgd_new_gen2(int *vgdid, int kind, int version, float *hyb,
 int Cvgd_read_vgrid_from_file(int *vgdid, int unit, int ip1,int ip2, 
                               int kind, int version)
 {
+  vgrid *my_vgd;
+  vgrid dummy;
   try
     {
-      vgrid my_vgd(unit, ip1, ip2, kind, version);
-      *vgdid=grid_check.get_tag(&my_vgd);
+      dummy.Cvgd_read_vgrid_from_file(my_vgd, unit, ip1, ip2, kind, version);
+      *vgdid=grid_check.get_tag(my_vgd);
     }
   catch(int x)
     {

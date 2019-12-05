@@ -7552,14 +7552,13 @@ int vgrid::Cvgd_stda76_pres_from_hgts_list(float *pres, float *hgts,
   }
 
   return(VGD_OK);
-
-
-  // ########## N E W   I N T E R F A C E ##########
-  // ########## N E W   I N T E R F A C E ##########
-
 }
 
-vgrid::vgrid(int unit, int ip1, int ip2, int kind, int version)
+
+// ########## N E W   I N T E R F A C E ##########
+// ########## N E W   I N T E R F A C E ##########
+
+int vgrid::Cvgd_read_vgrid_from_file(vgrid *my_new_vgrid, int unit, int ip1, int ip2, int kind, int version)
 {
 
   char  match_ipig;
@@ -7571,12 +7570,12 @@ vgrid::vgrid(int unit, int ip1, int ip2, int kind, int version)
   
   if(ip1 >= 0 && ip2 < 0) {
     printf("(Cvgd) ERROR in Cvgd_new_read, expecting optional value ip2\n");      
-    throw VGD_ERROR;
+    return(VGD_ERROR);
   }
   
   if(ip2 >= 0 && ip1 < 0){
     printf("(Cvgd) ERROR in Cvgd_new_read, expecting optional value ip1\n");      
-    throw VGD_ERROR;
+    return(VGD_ERROR);
   }
   match_ipig = 0;
   if(ip1 >= 0){
@@ -7584,24 +7583,24 @@ vgrid::vgrid(int unit, int ip1, int ip2, int kind, int version)
   }
   if(kind == -1 && version != -1) {
     printf("(Cvgd) ERROR in Cvgd_new_read, option kind must be used with option version\n");
-    throw VGD_ERROR;
+    return(VGD_ERROR);
   }
   
   error = c_fstinl(unit, &ni, &nj, &nk, -1, " ", ip1, ip2, -1, " ", ZNAME, keyList, &count, nkeyList);
   if (error < 0) {
     printf("(Cvgd) ERROR in Cvgd_new_read, with fstinl on nomvar !!\n");
-    throw VGD_ERROR;
+    return(VGD_ERROR);
   }
   if(count == 0){
     printf("(Cvgd) Cannot find %s with the following ips: ip1=%d, ip2=%d\n", ZNAME, ip1, ip2);
     if(match_ipig) {
       this->vcode = -1;
-      throw VGD_ERROR;
+      return(VGD_ERROR);
     }
     printf("(Cvgd) Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)\n");
     if(this->c_legacy(unit,kind) == VGD_ERROR){
       printf("(Cvgd) ERROR: failed to construct vgrid descriptor from legacy encoding\n");
-      throw VGD_ERROR;
+      return(VGD_ERROR);
     }
     if(this->fstd_init() == VGD_ERROR) {
       printf("(Cvgd) ERROR in Cvgd_new_read, problem creating record information\n");
@@ -7614,7 +7613,7 @@ vgrid::vgrid(int unit, int ip1, int ip2, int kind, int version)
       // Also read all the description information for the key
       if( correct_kind_and_version(keyList[i], kind, version, &var, &status) == VGD_ERROR) {
 	this->valid = 0;
-	throw VGD_ERROR;
+	return(VGD_ERROR);
       }
       if( status != 1) {
 	continue;
@@ -7627,10 +7626,10 @@ vgrid::vgrid(int unit, int ip1, int ip2, int kind, int version)
 	toc_found = 1;
 	if( this->C_load_toctoc(var,keyList[i]) == VGD_ERROR ) {
 	  printf("(Cvgd) ERROR in Cvgd_new_read, cannot load !!\n");
-	  throw VGD_ERROR;
+	  return(VGD_ERROR);
 	}
 	ni=this->table_ni;
-	nj=this->table_nj;
+	nj=this->table_nj; 
 	nk=this->table_nk;
       }
       else // A matching toctoc has already been found
@@ -7639,16 +7638,16 @@ vgrid::vgrid(int unit, int ip1, int ip2, int kind, int version)
 	// If not, we return with an error message.
         if( my_fstprm(keyList[i], &var2) == VGD_ERROR ) {
           printf("(Cvgd) ERROR in Cvgd_new_read, with my_fstprm on keyList[i] = %d\n",keyList[i]);
-          throw VGD_ERROR;
+          return(VGD_ERROR);
         }
         if( self2.C_load_toctoc(var2,keyList[i]) == VGD_ERROR ) {
 	  printf("(Cvgd) ERROR in Cvgd_new_read, cannot load !!\n");
-          throw VGD_ERROR;
+          return(VGD_ERROR);
         }
         status = this->Cvgd_vgdcmp(&self2);
         if ( status != 0 ){
           printf("(Cvgd) ERROR in Cvgd_new_read, found different entries in vertical descriptors after search on ip1 = %d, ip2 = %d, kind = %d, version = %d, status code is %d\n",ip1,ip2,kind,version,status);
-	  throw VGD_ERROR;
+	  return(VGD_ERROR);
         }
       } // toc_found
     } // Loop in !! 
@@ -7656,15 +7655,138 @@ vgrid::vgrid(int unit, int ip1, int ip2, int kind, int version)
 
   if(! toc_found) {
     printf("(Cvgd) ERROR in Cvgd_new_read, cannot find !! or it generate from legacy encoding\n");
-    throw VGD_ERROR;
+    return(VGD_ERROR);
   }
   // Fill structure from input table
-  if( this->Cvgd_new_from_table(this->table, this->table_ni, this->table_nj, this->table_nk) == VGD_ERROR ) {
-    printf("(Cvgd) ERROR in Cvgd_new_read, unable to construct from table\n");
-    throw VGD_ERROR;
-  }
+  vgrid new_vgrid(this->table, this->table_ni, this->table_nj, this->table_nk);
+  my_new_vgrid = &new_vgrid;
+  // if (failed == VGD_ERROR){
+  //   printf("(Cvgd) ERROR in Cvgd_new_read, unable to construct from table\n");
+  //   return(VGD_ERROR);
+  // }
   this->match_ipig = match_ipig;  
 
+  return(VGD_OK);
+}
+
+// Construct a vgrid from a table, var, key, ... ?
+vgrid::vgrid(double *table, int ni, int nj, int nk) {
+  int table_size, i;
+  double *ltable;
+
+  // Coordinate constructor - build vertical descriptor from table input
+  // Set internal vcode (if all above was successful)
+
+  this->valid = 0;
+  // Since table passed in argument may be the this->table, we take a copy before the call to free
+  table_size = ni * nj * nk;
+  ltable = (double*)malloc ( table_size * sizeof(double) );
+  if(! ltable ) {
+    printf("(Cvgd) ERROR in Cvgd_new_from_table, cannot allocate ltable of bouble of size %d\n", table_size);
+    throw VGD_ERROR;
+  }
+  my_copy_double(table, &ltable, table_size);  
+  free(this->table);
+  this->table_ni = ni;
+  this->table_nj = nj;
+  this->table_nk = nk;
+  this->table = (double*)malloc ( ni * nj * nk * sizeof(double) );
+  if(! this->table ) {
+    printf("(Cvgd) ERROR in Cvgd_new_from_table, cannot allocate table of bouble of size %d\n",table_size );
+    throw VGD_ERROR;
+  }
+  for(i = 0; i < table_size; i++) {
+    this->table[i] = ltable[i];
+  }
+  free(ltable);
+  this->kind    = (int) this->table[0];
+  this->version = (int) this->table[1];
+  // Fill remainder of structure
+  if( this->Cvgd_set_vcode() == VGD_ERROR ) {
+    printf("(Cvgd) ERROR in Cvgd_new_from_table, cannot set vcode\n");
+    throw VGD_ERROR;
+  }
+
+  switch(this->vcode) {
+  case 1:
+ if( this->c_decode_vert_0001() == VGD_ERROR ) {
+      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode -0001\n");
+      throw VGD_ERROR;
+    }
+    break;
+  case 1001:
+    if( this->c_decode_vert_1001() == VGD_ERROR ) {
+      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 1001\n");
+      throw VGD_ERROR;
+    }
+    break;
+  case 1002:
+    if( this->c_decode_vert_1002() == VGD_ERROR ) {
+      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 1002\n");
+      throw VGD_ERROR;
+    }
+    break;
+  case 2001:
+    if( this->c_decode_vert_2001() == VGD_ERROR ) {
+      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 2001\n");
+      throw VGD_ERROR;
+    }
+    break;
+  case 1003:
+  case 5001:
+    if( this->c_decode_vert_1003_5001() == VGD_ERROR ) {
+      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 1003 or 5001\n");
+      throw VGD_ERROR;
+    }
+    break;
+  case 4001:
+    if( this->c_decode_vert_4001() == VGD_ERROR ) {
+      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 4001\n");
+      throw VGD_ERROR;
+    }
+    break;
+  case 5002:
+  case 5003:
+  case 5004:
+  case 5005:
+    if( this->c_decode_vert_5002_5003_5004_5005() == VGD_ERROR ) {
+      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 5002,5003,5004 or 5005\n");
+      throw VGD_ERROR;
+    }
+    break;
+  case 5100:
+    if( this->c_decode_vert_5100() == VGD_ERROR ) {
+      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 5100\n");
+      throw VGD_ERROR;
+    }
+    break;    
+  case 5999:
+    if( this->c_decode_vert_5999() == VGD_ERROR ) {
+      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 5999\n");
+      throw VGD_ERROR;
+    }
+    break;    
+  case 21001:
+    if( this->c_decode_vert_21001() == VGD_ERROR ) {
+      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 21001\n");
+      throw VGD_ERROR;
+    }
+    break;    
+  case 21002:
+    if( this->c_decode_vert_21002() == VGD_ERROR ) {
+      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 21002\n");
+      throw VGD_ERROR;
+    }
+    break;    
+  default:
+    printf("(Cvgd) in Cvgd_new_from_table, invalid Vcode %d\n", this->vcode);
+    throw VGD_ERROR;
+  }
+  this->valid = 1;
+  if(this->fstd_init() == VGD_ERROR) {
+    printf("(Cvgd) ERROR in Cvgd_new_from_table, problem creating record information\n");
+  }
+
   return;
-};
+}
 // end of class vgrid

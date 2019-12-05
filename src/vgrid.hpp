@@ -102,7 +102,6 @@ public:
 			   int *ip1_list, float *levels, float *sfc_field,
 			   float *sfc_field_ls, int in_log, int dpidpis);
   vgrid();
-  vgrid(int unit, int ip1, int ip2, int kind, int version);
   void c_vgd_free_abci();
   int Cvgd_set_vcode_i(int Kind,int Version);
   int fstd_init();
@@ -232,6 +231,12 @@ static int Cvgd_getopt_int(char *key, int *value, int quiet);
   int Cvgd_stda76_pres(int *i_val, int nl_t, float *pres, float *sfc_temp, float *sfc_pres);
 static int Cvgd_stda76_hgts_from_pres_list(float *hgts, float *pres, int nb);
 static int Cvgd_stda76_pres_from_hgts_list(float *pres, float *hgts, int nb);
+
+
+// ########## N E W   I N T E R F A C E ##########
+  vgrid(int unit, int ip1, int ip2, int kind, int version);
+  vgrid(double *table, int ni, int nj, int nk);
+  int Cvgd_read_vgrid_from_file(vgrid *my_new_vgrid, int unit, int ip1, int ip2, int kind, int version);
 };
 
 #endif // VGRID_H
