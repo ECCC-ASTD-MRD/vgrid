@@ -19,6 +19,7 @@
  */
 
 #include "vgrid.hpp"
+#include "vgrid_subclasses.hpp"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -7616,7 +7617,7 @@ int vgrid::Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, in
   double *table, *table2;
   int table_size;
   int ni_dummy, nj_dummy, nk_dummy, istat;
-  int key, kind2, version2;
+  int key, kind2, version2, vcode;
   
   if(ip1 >= 0 && ip2 < 0)
   {
@@ -7749,11 +7750,17 @@ int vgrid::Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, in
     return(VGD_ERROR);
   }
 
+  vcode = kind2*1000 + version2;
+
   try
   {
-    // Fill structure from input table
-    vgrid new_vgrid(key);
-    *my_new_vgrid = &new_vgrid;
+    // Instantiate a vgrid subclass from the key, according to the vcode
+    switch (vcode)
+    {
+    case 5005:
+      vgrid_5005 new_vgrid(key);
+      *my_new_vgrid = &new_vgrid;
+    }
   }
   catch(int x)
   {
