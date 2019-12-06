@@ -31,6 +31,12 @@ private:
   int k_plus_top;
 };
 
+class vgrid_5004 : public vgrid_5002_5003_5004_5005
+{
+public:
+  vgrid_5004(int key);
+};
+
 class vgrid_5005 : public vgrid_5002_5003_5004_5005
 {
 public:

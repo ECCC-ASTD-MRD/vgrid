@@ -109,6 +109,11 @@ int vgrid_5002_5003_5004_5005::c_decode_vert()
   return(VGD_OK);  
 }
 
+// ########## class 5004 ##########
+vgrid_5004::vgrid_5004(int key) : vgrid_5002_5003_5004_5005(key, 0)
+{
+}
+
 // ########## class 5005 ##########
 vgrid_5005::vgrid_5005(int key) : vgrid_5002_5003_5004_5005(key, 0)
 {

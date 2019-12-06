@@ -7726,9 +7726,13 @@ int vgrid::Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, in
     // Instantiate a vgrid subclass from the key, according to the vcode
     switch (vcode)
     {
+    case 5004:
+      vgrid_5004 new_vgrid_5004(key);
+      *my_new_vgrid = &new_vgrid_5004;
+
     case 5005:
-      vgrid_5005 new_vgrid(key);
-      *my_new_vgrid = &new_vgrid;
+      vgrid_5005 new_vgrid_5005(key);
+      *my_new_vgrid = &new_vgrid_5005;
     }
   }
   catch(int x)

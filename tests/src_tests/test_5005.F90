@@ -30,7 +30,7 @@ program constructor_build_all
 
   integer, parameter :: nfiles=1
   character(len=200), dimension(nfiles) :: files=(/&
-       "data/dm_5005_from_model_run           "&
+       "data/dm_5004_from_model_run           "&
        /)
 
   stat = vgd_putopt("ALLOW_SIGMA",.true.)
