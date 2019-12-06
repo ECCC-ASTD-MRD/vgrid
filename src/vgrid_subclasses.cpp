@@ -22,8 +22,68 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-// ########## common to classes vgrid_5002, vgrid_5003, vgrid_5004, vgrid_5005 ##########
 
+// ########## common to classes vgrid_1003, vgrid_5001 ##########
+vgrid_1003_5001::vgrid_1003_5001(int key) : vgrid(key)
+{
+}
+
+int vgrid_1003_5001::c_decode_vert()
+{
+  int skip, k, ind, nk;
+
+  skip            = (int) this->table[2];
+
+  this->ptop_8  =         this->table[3];
+  this->pref_8  =         this->table[4];
+  this->rcoef1  = (float) this->table[5];
+ 
+  flip_transfer_d2c(this->ref_name,this->table[6]);
+  // The next two values in table are not used, so we continue with ind = 9
+  ind = 9;
+  nk = this->table_nj - skip;
+
+  // Free A, B and Ip1 vectors for momentum and thermo.
+  this->c_vgd_free_abci();
+
+  // Allocate and assign momentum level data, there are nk of them
+  this->nl_m = nk;
+  this->nl_t = nk;
+  this->nl_w = nk;
+  this->ip1_m =    (int*)malloc( nk * sizeof(int) );
+  this->a_m_8 = (double*)malloc( nk * sizeof(double) );
+  this->b_m_8 = (double*)malloc( nk * sizeof(double) );
+  if( !this->ip1_m || !this->a_m_8 || !this->b_m_8 )
+  {
+    printf("(Cvgd) ERROR in vgrid_1003_5001::c_decode_vert, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nk);
+    return(VGD_ERROR);
+  }
+  for ( k = 0; k < nk; k++)
+  {    
+    this->ip1_m[k] = (int) this->table[ind  ];
+    this->a_m_8[k] =       this->table[ind+1];
+    this->b_m_8[k] =       this->table[ind+2];
+    ind = ind + 3;
+  }
+  this->ip1_t = this->ip1_m;
+  this->a_t_8 = this->a_m_8;
+  this->b_t_8 = this->b_m_8;
+  this->ip1_w = this->ip1_m;
+  this->a_w_8 = this->a_m_8;
+  this->b_w_8 = this->b_m_8;
+  this->valid = 1;
+  
+  return(VGD_OK);
+}
+
+
+// ########## class 5001 ##########
+vgrid_5001::vgrid_5001(int key) : vgrid_1003_5001(key)
+{
+}
+
+
+// ########## common to classes vgrid_5002, vgrid_5003, vgrid_5004, vgrid_5005 ##########
 vgrid_5002_5003_5004_5005::vgrid_5002_5003_5004_5005(int key, int k_plus_top_value) : vgrid(key)
 {
   k_plus_top = k_plus_top_value;
@@ -44,7 +104,7 @@ int vgrid_5002_5003_5004_5005::c_decode_vert()
   flip_transfer_d2c(this->ref_name,this->table[7]);
   if( this->Cvgd_set_vcode_i(this->kind, this->version) == VGD_ERROR )
   {
-    printf("(Cvgd) ERROR in c_decode_vert_5002_5003_5004_5005, cannot set vcode\n");
+    printf("(Cvgd) ERROR in vgrid_5002_5003_5004_5005::c_decode_vert, cannot set vcode\n");
     return(VGD_ERROR);
   }
 
@@ -70,7 +130,7 @@ int vgrid_5002_5003_5004_5005::c_decode_vert()
   this->b_m_8 = (double*)malloc( nb * sizeof(double) );
   if( !this->ip1_m || !this->a_m_8 || !this->b_m_8 )
   {
-    printf("(Cvgd) ERROR in c_decode_vert_5002_5003_5004_5005, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nb);
+    printf("(Cvgd) ERROR in vgrid_5002_5003_5004_5005::c_decode_vert, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nb);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nb; k++)
@@ -91,7 +151,7 @@ int vgrid_5002_5003_5004_5005::c_decode_vert()
   this->b_t_8 = (double*)malloc( nb * sizeof(double) );
   if( !this->ip1_t || !this->a_t_8 || !this->b_t_8 )
   {
-    printf("(Cvgd) ERROR in c_decode_vert_5002_5003_5004_5005, cannot allocate,  ip1_t, a_t_8 and b_t_8 of size %d\n", nb);
+    printf("(Cvgd) ERROR in vgrid_5002_5003_5004_5005::c_decode_vert, cannot allocate,  ip1_t, a_t_8 and b_t_8 of size %d\n", nb);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nb; k++)
@@ -107,6 +167,16 @@ int vgrid_5002_5003_5004_5005::c_decode_vert()
   this->b_w_8 = this->b_t_8;
   this->valid = 1;
   return(VGD_OK);  
+}
+
+// ########## class 5002 ##########
+vgrid_5002::vgrid_5002(int key) : vgrid_5002_5003_5004_5005(key, 1)
+{
+}
+
+// ########## class 5003 ##########
+vgrid_5003::vgrid_5003(int key) : vgrid_5002_5003_5004_5005(key, 1)
+{
 }
 
 // ########## class 5004 ##########

@@ -7587,6 +7587,11 @@ int vgrid::Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, in
   int table_size;
   int ni_dummy, nj_dummy, nk_dummy, istat;
   int key, kind2, version2, vcode;
+  const int KEY_NOT_FOUND = -997;
+
+  key = KEY_NOT_FOUND;
+  kind2    = 0;
+  version2 = 0;
   
   if(ip1 >= 0 && ip2 < 0)
   {
@@ -7634,7 +7639,10 @@ int vgrid::Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, in
     {
       printf("(Cvgd) ERROR in Cvgd_new_read, problem creating record information\n");
     }
-    toc_found = 1;
+
+    // The vgrid has already been constructed
+    *my_new_vgrid = this;
+    return(VGD_OK);
   }
   else
   {
@@ -7726,6 +7734,18 @@ int vgrid::Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, in
     // Instantiate a vgrid subclass from the key, according to the vcode
     switch (vcode)
     {
+    case 5001:
+      vgrid_5001 new_vgrid_5001(key);
+      *my_new_vgrid = &new_vgrid_5001;
+
+    case 5002:
+      vgrid_5002 new_vgrid_5002(key);
+      *my_new_vgrid = &new_vgrid_5002;
+
+    case 5003:
+      vgrid_5003 new_vgrid_5003(key);
+      *my_new_vgrid = &new_vgrid_5003;
+
     case 5004:
       vgrid_5004 new_vgrid_5004(key);
       *my_new_vgrid = &new_vgrid_5004;
