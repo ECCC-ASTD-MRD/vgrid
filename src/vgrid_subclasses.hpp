@@ -22,11 +22,19 @@
 
 #include "vgrid.hpp"
 
-class vgrid_5005 : public vgrid
+class vgrid_5002_5003_5004_5005 : public vgrid
+{
+public:
+  vgrid_5002_5003_5004_5005(int key, int k_plus_top_value);
+  int c_decode_vert();
+private:
+  int k_plus_top;
+};
+
+class vgrid_5005 : public vgrid_5002_5003_5004_5005
 {
 public:
   vgrid_5005(int key);
-  int c_decode_vert();
 };
 
 #endif // VGRID_5005_H

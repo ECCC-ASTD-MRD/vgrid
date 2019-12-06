@@ -22,15 +22,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-vgrid_5005::vgrid_5005(int key) : vgrid(key)
+// ########## common to classes vgrid_5002, vgrid_5003, vgrid_5004, vgrid_5005 ##########
+
+vgrid_5002_5003_5004_5005::vgrid_5002_5003_5004_5005(int key, int k_plus_top_value) : vgrid(key)
 {
+  k_plus_top = k_plus_top_value;
 }
 
-int vgrid_5005::c_decode_vert()
+int vgrid_5002_5003_5004_5005::c_decode_vert()
 {
-  int skip, k, ind, k_plus_top, k_plus_diag, nk, nb, kind;
-
-  k_plus_top = 0;
+  int skip, k, ind, k_plus_diag, nk, nb, kind;
 
   this->kind    =   (int) this->table[0];
   this->version =   (int) this->table[1];
@@ -106,4 +107,9 @@ int vgrid_5005::c_decode_vert()
   this->b_w_8 = this->b_t_8;
   this->valid = 1;
   return(VGD_OK);  
+}
+
+// ########## class 5005 ##########
+vgrid_5005::vgrid_5005(int key) : vgrid_5002_5003_5004_5005(key, 0)
+{
 }
