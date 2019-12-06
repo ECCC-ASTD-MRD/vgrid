@@ -33,6 +33,39 @@ extern float VGD_STDA76_SFC_T;
 extern float VGD_STDA76_SFC_P;
 
 
+
+// Validity table for self
+#define VALID_TABLE_SIZE 15
+
+static int ptop_out_8_valid [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0, 5004, 5005, 5100,    0,     0,    0};
+static int ptop_8_valid     [VALID_TABLE_SIZE] = {0,    0, 1002, 1003,    0,    0, 5001, 5002, 5003, 5004,    0,    0,    0,     0,    0};
+static int pref_8_valid     [VALID_TABLE_SIZE] = {0,    0,    0, 1003,    0,    0, 5001, 5002, 5003, 5004, 5005, 5100,    0,     0,    0};
+static int rcoef1_valid     [VALID_TABLE_SIZE] = {0,    0,    0, 1003,    0,    0, 5001, 5002, 5003, 5004, 5005, 5100,    0, 21001,21002};
+static int rcoef2_valid     [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005, 5100,    0, 21001,21002};
+static int rcoef3_valid     [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 5100,    0, 21001,21002};
+static int rcoef4_valid     [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 5100,    0, 21001,21002};
+static int rcoef3_option    [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 21001,21002};
+static int rcoef4_option    [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 21001,21002};
+static int a_m_8_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 4001, 5001, 5002, 5003, 5004, 5005, 5100, 5999, 21001,21002};
+static int b_m_8_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 4001, 5001, 5002, 5003, 5004, 5005, 5100, 5999, 21001,21002};
+static int c_m_8_valid      [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 5100,    0, 21001,21002};
+static int a_t_8_valid      [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005, 5100,    0, 21001,21002};
+static int b_t_8_valid      [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005, 5100,    0, 21001,21002};
+static int c_t_8_valid      [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 5100,    0, 21001,21002};
+static int a_w_8_valid      [VALID_TABLE_SIZE] = {1,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,21002};
+static int b_w_8_valid      [VALID_TABLE_SIZE] = {1,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,21002};
+static int c_w_8_valid      [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,21002};
+static int ip1_m_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 4001, 5001, 5002, 5003, 5004, 5005, 5100, 5999, 21001,21002};
+static int ip1_t_valid      [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005, 5100,    0, 21001,21002};
+static int ip1_w_valid      [VALID_TABLE_SIZE] = {1,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,21002};
+static int dhm_valid        [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 5005, 5100,    0, 21001,21002};
+static int dht_valid        [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 5005, 5100,    0, 21001,21002};
+static int dhw_valid        [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,21002};
+static int is_in_logp       [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005, 5100,    0,     0,    0};
+static int vcode_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 4001, 5001, 5002, 5003, 5004, 5005, 5100, 5999, 21001,21002};
+
+
+
 class vgrid
 {
   // VARIABLES:
@@ -238,6 +271,12 @@ static int Cvgd_stda76_pres_from_hgts_list(float *pres, float *hgts, int nb);
   vgrid(int unit, int ip1, int ip2, int kind, int version);
   vgrid(int key);
   int Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, int ip2, int kind, int version);
+  virtual int c_decode_vert();  // = 0
+protected:
+  void flip_transfer_d2c(char *name, double val_8);
+  float c_convip_IP2Level(int IP,int *kind);
+  void decode_HY(VGD_TFSTD_ext var, double *ptop_8, double *pref_8, float *rcoef);
+  double c_comp_diag_a_ip1(double pref_8, int ip1);
 };
 
 #endif // VGRID_H

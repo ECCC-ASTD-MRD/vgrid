@@ -50,37 +50,6 @@ static float VGD_RGASD = 0.287050000000E+03;
 static float VGD_GRAV  = 0.980616000000E+01;
 static float VGD_TCDK  = 0.273150000000E+03;
 
-// Validity table for self
-#define VALID_TABLE_SIZE 15
-
-static int ptop_out_8_valid [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0, 5004, 5005, 5100,    0,     0,    0};
-static int ptop_8_valid     [VALID_TABLE_SIZE] = {0,    0, 1002, 1003,    0,    0, 5001, 5002, 5003, 5004,    0,    0,    0,     0,    0};
-static int pref_8_valid     [VALID_TABLE_SIZE] = {0,    0,    0, 1003,    0,    0, 5001, 5002, 5003, 5004, 5005, 5100,    0,     0,    0};
-static int rcoef1_valid     [VALID_TABLE_SIZE] = {0,    0,    0, 1003,    0,    0, 5001, 5002, 5003, 5004, 5005, 5100,    0, 21001,21002};
-static int rcoef2_valid     [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005, 5100,    0, 21001,21002};
-static int rcoef3_valid     [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 5100,    0, 21001,21002};
-static int rcoef4_valid     [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 5100,    0, 21001,21002};
-static int rcoef3_option    [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 21001,21002};
-static int rcoef4_option    [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 21001,21002};
-static int a_m_8_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 4001, 5001, 5002, 5003, 5004, 5005, 5100, 5999, 21001,21002};
-static int b_m_8_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 4001, 5001, 5002, 5003, 5004, 5005, 5100, 5999, 21001,21002};
-static int c_m_8_valid      [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 5100,    0, 21001,21002};
-static int a_t_8_valid      [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005, 5100,    0, 21001,21002};
-static int b_t_8_valid      [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005, 5100,    0, 21001,21002};
-static int c_t_8_valid      [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 5100,    0, 21001,21002};
-static int a_w_8_valid      [VALID_TABLE_SIZE] = {1,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,21002};
-static int b_w_8_valid      [VALID_TABLE_SIZE] = {1,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,21002};
-static int c_w_8_valid      [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,21002};
-static int ip1_m_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 4001, 5001, 5002, 5003, 5004, 5005, 5100, 5999, 21001,21002};
-static int ip1_t_valid      [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005, 5100,    0, 21001,21002};
-static int ip1_w_valid      [VALID_TABLE_SIZE] = {1,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,21002};
-static int dhm_valid        [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 5005, 5100,    0, 21001,21002};
-static int dht_valid        [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0, 5005, 5100,    0, 21001,21002};
-static int dhw_valid        [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,21002};
-static int is_in_logp       [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0, 5002, 5003, 5004, 5005, 5100,    0,     0,    0};
-static int vcode_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 4001, 5001, 5002, 5003, 5004, 5005, 5100, 5999, 21001,21002};
-
-
 // equality operator for VGD_TFSTD_ext
 bool operator==(const VGD_TFSTD_ext& lhs, const VGD_TFSTD_ext& rhs)
 {
@@ -261,7 +230,7 @@ int my_alloc_double(double **vec, int size, char *message){
   return(VGD_OK);
 }
 
-void flip_transfer_d2c(char *name, double val_8) {  
+void vgrid::flip_transfer_d2c(char *name, double val_8) {  
   // NOTE : Character un-stuffing from double is done right to left (Little endian style)
   int i;
   union {
@@ -675,7 +644,7 @@ int c_convip_Level2IP_old_style(float level, int kind) {
   return(IP);
 }
 
-float c_convip_IP2Level(int IP,int *kind) {
+float vgrid::c_convip_IP2Level(int IP,int *kind) {
 
    int    mode=-1,flag=0, strglen=0;
    float  level=0.0;
@@ -687,7 +656,7 @@ float c_convip_IP2Level(int IP,int *kind) {
    return(level);
 }
 
-void decode_HY(VGD_TFSTD_ext var, double *ptop_8, double *pref_8, float *rcoef){
+void vgrid::decode_HY(VGD_TFSTD_ext var, double *ptop_8, double *pref_8, float *rcoef){
   // In consultation with Vivian Lee, with decode explicitly instead of using f77 read_decode_hyb
   int kind;
   *ptop_8 = c_convip_IP2Level(var.ip1, &kind) * 100.;
@@ -847,7 +816,7 @@ int vgrid::Cvgd_vgdcmp(vgrid *vgd2) {
 double c_comp_diag_a_height(double pref_8, float height) {
   return log(pref_8) - VGD_GRAV*height/(VGD_RGASD*VGD_TCDK);
 }
-double c_comp_diag_a_ip1(double pref_8, int ip1) {
+double vgrid::c_comp_diag_a_ip1(double pref_8, int ip1) {
   int kind;
   return log(pref_8) - VGD_GRAV * c_convip_IP2Level(ip1,&kind) / (VGD_RGASD*VGD_TCDK);
 }
@@ -4191,92 +4160,92 @@ int vgrid::c_decode_vert_5100() {
   return(VGD_OK);  
 
 }
-int vgrid::c_decode_vert_5002_5003_5004_5005() {
-  int skip, k, ind, k_plus_top, k_plus_diag, nk, nb, kind;
-  
-  k_plus_top = 1;
-  this->kind    = (int) this->table[0];
-  this->version = (int) this->table[1];
-  skip             = (int) this->table[2];
-  this->ptop_8  = this->table[3];
-  this->pref_8  = this->table[4];
-  this->rcoef1  = (float) this->table[5];
-  this->rcoef2  = (float) this->table[6];
-  flip_transfer_d2c(this->ref_name,this->table[7]);
-  if( this->Cvgd_set_vcode_i(this->kind, this->version) == VGD_ERROR ) {
-    printf("(Cvgd) ERROR in c_decode_vert_5002_5003_5004_5005, cannot set vcode\n");
-    return(VGD_ERROR);
-  }
-  switch(this->vcode) {
-  case 5002:
-  case 5003:
-    k_plus_top=1;
-    break;
-  case 5004:
-  case 5005:
-    k_plus_top=0;
-    break;
-  default:
-    printf("(Cvgd) ERROR in c_decode_vert_5002_5003_5004_5005, Vcode %d not supported\n", this->vcode);
-    return(VGD_ERROR);
-  }
-
-  k_plus_diag = 0;
-  if(this->is_valid(dhm_valid)) {
-    k_plus_diag=1;
-  }
-
-  // The next value in table is not used, so we continue with ind = 9
-  ind = 9;
-  // nk is the number of momentum level without hyb=1.0 and the diag level in m
-  nk = ( this->table_nj - k_plus_top - skip ) / 2 -1 -k_plus_diag;
-
-  // Free A, B and Ip1 vectors for momentum and thermo.
-  this->c_vgd_free_abci();
-
-  // Allocate and assign momentum level data, there are nb of them nk + hyb=1 and possibly the diag in m
-  nb = nk + 1 + k_plus_diag;
-  this->nl_m = nb;
-  this->ip1_m = (int*)malloc( nb * sizeof(int) );
-  this->a_m_8 = (double*)malloc( nb * sizeof(double) );
-  this->b_m_8 = (double*)malloc( nb * sizeof(double) );
-  if( !this->ip1_m || !this->a_m_8 || !this->b_m_8 ){
-    printf("(Cvgd) ERROR in c_decode_vert_5002_5003_5004_5005, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nb);
-    return(VGD_ERROR);
-  }
-  for ( k = 0; k < nb; k++){
-    this->ip1_m[k] = (int) this->table[ind  ];
-    this->a_m_8[k] =       this->table[ind+1];
-    this->b_m_8[k] =       this->table[ind+2];
-    ind = ind + 3;
-  }
-  if(this->is_valid(dhm_valid)) this->dhm = c_convip_IP2Level( this->ip1_m[nb-1], &kind );
-
-  // Allocate and assign thermodynamic level data
-  nb = nb + k_plus_top;
-  this->nl_t = nb;
-  this->nl_w = nb;
-  this->ip1_t = (int*)malloc( nb * sizeof(int) );
-  this->a_t_8 = (double*)malloc( nb * sizeof(double) );
-  this->b_t_8 = (double*)malloc( nb * sizeof(double) );
-  if( !this->ip1_t || !this->a_t_8 || !this->b_t_8 ){
-    printf("(Cvgd) ERROR in c_decode_vert_5002_5003_5004_5005, cannot allocate,  ip1_t, a_t_8 and b_t_8 of size %d\n", nb);
-    return(VGD_ERROR);
-  }
-  for ( k = 0; k < nb; k++){
-    this->ip1_t[k] = (int) this->table[ind  ];
-    this->a_t_8[k] =       this->table[ind+1];
-    this->b_t_8[k] =       this->table[ind+2];
-    ind = ind + 3;
-  }
-  if(this->is_valid(dht_valid)) this->dht= c_convip_IP2Level( this->ip1_t[nb-1], &kind );
-  this->ip1_w = this->ip1_t;
-  this->a_w_8 = this->a_t_8;
-  this->b_w_8 = this->b_t_8;
-  this->valid = 1;
-  return(VGD_OK);  
-
-}
+// int vgrid::c_decode_vert_5002_5003_5004_5005() {
+//   int skip, k, ind, k_plus_top, k_plus_diag, nk, nb, kind;
+//  
+//   k_plus_top = 1;
+//   this->kind    = (int) this->table[0];
+//   this->version = (int) this->table[1];
+//   skip             = (int) this->table[2];
+//   this->ptop_8  = this->table[3];
+//   this->pref_8  = this->table[4];
+//   this->rcoef1  = (float) this->table[5];
+//   this->rcoef2  = (float) this->table[6];
+//   flip_transfer_d2c(this->ref_name,this->table[7]);
+//   if( this->Cvgd_set_vcode_i(this->kind, this->version) == VGD_ERROR ) {
+//     printf("(Cvgd) ERROR in c_decode_vert_5002_5003_5004_5005, cannot set vcode\n");
+//     return(VGD_ERROR);
+//   }
+//   switch(this->vcode) {
+//   case 5002:
+//   case 5003:
+//     k_plus_top=1;
+//     break;
+//   case 5004:
+//   case 5005:
+//     k_plus_top=0;
+//     break;
+//   default:
+//     printf("(Cvgd) ERROR in c_decode_vert_5002_5003_5004_5005, Vcode %d not supported\n", this->vcode);
+//     return(VGD_ERROR);
+//   }
+//
+//   k_plus_diag = 0;
+//   if(this->is_valid(dhm_valid)) {
+//     k_plus_diag=1;
+//   }
+//
+//   // The next value in table is not used, so we continue with ind = 9
+//   ind = 9;
+//   // nk is the number of momentum level without hyb=1.0 and the diag level in m
+//   nk = ( this->table_nj - k_plus_top - skip ) / 2 -1 -k_plus_diag;
+//
+//   // Free A, B and Ip1 vectors for momentum and thermo.
+//   this->c_vgd_free_abci();
+//
+//   // Allocate and assign momentum level data, there are nb of them nk + hyb=1 and possibly the diag in m
+//   nb = nk + 1 + k_plus_diag;
+//   this->nl_m = nb;
+//   this->ip1_m = (int*)malloc( nb * sizeof(int) );
+//   this->a_m_8 = (double*)malloc( nb * sizeof(double) );
+//   this->b_m_8 = (double*)malloc( nb * sizeof(double) );
+//   if( !this->ip1_m || !this->a_m_8 || !this->b_m_8 ){
+//     printf("(Cvgd) ERROR in c_decode_vert_5002_5003_5004_5005, cannot allocate,  ip1_m, a_m_8 and b_m_8 of size %d\n", nb);
+//     return(VGD_ERROR);
+//   }
+//   for ( k = 0; k < nb; k++){
+//     this->ip1_m[k] = (int) this->table[ind  ];
+//     this->a_m_8[k] =       this->table[ind+1];
+//     this->b_m_8[k] =       this->table[ind+2];
+//     ind = ind + 3;
+//   }
+//   if(this->is_valid(dhm_valid)) this->dhm = c_convip_IP2Level( this->ip1_m[nb-1], &kind );
+//
+//   // Allocate and assign thermodynamic level data
+//   nb = nb + k_plus_top;
+//   this->nl_t = nb;
+//   this->nl_w = nb;
+//   this->ip1_t = (int*)malloc( nb * sizeof(int) );
+//   this->a_t_8 = (double*)malloc( nb * sizeof(double) );
+//   this->b_t_8 = (double*)malloc( nb * sizeof(double) );
+//   if( !this->ip1_t || !this->a_t_8 || !this->b_t_8 ){
+//     printf("(Cvgd) ERROR in c_decode_vert_5002_5003_5004_5005, cannot allocate,  ip1_t, a_t_8 and b_t_8 of size %d\n", nb);
+//     return(VGD_ERROR);
+//   }
+//   for ( k = 0; k < nb; k++){
+//     this->ip1_t[k] = (int) this->table[ind  ];
+//     this->a_t_8[k] =       this->table[ind+1];
+//     this->b_t_8[k] =       this->table[ind+2];
+//     ind = ind + 3;
+//   }
+//   if(this->is_valid(dht_valid)) this->dht= c_convip_IP2Level( this->ip1_t[nb-1], &kind );
+//   this->ip1_w = this->ip1_t;
+//   this->a_w_8 = this->a_t_8;
+//   this->b_w_8 = this->b_t_8;
+//   this->valid = 1;
+//   return(VGD_OK);  
+//
+// }
 
 int vgrid::c_decode_vert_5999() {
   int skip, k, ind, nk;
@@ -4596,15 +4565,15 @@ int vgrid::Cvgd_new_from_table(double *table, int ni, int nj, int nk) {
       return(VGD_ERROR);
     }
     break;
-  case 5002:
-  case 5003:
-  case 5004:
-  case 5005:
-    if( this->c_decode_vert_5002_5003_5004_5005() == VGD_ERROR ) {
-      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 5002,5003,5004 or 5005\n");
-      return(VGD_ERROR);
-    }
-    break;
+  // case 5002:
+  // case 5003:
+  // case 5004:
+  // case 5005:
+  //   if( this->c_decode_vert_5002_5003_5004_5005() == VGD_ERROR ) {
+  //     printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 5002,5003,5004 or 5005\n");
+  //     return(VGD_ERROR);
+  //   }
+  //   break;
   case 5100:
     if( this->c_decode_vert_5100() == VGD_ERROR ) {
       printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 5100\n");
@@ -7852,7 +7821,7 @@ vgrid::vgrid(int key)
   case 5003:
   case 5004:
   case 5005:
-    if( this->c_decode_vert_5002_5003_5004_5005() == VGD_ERROR )
+    if( this->c_decode_vert() == VGD_ERROR )
     {
       printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 5002,5003,5004 or 5005\n");
       throw VGD_ERROR;
@@ -7897,5 +7866,10 @@ vgrid::vgrid(int key)
   }
 
   return;
+}
+
+// TO SATISFY THE COMPILER, for now
+int vgrid::c_decode_vert()
+{
 }
 // end of class vgrid

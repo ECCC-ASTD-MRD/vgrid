@@ -26,6 +26,7 @@ class vgrid_5005 : public vgrid
 {
 public:
   vgrid_5005(int key);
+  int c_decode_vert();
 };
 
 #endif // VGRID_5005_H
