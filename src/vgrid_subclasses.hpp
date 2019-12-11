@@ -34,6 +34,7 @@ class vgrid_1001 : public vgrid
 public:
   vgrid_1001(int key);
   int c_decode_vert();
+  int C_genab_1001(float *hyb, int nk, double **a_m_8, double **b_m_8, int **ip1_m);
 };
 
 class vgrid_1002 : public vgrid
@@ -41,6 +42,7 @@ class vgrid_1002 : public vgrid
 public:
   vgrid_1002(int key);
   int c_decode_vert();
+  int C_genab_1002(float *etauser, int nk, double *ptop_8, double **a_m_8, double **b_m_8, int **ip1_m);
 };
 
 class vgrid_1003_5001 : public vgrid
@@ -50,11 +52,20 @@ public:
   int c_decode_vert();
 };
 
+class vgrid_1003 : public vgrid_1003_5001
+{
+public:
+  vgrid_1003(int key);
+  int c_decode_vert();
+  int C_genab(float *hybuser, int nk, float rcoef, double ptop_8, double pref_8, double **a_m_8, double **b_m_8, int **ip1_m);
+};
+
 class vgrid_2001 : public vgrid
 {
 public:
   vgrid_2001(int key);
   int c_decode_vert();
+  int C_genab(float *pres, int nk, double **a_m_8, double **b_m_8, int **ip1_m);
 };
 
 class vgrid_4001 : public vgrid
@@ -62,12 +73,14 @@ class vgrid_4001 : public vgrid
 public:
   vgrid_4001(int key);
   int c_decode_vert();
+  int C_genab(float *hgts, int nk, double **a_m_8, double **b_m_8, int **ip1_m);
 };
 
 class vgrid_5001 : public vgrid_1003_5001
 {
 public:
   vgrid_5001(int key);
+  int C_genab(float *hybuser, int nk, float rcoef, double ptop_8, double pref_8, double **a_m_8, double **b_m_8, int **ip1_m);
 };
 
 class vgrid_5002_5003_5004_5005 : public vgrid
@@ -75,6 +88,8 @@ class vgrid_5002_5003_5004_5005 : public vgrid
 public:
   vgrid_5002_5003_5004_5005(int key, int k_plus_top_value);
   int c_decode_vert();
+protected:
+  int C_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t, int tlift);
 private:
   int k_plus_top;
 };
@@ -95,6 +110,7 @@ class vgrid_5004 : public vgrid_5002_5003_5004_5005
 {
 public:
   vgrid_5004(int key);
+  int vgrid_5004::C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t);
 };
 
 class vgrid_5005 : public vgrid_5002_5003_5004_5005

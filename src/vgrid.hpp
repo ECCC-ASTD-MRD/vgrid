@@ -196,25 +196,6 @@ public:
   int c_encode_vert_5999(int nk);
   int c_encode_vert_21001(char update);
   int c_encode_vert_21002(char update);
-  int c_decode_vert_0001();
-  int c_decode_vert_1001();
-  int c_decode_vert_1002();
-  int c_decode_vert_2001();
-  int c_decode_vert_4001();
-  int c_decode_vert_1003_5001();
-  int c_decode_vert_5100();
-  int c_decode_vert_5002_5003_5004_5005();
-  int c_decode_vert_5999();
-  int c_decode_vert_21001();
-  int c_decode_vert_21002();
-  int C_genab_1001(float *hyb, int nk, double **a_m_8, double **b_m_8, int **ip1_m);
-  int C_genab_1002(float *etauser, int nk, double *ptop_8, double **a_m_8, double **b_m_8, int **ip1_m);
-  int C_genab_1003(float *hybuser, int nk, float rcoef, double ptop_8, double pref_8, double **a_m_8, double **b_m_8, int **ip1_m);
-  int C_genab_2001(float *pres, int nk, double **a_m_8, double **b_m_8, int **ip1_m);
-  int C_genab_4001(float *hgts, int nk, double **a_m_8, double **b_m_8, int **ip1_m);
-  int C_genab_5001(float *hybuser, int nk, float rcoef, double ptop_8, double pref_8, double **a_m_8, double **b_m_8, int **ip1_m);
-  int C_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t, int tlift);
-  int C_genab_5004(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t);
   int C_load_toctoc(VGD_TFSTD_ext var, int key);
   int c_table_update();
   int c_vgrid_genab_5005(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double **ptop_out_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t, float dhm, float dht);
@@ -277,6 +258,10 @@ protected:
   float c_convip_IP2Level(int IP,int *kind);
   void decode_HY(VGD_TFSTD_ext var, double *ptop_8, double *pref_8, float *rcoef);
   double c_comp_diag_a_ip1(double pref_8, int ip1);
+
+  // Most subclasses have a private C_genab method, but the arguments are diffent for each one
+  // (Therefore, do not define the interface here.)
+  // virtual C_genab()
 };
 
 #endif // VGRID_H

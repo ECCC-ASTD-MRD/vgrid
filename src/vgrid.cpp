@@ -4443,52 +4443,52 @@ int vgrid::c_encode_vert_21002(char update){
 //   return(VGD_OK);  
 
 // }
-int vgrid::C_genab_1001(float *hyb, int nk, double **a_m_8, double **b_m_8, int **ip1_m)
-{
+// int vgrid::C_genab_1001(float *hyb, int nk, double **a_m_8, double **b_m_8, int **ip1_m)
+// {
 
-  // Andre Plante May 2015. 
-  char ok = 1;
-  int k,ip1, kind;
-  float f_one=1.f;
+//   // Andre Plante May 2015. 
+//   char ok = 1;
+//   int k,ip1, kind;
+//   float f_one=1.f;
 
-  if( my_alloc_double(a_m_8, nk, "(Cvgd) ERROR in C_genab_1001, malloc error with a_m_8") == VGD_ERROR )
-    return(VGD_ERROR);
-  if( my_alloc_double(b_m_8, nk, "(Cvgd) ERROR in C_genab_1001, malloc error with b_m_8") == VGD_ERROR )
-    return(VGD_ERROR);
-  if( my_alloc_int   (ip1_m, nk, "(Cvgd) ERROR in C_genab_1001, malloc error with ip1_m") == VGD_ERROR )
-    return(VGD_ERROR);
+//   if( my_alloc_double(a_m_8, nk, "(Cvgd) ERROR in C_genab_1001, malloc error with a_m_8") == VGD_ERROR )
+//     return(VGD_ERROR);
+//   if( my_alloc_double(b_m_8, nk, "(Cvgd) ERROR in C_genab_1001, malloc error with b_m_8") == VGD_ERROR )
+//     return(VGD_ERROR);
+//   if( my_alloc_int   (ip1_m, nk, "(Cvgd) ERROR in C_genab_1001, malloc error with ip1_m") == VGD_ERROR )
+//     return(VGD_ERROR);
   
-  if( memcmp( &(hyb[nk-1]), &f_one, sizeof(float)/sizeof(char)) ){
-    printf("WRONG SPECIFICATION OF SIGMA VERTICAL LEVELS: SIGMA(NK) MUST BE 1.0\n");
-    ok=0;
-  }
-  //Check monotonicity
-  for ( k = 1; k < nk; k++){
-    if(hyb[k] <= hyb[k-1]){
-      printf("WRONG SPECIFICATION OF SIGMA VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n");
-      ok=0;
-      break;
-    }
-  }
-  if(! ok){
-    printf("   Current choice:\n");
-    for ( k = 0; k < nk; k++){
-      printf("   %f\n", hyb[k]);
-    }
-    return(VGD_ERROR);
-  }
+//   if( memcmp( &(hyb[nk-1]), &f_one, sizeof(float)/sizeof(char)) ){
+//     printf("WRONG SPECIFICATION OF SIGMA VERTICAL LEVELS: SIGMA(NK) MUST BE 1.0\n");
+//     ok=0;
+//   }
+//   //Check monotonicity
+//   for ( k = 1; k < nk; k++){
+//     if(hyb[k] <= hyb[k-1]){
+//       printf("WRONG SPECIFICATION OF SIGMA VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n");
+//       ok=0;
+//       break;
+//     }
+//   }
+//   if(! ok){
+//     printf("   Current choice:\n");
+//     for ( k = 0; k < nk; k++){
+//       printf("   %f\n", hyb[k]);
+//     }
+//     return(VGD_ERROR);
+//   }
 
-  for ( k = 0; k < nk; k++){
-    (*a_m_8)[k]=0.;
-    // Go back and forth to ip1 in order to make sure hyb value is encodable.
-    ip1 = c_convip_Level2IP_old_style(hyb[k],1);
-    (*b_m_8)[k] = (double) c_convip_IP2Level(ip1,&kind);
-    (*ip1_m)[k] = ip1;
-  }
+//   for ( k = 0; k < nk; k++){
+//     (*a_m_8)[k]=0.;
+//     // Go back and forth to ip1 in order to make sure hyb value is encodable.
+//     ip1 = c_convip_Level2IP_old_style(hyb[k],1);
+//     (*b_m_8)[k] = (double) c_convip_IP2Level(ip1,&kind);
+//     (*ip1_m)[k] = ip1;
+//   }
 
-  return(VGD_OK);
+//   return(VGD_OK);
   
-}
+// }
 
 int vgrid::Cvgd_new_from_table(double *table, int ni, int nj, int nk) {
   int table_size, i;
@@ -4610,589 +4610,589 @@ int vgrid::Cvgd_new_from_table(double *table, int ni, int nj, int nk) {
   return(VGD_OK);
 }
 
-int vgrid::C_genab_1002(float *etauser, int nk, double *ptop_8, double **a_m_8, double **b_m_8, int **ip1_m)
-{
-  // Andre Plante May 2015.   
-  char ok=1;
-  int k;
+// int vgrid::C_genab_1002(float *etauser, int nk, double *ptop_8, double **a_m_8, double **b_m_8, int **ip1_m)
+// {
+//   // Andre Plante May 2015.   
+//   char ok=1;
+//   int k;
 
-  if( my_alloc_double(a_m_8, nk, "(Cvgd) ERROR in C_genab_1002, malloc error with a_m_8") == VGD_ERROR )
-    return(VGD_ERROR);
-  if( my_alloc_double(b_m_8, nk, "(Cvgd) ERROR in C_genab_1002, malloc error with b_m_8") == VGD_ERROR )
-    return(VGD_ERROR);
-  if( my_alloc_int   (ip1_m, nk, "(Cvgd) ERROR in C_genab_1002, malloc error with ip1_m") == VGD_ERROR )
-    return(VGD_ERROR);
+//   if( my_alloc_double(a_m_8, nk, "(Cvgd) ERROR in C_genab_1002, malloc error with a_m_8") == VGD_ERROR )
+//     return(VGD_ERROR);
+//   if( my_alloc_double(b_m_8, nk, "(Cvgd) ERROR in C_genab_1002, malloc error with b_m_8") == VGD_ERROR )
+//     return(VGD_ERROR);
+//   if( my_alloc_int   (ip1_m, nk, "(Cvgd) ERROR in C_genab_1002, malloc error with ip1_m") == VGD_ERROR )
+//     return(VGD_ERROR);
 
-  // For eta, relax the test on etauser[nk-1] != 1. to allow legacy construction of
-  // partial atmospheric levels. Some users just wanted the top half of the atmosphere and
-  // this test was making their call to vgrid to bomb. Since there is no more model
-  // using eta this is safe.
+//   // For eta, relax the test on etauser[nk-1] != 1. to allow legacy construction of
+//   // partial atmospheric levels. Some users just wanted the top half of the atmosphere and
+//   // this test was making their call to vgrid to bomb. Since there is no more model
+//   // using eta this is safe.
 
-  if(etauser[nk-1] > 1.){
-    printf("WRONG SPECIFICATION OF ETA VERTICAL LEVELS: ETA(NK-1) MUST BE LESS OR EQUAL TO 1.0\n");
-    ok=0;
-  }
-  //Check monotonicity
-  for ( k = 1; k < nk; k++){
-    if(etauser[k] <= etauser[k-1]){
-      printf(" WRONG SPECIFICATION OF ETA VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n");
-      ok=0;
-      break;
-    }
-  }
-  if(! ok){
-    printf("   Current choice:\n");
-    for ( k = 0; k < nk; k++){
-      printf("   %f\n", etauser[k]);
-    }
-    return(VGD_ERROR);
-  }
+//   if(etauser[nk-1] > 1.){
+//     printf("WRONG SPECIFICATION OF ETA VERTICAL LEVELS: ETA(NK-1) MUST BE LESS OR EQUAL TO 1.0\n");
+//     ok=0;
+//   }
+//   //Check monotonicity
+//   for ( k = 1; k < nk; k++){
+//     if(etauser[k] <= etauser[k-1]){
+//       printf(" WRONG SPECIFICATION OF ETA VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n");
+//       ok=0;
+//       break;
+//     }
+//   }
+//   if(! ok){
+//     printf("   Current choice:\n");
+//     for ( k = 0; k < nk; k++){
+//       printf("   %f\n", etauser[k]);
+//     }
+//     return(VGD_ERROR);
+//   }
 
-  if( *ptop_8 <= 0.) {
-    printf("(Cvgd) ERROR in C_genab_1002: ptop = %f must be greater than zero\n", *ptop_8);
-    return(VGD_ERROR);
-  }
+//   if( *ptop_8 <= 0.) {
+//     printf("(Cvgd) ERROR in C_genab_1002: ptop = %f must be greater than zero\n", *ptop_8);
+//     return(VGD_ERROR);
+//   }
 
-  int ip1, kind;
-  float eta;
-  for ( k = 0; k < nk; k++){
-    ip1 = c_convip_Level2IP_old_style(etauser[k],1);
-    eta = c_convip_IP2Level(ip1,&kind);
-    (*ip1_m)[k] = ip1;
-    (*a_m_8)[k] = (1. - eta) * (*ptop_8);
-    (*b_m_8)[k] = eta;
-  }
+//   int ip1, kind;
+//   float eta;
+//   for ( k = 0; k < nk; k++){
+//     ip1 = c_convip_Level2IP_old_style(etauser[k],1);
+//     eta = c_convip_IP2Level(ip1,&kind);
+//     (*ip1_m)[k] = ip1;
+//     (*a_m_8)[k] = (1. - eta) * (*ptop_8);
+//     (*b_m_8)[k] = eta;
+//   }
 
-  return(VGD_OK);
-}
+//   return(VGD_OK);
+// }
 
-int vgrid::C_genab_1003(float *hybuser, int nk, float rcoef, double ptop_8, double pref_8, double **a_m_8, double **b_m_8, int **ip1_m)
-{
-  // Andre Plante Sept 2017. 
-  char ok = 1;
-  int k;
-  int complete, ip1, kind;
-  float f_one=1.f, f_zero=0.f, pres;
-  double hybtop = ptop_8 / pref_8;
-  double hyb;
+// int vgrid::C_genab_1003(float *hybuser, int nk, float rcoef, double ptop_8, double pref_8, double **a_m_8, double **b_m_8, int **ip1_m)
+// {
+//   // Andre Plante Sept 2017. 
+//   char ok = 1;
+//   int k;
+//   int complete, ip1, kind;
+//   float f_one=1.f, f_zero=0.f, pres;
+//   double hybtop = ptop_8 / pref_8;
+//   double hyb;
    
-  ok = 1;
-  if( ptop_8 <= 0.) {
-    printf("(Cvgd) ERROR in C_genab_1003: ptop must be greater than zero, got %f\n", ptop_8);
-    return(VGD_ERROR);
-  }
-  if( memcmp( &(hybuser[nk-1]), &f_one, sizeof(float)/sizeof(char)) ){
-    printf("(Cvgd) ERROR in C_genab_1003: WRONG SPECIFICATION OF HYB VERTICAL LEVELS: HYB(NK) MUST BE 1.0, got %f\n",hybuser[nk-1]);
-    return(VGD_ERROR);
-  }
-  //Check monotonicity
-  for ( k = 1; k < nk; k++){
-    if(hybuser[k] <= hybuser[k-1]){
-      printf("(Cvgd) ERROR in C_genab_1003: WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n");
-      ok = 0;
-      break;
-    }
-  }
-  if(! ok){
-    printf("   Current choice:\n");
-    for ( k = 0; k < nk; k++){
-      printf("   %f\n", hybuser[k]);
-    }
-    return(VGD_ERROR);
-  }
+//   ok = 1;
+//   if( ptop_8 <= 0.) {
+//     printf("(Cvgd) ERROR in C_genab_1003: ptop must be greater than zero, got %f\n", ptop_8);
+//     return(VGD_ERROR);
+//   }
+//   if( memcmp( &(hybuser[nk-1]), &f_one, sizeof(float)/sizeof(char)) ){
+//     printf("(Cvgd) ERROR in C_genab_1003: WRONG SPECIFICATION OF HYB VERTICAL LEVELS: HYB(NK) MUST BE 1.0, got %f\n",hybuser[nk-1]);
+//     return(VGD_ERROR);
+//   }
+//   //Check monotonicity
+//   for ( k = 1; k < nk; k++){
+//     if(hybuser[k] <= hybuser[k-1]){
+//       printf("(Cvgd) ERROR in C_genab_1003: WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n");
+//       ok = 0;
+//       break;
+//     }
+//   }
+//   if(! ok){
+//     printf("   Current choice:\n");
+//     for ( k = 0; k < nk; k++){
+//       printf("   %f\n", hybuser[k]);
+//     }
+//     return(VGD_ERROR);
+//   }
 
-  if( my_alloc_double(a_m_8, nk, "(Cvgd) ERROR in C_genab_1003, malloc error with a_m_8") == VGD_ERROR )
-    return(VGD_ERROR);
-  if( my_alloc_double(b_m_8, nk, "(Cvgd) ERROR in C_genab_1003, malloc error with b_m_8") == VGD_ERROR )
-    return(VGD_ERROR);
-  if( my_alloc_int   (ip1_m, nk, "(Cvgd) ERROR in C_genab_1003, malloc error with ip1_m") == VGD_ERROR )
-    return(VGD_ERROR);
+//   if( my_alloc_double(a_m_8, nk, "(Cvgd) ERROR in C_genab_1003, malloc error with a_m_8") == VGD_ERROR )
+//     return(VGD_ERROR);
+//   if( my_alloc_double(b_m_8, nk, "(Cvgd) ERROR in C_genab_1003, malloc error with b_m_8") == VGD_ERROR )
+//     return(VGD_ERROR);
+//   if( my_alloc_int   (ip1_m, nk, "(Cvgd) ERROR in C_genab_1003, malloc error with ip1_m") == VGD_ERROR )
+//     return(VGD_ERROR);
 
-  for( k=0; k < nk; k++){
-    // Denormalised hyb to compute A and B
-    ip1 = c_convip_Level2IP_old_style( (float) hybuser[k], 1);
-    pres = c_convip_IP2Level(ip1, &kind);
-    (*ip1_m)[k] = ip1;
-    hyb = pres + ( 1. - pres ) * ptop_8/pref_8;
-    if( k == 0){
-      if( memcmp( &(hybuser[k]), &f_zero, sizeof(float)/sizeof(char)) ){
-	// Complete set
-	complete = 1;
-	hybtop = hyb;
-      } else {
-	// Incomplete set
-	complete = 0;
-	hybtop = ptop_8/pref_8;
-      }
-    }
-    if( complete && k == 0 ){
-      // Make sure B top is zero and  A is ptop
-      (*b_m_8)[k] = 0.;
-      (*a_m_8)[k] = ptop_8;
-    } else {
-      (*b_m_8)[k] = pow(( hyb - hybtop )/( 1. - hybtop ), rcoef);
-      (*a_m_8)[k] = pref_8 * ( hyb - (*b_m_8)[k] );
-    }
-  }
+//   for( k=0; k < nk; k++){
+//     // Denormalised hyb to compute A and B
+//     ip1 = c_convip_Level2IP_old_style( (float) hybuser[k], 1);
+//     pres = c_convip_IP2Level(ip1, &kind);
+//     (*ip1_m)[k] = ip1;
+//     hyb = pres + ( 1. - pres ) * ptop_8/pref_8;
+//     if( k == 0){
+//       if( memcmp( &(hybuser[k]), &f_zero, sizeof(float)/sizeof(char)) ){
+// 	// Complete set
+// 	complete = 1;
+// 	hybtop = hyb;
+//       } else {
+// 	// Incomplete set
+// 	complete = 0;
+// 	hybtop = ptop_8/pref_8;
+//       }
+//     }
+//     if( complete && k == 0 ){
+//       // Make sure B top is zero and  A is ptop
+//       (*b_m_8)[k] = 0.;
+//       (*a_m_8)[k] = ptop_8;
+//     } else {
+//       (*b_m_8)[k] = pow(( hyb - hybtop )/( 1. - hybtop ), rcoef);
+//       (*a_m_8)[k] = pref_8 * ( hyb - (*b_m_8)[k] );
+//     }
+//   }
 
-  return(VGD_OK);
-}
+//   return(VGD_OK);
+// }
   
-int vgrid::C_genab_2001(float *pres, int nk, double **a_m_8, double **b_m_8, int **ip1_m)
-{
+// int vgrid::C_genab_2001(float *pres, int nk, double **a_m_8, double **b_m_8, int **ip1_m)
+// {
 
-  // Andre Plante May 2015. 
-  char ok = 1;
-  int k;
+//   // Andre Plante May 2015. 
+//   char ok = 1;
+//   int k;
   
-  if( my_alloc_double(a_m_8, nk, "(Cvgd) ERROR in C_genab_2001, malloc error with a_m_8") == VGD_ERROR )
-    return(VGD_ERROR);
-  if( my_alloc_double(b_m_8, nk, "(Cvgd) ERROR in C_genab_2001, malloc error with b_m_8") == VGD_ERROR )
-    return(VGD_ERROR);
-  if( my_alloc_int   (ip1_m, nk, "(Cvgd) ERROR in C_genab_2001, malloc error with ip1_m") == VGD_ERROR )
-    return(VGD_ERROR);
+//   if( my_alloc_double(a_m_8, nk, "(Cvgd) ERROR in C_genab_2001, malloc error with a_m_8") == VGD_ERROR )
+//     return(VGD_ERROR);
+//   if( my_alloc_double(b_m_8, nk, "(Cvgd) ERROR in C_genab_2001, malloc error with b_m_8") == VGD_ERROR )
+//     return(VGD_ERROR);
+//   if( my_alloc_int   (ip1_m, nk, "(Cvgd) ERROR in C_genab_2001, malloc error with ip1_m") == VGD_ERROR )
+//     return(VGD_ERROR);
   
-  //Check monotonicity
-  for ( k = 1; k < nk; k++){
-    if(pres[k] <= pres[k-1]){
-      printf("WRONG SPECIFICATION OF PRESSURE VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n");
-      ok=0;
-      break;
-    }
-  }
-  if(! ok){
-    printf("   Current choice:\n");
-    for ( k = 0; k < nk; k++){
-      printf("   %f\n", pres[k]);
-    }
-    return(VGD_ERROR);
-  }
+//   //Check monotonicity
+//   for ( k = 1; k < nk; k++){
+//     if(pres[k] <= pres[k-1]){
+//       printf("WRONG SPECIFICATION OF PRESSURE VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n");
+//       ok=0;
+//       break;
+//     }
+//   }
+//   if(! ok){
+//     printf("   Current choice:\n");
+//     for ( k = 0; k < nk; k++){
+//       printf("   %f\n", pres[k]);
+//     }
+//     return(VGD_ERROR);
+//   }
 
-  for ( k = 0; k < nk; k++){
-    (*a_m_8)[k] = pres[k] * 100.;
-    (*b_m_8)[k] = 0.;
-    // Go back and forth to ip1 in order to make sure pres value is encodable.
-    (*ip1_m)[k] = c_convip_Level2IP(pres[k],2);
-  }
+//   for ( k = 0; k < nk; k++){
+//     (*a_m_8)[k] = pres[k] * 100.;
+//     (*b_m_8)[k] = 0.;
+//     // Go back and forth to ip1 in order to make sure pres value is encodable.
+//     (*ip1_m)[k] = c_convip_Level2IP(pres[k],2);
+//   }
 
-  return(VGD_OK);
+//   return(VGD_OK);
   
-}
+// }
 
-int vgrid::C_genab_4001(float *hgts, int nk, double **a_m_8, double **b_m_8, int **ip1_m)
-{
+// int vgrid::C_genab_4001(float *hgts, int nk, double **a_m_8, double **b_m_8, int **ip1_m)
+// {
 
-  // Andre Plante May 2018.
-  char ok = 1;
-  int k;
+//   // Andre Plante May 2018.
+//   char ok = 1;
+//   int k;
   
-  if( my_alloc_double(a_m_8, nk, "(Cvgd) ERROR in C_genab_4001, malloc error with a_m_8") == VGD_ERROR )
-    return(VGD_ERROR);
-  if( my_alloc_double(b_m_8, nk, "(Cvgd) ERROR in C_genab_4001, malloc error with b_m_8") == VGD_ERROR )
-    return(VGD_ERROR);
-  if( my_alloc_int   (ip1_m, nk, "(Cvgd) ERROR in C_genab_4001, malloc error with ip1_m") == VGD_ERROR )
-    return(VGD_ERROR);
+//   if( my_alloc_double(a_m_8, nk, "(Cvgd) ERROR in C_genab_4001, malloc error with a_m_8") == VGD_ERROR )
+//     return(VGD_ERROR);
+//   if( my_alloc_double(b_m_8, nk, "(Cvgd) ERROR in C_genab_4001, malloc error with b_m_8") == VGD_ERROR )
+//     return(VGD_ERROR);
+//   if( my_alloc_int   (ip1_m, nk, "(Cvgd) ERROR in C_genab_4001, malloc error with ip1_m") == VGD_ERROR )
+//     return(VGD_ERROR);
   
-  //Check monotonicity
-  for ( k = 1; k < nk; k++){
-    if(hgts[k] <= hgts[k-1]){
-      printf("WRONG SPECIFICATION OF HEIGHTS VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n");
-      ok=0;
-      break;
-    }
-  }
-  if ( hgts[0] < 0. ){
-    printf("WRONG SPECIFICATION OF HEIGHTS VERTICAL LEVELS: LEVELS must be positive\n");
-    ok=0;
-  }
-  if(! ok){
-    printf("   Current choice:\n");
-    for ( k = 0; k < nk; k++){
-      printf("   %f\n", hgts[k]);
-    }
-    return(VGD_ERROR);
-  }
+//   //Check monotonicity
+//   for ( k = 1; k < nk; k++){
+//     if(hgts[k] <= hgts[k-1]){
+//       printf("WRONG SPECIFICATION OF HEIGHTS VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n");
+//       ok=0;
+//       break;
+//     }
+//   }
+//   if ( hgts[0] < 0. ){
+//     printf("WRONG SPECIFICATION OF HEIGHTS VERTICAL LEVELS: LEVELS must be positive\n");
+//     ok=0;
+//   }
+//   if(! ok){
+//     printf("   Current choice:\n");
+//     for ( k = 0; k < nk; k++){
+//       printf("   %f\n", hgts[k]);
+//     }
+//     return(VGD_ERROR);
+//   }
 
-  for ( k = 0; k < nk; k++){
-    (*a_m_8)[k] = hgts[k];
-    (*b_m_8)[k] = 0.;
-    (*ip1_m)[k] = c_convip_Level2IP(hgts[k],4);
-  }
+//   for ( k = 0; k < nk; k++){
+//     (*a_m_8)[k] = hgts[k];
+//     (*b_m_8)[k] = 0.;
+//     (*ip1_m)[k] = c_convip_Level2IP(hgts[k],4);
+//   }
 
-  return(VGD_OK);
+//   return(VGD_OK);
   
-}
+// }
 
-int vgrid::C_genab_5001(float *hybuser, int nk, float rcoef, double ptop_8, double pref_8, double **a_m_8, double **b_m_8, int **ip1_m)
-{
-  // Andre Plante May 2015. 
-  char ok = 1;
-  int k;
-  int complet, ip1, kind;
-  float epsilon=1.0e-6, f_one=1.f;
-  double hybtop = ptop_8 / pref_8;
-  double hyb, pr1;
+// int vgrid::C_genab_5001(float *hybuser, int nk, float rcoef, double ptop_8, double pref_8, double **a_m_8, double **b_m_8, int **ip1_m)
+// {
+//   // Andre Plante May 2015. 
+//   char ok = 1;
+//   int k;
+//   int complet, ip1, kind;
+//   float epsilon=1.0e-6, f_one=1.f;
+//   double hybtop = ptop_8 / pref_8;
+//   double hyb, pr1;
    
-  if( my_alloc_double(a_m_8, nk, "(Cvgd) ERROR in C_genab_5001, malloc error with a_m_8") == VGD_ERROR )
-    return(VGD_ERROR);
-  if( my_alloc_double(b_m_8, nk, "(Cvgd) ERROR in C_genab_5001, malloc error with b_m_8") == VGD_ERROR )
-    return(VGD_ERROR);
-  if( my_alloc_int   (ip1_m, nk, "(Cvgd) ERROR in C_genab_5001, malloc error with ip1_m") == VGD_ERROR )
-    return(VGD_ERROR);
+//   if( my_alloc_double(a_m_8, nk, "(Cvgd) ERROR in C_genab_5001, malloc error with a_m_8") == VGD_ERROR )
+//     return(VGD_ERROR);
+//   if( my_alloc_double(b_m_8, nk, "(Cvgd) ERROR in C_genab_5001, malloc error with b_m_8") == VGD_ERROR )
+//     return(VGD_ERROR);
+//   if( my_alloc_int   (ip1_m, nk, "(Cvgd) ERROR in C_genab_5001, malloc error with ip1_m") == VGD_ERROR )
+//     return(VGD_ERROR);
 
-  if( memcmp( &(hybuser[nk-1]), &f_one, sizeof(float)/sizeof(char)) ){
-    printf("WRONG SPECIFICATION OF HYB VERTICAL LEVELS: HYB(NK) MUST BE 1.0\n");
-    ok=0;
-  }
-  //Check monotonicity
-  for ( k = 1; k < nk; k++){
-    if(hybuser[k] <= hybuser[k-1]){
-      printf(" WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n");
-      ok=0;
-      break;
-    }
-  }
-  if(! ok){
-    printf("   Current choice:\n");
-    for ( k = 0; k < nk; k++){
-      printf("   %f\n", hybuser[k]);
-    }
-    return(VGD_ERROR);
-  }
+//   if( memcmp( &(hybuser[nk-1]), &f_one, sizeof(float)/sizeof(char)) ){
+//     printf("WRONG SPECIFICATION OF HYB VERTICAL LEVELS: HYB(NK) MUST BE 1.0\n");
+//     ok=0;
+//   }
+//   //Check monotonicity
+//   for ( k = 1; k < nk; k++){
+//     if(hybuser[k] <= hybuser[k-1]){
+//       printf(" WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n");
+//       ok=0;
+//       break;
+//     }
+//   }
+//   if(! ok){
+//     printf("   Current choice:\n");
+//     for ( k = 0; k < nk; k++){
+//       printf("   %f\n", hybuser[k]);
+//     }
+//     return(VGD_ERROR);
+//   }
 
-  if( ptop_8 <= 0.) {
-    printf("(Cvgd) ERROR in C_genab_5001: ptop = %f must be greater than zero\n", ptop_8);
-    return(VGD_ERROR);
-  }
+//   if( ptop_8 <= 0.) {
+//     printf("(Cvgd) ERROR in C_genab_5001: ptop = %f must be greater than zero\n", ptop_8);
+//     return(VGD_ERROR);
+//   }
 
-  if( ( ptop_8 - (double)hybuser[0] * pref_8 ) / ptop_8 > epsilon ) {
-    printf("(Cvgd) ERROR in C_genab_5001: ptop = %f is lower than first hyb level = %f\n", ptop_8, (double)hybuser[0]*pref_8);
-    return(VGD_ERROR);
-  }
+//   if( ( ptop_8 - (double)hybuser[0] * pref_8 ) / ptop_8 > epsilon ) {
+//     printf("(Cvgd) ERROR in C_genab_5001: ptop = %f is lower than first hyb level = %f\n", ptop_8, (double)hybuser[0]*pref_8);
+//     return(VGD_ERROR);
+//   }
 
-  ip1 = c_convip_Level2IP( (float) hybtop, 5);
-  hybtop = (double) c_convip_IP2Level(ip1,&kind);
-  pr1 = 1./(1.-hybtop);
+//   ip1 = c_convip_Level2IP( (float) hybtop, 5);
+//   hybtop = (double) c_convip_IP2Level(ip1,&kind);
+//   pr1 = 1./(1.-hybtop);
   
-  // Find out if first level is at top
+//   // Find out if first level is at top
   
-  if( fabs( ptop_8 - (double)hybuser[0] * pref_8 ) / ptop_8 < epsilon) {
-    complet = 1;
-  } else{
-    printf("(Cvgd) NOTE: First hyb level is not at model top\n");
-    complet = 0;
-  }
+//   if( fabs( ptop_8 - (double)hybuser[0] * pref_8 ) / ptop_8 < epsilon) {
+//     complet = 1;
+//   } else{
+//     printf("(Cvgd) NOTE: First hyb level is not at model top\n");
+//     complet = 0;
+//   }
 
-  for ( k = 0; k < nk; k++){
-    ip1 = c_convip_Level2IP(hybuser[k],5);
-    hyb = (double)c_convip_IP2Level(ip1,&kind);
-    (*ip1_m)[k] = ip1;
-    (*b_m_8)[k] = pow( (hyb - hybtop) * pr1, rcoef);
-    (*a_m_8)[k] = pref_8 * ( hyb - (*b_m_8)[k] );
-  }
-  if(complet) {
-    (*b_m_8)[0] = 0.;
-    (*a_m_8)[0] = ptop_8;
-  }
+//   for ( k = 0; k < nk; k++){
+//     ip1 = c_convip_Level2IP(hybuser[k],5);
+//     hyb = (double)c_convip_IP2Level(ip1,&kind);
+//     (*ip1_m)[k] = ip1;
+//     (*b_m_8)[k] = pow( (hyb - hybtop) * pr1, rcoef);
+//     (*a_m_8)[k] = pref_8 * ( hyb - (*b_m_8)[k] );
+//   }
+//   if(complet) {
+//     (*b_m_8)[0] = 0.;
+//     (*a_m_8)[0] = ptop_8;
+//   }
     
-  return(VGD_OK);
-}
+//   return(VGD_OK);
+// }
 
-int vgrid::C_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t, int tlift)
-{
-  // Andre Plante May 2015.
+// int vgrid::C_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t, int tlift)
+// {
+//   // Andre Plante May 2015.
   
-  // Processing option
-  if( ! ( tlift == 0 || tlift == 1 ) ){
-    printf("(Cvgd) ERROR in C_genab_5002_5003, wrong value given to tlift, expecting 0 (for false) or 1 (for true), got %d\n",tlift);
-    fflush(stdout);
-    return(VGD_ERROR);
-  }
+//   // Processing option
+//   if( ! ( tlift == 0 || tlift == 1 ) ){
+//     printf("(Cvgd) ERROR in C_genab_5002_5003, wrong value given to tlift, expecting 0 (for false) or 1 (for true), got %d\n",tlift);
+//     fflush(stdout);
+//     return(VGD_ERROR);
+//   }
 
-  // Define local pointers pointing to "pointer to pointer" to simplify equation below
-  double *a_m_8, *b_m_8, *a_t_8, *b_t_8;
-  int *ip1_m, *ip1_t;
+//   // Define local pointers pointing to "pointer to pointer" to simplify equation below
+//   double *a_m_8, *b_m_8, *a_t_8, *b_t_8;
+//   int *ip1_m, *ip1_t;
     
-  char ok = 1;
-  int k;
-  float hybtop, rcoef;
-  double zsrf_8, ztop_8, zeta_8, lamba_8, pr1;  
+//   char ok = 1;
+//   int k;
+//   float hybtop, rcoef;
+//   double zsrf_8, ztop_8, zeta_8, lamba_8, pr1;  
   
-  *nl_m = nk + 1;
-  *nl_t = nk + 2;
+//   *nl_m = nk + 1;
+//   *nl_t = nk + 2;
 
-  *PP_a_m_8 = (double*)malloc( (*nl_m)*sizeof(double) );
-  if(! *PP_a_m_8){
-    printf("(Cvgd) ERROR in C_genab_5002_5003, malloc error with *PP_a_m_8\n");
-    return(VGD_ERROR);
-  }
-  *PP_b_m_8 = (double*)malloc( (*nl_m)*sizeof(double) );
-  if(! *PP_b_m_8){
-    printf("(Cvgd) ERROR in C_genab_5002_5003, malloc error with *PP_b_m_8\n");
-    return(VGD_ERROR);
-  }
-  *PP_ip1_m = (int*)malloc( (*nl_m)*sizeof(int) );
-  if(! *PP_ip1_m){
-    printf("(Cvgd) ERROR in C_genab_5002_5003, malloc error with *PP_ip1_m\n");
-    return(VGD_ERROR);
-  }
-  *PP_a_t_8 = (double*)malloc( (*nl_t)*sizeof(double) );
-  if(! *PP_a_t_8){
-    printf("(Cvgd) ERROR in C_genab_5002_5003, malloc error with *PP_a_t_8\n");
-    return(VGD_ERROR);
-  }
-  *PP_b_t_8 = (double*)malloc( (*nl_t)*sizeof(double) );
-  if(! *PP_b_t_8){
-    printf("(Cvgd) ERROR in C_genab_5002_5003, malloc error with *PP_b_t_8\n");
-    return(VGD_ERROR);
-  }
-  *PP_ip1_t = (int*)malloc( (*nl_t)*sizeof(int) );
-  if(! *PP_ip1_t){
-    printf("(Cvgd) ERROR in C_genab_5002_5003, malloc error with *PP_ip1_t\n");
-    return(VGD_ERROR);
-  }
+//   *PP_a_m_8 = (double*)malloc( (*nl_m)*sizeof(double) );
+//   if(! *PP_a_m_8){
+//     printf("(Cvgd) ERROR in C_genab_5002_5003, malloc error with *PP_a_m_8\n");
+//     return(VGD_ERROR);
+//   }
+//   *PP_b_m_8 = (double*)malloc( (*nl_m)*sizeof(double) );
+//   if(! *PP_b_m_8){
+//     printf("(Cvgd) ERROR in C_genab_5002_5003, malloc error with *PP_b_m_8\n");
+//     return(VGD_ERROR);
+//   }
+//   *PP_ip1_m = (int*)malloc( (*nl_m)*sizeof(int) );
+//   if(! *PP_ip1_m){
+//     printf("(Cvgd) ERROR in C_genab_5002_5003, malloc error with *PP_ip1_m\n");
+//     return(VGD_ERROR);
+//   }
+//   *PP_a_t_8 = (double*)malloc( (*nl_t)*sizeof(double) );
+//   if(! *PP_a_t_8){
+//     printf("(Cvgd) ERROR in C_genab_5002_5003, malloc error with *PP_a_t_8\n");
+//     return(VGD_ERROR);
+//   }
+//   *PP_b_t_8 = (double*)malloc( (*nl_t)*sizeof(double) );
+//   if(! *PP_b_t_8){
+//     printf("(Cvgd) ERROR in C_genab_5002_5003, malloc error with *PP_b_t_8\n");
+//     return(VGD_ERROR);
+//   }
+//   *PP_ip1_t = (int*)malloc( (*nl_t)*sizeof(int) );
+//   if(! *PP_ip1_t){
+//     printf("(Cvgd) ERROR in C_genab_5002_5003, malloc error with *PP_ip1_t\n");
+//     return(VGD_ERROR);
+//   }
 
-  a_m_8 = *PP_a_m_8;
-  b_m_8 = *PP_b_m_8;
-  ip1_m = *PP_ip1_m;
-  a_t_8 = *PP_a_t_8;
-  b_t_8 = *PP_b_t_8;
-  ip1_t = *PP_ip1_t;
+//   a_m_8 = *PP_a_m_8;
+//   b_m_8 = *PP_b_m_8;
+//   ip1_m = *PP_ip1_m;
+//   a_t_8 = *PP_a_t_8;
+//   b_t_8 = *PP_b_t_8;
+//   ip1_t = *PP_ip1_t;
 
-  zsrf_8  = log(pref_8);
-  if ( ptop_8 <= 0. ) {
-    printf("(Cvgd) ERROR in C_genab_5002_5003: ptop_8 must be > 0, got %f\n", ptop_8);
-    fflush(stdout);
-    return(VGD_ERROR);
-  }
-  ztop_8  = log(ptop_8);
+//   zsrf_8  = log(pref_8);
+//   if ( ptop_8 <= 0. ) {
+//     printf("(Cvgd) ERROR in C_genab_5002_5003: ptop_8 must be > 0, got %f\n", ptop_8);
+//     fflush(stdout);
+//     return(VGD_ERROR);
+//   }
+//   ztop_8  = log(ptop_8);
 
-  // Checking vertical layering
+//   // Checking vertical layering
 
-  //    Check range
-  hybtop = (float) (ptop_8 / pref_8);
-  if( hybuser[nk-1] >= 1. ) {
-    printf("(Cvgd) ERROR in C_genab_5002_5003: hyb must be < 1.0, got %f\n", hybuser[nk-1]);
-    fflush(stdout);
-    return(VGD_ERROR);
-  }
-  if( hybuser[0] <= hybtop ) {
-    printf("(Cvgd) ERROR in C_genab_5002_5003: hyb must be > %f, got %f\n", hybtop, hybuser[0]);
-    fflush(stdout);
-    return(VGD_ERROR);
-  }
+//   //    Check range
+//   hybtop = (float) (ptop_8 / pref_8);
+//   if( hybuser[nk-1] >= 1. ) {
+//     printf("(Cvgd) ERROR in C_genab_5002_5003: hyb must be < 1.0, got %f\n", hybuser[nk-1]);
+//     fflush(stdout);
+//     return(VGD_ERROR);
+//   }
+//   if( hybuser[0] <= hybtop ) {
+//     printf("(Cvgd) ERROR in C_genab_5002_5003: hyb must be > %f, got %f\n", hybtop, hybuser[0]);
+//     fflush(stdout);
+//     return(VGD_ERROR);
+//   }
 
-  //Check monotonicity
-  for ( k = 1; k < nk; k++){
-    if(hybuser[k] <= hybuser[k-1]){
-      printf(" WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n");
-      ok=0;
-      break;
-    }
-  }
-  if(! ok){
-    printf("   Current choice:\n");
-    for ( k = 0; k < nk; k++){
-      printf("   %f\n", hybuser[k]);
-    }
-    fflush(stdout);
-    return(VGD_ERROR);
-  }
+//   //Check monotonicity
+//   for ( k = 1; k < nk; k++){
+//     if(hybuser[k] <= hybuser[k-1]){
+//       printf(" WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n");
+//       ok=0;
+//       break;
+//     }
+//   }
+//   if(! ok){
+//     printf("   Current choice:\n");
+//     for ( k = 0; k < nk; k++){
+//       printf("   %f\n", hybuser[k]);
+//     }
+//     fflush(stdout);
+//     return(VGD_ERROR);
+//   }
 
-  // Momentum levels
-  pr1 = 1. / (zsrf_8 - ztop_8);
-  for( k = 0; k < nk; k++ ) {
-    zeta_8  = zsrf_8 + log((double)hybuser[k]);
-    lamba_8  = ( zeta_8 - ztop_8 ) * pr1;
-    rcoef  = (float) (rcoef2 - ( rcoef2 - rcoef1 ) * lamba_8);
-    b_m_8[k] = pow(lamba_8, rcoef);
-    a_m_8[k] = zeta_8;
-  }
-  a_m_8[nk] = zsrf_8;
-  b_m_8[nk] = 1.;
+//   // Momentum levels
+//   pr1 = 1. / (zsrf_8 - ztop_8);
+//   for( k = 0; k < nk; k++ ) {
+//     zeta_8  = zsrf_8 + log((double)hybuser[k]);
+//     lamba_8  = ( zeta_8 - ztop_8 ) * pr1;
+//     rcoef  = (float) (rcoef2 - ( rcoef2 - rcoef1 ) * lamba_8);
+//     b_m_8[k] = pow(lamba_8, rcoef);
+//     a_m_8[k] = zeta_8;
+//   }
+//   a_m_8[nk] = zsrf_8;
+//   b_m_8[nk] = 1.;
 
-  // Thermodynamic levels    
-  for( k = 1; k < nk; k++ ) {
-    b_t_8[k] = 0.5 * ( b_m_8[k] + b_m_8[k-1] );
-    a_t_8[k] = 0.5 * ( a_m_8[k] + a_m_8[k-1] );
-  }
-  // Special thermo levels
-  b_t_8[0]    = 0.5 * ( b_m_8[0]    + 0.    );
-  b_t_8[nk]   = 0.5 * ( b_m_8[nk-1] + 1.    );
-  b_t_8[nk+1] = 1.;
-  a_t_8[0]    = 0.5 * ( a_m_8[0]    + ztop_8);
-  a_t_8[nk]   = 0.5 * ( a_m_8[nk-1] + zsrf_8);
-  a_t_8[nk+1] = zsrf_8;
+//   // Thermodynamic levels    
+//   for( k = 1; k < nk; k++ ) {
+//     b_t_8[k] = 0.5 * ( b_m_8[k] + b_m_8[k-1] );
+//     a_t_8[k] = 0.5 * ( a_m_8[k] + a_m_8[k-1] );
+//   }
+//   // Special thermo levels
+//   b_t_8[0]    = 0.5 * ( b_m_8[0]    + 0.    );
+//   b_t_8[nk]   = 0.5 * ( b_m_8[nk-1] + 1.    );
+//   b_t_8[nk+1] = 1.;
+//   a_t_8[0]    = 0.5 * ( a_m_8[0]    + ztop_8);
+//   a_t_8[nk]   = 0.5 * ( a_m_8[nk-1] + zsrf_8);
+//   a_t_8[nk+1] = zsrf_8;
 
-  if( tlift ){
-    a_t_8[nk]   = a_m_8[nk-1];
-    b_t_8[nk]   = b_m_8[nk-1];
-  }
+//   if( tlift ){
+//     a_t_8[nk]   = a_m_8[nk-1];
+//     b_t_8[nk]   = b_m_8[nk-1];
+//   }
 
-  // Compute ip1 values
-  for(k = 0; k < nk; k++ ) {
-    ip1_m[k] = c_convip_Level2IP(hybuser[k],5);
-  }
-  ip1_m[nk] = c_convip_Level2IP(1.,5);
+//   // Compute ip1 values
+//   for(k = 0; k < nk; k++ ) {
+//     ip1_m[k] = c_convip_Level2IP(hybuser[k],5);
+//   }
+//   ip1_m[nk] = c_convip_Level2IP(1.,5);
   
-  ip1_t[0]    = c_convip_Level2IP( sqrtf( hybtop     * hybuser[0]   ), 5 );
-  for(k = 1; k < nk; k++ ) {
-    ip1_t[k]  = c_convip_Level2IP( sqrtf( hybuser[k] * hybuser[k-1] ), 5 );
-  }
-  if( tlift ){
-    ip1_t[nk]   = c_convip_Level2IP( hybuser[nk-1] , 5 );
-  } else {
-    ip1_t[nk]   = c_convip_Level2IP( sqrtf( hybuser[nk-1]*1.0f ), 5 );
-  }
-  ip1_t[nk+1] = c_convip_Level2IP(1.,5);
+//   ip1_t[0]    = c_convip_Level2IP( sqrtf( hybtop     * hybuser[0]   ), 5 );
+//   for(k = 1; k < nk; k++ ) {
+//     ip1_t[k]  = c_convip_Level2IP( sqrtf( hybuser[k] * hybuser[k-1] ), 5 );
+//   }
+//   if( tlift ){
+//     ip1_t[nk]   = c_convip_Level2IP( hybuser[nk-1] , 5 );
+//   } else {
+//     ip1_t[nk]   = c_convip_Level2IP( sqrtf( hybuser[nk-1]*1.0f ), 5 );
+//   }
+//   ip1_t[nk+1] = c_convip_Level2IP(1.,5);
   
-  return(VGD_OK);
+//   return(VGD_OK);
 
-}
+// }
 
-int vgrid::C_genab_5004(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t)
-{
-  // Andre Plante May 2015.
+// int vgrid::C_genab_5004(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t)
+// {
+//   // Andre Plante May 2015.
   
-  // Processing option
+//   // Processing option
 
-  // Define local pointers pointing to "pointer to pointer" to simplify equation below
-  double *a_m_8, *b_m_8, *a_t_8, *b_t_8;
-  int *ip1_m, *ip1_t;
+//   // Define local pointers pointing to "pointer to pointer" to simplify equation below
+//   double *a_m_8, *b_m_8, *a_t_8, *b_t_8;
+//   int *ip1_m, *ip1_t;
     
-  char ok = 1;
-  int k;
-  float hybtop, rcoef;
-  double zsrf_8, ztop_8, zeta_8, lamba_8, pr1, zetau_8, zeta2_8, l_ptop_8;  
+//   char ok = 1;
+//   int k;
+//   float hybtop, rcoef;
+//   double zsrf_8, ztop_8, zeta_8, lamba_8, pr1, zetau_8, zeta2_8, l_ptop_8;  
   
-  *nl_m = nk + 1;
-  *nl_t = nk + 1;
+//   *nl_m = nk + 1;
+//   *nl_t = nk + 1;
 
-  *PP_a_m_8 = (double*)malloc( (*nl_m)*sizeof(double) );
-  if(! *PP_a_m_8){
-    printf("(Cvgd) ERROR in C_genab_5004, malloc error with *PP_a_m_8\n");
-    return(VGD_ERROR);
-  }
-  *PP_b_m_8 = (double*)malloc( (*nl_m)*sizeof(double) );
-  if(! *PP_b_m_8){
-    printf("(Cvgd) ERROR in C_genab_5004, malloc error with *PP_b_m_8\n");
-    return(VGD_ERROR);
-  }
-  *PP_ip1_m = (int*)malloc( (*nl_m)*sizeof(int) );
-  if(! *PP_ip1_m){
-    printf("(Cvgd) ERROR in C_genab_5004, malloc error with *PP_ip1_m\n");
-    return(VGD_ERROR);
-  }
-  *PP_a_t_8 = (double*)malloc( (*nl_t)*sizeof(double) );
-  if(! *PP_a_t_8){
-    printf("(Cvgd) ERROR in C_genab_5004, malloc error with *PP_a_t_8\n");
-    return(VGD_ERROR);
-  }
-  *PP_b_t_8 = (double*)malloc( (*nl_t)*sizeof(double) );
-  if(! *PP_b_t_8){
-    printf("(Cvgd) ERROR in C_genab_5004, malloc error with *PP_b_t_8\n");
-    return(VGD_ERROR);
-  }
-  *PP_ip1_t = (int*)malloc( (*nl_t)*sizeof(int) );
-  if(! *PP_ip1_t){
-    printf("(Cvgd) ERROR in C_genab_5004, malloc error with *PP_ip1_t\n");
-    return(VGD_ERROR);
-  }
+//   *PP_a_m_8 = (double*)malloc( (*nl_m)*sizeof(double) );
+//   if(! *PP_a_m_8){
+//     printf("(Cvgd) ERROR in C_genab_5004, malloc error with *PP_a_m_8\n");
+//     return(VGD_ERROR);
+//   }
+//   *PP_b_m_8 = (double*)malloc( (*nl_m)*sizeof(double) );
+//   if(! *PP_b_m_8){
+//     printf("(Cvgd) ERROR in C_genab_5004, malloc error with *PP_b_m_8\n");
+//     return(VGD_ERROR);
+//   }
+//   *PP_ip1_m = (int*)malloc( (*nl_m)*sizeof(int) );
+//   if(! *PP_ip1_m){
+//     printf("(Cvgd) ERROR in C_genab_5004, malloc error with *PP_ip1_m\n");
+//     return(VGD_ERROR);
+//   }
+//   *PP_a_t_8 = (double*)malloc( (*nl_t)*sizeof(double) );
+//   if(! *PP_a_t_8){
+//     printf("(Cvgd) ERROR in C_genab_5004, malloc error with *PP_a_t_8\n");
+//     return(VGD_ERROR);
+//   }
+//   *PP_b_t_8 = (double*)malloc( (*nl_t)*sizeof(double) );
+//   if(! *PP_b_t_8){
+//     printf("(Cvgd) ERROR in C_genab_5004, malloc error with *PP_b_t_8\n");
+//     return(VGD_ERROR);
+//   }
+//   *PP_ip1_t = (int*)malloc( (*nl_t)*sizeof(int) );
+//   if(! *PP_ip1_t){
+//     printf("(Cvgd) ERROR in C_genab_5004, malloc error with *PP_ip1_t\n");
+//     return(VGD_ERROR);
+//   }
 
-  a_m_8 = *PP_a_m_8;
-  b_m_8 = *PP_b_m_8;
-  ip1_m = *PP_ip1_m;
-  a_t_8 = *PP_a_t_8;
-  b_t_8 = *PP_b_t_8;
-  ip1_t = *PP_ip1_t;
+//   a_m_8 = *PP_a_m_8;
+//   b_m_8 = *PP_b_m_8;
+//   ip1_m = *PP_ip1_m;
+//   a_t_8 = *PP_a_t_8;
+//   b_t_8 = *PP_b_t_8;
+//   ip1_t = *PP_ip1_t;
 
-  zsrf_8  = log(pref_8);
+//   zsrf_8  = log(pref_8);
 
-  if ( lrint(ptop_8) == -2 || lrint(ptop_8) == -1 ) {
-    // Auto compute ptop and make B(1) = 0
-    zetau_8 = zsrf_8 + log((double)hybuser[0]);
-    zeta2_8 = zsrf_8 + log((double)hybuser[1]);
-    ztop_8  = 0.5 * ( 3. * zetau_8 - zeta2_8);
-    l_ptop_8 = exp(ztop_8);
-    if( lrint(ptop_8) == -1 ) {
-      // Compute B(1) from ztop, B(1) != 0
-      zetau_8 = ztop_8;
-    }
-  } else if (ptop_8 <= 0.) {
-    printf("(Cvgd) ERROR in C_genab_5004: ptop_8 must be > 0, got %f\n",ptop_8);
-    return(VGD_ERROR);
-  } else {
-    // Take B(1) from user's ztop
-    l_ptop_8 = ptop_8;
-    ztop_8  = log(ptop_8);
-    zetau_8 = ztop_8;
-  }
+//   if ( lrint(ptop_8) == -2 || lrint(ptop_8) == -1 ) {
+//     // Auto compute ptop and make B(1) = 0
+//     zetau_8 = zsrf_8 + log((double)hybuser[0]);
+//     zeta2_8 = zsrf_8 + log((double)hybuser[1]);
+//     ztop_8  = 0.5 * ( 3. * zetau_8 - zeta2_8);
+//     l_ptop_8 = exp(ztop_8);
+//     if( lrint(ptop_8) == -1 ) {
+//       // Compute B(1) from ztop, B(1) != 0
+//       zetau_8 = ztop_8;
+//     }
+//   } else if (ptop_8 <= 0.) {
+//     printf("(Cvgd) ERROR in C_genab_5004: ptop_8 must be > 0, got %f\n",ptop_8);
+//     return(VGD_ERROR);
+//   } else {
+//     // Take B(1) from user's ztop
+//     l_ptop_8 = ptop_8;
+//     ztop_8  = log(ptop_8);
+//     zetau_8 = ztop_8;
+//   }
 
-  // Checking vertical layering
+//   // Checking vertical layering
 
-  //    Check range
-  hybtop = (float) (l_ptop_8 / pref_8);
-  if( hybuser[nk-1] >= 1. ) {
-    printf("(Cvgd) ERROR in C_genab_5004: hyb must be < 1.0, got %f\n", hybuser[nk-1]);
-    return(VGD_ERROR);
-  }
-  if( hybuser[0] <= hybtop ) {
-    printf("(Cvgd) ERROR in C_genab_5004: hyb must be > %f, got %f\n", hybtop, hybuser[0]);
-    return(VGD_ERROR);
-  }
+//   //    Check range
+//   hybtop = (float) (l_ptop_8 / pref_8);
+//   if( hybuser[nk-1] >= 1. ) {
+//     printf("(Cvgd) ERROR in C_genab_5004: hyb must be < 1.0, got %f\n", hybuser[nk-1]);
+//     return(VGD_ERROR);
+//   }
+//   if( hybuser[0] <= hybtop ) {
+//     printf("(Cvgd) ERROR in C_genab_5004: hyb must be > %f, got %f\n", hybtop, hybuser[0]);
+//     return(VGD_ERROR);
+//   }
 
-  //Check monotonicity
-  for ( k = 1; k < nk; k++){
-    if(hybuser[k] <= hybuser[k-1]){
-      printf(" WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n");
-      ok=0;
-      break;
-    }
-  }
-  if(! ok){
-    printf("   Current choice:\n");
-    for ( k = 0; k < nk; k++){
-      printf("   %f\n", hybuser[k]);
-    }
-    return(VGD_ERROR);
-  }
+//   //Check monotonicity
+//   for ( k = 1; k < nk; k++){
+//     if(hybuser[k] <= hybuser[k-1]){
+//       printf(" WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n");
+//       ok=0;
+//       break;
+//     }
+//   }
+//   if(! ok){
+//     printf("   Current choice:\n");
+//     for ( k = 0; k < nk; k++){
+//       printf("   %f\n", hybuser[k]);
+//     }
+//     return(VGD_ERROR);
+//   }
 
-  // Momentum levels
-  pr1 = 1. / (zsrf_8 - zetau_8);
-  for( k = 0; k < nk; k++ ) {
-    zeta_8  = zsrf_8 + log((double)hybuser[k]);
-    lamba_8  = ( zeta_8 - zetau_8 ) * pr1;
-    rcoef  = (float) (rcoef2 - ( rcoef2 - rcoef1 ) * lamba_8);
-    b_m_8[k] = pow(lamba_8, rcoef);
-    a_m_8[k] = zeta_8;
-  }
-  a_m_8[nk] = zsrf_8;
-  b_m_8[nk] = 1.;
+//   // Momentum levels
+//   pr1 = 1. / (zsrf_8 - zetau_8);
+//   for( k = 0; k < nk; k++ ) {
+//     zeta_8  = zsrf_8 + log((double)hybuser[k]);
+//     lamba_8  = ( zeta_8 - zetau_8 ) * pr1;
+//     rcoef  = (float) (rcoef2 - ( rcoef2 - rcoef1 ) * lamba_8);
+//     b_m_8[k] = pow(lamba_8, rcoef);
+//     a_m_8[k] = zeta_8;
+//   }
+//   a_m_8[nk] = zsrf_8;
+//   b_m_8[nk] = 1.;
 
-  // Thermodynamic levels    
-  for( k = 0; k < nk; k++ ) {
-    b_t_8[k] = 0.5 * ( b_m_8[k+1] + b_m_8[k] );
-    a_t_8[k] = 0.5 * ( a_m_8[k+1] + a_m_8[k] );
-  }
-  // Special thermo levels
-  b_t_8[nk] = 1.;
-  a_t_8[nk] = zsrf_8;
+//   // Thermodynamic levels    
+//   for( k = 0; k < nk; k++ ) {
+//     b_t_8[k] = 0.5 * ( b_m_8[k+1] + b_m_8[k] );
+//     a_t_8[k] = 0.5 * ( a_m_8[k+1] + a_m_8[k] );
+//   }
+//   // Special thermo levels
+//   b_t_8[nk] = 1.;
+//   a_t_8[nk] = zsrf_8;
 
-  // Compute ip1 values
-  for(k = 0; k < nk; k++ ) {
-    ip1_m[k] = c_convip_Level2IP(hybuser[k],5);    
-  }
-  ip1_m[nk] = c_convip_Level2IP(1.,5);
+//   // Compute ip1 values
+//   for(k = 0; k < nk; k++ ) {
+//     ip1_m[k] = c_convip_Level2IP(hybuser[k],5);    
+//   }
+//   ip1_m[nk] = c_convip_Level2IP(1.,5);
 
-  for(k = 0; k < nk-1; k++ ) {
-    ip1_t[k]  = c_convip_Level2IP( sqrtf( hybuser[k+1] * hybuser[k] ), 5 );
-  }
-  ip1_t[nk-1] = c_convip_Level2IP( sqrtf( 1.f * hybuser[nk-1] ), 5 );
-  ip1_t[nk]   = c_convip_Level2IP(1.,5);
+//   for(k = 0; k < nk-1; k++ ) {
+//     ip1_t[k]  = c_convip_Level2IP( sqrtf( hybuser[k+1] * hybuser[k] ), 5 );
+//   }
+//   ip1_t[nk-1] = c_convip_Level2IP( sqrtf( 1.f * hybuser[nk-1] ), 5 );
+//   ip1_t[nk]   = c_convip_Level2IP(1.,5);
   
-  return(VGD_OK);
+//   return(VGD_OK);
 
-}
+// }
 
 int vgrid::c_vgrid_genab_5005(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double **ptop_out_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t, float dhm, float dht)
 {
@@ -6748,7 +6748,7 @@ int vgrid::Cvgd_new_gen2(int kind, int version, float *hyb, int size_hyb, float 
     nk   = size_hyb;
     nl_m = size_hyb;
     nl_t = size_hyb;
-    if(this->C_genab_1001(hyb, size_hyb, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
+    if(this->C_genab(hyb, size_hyb, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
       free(a_m_8);
       free(b_m_8);
       free(ip1_m);
@@ -6759,7 +6759,7 @@ int vgrid::Cvgd_new_gen2(int kind, int version, float *hyb, int size_hyb, float 
     nk   = size_hyb;
     nl_m = size_hyb;
     nl_t = size_hyb;
-    if(this->C_genab_1002(hyb, size_hyb, ptop_8, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
+    if(this->C_genab(hyb, size_hyb, ptop_8, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
       free(a_m_8);
       free(b_m_8);
       free(ip1_m);
@@ -6774,7 +6774,7 @@ int vgrid::Cvgd_new_gen2(int kind, int version, float *hyb, int size_hyb, float 
     nk   = size_hyb;
     nl_m = size_hyb;
     nl_t = -1;
-    if(this->C_genab_2001(hyb, size_hyb, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
+    if(this->C_genab(hyb, size_hyb, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
       free(a_m_8);
       free(b_m_8);
       free(ip1_m);
@@ -6785,7 +6785,7 @@ int vgrid::Cvgd_new_gen2(int kind, int version, float *hyb, int size_hyb, float 
     nk   = size_hyb;
     nl_m = size_hyb;
     nl_t = -1;
-    if(this->C_genab_4001(hyb, size_hyb, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
+    if(this->C_genab(hyb, size_hyb, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
       free(a_m_8);
       free(b_m_8);
       free(ip1_m);
@@ -6796,7 +6796,7 @@ int vgrid::Cvgd_new_gen2(int kind, int version, float *hyb, int size_hyb, float 
     nk   = size_hyb;
     nl_m = size_hyb;
     nl_t = size_hyb;
-    if(this->C_genab_5001(hyb, size_hyb, *rcoef1, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
+    if(this->C_genab(hyb, size_hyb, *rcoef1, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
       free(a_m_8);
       free(b_m_8);
       free(ip1_m);
@@ -6831,7 +6831,7 @@ int vgrid::Cvgd_new_gen2(int kind, int version, float *hyb, int size_hyb, float 
     break;
   case 5004:
     nk   = size_hyb;
-    if(this->C_genab_5004(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t) == VGD_ERROR ) {
+    if(this->C_genab(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t) == VGD_ERROR ) {
       free(a_m_8);
       free(b_m_8);
       free(ip1_m);
@@ -7137,7 +7137,7 @@ int vgrid::C_gen_legacy_desc(int unit, int *keylist , int nb ){
 	goto bomb;
       }
       printf("(Cvgd)   sigma coordinate found\n");
-      if( this->C_genab_1001(hyb, nb, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
+      if( this->C_genab(hyb, nb, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
       {
 	goto bomb;
       }
@@ -7152,7 +7152,7 @@ int vgrid::C_gen_legacy_desc(int unit, int *keylist , int nb ){
     //---------------------------------------------
     printf("(Cvgd)   eta coordinate found\n");
     ptop_8 = ptop*100.;
-    if( this->C_genab_1002(hyb, nb, &ptop_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
+    if( this->C_genab(hyb, nb, &ptop_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
     {	  
       goto bomb;
     }
@@ -7171,7 +7171,7 @@ int vgrid::C_gen_legacy_desc(int unit, int *keylist , int nb ){
 	goto bomb;
       }
       decode_HY(va2, &ptop_8, &pref_8, &rcoef);
-      if( this->C_genab_1003(hyb, nb, rcoef, ptop_8, pref_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ) {      
+      if( this->C_genab(hyb, nb, rcoef, ptop_8, pref_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ) {      
 	goto bomb;
       }
       if( this->Cvgd_new_build_vert2(1, 3, nb, var.ig1, var.ig2, &ptop_8, &pref_8, &rcoef, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR ){
@@ -7184,7 +7184,7 @@ int vgrid::C_gen_legacy_desc(int unit, int *keylist , int nb ){
 
   case 2001:
     printf("(Cvgd)   pressure coordinate found\n");
-    if( this->C_genab_2001(hyb, nb, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
+    if( this->C_genab(hyb, nb, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
     {
       goto bomb;
     }
@@ -7201,7 +7201,7 @@ int vgrid::C_gen_legacy_desc(int unit, int *keylist , int nb ){
       goto bomb;
     }
     decode_HY(va2, &ptop_8, &pref_8, &rcoef);
-    if( this->C_genab_5001(hyb, nb, rcoef, ptop_8, pref_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
+    if( this->C_genab(hyb, nb, rcoef, ptop_8, pref_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
     {
       goto bomb;
     }
