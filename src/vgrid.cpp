@@ -7020,7 +7020,7 @@ int vgrid::C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, c
   return(VGD_OK);
 
 
-int vgrid::C_gen_legacy_desc(int unit, int *keylist , int nb ){
+  int vgrid::C_gen_legacy_desc( vgrid **my_new_vgrid, int unit, int *keylist , int nb ){
   
   int *ip1 = NULL;
   int kind, origkind, version, k, ni, nj, nk, hy_key, pt_key, e1_key;
@@ -7131,17 +7131,19 @@ int vgrid::C_gen_legacy_desc(int unit, int *keylist , int nb ){
   {
   case 1001:
       // SIGMA SIGMA SIGMA SIGMA SIGMA SIGMA SIGMA SIGMA
+    vgrid_1001 new_vgrid_1001();
+    *my_new_vgrid = & new_vgrid_0001;
       if( ! ALLOW_SIGMA )
       {
 	printf("(Cvgd)   C_gen_legacy_desc error: sigma coordinate construction is not ALLOWED.\n(Cvgd)       If your are certain that you want this sigma coordinate, set ALLOW_SIGMA to true e.g.\n(Cvgd)          in fortran stat =  vgd_putopt(\"ALLOW_SIGMA\",.true.)\n(Cvgd)          in C       stat = Cvgd_putopt_int(\"ALLOW_SIGMA\",1)\n");
 	goto bomb;
       }
       printf("(Cvgd)   sigma coordinate found\n");
-      if( this->C_genab(hyb, nb, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
+      if( my_new_vgrid->C_genab(hyb, nb, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
       {
 	goto bomb;
       }
-      if( this->Cvgd_new_build_vert2(kind, 1, nb, var.ig1, var.ig2, NULL, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR )
+      if(my_new_vgrid ->Cvgd_new_build_vert2(kind, 1, nb, var.ig1, var.ig2, NULL, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR )
       {
 	goto bomb;
       }
@@ -7150,31 +7152,35 @@ int vgrid::C_gen_legacy_desc(int unit, int *keylist , int nb ){
     //=============================================
     // PT PT PT PT PT PT PT PT PT PT PT PT PT PT PT
     //---------------------------------------------
+    vgrid_1001 new_vgrid_1002();
+    *my_new_vgrid = & new_vgrid_1002;
     printf("(Cvgd)   eta coordinate found\n");
     ptop_8 = ptop*100.;
-    if( this->C_genab(hyb, nb, &ptop_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
+    if( my_new_vgrid->C_genab(hyb, nb, &ptop_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
     {	  
       goto bomb;
     }
-    if( this->Cvgd_new_build_vert2(kind, 2, nb, var.ig1, var.ig2, &ptop_8, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR )
+    if( my_new_vgrid->Cvgd_new_build_vert2(kind, 2, nb, var.ig1, var.ig2, &ptop_8, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR )
     {
       goto bomb;
     }
 
   case 1003:
-      //================================================
-      // HY HY HY HY HY HY HY HY HY HY HY HY HY HY HY HY
-      //------------------------------------------------
+    //================================================
+    // HY HY HY HY HY HY HY HY HY HY HY HY HY HY HY HY
+    //------------------------------------------------
       printf("(Cvgd)   hybrid (normalized) coordinate found\n");
-      if( this->C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR ){
+    vgrid_1003 new_vgrid_1003();
+    *my_new_vgrid = & new_vgrid_0003;
+      if( my_new_vgrid->C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR ){
 	printf("(Cvgd) ERROR in C_gen_legacy_record, consistency check on HY failed (2)\n");
 	goto bomb;
       }
       decode_HY(va2, &ptop_8, &pref_8, &rcoef);
-      if( this->C_genab(hyb, nb, rcoef, ptop_8, pref_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ) {      
+      if( my_new_vgrid->C_genab(hyb, nb, rcoef, ptop_8, pref_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ) {      
 	goto bomb;
       }
-      if( this->Cvgd_new_build_vert2(1, 3, nb, var.ig1, var.ig2, &ptop_8, &pref_8, &rcoef, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR ){
+      if( my_new_vgrid->Cvgd_new_build_vert2(1, 3, nb, var.ig1, var.ig2, &ptop_8, &pref_8, &rcoef, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR ){
 	goto bomb;
       }      
 
@@ -7184,28 +7190,32 @@ int vgrid::C_gen_legacy_desc(int unit, int *keylist , int nb ){
 
   case 2001:
     printf("(Cvgd)   pressure coordinate found\n");
-    if( this->C_genab(hyb, nb, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
+    vgrid_2001 new_vgrid_2001();
+    *my_new_vgrid = & new_vgrid_2001;
+    if( my_new_vgrid->C_genab(hyb, nb, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
     {
       goto bomb;
     }
-    if( this->Cvgd_new_build_vert2(kind, 1, nb, var.ig1, var.ig2, NULL, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR )
+    if( my_new_vgrid->Cvgd_new_build_vert2(kind, 1, nb, var.ig1, var.ig2, NULL, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR )
     {
       goto bomb;
     }	
 
   case 5001:
     printf("(Cvgd)   Hybrid coordinate found\n");
-    if( this->C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR )
+    vgrid_1001 new_vgrid_5001();
+    *my_new_vgrid = & new_vgrid_5001;
+    if( my_new_vgrid->C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR )
     {
       printf("(Cvgd) ERROR in C_gen_legacy_desc, consistency check on HY failed\n");
       goto bomb;
     }
     decode_HY(va2, &ptop_8, &pref_8, &rcoef);
-    if( this->C_genab(hyb, nb, rcoef, ptop_8, pref_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
+    if( my_new_vgrid->C_genab(hyb, nb, rcoef, ptop_8, pref_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
     {
       goto bomb;
     }
-    if( this->Cvgd_new_build_vert2(kind, 1, nb, var.ig1, var.ig2, &ptop_8, &pref_8, &rcoef, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR )
+    if( my_new_vgrid->Cvgd_new_build_vert2(kind, 1, nb, var.ig1, var.ig2, &ptop_8, &pref_8, &rcoef, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR )
     {
       goto bomb;
     }	
@@ -7230,7 +7240,7 @@ int vgrid::C_gen_legacy_desc(int unit, int *keylist , int nb ){
 
 }
 
-int vgrid::c_legacy(int unit, int F_kind) {
+int vgrid::c_legacy(vgrid **my_new_vgrid, int unit, int F_kind) {
   // Construct vertical structure from legacy encoding (PT,HY...)
 
   int error, ni, nj, nk, nip1, i, j, k, kind, nb_kind=100, aa, nb;
@@ -7342,7 +7352,7 @@ int vgrid::c_legacy(int unit, int F_kind) {
     return(VGD_ERROR);
   }
   printf("(Cvgd)   Found %d unique ip1 of kind %d among the %d records in file to construct the vertical descriptor\n", nb, valid_kind, count);
-  error = this->C_gen_legacy_desc(unit, keylist , nb);
+  error = this->C_gen_legacy_desc(my_new_vgrid, unit, keylist , nb);
 
   if( error == VGD_ERROR ){
     printf("(Cvgd) ERROR: problem with C_gen_legacy_desc\n");
@@ -7648,7 +7658,7 @@ int vgrid::Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, in
     return(VGD_ERROR);
   }
   
-  if(ip2 >= 0 && ip1 < 0)
+  if(ip2 >= 0 && ip1 < 0)s
   {
     printf("(Cvgd) ERROR in Cvgd_new_read, expecting optional value ip1\n");      
     return(VGD_ERROR);
@@ -7679,18 +7689,15 @@ int vgrid::Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, in
       return(VGD_ERROR);
     }
     printf("(Cvgd) Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)\n");
-    if(this->c_legacy(unit,kind_sought) == VGD_ERROR)
+    if(this->c_legacy(my_new_vgrid, unit,kind_sought) == VGD_ERROR)
     {
       printf("(Cvgd) ERROR: failed to construct vgrid descriptor from legacy encoding\n");
       return(VGD_ERROR);
     }
-    if(this->fstd_init() == VGD_ERROR)
+    if(*my_new_vgrid->fstd_init() == VGD_ERROR)
     {
       printf("(Cvgd) ERROR in Cvgd_new_read, problem creating record information\n");
     }
-
-    // The vgrid has already been constructed
-    *my_new_vgrid = this;
     return(VGD_OK);
   }
   else

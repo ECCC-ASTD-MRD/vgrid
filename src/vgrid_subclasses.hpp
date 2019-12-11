@@ -34,7 +34,7 @@ class vgrid_1001 : public vgrid
 public:
   vgrid_1001(int key);
   int c_decode_vert();
-  int C_genab_1001(float *hyb, int nk, double **a_m_8, double **b_m_8, int **ip1_m);
+  int C_genab(float *hyb, int nk, double **a_m_8, double **b_m_8, int **ip1_m);
 };
 
 class vgrid_1002 : public vgrid
@@ -42,7 +42,7 @@ class vgrid_1002 : public vgrid
 public:
   vgrid_1002(int key);
   int c_decode_vert();
-  int C_genab_1002(float *etauser, int nk, double *ptop_8, double **a_m_8, double **b_m_8, int **ip1_m);
+  int C_genab(float *etauser, int nk, double *ptop_8, double **a_m_8, double **b_m_8, int **ip1_m);
 };
 
 class vgrid_1003_5001 : public vgrid
