@@ -4448,7 +4448,7 @@ int vgrid::C_genab_1001(float *hyb, int nk, double **a_m_8, double **b_m_8, int 
 
   // Andre Plante May 2015. 
   char ok = 1;
-  int k,ip1, kind2;
+  int k,ip1, kind;
   float f_one=1.f;
 
   if( my_alloc_double(a_m_8, nk, "(Cvgd) ERROR in C_genab_1001, malloc error with a_m_8") == VGD_ERROR )
@@ -4482,7 +4482,7 @@ int vgrid::C_genab_1001(float *hyb, int nk, double **a_m_8, double **b_m_8, int 
     (*a_m_8)[k]=0.;
     // Go back and forth to ip1 in order to make sure hyb value is encodable.
     ip1 = c_convip_Level2IP_old_style(hyb[k],1);
-    (*b_m_8)[k] = (double) c_convip_IP2Level(ip1,&kind2);
+    (*b_m_8)[k] = (double) c_convip_IP2Level(ip1,&kind);
     (*ip1_m)[k] = ip1;
   }
 
@@ -4653,11 +4653,11 @@ int vgrid::C_genab_1002(float *etauser, int nk, double *ptop_8, double **a_m_8, 
     return(VGD_ERROR);
   }
 
-  int ip1, kind2;
+  int ip1, kind;
   float eta;
   for ( k = 0; k < nk; k++){
     ip1 = c_convip_Level2IP_old_style(etauser[k],1);
-    eta = c_convip_IP2Level(ip1,&kind2);
+    eta = c_convip_IP2Level(ip1,&kind);
     (*ip1_m)[k] = ip1;
     (*a_m_8)[k] = (1. - eta) * (*ptop_8);
     (*b_m_8)[k] = eta;
@@ -4828,7 +4828,7 @@ int vgrid::C_genab_5001(float *hybuser, int nk, float rcoef, double ptop_8, doub
   // Andre Plante May 2015. 
   char ok = 1;
   int k;
-  int complet, ip1, kind2;
+  int complet, ip1, kind;
   float epsilon=1.0e-6, f_one=1.f;
   double hybtop = ptop_8 / pref_8;
   double hyb, pr1;
@@ -4871,7 +4871,7 @@ int vgrid::C_genab_5001(float *hybuser, int nk, float rcoef, double ptop_8, doub
   }
 
   ip1 = c_convip_Level2IP( (float) hybtop, 5);
-  hybtop = (double) c_convip_IP2Level(ip1,&kind2);
+  hybtop = (double) c_convip_IP2Level(ip1,&kind);
   pr1 = 1./(1.-hybtop);
   
   // Find out if first level is at top
@@ -4885,7 +4885,7 @@ int vgrid::C_genab_5001(float *hybuser, int nk, float rcoef, double ptop_8, doub
 
   for ( k = 0; k < nk; k++){
     ip1 = c_convip_Level2IP(hybuser[k],5);
-    hyb = (double)c_convip_IP2Level(ip1,&kind2);
+    hyb = (double)c_convip_IP2Level(ip1,&kind);
     (*ip1_m)[k] = ip1;
     (*b_m_8)[k] = pow( (hyb - hybtop) * pr1, rcoef);
     (*a_m_8)[k] = pref_8 * ( hyb - (*b_m_8)[k] );
@@ -7575,7 +7575,7 @@ int vgrid::Cvgd_stda76_pres_from_hgts_list(float *pres, float *hgts,
 // ########## N E W   I N T E R F A C E ##########
 // ########## N E W   I N T E R F A C E ##########
 
-int vgrid::Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, int ip2, int kind, int version)
+int vgrid::Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, int ip2, int kind_sought, int version_sought)
 {
 
   char  match_ipig;
@@ -7586,12 +7586,12 @@ int vgrid::Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, in
   double *table, *table2;
   int table_size;
   int ni_dummy, nj_dummy, nk_dummy, istat;
-  int key, kind2, version2, vcode;
+  int key, kind_found, version_found, vcode;
   const int KEY_NOT_FOUND = -997;
 
   key = KEY_NOT_FOUND;
-  kind2    = 0;
-  version2 = 0;
+  kind_found    = 0;
+  version_found = 0;
   
   if(ip1 >= 0 && ip2 < 0)
   {
@@ -7609,7 +7609,7 @@ int vgrid::Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, in
   {
     match_ipig = 1;
   }
-  if(kind == -1 && version != -1)
+  if(kind_sought == -1 && version_sought != -1)
   {
     printf("(Cvgd) ERROR in Cvgd_new_read, option kind must be used with option version\n");
     return(VGD_ERROR);
@@ -7630,7 +7630,7 @@ int vgrid::Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, in
       return(VGD_ERROR);
     }
     printf("(Cvgd) Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)\n");
-    if(this->c_legacy(unit,kind) == VGD_ERROR)
+    if(this->c_legacy(unit,kind_sought) == VGD_ERROR)
     {
       printf("(Cvgd) ERROR: failed to construct vgrid descriptor from legacy encoding\n");
       return(VGD_ERROR);
@@ -7649,9 +7649,9 @@ int vgrid::Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, in
     // Loop on all !! found
     for( i=0; i < count; i++)
     {     
-      // Check if kind and version match, skip the !! if not.
+      // Check if kind_sought and version_sought match, skip the !! if not.
       // Also read all the description information for the key
-      if( correct_kind_and_version(keyList[i], kind, version, &var, &status) == VGD_ERROR)
+      if( correct_kind_and_version(keyList[i], kind_sought, version_sought, &var, &status) == VGD_ERROR)
       {
 	this->valid = 0;
 	return(VGD_ERROR);
@@ -7680,8 +7680,8 @@ int vgrid::Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, in
 	  free(table2);
 	  return(VGD_ERROR);
 	}
-	kind2    = (int) table2[0];
-	version2 = (int) table2[1];
+	kind_found    = (int) table2[0];
+	version_found = (int) table2[1];
 	free(table2);
       }
       else // A matching toctoc has already been found
@@ -7704,17 +7704,17 @@ int vgrid::Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, in
 	  free(table);
 	  return(VGD_ERROR);
 	}
-	kind2    = (int) table[0];
-	version2 = (int) table[1];
+	kind_found    = (int) table[0];
+	version_found = (int) table[1];
 	free(table);
 
 	// Compare the record information to that of the first matching record
 	if (   var     != var2
-	    || kind    != kind2
-	    || version != version2
+	    || kind_sought    != kind_found
+	    || version_sought != version_found
 	   )
 	{
-	  printf("(Cvgd) ERROR in vgrid::Cvgd_read_vgrid_from_file, found different entries in vertical descriptors after search on ip1 = %d, ip2 = %d, kind = %d, version = %d\n",ip1,ip2,kind2,version2);
+	  printf("(Cvgd) ERROR in vgrid::Cvgd_read_vgrid_from_file, found different entries in vertical descriptors after search on ip1 = %d, ip2 = %d, kind = %d, version = %d\n",ip1,ip2,kind_found,version_found);
 	  return(VGD_ERROR);
 	}
       } // toc_ // Loop in !!
@@ -7727,7 +7727,7 @@ int vgrid::Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, in
     return(VGD_ERROR);
   }
 
-  vcode = kind2*1000 + version2;
+  vcode = kind_found*1000 + version_found;
 
   try
   {
