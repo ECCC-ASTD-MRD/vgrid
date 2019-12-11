@@ -4527,44 +4527,44 @@ int vgrid::Cvgd_new_from_table(double *table, int ni, int nj, int nk) {
     return(VGD_ERROR);
   }
 
-  switch(this->vcode) {
-  case 1:
- if( this->c_decode_vert_0001() == VGD_ERROR ) {
-      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode -0001\n");
-      return(VGD_ERROR);
-    }
-    break;
-  case 1001:
-    if( this->c_decode_vert_1001() == VGD_ERROR ) {
-      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 1001\n");
-      return(VGD_ERROR);
-    }
-    break;
-  case 1002:
-    if( this->c_decode_vert_1002() == VGD_ERROR ) {
-      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 1002\n");
-      return(VGD_ERROR);
-    }
-    break;
-  case 2001:
-    if( this->c_decode_vert_2001() == VGD_ERROR ) {
-      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 2001\n");
-      return(VGD_ERROR);
-    }
-    break;
-  case 1003:
-  case 5001:
-    if( this->c_decode_vert_1003_5001() == VGD_ERROR ) {
-      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 1003 or 5001\n");
-      return(VGD_ERROR);
-    }
-    break;
-  case 4001:
-    if( this->c_decode_vert_4001() == VGD_ERROR ) {
-      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 4001\n");
-      return(VGD_ERROR);
-    }
-    break;
+ //  switch(this->vcode) {
+ //  case 1:
+ // if( this->c_decode_vert_0001() == VGD_ERROR ) {
+ //      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode -0001\n");
+ //      return(VGD_ERROR);
+ //    }
+ //    break;
+ //  case 1001:
+ //    if( this->c_decode_vert_1001() == VGD_ERROR ) {
+ //      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 1001\n");
+ //      return(VGD_ERROR);
+ //    }
+ //    break;
+ //  case 1002:
+ //    if( this->c_decode_vert_1002() == VGD_ERROR ) {
+ //      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 1002\n");
+ //      return(VGD_ERROR);
+ //    }
+ //    break;
+ //  case 2001:
+ //    if( this->c_decode_vert_2001() == VGD_ERROR ) {
+ //      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 2001\n");
+ //      return(VGD_ERROR);
+ //    }
+ //    break;
+ //  case 1003:
+ //  case 5001:
+ //    if( this->c_decode_vert_1003_5001() == VGD_ERROR ) {
+ //      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 1003 or 5001\n");
+ //      return(VGD_ERROR);
+ //    }
+ //    break;
+ //  case 4001:
+ //    if( this->c_decode_vert_4001() == VGD_ERROR ) {
+ //      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 4001\n");
+ //      return(VGD_ERROR);
+ //    }
+ //    break;
   // case 5002:
   // case 5003:
   // case 5004:
@@ -4574,34 +4574,34 @@ int vgrid::Cvgd_new_from_table(double *table, int ni, int nj, int nk) {
   //     return(VGD_ERROR);
   //   }
   //   break;
-  case 5100:
-    if( this->c_decode_vert_5100() == VGD_ERROR ) {
-      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 5100\n");
-      return(VGD_ERROR);
-    }
-    break;    
-  case 5999:
-    if( this->c_decode_vert_5999() == VGD_ERROR ) {
-      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 5999\n");
-      return(VGD_ERROR);
-    }
-    break;    
-  case 21001:
-    if( this->c_decode_vert_21001() == VGD_ERROR ) {
-      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 21001\n");
-      return(VGD_ERROR);
-    }
-    break;    
-  case 21002:
-    if( this->c_decode_vert_21002() == VGD_ERROR ) {
-      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 21002\n");
-      return(VGD_ERROR);
-    }
-    break;    
-  default:
-    printf("(Cvgd) in Cvgd_new_from_table, invalid Vcode %d\n", this->vcode);
-    return(VGD_ERROR);
-  }
+  // case 5100:
+  //   if( this->c_decode_vert_5100() == VGD_ERROR ) {
+  //     printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 5100\n");
+  //     return(VGD_ERROR);
+  //   }
+  //   break;    
+  // case 5999:
+  //   if( this->c_decode_vert_5999() == VGD_ERROR ) {
+  //     printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 5999\n");
+  //     return(VGD_ERROR);
+  //   }
+  //   break;    
+  // case 21001:
+  //   if( this->c_decode_vert_21001() == VGD_ERROR ) {
+  //     printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 21001\n");
+  //     return(VGD_ERROR);
+  //   }
+  //   break;    
+  // case 21002:
+  //   if( this->c_decode_vert_21002() == VGD_ERROR ) {
+  //     printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 21002\n");
+  //     return(VGD_ERROR);
+  //   }
+  //   break;    
+  // default:
+  //   printf("(Cvgd) in Cvgd_new_from_table, invalid Vcode %d\n", this->vcode);
+  //   return(VGD_ERROR);
+  // }
   this->valid = 1;
   if(this->fstd_init() == VGD_ERROR) {
     printf("(Cvgd) ERROR in Cvgd_new_from_table, problem creating record information\n");
@@ -7018,21 +7018,19 @@ int vgrid::C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, c
   if( infon > 1 )
     printf("(Cvgd)   All %s consistent\n", nomvar);
   return(VGD_OK);
-}
+
 
 int vgrid::C_gen_legacy_desc(int unit, int *keylist , int nb ){
   
   int *ip1 = NULL;
-  int kind, origkind, k, ni, nj, nk, hy_key, pt_key, e1_key;
+  int kind, origkind, version, k, ni, nj, nk, hy_key, pt_key, e1_key;
   float ptop, rcoef;
-  float *hyb = NULL, *hybm = NULL;
+  float *hyb = NULL;
   double ptop_8, pref_8;
   double *a_m_8 = NULL, *b_m_8 = NULL;
   VGD_TFSTD_ext var, va2;
 
   if(my_alloc_float (&hyb  ,nb,"(Cvgd) ERROR: in C_gen_legacy_desc, cannot allocate hyb of size")   == VGD_ERROR)
-    return(VGD_ERROR);
-  if(my_alloc_float (&hybm ,nb,"(Cvgd) ERROR: in C_gen_legacy_desc, cannot allocate hybm of size")  == VGD_ERROR)
     return(VGD_ERROR);
 
   if( my_fstprm(keylist[0], &var) == VGD_ERROR ){
@@ -7046,6 +7044,8 @@ int vgrid::C_gen_legacy_desc(int unit, int *keylist , int nb ){
   }
   origkind=kind;
 
+  // Fill in the hyb array.  Also,
+  // Verify the dimensions and kind at each vertical level
   for( k = 1; k < nb; k++ ){
     if( my_fstprm(keylist[k], &va2) == VGD_ERROR ){
       printf("(Cvgd) ERROR: in C_gen_legacy_desc, fstprm 2 on key %d\n", keylist[k]);
@@ -7066,49 +7066,102 @@ int vgrid::C_gen_legacy_desc(int unit, int *keylist , int nb ){
   pt_key = c_fstinf (unit,&ni,&nj,&nk,-1," ",-1,  -1,  -1," ","PT  ");
   e1_key = c_fstinf (unit,&ni,&nj,&nk,-1," ",-1,  -1,  -1," ","E1  ");
 
-  if( kind == 1 ){
+
+  if(kind == 1)
+  {
     //============================
     // SIGMA ETA HYBRID-NORMALIZED
     //----------------------------
-    if( pt_key >= 0){
-      //=============================================
-      // PT PT PT PT PT PT PT PT PT PT PT PT PT PT PT
-      //---------------------------------------------
-      if( this->C_get_consistent_pt_e1(unit, &ptop,"PT  ") == VGD_ERROR ){
+    if(pt_key >= 0)
+    {
+      if(e1_key >= 0)
+        version = 4;
+      else
+        version = 2;
+
+    else // pt_key < 0
+    {
+      if(hy_key >= 0)
+        version = 3;
+      else
+        version = 1;
+    }
+  }
+
+  else // kind != 1
+    version = 1;
+
+  vcode = kind*1000 + version;
+
+
+  // Verify whether HY constistant with PT
+  if(  (vcode == 1002 || vcode == 1004)
+         && hy_key >= 0)
+  {
+    // pt_key > 0
+    // Verify whether HY constistant with PT
+      if( this->C_get_consistent_pt_e1(unit, &ptop,"PT  ") == VGD_ERROR )
+      {
 	printf("(Cvgd) ERROR in C_gen_legacy_desc, consistency check on PT failed\n");
 	goto bomb;
       }
-      if(hy_key >= 0){
-	// Verify if HY constistant with PT
-	if( this->C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR ){
-	  printf("(Cvgd) ERROR in C_gen_legacy_record, consistency check on HY failed (1)\n");
-	  goto bomb;
-	}
-	decode_HY(va2, &ptop_8, &pref_8, &rcoef);
-	if( fabs(rcoef - 1.0) > 1.e-5){
-	  printf("(Cvgd) ERROR in C_gen_legacy_desc, HY rcoef should by 1.0 since PT record is present in file\n");
-	  goto bomb;
-	}
-	if( fabs( ptop - ptop_8/100.) > 1.e-5 ){
-	  printf("(Cvgd) ERROR in C_gen_legacy_desc, ptop from HY is %f while it is %f in PT record\n",ptop_8/100., ptop);
-	  goto bomb;
-	}
-	printf("(Cvgd) INFO : in C_gen_legacy_desc HY record consistent with PT\n");
-      }
-      if( e1_key >= 0){
-	printf("(Cvgd) TODO in C_gen_legacy_desc, add support to 1004 etasef coordinate");
+
+
+    if( this->C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR )
+    {
+      printf("(Cvgd) ERROR in C_gen_legacy_record, consistency check on HY failed (1)\n");
+      goto bomb;
+    }
+    decode_HY(va2, &ptop_8, &pref_8, &rcoef);
+    if( fabs(rcoef - 1.0) > 1.e-5)
+    {
+      printf("(Cvgd) ERROR in C_gen_legacy_desc, HY rcoef should by 1.0 since PT record is present in file\n");
+      goto bomb;
+    }
+    if( fabs( ptop - ptop_8/100.) > 1.e-5 )
+    {
+      printf("(Cvgd) ERROR in C_gen_legacy_desc, ptop from HY is %f while it is %f in PT record\n",ptop_8/100., ptop);
+      goto bomb;
+    }
+    printf("(Cvgd) INFO : in C_gen_legacy_desc HY record consistent with PT\n");
+  }
+
+
+  switch(vcode)
+  {
+  case 1001:
+      // SIGMA SIGMA SIGMA SIGMA SIGMA SIGMA SIGMA SIGMA
+      if( ! ALLOW_SIGMA )
+      {
+	printf("(Cvgd)   C_gen_legacy_desc error: sigma coordinate construction is not ALLOWED.\n(Cvgd)       If your are certain that you want this sigma coordinate, set ALLOW_SIGMA to true e.g.\n(Cvgd)          in fortran stat =  vgd_putopt(\"ALLOW_SIGMA\",.true.)\n(Cvgd)          in C       stat = Cvgd_putopt_int(\"ALLOW_SIGMA\",1)\n");
 	goto bomb;
-      } else {
-	printf("(Cvgd)   eta coordinate found\n");
-	ptop_8 = ptop*100.;
-	if( this->C_genab_1002(hyb, nb, &ptop_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ){	  
-	  goto bomb;
-	}
-	if( this->Cvgd_new_build_vert2(kind, 2, nb, var.ig1, var.ig2, &ptop_8, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR ){
-	  goto bomb;
-	}
       }
-    } else if ( hy_key >= 0){
+      printf("(Cvgd)   sigma coordinate found\n");
+      if( this->C_genab_1001(hyb, nb, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
+      {
+	goto bomb;
+      }
+      if( this->Cvgd_new_build_vert2(kind, 1, nb, var.ig1, var.ig2, NULL, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR )
+      {
+	goto bomb;
+      }
+
+  case 1002:
+    //=============================================
+    // PT PT PT PT PT PT PT PT PT PT PT PT PT PT PT
+    //---------------------------------------------
+    printf("(Cvgd)   eta coordinate found\n");
+    ptop_8 = ptop*100.;
+    if( this->C_genab_1002(hyb, nb, &ptop_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
+    {	  
+      goto bomb;
+    }
+    if( this->Cvgd_new_build_vert2(kind, 2, nb, var.ig1, var.ig2, &ptop_8, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR )
+    {
+      goto bomb;
+    }
+
+  case 1003:
       //================================================
       // HY HY HY HY HY HY HY HY HY HY HY HY HY HY HY HY
       //------------------------------------------------
@@ -7124,49 +7177,46 @@ int vgrid::C_gen_legacy_desc(int unit, int *keylist , int nb ){
       if( this->Cvgd_new_build_vert2(1, 3, nb, var.ig1, var.ig2, &ptop_8, &pref_8, &rcoef, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR ){
 	goto bomb;
       }      
-    } else {
-      // SIGMA SIGMA SIGMA SIGMA SIGMA SIGMA SIGMA SIGMA
-      if( ! ALLOW_SIGMA ){
-	printf("(Cvgd)   C_gen_legacy_desc error: sigma coordinate construction is not ALLOWED.\n(Cvgd)       If your are certain that you want this sigma coordinate, set ALLOW_SIGMA to true e.g.\n(Cvgd)          in fortran stat =  vgd_putopt(\"ALLOW_SIGMA\",.true.)\n(Cvgd)          in C       stat = Cvgd_putopt_int(\"ALLOW_SIGMA\",1)\n");
-	goto bomb;
-      }
-      printf("(Cvgd)   sigma coordinate found\n");
-      if( this->C_genab_1001(hyb, nb, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ){
-	goto bomb;
-      }
-      if( this->Cvgd_new_build_vert2(kind, 1, nb, var.ig1, var.ig2, NULL, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR ){
-	goto bomb;
-      }
-    }
-    
-  } else if ( kind == 2 ){
+
+  case 1004:
+    printf("(Cvgd) TODO in C_gen_legacy_desc, add support to 1004 etasef coordinate");
+    goto bomb;
+
+  case 2001:
     printf("(Cvgd)   pressure coordinate found\n");
-    if( this->C_genab_2001(hyb, nb, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ){
+    if( this->C_genab_2001(hyb, nb, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
+    {
       goto bomb;
     }
-    if( this->Cvgd_new_build_vert2(kind, 1, nb, var.ig1, var.ig2, NULL, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR ){
+    if( this->Cvgd_new_build_vert2(kind, 1, nb, var.ig1, var.ig2, NULL, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR )
+    {
       goto bomb;
     }	
-  } else if ( kind == 5 ){
+
+  case 5001:
     printf("(Cvgd)   Hybrid coordinate found\n");
-    if( this->C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR ){
+    if( this->C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR )
+    {
       printf("(Cvgd) ERROR in C_gen_legacy_desc, consistency check on HY failed\n");
       goto bomb;
     }
     decode_HY(va2, &ptop_8, &pref_8, &rcoef);
-    if( this->C_genab_5001(hyb, nb, rcoef, ptop_8, pref_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ){
+    if( this->C_genab_5001(hyb, nb, rcoef, ptop_8, pref_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
+    {
       goto bomb;
     }
-    if( this->Cvgd_new_build_vert2(kind, 1, nb, var.ig1, var.ig2, &ptop_8, &pref_8, &rcoef, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR ){
+    if( this->Cvgd_new_build_vert2(kind, 1, nb, var.ig1, var.ig2, &ptop_8, &pref_8, &rcoef, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR )
+    {
       goto bomb;
     }	
-  } else {
+
+  default:
     printf("(Cvgd ERROR: in C_gen_legacy_desc, kind %d is not supported\n",kind);
     return(VGD_ERROR);
   }
+
   free(ip1);
   free(hyb);
-  free(hybm);
   free(a_m_8);
   free(b_m_8);
   return(VGD_OK);
@@ -7174,7 +7224,6 @@ int vgrid::C_gen_legacy_desc(int unit, int *keylist , int nb ){
  bomb:
   free(ip1);
   free(hyb);
-  free(hybm);
   free(a_m_8);
   free(b_m_8);
   return(VGD_ERROR);
