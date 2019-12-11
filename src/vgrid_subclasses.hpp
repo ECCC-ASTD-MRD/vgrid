@@ -22,10 +22,45 @@
 
 #include "vgrid.hpp"
 
+class vgrid_0001 : public vgrid
+{
+public:
+  vgrid_0001(int key);
+  int c_decode_vert();
+};
+
+class vgrid_1001 : public vgrid
+{
+public:
+  vgrid_1001(int key);
+  int c_decode_vert();
+};
+
+class vgrid_1002 : public vgrid
+{
+public:
+  vgrid_1002(int key);
+  int c_decode_vert();
+};
+
 class vgrid_1003_5001 : public vgrid
 {
 public:
   vgrid_1003_5001(int key);
+  int c_decode_vert();
+};
+
+class vgrid_2001 : public vgrid
+{
+public:
+  vgrid_2001(int key);
+  int c_decode_vert();
+};
+
+class vgrid_4001 : public vgrid
+{
+public:
+  vgrid_4001(int key);
   int c_decode_vert();
 };
 
@@ -66,6 +101,34 @@ class vgrid_5005 : public vgrid_5002_5003_5004_5005
 {
 public:
   vgrid_5005(int key);
+};
+
+class vgrid_5100 : public vgrid
+{
+public:
+  vgrid_5100(int key);
+  int c_decode_vert();
+};
+
+class vgrid_5999 : public vgrid
+{
+public:
+  vgrid_5999(int key);
+  int c_decode_vert();
+};
+
+class vgrid_21001 : public vgrid
+{
+public:
+  vgrid_21001(int key);
+  int c_decode_vert();
+};
+
+class vgrid_21002 : public vgrid
+{
+public:
+  vgrid_21002(int key);
+  int c_decode_vert();
 };
 
 #endif // VGRID_5005_H
