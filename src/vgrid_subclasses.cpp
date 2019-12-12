@@ -24,6 +24,12 @@
 
 
 // ########## class 0001 ##########
+vgrid_0001::vgrid_0001() : vgrid()
+{
+  this->kind = 0;
+  this->version = 1;
+  this->vcode = 0001;
+}
 vgrid_0001::vgrid_0001(int key) : vgrid(key)
 {
 }
@@ -77,6 +83,12 @@ int vgrid_0001::c_decode_vert()
 
 
 // ########## class 1001 ##########
+vgrid_1001::vgrid_1001() : vgrid()
+{
+  this->kind = 1;
+  this->version = 1;
+  this->vcode = 1001;
+}
 vgrid_1001::vgrid_1001(int key) : vgrid(key)
 {
 }
@@ -171,6 +183,12 @@ int vgrid_1001::C_genab(float *hyb, int nk, double **a_m_8, double **b_m_8, int 
 
 
 // ########## class 1002 ##########
+vgrid_1002::vgrid_1002() : vgrid()
+{
+  this->kind = 1;
+  this->version = 2;
+  this->vcode = 1002;
+}
 vgrid_1002::vgrid_1002(int key) : vgrid(key)
 {
 }
@@ -333,6 +351,12 @@ int vgrid_1003_5001::c_decode_vert()
 
 
 // ########## class 1003 ##########
+vgrid_1003::vgrid_1003() : vgrid()
+{
+  this->kind = 1;
+  this->version = 3;
+  this->vcode = 1003;
+}
 vgrid_1003::vgrid_1003(int key) : vgrid_1003_5001(key)
 {
 }
@@ -420,6 +444,12 @@ int vgrid_1003::C_genab(float *hybuser, int nk, float rcoef, double ptop_8, doub
 
 
 // ########## class 2001 ##########
+vgrid_2001::vgrid_2001() : vgrid()
+{
+  this->kind = 2;
+  this->version = 1;
+  this->vcode = 2001;
+}
 vgrid_2001::vgrid_2001(int key)
 {
 }
@@ -507,6 +537,12 @@ int vgrid_2001::C_genab(float *pres, int nk, double **a_m_8, double **b_m_8, int
 
 
 // ########## class 4001 ##########
+vgrid_4001::vgrid_4001() : vgrid()
+{
+  this->kind = 4;
+  this->version = 1;
+  this->vcode = 4001;
+}
 vgrid_4001::vgrid_4001(int key)
 {
 }
@@ -600,6 +636,12 @@ int vgrid_4001::C_genab(float *hgts, int nk, double **a_m_8, double **b_m_8, int
 
 
 // ########## class 5001 ##########
+vgrid_5001::vgrid_5001() : vgrid()
+{
+  this->kind = 5;
+  this->version = 1;
+  this->vcode = 5001;
+}
 vgrid_5001::vgrid_5001(int key) : vgrid_1003_5001(key)
 {
 }
@@ -947,16 +989,34 @@ int vgrid_5002_5003_5004_5005::C_genab_5002_5003(float *hybuser, int nk, int *nl
 }
 
 // ########## class 5002 ##########
+vgrid_5002::vgrid_5002() : vgrid()
+{
+  this->kind = 5;
+  this->version = 2;
+  this->vcode = 5002;
+}
 vgrid_5002::vgrid_5002(int key) : vgrid_5002_5003_5004_5005(key, 1)
 {
 }
 
 // ########## class 5003 ##########
+vgrid_5003::vgrid_5003() : vgrid()
+{
+  this->kind = 5;
+  this->version = 3;
+  this->vcode = 5003;
+}
 vgrid_5003::vgrid_5003(int key) : vgrid_5002_5003_5004_5005(key, 1)
 {
 }
 
 // ########## class 5004 ##########
+vgrid_5004::vgrid_5004() : vgrid()
+{
+  this->kind = 5;
+  this->version = 4;
+  this->vcode = 5004;
+}
 vgrid_5004::vgrid_5004(int key) : vgrid_5002_5003_5004_5005(key, 0)
 {
 }
@@ -1103,12 +1163,24 @@ int vgrid_5004::C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoe
 }
 
 // ########## class 5005 ##########
+vgrid_5005::vgrid_5005() : vgrid()
+{
+  this->kind = 5;
+  this->version = 5;
+  this->vcode = 5005;
+}
 vgrid_5005::vgrid_5005(int key) : vgrid_5002_5003_5004_5005(key, 0)
 {
 }
 
 
 // ########## class 5100 ##########
+vgrid_5100::vgrid_5100() : vgrid()
+{
+  this->kind = 5;
+  this->version = 100;
+  this->vcode = 5100;
+}
 vgrid_5100::vgrid_5100(int key)
 {
 }
@@ -1187,6 +1259,12 @@ int vgrid_5100::c_decode_vert()
 
 
 // ########## class 5999 ##########
+vgrid_5999::vgrid_5999() : vgrid()
+{
+  this->kind = 5;
+  this->version = 999;
+  this->vcode = 5999;
+}
 vgrid_5999::vgrid_5999(int key)
 {
 }
@@ -1234,6 +1312,12 @@ int vgrid_5999::c_decode_vert()
 
 
 // ########## class 21001 ##########
+vgrid_21001::vgrid_21001() : vgrid()
+{
+  this->kind = 21;
+  this->version = 1;
+  this->vcode = 21001;
+}
 vgrid_21001::vgrid_21001(int key)
 {
 }
@@ -1305,6 +1389,12 @@ int vgrid_21001::c_decode_vert()
 
 
 // ########## class 21002 ##########
+vgrid_21002::vgrid_21002() : vgrid()
+{
+  this->kind = 21;
+  this->version = 2;
+  this->vcode = 21002;
+}
 vgrid_21002::vgrid_21001(int key)
 {
 }
