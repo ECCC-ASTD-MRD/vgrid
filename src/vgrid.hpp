@@ -251,10 +251,13 @@ static int Cvgd_stda76_pres_from_hgts_list(float *pres, float *hgts, int nb);
 
 
 // ########## N E W   I N T E R F A C E ##########
+public:
   vgrid(int unit, int ip1, int ip2, int kind, int version);
   vgrid(int key);
   int Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, int ip2, int kind, int version);
-  virtual int c_decode_vert();  // = 0
+  virtual int c_decode_vert() = 0;
+  virtual int c_encode_vert() = 0;
+
 protected:
   void flip_transfer_d2c(char *name, double val_8);
   float c_convip_IP2Level(int IP,int *kind);

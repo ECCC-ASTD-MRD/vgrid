@@ -81,6 +81,39 @@ int vgrid_0001::c_decode_vert()
   return(VGD_OK);
 }
 
+int vgrid_0001::c_encode_vert()
+{
+  int skip = 1;
+
+  //Fill header
+  this->table[0] = this->kind;
+  this->table[1] = this->version;
+  this->table[2] = skip;
+  
+  int k, ind = 3;
+  for ( k = 0; k < nk; k++){
+    this->table[ind  ] = this->ip1_m[k];
+    this->table[ind+1] = this->a_m_8[k];
+    this->table[ind+2] = 0;
+    ind = ind + 3;
+  }
+  for ( k = 0; k < nk; k++){
+    this->table[ind  ] = this->ip1_w[k];
+    this->table[ind+1] = this->a_w_8[k];
+    this->table[ind+2] = 0;
+    ind = ind + 3;
+  }
+  this->nl_w = this->nl_w;
+  this->a_t_8 = this->a_m_8;
+  this->b_t_8 = this->b_m_8;
+  this->c_t_8 = this->c_m_8;
+  this->ip1_t = this->ip1_m;
+
+  this->valid = 1;
+
+  return(VGD_OK);
+}
+
 
 // ########## class 1001 ##########
 vgrid_1001::vgrid_1001() : vgrid()
@@ -128,6 +161,42 @@ int vgrid_1001::c_decode_vert()
   this->ip1_w = this->ip1_m;
   this->a_w_8 = this->a_m_8;
   this->b_w_8 = this->b_m_8;
+  this->valid = 1;
+  return(VGD_OK);
+}
+
+int vgrid_1001::c_encode_vert()
+{
+  int skip = 2;
+
+  //Fill header
+  this->table[0] = this->kind;
+  this->table[1] = this->version;
+  this->table[2] = skip;
+  flip_transfer_c2d(this->ref_name, &(this->table[3]));
+
+  this->table[4] = 0.;
+  this->table[5] = 0.;
+  
+
+  int k, ind = 6;
+  for ( k = 0; k < nk; k++){
+    this->table[ind  ] = this->ip1_m[k];
+    this->table[ind+1] = this->a_m_8[k];
+    this->table[ind+2] = this->b_m_8[k];
+    ind = ind + 3;
+  }
+  this->nl_t = this->nl_m;
+  this->nl_w = this->nl_m;
+  this->a_t_8 = this->a_m_8;
+  this->b_t_8 = this->b_m_8;
+  this->c_t_8 = this->c_m_8;
+  this->a_w_8 = this->a_m_8;
+  this->b_w_8 = this->b_m_8;
+  this->c_w_8 = this->c_m_8;
+  this->ip1_t = this->ip1_m;
+  this->ip1_w = this->ip1_m;
+
   this->valid = 1;
   return(VGD_OK);
 }
@@ -231,6 +300,40 @@ int vgrid_1002::c_decode_vert()
   this->b_w_8 = this->b_m_8;
   this->valid = 1;
 
+  return(VGD_OK);
+}
+
+int vgrid_1002::c_encode_vert()
+{
+  int skip = 2;
+
+  //Fill header
+  this->table[0] = this->kind;
+  this->table[1] = this->version;
+  this->table[2] = skip;
+  this->table[3] = this->ptop_8;
+  flip_transfer_c2d(this->ref_name, &(this->table[4]));
+  this->table[5] = 0.;
+  
+  int k, ind = 6;
+  for ( k = 0; k < nk; k++){
+    this->table[ind  ] = this->ip1_m[k];
+    this->table[ind+1] = this->a_m_8[k];
+    this->table[ind+2] = this->b_m_8[k];
+    ind = ind + 3;
+  }
+  this->nl_t = this->nl_m;
+  this->nl_w = this->nl_m;
+  this->a_t_8 = this->a_m_8;
+  this->b_t_8 = this->b_m_8;
+  this->c_t_8 = this->c_m_8;
+  this->a_w_8 = this->a_m_8;
+  this->b_w_8 = this->b_m_8;
+  this->c_w_8 = this->c_m_8;
+  this->ip1_t = this->ip1_m;
+  this->ip1_w = this->ip1_m;
+
+  this->valid = 1;
   return(VGD_OK);
 }
 
@@ -492,6 +595,38 @@ int vgrid_2001::c_decode_vert()
   return(VGD_OK);
 }
 
+int vgrid_2001::c_encode_vert()
+{  
+  int skip = 1;
+
+  //Fill header
+  this->table[0] = this->kind;
+  this->table[1] = this->version;
+  this->table[2] = skip;
+  
+  int k, ind = 3;
+  for ( k = 0; k < nk; k++){
+    this->table[ind  ] = this->ip1_m[k];
+    this->table[ind+1] = this->a_m_8[k];
+    this->table[ind+2] = this->b_m_8[k];
+    ind = ind + 3;
+  }
+  this->nl_t = this->nl_m;
+  this->nl_w = this->nl_m;
+  this->a_t_8 = this->a_m_8;
+  this->b_t_8 = this->b_m_8;
+  this->c_t_8 = this->c_m_8;
+  this->a_w_8 = this->a_m_8;
+  this->b_w_8 = this->b_m_8;
+  this->c_w_8 = this->c_m_8;
+  this->ip1_t = this->ip1_m;
+  this->ip1_w = this->ip1_m;
+
+  this->valid = 1;
+
+  return(VGD_OK);
+}
+
 int vgrid_2001::C_genab(float *pres, int nk, double **a_m_8, double **b_m_8, int **ip1_m)
 {
   char ok = 1;
@@ -585,6 +720,38 @@ int vgrid_4001::c_decode_vert()
   return(VGD_OK);
 }
 
+int vgrid_4001::c_encode_vert()
+{  
+  int skip = 1;
+
+  //Fill header
+  this->table[0] = this->kind;
+  this->table[1] = this->version;
+  this->table[2] = skip;
+  
+  int k, ind = 3;
+  for ( k = 0; k < nk; k++){
+    this->table[ind  ] = this->ip1_m[k];
+    this->table[ind+1] = this->a_m_8[k];
+    this->table[ind+2] = 0.;
+    ind = ind + 3;
+  }
+  this->nl_t = this->nl_m;
+  this->nl_w = this->nl_m;
+  this->a_t_8 = this->a_m_8;
+  this->b_t_8 = this->b_m_8;
+  this->c_t_8 = this->c_m_8;
+  this->a_w_8 = this->a_m_8;
+  this->b_w_8 = this->b_m_8;
+  this->c_w_8 = this->c_m_8;
+  this->ip1_t = this->ip1_m;
+  this->ip1_w = this->ip1_m;
+
+  this->valid = 1;
+
+  return(VGD_OK);
+}
+
 int vgrid_4001::C_genab(float *hgts, int nk, double **a_m_8, double **b_m_8, int **ip1_m)
 {
 
@@ -644,6 +811,46 @@ vgrid_5001::vgrid_5001() : vgrid()
 }
 vgrid_5001::vgrid_5001(int key) : vgrid_1003_5001(key)
 {
+}
+
+int vgrid_5001::c_encode_vert()
+{
+  int skip = 3;
+  
+  //Fill header
+  this->table[0] = this->kind;
+  this->table[1] = this->version;
+  this->table[2] = skip;
+
+  this->table[3] = this->ptop_8;
+  this->table[4] = this->pref_8;
+  this->table[5] = this->rcoef1;
+  
+  flip_transfer_c2d(this->ref_name, &(this->table[6]));
+  this->table[7] = 0.;
+  this->table[8] = 0.;
+
+  int k, ind = 9;
+  for ( k = 0; k < nk; k++){
+    this->table[ind  ] = this->ip1_m[k];
+    this->table[ind+1] = this->a_m_8[k];
+    this->table[ind+2] = this->b_m_8[k];
+    ind = ind + 3;
+  }
+  this->nl_t = this->nl_m;
+  this->nl_w = this->nl_m;
+  this->a_t_8 = this->a_m_8;
+  this->b_t_8 = this->b_m_8;
+  this->c_t_8 = this->c_m_8;
+  this->a_w_8 = this->a_m_8;
+  this->b_w_8 = this->b_m_8;
+  this->c_w_8 = this->c_m_8;
+  this->ip1_t = this->ip1_m;
+  this->ip1_w = this->ip1_m;
+  
+  this->valid = 1;
+
+  return(VGD_OK);
 }
 
 int vgrid_5001::C_genab(float *hybuser, int nk, float rcoef, double ptop_8, double pref_8, double **a_m_8, double **b_m_8, int **ip1_m)
@@ -815,6 +1022,47 @@ int vgrid_5002_5003_5004_5005::c_decode_vert()
   this->b_w_8 = this->b_t_8;
   this->valid = 1;
   return(VGD_OK);  
+}
+
+int vgrid_5002_5003_5004_5005::c_encode_vert()
+{
+  int skip = 3;
+
+  //Fill header
+  this->table[0] = this->kind;
+  this->table[1] = this->version;
+  this->table[2] = skip;
+  this->table[3] = this->ptop_8;
+  this->table[4] = this->pref_8;
+  this->table[5] = this->rcoef1;  
+  this->table[6] = this->rcoef2;
+  flip_transfer_c2d(this->ref_name, &(this->table[7]));
+  this->table[8] = 0.;
+
+  int k, ind = 9;
+  for ( k = 0; k < this->nl_m; k++)
+  {
+    this->table[ind  ] = this->ip1_m[k];
+    this->table[ind+1] = this->a_m_8[k];
+    this->table[ind+2] = this->b_m_8[k];
+    ind = ind + 3;
+  }
+  for ( k = 0; k < this->nl_t; k++)
+  {
+    this->table[ind  ] = this->ip1_t[k];
+    this->table[ind+1] = this->a_t_8[k];
+    this->table[ind+2] = this->b_t_8[k];
+    ind = ind + 3;
+  }
+  this->nl_w = this->nl_t;
+  this->a_w_8 = this->a_t_8;
+  this->b_w_8 = this->b_t_8;
+  this->c_w_8 = this->c_t_8;
+  this->ip1_w = this->ip1_t;
+
+  this->valid = 1;
+
+  return(VGD_OK);
 }
 
 
@@ -1257,6 +1505,50 @@ int vgrid_5100::c_decode_vert()
   return(VGD_OK);
 }
 
+int vgrid_5100::c_encode_vert()
+{
+  int skip = 3;
+
+  //Fill header
+  this->table[0] = this->kind;
+  this->table[1] = this->version;
+  this->table[2] = skip;
+  this->table[3] = this->ptop_8;
+  this->table[4] = this->pref_8;
+  this->table[5] = this->rcoef1;  
+  this->table[6] = this->rcoef2;
+  this->table[7] = this->rcoef3;
+  this->table[8] = this->rcoef4;
+  flip_transfer_c2d(this->ref_name, &(this->table[9]));
+  flip_transfer_c2d(this->ref_namel, &(this->table[10]));
+  this->table[11] = 0.;
+
+  int k, ind = 12;
+  for ( k = 0; k < this->nl_m; k++){
+    this->table[ind  ] = this->ip1_m[k];
+    this->table[ind+1] = this->a_m_8[k];
+    this->table[ind+2] = this->b_m_8[k];
+    this->table[ind+3] = this->c_m_8[k];
+    ind = ind + 4;
+  }
+  for ( k = 0; k < this->nl_t; k++){
+    this->table[ind  ] = this->ip1_t[k];
+    this->table[ind+1] = this->a_t_8[k];
+    this->table[ind+2] = this->b_t_8[k];
+    this->table[ind+3] = this->c_t_8[k];
+    ind = ind + 4;
+  }
+  this->nl_w = this->nl_t;
+  this->a_w_8 = this->a_t_8;
+  this->b_w_8 = this->b_t_8;
+  this->c_w_8 = this->c_t_8;
+  this->ip1_w = this->ip1_t;
+
+  this->valid = 1;
+
+  return(VGD_OK);
+}
+
 
 // ########## class 5999 ##########
 vgrid_5999::vgrid_5999() : vgrid()
@@ -1307,6 +1599,59 @@ int vgrid_5999::c_decode_vert()
   this->a_w_8 = this->a_m_8;
   this->b_w_8 = this->b_m_8;
   
+  return(VGD_OK);
+}
+
+int vgrid_5999::c_encode_vert()
+{
+  int i, k, kind, skip = 2;
+  float hyb;
+
+  // Check ip1 validity
+  for( k=0; k < nk; k++){
+    hyb = c_convip_IP2Level(this->ip1_m[k],&kind);
+    hyb = hyb*2.f; // To silence the compiler warning
+    // Even if hyb is kind 5, kind 4 may be present due to diag level in m AGL
+    if( kind != 5 && kind != 4 ) {
+      printf("Error in vgrid_5999::c_encode_vert, ip1 kind must be 5 or 4 but got %d, for ip1 = %d\n", kind, this->ip1_m[k]);
+      return(VGD_ERROR);
+    }
+    for( i=k+1; i < nk; i++) {
+      if( this->ip1_m[i] == this->ip1_m[k]) {
+	printf("Error in encode_vert_5999, repetition present in ip1 list for at least ip1 = %d\n", this->ip1_m[i]);
+	return(VGD_ERROR);
+      }
+    }
+  }
+
+  //Fill header
+  this->table[0] = this->kind;
+  this->table[1] = this->version;
+  this->table[2] = skip;
+  flip_transfer_c2d(this->ref_name, &(this->table[3]));
+  this->table[4] = 0.;
+  this->table[5] = 0.;
+
+  int ind = 6;
+  for ( k = 0; k < nk; k++){
+    this->table[ind  ] = this->ip1_m[k];
+    this->table[ind+1] = this->a_m_8[k];
+    this->table[ind+2] = this->b_m_8[k];
+    ind = ind + 3;
+  }
+  this->nl_t = this->nl_m;
+  this->nl_w = this->nl_m;
+  this->a_t_8 = this->a_m_8;
+  this->b_t_8 = this->b_m_8;
+  this->c_t_8 = this->c_m_8;
+  this->a_w_8 = this->a_m_8;
+  this->b_w_8 = this->b_m_8;
+  this->c_w_8 = this->c_m_8;
+  this->ip1_t = this->ip1_m;
+  this->ip1_w = this->ip1_m;
+
+  this->valid = 1;
+
   return(VGD_OK);
 }
 
@@ -1384,6 +1729,50 @@ int vgrid_21001::c_decode_vert()
   this->ip1_w = this->ip1_t;
   this->a_w_8 = this->a_t_8;
   this->b_w_8 = this->b_t_8;
+  return(VGD_OK);
+}
+
+int vgrid_21001::c_encode_vert()
+{
+  int skip = 3;
+
+  //Fill header
+  this->table[0] = this->kind;
+  this->table[1] = this->version;
+  this->table[2] = skip;
+  this->table[3] = this->rcoef1;  
+  this->table[4] = this->rcoef2;
+  this->table[5] = this->rcoef3;  
+  this->table[6] = this->rcoef4;
+  flip_transfer_c2d(this->ref_name,  &(this->table[7]));
+  flip_transfer_c2d(this->ref_namel, &(this->table[8]));
+  this->table[9] = 0.; 
+  this->table[10]= 0.; 
+  this->table[11]= 0.; 
+
+  int k, ind = 12;
+  for ( k = 0; k < this->nl_m; k++){
+    this->table[ind  ] = this->ip1_m[k];
+    this->table[ind+1] = this->a_m_8[k];
+    this->table[ind+2] = this->b_m_8[k];
+    this->table[ind+3] = this->c_m_8[k];
+    ind = ind + 4;
+  }
+  for ( k = 0; k < this->nl_t; k++){
+    this->table[ind  ] = this->ip1_t[k];
+    this->table[ind+1] = this->a_t_8[k];
+    this->table[ind+2] = this->b_t_8[k];
+    this->table[ind+3] = this->c_t_8[k];
+    ind = ind + 4;
+  }
+  this->nl_w = this->nl_t;
+  this->a_w_8 = this->a_t_8;
+  this->b_w_8 = this->b_t_8;
+  this->c_w_8 = this->c_t_8;
+  this->ip1_w = this->ip1_t;
+
+  this->valid = 1;
+
   return(VGD_OK);
 }
 
@@ -1482,6 +1871,50 @@ int vgrid_21002::c_decode_vert()
   this->b_t_8[nb-1] = this->table[ind+2];
   this->c_t_8[nb-1] = this->table[ind+3];
   this->dht = c_convip_IP2Level( this->ip1_t[nb-1], &kind );
+
+  return(VGD_OK);
+}
+
+int vgrid_21002::c_encode_vert()
+{
+  int skip = 3;
+
+  //Fill header
+  this->table[0] = this->kind;
+  this->table[1] = this->version;
+  this->table[2] = skip;
+  this->table[3] = this->rcoef1;  
+  this->table[4] = this->rcoef2;
+  this->table[5] = this->rcoef3;  
+  this->table[6] = this->rcoef4;
+  flip_transfer_c2d(this->ref_name, &(this->table[7]));
+  flip_transfer_c2d(this->ref_namel, &(this->table[8]));
+  this->table[9] = 0.; 
+  this->table[10]= 0.; 
+  this->table[11]= 0.; 
+
+  int k, ind = 12;
+  for ( k = 0; k < this->nl_m; k++){
+    this->table[ind  ] = this->ip1_m[k];
+    this->table[ind+1] = this->a_m_8[k];
+    this->table[ind+2] = this->b_m_8[k];
+    this->table[ind+3] = this->c_m_8[k];
+    ind = ind + 4;
+  }
+  for ( k = 0; k < this->nl_w; k++){
+    this->table[ind  ] = this->ip1_w[k];
+    this->table[ind+1] = this->a_w_8[k];
+    this->table[ind+2] = this->b_w_8[k];
+    this->table[ind+3] = this->c_w_8[k];
+    ind = ind + 4;
+  }
+  // Thermo diag level
+  this->table[ind  ] = this->ip1_t[this->nl_t-1];
+  this->table[ind+1] = this->a_t_8[this->nl_t-1];
+  this->table[ind+2] = this->b_t_8[this->nl_t-1];
+  this->table[ind+3] = this->c_t_8[this->nl_t-1];
+  
+  this->valid = 1;
 
   return(VGD_OK);
 }
