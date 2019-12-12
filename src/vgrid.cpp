@@ -506,7 +506,7 @@ int vgrid::c_table_update() {
   case 5003:
   case 5004:
   case 5005:
-    if( this->c_encode_vert_5002_5003_5004_5005(1) == VGD_ERROR ) {
+    if( this->c_encode_vert_5002_5003_5004_5005() == VGD_ERROR ) {
       printf("(Cvgd) ERROR in c_table_update, cannot encode Vcode %d\n",this->vcode);
       return(VGD_ERROR);
     }
@@ -3193,24 +3193,58 @@ int vgrid::Cvgd_new_build_vert2(int kind, int version, int nk, int ip1, int ip2,
     ier = this->c_encode_vert_5001(nk);
     break;
   case 5002:
-    strcpy(cvcode,"5002");
-    ier = this->c_encode_vert_5002_5003_5004_5005(0);
-    break;
   case 5003:
-    strcpy(cvcode,"5003");
-    ier = this->c_encode_vert_5002_5003_5004_5005(0);
-    break;
   case 5004:
-    strcpy(cvcode,"5004");
-    ier = this->c_encode_vert_5002_5003_5004_5005(0);
-    break;
   case 5005:
-    strcpy(cvcode,"5005");
-    ier = this->c_encode_vert_5002_5003_5004_5005(0);
-    break;
+    if( this->table )
+      free( this->table );
+    this->table_ni = 3;
+    this->table_nj = this->nl_m + this->nl_t + skip;
+    this->table_nk = 1;
+    table_size = this->table_ni * this->table_nj * this->table_nk;
+    this->table = (double*)malloc ( table_size * sizeof(double) );
+    if(! this->table )
+    {
+      printf("(Cvgd) ERROR in Cvgd_new_build_vert2, cannot allocate table of bouble of size %d\n", table_size);
+      return(VGD_ERROR);
+    }
+    strcpy(this->ref_name,"P0  ");
+    strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
+    switch (this-vcode)
+    {
+    case 5002:
+      strcpy(cvcode,"5002");
+      ier = this->c_encode_vert_5002_5003_5004_5005();
+      break;
+    case 5003:
+      strcpy(cvcode,"5003");
+      ier = this->c_encode_vert_5002_5003_5004_5005();
+      break;
+    case 5004:
+      strcpy(cvcode,"5004");
+      ier = this->c_encode_vert_5002_5003_5004_5005();
+      break;
+    case 5005:
+      strcpy(cvcode,"5005");
+      ier = this->c_encode_vert_5002_5003_5004_5005();
+      break;
+    }
   case 5100:
     strcpy(cvcode,"5100");
-    ier = this->c_encode_vert_5100(0);
+    if( this->table )
+      free( this->table );
+    this->table_ni = 4;
+    this->table_nj = this->nl_m + this->nl_t + skip;
+    this->table_nk = 1;
+    table_size = this->table_ni * this->table_nj * this->table_nk;
+    this->table = (double*)malloc ( table_size * sizeof(double) );
+    if(! this->table ) {
+      printf("(Cvgd) ERROR in Cvgd_new_build_vert2, cannot allocate table of bouble of size %d\n", table_size);
+      return(VGD_ERROR);
+    }
+    strcpy(this->ref_name,"P0  ");
+    strcpy(this->ref_namel,"P0LS");
+    ier = this->c_encode_vert_5100();
     break;
   case 5999:
     strcpy(cvcode,"5999");
@@ -3218,11 +3252,52 @@ int vgrid::Cvgd_new_build_vert2(int kind, int version, int nk, int ip1, int ip2,
     break;
   case 21001:
     strcpy(cvcode,"21001");
-    ier = this->c_encode_vert_21001(0);
+    if( this->table )
+      free( this->table );
+    this->table_ni = 4;
+    this->table_nj = this->nl_m + this->nl_t + skip;
+    this->table_nk = 1;
+    table_size = this->table_ni * this->table_nj * this->table_nk;
+    this->table = (double*)malloc ( table_size * sizeof(double) );
+    if(! this->table ) {
+      printf("(Cvgd) ERROR in Cvgd_new_build_vert2, cannot allocate table of bouble of size %d\n", table_size);
+      return(VGD_ERROR);
+    }
+    strcpy(this->ref_name,"ME  ");
+    strcpy(this->ref_namel,"MELS");
+    if ( fabs( this->rcoef3 - this->rcoef1 ) < 1.0e-6 && fabs( this->rcoef4 - this->rcoef2 ) < 1.0e-6) {
+      strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
+    }
+    if ( this->rcoef3 < 0. || this->rcoef4 < 0. ) {
+      strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
+    }
+    ier = this->c_encode_vert_21001();
     break;
   case 21002:
     strcpy(cvcode,"21002");
-    ier = this->c_encode_vert_21002(0);
+    if( this->table )
+      free( this->table );
+    this->table_ni = 4;
+    // To have a complete set of levels parameters, we need all momentum and Vertical-Velocity
+    // levels, the thermo levels set only differs for the diag level. Therefor we only write
+    // Momentum, Vertical-Velocity and the thermo diag level
+    this->table_nj = this->nl_m + this->nl_w + 1 + skip;
+    this->table_nk = 1;
+    table_size = this->table_ni * this->table_nj * this->table_nk;
+    this->table = (double*)malloc ( table_size * sizeof(double) );
+    if(! this->table ) {
+      printf("(Cvgd) ERROR in Cvgd_new_build_vert2, cannot allocate table of bouble of size %d\n", table_size);
+      return(VGD_ERROR);
+    }
+    strcpy(this->ref_name,"ME  ");
+     strcpy(this->ref_namel,"MELS");
+    if ( fabs( this->rcoef3 - this->rcoef1 ) < 1.0e-6 && fabs( this->rcoef4 - this->rcoef2 ) < 1.0e-6) {
+      strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
+    }
+    if ( this->rcoef3 < 0. || this->rcoef4 < 0. ) {
+      strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
+    }
+    ier = this->c_encode_vert_21002();
     break;
   default:
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_new_build_vert2, invalid kind or version : kind=%d, version=%d\n",kind,version);
@@ -3535,23 +3610,9 @@ int vgrid::c_encode_vert_5001(int nk){
   return(VGD_OK);
 }
 
-int vgrid::c_encode_vert_5002_5003_5004_5005(char update){
+int vgrid::c_encode_vert_5002_5003_5004_5005()
+{
   int skip = 3, table_size;
-  if(! update) {    
-    if( this->table )
-      free( this->table );
-    this->table_ni = 3;
-    this->table_nj = this->nl_m + this->nl_t + skip;
-    this->table_nk = 1;
-    table_size = this->table_ni * this->table_nj * this->table_nk;
-    this->table = (double*)malloc ( table_size * sizeof(double) );
-    if(! this->table ) {
-      printf("(Cvgd) ERROR in c_encode_vert_5002_5003_5004_5005, cannot allocate table of bouble of size %d\n", table_size);
-      return(VGD_ERROR);
-    }
-    strcpy(this->ref_name,"P0  ");
-    strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
-  }
   //Fill header
   this->table[0] = this->kind;
   this->table[1] = this->version;
@@ -3564,13 +3625,15 @@ int vgrid::c_encode_vert_5002_5003_5004_5005(char update){
   this->table[8] = 0.;
 
   int k, ind = 9;
-  for ( k = 0; k < this->nl_m; k++){
+  for ( k = 0; k < this->nl_m; k++)
+  {
     this->table[ind  ] = this->ip1_m[k];
     this->table[ind+1] = this->a_m_8[k];
     this->table[ind+2] = this->b_m_8[k];
     ind = ind + 3;
   }
-  for ( k = 0; k < this->nl_t; k++){
+  for ( k = 0; k < this->nl_t; k++)
+  {
     this->table[ind  ] = this->ip1_t[k];
     this->table[ind+1] = this->a_t_8[k];
     this->table[ind+2] = this->b_t_8[k];
@@ -3586,23 +3649,8 @@ int vgrid::c_encode_vert_5002_5003_5004_5005(char update){
 
   return(VGD_OK);
 }
-int vgrid::c_encode_vert_5100(char update){
+int vgrid::c_encode_vert_5100(){
   int skip = 3, table_size;
-  if(! update) {    
-    if( this->table )
-      free( this->table );
-    this->table_ni = 4;
-    this->table_nj = this->nl_m + this->nl_t + skip;
-    this->table_nk = 1;
-    table_size = this->table_ni * this->table_nj * this->table_nk;
-    this->table = (double*)malloc ( table_size * sizeof(double) );
-    if(! this->table ) {
-      printf("(Cvgd) ERROR in c_encode_vert_5100, cannot allocate table of bouble of size %d\n", table_size);
-      return(VGD_ERROR);
-    }
-    strcpy(this->ref_name,"P0  ");
-    strcpy(this->ref_namel,"P0LS");
-  }
   //Fill header
   this->table[0] = this->kind;
   this->table[1] = this->version;
@@ -3712,29 +3760,8 @@ int vgrid::c_encode_vert_5999(int nk){
   return(VGD_OK);
 }
 
-int vgrid::c_encode_vert_21001(char update){
+int vgrid::c_encode_vert_21001(){
   int skip = 3, table_size;
-  if(! update) {    
-    if( this->table )
-      free( this->table );
-    this->table_ni = 4;
-    this->table_nj = this->nl_m + this->nl_t + skip;
-    this->table_nk = 1;
-    table_size = this->table_ni * this->table_nj * this->table_nk;
-    this->table = (double*)malloc ( table_size * sizeof(double) );
-    if(! this->table ) {
-      printf("(Cvgd) ERROR in c_encode_vert_21001, cannot allocate table of bouble of size %d\n", table_size);
-      return(VGD_ERROR);
-    }
-    strcpy(this->ref_name,"ME  ");
-    strcpy(this->ref_namel,"MELS");
-    if ( fabs( this->rcoef3 - this->rcoef1 ) < 1.0e-6 && fabs( this->rcoef4 - this->rcoef2 ) < 1.0e-6) {
-      strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
-    }
-    if ( this->rcoef3 < 0. || this->rcoef4 < 0. ) {
-      strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
-    }
-  }
 
   //Fill header
   this->table[0] = this->kind;
@@ -3775,32 +3802,8 @@ int vgrid::c_encode_vert_21001(char update){
 
   return(VGD_OK);
 }
-int vgrid::c_encode_vert_21002(char update){
+int vgrid::c_encode_vert_21002(){
   int skip = 3, table_size;
-  if(! update) {    
-    if( this->table )
-      free( this->table );
-    this->table_ni = 4;
-    // To have a complete set of levels parameters, we need all momentum and Vertical-Velocity
-    // levels, the thermo levels set only differs for the diag level. Therefor we only write
-    // Momentum, Vertical-Velocity and the thermo diag level
-    this->table_nj = this->nl_m + this->nl_w + 1 + skip;
-    this->table_nk = 1;
-    table_size = this->table_ni * this->table_nj * this->table_nk;
-    this->table = (double*)malloc ( table_size * sizeof(double) );
-    if(! this->table ) {
-      printf("(Cvgd) ERROR in c_encode_vert_21002, cannot allocate table of bouble of size %d\n", table_size);
-      return(VGD_ERROR);
-    }
-    strcpy(this->ref_name,"ME  ");
-     strcpy(this->ref_namel,"MELS");
-    if ( fabs( this->rcoef3 - this->rcoef1 ) < 1.0e-6 && fabs( this->rcoef4 - this->rcoef2 ) < 1.0e-6) {
-      strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
-    }
-    if ( this->rcoef3 < 0. || this->rcoef4 < 0. ) {
-      strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
-    }
-  }
 
   //Fill header
   this->table[0] = this->kind;
