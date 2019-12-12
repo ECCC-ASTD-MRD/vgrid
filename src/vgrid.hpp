@@ -268,4 +268,6 @@ protected:
   // virtual C_genab()
 };
 
+class vgrid_exception : public exception
+
 #endif // VGRID_H

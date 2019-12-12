@@ -6523,13 +6523,13 @@ int vgrid::Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, in
   
   if(ip1 >= 0 && ip2 < 0)
   {
-    printf("(Cvgd) ERROR in Cvgd_new_read, expecting optional value ip2\n");      
+    printf("(Cvgd) ERROR in Cvgd_read_vgrid_from_file, expecting optional value ip2\n");      
     return(VGD_ERROR);
   }
   
   if(ip2 >= 0 && ip1 < 0)s
   {
-    printf("(Cvgd) ERROR in Cvgd_new_read, expecting optional value ip1\n");      
+    printf("(Cvgd) ERROR in Cvgd_read_vgrid_from_file, expecting optional value ip1\n");      
     return(VGD_ERROR);
   }
   match_ipig = 0;
@@ -6539,18 +6539,23 @@ int vgrid::Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, in
   }
   if(kind_sought == -1 && version_sought != -1)
   {
-    printf("(Cvgd) ERROR in Cvgd_new_read, option kind must be used with option version\n");
+    printf("(Cvgd) ERROR in Cvgd_read_vgrid_from_file, option kind must be used with option version\n");
     return(VGD_ERROR);
   }
   
+  // Get a list of !! records
   error = c_fstinl(unit, &ni, &nj, &nk, -1, " ", ip1, ip2, -1, " ", ZNAME, keyList, &count, nkeyList);
   if (error < 0)
   {
-    printf("(Cvgd) ERROR in Cvgd_new_read, with fstinl on nomvar !!\n");
+    printf("(Cvgd) ERROR in Cvgd_read_vgrid_from_file, with fstinl on nomvar !!\n");
     return(VGD_ERROR);
   }
+
   if(count == 0)
   {
+    // There are no !! records in the file
+    // Create a vgrid object using legacy techniques to extract the information from the file
+
     printf("(Cvgd) Cannot find %s with the following ips: ip1=%d, ip2=%d\n", ZNAME, ip1, ip2);
     if(match_ipig)
     {
@@ -6565,13 +6570,14 @@ int vgrid::Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, in
     }
     if(*my_new_vgrid->fstd_init() == VGD_ERROR)
     {
-      printf("(Cvgd) ERROR in Cvgd_new_read, problem creating record information\n");
+      printf("(Cvgd) ERROR in Cvgd_read_vgrid_from_file, problem creating record information\n");
     }
     return(VGD_OK);
   }
+
   else
   {
-    // Loop on all !! found
+    // Loop on all !! records found
     for( i=0; i < count; i++)
     {     
       // Check if kind_sought and version_sought match, skip the !! if not.
@@ -6615,7 +6621,7 @@ int vgrid::Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, in
 	// If not, return with an error message.
         if( my_fstprm(keyList[i], &var) == VGD_ERROR )
 	{
-          printf("(Cvgd) ERROR in Cvgd_new_read, with my_fstprm on keyList[i] = %d\n",
+          printf("(Cvgd) ERROR in Cvgd_read_vgrid_from_file, with my_fstprm on keyList[i] = %d\n",
 		 keyList[i]);
           return(VGD_ERROR);
         }
@@ -6648,7 +6654,7 @@ int vgrid::Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, in
 
   if(! toc_found)
   {
-    printf("(Cvgd) ERROR in Cvgd_new_read, cannot find !! or it generate from legacy encoding\n");
+    printf("(Cvgd) ERROR in Cvgd_read_vgrid_from_file, cannot find !! or it generate from legacy encoding\n");
     return(VGD_ERROR);
   }
 
@@ -6720,7 +6726,7 @@ int vgrid::Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, in
       *my_new_vgrid = & new_vgrid_21002;
     }
   }
-  catch(int x)
+  catch(vgrid_exception)
   {
     printf("(Cvgd) ERROR in vgrid::Cvgd_read_vgrid_from_file, unable to construct from a key %d\n", key);
     return(VGD_ERROR);
@@ -6743,13 +6749,13 @@ vgrid::vgrid(int key)
   // Read all the description information, var, for the key
   if( my_fstprm(key, &var) == VGD_ERROR ) {
     printf("(Cvgd) ERROR in vgrid::vgrid(key), with my_fstprm on key %d\n",key);
-    throw VGD_ERROR;
+    throw vgrid_exception;
   }
 
   // Enter var data into this; and read the field into this->table
   if( this->C_load_toctoc(var, key) == VGD_ERROR )
   {
-    printf("(Cvgd) ERROR in Cvgd_new_read, cannot load !!\n");
+    printf("(Cvgd) ERROR in Cvgd_read_vgrid_from_file, cannot load !!\n");
   }
 
   this->kind    = (int) this->table[0];
@@ -6757,19 +6763,19 @@ vgrid::vgrid(int key)
 
   if( this->Cvgd_set_vcode() == VGD_ERROR )
   {
-    printf("(Cvgd) ERROR in Cvgd_new_from_table, cannot set vcode\n");
-    throw VGD_ERROR;
+    printf("(Cvgd) ERROR in Cvgd_set_vcode, cannot set vcode\n");
+    throw vgrid_exception;
   }
 
   if( this->c_decode_vert() == VGD_ERROR )
   {
-    printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode %d\n", this->vcode);
-    throw VGD_ERROR;
+    printf("(Cvgd) in Cvgd_set_vcode, problem decoding table with vcode %d\n", this->vcode);
+    throw vgrid_exception;
   }
   this->valid = 1;
   if(this->fstd_init() == VGD_ERROR)
   {
-    printf("(Cvgd) ERROR in Cvgd_new_from_table, problem creating record information\n");
+    printf("(Cvgd) ERROR in Cvgd_set_vcode, problem creating record information\n");
   }
 
   return;
