@@ -2528,6 +2528,24 @@ void vgrid::init(void)
 vgrid::vgrid()
 {
   init();
+  this->table_nk = 1;
+}
+
+vgrid::allocate_table(int nk)
+{
+  int table_sizej;
+
+  set_table_nj(nk);
+
+  //if( this->table )
+  //  free( this->table );
+  table_size = this->table_ni * this->table_nj * this->table_nk;
+  this->table = (double*)malloc ( table_size * sizeof(double) );
+  if(! this->table )
+  {
+    printf("(Cvgd) ERROR in allocate_table, cannot allocate table of double of size %d\n",table_size );
+    return(VGD_ERROR);
+  }
 }
 
 void vgrid::c_vgd_free_abci() {
@@ -2883,469 +2901,352 @@ int vgrid::Cvgd_new_build_vert_21002(int ip1, int ip2, float rcoef1, float rcoef
   }
   return(VGD_OK);
 }
-int vgrid::Cvgd_new_build_vert2(int kind, int version, int nk, int ip1, int ip2, double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
+
+
+
+int vgrid::Cvgd_new_build_vert2(vgrid *my_new_vgrid, int kind, int version, int nk, int ip1, int ip2, double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
 		     double *a_m_8, double *b_m_8, double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8, double *a_w_8, double *b_w_8, double *c_w_8, int *ip1_m, int *ip1_t, int *ip1_w, int nl_m, int nl_t, int nl_w)
 {
-  int errorInput = 0, ier;
-  int table_size;
+  int errorInput = 0, vcode;
 
-  // Initializations
-  this->valid      = 1;
-  this->kind       = kind;
-  this->version    = version;
-  this->unit       = -1;
-  this->match_ipig = 1;
-  this->nk         = nk;
-  this->nl_m       = nl_m;
-  // Note that this->nl_t and this->nl_w may be overwritten in c_encode_vert_* function below
-  this->nl_t       = nl_t;
-  this->nl_w       = nl_w;
-  this->rec.ip1    = (int) fmax(0,ip1);
-  this->rec.ip2    = (int) fmax(0,ip2);
-  strcpy(this->rec.nomvar,"!!  ");
-  if(this->Cvgd_set_vcode_i(kind, version) == VGD_ERROR)  {
-    printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem with Cvgd_set_vcode_i");
-    return (VGD_ERROR);
+
+  try
+  {
+    // Instantiate a vgrid subclass from the key, according to the vcode
+    vcode = kind*1000 + version;
+    switch(vcode)
+    {
+    case 0001:
+      vgrid_0001 new_vgrid_0001();
+      *my_new_vgrid = & new_vgrid_0001;
+
+    case 1001:
+      vgrid_1001 new_vgrid_1001();
+      *my_new_vgrid = & new_vgrid_1001;
+
+    case 1002:
+      vgrid_1002 new_vgrid_1002();
+      *my_new_vgrid = & new_vgrid_1002;
+
+    case 1003:
+      vgrid_1003 new_vgrid_1003();
+      *my_new_vgrid = & new_vgrid_1003;
+
+    case 2001:
+      vgrid_2001 new_vgrid_2001();
+      *my_new_vgrid = & new_vgrid_2001;
+
+    case 4001:
+      vgrid_4001 new_vgrid_4001();
+      *my_new_vgrid = & new_vgrid_4001;
+
+    case 5001:
+      vgrid_5001 new_vgrid_5001();
+      *my_new_vgrid = &new_vgrid_5001;
+
+    case 5002:
+      vgrid_5002 new_vgrid_5002();
+      *my_new_vgrid = &new_vgrid_5002;
+
+    case 5003:
+      vgrid_5003 new_vgrid_5003();
+      *my_new_vgrid = &new_vgrid_5003;
+
+    case 5004:
+      vgrid_5004 new_vgrid_5004();
+      *my_new_vgrid = &new_vgrid_5004;
+
+    case 5005:
+      vgrid_5005 new_vgrid_5005();
+      *my_new_vgrid = &new_vgrid_5005;
+
+    case 5100:
+      vgrid_5100 new_vgrid_5100();
+      *my_new_vgrid = & new_vgrid_5100;
+
+    case 5999:
+      vgrid_5999 new_vgrid_5999();
+      *my_new_vgrid = & new_vgrid_5999;
+
+    case 21001:
+      vgrid_21001 new_vgrid_21001();
+      *my_new_vgrid = & new_vgrid_21001;
+
+    case 21002:
+      vgrid_21002 new_vgrid_21002();
+      *my_new_vgrid = & new_vgrid_21002;
+
+    default:
+      printf("(Cvgd) ERROR in Cvgd_new_build_vert2, unrecognized vcode=%s\n",vcode);
+      return(VGD_ERROR);
+    }
   }
-  this->rec.ig1   = this->vcode;
+  catch(vgrid_exception)
+  {
+    printf("(Cvgd) ERROR in vgrid::Cvgd_new_build_vert2, unable to construct from parameters\n");
+    return(VGD_ERROR);
+  }
+
+  // Complete the initializations
+  my_new_vgrid->unit       = -1;
+  my_new_vgrid->match_ipig = 1;
+  my_new_vgrid->nk         = nk;
+  my_new_vgrid->nl_m       = nl_m;
+  // Note that my_new_vgrid->nl_t and my_new_vgrid->nl_w may be overwritten in c_encode_vert function below
+  my_new_vgrid->nl_t       = nl_t;
+  my_new_vgrid->nl_w       = nl_w;
+  my_new_vgrid->rec.ip1    = (int) fmax(0,ip1);
+  my_new_vgrid->rec.ip2    = (int) fmax(0,ip2);
+  strcpy(my_new_vgrid->rec.nomvar,"!!  ");
+  my_new_vgrid->rec.ig1   = my_new_vgrid->vcode;
+
+
 
   // Check for required inputs
-  if( this->is_valid( ptop_8_valid) ) {
+  if( my_new_vgrid->is_valid( ptop_8_valid) ) {
     if(ptop_8) {
-      this->ptop_8 = *ptop_8;
+      my_new_vgrid->ptop_8 = *ptop_8;
     } else {
       printf("(Cvgd) ptop_8 is a required constructor entry\n");
       errorInput = 1;
     }
   }
-  if(this->is_valid( pref_8_valid)) {
+  if(my_new_vgrid->is_valid( pref_8_valid)) {
     if(pref_8){
-      this->pref_8 = *pref_8;
+      my_new_vgrid->pref_8 = *pref_8;
     } else {
       printf("(Cvgd) pref_8 is a required constructor entry\n");
       errorInput = 1;
     }
   }
-  if(this->is_valid( rcoef1_valid)) {
+  if(my_new_vgrid->is_valid( rcoef1_valid)) {
     if(rcoef1){
-      this->rcoef1 = *rcoef1;
+      my_new_vgrid->rcoef1 = *rcoef1;
     } else {
       printf("(Cvgd) rcoef1 is a required constructor entry\n");
       errorInput = 1;
     }
   }
-  if(this->is_valid( rcoef2_valid)) {
+  if(my_new_vgrid->is_valid( rcoef2_valid)) {
     if(rcoef2){
-      this->rcoef2 = *rcoef2;
+      my_new_vgrid->rcoef2 = *rcoef2;
     } else {
       printf("(Cvgd) rcoef2 is a required constructor entry\n");
       errorInput = 1;
     }
   }
-  if(this->is_valid( rcoef3_valid)) {
+  if(my_new_vgrid->is_valid( rcoef3_valid)) {
     if(rcoef3){
-      this->rcoef3 = *rcoef3;
+      my_new_vgrid->rcoef3 = *rcoef3;
     } else {
       printf("(Cvgd) rcoef3 is a required constructor entry\n");
       errorInput = 1;
     }
   }
-  if(this->is_valid( rcoef4_valid)) {
+  if(my_new_vgrid->is_valid( rcoef4_valid)) {
     if(rcoef4){
-      this->rcoef4 = *rcoef4;
+      my_new_vgrid->rcoef4 = *rcoef4;
     } else {
       printf("(Cvgd) rcoef4 is a required constructor entry\n");
       errorInput = 1;
     }
   }
-  if(this->is_valid( a_m_8_valid)) {
+  if(my_new_vgrid->is_valid( a_m_8_valid)) {
     if(a_m_8){
-      free(this->a_m_8);
-      this->a_m_8 = (double*)malloc( nl_m * sizeof(double) );
-      if(! this->a_m_8){ 
+      free(my_new_vgrid->a_m_8);
+      my_new_vgrid->a_m_8 = (double*)malloc( nl_m * sizeof(double) );
+      if(! my_new_vgrid->a_m_8){ 
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating a_m_8 of size = %d\n", nl_m);
 	return(VGD_ERROR);
       }
-      my_copy_double(a_m_8, &(this->a_m_8), nl_m);
+      my_copy_double(a_m_8, &(my_new_vgrid->a_m_8), nl_m);
     } else {
       printf("(Cvgd) a_m_8 is a required constructor entry\n");
       errorInput = 1;
     }
   }
-  if(this->is_valid( b_m_8_valid)) {
+  if(my_new_vgrid->is_valid( b_m_8_valid)) {
     if(b_m_8){
-      free(this->b_m_8);
-      this->b_m_8 = (double*)malloc( nl_m * sizeof(double) );
-      if(! this->b_m_8) {
+      free(my_new_vgrid->b_m_8);
+      my_new_vgrid->b_m_8 = (double*)malloc( nl_m * sizeof(double) );
+      if(! my_new_vgrid->b_m_8) {
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating b_m_8\n");
 	return(VGD_ERROR);
       }
-      my_copy_double(b_m_8, &(this->b_m_8), nl_m);
+      my_copy_double(b_m_8, &(my_new_vgrid->b_m_8), nl_m);
     } else {
       printf("(Cvgd) b_m_8 is a required constructor entry\n");
       errorInput = 1;
     }
   }
-  if(this->is_valid( c_m_8_valid)) {
+  if(my_new_vgrid->is_valid( c_m_8_valid)) {
     if(c_m_8){
-      free(this->c_m_8);
-      this->c_m_8 = (double*)malloc( nl_m * sizeof(double) );
-      if(! this->c_m_8) {
+      free(my_new_vgrid->c_m_8);
+      my_new_vgrid->c_m_8 = (double*)malloc( nl_m * sizeof(double) );
+      if(! my_new_vgrid->c_m_8) {
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating c_m_8\n");
 	return(VGD_ERROR);
       }
-      my_copy_double(c_m_8, &(this->c_m_8), nl_m);
+      my_copy_double(c_m_8, &(my_new_vgrid->c_m_8), nl_m);
     } else {
       printf("(Cvgd) c_m_8 is a required constructor entry\n");
       errorInput = 1;
     }
   }
-  if(this->is_valid( a_t_8_valid)) {
+  if(my_new_vgrid->is_valid( a_t_8_valid)) {
     if(a_t_8){
-      free(this->a_t_8);
-      this->a_t_8 = (double*)malloc( nl_t * sizeof(double) );
-      if(! this->a_t_8) {
+      free(my_new_vgrid->a_t_8);
+      my_new_vgrid->a_t_8 = (double*)malloc( nl_t * sizeof(double) );
+      if(! my_new_vgrid->a_t_8) {
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating a_t_8\n");
 	return(VGD_ERROR);
       }
-      my_copy_double(a_t_8, &(this->a_t_8), nl_t);
+      my_copy_double(a_t_8, &(my_new_vgrid->a_t_8), nl_t);
     } else {
       printf("(Cvgd) a_t_8 is a required constructor entry\n");
       errorInput = 1;
     }
   }
-  if(this->is_valid( b_t_8_valid)) {
+  if(my_new_vgrid->is_valid( b_t_8_valid)) {
     if(b_t_8){
-      free(this->b_t_8);
-      this->b_t_8 = (double*)malloc( nl_t * sizeof(double) );
-      if(! this->b_t_8) {
+      free(my_new_vgrid->b_t_8);
+      my_new_vgrid->b_t_8 = (double*)malloc( nl_t * sizeof(double) );
+      if(! my_new_vgrid->b_t_8) {
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating b_t_8\n");
 	return(VGD_ERROR);
       }
-      my_copy_double(b_t_8, &(this->b_t_8), nl_t);
+      my_copy_double(b_t_8, &(my_new_vgrid->b_t_8), nl_t);
     } else {
       printf("(Cvgd) b_t_8 is a required constructor entry\n");
       errorInput = 1;
     }
   }
-  if(this->is_valid( c_t_8_valid)) {
+  if(my_new_vgrid->is_valid( c_t_8_valid)) {
     if(c_t_8){
-      free(this->c_t_8);
-      this->c_t_8 = (double*)malloc( nl_t * sizeof(double) );
-      if(! this->c_t_8) {
+      free(my_new_vgrid->c_t_8);
+      my_new_vgrid->c_t_8 = (double*)malloc( nl_t * sizeof(double) );
+      if(! my_new_vgrid->c_t_8) {
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating c_t_8\n");
 	return(VGD_ERROR);
       }
-      my_copy_double(c_t_8, &(this->c_t_8), nl_t);
+      my_copy_double(c_t_8, &(my_new_vgrid->c_t_8), nl_t);
     } else {
       printf("(Cvgd) c_t_8 is a required constructor entry\n");
       errorInput = 1;
     }
   }
-  if(this->is_valid( a_w_8_valid)) {
+  if(my_new_vgrid->is_valid( a_w_8_valid)) {
     if(a_w_8){
-      free(this->a_w_8);
-      this->a_w_8 = (double*)malloc( nl_w * sizeof(double) );
-      if(! this->a_w_8) {
+      free(my_new_vgrid->a_w_8);
+      my_new_vgrid->a_w_8 = (double*)malloc( nl_w * sizeof(double) );
+      if(! my_new_vgrid->a_w_8) {
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating a_w_8\n");
 	return(VGD_ERROR);
       }
-      my_copy_double(a_w_8, &(this->a_w_8), nl_w);
+      my_copy_double(a_w_8, &(my_new_vgrid->a_w_8), nl_w);
     } else {
       printf("(Cvgd) a_w_8 is a required constructor entry\n");
       errorInput = 1;
     }
   }
-  if(this->is_valid( b_w_8_valid)) {
+  if(my_new_vgrid->is_valid( b_w_8_valid)) {
     if(b_w_8){
-      free(this->b_w_8);
-      this->b_w_8 = (double*)malloc( nl_w * sizeof(double) );
-      if(! this->b_w_8) {
+      free(my_new_vgrid->b_w_8);
+      my_new_vgrid->b_w_8 = (double*)malloc( nl_w * sizeof(double) );
+      if(! my_new_vgrid->b_w_8) {
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating b_w_8\n");
 	return(VGD_ERROR);
       }
-      my_copy_double(b_w_8, &(this->b_w_8), nl_w);
+      my_copy_double(b_w_8, &(my_new_vgrid->b_w_8), nl_w);
     } else {
       printf("(Cvgd) b_w_8 is a required constructor entry\n");
       errorInput = 1;
     }
   }
-  if(this->is_valid( c_w_8_valid)) {
+  if(my_new_vgrid->is_valid( c_w_8_valid)) {
     if(c_w_8){
-      free(this->c_w_8);
-      this->c_w_8 = (double*)malloc( nl_w * sizeof(double) );
-      if(! this->c_w_8) {
+      free(my_new_vgrid->c_w_8);
+      my_new_vgrid->c_w_8 = (double*)malloc( nl_w * sizeof(double) );
+      if(! my_new_vgrid->c_w_8) {
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating c_w_8\n");
 	return(VGD_ERROR);
       }
-      my_copy_double(c_w_8, &(this->c_w_8), nl_w);
+      my_copy_double(c_w_8, &(my_new_vgrid->c_w_8), nl_w);
     } else {
       printf("(Cvgd) c_w_8 is a required constructor entry\n");
       errorInput = 1;
     }
   }
 
-  if(this->is_valid( ip1_m_valid)) {
+  if(my_new_vgrid->is_valid( ip1_m_valid)) {
     if(ip1_m){
-      free(this->ip1_m);
-      this->ip1_m = (int*)malloc( nl_m * sizeof(int) );
-      if(! this->ip1_m) {
+      free(my_new_vgrid->ip1_m);
+      my_new_vgrid->ip1_m = (int*)malloc( nl_m * sizeof(int) );
+      if(! my_new_vgrid->ip1_m) {
 	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating ip1_m in Cvgd_new_build_vert2\n");
 	return(VGD_ERROR);
       }
-      my_copy_int(ip1_m, &(this->ip1_m), nl_m);
+      my_copy_int(ip1_m, &(my_new_vgrid->ip1_m), nl_m);
     } else {
       printf("(Cvgd) ip1_m is a required constructor entry\n");
       errorInput = 1;
     }
   }
-  if(this->is_valid( ip1_t_valid)) {
+  if(my_new_vgrid->is_valid( ip1_t_valid)) {
     if(ip1_t){
-      free(this->ip1_t);
-      this->ip1_t = (int*)malloc( nl_t * sizeof(int) );
-      if(! this->ip1_t) {
+      free(my_new_vgrid->ip1_t);
+      my_new_vgrid->ip1_t = (int*)malloc( nl_t * sizeof(int) );
+      if(! my_new_vgrid->ip1_t) {
 	printf("(Cvgd) ERROR: in Cvgd_new_build_vert2, problem allocating ip1_t\n");
 	return(VGD_ERROR);
       }
-      my_copy_int(ip1_t, &(this->ip1_t), nl_t);
+      my_copy_int(ip1_t, &(my_new_vgrid->ip1_t), nl_t);
     } else {
       printf("(Cvgd) ip1_t is a required constructor entry\n");
       errorInput = 1;
     }
   }
-  if(this->is_valid( ip1_w_valid)) {
+  if(my_new_vgrid->is_valid( ip1_w_valid)) {
     if(ip1_w){
-      free(this->ip1_w);
-      this->ip1_w = (int*)malloc( nl_w * sizeof(int) );
-      if(! this->ip1_w) {
+      free(my_new_vgrid->ip1_w);
+      my_new_vgrid->ip1_w = (int*)malloc( nl_w * sizeof(int) );
+      if(! my_new_vgrid->ip1_w) {
 	printf("(Cvgd) ERROR: in Cvgd_new_build_vert2, problem allocating ip1_w\n");
 	return(VGD_ERROR);
       }
-      my_copy_int(ip1_w, &(this->ip1_w), nl_w);
+      my_copy_int(ip1_w, &(my_new_vgrid->ip1_w), nl_w);
     } else {
       printf("(Cvgd) ip1_w is a required constructor entry\n");
       errorInput = 1;
     }
   }
-  if (errorInput > 0) {
+  if (errorInput > 0)
+  {
     return (VGD_ERROR);
-  }  
+  }
 
-  // Fill table with version-specific encoder
-  switch(this->vcode) {
-  case 1:
-    if( this->table )
-      free( this->table );
-    this->table_ni = 3;
-    this->table_nj = 2*nk+skip;
-    this->table_nk = 1;
-    table_size = this->table_ni * this->table_nj * this->table_nk;
-    this->table = (double*)malloc ( table_size * sizeof(double) );
-    if(! this->table ) {
-      printf("(Cvgd) ERROR in Cvgd_new_build_vert2, cannot allocate table of bouble of size %d\n",table_size );
-      return(VGD_ERROR);
-    }
-    strcpy(this->ref_name,VGD_NO_REF_NOMVAR);
-    strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
-    ier = this->c_encode_vert();
-    break;
-  case 1001:
-    if( this->table )
-      free( this->table );
-    this->table_ni = 3;
-    this->table_nj = nk+skip;
-    this->table_nk = 1;
-    table_size = this->table_ni * this->table_nj * this->table_nk;
-    this->table = (double*)malloc ( table_size * sizeof(double) );
-    if(! this->table ) {
-      printf("(Cvgd) ERROR in Cvgd_new_build_vert2, cannot allocate table of bouble of size %d\n",table_size );
-      return(VGD_ERROR);
-    }
 
-  strcpy(this->ref_name,"P0  ");
-  strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
-    ier = this->c_encode_vert();
-    break;
-  case 1002:
-    if( this->table )
-      free( this->table );
-    this->table_ni = 3;
-    this->table_nj = nk+skip;
-    this->table_nk = 1;
-    table_size = this->table_ni * this->table_nj * this->table_nk;
-    this->table = (double*)malloc ( table_size * sizeof(double) );
-    if(! this->table ) {
-      printf("(Cvgd) ERROR in Cvgd_new_build_vert2, cannot allocate table of bouble of size %d\n",table_size );
-      return(VGD_ERROR);
-    }
-    strcpy(this->ref_name,"P0  ");
-    strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
-    ier = this->c_encode_vert();
-    break;
-  case 2001:
-    if( this->table )
-      free( this->table );
-    this->table_ni = 3;
-    this->table_nj = nk+skip;
-    this->table_nk = 1;
-    table_size = this->table_ni * this->table_nj * this->table_nk;
-    this->table = (double*)malloc ( table_size * sizeof(double) );
-    if(! this->table ) {
-      printf("(Cvgd) ERROR in Cvgd_new_build_vert2, cannot allocate table of bouble of size %d\n",table_size );
-      return(VGD_ERROR);
-    }
-    strcpy(this->ref_name,VGD_NO_REF_NOMVAR);
-    strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
-    ier = this->c_encode_vert();
-    break;
-  case 4001:
-    if( this->table )
-      free( this->table );
-    this->table_ni = 3;
-    this->table_nj = nk+skip;
-    this->table_nk = 1;
-    table_size = this->table_ni * this->table_nj * this->table_nk;
-    this->table = (double*)malloc ( table_size * sizeof(double) );
-    if(! this->table ) {
-      printf("(Cvgd) ERROR in Cvgd_new_build_vert2, cannot allocate table of bouble of size %d\n",table_size );
-      return(VGD_ERROR);
-    }
-    strcpy(this->ref_name,VGD_NO_REF_NOMVAR);
-    strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
-    ier = this->c_encode_vert();
-    break;
-  case 1003:
-  case 5001:
-    if( this->table )
-      free( this->table );
-    this->table_ni = 3;
-    this->table_nj = nk+skip;
-    this->table_nk = 1;
-    table_size = this->table_ni * this->table_nj * this->table_nk;
-    this->table = (double*)malloc ( table_size * sizeof(double) );
-    if(! this->table ) {
-      printf("(Cvgd) ERROR in Cvgd_new_build_vert2, cannot allocate table of bouble of size %d\n",table_size );
-      return(VGD_ERROR);
-    }
-    strcpy(this->ref_name,"P0  ");
-    strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
-    ier = this->c_encode_vert();
-    break;
-  case 5002:
-  case 5003:
-  case 5004:
-  case 5005:
-    if( this->table )
-      free( this->table );
-    this->table_ni = 3;
-    this->table_nj = this->nl_m + this->nl_t + skip;
-    this->table_nk = 1;
-    table_size = this->table_ni * this->table_nj * this->table_nk;
-    this->table = (double*)malloc ( table_size * sizeof(double) );
-    if(! this->table )
-    {
-      printf("(Cvgd) ERROR in Cvgd_new_build_vert2, cannot allocate table of bouble of size %d\n", table_size);
-      return(VGD_ERROR);
-    }
-    strcpy(this->ref_name,"P0  ");
-    strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
-    ier = this->c_encode_vert();
-  case 5100:
-    if( this->table )
-      free( this->table );
-    this->table_ni = 4;
-    this->table_nj = this->nl_m + this->nl_t + skip;
-    this->table_nk = 1;
-    table_size = this->table_ni * this->table_nj * this->table_nk;
-    this->table = (double*)malloc ( table_size * sizeof(double) );
-    if(! this->table ) {
-      printf("(Cvgd) ERROR in Cvgd_new_build_vert2, cannot allocate table of bouble of size %d\n", table_size);
-      return(VGD_ERROR);
-    }
-    strcpy(this->ref_name,"P0  ");
-    strcpy(this->ref_namel,"P0LS");
-    ier = this->c_encode_vert();
-    break;
-  case 5999:
-    if( this->table )
-      free( this->table );
-    this->table_ni = 3;
-    this->table_nj = nk+skip;
-    this->table_nk = 1;
-    table_size = this->table_ni * this->table_nj * this->table_nk;
-    this->table = (double*)malloc ( table_size * sizeof(double) );
-    if(! this->table ) {
-      printf("(Cvgd) ERROR in Cvgd_new_build_vert2, cannot allocate table of bouble of size %d\n",table_size );
-      return(VGD_ERROR);
-    }
-    strcpy(this->ref_name,"P0  ");
-    strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
-    ier = this->c_encode_vert();
-    break;
-  case 21001:
-    if( this->table )
-      free( this->table );
-    this->table_ni = 4;
-    this->table_nj = this->nl_m + this->nl_t + skip;
-    this->table_nk = 1;
-    table_size = this->table_ni * this->table_nj * this->table_nk;
-    this->table = (double*)malloc ( table_size * sizeof(double) );
-    if(! this->table ) {
-      printf("(Cvgd) ERROR in Cvgd_new_build_vert2, cannot allocate table of bouble of size %d\n", table_size);
-      return(VGD_ERROR);
-    }
-    strcpy(this->ref_name,"ME  ");
-    strcpy(this->ref_namel,"MELS");
-    if ( fabs( this->rcoef3 - this->rcoef1 ) < 1.0e-6 && fabs( this->rcoef4 - this->rcoef2 ) < 1.0e-6) {
-      strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
-    }
-    if ( this->rcoef3 < 0. || this->rcoef4 < 0. ) {
-      strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
-    }
-    ier = this->c_encode_vert();
-    break;
-  case 21002:
-    if( this->table )
-      free( this->table );
-    this->table_ni = 4;
-    // To have a complete set of levels parameters, we need all momentum and Vertical-Velocity
-    // levels, the thermo levels set only differs for the diag level. Therefor we only write
-    // Momentum, Vertical-Velocity and the thermo diag level
-    this->table_nj = this->nl_m + this->nl_w + 1 + skip;
-    this->table_nk = 1;
-    table_size = this->table_ni * this->table_nj * this->table_nk;
-    this->table = (double*)malloc ( table_size * sizeof(double) );
-    if(! this->table ) {
-      printf("(Cvgd) ERROR in Cvgd_new_build_vert2, cannot allocate table of bouble of size %d\n", table_size);
-      return(VGD_ERROR);
-    }
-    strcpy(this->ref_name,"ME  ");
-     strcpy(this->ref_namel,"MELS");
-    if ( fabs( this->rcoef3 - this->rcoef1 ) < 1.0e-6 && fabs( this->rcoef4 - this->rcoef2 ) < 1.0e-6) {
-      strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
-    }
-    if ( this->rcoef3 < 0. || this->rcoef4 < 0. ) {
-      strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
-    }
-    ier = this->c_encode_vert();
-    break;
-  default:
-    fprintf(stderr,"(Cvgd) ERROR in Cvgd_new_build_vert2, invalid kind or version : kind=%d, version=%d\n",kind,version);
+
+  // Fill the table (encode the vertical co-ordinate)
+  if(my_new_vgrid->allocate_table(nk) == VGD_ERROR)
+  {
+    printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem with allocate_table for vcode=_%s\n",my_new_vgrid->vcode);
+    return(VGD_ERROR);
+  }
+  if(my_new_vgrid->c_encode_vert() == VGD_ERROR)
+  {
+    printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem with c_encode_vert for vcode=_%s\n",my_new_vgrid->vcode);
     return(VGD_ERROR);
   }
 
-  if(ier == VGD_ERROR) {
-    printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem with encode_vert_%s\n",this->vcode);
-    return(VGD_ERROR);
-  }
 
-  this->valid = 1;
-  if(this->fstd_init() == VGD_ERROR) {
+  my_new_vgrid->valid = 1;
+  if(my_new_vgrid->fstd_init() == VGD_ERROR)
+  {
     printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem with fstd_init\n");
   }
 
   return(VGD_OK);
-
 }
 
 // Should no longer be called
@@ -6495,7 +6396,6 @@ int vgrid::Cvgd_stda76_pres_from_hgts_list(float *pres, float *hgts,
 
 int vgrid::Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, int ip2, int kind_sought, int version_sought)
 {
-
   char  match_ipig;
   int error, i, ni, nj, nk;
   int toc_found = 0, count, nkeyList = MAX_DESC_REC;
@@ -6714,6 +6614,10 @@ int vgrid::Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, in
     case 21002:
       vgrid_21002 new_vgrid_21002(key);
       *my_new_vgrid = & new_vgrid_21002;
+
+    default:
+    printf("(Cvgd) ERROR in Cvgd_read_vgrid_from_file, unrecognized vcode=%s\n",vcode);
+    return(VGD_ERROR);
     }
   }
   catch(vgrid_exception)
@@ -6721,7 +6625,7 @@ int vgrid::Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, in
     printf("(Cvgd) ERROR in vgrid::Cvgd_read_vgrid_from_file, unable to construct from a key %d\n", key);
     return(VGD_ERROR);
   }
-  this->match_ipig = match_ipig;  
+  this->match_ipig = match_ipig;
 
   return(VGD_OK);
 }

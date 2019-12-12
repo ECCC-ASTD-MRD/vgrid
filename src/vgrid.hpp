@@ -261,6 +261,8 @@ public:
   virtual int c_encode_vert() = 0;
 
 protected:
+  virtual void set_table_nj(int nk) = 0;
+  virtual void allocate_table(int nk) = 0;
   void flip_transfer_d2c(char *name, double val_8);
   float c_convip_IP2Level(int IP,int *kind);
   void decode_HY(VGD_TFSTD_ext var, double *ptop_8, double *pref_8, float *rcoef);

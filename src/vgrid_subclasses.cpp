@@ -29,11 +29,17 @@ vgrid_0001::vgrid_0001() : vgrid()
   this->kind    = 0;
   this->version = 1;
   this->vcode   = 0001;
-  this->skip    = 1;
+  this->skip    = 1;  // Could be changed by c_decode_vert
+  this->table_ni = 3;
 }
+
 vgrid_0001::vgrid_0001(int key) : vgrid(key)
 {
-  this->skip = 0;  // will be changed by c_decode_vert
+}
+
+void vgrid_0001::set_table_nj(int nk)
+{
+  table_nj = 2*nk+skip;
 }
 
 int vgrid_0001::c_decode_vert()
@@ -122,9 +128,17 @@ vgrid_1001::vgrid_1001() : vgrid()
   this->version = 1;
   this->vcode   = 1001;
   this->skip    = 2; // Could be changed by c_decode_vert
+  this->table_ni = 3;
+  strcpy(this->ref_name,"P0  ");
 }
+
 vgrid_1001::vgrid_1001(int key) : vgrid(key)
 {
+}
+
+void vgrid_1001::set_table_nj(int nk)
+{
+  table_nj = nk+skip;
 }
 
 int vgrid_1001::c_decode_vert()
@@ -257,9 +271,17 @@ vgrid_1002::vgrid_1002() : vgrid()
   this->version = 2;
   this->vcode   = 1002;
   this->skip    = 2; // Could be changed by c_decode_vert
+  this->table_ni = 3;
+  strcpy(this->ref_name,"P0  ");
 }
+
 vgrid_1002::vgrid_1002(int key) : vgrid(key)
 {
+}
+
+void vgrid_1002::set_table_nj(int nk)
+{
+  table_nj = nk+skip;
 }
 
 int vgrid_1002::c_decode_vert()
@@ -458,9 +480,16 @@ vgrid_1003::vgrid_1003() : vgrid()
   this->version = 3;
   this->vcode   = 1003;
   this->skip    = 0; // Could be change by c_decode_vert
+  strcpy(this->ref_name,"P0  ");
 }
+
 vgrid_1003::vgrid_1003(int key) : vgrid_1003_5001(key)
 {
+}
+
+void vgrid_1003::set_table_nj(int nk)
+{
+  table_nj = nk+skip;
 }
 
 int vgrid_1003::C_genab(float *hybuser, int nk, float rcoef, double ptop_8, double pref_8, double **a_m_8, double **b_m_8, int **ip1_m)
@@ -552,9 +581,16 @@ vgrid_2001::vgrid_2001() : vgrid()
   this->version = 1;
   this->vcode   = 2001;
   this->skip    = 1;
+  this->table_ni = 3;
 }
+
 vgrid_2001::vgrid_2001(int key)
 {
+}
+
+void vgrid_2001::set_table_nj(int nk)
+{
+  table_nj = nk+skip;
 }
 
 int vgrid_2001::c_decode_vert()
@@ -676,9 +712,16 @@ vgrid_4001::vgrid_4001() : vgrid()
   this->version = 1;
   this->vcode = 4001;
   this->skip    = 1; // Could be changed by c_decode_vert
+  this->table_ni = 3;
 }
+
 vgrid_4001::vgrid_4001(int key)
 {
+}
+
+void vgrid_4001::set_table_nj(int nk)
+{
+  table_nj = nk+skip;
 }
 
 int vgrid_4001::c_decode_vert()
@@ -806,9 +849,17 @@ vgrid_5001::vgrid_5001() : vgrid()
   this->version = 1;
   this->vcode   = 5001;
   this->skip    = 3;
+  this->table_ni = 3;
+  strcpy(this->ref_name,"P0  ");
 }
+
 vgrid_5001::vgrid_5001(int key) : vgrid_1003_5001(key)
 {
+}
+
+void vgrid_5001::set_table_nj(int nk)
+{
+  table_nj = nk+skip;
 }
 
 int vgrid_5001::c_encode_vert()
@@ -938,6 +989,11 @@ int vgrid_5001::C_genab(float *hybuser, int nk, float rcoef, double ptop_8, doub
 vgrid_5002_5003_5004_5005::vgrid_5002_5003_5004_5005(int key, int k_plus_top_value) : vgrid(key)
 {
   k_plus_top = k_plus_top_value;
+}
+
+void vgrid_5002_5003_5004_5005::set_table_nj(int nk)
+{
+  table_nj = this->nl_m + this->nl_t + skip;
 }
 
 int vgrid_5002_5003_5004_5005::c_decode_vert()
@@ -1237,7 +1293,9 @@ vgrid_5002::vgrid_5002() : vgrid()
   this->version = 2;
   this->vcode   = 5002;
   this->skip    = 3; // Could be changed by c_decode_vert
+  this->table_ni = 3;
 }
+
 vgrid_5002::vgrid_5002(int key) : vgrid_5002_5003_5004_5005(key, 1)
 {
 }
@@ -1249,6 +1307,7 @@ vgrid_5003::vgrid_5003() : vgrid()
   this->version = 3;
   this->vcode   = 5003;
   this->skip    = 3; // Could be changed by c_decode_vert
+  this->table_ni = 3;
 }
 vgrid_5003::vgrid_5003(int key) : vgrid_5002_5003_5004_5005(key, 1)
 {
@@ -1261,6 +1320,7 @@ vgrid_5004::vgrid_5004() : vgrid()
   this->version = 4;
   this->vcode   = 5004;
   this->skip    = 3; // Could be changed by c_decode_vert
+  this->table_ni = 3;
 }
 vgrid_5004::vgrid_5004(int key) : vgrid_5002_5003_5004_5005(key, 0)
 {
@@ -1414,6 +1474,8 @@ vgrid_5005::vgrid_5005() : vgrid()
   this->version = 5;
   this->vcode   = 5005;
   this->skip    = 3; // Could be changed by c_decode_vert
+  this->table_ni = 3;
+  strcpy(this->ref_name,"P0  ");
 }
 vgrid_5005::vgrid_5005(int key) : vgrid_5002_5003_5004_5005(key, 0)
 {
@@ -1427,9 +1489,18 @@ vgrid_5100::vgrid_5100() : vgrid()
   this->version = 100;
   this->vcode   = 5100;
   this->skip    = 3; // Could be changed by c_decode_vert
+  this->table_ni = 4;
+  strcpy(this->ref_name,"P0  ");
+  strcpy(this->ref_namel,"P0LS");
 }
+
 vgrid_5100::vgrid_5100(int key)
 {
+}
+
+void vgrid_5100::set_table_nj(int nk)
+{
+  table_nj = this->nl_m + this->nl_t + skip;
 }
 
 int vgrid_5100::c_decode_vert()
@@ -1554,9 +1625,17 @@ vgrid_5999::vgrid_5999() : vgrid()
   this->version = 999;
   this->vcode   = 5999;
   this->skip    = 2; // Could be changed by c_decode_vert
+  this->table_ni = 3;
+  strcpy(this->ref_name,"P0  ");
 }
+
 vgrid_5999::vgrid_5999(int key)
 {
+}
+
+void vgrid_5100::set_table_nj(int nk)
+{
+  table_nj = nk+skip;
 }
 
 int vgrid_5999::c_decode_vert()
@@ -1661,9 +1740,27 @@ vgrid_21001::vgrid_21001() : vgrid()
   this->version = 1;
   this->vcode   = 21001;
   this->skip    = 3; // Could be changed by c_decode_vert
+  this->table_ni = 4;
+  strcpy(this->ref_name,"ME  ");
+  strcpy(this->ref_namel,"MELS");
+  if (   fabs( this->rcoef3 - this->rcoef1 ) < 1.0e-6
+      && fabs( this->rcoef4 - this->rcoef2 ) < 1.0e-6)
+  {
+    strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
+  }
+  if ( this->rcoef3 < 0. || this->rcoef4 < 0. )
+  {
+    strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
+  }
 }
+
 vgrid_21001::vgrid_21001(int key)
 {
+}
+
+void vgrid_21001::set_table_nj(int nk)
+{
+  table_nj = this->nl_m + this->nl_t + skip;
 }
 
 int vgrid_21001::c_decode_vert()
@@ -1781,9 +1878,31 @@ vgrid_21002::vgrid_21002() : vgrid()
   this->version = 2;
   this->vcode   = 21002;
   this->skip    = 3; // Could be changed by c_decode_vert
+  this->table_ni = 4;
+
+  // To have a complete set of levels parameters, we need all momentum and Vertical-Velocity
+  // levels, the thermo levels set only differs for the diag level. Therefor we only write
+  // Momentum, Vertical-Velocity and the thermo diag level
+  strcpy(this->ref_name,"ME  ");
+  strcpy(this->ref_namel,"MELS");
+  if (   fabs( this->rcoef3 - this->rcoef1 ) < 1.0e-6
+      && fabs( this->rcoef4 - this->rcoef2 ) < 1.0e-6)
+  {
+    strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
+  }
+  if ( this->rcoef3 < 0. || this->rcoef4 < 0. )
+  {
+    strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
+  }
 }
+
 vgrid_21002::vgrid_21001(int key)
 {
+}
+
+void vgrid_21002::set_table_nj(int nk)
+{
+  table_nj = this->nl_m + this->nl_w + 1 + skip;
 }
 
 int vgrid_21002::c_decode_vert()

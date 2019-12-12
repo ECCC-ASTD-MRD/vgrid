@@ -132,9 +132,10 @@ int Cvgd_new_build_vert2(int *vgdid, int kind, int version, int nk,
                          double *c_w_8, int *ip1_m, int *ip1_t, int *ip1_w,
                          int nl_m, int nl_t, int nl_w)
 {
-  vgrid my_vgd;
+  vgrid *my_vgd;
+  vgrid dummy;
   int status;
-  status=my_vgd.Cvgd_new_build_vert2(kind, version,
+  status=dummy.Cvgd_new_build_vert2(&my_vgd, version,
                                      nk, ip1, ip2, ptop_8,
                                      pref_8, rcoef1, rcoef2,
                                      rcoef3, rcoef4, a_m_8,
