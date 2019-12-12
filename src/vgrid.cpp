@@ -499,15 +499,6 @@ void vgrid::Cvgd_table_shape(int **tshape) {
   (*tshape)[2] = this->table_nk;
 }
 
-int vgrid::c_table_update() {
-  if( this->c_encode_vert() == VGD_ERROR )
-  {
-    printf("(Cvgd) ERROR in c_table_update, cannot encode Vcode %d\n",this->vcode);
-    return(VGD_ERROR);
-  }
-  return(VGD_OK);  
-}
-
 void my_copy_double(double *aa, double **bb, int ind){
   while (ind--) {
     (*bb)[ind] = aa[ind];
@@ -5410,8 +5401,8 @@ int vgrid::Cvgd_put_int(char *key, int value) {
 	// Height coordinate
 	this->a_m_8[this->nl_m -1 ] = c_convip_IP2Level(value, &kind);
       }
-      if( this->c_table_update() == VGD_ERROR) {
-	printf("(Cvgd) ERROR in Cvgd_put_int, problem with c_table_update for key %s\n",key);
+      if( this->c_encode_vert() == VGD_ERROR) {
+	printf("(Cvgd) ERROR in Cvgd_put_int, problem with c_encode_vert for key %s\n",key);
 	return(VGD_ERROR);
       }
     } else {
@@ -5427,8 +5418,8 @@ int vgrid::Cvgd_put_int(char *key, int value) {
 	// Height coordinate
 	this->a_t_8[this->nl_t -1 ] =  c_convip_IP2Level(value, &kind);
       }
-      if( this->c_table_update() == VGD_ERROR) {
-	printf("(Cvgd) ERROR in Cvgd_put_int, problem with c_table_update for key %s\n", key);
+      if( this->c_encode_vert() == VGD_ERROR) {
+	printf("(Cvgd) ERROR in Cvgd_put_int, problem with c_encode_vert for key %s\n", key);
 	return(VGD_ERROR);
       }
     } else {
@@ -5444,8 +5435,8 @@ int vgrid::Cvgd_put_int(char *key, int value) {
 	// Height coordinate
 	this->a_w_8[this->nl_w -1 ] =  c_convip_IP2Level(value, &kind);
       }
-      if( this->c_table_update() == VGD_ERROR) {
-	printf("(Cvgd) ERROR in Cvgd_put_int, problem with c_table_update for key %s\n", key);
+      if( this->c_encode_vert() == VGD_ERROR) {
+	printf("(Cvgd) ERROR in Cvgd_put_int, problem with c_encode_vert for key %s\n", key);
 	return(VGD_ERROR);
       }
     } else {
