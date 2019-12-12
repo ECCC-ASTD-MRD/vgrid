@@ -220,8 +220,6 @@ static int Cvgd_getopt_int(char *key, int *value, int quiet);
   int Cvgd_new_gen2(int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
 	      double *ptop_8, double *pref_8, double *ptop_out_8,
 	      int ip1, int ip2, float *dhm, float *dht, float *dhw, int avg);
-  int C_get_consistent_pt_e1(int iun, float *val, char *nomvar);
-  int C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, char *nomvar);
   int C_gen_legacy_desc(int unit, int *keylist , int nb);
   int c_legacy(int unit, int F_kind);
   int Cvgd_new_gen(int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2,
@@ -244,6 +242,10 @@ static int Cvgd_getopt_int(char *key, int *value, int quiet);
   int Cvgd_new_from_table(double *table, int ni, int nj, int nk);
   int Cvgd_stda76_temp(int *i_val, int nl_t, float *temp);
   int Cvgd_stda76_pres(int *i_val, int nl_t, float *pres, float *sfc_temp, float *sfc_pres);
+private:
+static int C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, char *nomvar);
+static int C_get_consistent_pt_e1(int iun, float *val, char *nomvar);
+public:
 static int Cvgd_stda76_hgts_from_pres_list(float *hgts, float *pres, int nb);
 static int Cvgd_stda76_pres_from_hgts_list(float *pres, float *hgts, int nb);
 

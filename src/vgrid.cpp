@@ -6923,7 +6923,7 @@ int vgrid::Cvgd_new_gen2(int kind, int version, float *hyb, int size_hyb, float 
   return (VGD_OK);
 }
 
-int vgrid::C_get_consistent_pt_e1(int iun, float *val, char *nomvar ){
+int C_get_consistent_pt_e1(int iun, float *val, char *nomvar ){
   int error, ni, nj, nk, nmax=1000, infon, k;
   int liste[nmax];
   float *work;
@@ -6970,7 +6970,7 @@ int vgrid::C_get_consistent_pt_e1(int iun, float *val, char *nomvar ){
   return(VGD_ERROR);
 }
 
-int vgrid::C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, char *nomvar ){
+int C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, char *nomvar ){
   int error, ni, nj, nk, nmax=1000, infon, ind;
   int liste[nmax];
   VGD_TFSTD_ext va3;
@@ -7100,14 +7100,14 @@ int vgrid::C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, c
   {
     // pt_key > 0
     // Verify whether HY constistant with PT
-      if( this->C_get_consistent_pt_e1(unit, &ptop,"PT  ") == VGD_ERROR )
+      if( C_get_consistent_pt_e1(unit, &ptop,"PT  ") == VGD_ERROR )
       {
 	printf("(Cvgd) ERROR in C_gen_legacy_desc, consistency check on PT failed\n");
 	goto bomb;
       }
 
 
-    if( this->C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR )
+    if( C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR )
     {
       printf("(Cvgd) ERROR in C_gen_legacy_record, consistency check on HY failed (1)\n");
       goto bomb;
@@ -7172,7 +7172,7 @@ int vgrid::C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, c
       printf("(Cvgd)   hybrid (normalized) coordinate found\n");
     vgrid_1003 new_vgrid_1003();
     *my_new_vgrid = & new_vgrid_0003;
-      if( my_new_vgrid->C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR ){
+      if( C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR ){
 	printf("(Cvgd) ERROR in C_gen_legacy_record, consistency check on HY failed (2)\n");
 	goto bomb;
       }
@@ -7205,7 +7205,7 @@ int vgrid::C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, c
     printf("(Cvgd)   Hybrid coordinate found\n");
     vgrid_1001 new_vgrid_5001();
     *my_new_vgrid = & new_vgrid_5001;
-    if( my_new_vgrid->C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR )
+    if( C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR )
     {
       printf("(Cvgd) ERROR in C_gen_legacy_desc, consistency check on HY failed\n");
       goto bomb;
