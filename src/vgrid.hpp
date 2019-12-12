@@ -110,6 +110,9 @@ public:
   int      version;       // Vertical coordinate code
   char     match_ipig;    // do ip/ig matching for records
   char     valid;         // Validity of structure
+protected:
+  int      skip;          // space to be added to table_nj
+
   // METHODS:
 private:
   void init(void);

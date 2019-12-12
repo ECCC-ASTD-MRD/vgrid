@@ -26,19 +26,21 @@
 // ########## class 0001 ##########
 vgrid_0001::vgrid_0001() : vgrid()
 {
-  this->kind = 0;
+  this->kind    = 0;
   this->version = 1;
-  this->vcode = 0001;
+  this->vcode   = 0001;
+  this->skip    = 1;
 }
 vgrid_0001::vgrid_0001(int key) : vgrid(key)
 {
+  this->skip = 0;  // will be changed by c_decode_vert
 }
 
 int vgrid_0001::c_decode_vert()
 {
-  int skip, nk, k, ind;
+  int nk, k, ind;
 
-  skip          = (int) this->table[2];
+  this->skip = (int) this->table[2];
   ind = 3;
   
   nk = (this->table_nj - skip)/2;
@@ -83,12 +85,10 @@ int vgrid_0001::c_decode_vert()
 
 int vgrid_0001::c_encode_vert()
 {
-  int skip = 1;
-
   //Fill header
   this->table[0] = this->kind;
   this->table[1] = this->version;
-  this->table[2] = skip;
+  this->table[2] = this->skip;
   
   int k, ind = 3;
   for ( k = 0; k < nk; k++){
@@ -118,9 +118,10 @@ int vgrid_0001::c_encode_vert()
 // ########## class 1001 ##########
 vgrid_1001::vgrid_1001() : vgrid()
 {
-  this->kind = 1;
+  this->kind    = 1;
   this->version = 1;
-  this->vcode = 1001;
+  this->vcode   = 1001;
+  this->skip    = 2; // Could be changed by c_decode_vert
 }
 vgrid_1001::vgrid_1001(int key) : vgrid(key)
 {
@@ -128,14 +129,14 @@ vgrid_1001::vgrid_1001(int key) : vgrid(key)
 
 int vgrid_1001::c_decode_vert()
 {
-  int skip, nk, k, ind;
+  int nk, k, ind;
 
-  skip = (int) this->table[2];
+  this->skip = (int) this->table[2];
   flip_transfer_d2c(this->ref_name,this->table[3]);
   // The next two values in table are not used, so we continue with ind = 6
   ind = 6;
   
-  nk = this->table_nj - skip;
+  nk = this->table_nj - this->skip;
   // Free A, B and Ip1 vectors for momentum and thermo.
   this->c_vgd_free_abci();
   // Allocate and assign level data, there are nk of them
@@ -167,12 +168,10 @@ int vgrid_1001::c_decode_vert()
 
 int vgrid_1001::c_encode_vert()
 {
-  int skip = 2;
-
   //Fill header
   this->table[0] = this->kind;
   this->table[1] = this->version;
-  this->table[2] = skip;
+  this->table[2] = this->skip;
   flip_transfer_c2d(this->ref_name, &(this->table[3]));
 
   this->table[4] = 0.;
@@ -254,9 +253,10 @@ int vgrid_1001::C_genab(float *hyb, int nk, double **a_m_8, double **b_m_8, int 
 // ########## class 1002 ##########
 vgrid_1002::vgrid_1002() : vgrid()
 {
-  this->kind = 1;
+  this->kind    = 1;
   this->version = 2;
-  this->vcode = 1002;
+  this->vcode   = 1002;
+  this->skip    = 2; // Could be changed by c_decode_vert
 }
 vgrid_1002::vgrid_1002(int key) : vgrid(key)
 {
@@ -264,14 +264,14 @@ vgrid_1002::vgrid_1002(int key) : vgrid(key)
 
 int vgrid_1002::c_decode_vert()
 {
-  int skip, nk, k, ind;
+  int nk, k, ind;
 
-  skip          = (int) this->table[2];
+  this->skip    = (int) this->table[2];
   this->ptop_8  =       this->table[3];
   flip_transfer_d2c(this->ref_name,this->table[4]);
   // The next value in table is not used, so we continue with ind = 6
   ind = 6;
-  nk = this->table_nj - skip;
+  nk = this->table_nj - this->skip;
   
   // Free A, B and Ip1 vectors for momentum and thermo.
   this->c_vgd_free_abci();
@@ -305,12 +305,10 @@ int vgrid_1002::c_decode_vert()
 
 int vgrid_1002::c_encode_vert()
 {
-  int skip = 2;
-
   //Fill header
   this->table[0] = this->kind;
   this->table[1] = this->version;
-  this->table[2] = skip;
+  this->table[2] = this->skip;
   this->table[3] = this->ptop_8;
   flip_transfer_c2d(this->ref_name, &(this->table[4]));
   this->table[5] = 0.;
@@ -406,9 +404,9 @@ vgrid_1003_5001::vgrid_1003_5001(int key) : vgrid(key)
 
 int vgrid_1003_5001::c_decode_vert()
 {
-  int skip, k, ind, nk;
+  int k, ind, nk;
 
-  skip            = (int) this->table[2];
+  this->skip    =   (int) this->table[2];
 
   this->ptop_8  =         this->table[3];
   this->pref_8  =         this->table[4];
@@ -417,7 +415,7 @@ int vgrid_1003_5001::c_decode_vert()
   flip_transfer_d2c(this->ref_name,this->table[6]);
   // The next two values in table are not used, so we continue with ind = 9
   ind = 9;
-  nk = this->table_nj - skip;
+  nk = this->table_nj - this->skip;
 
   // Free A, B and Ip1 vectors for momentum and thermo.
   this->c_vgd_free_abci();
@@ -456,9 +454,10 @@ int vgrid_1003_5001::c_decode_vert()
 // ########## class 1003 ##########
 vgrid_1003::vgrid_1003() : vgrid()
 {
-  this->kind = 1;
+  this->kind    = 1;
   this->version = 3;
-  this->vcode = 1003;
+  this->vcode   = 1003;
+  this->skip    = 0; // Could be change by c_decode_vert
 }
 vgrid_1003::vgrid_1003(int key) : vgrid_1003_5001(key)
 {
@@ -549,9 +548,10 @@ int vgrid_1003::C_genab(float *hybuser, int nk, float rcoef, double ptop_8, doub
 // ########## class 2001 ##########
 vgrid_2001::vgrid_2001() : vgrid()
 {
-  this->kind = 2;
+  this->kind    = 2;
   this->version = 1;
-  this->vcode = 2001;
+  this->vcode   = 2001;
+  this->skip    = 1;
 }
 vgrid_2001::vgrid_2001(int key)
 {
@@ -559,12 +559,12 @@ vgrid_2001::vgrid_2001(int key)
 
 int vgrid_2001::c_decode_vert()
 {
-  int skip, nk, k, ind;
+  int nk, k, ind;
 
-  skip = (int) this->table[2];
+  this->skip = (int) this->table[2];
   ind = 3;
 
-  nk = this->table_nj - skip;
+  nk = this->table_nj - this->skip;
 
   // Free A, B and Ip1 vectors for momentum and thermo.
   this->c_vgd_free_abci();
@@ -596,13 +596,11 @@ int vgrid_2001::c_decode_vert()
 }
 
 int vgrid_2001::c_encode_vert()
-{  
-  int skip = 1;
-
+{
   //Fill header
   this->table[0] = this->kind;
   this->table[1] = this->version;
-  this->table[2] = skip;
+  this->table[2] = this->skip;
   
   int k, ind = 3;
   for ( k = 0; k < nk; k++){
@@ -677,6 +675,7 @@ vgrid_4001::vgrid_4001() : vgrid()
   this->kind = 4;
   this->version = 1;
   this->vcode = 4001;
+  this->skip    = 1; // Could be changed by c_decode_vert
 }
 vgrid_4001::vgrid_4001(int key)
 {
@@ -684,12 +683,12 @@ vgrid_4001::vgrid_4001(int key)
 
 int vgrid_4001::c_decode_vert()
 {
-  int skip, nk, k, ind;
+  int nk, k, ind;
 
-  skip = (int) this->table[2];
+  this->skip = (int) this->table[2];
   ind = 3;
 
-  nk = this->table_nj - skip;
+  nk = this->table_nj - this->skip;
 
   // Free A, B and Ip1 vectors for momentum and thermo.
   this->c_vgd_free_abci();
@@ -721,13 +720,11 @@ int vgrid_4001::c_decode_vert()
 }
 
 int vgrid_4001::c_encode_vert()
-{  
-  int skip = 1;
-
+{
   //Fill header
   this->table[0] = this->kind;
   this->table[1] = this->version;
-  this->table[2] = skip;
+  this->table[2] = this->skip;
   
   int k, ind = 3;
   for ( k = 0; k < nk; k++){
@@ -805,9 +802,10 @@ int vgrid_4001::C_genab(float *hgts, int nk, double **a_m_8, double **b_m_8, int
 // ########## class 5001 ##########
 vgrid_5001::vgrid_5001() : vgrid()
 {
-  this->kind = 5;
+  this->kind    = 5;
   this->version = 1;
-  this->vcode = 5001;
+  this->vcode   = 5001;
+  this->skip    = 3;
 }
 vgrid_5001::vgrid_5001(int key) : vgrid_1003_5001(key)
 {
@@ -815,12 +813,10 @@ vgrid_5001::vgrid_5001(int key) : vgrid_1003_5001(key)
 
 int vgrid_5001::c_encode_vert()
 {
-  int skip = 3;
-  
   //Fill header
   this->table[0] = this->kind;
   this->table[1] = this->version;
-  this->table[2] = skip;
+  this->table[2] = this->skip;
 
   this->table[3] = this->ptop_8;
   this->table[4] = this->pref_8;
@@ -946,11 +942,11 @@ vgrid_5002_5003_5004_5005::vgrid_5002_5003_5004_5005(int key, int k_plus_top_val
 
 int vgrid_5002_5003_5004_5005::c_decode_vert()
 {
-  int skip, k, ind, k_plus_diag, nk, nb, kind;
+  int k, ind, k_plus_diag, nk, nb, kind;
 
   this->kind    =   (int) this->table[0];
   this->version =   (int) this->table[1];
-  skip          =   (int) this->table[2];
+  this->skip    =   (int) this->table[2];
   this->ptop_8  =         this->table[3];
   this->pref_8  =         this->table[4];
   this->rcoef1  = (float) this->table[5];
@@ -1026,12 +1022,10 @@ int vgrid_5002_5003_5004_5005::c_decode_vert()
 
 int vgrid_5002_5003_5004_5005::c_encode_vert()
 {
-  int skip = 3;
-
   //Fill header
   this->table[0] = this->kind;
   this->table[1] = this->version;
-  this->table[2] = skip;
+  this->table[2] = this->skip;
   this->table[3] = this->ptop_8;
   this->table[4] = this->pref_8;
   this->table[5] = this->rcoef1;  
@@ -1239,9 +1233,10 @@ int vgrid_5002_5003_5004_5005::C_genab_5002_5003(float *hybuser, int nk, int *nl
 // ########## class 5002 ##########
 vgrid_5002::vgrid_5002() : vgrid()
 {
-  this->kind = 5;
+  this->kind    = 5;
   this->version = 2;
-  this->vcode = 5002;
+  this->vcode   = 5002;
+  this->skip    = 3; // Could be changed by c_decode_vert
 }
 vgrid_5002::vgrid_5002(int key) : vgrid_5002_5003_5004_5005(key, 1)
 {
@@ -1250,9 +1245,10 @@ vgrid_5002::vgrid_5002(int key) : vgrid_5002_5003_5004_5005(key, 1)
 // ########## class 5003 ##########
 vgrid_5003::vgrid_5003() : vgrid()
 {
-  this->kind = 5;
+  this->kind    = 5;
   this->version = 3;
-  this->vcode = 5003;
+  this->vcode   = 5003;
+  this->skip    = 3; // Could be changed by c_decode_vert
 }
 vgrid_5003::vgrid_5003(int key) : vgrid_5002_5003_5004_5005(key, 1)
 {
@@ -1261,9 +1257,10 @@ vgrid_5003::vgrid_5003(int key) : vgrid_5002_5003_5004_5005(key, 1)
 // ########## class 5004 ##########
 vgrid_5004::vgrid_5004() : vgrid()
 {
-  this->kind = 5;
+  this->kind    = 5;
   this->version = 4;
-  this->vcode = 5004;
+  this->vcode   = 5004;
+  this->skip    = 3; // Could be changed by c_decode_vert
 }
 vgrid_5004::vgrid_5004(int key) : vgrid_5002_5003_5004_5005(key, 0)
 {
@@ -1413,9 +1410,10 @@ int vgrid_5004::C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoe
 // ########## class 5005 ##########
 vgrid_5005::vgrid_5005() : vgrid()
 {
-  this->kind = 5;
+  this->kind    = 5;
   this->version = 5;
-  this->vcode = 5005;
+  this->vcode   = 5005;
+  this->skip    = 3; // Could be changed by c_decode_vert
 }
 vgrid_5005::vgrid_5005(int key) : vgrid_5002_5003_5004_5005(key, 0)
 {
@@ -1425,9 +1423,10 @@ vgrid_5005::vgrid_5005(int key) : vgrid_5002_5003_5004_5005(key, 0)
 // ########## class 5100 ##########
 vgrid_5100::vgrid_5100() : vgrid()
 {
-  this->kind = 5;
+  this->kind    = 5;
   this->version = 100;
-  this->vcode = 5100;
+  this->vcode   = 5100;
+  this->skip    = 3; // Could be changed by c_decode_vert
 }
 vgrid_5100::vgrid_5100(int key)
 {
@@ -1435,9 +1434,9 @@ vgrid_5100::vgrid_5100(int key)
 
 int vgrid_5100::c_decode_vert()
 {
-  int skip, k, ind, nb, kind;
+  int k, ind, nb, kind;
 
-  skip          =   (int) this->table[2];
+  this->skip    =   (int) this->table[2];
   this->ptop_8  =         this->table[3];
   this->pref_8  =         this->table[4];
   this->rcoef1  = (float) this->table[5];
@@ -1507,12 +1506,10 @@ int vgrid_5100::c_decode_vert()
 
 int vgrid_5100::c_encode_vert()
 {
-  int skip = 3;
-
   //Fill header
   this->table[0] = this->kind;
   this->table[1] = this->version;
-  this->table[2] = skip;
+  this->table[2] = this->skip;
   this->table[3] = this->ptop_8;
   this->table[4] = this->pref_8;
   this->table[5] = this->rcoef1;  
@@ -1553,9 +1550,10 @@ int vgrid_5100::c_encode_vert()
 // ########## class 5999 ##########
 vgrid_5999::vgrid_5999() : vgrid()
 {
-  this->kind = 5;
+  this->kind    = 5;
   this->version = 999;
-  this->vcode = 5999;
+  this->vcode   = 5999;
+  this->skip    = 2; // Could be changed by c_decode_vert
 }
 vgrid_5999::vgrid_5999(int key)
 {
@@ -1563,14 +1561,14 @@ vgrid_5999::vgrid_5999(int key)
 
 int vgrid_5999::c_decode_vert()
 {
-  int skip, k, ind, nk;
+  int k, ind, nk;
 
-  skip = (int) this->table[2];
+  this->skip = (int) this->table[2];
   flip_transfer_d2c(this->ref_name,this->table[3]);
 
   // The next two values in table are not used, so we continue with ind = 6
   ind = 6;
-  nk = this->table_nj - skip;
+  nk = this->table_nj - this->skip;
 
   // Free A, B and Ip1 vectors for momentum and thermo.
   this->c_vgd_free_abci();
@@ -1604,7 +1602,7 @@ int vgrid_5999::c_decode_vert()
 
 int vgrid_5999::c_encode_vert()
 {
-  int i, k, kind, skip = 2;
+  int i, k, kind;
   float hyb;
 
   // Check ip1 validity
@@ -1627,7 +1625,7 @@ int vgrid_5999::c_encode_vert()
   //Fill header
   this->table[0] = this->kind;
   this->table[1] = this->version;
-  this->table[2] = skip;
+  this->table[2] = this->skip;
   flip_transfer_c2d(this->ref_name, &(this->table[3]));
   this->table[4] = 0.;
   this->table[5] = 0.;
@@ -1659,9 +1657,10 @@ int vgrid_5999::c_encode_vert()
 // ########## class 21001 ##########
 vgrid_21001::vgrid_21001() : vgrid()
 {
-  this->kind = 21;
+  this->kind    = 21;
   this->version = 1;
-  this->vcode = 21001;
+  this->vcode   = 21001;
+  this->skip    = 3; // Could be changed by c_decode_vert
 }
 vgrid_21001::vgrid_21001(int key)
 {
@@ -1669,9 +1668,9 @@ vgrid_21001::vgrid_21001(int key)
 
 int vgrid_21001::c_decode_vert()
 {
-  int skip, k, ind, nb, kind;
+  int k, ind, nb, kind;
 
-  skip          =   (int) this->table[2];
+  this->skip    =   (int) this->table[2];
   this->rcoef1  = (float) this->table[3];
   this->rcoef2  = (float) this->table[4];
   this->rcoef3  = (float) this->table[5];
@@ -1734,12 +1733,10 @@ int vgrid_21001::c_decode_vert()
 
 int vgrid_21001::c_encode_vert()
 {
-  int skip = 3;
-
   //Fill header
   this->table[0] = this->kind;
   this->table[1] = this->version;
-  this->table[2] = skip;
+  this->table[2] = this->skip;
   this->table[3] = this->rcoef1;  
   this->table[4] = this->rcoef2;
   this->table[5] = this->rcoef3;  
@@ -1780,9 +1777,10 @@ int vgrid_21001::c_encode_vert()
 // ########## class 21002 ##########
 vgrid_21002::vgrid_21002() : vgrid()
 {
-  this->kind = 21;
+  this->kind    = 21;
   this->version = 2;
-  this->vcode = 21002;
+  this->vcode   = 21002;
+  this->skip    = 3; // Could be changed by c_decode_vert
 }
 vgrid_21002::vgrid_21001(int key)
 {
@@ -1790,9 +1788,9 @@ vgrid_21002::vgrid_21001(int key)
 
 int vgrid_21002::c_decode_vert()
 {
-  int skip, k, ind, nb, kind;
+  int k, ind, nb, kind;
 
-  skip          =   (int) this->table[2];
+  this->skip    =   (int) this->table[2];
   this->rcoef1  = (float) this->table[3];
   this->rcoef2  = (float) this->table[4];
   this->rcoef3  = (float) this->table[5];
@@ -1877,12 +1875,10 @@ int vgrid_21002::c_decode_vert()
 
 int vgrid_21002::c_encode_vert()
 {
-  int skip = 3;
-
   //Fill header
   this->table[0] = this->kind;
   this->table[1] = this->version;
-  this->table[2] = skip;
+  this->table[2] = this->skip;
   this->table[3] = this->rcoef1;  
   this->table[4] = this->rcoef2;
   this->table[5] = this->rcoef3;  

@@ -2488,6 +2488,7 @@ void vgrid::init(void)
   version       = 0;
   match_ipig    = 0;
   valid         = 0;
+  skip          = 0;
 
   rec.fstd_initialized = 0;
   rec.dateo = 0;
@@ -2886,7 +2887,7 @@ int vgrid::Cvgd_new_build_vert2(int kind, int version, int nk, int ip1, int ip2,
 		     double *a_m_8, double *b_m_8, double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8, double *a_w_8, double *b_w_8, double *c_w_8, int *ip1_m, int *ip1_t, int *ip1_w, int nl_m, int nl_t, int nl_w)
 {
   int errorInput = 0, ier;
-  int table_size, skip;
+  int table_size;
 
   // Initializations
   this->valid      = 1;
@@ -3133,7 +3134,6 @@ int vgrid::Cvgd_new_build_vert2(int kind, int version, int nk, int ip1, int ip2,
   // Fill table with version-specific encoder
   switch(this->vcode) {
   case 1:
-    skip = 1;
     if( this->table )
       free( this->table );
     this->table_ni = 3;
@@ -3150,7 +3150,6 @@ int vgrid::Cvgd_new_build_vert2(int kind, int version, int nk, int ip1, int ip2,
     ier = this->c_encode_vert();
     break;
   case 1001:
-    skip = 2;
     if( this->table )
       free( this->table );
     this->table_ni = 3;
@@ -3168,7 +3167,6 @@ int vgrid::Cvgd_new_build_vert2(int kind, int version, int nk, int ip1, int ip2,
     ier = this->c_encode_vert();
     break;
   case 1002:
-    skip = 2;
     if( this->table )
       free( this->table );
     this->table_ni = 3;
@@ -3185,7 +3183,6 @@ int vgrid::Cvgd_new_build_vert2(int kind, int version, int nk, int ip1, int ip2,
     ier = this->c_encode_vert();
     break;
   case 2001:
-    skip = 1;
     if( this->table )
       free( this->table );
     this->table_ni = 3;
@@ -3202,7 +3199,6 @@ int vgrid::Cvgd_new_build_vert2(int kind, int version, int nk, int ip1, int ip2,
     ier = this->c_encode_vert();
     break;
   case 4001:
-    skip = 1;
     if( this->table )
       free( this->table );
     this->table_ni = 3;
@@ -3220,7 +3216,6 @@ int vgrid::Cvgd_new_build_vert2(int kind, int version, int nk, int ip1, int ip2,
     break;
   case 1003:
   case 5001:
-    skip = 3;
     if( this->table )
       free( this->table );
     this->table_ni = 3;
@@ -3240,7 +3235,6 @@ int vgrid::Cvgd_new_build_vert2(int kind, int version, int nk, int ip1, int ip2,
   case 5003:
   case 5004:
   case 5005:
-    skip = 3;
     if( this->table )
       free( this->table );
     this->table_ni = 3;
@@ -3257,7 +3251,6 @@ int vgrid::Cvgd_new_build_vert2(int kind, int version, int nk, int ip1, int ip2,
     strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
     ier = this->c_encode_vert();
   case 5100:
-    skip = 3;
     if( this->table )
       free( this->table );
     this->table_ni = 4;
@@ -3274,7 +3267,6 @@ int vgrid::Cvgd_new_build_vert2(int kind, int version, int nk, int ip1, int ip2,
     ier = this->c_encode_vert();
     break;
   case 5999:
-    skip = 2;
     if( this->table )
       free( this->table );
     this->table_ni = 3;
@@ -3291,7 +3283,6 @@ int vgrid::Cvgd_new_build_vert2(int kind, int version, int nk, int ip1, int ip2,
     ier = this->c_encode_vert();
     break;
   case 21001:
-    skip = 3;
     if( this->table )
       free( this->table );
     this->table_ni = 4;
@@ -3314,7 +3305,6 @@ int vgrid::Cvgd_new_build_vert2(int kind, int version, int nk, int ip1, int ip2,
     ier = this->c_encode_vert();
     break;
   case 21002:
-    skip = 3;
     if( this->table )
       free( this->table );
     this->table_ni = 4;
