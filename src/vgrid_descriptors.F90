@@ -230,10 +230,10 @@ module vGrid_Descriptors
          integer (c_int), value :: ni, nj, nk
       end function f_new_from_table
 
-      integer(c_int) function f_new_gen(vgdid_p,kind,version,hyb_CP,size_hyb,rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP, &
+      integer(c_int) function f_new_gen(vgdid,kind,version,hyb_CP,size_hyb,rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP, &
            ip1,ip2,dhm_CP,dht_CP,dhw_CP,avg) bind(c, name='Cvgd_new_gen2')
          use iso_c_binding, only : c_ptr, c_int
-         type(c_ptr), value :: vgdid_p
+         type(c_ptr), value :: vgdid
          integer (c_int), value :: kind, version, size_hyb
          type(c_ptr), value :: hyb_CP,rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP
          type(c_ptr), value :: dhm_CP,dht_CP,dhw_CP

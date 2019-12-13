@@ -49,7 +49,6 @@ int check_build_1001_2001_5999_4001(vgrid my_vgrid, int vcode){
   int *ip1_m = NULL;
   double *a_m_8 = NULL, *b_m_8 = NULL;
   vgrid *my_vgrid2;
-  vgrid vgrid_plain;
 
   if( my_vgrid.Cvgd_get_int("KIND", &kind, 0) == VGD_ERROR ){
     return(VGD_ERROR);
@@ -136,7 +135,6 @@ int check_build_1002(vgrid my_vgrid){
   int *ip1_m = NULL;
   double *a_m_8 = NULL, *b_m_8 = NULL, ptop_8;
   vgrid my_vgrid2;
-  vgrid vgrid_plain;
 
   if( my_vgrid.Cvgd_get_int("KIND", &kind, 0) == VGD_ERROR ){
     return(VGD_ERROR);
@@ -175,8 +173,9 @@ int check_build_1002(vgrid my_vgrid){
   } else {
     printf("     Descritors are equal.\n");
   }
-  my_vgrid2 = vgrid_plain;
 
+  free(my_vgrid2);
+  my_vgrid2 = nullptr;
   if( Cvgd_new_build_vert_1002(&my_vgrid2, -1, -1, ptop_8, a_m_8, b_m_8, ip1_m, nk) == VGD_ERROR) {
     return(VGD_ERROR);
   }
@@ -200,7 +199,6 @@ int check_build_5001(vgrid my_vgrid){
   float rc_1;
   double *a_m_8 = NULL, *b_m_8 = NULL, ptop_8, pref_8;
   vgrid my_vgrid2;
-  vgrid vgrid_plain;
 
   if( my_vgrid.Cvgd_get_int("KIND", &kind, 0) == VGD_ERROR ){
     return(VGD_ERROR);
@@ -245,7 +243,6 @@ int check_build_5001(vgrid my_vgrid){
   } else {
     printf("     Descritors are equal.\n");
   }
-  my_vgrid2 = vgrid_plain;
 
   printf("  Testing specific interface\n");
   free(my_vgrid2);
@@ -275,7 +272,6 @@ int check_build_5002(vgrid my_vgrid){
   float rc_1, rc_2;
   double *a_m_8 = NULL, *b_m_8 = NULL, *a_t_8 = NULL, *b_t_8 = NULL, ptop_8, pref_8;
   vgrid my_vgrid2;
-  vgrid vgrid_plain;
 
   if( my_vgrid.Cvgd_get_int("KIND", &kind, 0) == VGD_ERROR ){
     return(VGD_ERROR);
@@ -330,8 +326,6 @@ int check_build_5002(vgrid my_vgrid){
     printf("     Descritors are equal.\n");
   }
 
-  my_vgrid2 = vgrid_plain;
-
   printf("  Testing specific interface\n");
   free(my_vgrid2);
   my_vgrid2 = nullptr;
@@ -363,7 +357,6 @@ int check_build_5005(vgrid my_vgrid){
   float rc_1, rc_2;
   double *a_m_8 = NULL, *b_m_8 = NULL, *a_t_8 = NULL, *b_t_8 = NULL, pref_8;
   vgrid my_vgrid2;
-  vgrid vgrid_plain;
 
   if( my_vgrid.Cvgd_get_int("KIND", &kind, 0) == VGD_ERROR ){
     return(VGD_ERROR);
@@ -414,8 +407,6 @@ int check_build_5005(vgrid my_vgrid){
   } else {
     printf("     Descritors are equal.\n");
   }
-
-  my_vgrid2 = vgrid_plain;
 
   printf("  Testing specific interface\n");
   free(my_vgrid2);
