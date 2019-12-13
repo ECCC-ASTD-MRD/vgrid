@@ -171,16 +171,16 @@ int Cvgd_new_gen2(int *vgdid, int kind, int version, float *hyb,
                   double *ptop_out_8, int ip1, int ip2, float *dhm, float *dht,
                   float *dhw, int avg)
 {
-  vgrid my_vgd;
+  vgrid *my_vgd;
   int status;
-  status=my_vgd.Cvgd_new_gen2(kind, version, hyb,
+  status=vgrid::Cvgd_new_gen2(&my_vgdid, kind, version, hyb,
                               size_hyb, rcoef1, rcoef2, rcoef3,
                               rcoef4, ptop_8, pref_8,
                               ptop_out_8, ip1, ip2, dhm, dht,
                               dhw, avg);
   if(status != VGD_ERROR)
     {
-      *vgdid=grid_check.get_tag(&my_vgd);
+      *vgdid=grid_check.get_tag(my_vgd);
     }
   return status;
 }

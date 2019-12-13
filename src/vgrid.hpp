@@ -220,7 +220,7 @@ public:
   int Cvgd_put_char(char *key, char *value);
   static int Cvgd_putopt_int(char *key, int value);
   int Cvgd_put_int(char *key, int value);
-  int Cvgd_new_gen2(int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
+  static int Cvgd_new_gen2(int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
 	      double *ptop_8, double *pref_8, double *ptop_out_8,
 	      int ip1, int ip2, float *dhm, float *dht, float *dhw, int avg);
   int C_gen_legacy_desc(int unit, int *keylist , int nb);

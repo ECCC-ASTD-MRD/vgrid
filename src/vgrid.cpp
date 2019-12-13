@@ -5300,7 +5300,7 @@ int vgrid::Cvgd_put_int(char *key, int value) {
 int vgrid::Cvgd_new_gen(int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2, 
 	      double *ptop_8, double *pref_8, double *ptop_out_8,
 		 int ip1, int ip2, float *dhm, float *dht, int avg){
-  if( this->Cvgd_new_gen2(kind, version, hyb, size_hyb, rcoef1, rcoef2, NULL, NULL,
+  if(Cvgd_new_gen2(this, kind, version, hyb, size_hyb, rcoef1, rcoef2, NULL, NULL,
 		   ptop_8, pref_8, ptop_out_8,
 		ip1, ip2, dhm, dht, NULL, avg) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen, see details above\n");
@@ -5309,7 +5309,7 @@ int vgrid::Cvgd_new_gen(int kind, int version, float *hyb, int size_hyb, float *
   return(VGD_OK);
 }
 int vgrid::Cvgd_new_gen_1001(float *hyb, int size_hyb, int ip1, int ip2) {
-  if( this->Cvgd_new_gen2(1, 1, hyb, size_hyb, NULL, NULL, NULL, NULL,
+  if(Cvgd_new_gen2(this, 1, 1, hyb, size_hyb, NULL, NULL, NULL, NULL,
 		NULL, NULL, NULL, ip1, ip2, NULL, NULL, NULL, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen_1001, see details above\n");
     return(VGD_ERROR);
@@ -5317,7 +5317,7 @@ int vgrid::Cvgd_new_gen_1001(float *hyb, int size_hyb, int ip1, int ip2) {
   return(VGD_OK);
 }
 int vgrid::Cvgd_new_gen_2001(float *hyb, int size_hyb, int ip1, int ip2) {
-  if( this->Cvgd_new_gen2(2, 1, hyb, size_hyb, NULL, NULL, NULL, NULL,
+  if(Cvgd_new_gen2(this, 2, 1, hyb, size_hyb, NULL, NULL, NULL, NULL,
 		NULL, NULL, NULL, ip1, ip2, NULL, NULL, NULL, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen_2001, see details above\n");
     return(VGD_ERROR);
@@ -5325,7 +5325,7 @@ int vgrid::Cvgd_new_gen_2001(float *hyb, int size_hyb, int ip1, int ip2) {
   return(VGD_OK);
 }
 int vgrid::Cvgd_new_gen_5999(float *hyb, int size_hyb, int ip1, int ip2) {
-  if( this->Cvgd_new_gen2(5, 999, hyb, size_hyb, NULL, NULL, NULL, NULL,
+  if(Cvgd_new_gen2(this, 5, 999, hyb, size_hyb, NULL, NULL, NULL, NULL,
 		NULL, NULL, NULL, ip1, ip2, NULL, NULL, NULL, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen_5999, see details above\n");
     return(VGD_ERROR);
@@ -5333,7 +5333,7 @@ int vgrid::Cvgd_new_gen_5999(float *hyb, int size_hyb, int ip1, int ip2) {
   return(VGD_OK);
 }
 int vgrid::Cvgd_new_gen_1002(float *hyb, int size_hyb, double ptop_8, int ip1, int ip2) {
-  if( this->Cvgd_new_gen2(1, 2, hyb, size_hyb, NULL, NULL, NULL, NULL,
+  if(Cvgd_new_gen2(this, 1, 2, hyb, size_hyb, NULL, NULL, NULL, NULL,
 		&ptop_8, NULL, NULL, ip1, ip2, NULL, NULL, NULL, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen_1002, see details above\n");
     return(VGD_ERROR);
@@ -5341,7 +5341,7 @@ int vgrid::Cvgd_new_gen_1002(float *hyb, int size_hyb, double ptop_8, int ip1, i
   return(VGD_OK);
 }
 int vgrid::Cvgd_new_gen_4001(float *hyb, int size_hyb, int ip1, int ip2) {  
-  if( this->Cvgd_new_gen2(4, 1, hyb, size_hyb, NULL, NULL, NULL, NULL,
+  if(Cvgd_new_gen2(this, 4, 1, hyb, size_hyb, NULL, NULL, NULL, NULL,
 		NULL, NULL, NULL, ip1, ip2, NULL, NULL, NULL, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen_4001, see details above\n");
     return(VGD_ERROR);
@@ -5349,7 +5349,7 @@ int vgrid::Cvgd_new_gen_4001(float *hyb, int size_hyb, int ip1, int ip2) {
   return(VGD_OK);
 }
 int vgrid::Cvgd_new_gen_5001(float *hyb, int size_hyb, double ptop_8, double pref_8, float rcoef1, int ip1, int ip2) {
-  if( this->Cvgd_new_gen2(5, 1, hyb, size_hyb, &rcoef1, NULL, NULL, NULL,
+  if(Cvgd_new_gen2(this, 5, 1, hyb, size_hyb, &rcoef1, NULL, NULL, NULL,
 		&ptop_8, &pref_8, NULL, ip1, ip2, NULL, NULL, NULL, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen_5001, see details above\n");
     return(VGD_ERROR);
@@ -5357,7 +5357,7 @@ int vgrid::Cvgd_new_gen_5001(float *hyb, int size_hyb, double ptop_8, double pre
   return(VGD_OK);
 }
 int vgrid::Cvgd_new_gen_5002(float *hyb, int size_hyb, double ptop_8, double pref_8, float rcoef1, float rcoef2, int ip1, int ip2) {
-  if( this->Cvgd_new_gen2(5, 2, hyb, size_hyb, &rcoef1, &rcoef2, NULL, NULL,
+  if(Cvgd_new_gen2(this, 5, 2, hyb, size_hyb, &rcoef1, &rcoef2, NULL, NULL,
 		&ptop_8, &pref_8, NULL, ip1, ip2, NULL, NULL, NULL, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen_5002, see details above\n");
     return(VGD_ERROR);
@@ -5365,7 +5365,7 @@ int vgrid::Cvgd_new_gen_5002(float *hyb, int size_hyb, double ptop_8, double pre
   return(VGD_OK);
 }
 int vgrid::Cvgd_new_gen_5005(float *hyb, int size_hyb, double pref_8, double *ptop_out_8, float rcoef1, float rcoef2, int ip1, int ip2, float dhm, float dht) {
-  if( this->Cvgd_new_gen2(5, 5, hyb, size_hyb, &rcoef1, &rcoef2, NULL, NULL,
+  if(Cvgd_new_gen2(this, 5, 5, hyb, size_hyb, &rcoef1, &rcoef2, NULL, NULL,
 		NULL, &pref_8, ptop_out_8, ip1, ip2, &dhm, &dht, NULL, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen_5005, see details above\n");
     return(VGD_ERROR);
@@ -5373,7 +5373,7 @@ int vgrid::Cvgd_new_gen_5005(float *hyb, int size_hyb, double pref_8, double *pt
   return(VGD_OK);
 }
 int vgrid::Cvgd_new_gen_5100(float *hyb, int size_hyb, double pref_8, double *ptop_out_8, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, int avg) {
-  if( this->Cvgd_new_gen2(5, 100, hyb, size_hyb, &rcoef1, &rcoef2,  &rcoef3, &rcoef4,
+  if(Cvgd_new_gen2(this, 5, 100, hyb, size_hyb, &rcoef1, &rcoef2,  &rcoef3, &rcoef4,
 		NULL, &pref_8, ptop_out_8, ip1, ip2, &dhm, &dht, NULL, avg) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen_5100, see details above\n");
     return(VGD_ERROR);
@@ -5382,7 +5382,7 @@ int vgrid::Cvgd_new_gen_5100(float *hyb, int size_hyb, double pref_8, double *pt
 }
 
 int vgrid::Cvgd_new_gen_21001(float *hyb, int size_hyb, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht) {
-  if( this->Cvgd_new_gen2(21, 1, hyb, size_hyb, &rcoef1, &rcoef2, &rcoef3, &rcoef4,
+  if(Cvgd_new_gen2(this, 21, 1, hyb, size_hyb, &rcoef1, &rcoef2, &rcoef3, &rcoef4,
 		NULL, NULL, NULL, ip1, ip2, &dhm, &dht, NULL, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen_21001, see details above\n");
     return(VGD_ERROR);
@@ -5391,7 +5391,7 @@ int vgrid::Cvgd_new_gen_21001(float *hyb, int size_hyb, float rcoef1, float rcoe
 }
 
 int vgrid::Cvgd_new_gen_21002(float *hyb, int size_hyb, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, float dhw) {
-  if( this->Cvgd_new_gen2(21, 2, hyb, size_hyb, &rcoef1, &rcoef2, &rcoef3, &rcoef4,
+  if(Cvgd_new_gen2(this, 21, 2, hyb, size_hyb, &rcoef1, &rcoef2, &rcoef3, &rcoef4,
 		NULL, NULL, NULL, ip1, ip2, &dhm, &dht, &dhw, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen_21002, see details above\n");
     return(VGD_ERROR);
@@ -5399,7 +5399,7 @@ int vgrid::Cvgd_new_gen_21002(float *hyb, int size_hyb, float rcoef1, float rcoe
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_new_gen2(int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
+int vgrid::Cvgd_new_gen2(vgrid **my_new_vgrid, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
 	      double *ptop_8, double *pref_8, double *ptop_out_8,
 	      int ip1, int ip2, float *dhm, float *dht, float *dhw, int avg){
 
@@ -5456,175 +5456,217 @@ int vgrid::Cvgd_new_gen2(int kind, int version, float *hyb, int size_hyb, float 
   }
   int nk = -1, nl_m = -1, nl_t = -1, nl_w = -1;
 
-  switch(this->vcode) {
-  case 1:	
-    fprintf(stderr,"(Cvgd) ERROR in Cvgd_new_gen2, kind=%d, version=%d\n cannot be generated, function to di so is in Nemo\n",kind,version);
-    return(VGD_ERROR);
-    break;
-  case 1001:	
-    nk   = size_hyb;
-    nl_m = size_hyb;
-    nl_t = size_hyb;
-    if(this->C_genab(hyb, size_hyb, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
-      free(a_m_8);
-      free(b_m_8);
-      free(ip1_m);
+  try
+  {
+    vgrid new_vgrid(vcode);
+    *my_new_vgrid = &new_vgrid;
+
+    switch(vcode) 
+    {
+    case 1:	
+      fprintf(stderr,"(Cvgd) ERROR in Cvgd_new_gen2, kind=%d, version=%d\n cannot be generated, function to di so is in Nemo\n",kind,version);
       return(VGD_ERROR);
-    }
-    break;
+      break;
+
+    case 1001:	
+      nk   = size_hyb;
+      nl_m = size_hyb;
+      nl_t = size_hyb;
+      if(my_new_vgrid->C_genab(hyb, size_hyb, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR )
+      {
+        free(a_m_8);
+        free(b_m_8);
+        free(ip1_m);
+        return(VGD_ERROR);
+      }
+      break;
+
   case 1002:
     nk   = size_hyb;
     nl_m = size_hyb;
     nl_t = size_hyb;
-    if(this->C_genab(hyb, size_hyb, ptop_8, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
+    if(my_new_vgrid->C_genab(hyb, size_hyb, ptop_8, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR )
+    {
       free(a_m_8);
       free(b_m_8);
       free(ip1_m);
       return(VGD_ERROR);
     }
     break;
-  case 1003:
-    fprintf(stderr,"(Cvgd) ERROR in Cvgd_new_gen2, kind=%d, version=%d\n cannot be generated, please use kind 1 of version 2\n",kind,version);
-    return(VGD_ERROR);
-    break;
-  case 2001:
-    nk   = size_hyb;
-    nl_m = size_hyb;
-    nl_t = -1;
-    if(this->C_genab(hyb, size_hyb, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
-      free(a_m_8);
-      free(b_m_8);
-      free(ip1_m);
+
+    case 1003:
+      fprintf(stderr,"(Cvgd) ERROR in Cvgd_new_gen2, kind=%d, version=%d\n cannot be generated, please use kind 1 of version 2\n",kind,version);
       return(VGD_ERROR);
-    }
-    break;
+      break;
+
+    case 2001:
+      nk   = size_hyb;
+      nl_m = size_hyb;
+      nl_t = -1;
+      if(my_new_vgrid->C_genab(hyb, size_hyb, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR )
+      {
+        free(a_m_8);
+        free(b_m_8);
+        free(ip1_m);
+        return(VGD_ERROR);
+      }
+      break;
+
   case 4001:
     nk   = size_hyb;
     nl_m = size_hyb;
     nl_t = -1;
-    if(this->C_genab(hyb, size_hyb, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
+    if(my_new_vgrid->C_genab(hyb, size_hyb, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR )
+    {
       free(a_m_8);
       free(b_m_8);
       free(ip1_m);
       return(VGD_ERROR);
     }
     break;
-  case 5001:
-    nk   = size_hyb;
-    nl_m = size_hyb;
-    nl_t = size_hyb;
-    if(this->C_genab(hyb, size_hyb, *rcoef1, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
-      free(a_m_8);
-      free(b_m_8);
-      free(ip1_m);
-      return(VGD_ERROR);
-    }
-    break;
-  case 5002:
-    nk   = size_hyb;
-    tlift = 0;
-    if(this->C_genab_5002_5003(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t, tlift) == VGD_ERROR ) {
-      free(a_m_8);
-      free(b_m_8);
-      free(ip1_m);
-      free(a_t_8);
-      free(b_t_8);
-      free(ip1_t);
-      return(VGD_ERROR);
-    }    
-    break;
-  case 5003:
-    nk   = size_hyb;
-    tlift = 1;
-    if(this->C_genab_5002_5003(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t, tlift) == VGD_ERROR ) {
-      free(a_m_8);
-      free(b_m_8);
-      free(ip1_m);
-      free(a_t_8);
-      free(b_t_8);
-      free(ip1_t);
-      return(VGD_ERROR);
-    }    
-    break;
-  case 5004:
-    nk   = size_hyb;
-    if(this->C_genab(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t) == VGD_ERROR ) {
-      free(a_m_8);
-      free(b_m_8);
-      free(ip1_m);
-      free(a_t_8);
-      free(b_t_8);
-      free(ip1_t);
-      return(VGD_ERROR);
-    }    
-     break;
-  case 5005:
-    nk   = size_hyb;
-    if(this->c_vgrid_genab_5005(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, &ptop_out_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t, *dhm, *dht) == VGD_ERROR ) {
-      free(a_m_8);
-      free(b_m_8);
-      free(ip1_m);
-      free(a_t_8);
-      free(b_t_8);
-      free(ip1_t);
-      return(VGD_ERROR);
-      
-    }
-    break;
-  case 5100:
-    nk   = size_hyb;
-    if(this->c_vgrid_genab_5100(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *l_rcoef3, *l_rcoef4, &ptop_out_8, *pref_8, &a_m_8, &b_m_8, &c_m_8, &ip1_m, &a_t_8, &b_t_8, &c_t_8, &ip1_t, *dhm, *dht, avg) == VGD_ERROR ) {
-      free(a_m_8);
-      free(b_m_8);
-      free(c_m_8);
-      free(ip1_m);
-      free(a_t_8);
-      free(b_t_8);
-      free(c_t_8);
-      free(ip1_t);
-      return(VGD_ERROR);
 
-    }
-    break;
-  case 21001:
-    nk   = size_hyb;
-    if(this->c_vgrid_genab_21001(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *l_rcoef3, *l_rcoef4, &a_m_8, &b_m_8, &c_m_8, &ip1_m, &a_t_8, &b_t_8, &c_t_8, &ip1_t, *dhm, *dht) == VGD_ERROR ) {
-      free(a_m_8);
-      free(b_m_8);
-      free(c_m_8);
-      free(ip1_m);
-      free(a_t_8);
-      free(b_t_8);
-      free(c_t_8);
-      free(ip1_t);
-      return(VGD_ERROR);
+    case 5001:
+      nk   = size_hyb;
+      nl_m = size_hyb;
+      nl_t = size_hyb;
+      if(my_new_vgrid->C_genab(hyb, size_hyb, *rcoef1, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR )
+      {
+        free(a_m_8);
+        free(b_m_8);
+        free(ip1_m);
+        return(VGD_ERROR);
+      }
+      break;
 
-    }
-    break;
-  case 21002:
-    nk   = size_hyb;    
-    if(this->c_vgrid_genab_21002(hyb, size_hyb, &nl_m, &nl_t, &nl_w, *rcoef1, *rcoef2, *l_rcoef3, *l_rcoef4, &a_m_8, &b_m_8, &c_m_8, &ip1_m, &a_t_8, &b_t_8, &c_t_8, &ip1_t, &a_w_8, &b_w_8, &c_w_8, &ip1_w, *dhm, *dht, *dhw) == VGD_ERROR ) {
-      free(a_m_8);
-      free(b_m_8);
-      free(c_m_8);
-      free(ip1_m);
-      free(a_t_8);
-      free(b_t_8);
-      free(c_t_8);
-      free(ip1_t);
-      free(a_w_8);
-      free(b_w_8);
-      free(c_w_8);
-      free(ip1_w);
-      return(VGD_ERROR);
+    case 5002:
+      nk   = size_hyb;
+      tlift = 0;
+      if(my_new_vgrid->C_genab_5002_5003(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t, tlift) == VGD_ERROR )
+      {
+        free(a_m_8);
+        free(b_m_8);
+        free(ip1_m);
+        free(a_t_8);
+        free(b_t_8);
+        free(ip1_t);
+        return(VGD_ERROR);
+      }    
+      break;
 
+    case 5003:
+      nk   = size_hyb;
+      tlift = 1;
+      if(my_new_vgrid->C_genab_5002_5003(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t, tlift) == VGD_ERROR )
+      {
+        free(a_m_8);
+        free(b_m_8);
+        free(ip1_m);
+        free(a_t_8);
+        free(b_t_8);
+        free(ip1_t);
+        return(VGD_ERROR);
+      }    
+      break;
+
+    case 5004:
+      nk   = size_hyb;
+      if(my_new_vgrid->C_genab(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t) == VGD_ERROR )
+      {
+        free(a_m_8);
+        free(b_m_8);
+        free(ip1_m);
+        free(a_t_8);
+        free(b_t_8);
+        free(ip1_t);
+        return(VGD_ERROR);
+      }    
+      break;
+
+    case 5005:
+      nk   = size_hyb;
+      if(my_new_vgrid->c_vgrid_genab_5005(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, &ptop_out_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t, *dhm, *dht) == VGD_ERROR )
+      {
+        free(a_m_8);
+        free(b_m_8);
+        free(ip1_m);
+        free(a_t_8);
+        free(b_t_8);
+        free(ip1_t);
+        return(VGD_ERROR);
+      }
+      break;
+
+    case 5100:
+      nk   = size_hyb;
+      if(my_new_vgrid->c_vgrid_genab_5100(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *l_rcoef3, *l_rcoef4, &ptop_out_8, *pref_8, &a_m_8, &b_m_8, &c_m_8, &ip1_m, &a_t_8, &b_t_8, &c_t_8, &ip1_t, *dhm, *dht, avg) == VGD_ERROR )
+      {
+        free(a_m_8);
+        free(b_m_8);
+        free(c_m_8);
+        free(ip1_m);
+        free(a_t_8);
+        free(b_t_8);
+        free(c_t_8);
+        free(ip1_t);
+        return(VGD_ERROR);
+      }
+      break;
+
+    case 21001:
+      nk   = size_hyb;
+      if(my_new_vgrid->c_vgrid_genab_21001(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *l_rcoef3, *l_rcoef4, &a_m_8, &b_m_8, &c_m_8, &ip1_m, &a_t_8, &b_t_8, &c_t_8, &ip1_t, *dhm, *dht) == VGD_ERROR )
+      {
+        free(a_m_8);
+        free(b_m_8);
+        free(c_m_8);
+        free(ip1_m);
+        free(a_t_8);
+        free(b_t_8);
+        free(c_t_8);
+        free(ip1_t);
+        return(VGD_ERROR);
+      }
+      break;
+
+    case 21002:
+      nk   = size_hyb;    
+      if(my_new_vgrid->c_vgrid_genab_21002(hyb, size_hyb, &nl_m, &nl_t, &nl_w, *rcoef1, *rcoef2, *l_rcoef3, *l_rcoef4, &a_m_8, &b_m_8, &c_m_8, &ip1_m, &a_t_8, &b_t_8, &c_t_8, &ip1_t, &a_w_8, &b_w_8, &c_w_8, &ip1_w, *dhm, *dht, *dhw) == VGD_ERROR )
+      {
+        free(a_m_8);
+        free(b_m_8);
+        free(c_m_8);
+        free(ip1_m);
+        free(a_t_8);
+        free(b_t_8);
+        free(c_t_8);
+        free(ip1_t);
+        free(a_w_8);
+        free(b_w_8);
+        free(c_w_8);
+        free(ip1_w);
+        return(VGD_ERROR);
+      }
+      break;
+
+    default:
+      printf("(Cvgd) ERROR in Cvgd_new_gen2, invalid kind or version, kind = %d, version = %d\n",kind,version);
+      return(VGD_ERROR);
     }
-    break;
-  default:
-    printf("(Cvgd) ERROR in Cvgd_new_gen2, invalid kind or version, kind = %d, version = %d\n",kind,version);
+  }
+  catch (vgrid_exception)
+  {
+    free(a_m_8);
+    free(b_m_8);
+    free(c_m_8);
+    free(a_t_8);
+    free(b_t_8);
+    free(c_t_8);
+    free(ip1_m);
+    free(ip1_t);
+
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == Cvgd_new_build_vert2(this,kind,version,nk,ip1,ip2,ptop_8,pref_8,rcoef1,rcoef2,l_rcoef3,l_rcoef4,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,a_w_8,b_w_8,c_w_8,ip1_m,ip1_t,ip1_w,nl_m,nl_t,nl_w) ) {
+  if( VGD_ERROR == Cvgd_new_build_vert2(my_new_vgrid,kind,version,nk,ip1,ip2,ptop_8,pref_8,rcoef1,rcoef2,l_rcoef3,l_rcoef4,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,a_w_8,b_w_8,c_w_8,ip1_m,ip1_t,ip1_w,nl_m,nl_t,nl_w) ) {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_new_gen2, problem with new_build_vert for kind = %d, version = %d\n",kind,version);
     return(VGD_ERROR);
   }
@@ -5845,12 +5887,15 @@ int C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, char *no
   }
 
 
-  switch(vcode)
+  try
   {
-  case 1001:
+    vgrid new_vgrid(vcode);
+    *my_new_vgrid = &new_vgrid;
+
+    switch(vcode)
+    {
+    case 1001:
       // SIGMA SIGMA SIGMA SIGMA SIGMA SIGMA SIGMA SIGMA
-    vgrid_1001 new_vgrid_1001();
-    *my_new_vgrid = & new_vgrid_0001;
       if( ! ALLOW_SIGMA )
       {
 	printf("(Cvgd)   C_gen_legacy_desc error: sigma coordinate construction is not ALLOWED.\n(Cvgd)       If your are certain that you want this sigma coordinate, set ALLOW_SIGMA to true e.g.\n(Cvgd)          in fortran stat =  vgd_putopt(\"ALLOW_SIGMA\",.true.)\n(Cvgd)          in C       stat = Cvgd_putopt_int(\"ALLOW_SIGMA\",1)\n");
@@ -5866,30 +5911,26 @@ int C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, char *no
 	goto bomb;
       }
 
-  case 1002:
-    //=============================================
-    // PT PT PT PT PT PT PT PT PT PT PT PT PT PT PT
-    //---------------------------------------------
-    vgrid_1001 new_vgrid_1002();
-    *my_new_vgrid = & new_vgrid_1002;
-    printf("(Cvgd)   eta coordinate found\n");
-    ptop_8 = ptop*100.;
-    if( my_new_vgrid->C_genab(hyb, nb, &ptop_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
-    {	  
-      goto bomb;
-    }
-    if(Cvgd_new_build_vert2(my_new_vgrid, kind, 2, nb, var.ig1, var.ig2, &ptop_8, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR )
-    {
-      goto bomb;
-    }
+    case 1002:
+      //=============================================
+      // PT PT PT PT PT PT PT PT PT PT PT PT PT PT PT
+      //---------------------------------------------
+      printf("(Cvgd)   eta coordinate found\n");
+      ptop_8 = ptop*100.;
+      if( my_new_vgrid->C_genab(hyb, nb, &ptop_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
+      {	  
+        goto bomb;
+      }
+      if(Cvgd_new_build_vert2(my_new_vgrid, kind, 2, nb, var.ig1, var.ig2, &ptop_8, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR )
+      {
+        goto bomb;
+      }
 
-  case 1003:
-    //================================================
-    // HY HY HY HY HY HY HY HY HY HY HY HY HY HY HY HY
-    //------------------------------------------------
+    case 1003:
+      //================================================
+      // HY HY HY HY HY HY HY HY HY HY HY HY HY HY HY HY
+      //------------------------------------------------
       printf("(Cvgd)   hybrid (normalized) coordinate found\n");
-    vgrid_1003 new_vgrid_1003();
-    *my_new_vgrid = & new_vgrid_0003;
       if( C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR ){
 	printf("(Cvgd) ERROR in C_gen_legacy_record, consistency check on HY failed (2)\n");
 	goto bomb;
@@ -5902,45 +5943,46 @@ int C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, char *no
 	goto bomb;
       }      
 
-  case 1004:
-    printf("(Cvgd) TODO in C_gen_legacy_desc, add support to 1004 etasef coordinate");
+    case 1004:
+      printf("(Cvgd) TODO in C_gen_legacy_desc, add support to 1004 etasef coordinate");
+      goto bomb;
+
+    case 2001:
+      printf("(Cvgd)   pressure coordinate found\n");
+      if( my_new_vgrid->C_genab(hyb, nb, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
+      {
+        goto bomb;
+      }
+      if(Cvgd_new_build_vert2(my_new_vgrid, kind, 1, nb, var.ig1, var.ig2, NULL, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR )
+      {
+        goto bomb;
+      }	
+
+    case 5001:
+      printf("(Cvgd)   Hybrid coordinate found\n");
+      if( C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR )
+      {
+        printf("(Cvgd) ERROR in C_gen_legacy_desc, consistency check on HY failed\n");
+        goto bomb;
+      }
+      decode_HY(va2, &ptop_8, &pref_8, &rcoef);
+      if( my_new_vgrid->C_genab(hyb, nb, rcoef, ptop_8, pref_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
+      {
+        goto bomb;
+      }
+      if(Cvgd_new_build_vert2(my_new_vgrid, kind, 1, nb, var.ig1, var.ig2, &ptop_8, &pref_8, &rcoef, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR )
+      {
+        goto bomb;
+      }	
+
+    default:
+      printf("(Cvgd ERROR: in C_gen_legacy_desc, kind %d is not supported\n",kind);
+      return(VGD_ERROR);
+    }
+  }
+  catch (vgrid_exception)
+  {
     goto bomb;
-
-  case 2001:
-    printf("(Cvgd)   pressure coordinate found\n");
-    vgrid_2001 new_vgrid_2001();
-    *my_new_vgrid = & new_vgrid_2001;
-    if( my_new_vgrid->C_genab(hyb, nb, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
-    {
-      goto bomb;
-    }
-    if(Cvgd_new_build_vert2(my_new_vgrid, kind, 1, nb, var.ig1, var.ig2, NULL, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR )
-    {
-      goto bomb;
-    }	
-
-  case 5001:
-    printf("(Cvgd)   Hybrid coordinate found\n");
-    vgrid_1001 new_vgrid_5001();
-    *my_new_vgrid = & new_vgrid_5001;
-    if( C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR )
-    {
-      printf("(Cvgd) ERROR in C_gen_legacy_desc, consistency check on HY failed\n");
-      goto bomb;
-    }
-    decode_HY(va2, &ptop_8, &pref_8, &rcoef);
-    if( my_new_vgrid->C_genab(hyb, nb, rcoef, ptop_8, pref_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
-    {
-      goto bomb;
-    }
-    if(Cvgd_new_build_vert2(my_new_vgrid, kind, 1, nb, var.ig1, var.ig2, &ptop_8, &pref_8, &rcoef, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR )
-    {
-      goto bomb;
-    }	
-
-  default:
-    printf("(Cvgd ERROR: in C_gen_legacy_desc, kind %d is not supported\n",kind);
-    return(VGD_ERROR);
   }
 
   free(ip1);
