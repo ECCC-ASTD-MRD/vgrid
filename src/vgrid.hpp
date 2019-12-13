@@ -170,7 +170,7 @@ public:
 			      double *a_t_8, double *b_t_8, double *c_t_8,
 			      double *a_w_8, double *b_w_8, double *c_w_8,
 			      int *ip1_m, int *ip1_t, int *ip1_w, int nl);
-  int Cvgd_new_build_vert2(int kind, int version, int nk, int ip1, int ip2, double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
+  static int Cvgd_new_build_vert2(int kind, int version, int nk, int ip1, int ip2, double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
 		     double *a_m_8, double *b_m_8, double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8, double *a_w_8, double *b_w_8, double *c_w_8, int *ip1_m, int *ip1_t, int *ip1_w, int nl_m, int nl_t, int nl_w);
   int C_compute_heights_0001(int ni, int nj, int nk, int *ip1_list, float *levels);
   int C_compute_heights_0001_8(int ni, int nj, int nk, int *ip1_list, double *levels);
@@ -206,7 +206,7 @@ public:
   int c_vgrid_genab_21002(float *hybuser, int nk, int *nl_m, int *nl_t, int *nl_w, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, double **PP_a_w_8, double **PP_b_w_8, double **PP_c_w_8, int **PP_ip1_w, float dhm, float dht, float dhw);
   int Cvgd_vgdcmp(vgrid *vgd2);
   void Cvgd_free();
-static int Cvgd_getopt_int(char *key, int *value, int quiet);
+  static int Cvgd_getopt_int(char *key, int *value, int quiet);
   int Cvgd_get_int(char *key, int *value, int quiet);
   int Cvgd_get_int_1d(char *key, int **value, int *nk, int quiet);
   int Cvgd_get_float(char *key, float *value, int quiet);
@@ -245,18 +245,18 @@ static int Cvgd_getopt_int(char *key, int *value, int quiet);
   int Cvgd_stda76_temp(int *i_val, int nl_t, float *temp);
   int Cvgd_stda76_pres(int *i_val, int nl_t, float *pres, float *sfc_temp, float *sfc_pres);
 private:
-static int C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, char *nomvar);
-static int C_get_consistent_pt_e1(int iun, float *val, char *nomvar);
-public:
-static int Cvgd_stda76_hgts_from_pres_list(float *hgts, float *pres, int nb);
-static int Cvgd_stda76_pres_from_hgts_list(float *pres, float *hgts, int nb);
+  static int C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, char *nomvar);
+  static int C_get_consistent_pt_e1(int iun, float *val, char *nomvar);
+  public:
+  static int Cvgd_stda76_hgts_from_pres_list(float *hgts, float *pres, int nb);
+  static int Cvgd_stda76_pres_from_hgts_list(float *pres, float *hgts, int nb);
 
 
 // ########## N E W   I N T E R F A C E ##########
 public:
   vgrid(int unit, int ip1, int ip2, int kind, int version);
   vgrid(int key);
-  int Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, int ip2, int kind, int version);
+  static int Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, int ip2, int kind, int version);
   virtual int c_decode_vert() = 0;
   virtual int c_encode_vert() = 0;
 

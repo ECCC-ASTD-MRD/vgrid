@@ -133,9 +133,8 @@ int Cvgd_new_build_vert2(int *vgdid, int kind, int version, int nk,
                          int nl_m, int nl_t, int nl_w)
 {
   vgrid *my_vgd;
-  vgrid dummy;
   int status;
-  status=dummy.Cvgd_new_build_vert2(&my_vgd, version,
+  status=vgrid::Cvgd_new_build_vert2(&my_vgd, version,
                                      nk, ip1, ip2, ptop_8,
                                      pref_8, rcoef1, rcoef2,
                                      rcoef3, rcoef4, a_m_8,
@@ -190,10 +189,9 @@ int Cvgd_read_vgrid_from_file(int *vgdid, int unit, int ip1,int ip2,
                               int kind, int version)
 {
   vgrid *my_vgd;
-  vgrid dummy;
   int status;
 
-  status=dummy.Cvgd_read_vgrid_from_file(&my_vgd, unit, ip1, ip2, kind, version);
+  status=vgrid::Cvgd_read_vgrid_from_file(&my_vgd, unit, ip1, ip2, kind, version);
   if(status != VGD_ERROR)
     {
       *vgdid=grid_check.get_tag(my_vgd);
