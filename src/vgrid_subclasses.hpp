@@ -142,6 +142,7 @@ class vgrid_5005 : public vgrid_5002_5003_5004_5005
 public:
   vgrid_5005();
   vgrid_5005(int key) : vgrid_5005() : vgrid(key);
+  int vgrid_5005::C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double **ptop_out_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t, float dhm, float dht);
   void fstd_subinit();
 };
 
@@ -150,6 +151,7 @@ class vgrid_5100 : public vgrid
 public:
   vgrid_5100();
   vgrid_5100(int key) : vgrid_5100() : vgrid(key);
+  int vgrid_5100::C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **ptop_out_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, float dhm, float dht, int avg);
   int c_decode_vert();
   int c_encode_vert();
 };
@@ -169,6 +171,7 @@ class vgrid_21001 : public vgrid
 public:
   vgrid_21001();
   vgrid_21001(int key) : vgrid_21001() : vgrid(key);
+  int vgrid_21001::C__genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, float dhm, float dht);
   int c_decode_vert();
   int c_encode_vert();
   void fstd_subinit();
@@ -179,6 +182,7 @@ class vgrid_21002 : public vgrid
 public:
   vgrid_21002();
   vgrid_21002(int key) : vgrid_21002() : vgrid(key);
+  int vgrid_21002::C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, int *nl_w, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, double **PP_a_w_8, double **PP_b_w_8, double **PP_c_w_8, int **PP_ip1_w, float dhm, float dht, float dhw);
   int c_decode_vert();
   int c_encode_vert();
   void fstd_subinit();
