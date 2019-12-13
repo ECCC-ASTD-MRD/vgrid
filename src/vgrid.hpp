@@ -241,7 +241,7 @@ public:
 
   int Cvgd_new_read(int unit, int ip1, int ip2, int kind, int version);
   int Cvgd_write_desc (int unit);
-  int Cvgd_new_from_table(double *table, int ni, int nj, int nk);
+  static int Cvgd_new_from_table(vgrid **my_new_vgrid, double *table, int ni, int nj, int nk);
   int Cvgd_stda76_temp(int *i_val, int nl_t, float *temp);
   int Cvgd_stda76_pres(int *i_val, int nl_t, float *pres, float *sfc_temp, float *sfc_pres);
 private:
@@ -254,6 +254,8 @@ private:
 
 // ########## N E W   I N T E R F A C E ##########
 public:
+  vgrid(int kind, int version);
+  vgrid(int vcode);
   vgrid(int unit, int ip1, int ip2, int kind, int version);
   vgrid(int key);
   static int Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, int ip2, int kind, int version);

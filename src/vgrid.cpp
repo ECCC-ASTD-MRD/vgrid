@@ -2531,6 +2531,80 @@ vgrid::vgrid()
   this->table_nk = 1;
 }
 
+vgrid::vgrid(int kind, int version) : vgrid(kind*1000 + version)
+{
+}
+
+vgrid::vgrid(int vcode)
+{
+  switch(vcode)
+  {
+  case 0001:
+    vgrid_0001 new_vgrid_0001();
+    *my_new_vgrid = & new_vgrid_0001;
+
+  case 1001:
+    vgrid_1001 new_vgrid_1001();
+    *my_new_vgrid = & new_vgrid_1001;
+
+  case 1002:
+    vgrid_1002 new_vgrid_1002();
+    *my_new_vgrid = & new_vgrid_1002;
+
+  case 1003:
+    vgrid_1003 new_vgrid_1003();
+    *my_new_vgrid = & new_vgrid_1003;
+
+  case 2001:
+    vgrid_2001 new_vgrid_2001();
+    *my_new_vgrid = & new_vgrid_2001;
+
+  case 4001:
+    vgrid_4001 new_vgrid_4001();
+    *my_new_vgrid = & new_vgrid_4001;
+
+  case 5001:
+    vgrid_5001 new_vgrid_5001();
+    *my_new_vgrid = &new_vgrid_5001;
+
+  case 5002:
+    vgrid_5002 new_vgrid_5002();
+    *my_new_vgrid = &new_vgrid_5002;
+
+  case 5003:
+    vgrid_5003 new_vgrid_5003();
+    *my_new_vgrid = &new_vgrid_5003;
+
+  case 5004:
+    vgrid_5004 new_vgrid_5004();
+    *my_new_vgrid = &new_vgrid_5004;
+
+  case 5005:
+    vgrid_5005 new_vgrid_5005();
+    *my_new_vgrid = &new_vgrid_5005;
+
+  case 5100:
+    vgrid_5100 new_vgrid_5100();
+    *my_new_vgrid = & new_vgrid_5100;
+
+  case 5999:
+    vgrid_5999 new_vgrid_5999();
+    *my_new_vgrid = & new_vgrid_5999;
+
+  case 21001:
+    vgrid_21001 new_vgrid_21001();
+    *my_new_vgrid = & new_vgrid_21001;
+
+  case 21002:
+    vgrid_21002 new_vgrid_21002();
+    *my_new_vgrid = & new_vgrid_21002;
+
+  default:
+    printf("(Cvgd) ERROR in vgrid::vgrid(vcode), unrecognized vcode=%s\n",vcode);
+    throw vgrid_exception;
+  }
+}
+
 vgrid::allocate_table(int nk)
 {
   int table_sizej;
@@ -2912,74 +2986,8 @@ int vgrid::Cvgd_new_build_vert2(vgrid *my_new_vgrid, int kind, int version, int 
 
   try
   {
-    // Instantiate a vgrid subclass from the key, according to the vcode
-    vcode = kind*1000 + version;
-    switch(vcode)
-    {
-    case 0001:
-      vgrid_0001 new_vgrid_0001();
-      *my_new_vgrid = & new_vgrid_0001;
-
-    case 1001:
-      vgrid_1001 new_vgrid_1001();
-      *my_new_vgrid = & new_vgrid_1001;
-
-    case 1002:
-      vgrid_1002 new_vgrid_1002();
-      *my_new_vgrid = & new_vgrid_1002;
-
-    case 1003:
-      vgrid_1003 new_vgrid_1003();
-      *my_new_vgrid = & new_vgrid_1003;
-
-    case 2001:
-      vgrid_2001 new_vgrid_2001();
-      *my_new_vgrid = & new_vgrid_2001;
-
-    case 4001:
-      vgrid_4001 new_vgrid_4001();
-      *my_new_vgrid = & new_vgrid_4001;
-
-    case 5001:
-      vgrid_5001 new_vgrid_5001();
-      *my_new_vgrid = &new_vgrid_5001;
-
-    case 5002:
-      vgrid_5002 new_vgrid_5002();
-      *my_new_vgrid = &new_vgrid_5002;
-
-    case 5003:
-      vgrid_5003 new_vgrid_5003();
-      *my_new_vgrid = &new_vgrid_5003;
-
-    case 5004:
-      vgrid_5004 new_vgrid_5004();
-      *my_new_vgrid = &new_vgrid_5004;
-
-    case 5005:
-      vgrid_5005 new_vgrid_5005();
-      *my_new_vgrid = &new_vgrid_5005;
-
-    case 5100:
-      vgrid_5100 new_vgrid_5100();
-      *my_new_vgrid = & new_vgrid_5100;
-
-    case 5999:
-      vgrid_5999 new_vgrid_5999();
-      *my_new_vgrid = & new_vgrid_5999;
-
-    case 21001:
-      vgrid_21001 new_vgrid_21001();
-      *my_new_vgrid = & new_vgrid_21001;
-
-    case 21002:
-      vgrid_21002 new_vgrid_21002();
-      *my_new_vgrid = & new_vgrid_21002;
-
-    default:
-      printf("(Cvgd) ERROR in Cvgd_new_build_vert2, unrecognized vcode=%s\n",vcode);
-      return(VGD_ERROR);
-    }
+    vgrid new_vgrid(kind, version);
+    *my_new_vgrid = &new_vgrid
   }
   catch(vgrid_exception)
   {
@@ -3249,15 +3257,18 @@ int vgrid::Cvgd_new_build_vert2(vgrid *my_new_vgrid, int kind, int version, int 
   return(VGD_OK);
 }
 
-// Should no longer be called
-int vgrid::Cvgd_new_from_table(double *table, int ni, int nj, int nk) {
+
+int vgrid::Cvgd_new_from_table(vgrid **my_new_vgrid, double *table, int ni, int nj, int nk) {
   int table_size, i;
   double *ltable;
+  int kind, version;
 
   // Coordinate constructor - build vertical descriptor from table input
   // Set internal vcode (if all above was successful)
 
   this->valid = 0;
+
+  // V V V V V   THIS SHOULD NO LONGER BE NECESSARY   V V V V V
   // Since table passed in argument may be the this->table, we take a copy before the call to free
   table_size = ni * nj * nk;
   ltable = (double*)malloc ( table_size * sizeof(double) );
@@ -3265,105 +3276,50 @@ int vgrid::Cvgd_new_from_table(double *table, int ni, int nj, int nk) {
     printf("(Cvgd) ERROR in Cvgd_new_from_table, cannot allocate ltable of bouble of size %d\n", table_size);
     return(VGD_ERROR);
   }
-  my_copy_double(table, &ltable, table_size);  
-  free(this->table);
-  this->table_ni = ni;
-  this->table_nj = nj;
-  this->table_nk = nk;
-  this->table = (double*)malloc ( ni * nj * nk * sizeof(double) );
-  if(! this->table ) {
-    printf("(Cvgd) ERROR in Cvgd_new_from_table, cannot allocate table of bouble of size %d\n",table_size );
-    return(VGD_ERROR);
+  my_copy_double(table, &ltable, table_size);
+  // ^ ^ ^ ^ ^  THIS SHOULD NO LONGER BE NECESSARY   ^ ^ ^ ^ ^
+
+  kind    = (int) ltable[0];
+  version = (int) ltable[1];
+
+
+  try
+  {
+    vgrid new_vgrid(kind, version);
+    *my_new_vgrid = &new_vgrid;
   }
-  for(i = 0; i < table_size; i++) {
-    this->table[i] = ltable[i];
-  }
-  free(ltable);
-  this->kind    = (int) this->table[0];
-  this->version = (int) this->table[1];
-  // Fill remainder of structure
-  if( this->Cvgd_set_vcode() == VGD_ERROR ) {
-    printf("(Cvgd) ERROR in Cvgd_new_from_table, cannot set vcode\n");
+  catch(vgrid_exception)
+  {
+    printf("(Cvgd) ERROR in vgrid::Cvgd_new_from_table, unable to construct from kind=%d, version=%d\n",
+           kind, version);
     return(VGD_ERROR);
   }
 
- //  switch(this->vcode) {
- //  case 1:
- // if( this->c_decode_vert_0001() == VGD_ERROR ) {
- //      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode -0001\n");
- //      return(VGD_ERROR);
- //    }
- //    break;
- //  case 1001:
- //    if( this->c_decode_vert_1001() == VGD_ERROR ) {
- //      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 1001\n");
- //      return(VGD_ERROR);
- //    }
- //    break;
- //  case 1002:
- //    if( this->c_decode_vert_1002() == VGD_ERROR ) {
- //      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 1002\n");
- //      return(VGD_ERROR);
- //    }
- //    break;
- //  case 2001:
- //    if( this->c_decode_vert_2001() == VGD_ERROR ) {
- //      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 2001\n");
- //      return(VGD_ERROR);
- //    }
- //    break;
- //  case 1003:
- //  case 5001:
- //    if( this->c_decode_vert_1003_5001() == VGD_ERROR ) {
- //      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 1003 or 5001\n");
- //      return(VGD_ERROR);
- //    }
- //    break;
- //  case 4001:
- //    if( this->c_decode_vert_4001() == VGD_ERROR ) {
- //      printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 4001\n");
- //      return(VGD_ERROR);
- //    }
- //    break;
-  // case 5002:
-  // case 5003:
-  // case 5004:
-  // case 5005:
-  //   if( this->c_decode_vert_5002_5003_5004_5005() == VGD_ERROR ) {
-  //     printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 5002,5003,5004 or 5005\n");
-  //     return(VGD_ERROR);
-  //   }
-  //   break;
-  // case 5100:
-  //   if( this->c_decode_vert_5100() == VGD_ERROR ) {
-  //     printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 5100\n");
-  //     return(VGD_ERROR);
-  //   }
-  //   break;    
-  // case 5999:
-  //   if( this->c_decode_vert_5999() == VGD_ERROR ) {
-  //     printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 5999\n");
-  //     return(VGD_ERROR);
-  //   }
-  //   break;    
-  // case 21001:
-  //   if( this->c_decode_vert_21001() == VGD_ERROR ) {
-  //     printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 21001\n");
-  //     return(VGD_ERROR);
-  //   }
-  //   break;    
-  // case 21002:
-  //   if( this->c_decode_vert_21002() == VGD_ERROR ) {
-  //     printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode 21002\n");
-  //     return(VGD_ERROR);
-  //   }
-  //   break;    
-  // default:
-  //   printf("(Cvgd) in Cvgd_new_from_table, invalid Vcode %d\n", this->vcode);
-  //   return(VGD_ERROR);
-  // }
+
+  my_new_vgrid->table_ni = ni;
+  my_new_vgrid->table_nj = nj;
+  my_new_vgrid->table_nk = nk;
+
+  my_new_vgrid->table = (double*)malloc ( ni * nj * nk * sizeof(double) );
+  if(! my_new_vgrid->table ) {
+    printf("(Cvgd) ERROR in Cvgd_new_from_table, cannot allocate table of double of size %d\n",table_size );
+    return(VGD_ERROR);
+  }
+  for(i = 0; i < table_size; i++) {
+    my_new_vgrid->table[i] = ltable[i];
+  }
+  free(ltable);
+
+  // Fill remainder of structure
+  if( my_new_vgrid->c_decode_vert() == VGD_ERROR )
+  {
+    printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode %d\n", this->vcode);
+    return(VGD_ERROR);
+  }
+
   this->valid = 1;
-  if(this->fstd_init() == VGD_ERROR) {
+  if(this->fstd_init() == VGD_ERROR)
+  {
     printf("(Cvgd) ERROR in Cvgd_new_from_table, problem creating record information\n");
   }
 
@@ -6216,7 +6172,7 @@ int vgrid::Cvgd_new_read(int unit, int ip1, int ip2, int kind, int version) {
     return(VGD_ERROR);
   }
   // Fill structure from input table
-  if( this->Cvgd_new_from_table(this->table, this->table_ni, this->table_nj, this->table_nk) == VGD_ERROR ) {
+  if( vgrid::Cvgd_new_from_table(this, this->table, this->table_ni, this->table_nj, this->table_nk) == VGD_ERROR ) {
     printf("(Cvgd) ERROR in Cvgd_new_read, unable to construct from table\n");
     return(VGD_ERROR);
   }

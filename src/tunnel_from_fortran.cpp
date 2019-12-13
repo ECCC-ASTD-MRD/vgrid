@@ -157,7 +157,7 @@ int Cvgd_new_from_table(int *vgdid, double *table,
   vgrid my_vgd;
   int status;
 
-  status=my_vgd.Cvgd_new_from_table(table, ni, nj, nk);
+  status=vgrid::Cvgd_new_from_table(&my_vgd, table, ni, nj, nk);
   if(status != VGD_ERROR)
     {
       *vgdid=grid_check.get_tag(&my_vgd);
