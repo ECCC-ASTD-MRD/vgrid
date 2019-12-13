@@ -2751,85 +2751,9 @@ int vgrid::fstd_init() {
    if( h->fstd_initialized )
       return(VGD_OK);
 
-   h->ig2=h->ig3=h->ig4=0;
+   h->ig2 = h->ig3 = h->ig4 = 0;
 
-   if( this->Cvgd_set_vcode() == VGD_ERROR ){
-     return(VGD_ERROR);
-   }
-
-   switch(this->vcode) {
-      case 1:
-         strcpy(h->etiket,"HEIGHT_OCEAN");
-         break;
-      case 1001:
-         strcpy(h->etiket,"ETA_GEMV3");
-         break;
-      case 1002:
-         strcpy(h->etiket,"ETA_GEMV3");
-         h->ig2=(int)round(this->ptop_8*10.0);
-         break;
-      case 2001:
-         strcpy(h->etiket,"PRESSURE");
-         break;
-      case 1003:
-         strcpy(h->etiket,"HYBNORM_GEM3");
-         h->ig2=(int)round(this->ptop_8*10.0);
-         h->ig3=(int)roundf(this->rcoef1*100.0f);
-         break;
-      case 4001:
-         strcpy(h->etiket,"M_ABOVE_SFC");
-         break;
-      case 5001:
-         strcpy(h->etiket,"HYB_GEMV3");
-         h->ig2=(int)round(this->ptop_8*10.0);
-         h->ig3=(int)roundf(this->rcoef1*100.0f);
-         break;
-      case 5002:
-      case 5003:
-      case 5004:
-         strcpy(h->etiket,"STG_CP_GEMV4");
-         h->ig2=(int)round(this->ptop_8*10.0);
-         h->ig3=(int)roundf(this->rcoef1*100.0f);
-         h->ig4=(int)roundf(this->rcoef2*100.0f);
-         break;
-      case 5005:
-         strcpy(h->etiket,"STG_CP_GEMV4");
-         h->ig2=0;
-         h->ig3=(int)roundf(this->rcoef1*100.0f);
-         h->ig4=(int)roundf(this->rcoef2*100.0f);
-         break;
-      case 5100:
-         strcpy(h->etiket,"STG_CP_SLEVE");
-         h->ig2=0;
-         h->ig3=0;
-         h->ig4=0;
-         break;
-      case 5999:
-         strcpy(h->etiket,"UNSTAG_OTHER");
-         h->ig2=0;
-         h->ig3=0;
-         h->ig4=0;
-         break;
-      case 21001:
-	 if( this->Cvgd_is_valid("ref_namel_valid" ) ){
-	    strcpy(h->etiket,"HYB_H_CP_SLV");
-	 } else {
-            strcpy(h->etiket,"HYB_H_CP");
-         }
-         h->ig2=0;
-         h->ig3=0;
-         h->ig4=0;
-         break;
-      case 21002:
-         strcpy(h->etiket,"HYB_H_LORENZ");
-         h->ig2=0;
-         h->ig3=0;
-         h->ig4=0;
-         break;
-       default:
-         fprintf(stderr,"(Cvgd) ERROR in fstd_init, invalid kind or version: kind=%d, version=%d\n",this->kind,this->version);
-         return(VGD_ERROR);
-   }
+   fstd_subinit();  // subclass-specific assignments
 
    strcpy(h->nomvar,"!!");
    strcpy(h->typvar,"X");

@@ -116,6 +116,12 @@ int vgrid_0001::c_encode_vert()
   return(VGD_OK);
 }
 
+void vgrid_0001::fstd_subinit()
+{
+  VGD_TFSTD *h = &this->rec;
+  strcpy(h->etiket,"HEIGHT_OCEAN");
+};
+
 
 // ########## class 1001 ##########
 vgrid_1001::vgrid_1001() : vgrid()
@@ -254,6 +260,12 @@ int vgrid_1001::C_genab(float *hyb, int nk, double **a_m_8, double **b_m_8, int 
 
   return(VGD_OK);
 }
+
+void vgrid_1001::fstd_subinit()
+{
+  VGD_TFSTD *h = &this->rec;
+  strcpy(h->etiket,"ETA_GEMV3");
+};
 
 
 // ########## class 1002 ##########
@@ -456,6 +468,13 @@ int vgrid_1003_5001::c_decode_vert()
   return(VGD_OK);
 }
 
+void vgrid_1002::fstd_subinit()
+{
+  VGD_TFSTD *h = &this->rec;
+  strcpy(h->etiket,"ETA_GEMV3");
+  h->ig2=(int)round(this->ptop_8*10.0);
+};
+
 
 // ########## class 1003 ##########
 vgrid_1003::vgrid_1003() : vgrid()
@@ -552,6 +571,14 @@ int vgrid_1003::C_genab(float *hybuser, int nk, float rcoef, double ptop_8, doub
 
   return(VGD_OK);
 }
+
+void vgrid_1003::fstd_subinit()
+{
+  VGD_TFSTD *h = &this->rec;
+  strcpy(h->etiket,"HYBNORM_GEM3");
+  h->ig2=(int)round(this->ptop_8*10.0);
+  h->ig3=(int)roundf(this->rcoef1*100.0f);
+};
 
 
 // ########## class 2001 ##########
@@ -679,6 +706,12 @@ int vgrid_2001::C_genab(float *pres, int nk, double **a_m_8, double **b_m_8, int
 
   return(VGD_OK);
 }
+
+void vgrid_2001::fstd_subinit()
+{
+  VGD_TFSTD *h = &this->rec;
+  strcpy(h->etiket,"PRESSURE");
+};
 
 
 // ########## class 4001 ##########
@@ -812,6 +845,12 @@ int vgrid_4001::C_genab(float *hgts, int nk, double **a_m_8, double **b_m_8, int
 
   return(VGD_OK);
 }
+
+void vgrid_4001::fstd_subinit()
+{
+  VGD_TFSTD *h = &this->rec;
+  strcpy(h->etiket,"M_ABOVE_SFC");
+};
 
 
 // ########## class 5001 ##########
@@ -1249,6 +1288,14 @@ int vgrid_5002_5003_5004_5005::C_genab_5002_5003(float *hybuser, int nk, int *nl
   return(VGD_OK);
 }
 
+void vgrid_5001::fstd_subinit()
+{
+  VGD_TFSTD *h = &this->rec;
+  strcpy(h->etiket,"HYB_GEMV3");
+  h->ig2=(int)round(this->ptop_8*10.0);
+  h->ig3=(int)roundf(this->rcoef1*100.0f);
+};
+
 // ########## class 5002 ##########
 vgrid_5002::vgrid_5002() : vgrid()
 {
@@ -1260,6 +1307,15 @@ vgrid_5002::vgrid_5002() : vgrid()
   this->table_ni = 3;
 }
 
+void vgrid_5002::fstd_subinit()
+{
+  VGD_TFSTD *h = &this->rec;
+  strcpy(h->etiket,"STG_CP_GEMV4");
+  h->ig2=(int)round(this->ptop_8*10.0);
+  h->ig3=(int)roundf(this->rcoef1*100.0f);
+  h->ig4=(int)roundf(this->rcoef2*100.0f);
+};
+
 // ########## class 5003 ##########
 vgrid_5003::vgrid_5003() : vgrid()
 {
@@ -1270,6 +1326,15 @@ vgrid_5003::vgrid_5003() : vgrid()
   this->k_plus_top = 1;
   this->table_ni = 3;
 }
+
+void vgrid_5003::fstd_subinit()
+{
+  VGD_TFSTD *h = &this->rec;
+  strcpy(h->etiket,"STG_CP_GEMV4");
+  h->ig2=(int)round(this->ptop_8*10.0);
+  h->ig3=(int)roundf(this->rcoef1*100.0f);
+  h->ig4=(int)roundf(this->rcoef2*100.0f);
+};
 
 // ########## class 5004 ##########
 vgrid_5004::vgrid_5004() : vgrid()
@@ -1422,6 +1487,15 @@ int vgrid_5004::C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoe
   return(VGD_OK);
 }
 
+void vgrid_5004::fstd_subinit()
+{
+  VGD_TFSTD *h = &this->rec;
+  strcpy(h->etiket,"STG_CP_GEMV4");
+  h->ig2=(int)round(this->ptop_8*10.0);
+  h->ig3=(int)roundf(this->rcoef1*100.0f);
+  h->ig4=(int)roundf(this->rcoef2*100.0f);
+};
+
 // ########## class 5005 ##########
 vgrid_5005::vgrid_5005() : vgrid()
 {
@@ -1432,6 +1506,15 @@ vgrid_5005::vgrid_5005() : vgrid()
   this->table_ni = 3;
   strcpy(this->ref_name,"P0  ");
 }
+
+void vgrid_5005::fstd_subinit()
+{
+  VGD_TFSTD *h = &this->rec;
+  strcpy(h->etiket,"STG_CP_GEMV4");
+  h->ig2=0;
+  h->ig3=(int)roundf(this->rcoef1*100.0f);
+  h->ig4=(int)roundf(this->rcoef2*100.0f);
+};
 
 
 // ########## class 5100 ##########
@@ -1565,6 +1648,15 @@ int vgrid_5100::c_encode_vert()
   return(VGD_OK);
 }
 
+void vgrid_5100::fstd_subinit()
+{
+  VGD_TFSTD *h = &this->rec;
+  strcpy(h->etiket,"STG_CP_SLEVE");
+  h->ig2=0;
+  h->ig3=0;
+  h->ig4=0;
+};
+
 
 // ########## class 5999 ##########
 vgrid_5999::vgrid_5999() : vgrid()
@@ -1675,6 +1767,15 @@ int vgrid_5999::c_encode_vert()
 
   return(VGD_OK);
 }
+
+void vgrid_5999::fstd_subinit()
+{
+  VGD_TFSTD *h = &this->rec;
+  strcpy(h->etiket,"UNSTAG_OTHER");
+  h->ig2=0;
+  h->ig3=0;
+  h->ig4=0;
+};
 
 
 // ########## class 21001 ##########
@@ -1809,6 +1910,22 @@ int vgrid_21001::c_encode_vert()
 
   return(VGD_OK);
 }
+
+void vgrid_21001::fstd_subinit()
+{
+  VGD_TFSTD *h = &this->rec;
+  if( this->Cvgd_is_valid("ref_namel_valid" ) )
+  {
+    strcpy(h->etiket,"HYB_H_CP_SLV");
+  }
+  else
+  {
+    strcpy(h->etiket,"HYB_H_CP");
+  }
+  h->ig2=0;
+  h->ig3=0;
+  h->ig4=0;
+};
 
 
 // ########## class 21002 ##########
@@ -1969,3 +2086,12 @@ int vgrid_21002::c_encode_vert()
 
   return(VGD_OK);
 }
+
+void vgrid_21002::fstd_subinit()
+{
+  VGD_TFSTD *h = &this->rec;
+  strcpy(h->etiket,"HYB_H_LORENZ");
+  h->ig2=0;
+  h->ig3=0;
+  h->ig4=0;
+};

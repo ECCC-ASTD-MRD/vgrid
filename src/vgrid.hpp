@@ -276,8 +276,8 @@ private:
 
 
 // ########## N E W   I N T E R F A C E ##########
-// Constructors
 public:
+  // Constructors
   vgrid();
   vgrid(int kind, int version);
   vgrid(int vcode);
@@ -292,6 +292,7 @@ public:
 protected:
   virtual void set_table_nj(int nk) = 0;
   virtual void allocate_table(int nk) = 0;
+  virtual void fstd_subinit() = 0;  // subclass-specific assignments to initialize the fstd record
 
   // Most subclasses have a private C_genab method, but the arguments are diffent for each one
   // (Therefore, do not define the interface here.)
