@@ -270,7 +270,7 @@ void flip_transfer_c2d(char *name, void *val_8) {
   //printf("ENCODE tt=%16.16lx\n",tt);
 }
 
-int max_int(int *vec, int ni) {
+int vgrid::max_int(int *vec, int ni) {
   int i, ind = 0;
   for( i = 1; i < ni; i++){
     if( vec[i] > vec[ind] )
@@ -279,14 +279,14 @@ int max_int(int *vec, int ni) {
   return(vec[ind]);
 }
 
-double c_get_error(char *key, int quiet) {
+double vgrid::c_get_error(char *key, int quiet) {
   if (! quiet) {
     printf("(Cvgd) ERROR in c_get_error, attempt to retrieve invalid key %s\n",key);
   }
   return(VGD_MISSING);
 }
 
-void c_hypsometric (float *pkp, float pk, float Tk, float gammaT, float zk, float zkp){
+void vgrid::c_hypsometric (float *pkp, float pk, float Tk, float gammaT, float zk, float zkp){
   // Compute pressure pkp which is at top of the following atmopheric layer
   //
   //  \(pkp,zkp)
@@ -303,7 +303,7 @@ void c_hypsometric (float *pkp, float pk, float Tk, float gammaT, float zk, floa
   }
 }
 
-int c_set_stda_layer(int ind, float Tk, float pk, float *zk, float *zkp, float *gammaT, float *pkp, int *zero_lapse_rate) {
+int vgrid::c_set_stda_layer(int ind, float Tk, float pk, float *zk, float *zkp, float *gammaT, float *pkp, int *zero_lapse_rate) {
 
   //Andre PLante 2017
   //
@@ -341,7 +341,7 @@ int c_set_stda_layer(int ind, float Tk, float pk, float *zk, float *zkp, float *
   return(VGD_OK);
 }
 
-int c_get_stda76(float *Tk, float *pk, float *zk, float *gammaT, 
+int vgrid::c_get_stda76(float *Tk, float *pk, float *zk, float *gammaT, 
 			int *zero_lapse_rate){
   int ind;
 
@@ -499,19 +499,19 @@ void vgrid::Cvgd_table_shape(int **tshape) {
   (*tshape)[2] = this->table_nk;
 }
 
-void my_copy_double(double *aa, double **bb, int ind){
+void vgrid::my_copy_double(double *aa, double **bb, int ind){
   while (ind--) {
     (*bb)[ind] = aa[ind];
   }
 }
 
-void my_copy_int(int *aa, int **bb, int ind){
+void vgrid::my_copy_int(int *aa, int **bb, int ind){
   while (ind--) {
     (*bb)[ind] = aa[ind];
   }
 }
 
-int same_vec_i(int *vec1, int n1, int *vec2, int n2) {
+int vgrid::same_vec_i(int *vec1, int n1, int *vec2, int n2) {
   int i;
   if(vec1) {
     if (vec2) {
@@ -532,7 +532,7 @@ int same_vec_i(int *vec1, int n1, int *vec2, int n2) {
   return(0);
 }
 
-int same_vec_r8(double *vec1, int n1, double *vec2, int n2) {
+int vgrid::same_vec_r8(double *vec1, int n1, double *vec2, int n2) {
   if(vec1) {
     if (vec2) {
       if ( n1 == n2 ) {	
@@ -585,7 +585,7 @@ int similar_vec_r8(double *vec1, int n1, double *vec2, int n2) {
   return(0);
 }
 
-int c_convip_Level2IP(float level, int kind) {
+int vgrid::c_convip_Level2IP(float level, int kind) {
 
   int    mode=2,flag=0, IP, strglen=0; 
   char   format;
@@ -596,7 +596,7 @@ int c_convip_Level2IP(float level, int kind) {
   return(IP);
 }
 
-int c_convip_Level2IP_old_style(float level, int kind) {
+int vgrid::c_convip_Level2IP_old_style(float level, int kind) {
 
   int    mode=3,flag=0, IP, strglen=0; 
   char   format; 
@@ -627,7 +627,7 @@ void vgrid::decode_HY(VGD_TFSTD_ext var, double *ptop_8, double *pref_8, float *
   *rcoef = var.ig2/1000.f;
 }
 
-int my_fstprm(int key,VGD_TFSTD_ext *ff) {
+int vgrid::my_fstprm(int key,VGD_TFSTD_ext *ff) {
   //var->ip1 = 62;
   double nhours;
   STR_INIT(ff->typvar,VGD_LEN_TYPVAR);
@@ -776,7 +776,7 @@ int vgrid::Cvgd_vgdcmp(vgrid *vgd2) {
   return(0);
 }
 
-double c_comp_diag_a_height(double pref_8, float height) {
+double vgrid::c_comp_diag_a_height(double pref_8, float height) {
   return log(pref_8) - VGD_GRAV*height/(VGD_RGASD*VGD_TCDK);
 }
 double vgrid::c_comp_diag_a_ip1(double pref_8, int ip1) {
@@ -785,7 +785,7 @@ double vgrid::c_comp_diag_a_ip1(double pref_8, int ip1) {
 }
 
 /*----------------------------------------------------------------------------
- * Nom      : <VDG_FindIp1Idx>
+ * Nom      : <Cvgd_FindIp1Idx>
  * Creation : Avril 2015 - E. Legault-Ouellet - CMC/CMOE
  *
  * But      : Trouver l'index d'un ip1 dans une liste d'ip1
@@ -801,7 +801,7 @@ double vgrid::c_comp_diag_a_ip1(double pref_8, int ip1) {
  *
  *----------------------------------------------------------------------------
  */
-int VGD_FindIp1Idx(int Ip1,int *Lst,int Size) {
+int vgrid::Cvgd_FindIp1Idx(int Ip1,int *Lst,int Size) {
    int idx=0;
    while( Size-- ) {
       if( *Lst++ == Ip1 )
@@ -1108,10 +1108,10 @@ int vgrid::C_compute_heights_0001_8(int ni, int nj, int nk, int *ip1_list, doubl
   }  
 
   for(k=0; k < nk; k++) {
-    if( (ind = VGD_FindIp1Idx( ip1_list[k], this->ip1_m, this->nl_m) ) != -1 ) {
+    if( (ind = Cvgd_FindIp1Idx( ip1_list[k], this->ip1_m, this->nl_m) ) != -1 ) {
       aa_8[k] = this->a_m_8[ind];
     } else {
-      if( (ind = VGD_FindIp1Idx( ip1_list[k], this->ip1_w, this->nl_w) ) != -1 ) {
+      if( (ind = Cvgd_FindIp1Idx( ip1_list[k], this->ip1_w, this->nl_w) ) != -1 ) {
 	aa_8[k] = this->a_w_8[ind];
       } else {
 	printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n", proc_name,ip1_list[k]);
@@ -1150,10 +1150,10 @@ int vgrid::C_compute_heights_0001(int ni, int nj, int nk, int *ip1_list, float *
   }  
 
   for(k=0; k < nk; k++) {
-    if( (ind = VGD_FindIp1Idx( ip1_list[k], this->ip1_m, this->nl_m) ) != -1 ) {
+    if( (ind = Cvgd_FindIp1Idx( ip1_list[k], this->ip1_m, this->nl_m) ) != -1 ) {
       aa_8[k] = this->a_m_8[ind];
     } else {
-      if( (ind = VGD_FindIp1Idx( ip1_list[k], this->ip1_w, this->nl_w) ) != -1 ) {
+      if( (ind = Cvgd_FindIp1Idx( ip1_list[k], this->ip1_w, this->nl_w) ) != -1 ) {
 	aa_8[k] = this->a_w_8[ind];
       } else {
 	printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n", proc_name,ip1_list[k]);
@@ -1194,7 +1194,7 @@ int vgrid::C_compute_pressure_1001_1002_8(int ni, int nj, int nk, int *ip1_list,
   
   // Find ip1 indexes  
   for( k = 0; k < nk; ++k ){
-    if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],this->ip1_m,this->nl_m)) == -1 ) {
+    if( ( ind[k] = Cvgd_FindIp1Idx(ip1_list[k],this->ip1_m,this->nl_m)) == -1 ) {
       printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n", proc_name, ip1_list[k]);
       free(ind);
       return(VGD_ERROR);
@@ -1233,7 +1233,7 @@ int vgrid::C_compute_pressure_1001_1002(int ni, int nj, int nk, int *ip1_list, f
   
   // Find ip1 indexes  
   for( k = 0; k < nk; ++k ){
-    if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],this->ip1_m,this->nl_m)) == -1 ) {
+    if( ( ind[k] = Cvgd_FindIp1Idx(ip1_list[k],this->ip1_m,this->nl_m)) == -1 ) {
       printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n", proc_name, ip1_list[k]);
       free(ind);
       return(VGD_ERROR);
@@ -1271,7 +1271,7 @@ if( my_alloc_int(&ind, nk, message) == VGD_ERROR )
   
   // Find ip1 indexes
   for( k = 0; k < nk; ++k ){
-    if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],this->ip1_m,this->nl_m)) == -1 ) {
+    if( ( ind[k] = Cvgd_FindIp1Idx(ip1_list[k],this->ip1_m,this->nl_m)) == -1 ) {
       printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n",proc_name, ip1_list[k]);
       free(ind);
       return(VGD_ERROR);
@@ -1309,7 +1309,7 @@ if( my_alloc_int(&ind, nk, message) == VGD_ERROR )
   
   // Find ip1 indexes
   for( k = 0; k < nk; ++k ){
-    if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],this->ip1_m,this->nl_m)) == -1 ) {
+    if( ( ind[k] = Cvgd_FindIp1Idx(ip1_list[k],this->ip1_m,this->nl_m)) == -1 ) {
       printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n",proc_name, ip1_list[k]);
       free(ind);
       return(VGD_ERROR);
@@ -1347,7 +1347,7 @@ int vgrid::C_compute_heights_4001_8(int ni, int nj, int nk, int *ip1_list, doubl
   
   // Find ip1 indexes
   for( k = 0; k < nk; ++k ){
-    if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],this->ip1_m,this->nl_m)) == -1 ) {
+    if( ( ind[k] = Cvgd_FindIp1Idx(ip1_list[k],this->ip1_m,this->nl_m)) == -1 ) {
       printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n",proc_name, ip1_list[k]);
       free(ind);
       return(VGD_ERROR);
@@ -1385,7 +1385,7 @@ int vgrid::C_compute_heights_4001(int ni, int nj, int nk, int *ip1_list, float *
   
   // Find ip1 indexes
   for( k = 0; k < nk; ++k ){
-    if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],this->ip1_m,this->nl_m)) == -1 ) {
+    if( ( ind[k] = Cvgd_FindIp1Idx(ip1_list[k],this->ip1_m,this->nl_m)) == -1 ) {
       printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n",proc_name, ip1_list[k]);
       free(ind);
       return(VGD_ERROR);
@@ -1423,7 +1423,7 @@ int vgrid::C_compute_pressure_1003_5001_8(int ni, int nj, int nk, int *ip1_list,
   
   // Find ip1 indexes
   for( k = 0; k < nk; ++k ){
-    if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],this->ip1_m,this->nl_m)) == -1 ) {
+    if( ( ind[k] = Cvgd_FindIp1Idx(ip1_list[k],this->ip1_m,this->nl_m)) == -1 ) {
       printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n",proc_name, ip1_list[k]);
       free(ind);
       return(VGD_ERROR);
@@ -1479,7 +1479,7 @@ int vgrid::C_compute_pressure_1003_5001(int ni, int nj, int nk, int *ip1_list, f
   
   // Find ip1 indexes
   for( k = 0; k < nk; ++k ){
-    if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],this->ip1_m,this->nl_m)) == -1 ) {
+    if( ( ind[k] = Cvgd_FindIp1Idx(ip1_list[k],this->ip1_m,this->nl_m)) == -1 ) {
       printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n",proc_name, ip1_list[k]);
       free(ind);
       return(VGD_ERROR);
@@ -1538,11 +1538,11 @@ int vgrid::C_compute_pressure_5002_5003_5004_5005_8(int ni, int nj, int nk, int 
   }
 
   for(k=0; k < nk; k++) {
-    if( (ind = VGD_FindIp1Idx( ip1_list[k], this->ip1_m, this->nl_m) ) != -1 ) {
+    if( (ind = Cvgd_FindIp1Idx( ip1_list[k], this->ip1_m, this->nl_m) ) != -1 ) {
       aa_8[k] = this->a_m_8[ind];
       bb_8[k] = this->b_m_8[ind];
     } else {
-      if( (ind = VGD_FindIp1Idx( ip1_list[k], this->ip1_t, this->nl_t) ) != -1 ) {
+      if( (ind = Cvgd_FindIp1Idx( ip1_list[k], this->ip1_t, this->nl_t) ) != -1 ) {
 	aa_8[k] = this->a_t_8[ind];
 	bb_8[k] = this->b_t_8[ind];
       } else {
@@ -1635,11 +1635,11 @@ int vgrid::C_compute_pressure_5002_5003_5004_5005(int ni, int nj, int nk, int *i
   }
 
   for(k=0; k < nk; k++) {
-    if( (ind = VGD_FindIp1Idx( ip1_list[k], this->ip1_m, this->nl_m) ) != -1 ) {
+    if( (ind = Cvgd_FindIp1Idx( ip1_list[k], this->ip1_m, this->nl_m) ) != -1 ) {
       aa_8[k] = this->a_m_8[ind];
       bb_8[k] = this->b_m_8[ind];
     } else {
-      if( (ind = VGD_FindIp1Idx( ip1_list[k], this->ip1_t, this->nl_t) ) != -1 ) {
+      if( (ind = Cvgd_FindIp1Idx( ip1_list[k], this->ip1_t, this->nl_t) ) != -1 ) {
 	aa_8[k] = this->a_t_8[ind];
 	bb_8[k] = this->b_t_8[ind];
       } else {
@@ -1737,12 +1737,12 @@ int vgrid::C_compute_pressure_5100_8(int ni, int nj, int nk, int *ip1_list, doub
   }
 
   for(k=0; k < nk; k++) {
-    if( (ind = VGD_FindIp1Idx( ip1_list[k], this->ip1_m, this->nl_m) ) != -1 ) {
+    if( (ind = Cvgd_FindIp1Idx( ip1_list[k], this->ip1_m, this->nl_m) ) != -1 ) {
       aa_8[k] = this->a_m_8[ind];
       bb_8[k] = this->b_m_8[ind];
       cc_8[k] = this->c_m_8[ind];
     } else {
-      if( (ind = VGD_FindIp1Idx( ip1_list[k], this->ip1_t, this->nl_t) ) != -1 ) {
+      if( (ind = Cvgd_FindIp1Idx( ip1_list[k], this->ip1_t, this->nl_t) ) != -1 ) {
 	aa_8[k] = this->a_t_8[ind];
 	bb_8[k] = this->b_t_8[ind];
 	cc_8[k] = this->c_t_8[ind];
@@ -1862,12 +1862,12 @@ int vgrid::C_compute_pressure_5100(int ni, int nj, int nk, int *ip1_list, float 
   }
 
   for(k=0; k < nk; k++) {
-    if( (ind = VGD_FindIp1Idx( ip1_list[k], this->ip1_m, this->nl_m) ) != -1 ) {
+    if( (ind = Cvgd_FindIp1Idx( ip1_list[k], this->ip1_m, this->nl_m) ) != -1 ) {
       aa_8[k] = this->a_m_8[ind];
       bb_8[k] = this->b_m_8[ind];
       cc_8[k] = this->c_m_8[ind];
     } else {
-      if( (ind = VGD_FindIp1Idx( ip1_list[k], this->ip1_t, this->nl_t) ) != -1 ) {
+      if( (ind = Cvgd_FindIp1Idx( ip1_list[k], this->ip1_t, this->nl_t) ) != -1 ) {
 	aa_8[k] = this->a_t_8[ind];
 	bb_8[k] = this->b_t_8[ind];
 	cc_8[k] = this->c_t_8[ind];
@@ -1988,17 +1988,17 @@ int vgrid::C_compute_heights_21001_8(int ni, int nj, int nk, int *ip1_list, doub
   }
 
   for(k=0; k < nk; k++) {
-    if( (ind = VGD_FindIp1Idx( ip1_list[k], this->ip1_m, this->nl_m) ) != -1 ) {
+    if( (ind = Cvgd_FindIp1Idx( ip1_list[k], this->ip1_m, this->nl_m) ) != -1 ) {
       aa_8[k] = this->a_m_8[ind];
       bb_8[k] = this->b_m_8[ind];
       cc_8[k] = this->c_m_8[ind];
     } else {
-      if( (ind = VGD_FindIp1Idx( ip1_list[k], this->ip1_t, this->nl_t) ) != -1 ) {
+      if( (ind = Cvgd_FindIp1Idx( ip1_list[k], this->ip1_t, this->nl_t) ) != -1 ) {
 	aa_8[k] = this->a_t_8[ind];
 	bb_8[k] = this->b_t_8[ind];
 	cc_8[k] = this->c_t_8[ind];
       } else {
-	if( (ind = VGD_FindIp1Idx( ip1_list[k], this->ip1_w, this->nl_w) ) != -1 ) {
+	if( (ind = Cvgd_FindIp1Idx( ip1_list[k], this->ip1_w, this->nl_w) ) != -1 ) {
 	  aa_8[k] = this->a_w_8[ind];
 	  bb_8[k] = this->b_w_8[ind];
 	  cc_8[k] = this->c_w_8[ind];
@@ -2076,17 +2076,17 @@ int vgrid::C_compute_heights_21001(int ni, int nj, int nk, int *ip1_list, float 
   }
 
   for(k=0; k < nk; k++) {
-    if( (ind = VGD_FindIp1Idx( ip1_list[k], this->ip1_m, this->nl_m) ) != -1 ) {
+    if( (ind = Cvgd_FindIp1Idx( ip1_list[k], this->ip1_m, this->nl_m) ) != -1 ) {
       aa_8[k] = this->a_m_8[ind];
       bb_8[k] = this->b_m_8[ind];
       cc_8[k] = this->c_m_8[ind];
     } else {
-      if( (ind = VGD_FindIp1Idx( ip1_list[k], this->ip1_t, this->nl_t) ) != -1 ) {
+      if( (ind = Cvgd_FindIp1Idx( ip1_list[k], this->ip1_t, this->nl_t) ) != -1 ) {
 	aa_8[k] = this->a_t_8[ind];
 	bb_8[k] = this->b_t_8[ind];
 	cc_8[k] = this->c_t_8[ind];
       } else {
-	if( (ind = VGD_FindIp1Idx( ip1_list[k], this->ip1_w, this->nl_w) ) != -1 ) {
+	if( (ind = Cvgd_FindIp1Idx( ip1_list[k], this->ip1_w, this->nl_w) ) != -1 ) {
 	  aa_8[k] = this->a_w_8[ind];
 	  bb_8[k] = this->b_w_8[ind];
 	  cc_8[k] = this->c_w_8[ind];
@@ -2444,16 +2444,29 @@ int vgrid::Cvgd_diag_withref_2ref(int ni, int nj, int nk, int *ip1_list, float *
   return(VGD_OK);
 }
 
-// Initialize all members to null values
-// This private method is called by the constructors.
-void vgrid::init(void)
+/*----------------------------------------------------------------------------
+ * Nom      : <c_vgd_construct>
+ * Creation : Avril 2015 - E. Legault-Ouellet - CMC/CMOE
+ *
+ * But      : Initialise et retourne une structure de type vgrid_descriptor
+ *
+ * Parametres :
+ *
+ * Retour   : Une structure initialisée de type vgrid_descriptor
+ *
+ * Remarques :
+ *
+ *----------------------------------------------------------------------------
+ */
+
+vgrid::vgrid()
 {
   ptop_8        = VGD_MISSING;
   pref_8        = VGD_MISSING;  
   table         = NULL;
   table_ni      = 0;
   table_nj      = 0;
-  table_nk      = 0;
+  table_nk      = 1;
   a_m_8         = NULL;
   b_m_8         = NULL;
   c_m_8         = NULL;
@@ -2508,28 +2521,6 @@ void vgrid::init(void)
   strcpy(rec.nomvar,"    ");
   strcpy(rec.etiket,"            ");
   strcpy(rec.grtyp," ");
-  return;
-}
-
-/*----------------------------------------------------------------------------
- * Nom      : <c_vgd_construct>
- * Creation : Avril 2015 - E. Legault-Ouellet - CMC/CMOE
- *
- * But      : Initialise et retourne une structure de type vgrid_descriptor
- *
- * Parametres :
- *
- * Retour   : Une structure initialisée de type vgrid_descriptor
- *
- * Remarques :
- *
- *----------------------------------------------------------------------------
- */
-
-vgrid::vgrid()
-{
-  init();
-  this->table_nk = 1;
 }
 
 vgrid::vgrid(int kind, int version) : vgrid(kind*1000 + version)

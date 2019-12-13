@@ -69,7 +69,7 @@ static int vcode_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 400
 class vgrid
 {
   // VARIABLES:
-public:
+private:
   VGD_TFSTD rec;          // RPN standard file header
   double   ptop_8;        // Top level pressure (Pa)
   double   pref_8;        // Reference pressure (Pa)
@@ -116,8 +116,31 @@ protected:
 
   // METHODS:
 private:
-  void init(void);
-  int correct_kind_and_version(int key, int kind, int version, VGD_TFSTD_ext *var, int *status);
+  static int correct_kind_and_version(int key, int kind, int version, VGD_TFSTD_ext *var, int *status);
+  static int max_int(int *vec, int ni);
+  static double c_get_error(char *key, int quiet);
+  static void c_hypsometric (float *pkp, float pk, float Tk, float gammaT, float zk, float zkp);
+  static int c_set_stda_layer(int ind, float Tk, float pk, float *zk, float *zkp, float *gammaT,
+                              float *pkp, int *zero_lapse_rate);
+  static int c_get_stda76(float *Tk, float *pk, float *zk, float *gammaT, int *zero_lapse_rate);
+  static void my_copy_double(double *aa, double **bb, int ind);
+  static my_copy_int(int *aa, int **bb, int ind);
+  static int same_vec_i(int *vec1, int n1, int *vec2, int n2);
+  static int same_vec_r8(double *vec1, int n1, double *vec2, int n2);
+  static int similar_vec_r8(double *vec1, int n1, double *vec2, int n2);
+  static int my_fstprm(int key,VGD_TFSTD_ext *ff);
+  static double c_comp_diag_a_height(double pref_8, float height);
+  static double c_comp_diag_a_ip1(double pref_8, int ip1);
+  static int Cvgd_FindIp1Idx(int Ip1,int *Lst,int Size);
+
+protected:
+  static void flip_transfer_d2c(char *name, double val_8);
+  static void flip_transfer_c2d(char *name, void *val_8);
+  static int c_convip_Level2IP(float level, int kind);
+  static int c_convip_Level2IP_old_style(float level, int kind);
+  static float c_convip_IP2Level(int IP,int *kind);
+  static void decode_HY(VGD_TFSTD_ext var, double *ptop_8, double *pref_8, float *rcoef);
+
 public:
   int is_valid(int *table_valid);
   int is_option(int *table_option);
@@ -139,7 +162,6 @@ public:
   int Cvgd_diag_withref_2ref(int ni, int nj, int nk,
 			   int *ip1_list, float *levels, float *sfc_field,
 			   float *sfc_field_ls, int in_log, int dpidpis);
-  vgrid();
   void c_vgd_free_abci();
   int Cvgd_set_vcode_i(int Kind,int Version);
   int fstd_init();
@@ -254,11 +276,15 @@ private:
 
 
 // ########## N E W   I N T E R F A C E ##########
+// Constructors
 public:
+  vgrid();
   vgrid(int kind, int version);
   vgrid(int vcode);
   vgrid(int unit, int ip1, int ip2, int kind, int version);
-  vgrid(int key);
+  vgrid(int key) : vgrid();
+
+public:
   static int Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, int ip2, int kind, int version);
   virtual int c_decode_vert() = 0;
   virtual int c_encode_vert() = 0;
@@ -266,10 +292,6 @@ public:
 protected:
   virtual void set_table_nj(int nk) = 0;
   virtual void allocate_table(int nk) = 0;
-  void flip_transfer_d2c(char *name, double val_8);
-  float c_convip_IP2Level(int IP,int *kind);
-  void decode_HY(VGD_TFSTD_ext var, double *ptop_8, double *pref_8, float *rcoef);
-  double c_comp_diag_a_ip1(double pref_8, int ip1);
 
   // Most subclasses have a private C_genab method, but the arguments are diffent for each one
   // (Therefore, do not define the interface here.)
