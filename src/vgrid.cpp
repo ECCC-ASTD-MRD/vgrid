@@ -4406,6 +4406,7 @@ int C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, char *no
   if( infon > 1 )
     printf("(Cvgd)   All %s consistent\n", nomvar);
   return(VGD_OK);
+}
 
 
   int vgrid::C_gen_legacy_desc( vgrid **my_new_vgrid, int unit, int *keylist , int nb ){
@@ -4751,107 +4752,107 @@ int vgrid::c_legacy(vgrid **my_new_vgrid, int unit, int F_kind) {
   return(VGD_OK);
 }
 
-int vgrid::Cvgd_new_read(int unit, int ip1, int ip2, int kind, int version) {
+// int vgrid::Cvgd_new_read(int unit, int ip1, int ip2, int kind, int version) {
 
-  char  match_ipig;
-  int error, i, ni, nj, nk;
-  int toc_found = 0, count, nkeyList = MAX_DESC_REC;
-  int keyList[nkeyList], status;
-  VGD_TFSTD_ext var;
-  vgrid self2;
+//   char  match_ipig;
+//   int error, i, ni, nj, nk;
+//   int toc_found = 0, count, nkeyList = MAX_DESC_REC;
+//   int keyList[nkeyList], status;
+//   VGD_TFSTD_ext var;
+//   vgrid self2;
   
-  if(ip1 >= 0 && ip2 < 0) {
-    printf("(Cvgd) ERROR in Cvgd_new_read, expecting optional value ip2\n");      
-    return (VGD_ERROR);
-  }
+//   if(ip1 >= 0 && ip2 < 0) {
+//     printf("(Cvgd) ERROR in Cvgd_new_read, expecting optional value ip2\n");      
+//     return (VGD_ERROR);
+//   }
   
-  if(ip2 >= 0 && ip1 < 0){
-    printf("(Cvgd) ERROR in Cvgd_new_read, expecting optional value ip1\n");      
-    return (VGD_ERROR);
-  }
-  match_ipig = 0;
-  if(ip1 >= 0){
-    match_ipig = 1;
-  }
-  if(kind == -1 && version != -1) {
-    printf("(Cvgd) ERROR in Cvgd_new_read, option kind must be used with option version\n");
-    return (VGD_ERROR);
-  }
+//   if(ip2 >= 0 && ip1 < 0){
+//     printf("(Cvgd) ERROR in Cvgd_new_read, expecting optional value ip1\n");      
+//     return (VGD_ERROR);
+//   }
+//   match_ipig = 0;
+//   if(ip1 >= 0){
+//     match_ipig = 1;
+//   }
+//   if(kind == -1 && version != -1) {
+//     printf("(Cvgd) ERROR in Cvgd_new_read, option kind must be used with option version\n");
+//     return (VGD_ERROR);
+//   }
   
-  error = c_fstinl(unit, &ni, &nj, &nk, -1, " ", ip1, ip2, -1, " ", ZNAME, keyList, &count, nkeyList);
-  if (error < 0) {
-    printf("(Cvgd) ERROR in Cvgd_new_read, with fstinl on nomvar !!\n");
-    return(VGD_ERROR);
-  }
-  if(count == 0){
-    printf("(Cvgd) Cannot find %s with the following ips: ip1=%d, ip2=%d\n", ZNAME, ip1, ip2);
-    if(match_ipig) {
-      this->vcode = -1;
-      return(VGD_ERROR);
-    }
-    printf("(Cvgd) Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)\n");
-    if(this->c_legacy(unit,kind) == VGD_ERROR){
-      printf("(Cvgd) ERROR: failed to construct vgrid descriptor from legacy encoding\n");
-      return(VGD_ERROR);
-    }
-    if(this->fstd_init() == VGD_ERROR) {
-      printf("(Cvgd) ERROR in Cvgd_new_read, problem creating record information\n");
-    }
-    toc_found = 1;
-  } else {
-    // Loop on all !! found
-    for( i=0; i < count; i++) {     
-      // Check if kind and version match, skip the !! if not.
-      if( correct_kind_and_version(keyList[i], kind, version, &var, &status) == VGD_ERROR) {
-	this->valid = 0;
-	return(VGD_ERROR);
-      }
-      if( status != 1) {
-	continue;
-      }
-      // If we reached this stage then the toc satisfy the selection criteria but it may not be the only one.
-      if(! toc_found) {
-	toc_found = 1;
-	if( this->C_load_toctoc(var,keyList[i]) == VGD_ERROR ) {
-	  printf("(Cvgd) ERROR in Cvgd_new_read, cannot load !!\n");
-	  return(VGD_ERROR);
-	}
-	ni=this->table_ni;
-	nj=this->table_nj;
-	nk=this->table_nk;
-	continue;
-      }
- // If we get at this point this means that there are more than one toc satisfying the selection criteria.
-      // We load then all to check if they are the same. If not, we return with an error message.
-      if( my_fstprm(keyList[i], &var) == VGD_ERROR ) {
-	printf("(Cvgd) ERROR in Cvgd_new_read, with my_fstprm on keyList[i] = %d\n",keyList[i]);
-	return(VGD_ERROR);
-      }
-      if( self2.C_load_toctoc(var,keyList[i]) == VGD_ERROR ) {
-	printf("(Cvgd) ERROR in Cvgd_new_read, cannot load !!\n");
-	return(VGD_ERROR);
-      }
-      status = this->Cvgd_vgdcmp(&self2);
-      if ( status != 0 ){
-	printf("(Cvgd) ERROR in Cvgd_new_read, found different entries in vertical descriptors after search on ip1 = %d, ip2 = %d, kind = %d, version = %d, status code is %d\n",ip1,ip2,kind,version,status);
-	return(VGD_ERROR);
-      }
-    } // Loop in !! 
-  } //if(count == 0)
+//   error = c_fstinl(unit, &ni, &nj, &nk, -1, " ", ip1, ip2, -1, " ", ZNAME, keyList, &count, nkeyList);
+//   if (error < 0) {
+//     printf("(Cvgd) ERROR in Cvgd_new_read, with fstinl on nomvar !!\n");
+//     return(VGD_ERROR);
+//   }
+//   if(count == 0){
+//     printf("(Cvgd) Cannot find %s with the following ips: ip1=%d, ip2=%d\n", ZNAME, ip1, ip2);
+//     if(match_ipig) {
+//       this->vcode = -1;
+//       return(VGD_ERROR);
+//     }
+//     printf("(Cvgd) Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)\n");
+//     if(this->c_legacy(unit,kind) == VGD_ERROR){
+//       printf("(Cvgd) ERROR: failed to construct vgrid descriptor from legacy encoding\n");
+//       return(VGD_ERROR);
+//     }
+//     if(this->fstd_init() == VGD_ERROR) {
+//       printf("(Cvgd) ERROR in Cvgd_new_read, problem creating record information\n");
+//     }
+//     toc_found = 1;
+//   } else {
+//     // Loop on all !! found
+//     for( i=0; i < count; i++) {     
+//       // Check if kind and version match, skip the !! if not.
+//       if( correct_kind_and_version(keyList[i], kind, version, &var, &status) == VGD_ERROR) {
+// 	this->valid = 0;
+// 	return(VGD_ERROR);
+//       }
+//       if( status != 1) {
+// 	continue;
+//       }
+//       // If we reached this stage then the toc satisfy the selection criteria but it may not be the only one.
+//       if(! toc_found) {
+// 	toc_found = 1;
+// 	if( this->C_load_toctoc(var,keyList[i]) == VGD_ERROR ) {
+// 	  printf("(Cvgd) ERROR in Cvgd_new_read, cannot load !!\n");
+// 	  return(VGD_ERROR);
+// 	}
+// 	ni=this->table_ni;
+// 	nj=this->table_nj;
+// 	nk=this->table_nk;
+// 	continue;
+//       }
+//  // If we get at this point this means that there are more than one toc satisfying the selection criteria.
+//       // We load then all to check if they are the same. If not, we return with an error message.
+//       if( my_fstprm(keyList[i], &var) == VGD_ERROR ) {
+// 	printf("(Cvgd) ERROR in Cvgd_new_read, with my_fstprm on keyList[i] = %d\n",keyList[i]);
+// 	return(VGD_ERROR);
+//       }
+//       if( self2.C_load_toctoc(var,keyList[i]) == VGD_ERROR ) {
+// 	printf("(Cvgd) ERROR in Cvgd_new_read, cannot load !!\n");
+// 	return(VGD_ERROR);
+//       }
+//       status = this->Cvgd_vgdcmp(&self2);
+//       if ( status != 0 ){
+// 	printf("(Cvgd) ERROR in Cvgd_new_read, found different entries in vertical descriptors after search on ip1 = %d, ip2 = %d, kind = %d, version = %d, status code is %d\n",ip1,ip2,kind,version,status);
+// 	return(VGD_ERROR);
+//       }
+//     } // Loop in !! 
+//   } //if(count == 0)
 
-  if(! toc_found) {
-    printf("(Cvgd) ERROR in Cvgd_new_read, cannot find !! or it generate from legacy encoding\n");
-    return(VGD_ERROR);
-  }
-  // Fill structure from input table
-  if( vgrid::Cvgd_new_from_table(this, this->table, this->table_ni, this->table_nj, this->table_nk) == VGD_ERROR ) {
-    printf("(Cvgd) ERROR in Cvgd_new_read, unable to construct from table\n");
-    return(VGD_ERROR);
-  }
-  this->match_ipig = match_ipig;  
+//   if(! toc_found) {
+//     printf("(Cvgd) ERROR in Cvgd_new_read, cannot find !! or it generate from legacy encoding\n");
+//     return(VGD_ERROR);
+//   }
+//   // Fill structure from input table
+//   if( vgrid::Cvgd_new_from_table(this, this->table, this->table_ni, this->table_nj, this->table_nk) == VGD_ERROR ) {
+//     printf("(Cvgd) ERROR in Cvgd_new_read, unable to construct from table\n");
+//     return(VGD_ERROR);
+//   }
+//   this->match_ipig = match_ipig;  
 
-  return(VGD_OK);
-}
+//   return(VGD_OK);
+// }
 
 int vgrid::Cvgd_write_desc (int unit) {
   int ip1, ip2;
