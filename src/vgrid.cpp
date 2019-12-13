@@ -2489,6 +2489,7 @@ void vgrid::init(void)
   match_ipig    = 0;
   valid         = 0;
   skip          = 0;
+  k_plus_top    = 0;
 
   rec.fstd_initialized = 0;
   rec.dateo = 0;

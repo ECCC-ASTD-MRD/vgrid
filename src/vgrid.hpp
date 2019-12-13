@@ -112,6 +112,7 @@ public:
   char     valid;         // Validity of structure
 protected:
   int      skip;          // space to be added to table_nj
+  int      k_plus_top     // used in c_decode_vert for 5002, 5003
 
   // METHODS:
 private:

@@ -33,10 +33,6 @@ vgrid_0001::vgrid_0001() : vgrid()
   this->table_ni = 3;
 }
 
-vgrid_0001::vgrid_0001(int key) : vgrid(key)
-{
-}
-
 void vgrid_0001::set_table_nj(int nk)
 {
   table_nj = 2*nk+skip;
@@ -130,10 +126,6 @@ vgrid_1001::vgrid_1001() : vgrid()
   this->skip    = 2; // Could be changed by c_decode_vert
   this->table_ni = 3;
   strcpy(this->ref_name,"P0  ");
-}
-
-vgrid_1001::vgrid_1001(int key) : vgrid(key)
-{
 }
 
 void vgrid_1001::set_table_nj(int nk)
@@ -273,10 +265,6 @@ vgrid_1002::vgrid_1002() : vgrid()
   this->skip    = 2; // Could be changed by c_decode_vert
   this->table_ni = 3;
   strcpy(this->ref_name,"P0  ");
-}
-
-vgrid_1002::vgrid_1002(int key) : vgrid(key)
-{
 }
 
 void vgrid_1002::set_table_nj(int nk)
@@ -420,10 +408,6 @@ int vgrid_1002::C_genab(float *etauser, int nk, double *ptop_8, double **a_m_8, 
 }
 
 // ########## common to classes vgrid_1003, vgrid_5001 ##########
-vgrid_1003_5001::vgrid_1003_5001(int key) : vgrid(key)
-{
-}
-
 int vgrid_1003_5001::c_decode_vert()
 {
   int k, ind, nk;
@@ -481,10 +465,6 @@ vgrid_1003::vgrid_1003() : vgrid()
   this->vcode   = 1003;
   this->skip    = 0; // Could be change by c_decode_vert
   strcpy(this->ref_name,"P0  ");
-}
-
-vgrid_1003::vgrid_1003(int key) : vgrid_1003_5001(key)
-{
 }
 
 void vgrid_1003::set_table_nj(int nk)
@@ -582,10 +562,6 @@ vgrid_2001::vgrid_2001() : vgrid()
   this->vcode   = 2001;
   this->skip    = 1;
   this->table_ni = 3;
-}
-
-vgrid_2001::vgrid_2001(int key)
-{
 }
 
 void vgrid_2001::set_table_nj(int nk)
@@ -713,10 +689,6 @@ vgrid_4001::vgrid_4001() : vgrid()
   this->vcode = 4001;
   this->skip    = 1; // Could be changed by c_decode_vert
   this->table_ni = 3;
-}
-
-vgrid_4001::vgrid_4001(int key)
-{
 }
 
 void vgrid_4001::set_table_nj(int nk)
@@ -853,10 +825,6 @@ vgrid_5001::vgrid_5001() : vgrid()
   strcpy(this->ref_name,"P0  ");
 }
 
-vgrid_5001::vgrid_5001(int key) : vgrid_1003_5001(key)
-{
-}
-
 void vgrid_5001::set_table_nj(int nk)
 {
   table_nj = nk+skip;
@@ -986,11 +954,6 @@ int vgrid_5001::C_genab(float *hybuser, int nk, float rcoef, double ptop_8, doub
 
 
 // ########## common to classes vgrid_5002, vgrid_5003, vgrid_5004, vgrid_5005 ##########
-vgrid_5002_5003_5004_5005::vgrid_5002_5003_5004_5005(int key, int k_plus_top_value) : vgrid(key)
-{
-  k_plus_top = k_plus_top_value;
-}
-
 void vgrid_5002_5003_5004_5005::set_table_nj(int nk)
 {
   table_nj = this->nl_m + this->nl_t + skip;
@@ -1293,11 +1256,8 @@ vgrid_5002::vgrid_5002() : vgrid()
   this->version = 2;
   this->vcode   = 5002;
   this->skip    = 3; // Could be changed by c_decode_vert
+  this->k_plus_top = 1;
   this->table_ni = 3;
-}
-
-vgrid_5002::vgrid_5002(int key) : vgrid_5002_5003_5004_5005(key, 1)
-{
 }
 
 // ########## class 5003 ##########
@@ -1307,10 +1267,8 @@ vgrid_5003::vgrid_5003() : vgrid()
   this->version = 3;
   this->vcode   = 5003;
   this->skip    = 3; // Could be changed by c_decode_vert
+  this->k_plus_top = 1;
   this->table_ni = 3;
-}
-vgrid_5003::vgrid_5003(int key) : vgrid_5002_5003_5004_5005(key, 1)
-{
 }
 
 // ########## class 5004 ##########
@@ -1321,9 +1279,6 @@ vgrid_5004::vgrid_5004() : vgrid()
   this->vcode   = 5004;
   this->skip    = 3; // Could be changed by c_decode_vert
   this->table_ni = 3;
-}
-vgrid_5004::vgrid_5004(int key) : vgrid_5002_5003_5004_5005(key, 0)
-{
 }
 
 int vgrid_5004::C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t)
@@ -1477,9 +1432,6 @@ vgrid_5005::vgrid_5005() : vgrid()
   this->table_ni = 3;
   strcpy(this->ref_name,"P0  ");
 }
-vgrid_5005::vgrid_5005(int key) : vgrid_5002_5003_5004_5005(key, 0)
-{
-}
 
 
 // ########## class 5100 ##########
@@ -1492,10 +1444,6 @@ vgrid_5100::vgrid_5100() : vgrid()
   this->table_ni = 4;
   strcpy(this->ref_name,"P0  ");
   strcpy(this->ref_namel,"P0LS");
-}
-
-vgrid_5100::vgrid_5100(int key)
-{
 }
 
 void vgrid_5100::set_table_nj(int nk)
@@ -1629,10 +1577,6 @@ vgrid_5999::vgrid_5999() : vgrid()
   strcpy(this->ref_name,"P0  ");
 }
 
-vgrid_5999::vgrid_5999(int key)
-{
-}
-
 void vgrid_5100::set_table_nj(int nk)
 {
   table_nj = nk+skip;
@@ -1752,10 +1696,6 @@ vgrid_21001::vgrid_21001() : vgrid()
   {
     strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
   }
-}
-
-vgrid_21001::vgrid_21001(int key)
-{
 }
 
 void vgrid_21001::set_table_nj(int nk)
@@ -1894,10 +1834,6 @@ vgrid_21002::vgrid_21002() : vgrid()
   {
     strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
   }
-}
-
-vgrid_21002::vgrid_21001(int key)
-{
 }
 
 void vgrid_21002::set_table_nj(int nk)
