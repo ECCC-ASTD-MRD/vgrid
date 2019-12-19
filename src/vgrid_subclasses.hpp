@@ -26,7 +26,7 @@ class vgrid_0001 : public vgrid
 {
 public:
   vgrid_0001();
-  vgrid_0001(int key) : vgrid_0001() : vgrid(key);
+  vgrid_0001(int key);
   int c_decode_vert();
   int c_encode_vert();
   void fstd_subinit();
@@ -36,7 +36,7 @@ class vgrid_1001 : public vgrid
 {
 public:
   vgrid_1001();
-  vgrid_1001(int key) : vgrid_1001() : vgrid(key);
+  vgrid_1001(int key);
   int c_decode_vert();
   int c_encode_vert();
   int C_genab(float *hyb, int nk, double **a_m_8, double **b_m_8, int **ip1_m);
@@ -47,7 +47,7 @@ class vgrid_1002 : public vgrid
 {
 public:
   vgrid_1002();
-  vgrid_1002(int key) : vgrid_1002() : vgrid(key);
+  vgrid_1002(int key);
   int c_decode_vert();
   int c_encode_vert();
   int C_genab(float *etauser, int nk, double *ptop_8, double **a_m_8, double **b_m_8, int **ip1_m);
@@ -65,7 +65,7 @@ class vgrid_1003 : public vgrid_1003_5001
 {
 public:
   vgrid_1003();
-  vgrid_1003(int key) : vgrid_1003() : vgrid(key);
+  vgrid_1003(int key);
   int c_decode_vert();
   int c_encode_vert();
   int C_genab(float *hybuser, int nk, float rcoef, double ptop_8, double pref_8, double **a_m_8, double **b_m_8, int **ip1_m);
@@ -76,7 +76,7 @@ class vgrid_2001 : public vgrid
 {
 public:
   vgrid_2001();
-  vgrid_2001(int key) : vgrid_2001() : vgrid(key);
+  vgrid_2001(int key);
   int c_decode_vert();
   int c_encode_vert();
   int C_genab(float *pres, int nk, double **a_m_8, double **b_m_8, int **ip1_m);
@@ -87,7 +87,7 @@ class vgrid_4001 : public vgrid
 {
 public:
   vgrid_4001();
-  vgrid_4001(int key) : vgrid_4001() : vgrid(key);
+  vgrid_4001(int key);
   int c_decode_vert();
   int c_encode_vert();
   int C_genab(float *hgts, int nk, double **a_m_8, double **b_m_8, int **ip1_m);
@@ -98,7 +98,7 @@ class vgrid_5001 : public vgrid_1003_5001
 {
 public:
   vgrid_5001();
-  vgrid_5001(int key) : vgrid_5001() : vgrid(key);
+  vgrid_5001(int key);
   int C_genab(float *hybuser, int nk, float rcoef, double ptop_8, double pref_8, double **a_m_8, double **b_m_8, int **ip1_m);
 };
   void fstd_subinit();
@@ -116,7 +116,7 @@ class vgrid_5002 : public vgrid_5002_5003_5004_5005
 {
 public:
   vgrid_5002();
-  vgrid_5002(int key) : vgrid_5002() : vgrid(key);
+  vgrid_5002(int key);
   void fstd_subinit();
 };
 
@@ -124,7 +124,7 @@ class vgrid_5003 : public vgrid_5002_5003_5004_5005
 {
 public:
   vgrid_5003();
-  vgrid_5003(int key) : vgrid_5003() : vgrid(key);
+  vgrid_5003(int key);
   void fstd_subinit();
 };
 
@@ -132,8 +132,8 @@ class vgrid_5004 : public vgrid_5002_5003_5004_5005
 {
 public:
   vgrid_5004();
-  vgrid_5004(int key) : vgrid_5004() : vgrid(key);
-  int vgrid_5004::C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t);
+  vgrid_5004(int key);
+  int C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t);
   void fstd_subinit();
 };
 
@@ -141,8 +141,8 @@ class vgrid_5005 : public vgrid_5002_5003_5004_5005
 {
 public:
   vgrid_5005();
-  vgrid_5005(int key) : vgrid_5005() : vgrid(key);
-  int vgrid_5005::C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double **ptop_out_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t, float dhm, float dht);
+  vgrid_5005(int key);
+  int C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double **ptop_out_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t, float dhm, float dht);
   void fstd_subinit();
 };
 
@@ -150,8 +150,8 @@ class vgrid_5100 : public vgrid
 {
 public:
   vgrid_5100();
-  vgrid_5100(int key) : vgrid_5100() : vgrid(key);
-  int vgrid_5100::C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **ptop_out_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, float dhm, float dht, int avg);
+  vgrid_5100(int key);
+  int C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **ptop_out_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, float dhm, float dht, int avg);
   int c_decode_vert();
   int c_encode_vert();
 };
@@ -160,7 +160,7 @@ class vgrid_5999 : public vgrid
 {
 public:
   vgrid_5999();
-  vgrid_5999(int key) : vgrid_5999() : vgrid(key);
+  vgrid_5999(int key);
   int c_decode_vert();
   int c_encode_vert();
   void fstd_subinit();
@@ -170,8 +170,8 @@ class vgrid_21001 : public vgrid
 {
 public:
   vgrid_21001();
-  vgrid_21001(int key) : vgrid_21001() : vgrid(key);
-  int vgrid_21001::C__genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, float dhm, float dht);
+  vgrid_21001(int key);
+  int C__genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, float dhm, float dht);
   int c_decode_vert();
   int c_encode_vert();
   void fstd_subinit();
@@ -181,8 +181,8 @@ class vgrid_21002 : public vgrid
 {
 public:
   vgrid_21002();
-  vgrid_21002(int key) : vgrid_21002() : vgrid(key);
-  int vgrid_21002::C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, int *nl_w, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, double **PP_a_w_8, double **PP_b_w_8, double **PP_c_w_8, int **PP_ip1_w, float dhm, float dht, float dhw);
+  vgrid_21002(int key);
+  int C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, int *nl_w, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, double **PP_a_w_8, double **PP_b_w_8, double **PP_c_w_8, int **PP_ip1_w, float dhm, float dht, float dhw);
   int c_decode_vert();
   int c_encode_vert();
   void fstd_subinit();

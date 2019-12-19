@@ -22,6 +22,7 @@
 #define VGRID_H
 
 #include "vgrid_descriptor.h"
+#include <exception>      // std::exception
 
 #define VGD_OK       0
 #define VGD_ERROR    -1
@@ -112,7 +113,7 @@ private:
   char     valid;         // Validity of structure
 protected:
   int      skip;          // space to be added to table_nj
-  int      k_plus_top     // used in c_decode_vert for 5002, 5003
+  int      k_plus_top;    // used in c_decode_vert for 5002, 5003
 
   // METHODS:
 private:
@@ -124,7 +125,7 @@ private:
                               float *pkp, int *zero_lapse_rate);
   static int c_get_stda76(float *Tk, float *pk, float *zk, float *gammaT, int *zero_lapse_rate);
   static void my_copy_double(double *aa, double **bb, int ind);
-  static my_copy_int(int *aa, int **bb, int ind);
+  static void my_copy_int(int *aa, int **bb, int ind);
   static int same_vec_i(int *vec1, int n1, int *vec2, int n2);
   static int same_vec_r8(double *vec1, int n1, double *vec2, int n2);
   static int similar_vec_r8(double *vec1, int n1, double *vec2, int n2);
@@ -291,7 +292,7 @@ public:
   vgrid(int kind, int version);
   vgrid(int vcode);
   vgrid(int unit, int ip1, int ip2, int kind, int version);
-  vgrid(int key) : vgrid();
+  vgrid(int key, float dummy);
 
 public:
   static int Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, int ip2, int kind, int version);
@@ -308,6 +309,8 @@ protected:
   // virtual C_genab()
 };
 
-class vgrid_exception : public exception
+class vgrid_exception : public std::exception
+{
+};
 
 #endif // VGRID_H

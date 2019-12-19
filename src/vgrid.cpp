@@ -5262,7 +5262,7 @@ int vgrid::Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, in
 
 
 // Construct a vgrid from key
-vgrid::vgrid(int key)
+vgrid::vgrid(int key) : vgrid()
 {
   double *table;
   VGD_TFSTD_ext var;
