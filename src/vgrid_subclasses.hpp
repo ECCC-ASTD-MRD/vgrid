@@ -17,8 +17,8 @@
 // Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 // Boston, MA 02111-1307, USA.
 
-#ifndef VGRID_5005_H
-#define VGRID_5005_H
+#ifndef VGRID_SUBCLASSES_H
+#define VGRID_SUBCLASSES_H
 
 #include "vgrid.hpp"
 
@@ -188,4 +188,4 @@ public:
   void fstd_subinit();
 };
 
-#endif // VGRID_5005_H
+#endif // VGRID_SUBCLASSES_H
