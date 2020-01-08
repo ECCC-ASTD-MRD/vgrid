@@ -231,13 +231,13 @@ public:
   // Constructors
   vgrid();
   vgrid(int unit, int ip1, int ip2, int kind, int version);
-  vgrid(int key, float dummy);
 
 public:
   virtual int c_decode_vert() = 0;
   virtual int c_encode_vert() = 0;
 
 protected:
+  void build_vgrid_from_key(int key);
   virtual void set_table_nj(int nk) = 0;
   virtual int allocate_table(int nk) = 0;
   virtual void fstd_subinit() = 0;  // subclass-specific assignments to initialize the fstd record

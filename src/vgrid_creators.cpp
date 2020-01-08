@@ -17,6 +17,34 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
+
+
+Cvgd_create_vgrid_from_vcode(vgrid **new_vgrid, int vcode)
+{
+  // Instantiate a vgrid subclass from the key, according to the vcode
+  switch (vcode)
+  {
+  case 0001:  vgrid_0001  new_vgrid(key);
+  case 1001:  vgrid_1001  new_vgrid(key);
+  case 1002:  vgrid_1002  new_vgrid(key);
+  case 1003:  vgrid_1003  new_vgrid(key);
+  case 2001:  vgrid_2001  new_vgrid(key);
+  case 4001:  vgrid_4001  new_vgrid(key);
+  case 5001:  vgrid_5001  new_vgrid(key);
+  case 5002:  vgrid_5002  new_vgrid(key);
+  case 5003:  vgrid_5003  new_vgrid(key);
+  case 5004:  vgrid_5004  new_vgrid(key);
+  case 5005:  vgrid_5005  new_vgrid(key);
+  case 5100:  vgrid_5100  new_vgrid(key);
+  case 5999:  vgrid_5999  new_vgrid(key);
+  case 21001: vgrid_21001 new_vgrid(key);
+  case 21002: vgrid_21002 new_vgrid(key);
+
+  default:
+    throw vgrid_exception();
+  }
+}
+
 int Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, int ip2, int kind_sought, int version_sought)
 {
   char  match_ipig;
@@ -175,73 +203,7 @@ int Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, int ip2, 
 
   try
   {
-    // Instantiate a vgrid subclass from the key, according to the vcode
-    switch (vcode)
-    {
-    case 0001:
-      vgrid_0001 new_vgrid_0001(key);
-      *my_new_vgrid = & new_vgrid_0001;
-
-    case 1001:
-      vgrid_1001 new_vgrid_1001(key);
-      *my_new_vgrid = & new_vgrid_1001;
-
-    case 1002:
-      vgrid_1002 new_vgrid_1002(key);
-      *my_new_vgrid = & new_vgrid_1002;
-
-    case 1003:
-      vgrid_1003 new_vgrid_1003(key);
-      *my_new_vgrid = & new_vgrid_1003;
-
-    case 2001:
-      vgrid_2001 new_vgrid_2001(key);
-      *my_new_vgrid = & new_vgrid_2001;
-
-    case 4001:
-      vgrid_4001 new_vgrid_4001(key);
-      *my_new_vgrid = & new_vgrid_4001;
-
-    case 5001:
-      vgrid_5001 new_vgrid_5001(key);
-      *my_new_vgrid = &new_vgrid_5001;
-
-    case 5002:
-      vgrid_5002 new_vgrid_5002(key);
-      *my_new_vgrid = &new_vgrid_5002;
-
-    case 5003:
-      vgrid_5003 new_vgrid_5003(key);
-      *my_new_vgrid = &new_vgrid_5003;
-
-    case 5004:
-      vgrid_5004 new_vgrid_5004(key);
-      *my_new_vgrid = &new_vgrid_5004;
-
-    case 5005:
-      vgrid_5005 new_vgrid_5005(key);
-      *my_new_vgrid = &new_vgrid_5005;
-
-    case 5100:
-      vgrid_5100 new_vgrid_5100(key);
-      *my_new_vgrid = & new_vgrid_5100;
-
-    case 5999:
-      vgrid_5999 new_vgrid_5999(key);
-      *my_new_vgrid = & new_vgrid_5999;
-
-    case 21001:
-      vgrid_21001 new_vgrid_21001(key);
-      *my_new_vgrid = & new_vgrid_21001;
-
-    case 21002:
-      vgrid_21002 new_vgrid_21002(key);
-      *my_new_vgrid = & new_vgrid_21002;
-
-    default:
-    printf("(Cvgd) ERROR in Cvgd_read_vgrid_from_file, unrecognized vcode=%s\n",vcode);
-    return(VGD_ERROR);
-    }
+    Cvgd_create_vgrid_from_vcode(my_new_vgrid, vcode);
   }
   catch(vgrid_exception)
   {
@@ -251,6 +213,61 @@ int Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, int ip2, 
   this->match_ipig = match_ipig;
 
   return(VGD_OK);
+}
+
+
+
+int Cvgd_create_vgrid_from_filekey(vgrid **new_vgrid, int key)
+{
+  double *table;
+  VGD_TFSTD_ext var;
+  int ni, nj, nk, table_size, istat;
+  int kind, version, vcode;
+  float dummy;
+
+  // Read all the description information, var, for the key
+  if( my_fstprm(key, &var) == VGD_ERROR )
+  {
+    printf("(Cvgd) ERROR in Cvgd_create_vgrid_from_filekey, with my_fstprm on key %d\n",
+	   key);
+    return(VGD_ERROR);
+  }
+
+  // Read the field into table
+  ni = var.ni;
+  nj = var.nj;
+  nk = var.nk;
+  table_size=ni*nj*nk;
+  table = (double*)malloc ( table_size * sizeof(double) );
+  if(! table )
+  {
+    printf("(Cvgd) ERROR in Cvgd_create_vgrid_from_filekey, cannot allocate table of doubles of size %d\n",table_size );
+    return(VGD_ERROR);
+  }
+  istat = c_fstluk(table, key, &ni, &nj, &nk);
+  if(istat < 0)
+  {
+    printf("(Cvgd) ERROR in Cvgd_create_vgrid_from_filekey, problem with fstluk\n");
+    free(table);
+    return(VGD_ERROR);
+  }
+  kind    = (int) table[0];
+  version = (int) table[1];
+
+  vcode = kind*1000 + version;
+  try
+  {
+    Cvgd_create_vgrid_from_vcode(new_vgrid, vcode);
+    new_vgrid->build_vgrid_from_key(key);
+  }
+  catch(vgrid_exception)
+  {
+    printf("(Cvgd) ERROR in Cvgd_read_vgrid_from_file, unable to construct from a key %d\n", key);
+    return(VGD_ERROR);
+  }
+
+  // Complete the construction of the vgrid
+  new_vgrid->vgrid(key, dummy);
 }
 
 

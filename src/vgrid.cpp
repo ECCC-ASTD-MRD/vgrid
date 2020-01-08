@@ -3750,12 +3750,8 @@ int vgrid::Cvgd_stda76_pres_from_hgts_list(float *pres, float *hgts,
 }
 
 
-// ########## N E W   I N T E R F A C E ##########
-// ########## N E W   I N T E R F A C E ##########
-
-
 // Construct a vgrid from key
-vgrid::vgrid(int key, float dummy) : vgrid()
+void vgrid::build_vgrid_from_key(int key) : vgrid()
 {
   double *table;
   VGD_TFSTD_ext var;
