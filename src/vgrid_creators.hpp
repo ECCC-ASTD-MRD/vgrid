@@ -35,4 +35,67 @@ static int Cvgd_new_gen2(vgrid *my_new_vgrid, int kind, int version, float *hyb,
 	      double *ptop_8, double *pref_8, double *ptop_out_8,
 	      int ip1, int ip2, float *dhm, float *dht, float *dhw, int avg);
 
+
+
+
+
+
+
+  // Front ends to call Cvgd_new_build_vert2 to create a vgrid
+  static int Cvgd_new_build_vert(vgrid *my_new_vgrid, int kind, int version, int nk, int ip1, int ip2, double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2,
+			double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int nl_m, int nl_t);
+  static int Cvgd_new_build_vert_1001(vgrid *my_new_vgrid, int ip1, int ip2, 
+			     double *a_m_8, double *b_m_8, int *ip1_m, int nk);
+  static int Cvgd_new_build_vert_1002(vgrid *my_new_vgrid, int ip1, int ip2, double ptop_8,
+			     double *a_m_8, double *b_m_8, int *ip1_m, int nk);
+  static int Cvgd_new_build_vert_2001(vgrid *my_new_vgrid, int ip1, int ip2, 
+			     double *a_m_8, double *b_m_8, int *ip1_m, int nk);
+  static int Cvgd_new_build_vert_4001(vgrid *my_new_vgrid, int ip1, int ip2, 
+			     double *a_m_8, double *b_m_8, int *ip1_m, int nk);
+  static int Cvgd_new_build_vert_5001(vgrid *my_new_vgrid, int ip1, int ip2, double ptop_8, double pref_8, float rcoef1,
+			     double *a_m_8, double *b_m_8, int *ip1_m, int nk);
+  static int Cvgd_new_build_vert_5002(vgrid *my_new_vgrid, int ip1, int ip2, double ptop_8, double pref_8, float rcoef1, float rcoef2,
+			     double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int nl_m, int nl_t);
+  static int Cvgd_new_build_vert_5005(vgrid *my_new_vgrid, int ip1, int ip2, double pref_8, float rcoef1, float rcoef2,
+			     double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int nl);
+  static int Cvgd_new_build_vert_5100(vgrid *my_new_vgrid, int ip1, int ip2, double pref_8, float rcoef1, float rcoef2, float rcoef3, float rcoef4,
+			     double *a_m_8, double *b_m_8, double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8, int *ip1_m, int *ip1_t, int nl);
+  static int Cvgd_new_build_vert_5999(vgrid *my_new_vgrid, int ip1, int ip2, 
+			     double *a_m_8, double *b_m_8, int *ip1_m, int nk);
+  static int Cvgd_new_build_vert_21001(vgrid *my_new_vgrid, int ip1, int ip2, float rcoef1, float rcoef2, float rcoef3, float rcoef4, 
+			      double *a_m_8, double *b_m_8, double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8, int *ip1_m, int *ip1_t, int nl);
+  static int Cvgd_new_build_vert_21002(vgrid *my_new_vgrid, int ip1, int ip2, float rcoef1, float rcoef2, float rcoef3, float rcoef4, 
+			      double *a_m_8, double *b_m_8, double *c_m_8,
+			      double *a_t_8, double *b_t_8, double *c_t_8,
+			      double *a_w_8, double *b_w_8, double *c_w_8,
+			      int *ip1_m, int *ip1_t, int *ip1_w, int nl);
+
+
+
+
+
+
+
+  // Front ends to call Cvgd_new_gen2 to construct a vgrid
+  static int Cvgd_new_gen(vgrid **my_new_vgrid, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2,
+	      double *ptop_8, double *pref_8, double *ptop_out_8,
+		 int ip1, int ip2, float *dhm, float *dht, int avg);
+  static int Cvgd_new_gen_1001(vgrid *my_new_vgrid, float *hyb, int size_hyb, int ip1, int ip2);
+  static int Cvgd_new_gen_2001(vgrid *my_new_vgrid, float *hyb, int size_hyb, int ip1, int ip2);
+  static int Cvgd_new_gen_5999(vgrid *my_new_vgrid, float *hyb, int size_hyb, int ip1, int ip2);
+  static int Cvgd_new_gen_1002(vgrid *my_new_vgrid, float *hyb, int size_hyb, double ptop_8, int ip1, int ip2);
+  static int Cvgd_new_gen_4001(vgrid *my_new_vgrid, float *hyb, int size_hyb, int ip1, int ip2);
+  static int Cvgd_new_gen_5001(vgrid *my_new_vgrid, float *hyb, int size_hyb, double ptop_8, double pref_8, float rcoef1, int ip1, int ip2);
+  static int Cvgd_new_gen_5002(vgrid *my_new_vgrid, float *hyb, int size_hyb, double ptop_8, double pref_8, float rcoef1, float rcoef2, int ip1, int ip2);
+  static int Cvgd_new_gen_5005(vgrid *my_new_vgrid, float *hyb, int size_hyb, double pref_8, double *ptop_out_8, float rcoef1, float rcoef2, int ip1, int ip2, float dhm, float dht );
+  static int Cvgd_new_gen_5100(vgrid *my_new_vgrid, float *hyb, int size_hyb, double pref_8, double *ptop_out_8, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, int avg);
+  static int Cvgd_new_gen_21001(vgrid *my_new_vgrid, float *hyb, int size_hyb, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht);
+  static int Cvgd_new_gen_21002(vgrid *my_new_vgrid, float *hyb, int size_hyb, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, float dhw);
+
+
+
+
+  int C_gen_legacy_desc(vgrid **my_new_vgrid, int unit, int *keylist , int nb);
+  int c_legacy(int unit, int F_kind);
+
 #endif // VGRID_CREATORS_H

@@ -66,6 +66,8 @@ static int is_in_logp       [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    
 static int vcode_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 4001, 5001, 5002, 5003, 5004, 5005, 5100, 5999, 21001,21002};
 
 
+int my_fstprm(int key,VGD_TFSTD_ext *ff);
+
 
 class vgrid
 {
@@ -129,7 +131,6 @@ private:
   static int same_vec_i(int *vec1, int n1, int *vec2, int n2);
   static int same_vec_r8(double *vec1, int n1, double *vec2, int n2);
   static int similar_vec_r8(double *vec1, int n1, double *vec2, int n2);
-  static int my_fstprm(int key,VGD_TFSTD_ext *ff);
   static double c_comp_diag_a_height(double pref_8, float height);
   static double c_comp_diag_a_ip1(double pref_8, int ip1);
   static int Cvgd_FindIp1Idx(int Ip1,int *Lst,int Size);
@@ -167,36 +168,6 @@ public:
   int Cvgd_set_vcode_i(int Kind,int Version);
   int fstd_init();
   int Cvgd_set_vcode();
-
-
-  // Front ends to call Cvgd_new_build_vert2 to construct a vgrid
-  static int Cvgd_new_build_vert(vgrid *my_new_vgrid, int kind, int version, int nk, int ip1, int ip2, double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2,
-			double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int nl_m, int nl_t);
-  static int Cvgd_new_build_vert_1001(vgrid *my_new_vgrid, int ip1, int ip2, 
-			     double *a_m_8, double *b_m_8, int *ip1_m, int nk);
-  static int Cvgd_new_build_vert_1002(vgrid *my_new_vgrid, int ip1, int ip2, double ptop_8,
-			     double *a_m_8, double *b_m_8, int *ip1_m, int nk);
-  static int Cvgd_new_build_vert_2001(vgrid *my_new_vgrid, int ip1, int ip2, 
-			     double *a_m_8, double *b_m_8, int *ip1_m, int nk);
-  static int Cvgd_new_build_vert_4001(vgrid *my_new_vgrid, int ip1, int ip2, 
-			     double *a_m_8, double *b_m_8, int *ip1_m, int nk);
-  static int Cvgd_new_build_vert_5001(vgrid *my_new_vgrid, int ip1, int ip2, double ptop_8, double pref_8, float rcoef1,
-			     double *a_m_8, double *b_m_8, int *ip1_m, int nk);
-  static int Cvgd_new_build_vert_5002(vgrid *my_new_vgrid, int ip1, int ip2, double ptop_8, double pref_8, float rcoef1, float rcoef2,
-			     double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int nl_m, int nl_t);
-  static int Cvgd_new_build_vert_5005(vgrid *my_new_vgrid, int ip1, int ip2, double pref_8, float rcoef1, float rcoef2,
-			     double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int nl);
-  static int Cvgd_new_build_vert_5100(vgrid *my_new_vgrid, int ip1, int ip2, double pref_8, float rcoef1, float rcoef2, float rcoef3, float rcoef4,
-			     double *a_m_8, double *b_m_8, double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8, int *ip1_m, int *ip1_t, int nl);
-  static int Cvgd_new_build_vert_5999(vgrid *my_new_vgrid, int ip1, int ip2, 
-			     double *a_m_8, double *b_m_8, int *ip1_m, int nk);
-  static int Cvgd_new_build_vert_21001(vgrid *my_new_vgrid, int ip1, int ip2, float rcoef1, float rcoef2, float rcoef3, float rcoef4, 
-			      double *a_m_8, double *b_m_8, double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8, int *ip1_m, int *ip1_t, int nl);
-  static int Cvgd_new_build_vert_21002(vgrid *my_new_vgrid, int ip1, int ip2, float rcoef1, float rcoef2, float rcoef3, float rcoef4, 
-			      double *a_m_8, double *b_m_8, double *c_m_8,
-			      double *a_t_8, double *b_t_8, double *c_t_8,
-			      double *a_w_8, double *b_w_8, double *c_w_8,
-			      int *ip1_m, int *ip1_t, int *ip1_w, int nl);
 
   int C_compute_heights_0001(int ni, int nj, int nk, int *ip1_list, float *levels);
   int C_compute_heights_0001_8(int ni, int nj, int nk, int *ip1_list, double *levels);
@@ -241,25 +212,6 @@ public:
   int Cvgd_put_char(char *key, char *value);
   int Cvgd_putopt_int(char *key, int value);
   int Cvgd_put_int(char *key, int value);
-  int C_gen_legacy_desc(int unit, int *keylist , int nb);
-  int c_legacy(int unit, int F_kind);
-
-
-  // Front ends to call Cvgd_new_gen2 to construct a vgrid
-  static int Cvgd_new_gen(vgrid *my_new_vgrid, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2,
-	      double *ptop_8, double *pref_8, double *ptop_out_8,
-		 int ip1, int ip2, float *dhm, float *dht, int avg);
-  static int Cvgd_new_gen_1001(vgrid *my_new_vgrid, float *hyb, int size_hyb, int ip1, int ip2);
-  static int Cvgd_new_gen_2001(vgrid *my_new_vgrid, float *hyb, int size_hyb, int ip1, int ip2);
-  static int Cvgd_new_gen_5999(vgrid *my_new_vgrid, float *hyb, int size_hyb, int ip1, int ip2);
-  static int Cvgd_new_gen_1002(vgrid *my_new_vgrid, float *hyb, int size_hyb, double ptop_8, int ip1, int ip2);
-  static int Cvgd_new_gen_4001(vgrid *my_new_vgrid, float *hyb, int size_hyb, int ip1, int ip2);
-  static int Cvgd_new_gen_5001(vgrid *my_new_vgrid, float *hyb, int size_hyb, double ptop_8, double pref_8, float rcoef1, int ip1, int ip2);
-  static int Cvgd_new_gen_5002(vgrid *my_new_vgrid, float *hyb, int size_hyb, double ptop_8, double pref_8, float rcoef1, float rcoef2, int ip1, int ip2);
-  static int Cvgd_new_gen_5005(vgrid *my_new_vgrid, float *hyb, int size_hyb, double pref_8, double *ptop_out_8, float rcoef1, float rcoef2, int ip1, int ip2, float dhm, float dht );
-  static int Cvgd_new_gen_5100(vgrid *my_new_vgrid, float *hyb, int size_hyb, double pref_8, double *ptop_out_8, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, int avg);
-  static int Cvgd_new_gen_21001(vgrid *my_new_vgrid, float *hyb, int size_hyb, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht);
-  static int Cvgd_new_gen_21002(vgrid *my_new_vgrid, float *hyb, int size_hyb, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, float dhw);
 
 
   int Cvgd_new_read(int unit, int ip1, int ip2, int kind, int version);
@@ -287,7 +239,7 @@ public:
 
 protected:
   virtual void set_table_nj(int nk) = 0;
-  virtual void allocate_table(int nk) = 0;
+  virtual int allocate_table(int nk) = 0;
   virtual void fstd_subinit() = 0;  // subclass-specific assignments to initialize the fstd record
 
   // Most subclasses have a private C_genab method, but the arguments are diffent for each one
