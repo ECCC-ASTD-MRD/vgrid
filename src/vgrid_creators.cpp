@@ -677,7 +677,7 @@ int C_gen_legacy_desc( vgrid **my_new_vgrid, int unit, int *keylist , int nb )
     printf("(Cvgd) ERROR: in C_gen_legacy_desc, fstprm 1 on key %d\n", keylist[0]);
     goto bomb;
   }
-  hyb[0] = c_convip_IP2Level(var.ip1,&kind);
+  hyb[0] = vgrid::c_convip_IP2Level(var.ip1,&kind);
   if( kind != 1 && kind != 2 && kind != 5 ){
     printf("(Cvgd) ERROR: in C_gen_legacy_desc, kind = %d, has to be 1, 2 or 5\n", kind);
     goto bomb;
@@ -695,7 +695,7 @@ int C_gen_legacy_desc( vgrid **my_new_vgrid, int unit, int *keylist , int nb )
       printf("(Cvgd) ERROR: in C_gen_legacy_desc, dim misatch expected (%d,%d,%d), got (%d,%d,%d)\n", var.ni, var.nj, var.nk, va2.ni, va2.nj, va2.nk);
       goto bomb;
     }
-    hyb[k] = c_convip_IP2Level(va2.ip1,&kind);
+    hyb[k] = vgrid::c_convip_IP2Level(va2.ip1,&kind);
     if( kind != origkind ){
       printf("(Cvgd) ERROR: in C_gen_legacy_desc, expecting kind = %d, got kind = %d\n",origkind, kind);
       goto bomb;
@@ -741,19 +741,19 @@ int C_gen_legacy_desc( vgrid **my_new_vgrid, int unit, int *keylist , int nb )
   {
     // pt_key > 0
     // Verify whether HY constistant with PT
-      if( C_get_consistent_pt_e1(unit, &ptop,"PT  ") == VGD_ERROR )
-      {
-	printf("(Cvgd) ERROR in C_gen_legacy_desc, consistency check on PT failed\n");
-	goto bomb;
-      }
+    if( vgrid::C_get_consistent_pt_e1(unit, &ptop,"PT  ") == VGD_ERROR )
+    {
+      printf("(Cvgd) ERROR in C_gen_legacy_desc, consistency check on PT failed\n");
+      goto bomb;
+    }
 
 
-    if( C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR )
+    if( vgrid::C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR )
     {
       printf("(Cvgd) ERROR in C_gen_legacy_record, consistency check on HY failed (1)\n");
       goto bomb;
     }
-    decode_HY(va2, &ptop_8, &pref_8, &rcoef);
+    vgrid::decode_HY(va2, &ptop_8, &pref_8, &rcoef);
     if( fabs(rcoef - 1.0) > 1.e-5)
     {
       printf("(Cvgd) ERROR in C_gen_legacy_desc, HY rcoef should by 1.0 since PT record is present in file\n");
@@ -811,11 +811,11 @@ int C_gen_legacy_desc( vgrid **my_new_vgrid, int unit, int *keylist , int nb )
       // HY HY HY HY HY HY HY HY HY HY HY HY HY HY HY HY
       //------------------------------------------------
       printf("(Cvgd)   hybrid (normalized) coordinate found\n");
-      if( C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR ){
+      if( vgrid::C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR ){
 	printf("(Cvgd) ERROR in C_gen_legacy_record, consistency check on HY failed (2)\n");
 	goto bomb;
       }
-      decode_HY(va2, &ptop_8, &pref_8, &rcoef);
+      vgrid::decode_HY(va2, &ptop_8, &pref_8, &rcoef);
       if( ((vgrid_1003*)(*my_new_vgrid))->C_genab(hyb, nb, rcoef, ptop_8, pref_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ) {      
 	goto bomb;
       }
@@ -840,12 +840,12 @@ int C_gen_legacy_desc( vgrid **my_new_vgrid, int unit, int *keylist , int nb )
 
     case 5001:
       printf("(Cvgd)   Hybrid coordinate found\n");
-      if( C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR )
+      if( vgrid::C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR )
       {
         printf("(Cvgd) ERROR in C_gen_legacy_desc, consistency check on HY failed\n");
         goto bomb;
       }
-      decode_HY(va2, &ptop_8, &pref_8, &rcoef);
+      vgrid::decode_HY(va2, &ptop_8, &pref_8, &rcoef);
       if( ((vgrid_5001*)(*my_new_vgrid))->C_genab(hyb, nb, rcoef, ptop_8, pref_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
       {
         goto bomb;
@@ -908,7 +908,7 @@ int c_legacy(vgrid **my_new_vgrid, int unit, int F_kind)
       printf("(Cvgd) ERROR in c_legacy, error return from fstprm wrapper for fst key = %d",keylist[i]);
       return(VGD_ERROR);
     }
-    preslist[i] = c_convip_IP2Level(var.ip1,&kind);
+    preslist[i] = vgrid::c_convip_IP2Level(var.ip1,&kind);
     if( strcmp(var.nomvar, ">>  ") == 0 )
       continue;
     if( strcmp(var.nomvar, "^^  ") == 0 )

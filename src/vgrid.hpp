@@ -69,10 +69,6 @@ static int vcode_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 400
 // Options
 static int ALLOW_SIGMA = 0;
 
-float c_convip_IP2Level(int IP,int *kind);
-int C_get_consistent_pt_e1(int iun, float *val, char *nomvar);
-int C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, char *nomvar);
-void decode_HY(VGD_TFSTD_ext var, double *ptop_8, double *pref_8, float *rcoef);
 int max_int(int *vec, int ni);
 int my_fstprm(int key,VGD_TFSTD_ext *ff);
 int my_alloc_int(int **vec, int size, char *message);
@@ -152,7 +148,6 @@ protected:
 
 
 public:
-  static int correct_kind_and_version(int key, int kind, int version, VGD_TFSTD_ext *var, int *status);
   int is_valid(int *table_valid);
   int is_option(int *table_option);
   int Cvgd_is_valid(char *valid_table_name);
@@ -163,7 +158,6 @@ public:
   int c_stda76_temp_pres_from_heights(int *i_val, int nl, float *temp, float *pres, float *sfc_temp, float *sfc_pres);
   void Cvgd_table_shape(int **tshape);
   int Cvgd_print_desc(int sout, int convip);
-  static int Cvgd_print_vcode_description(int vcode);
   int Cvgd_levels_8(int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8, int in_log);
   int Cvgd_levels(int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, int in_log);
   int Cvgd_levels_2ref_8(int ni, int nj, int nk, int *ip1_list, double *levels_8, double *sfc_field_8, double *sfc_field_ls_8, int in_log);
@@ -228,7 +222,14 @@ public:
   int Cvgd_write_desc (int unit);
   int Cvgd_stda76_temp(int *i_val, int nl_t, float *temp);
   int Cvgd_stda76_pres(int *i_val, int nl_t, float *pres, float *sfc_temp, float *sfc_pres);
+
 public:
+  static int Cvgd_print_vcode_description(int vcode);
+  static float c_convip_IP2Level(int IP,int *kind);
+  static void decode_HY(VGD_TFSTD_ext var, double *ptop_8, double *pref_8, float *rcoef);
+  static int correct_kind_and_version(int key, int kind, int version, VGD_TFSTD_ext *var, int *status);
+  static int C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, char *nomvar);
+  static int C_get_consistent_pt_e1(int iun, float *val, char *nomvar);
   static int Cvgd_stda76_hgts_from_pres_list(float *hgts, float *pres, int nb);
   static int Cvgd_stda76_pres_from_hgts_list(float *pres, float *hgts, int nb);
 

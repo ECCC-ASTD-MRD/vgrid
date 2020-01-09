@@ -607,7 +607,7 @@ int vgrid::c_convip_Level2IP_old_style(float level, int kind) {
   return(IP);
 }
 
-float c_convip_IP2Level(int IP,int *kind) {
+float vgrid::c_convip_IP2Level(int IP,int *kind) {
 
    int    mode=-1,flag=0, strglen=0;
    float  level=0.0;
@@ -619,7 +619,7 @@ float c_convip_IP2Level(int IP,int *kind) {
    return(level);
 }
 
-void decode_HY(VGD_TFSTD_ext var, double *ptop_8, double *pref_8, float *rcoef){
+void vgrid::decode_HY(VGD_TFSTD_ext var, double *ptop_8, double *pref_8, float *rcoef){
   // In consultation with Vivian Lee, with decode explicitly instead of using f77 read_decode_hyb
   int kind;
   *ptop_8 = c_convip_IP2Level(var.ip1, &kind) * 100.;
@@ -3983,7 +3983,7 @@ int vgrid::Cvgd_put_int(char *key, int value) {
   return(VGD_OK);
 }
 
-int C_get_consistent_pt_e1(int iun, float *val, char *nomvar ){
+int vgrid::C_get_consistent_pt_e1(int iun, float *val, char *nomvar ){
   int error, ni, nj, nk, nmax=1000, infon, k;
   int liste[nmax];
   float *work;
@@ -4030,7 +4030,7 @@ int C_get_consistent_pt_e1(int iun, float *val, char *nomvar ){
   return(VGD_ERROR);
 }
 
-int C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, char *nomvar ){
+int vgrid::C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, char *nomvar ){
   int error, ni, nj, nk, nmax=1000, infon, ind;
   int liste[nmax];
   VGD_TFSTD_ext va3;
