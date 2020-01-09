@@ -75,12 +75,9 @@ class vgrid_1003 : public vgrid_1003_5001
 public:
   vgrid_1003();
   vgrid_1003(int key);
-  int c_decode_vert();
-  int c_encode_vert();
   int C_genab(float *hybuser, int nk, float rcoef, double ptop_8, double pref_8, double **a_m_8, double **b_m_8, int **ip1_m);
 private:
   void fstd_subinit();
-  void set_table_nj(int nk);
 };
 
 class vgrid_2001 : public vgrid

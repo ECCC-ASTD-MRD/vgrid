@@ -216,12 +216,6 @@ module vGrid_Descriptors
          type(c_ptr), value :: vgdid
          integer (c_int), value :: unit, ip1, ip2, kind, version
       end function f_read_vgrid_from_file
-
-      integer(c_int) function f_new_read(vgdid,unit,ip1,ip2,kind,version) bind(c, name='Cvgd_new_read')
-         use iso_c_binding, only : c_ptr, c_int, c_char
-         integer :: vgdid
-         integer (c_int), value :: unit, ip1, ip2, kind, version
-      end function f_new_read
       
       integer(c_int) function f_new_from_table(vgdid, table_CP, ni, nj, nk) bind(c, name='Cvgd_new_from_table')
          use iso_c_binding, only : c_ptr, c_int
@@ -297,7 +291,7 @@ module vGrid_Descriptors
    end interface
    
    interface vgd_new
-      module procedure new_read
+      module procedure read_vgrid_from_file
       module procedure new_from_table
       module procedure new_build_vert
       module procedure new_gen      
@@ -400,7 +394,7 @@ contains
          endif
 
          if( f_read_vgrid_from_file(vgdid_p, unit, l_ip1, l_ip2, l_kind, l_version) == VGD_ERROR )then
-            print*,'(F_vgd) ERROR: In new_read, problem with f_new_read'
+            print*,'(F_vgd) ERROR: In read_vgrid_from_file, problem with f_read_vgrid_from_file'
             return
          endif
       case DEFAULT
@@ -412,82 +406,6 @@ contains
       status = VGD_OK
 
    end function read_vgrid_from_file
-  
-   integer function new_read(vgdid,unit,format,ip1,ip2,kind,version) result(status)
-      use vgrid_utils, only: up
-      ! Coordinate constructor - read from a file and initialize instance
-      integer, intent(inout) :: vgdid !Vertical descriptor id
-      integer, intent(in) :: unit                 !File unit to read descriptor information from
-      character(len=*), target, optional, intent(in) :: format !File format ('fst' or 'bin') default is 'fst'
-      integer, target,optional :: ip1,ip2                 !ip1,2 values of the desired descriptors
-      integer, target,optional, intent(in) :: kind        ! Level kind requested by user.
-      integer, target,optional, intent(in) :: version     ! Level version requested by user.
-      
-      ! Local variables
-      integer :: ni,nj,nk, istat, error, l_ip1, l_ip2, l_kind, l_version
-      character(len=100) :: myformat
-      real(kind=8), dimension(:,:,:), pointer :: table_8
-
-      nullify(table_8)
-
-      status = VGD_ERROR
-
-      myformat='FST'
-      if (present(format)) myformat = trim(up(format))
-      select case (trim(up(myformat)))
-      case ('FST')      
-         if(present(ip1))then
-            l_ip1 = ip1
-         else
-            l_ip1 = -1
-         endif
-         if(present(ip2))then
-            l_ip2 = ip2
-         else
-            l_ip2 = -1
-         endif
-         if(present(kind))then
-            l_kind = kind
-         else
-            l_kind = -1
-         endif
-         if(present(version))then
-            l_version = version
-         else
-            l_version = -1
-         endif
-
-         if( f_new_read(vgdid, unit, l_ip1, l_ip2, l_kind, l_version) == VGD_ERROR )then
-            print*,'(F_vgd) ERROR: In new_read, problem with f_new_read'
-            return
-         endif
-      case ('BIN')
-         read(unit) ni,nj,nk
-         allocate(table_8(ni,nj,nk),stat=istat)
-         if (istat /= 0) then
-            write(for_msg,*) 'unable to allocate table_8'
-            call msg(MSG_ERROR,VGD_PRFX//for_msg)
-            return
-         endif
-         read(unit) table_8
-         print*,'table_8(1:3,1,1)',table_8(1:3,1,1)
-         
-         error = new_from_table(vgdid,table_8)
-         if (error < 0) then
-            write(for_msg,*) 'In new_read, problem creating record information'
-            call msg(MSG_ERROR,VGD_PRFX//for_msg)
-            return
-         endif
-         ! Warn user on invalid input format specification
-      case DEFAULT
-         write(for_msg,*) 'invalid constructor format request ',trim(myformat)
-         call msg(MSG_ERROR,VGD_PRFX//for_msg)
-         return
-      end select
-
-      status = VGD_OK
-
-   end function new_read
 
     integer function new_from_table(vgdid,table) result(status)
        ! Coordinate constructor - build vertical descriptor from table input
@@ -928,14 +846,14 @@ contains
     call convip_plus (ip1, lev, kind,-1, blk_S, .false.)
     ! Create grid descriptor instance and call level calculator
     if (any(MATCH_GRTYP == grtyp)) then
-       error = new_read(vgdid,unit=unit,format='fst',ip1=ig1,ip2=ig2,kind=kind)
+       error = read_vgrid_from_file(vgdid,unit=unit,format='fst',ip1=ig1,ip2=ig2,kind=kind)
        if(error==VGD_ERROR)then
-          write(for_msg,*) 'The above error was produce with call to new_read with specific ip1 and 1p2, trying with wild card -1, if there is no error below, disregard the above error.'
+          write(for_msg,*) 'The above error was produce with call to read_vgrid_from_file with specific ip1 and 1p2, trying with wild card -1, if there is no error below, disregard the above error.'
           call msg(MSG_WARNING,VGD_PRFX//for_msg)
-          error = new_read(vgdid,unit=unit,format='fst',                kind=kind)
+          error = read_vgrid_from_file(vgdid,unit=unit,format='fst',                kind=kind)
        endif
     else
-       error = new_read(vgdid,unit=unit,format='fst',ip1=-1,ip2=-1,kind=kind)
+       error = read_vgrid_from_file(vgdid,unit=unit,format='fst',ip1=-1,ip2=-1,kind=kind)
     endif
 
     if (error /= VGD_OK) then

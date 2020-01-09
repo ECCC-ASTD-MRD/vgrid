@@ -35,11 +35,10 @@ vgrid_0001::vgrid_0001() : vgrid()
   this->table_ni = 3;
 }
 
-// I think that this constructor is not even used
-// vgrid_0001::vgrid_0001(int key) : vgrid_0001()
-// {
-//   this->build_vgrid_from_key(key);
-// };
+vgrid_0001::vgrid_0001(int key) : vgrid()
+{
+  this->build_vgrid_from_key(key);
+};
 
 void vgrid_0001::set_table_nj(int nk)
 {
@@ -142,9 +141,10 @@ vgrid_1001::vgrid_1001() : vgrid()
   strcpy(this->ref_name,"P0  ");
 }
 
-// vgrid_1001(int key) : vgrid_1001() : vgrid(key)
-// {
-// };
+vgrid_1001::vgrid_1001(int key) : vgrid()
+{
+  this->build_vgrid_from_key(key);
+};
 
 void vgrid_1001::set_table_nj(int nk)
 {
@@ -291,9 +291,10 @@ vgrid_1002::vgrid_1002() : vgrid()
   strcpy(this->ref_name,"P0  ");
 }
 
-// vgrid_1002(int key) : vgrid_1002() : vgrid(key)
-// {
-// };
+vgrid_1002::vgrid_1002(int key) : vgrid()
+{
+  this->build_vgrid_from_key(key);
+};
 
 void vgrid_1002::set_table_nj(int nk)
 {
@@ -549,9 +550,10 @@ vgrid_1003::vgrid_1003() : vgrid_1003_5001()
   strcpy(this->ref_name,"P0  ");
 }
 
-// vgrid_1003(int key) : vgrid_1003() : vgrid(key)
-// {
-// };
+vgrid_1003::vgrid_1003(int key) : vgrid_1003_5001()
+{
+  this->build_vgrid_from_key(key);
+};
 
 int vgrid_1003::C_genab(float *hybuser, int nk, float rcoef, double ptop_8, double pref_8, double **a_m_8, double **b_m_8, int **ip1_m)
 {
@@ -653,9 +655,10 @@ vgrid_2001::vgrid_2001() : vgrid()
   this->table_ni = 3;
 }
 
-// vgrid_2001(int key) : vgrid_2001() : vgrid(key)
-// {
-// };
+vgrid_2001::vgrid_2001(int key) : vgrid()
+{
+  this->build_vgrid_from_key(key);
+};
 
 void vgrid_2001::set_table_nj(int nk)
 {
@@ -790,9 +793,10 @@ vgrid_4001::vgrid_4001() : vgrid()
   this->table_ni = 3;
 }
 
-// vgrid_4001(int key) : vgrid_4001() : vgrid(key)
-// {
-// };
+vgrid_4001::vgrid_4001(int key) : vgrid()
+{
+  this->build_vgrid_from_key(key);
+};
 
 void vgrid_4001::set_table_nj(int nk)
 {
@@ -934,9 +938,10 @@ vgrid_5001::vgrid_5001() : vgrid_1003_5001()
   strcpy(this->ref_name,"P0  ");
 }
 
-// vgrid_5001(int key) : vgrid_5001() : vgrid(key)
-// {
-// };
+vgrid_5001::vgrid_5001(int key) : vgrid_1003_5001()
+{
+  this->build_vgrid_from_key(key);
+};
 
 void vgrid_5001::set_table_nj(int nk)
 {
@@ -1347,9 +1352,10 @@ vgrid_5002::vgrid_5002() : vgrid_5002_5003_5004_5005()
   this->table_ni = 3;
 }
 
-// vgrid_5002(int key) : vgrid_5002() : vgrid(key)
-// {
-// };
+vgrid_5002::vgrid_5002(int key) : vgrid_5002_5003_5004_5005()
+{
+  this->build_vgrid_from_key(key);
+};
 
 void vgrid_5002::fstd_subinit()
 {
@@ -1371,9 +1377,10 @@ vgrid_5003::vgrid_5003() : vgrid_5002_5003_5004_5005()
   this->table_ni = 3;
 }
 
-// vgrid_5003(int key) : vgrid_5003() : vgrid(key)
-// {
-// };
+vgrid_5003::vgrid_5003(int key) : vgrid_5002_5003_5004_5005()
+{
+  this->build_vgrid_from_key(key);
+};
 
 void vgrid_5003::fstd_subinit()
 {
@@ -1394,9 +1401,10 @@ vgrid_5004::vgrid_5004() : vgrid_5002_5003_5004_5005()
   this->table_ni = 3;
 }
 
-// vgrid_5004(int key) : vgrid_5004() : vgrid(key)
-// {
-// };
+vgrid_5004::vgrid_5004(int key) : vgrid_5002_5003_5004_5005()
+{
+  this->build_vgrid_from_key(key);
+};
 
 int vgrid_5004::C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t)
 {
@@ -1559,9 +1567,10 @@ vgrid_5005::vgrid_5005() : vgrid_5002_5003_5004_5005()
   strcpy(this->ref_name,"P0  ");
 }
 
-// vgrid_5005(int key) : vgrid_5005() : vgrid(key)
-// {
-// };
+vgrid_5005::vgrid_5005(int key) : vgrid_5002_5003_5004_5005()
+{
+  this->build_vgrid_from_key(key);
+};
 
 int vgrid_5005::C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double **ptop_out_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t, float dhm, float dht)
 {
@@ -1724,9 +1733,10 @@ vgrid_5100::vgrid_5100() : vgrid()
   strcpy(this->ref_namel,"P0LS");
 }
 
-// vgrid_5100(int key) : vgrid_5100() : vgrid(key)
-// {
-// };
+vgrid_5100::vgrid_5100(int key) : vgrid()
+{
+  this->build_vgrid_from_key(key);
+};
 
 int vgrid_5100::C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **ptop_out_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, float dhm, float dht, int avg)
 {
@@ -2046,9 +2056,10 @@ vgrid_5999::vgrid_5999() : vgrid()
   strcpy(this->ref_name,"P0  ");
 }
 
-// vgrid_5999(int key) : vgrid_5999() : vgrid(key)
-// {
-// };
+vgrid_5999::vgrid_5999(int key) : vgrid()
+{
+  this->build_vgrid_from_key(key);
+};
 
 void vgrid_5999::set_table_nj(int nk)
 {
@@ -2180,9 +2191,10 @@ vgrid_21001::vgrid_21001() : vgrid()
   }
 }
 
-// vgrid_21001(int key) : vgrid_21001() : vgrid(key)
-// {
-// };
+vgrid_21001::vgrid_21001(int key) : vgrid()
+{
+  this->build_vgrid_from_key(key);
+};
 
 
 int vgrid_21001::C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, float dhm, float dht)
@@ -2507,9 +2519,10 @@ vgrid_21002::vgrid_21002() : vgrid()
   }
 }
 
-// vgrid_21002(int key) : vgrid_21002() : vgrid(key)
-// {
-// };
+vgrid_21002::vgrid_21002(int key) : vgrid()
+{
+  this->build_vgrid_from_key(key);
+};
 
 int vgrid_21002::C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, int *nl_w, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, double **PP_a_w_8, double **PP_b_w_8, double **PP_c_w_8, int **PP_ip1_w, float dhm, float dht, float dhw)
 {
