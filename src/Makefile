@@ -56,7 +56,7 @@ vgrid_descriptors.o: vgrid_descriptors.F90 vgrid_utils.o vgrid_descriptors.hf
 
 vgrid_utils.o: vgrid_utils.F90 vgrid_descriptors.hf
 
-tunnel_from_fortran.o:  tunnel_from_fortran.cpp tunnel_from_fortran.hpp tunnel_from_fortran.h vgrid.hpp vgrid_descriptor.h
+tunnel_from_fortran.o:  tunnel_from_fortran.cpp vgrid_creators.hpp tunnel_from_fortran.hpp tunnel_from_fortran.h vgrid.hpp vgrid_descriptor.h
 
 coat_check.o:  coat_check.cpp coat_check.hpp vgrid.h
 

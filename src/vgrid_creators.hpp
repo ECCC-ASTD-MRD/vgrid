@@ -45,7 +45,7 @@ int Cvgd_new_build_vert2(vgrid **my_new_vgrid, int kind, int version, int nk, in
 int Cvgd_new_from_table(vgrid **my_new_vgrid, double *table, int ni, int nj, int nk);
 
 // A generic work-horse to validate arguments and to construct a vgrid using C_genab and Cvgd_new_build_vert2
-int Cvgd_new_gen2(vgrid *my_new_vgrid, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
+int Cvgd_new_gen2(vgrid **my_new_vgrid, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
 	      double *ptop_8, double *pref_8, double *ptop_out_8,
 	      int ip1, int ip2, float *dhm, float *dht, float *dhw, int avg);
 

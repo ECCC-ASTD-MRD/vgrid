@@ -339,7 +339,7 @@ int Cvgd_new_build_vert2(vgrid **my_new_vgrid, int kind, int version, int nk, in
     return(VGD_ERROR);
   }
 
-  status=(*my_new_vgrid)->Cvgd_new_build_vert2(
+  status=(*my_new_vgrid)->Cvgd_build_from_ab(
 			    kind, version, nk, ip1, ip2,
 			    ptop_8, pref_8, rcoef1, rcoef2,
 			    rcoef3, rcoef4, a_m_8, b_m_8,
@@ -385,7 +385,7 @@ int Cvgd_new_from_table(vgrid **my_new_vgrid, double *table, int ni, int nj, int
     return(VGD_ERROR);
   }
 
-  status=(*my_new_vgrid)->Cvgd_new_from_table(table, ni, nj, nk);
+  status=(*my_new_vgrid)->Cvgd_build_from_table(table, ni, nj, nk);
 
   return(status);
 }
@@ -410,7 +410,7 @@ int Cvgd_new_gen2(vgrid **my_new_vgrid, int kind, int version, float *hyb, int s
     return(VGD_ERROR);
   }
 
-  status=(*my_new_vgrid)->Cvgd_new_gen2(kind, version, hyb, size_hyb, rcoef1, rcoef2, rcoef3, rcoef4,
+  status=(*my_new_vgrid)->Cvgd_build_from_hyb(kind, version, hyb, size_hyb, rcoef1, rcoef2, rcoef3, rcoef4,
 	                                ptop_8, pref_8, ptop_out_8, ip1, ip2, dhm, dht, dhw, avg);
 
   return (status);

@@ -23,6 +23,7 @@
 
 
 #include "coat_check.hpp"
+#include "vgrid_creators.hpp"
 #include "vgrid.hpp"
 #include "vgrid_descriptor.h"
 #include "tunnel_from_fortran.hpp"
@@ -134,18 +135,18 @@ int Cvgd_new_build_vert2(int *vgdid, int kind, int version, int nk,
 {
   vgrid *my_vgd;
   int status;
-  status=vgrid::Cvgd_new_build_vert2(&my_vgd, version,
-                                     nk, ip1, ip2, ptop_8,
-                                     pref_8, rcoef1, rcoef2,
-                                     rcoef3, rcoef4, a_m_8,
-                                     b_m_8, c_m_8, a_t_8,
-                                     b_t_8, c_t_8, a_w_8,
-                                     b_w_8, c_w_8, ip1_m,
-                                     ip1_t, ip1_w, nl_m, nl_t,
-                                     nl_w);
+  status=Cvgd_new_build_vert2(&my_vgd, kind, version,
+                                      nk, ip1, ip2, ptop_8,
+                                      pref_8, rcoef1, rcoef2,
+                                      rcoef3, rcoef4, a_m_8,
+                                      b_m_8, c_m_8, a_t_8,
+                                      b_t_8, c_t_8, a_w_8,
+                                      b_w_8, c_w_8, ip1_m,
+                                      ip1_t, ip1_w, nl_m, nl_t,
+                                      nl_w);
   if(status != VGD_ERROR)
     {
-      *vgdid=grid_check.get_tag(&my_vgd);
+      *vgdid=grid_check.get_tag(my_vgd);
     }
   return status;
 };
@@ -154,13 +155,13 @@ int Cvgd_new_build_vert2(int *vgdid, int kind, int version, int nk,
 int Cvgd_new_from_table(int *vgdid, double *table,
                         int ni, int nj, int nk)
 {
-  vgrid my_vgd;
+  vgrid *my_vgd;
   int status;
 
-  status=vgrid::Cvgd_new_from_table(&my_vgd, table, ni, nj, nk);
+  status=Cvgd_new_from_table(&my_vgd, table, ni, nj, nk);
   if(status != VGD_ERROR)
     {
-      *vgdid=grid_check.get_tag(&my_vgd);
+      *vgdid=grid_check.get_tag(my_vgd);
     }
   return status;
 };
@@ -173,11 +174,11 @@ int Cvgd_new_gen2(int *vgdid, int kind, int version, float *hyb,
 {
   vgrid *my_vgd;
   int status;
-  status=vgrid::Cvgd_new_gen2(&my_vgdid, kind, version, hyb,
-                              size_hyb, rcoef1, rcoef2, rcoef3,
-                              rcoef4, ptop_8, pref_8,
-                              ptop_out_8, ip1, ip2, dhm, dht,
-                              dhw, avg);
+  status=Cvgd_new_gen2(&my_vgd, kind, version, hyb,
+                       size_hyb, rcoef1, rcoef2, rcoef3,
+                       rcoef4, ptop_8, pref_8,
+                       ptop_out_8, ip1, ip2, dhm, dht,
+                       dhw, avg);
   if(status != VGD_ERROR)
     {
       *vgdid=grid_check.get_tag(my_vgd);
@@ -191,7 +192,7 @@ int Cvgd_read_vgrid_from_file(int *vgdid, int unit, int ip1,int ip2,
   vgrid *my_vgd;
   int status;
 
-  status=vgrid::Cvgd_read_vgrid_from_file(&my_vgd, unit, ip1, ip2, kind, version);
+  status=Cvgd_read_vgrid_from_file(&my_vgd, unit, ip1, ip2, kind, version);
   if(status != VGD_ERROR)
     {
       *vgdid=grid_check.get_tag(my_vgd);
@@ -202,12 +203,12 @@ int Cvgd_read_vgrid_from_file(int *vgdid, int unit, int ip1,int ip2,
 int Cvgd_new_read(int *vgdid, int unit, int ip1,int ip2, 
                   int kind, int version)
 {
-  vgrid my_vgd;
+  vgrid *my_vgd;
   int status;
-  status=my_vgd.Cvgd_new_read(unit, ip1, ip2, kind, version);
+  status=my_vgd->Cvgd_new_read(unit, ip1, ip2, kind, version);
   if(status != VGD_ERROR)
     {
-      *vgdid=grid_check.get_tag(&my_vgd);
+      *vgdid=grid_check.get_tag(my_vgd);
     }
   return status;
 }

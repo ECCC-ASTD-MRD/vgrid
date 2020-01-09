@@ -172,17 +172,17 @@ public:
   int Cvgd_set_vcode_i(int Kind,int Version);
   int fstd_init();
   int Cvgd_set_vcode();
-  int Cvgd_new_build_vert2(int kind, int version, int nk, int ip1, int ip2,
-			   double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2,
-			   float *rcoef3, float *rcoef4, double *a_m_8, double *b_m_8,
-			   double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8,
-			   double *a_w_8, double *b_w_8, double *c_w_8, int *ip1_m,
-			   int *ip1_t, int *ip1_w, int nl_m, int nl_t, int nl_w);
-  int Cvgd_new_from_table(double *table, int ni, int nj, int nk);
-  int Cvgd_new_gen2(int kind, int version, float *hyb, int size_hyb, float *rcoef1,
-                    float *rcoef2, float *rcoef3, float *rcoef4,
-                    double *ptop_8, double *pref_8, double *ptop_out_8,
-                    int ip1, int ip2, float *dhm, float *dht, float *dhw, int avg);
+  int Cvgd_build_from_ab(int kind, int version, int nk, int ip1, int ip2,
+			 double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2,
+			 float *rcoef3, float *rcoef4, double *a_m_8, double *b_m_8,
+			 double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8,
+			 double *a_w_8, double *b_w_8, double *c_w_8, int *ip1_m,
+			 int *ip1_t, int *ip1_w, int nl_m, int nl_t, int nl_w);
+  int Cvgd_build_from_table(double *table, int ni, int nj, int nk);
+  int Cvgd_build_from_hyb(int kind, int version, float *hyb, int size_hyb, float *rcoef1,
+                          float *rcoef2, float *rcoef3, float *rcoef4,
+                          double *ptop_8, double *pref_8, double *ptop_out_8,
+                          int ip1, int ip2, float *dhm, float *dht, float *dhw, int avg);
 
   int C_compute_heights_0001(int ni, int nj, int nk, int *ip1_list, float *levels);
   int C_compute_heights_0001_8(int ni, int nj, int nk, int *ip1_list, double *levels);
@@ -203,7 +203,6 @@ public:
   int C_load_toctoc(VGD_TFSTD_ext var, int key);
   int Cvgd_vgdcmp(vgrid *vgd2);
   void Cvgd_free();
-  int Cvgd_getopt_int(char *key, int *value, int quiet);
   int Cvgd_get_int(char *key, int *value, int quiet);
   int Cvgd_get_int_1d(char *key, int **value, int *nk, int quiet);
   int Cvgd_get_float(char *key, float *value, int quiet);
@@ -214,7 +213,6 @@ public:
   int Cvgd_get_double_3d(char *key, double **value, int *ni, int *nj, int *nk, int quiet);
   int Cvgd_get_char(char *key, char out[], int quiet);
   int Cvgd_put_char(char *key, char *value);
-  int Cvgd_putopt_int(char *key, int value);
   int Cvgd_put_int(char *key, int value);
 
 
@@ -224,6 +222,8 @@ public:
   int Cvgd_stda76_pres(int *i_val, int nl_t, float *pres, float *sfc_temp, float *sfc_pres);
 
 public:
+  static int Cvgd_putopt_int(char *key, int value);
+  static int Cvgd_getopt_int(char *key, int *value, int quiet);
   static int Cvgd_print_vcode_description(int vcode);
   static float c_convip_IP2Level(int IP,int *kind);
   static void decode_HY(VGD_TFSTD_ext var, double *ptop_8, double *pref_8, float *rcoef);

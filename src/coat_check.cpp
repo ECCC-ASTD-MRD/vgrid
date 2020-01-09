@@ -38,7 +38,7 @@ vgrid* coat_check::get_vgrid(int tag)
       printf("ERROR in coat_check:  invalid tag=%d\n",tag);
       throw tag;
     }
-  return &hangers[tag].vgd;
+  return hangers[tag].vgd;
   // Don't change num_tags_issued, because the client is still using the tag.
 };
 
@@ -53,7 +53,7 @@ int coat_check::get_tag(vgrid *vgrid_p)
   for(hanger_index=0; hanger_index <= latest_hanger_filled; hanger_index++)
     {
       // TBD:  create and use vgrid operator ==
-      if(vgrid_p->Cvgd_vgdcmp(&hangers[hanger_index].vgd) == 0)
+      if(vgrid_p->Cvgd_vgdcmp(hangers[hanger_index].vgd) == 0)
         break;
     }
 
@@ -78,7 +78,7 @@ int coat_check::get_tag(vgrid *vgrid_p)
       else
         {
           hanger_p=&hangers[++latest_hanger_filled];
-          hanger_p->vgd=*vgrid_p;
+          hanger_p->vgd=vgrid_p;
           hanger_p->num_tags_issued=1;
           return latest_hanger_filled;
         }
