@@ -66,13 +66,28 @@ static int is_in_logp       [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    
 static int vcode_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 4001, 5001, 5002, 5003, 5004, 5005, 5100, 5999, 21001,21002};
 
 
+// Options
+static int ALLOW_SIGMA = 0;
+
+float c_convip_IP2Level(int IP,int *kind);
+int C_get_consistent_pt_e1(int iun, float *val, char *nomvar);
+int C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, char *nomvar);
+void decode_HY(VGD_TFSTD_ext var, double *ptop_8, double *pref_8, float *rcoef);
+int max_int(int *vec, int ni);
 int my_fstprm(int key,VGD_TFSTD_ext *ff);
+int my_alloc_int(int **vec, int size, char *message);
+int my_alloc_float(float **vec, int size, char *message);
+int my_alloc_double(double **vec, int size, char *message);
+void my_copy_double(double *aa, double **bb, int ind);
+void my_copy_int(int *aa, int **bb, int ind);
+bool operator==(const VGD_TFSTD_ext& lhs, const VGD_TFSTD_ext& rhs);
+bool operator!=(const VGD_TFSTD_ext& lhs, const VGD_TFSTD_ext& rhs);
 
 
 class vgrid
 {
   // VARIABLES:
-private:
+protected:
   VGD_TFSTD rec;          // RPN standard file header
   double   ptop_8;        // Top level pressure (Pa)
   double   pref_8;        // Reference pressure (Pa)
@@ -113,42 +128,37 @@ private:
   int      version;       // Vertical coordinate code
   char     match_ipig;    // do ip/ig matching for records
   char     valid;         // Validity of structure
-protected:
   int      skip;          // space to be added to table_nj
   int      k_plus_top;    // used in c_decode_vert for 5002, 5003
 
   // METHODS:
 private:
-  static int correct_kind_and_version(int key, int kind, int version, VGD_TFSTD_ext *var, int *status);
-  static int max_int(int *vec, int ni);
   static double c_get_error(char *key, int quiet);
   static void c_hypsometric (float *pkp, float pk, float Tk, float gammaT, float zk, float zkp);
   static int c_set_stda_layer(int ind, float Tk, float pk, float *zk, float *zkp, float *gammaT,
                               float *pkp, int *zero_lapse_rate);
   static int c_get_stda76(float *Tk, float *pk, float *zk, float *gammaT, int *zero_lapse_rate);
-  static void my_copy_double(double *aa, double **bb, int ind);
-  static void my_copy_int(int *aa, int **bb, int ind);
   static int same_vec_i(int *vec1, int n1, int *vec2, int n2);
   static int same_vec_r8(double *vec1, int n1, double *vec2, int n2);
-  static int similar_vec_r8(double *vec1, int n1, double *vec2, int n2);
-  static double c_comp_diag_a_height(double pref_8, float height);
-  static double c_comp_diag_a_ip1(double pref_8, int ip1);
-  static int Cvgd_FindIp1Idx(int Ip1,int *Lst,int Size);
+  static int similar_vec_r8(double *vec1, int n1, double *vec2, int n2);  static int Cvgd_FindIp1Idx(int Ip1,int *Lst,int Size);
 
 protected:
   static void flip_transfer_d2c(char *name, double val_8);
   static void flip_transfer_c2d(char *name, void *val_8);
   static int c_convip_Level2IP(float level, int kind);
   static int c_convip_Level2IP_old_style(float level, int kind);
-  static float c_convip_IP2Level(int IP,int *kind);
-  static void decode_HY(VGD_TFSTD_ext var, double *ptop_8, double *pref_8, float *rcoef);
+  static double c_comp_diag_a_height(double pref_8, float height);
+  static double c_comp_diag_a_ip1(double pref_8, int ip1);
+
 
 public:
+  static int correct_kind_and_version(int key, int kind, int version, VGD_TFSTD_ext *var, int *status);
   int is_valid(int *table_valid);
   int is_option(int *table_option);
   int Cvgd_is_valid(char *valid_table_name);
   int is_required_double(double *ptr, int *table_valid, char *message);
   int is_required_float(float *ptr, int *table_valid, char *message);
+  void set_match_ipig(int match_ipig);
   int c_stda76_temp_from_press(int *i_val, int nl, float *temp);
   int c_stda76_temp_pres_from_heights(int *i_val, int nl, float *temp, float *pres, float *sfc_temp, float *sfc_pres);
   void Cvgd_table_shape(int **tshape);
@@ -168,6 +178,17 @@ public:
   int Cvgd_set_vcode_i(int Kind,int Version);
   int fstd_init();
   int Cvgd_set_vcode();
+  int Cvgd_new_build_vert2(int kind, int version, int nk, int ip1, int ip2,
+			   double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2,
+			   float *rcoef3, float *rcoef4, double *a_m_8, double *b_m_8,
+			   double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8,
+			   double *a_w_8, double *b_w_8, double *c_w_8, int *ip1_m,
+			   int *ip1_t, int *ip1_w, int nl_m, int nl_t, int nl_w);
+  int Cvgd_new_from_table(double *table, int ni, int nj, int nk);
+  int Cvgd_new_gen2(int kind, int version, float *hyb, int size_hyb, float *rcoef1,
+                    float *rcoef2, float *rcoef3, float *rcoef4,
+                    double *ptop_8, double *pref_8, double *ptop_out_8,
+                    int ip1, int ip2, float *dhm, float *dht, float *dhw, int avg);
 
   int C_compute_heights_0001(int ni, int nj, int nk, int *ip1_list, float *levels);
   int C_compute_heights_0001_8(int ni, int nj, int nk, int *ip1_list, double *levels);
@@ -185,17 +206,6 @@ public:
   int C_compute_pressure_5002_5003_5004_5005_8(int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, int in_log, int dpidpis);
   int C_compute_pressure_5100(int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, float *sfc_field_ls, int in_log, int dpidpis);
   int C_compute_pressure_5100_8(int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, double *sfc_field_ls, int in_log, int dpidpis);
-  int c_encode_vert_0001(int nk);
-  int c_encode_vert_1001(int nk);
-  int c_encode_vert_1002(int nk);
-  int c_encode_vert_2001(int nk);
-  int c_encode_vert_4001(int nk);
-  int c_encode_vert_5001(int nk);
-  int c_encode_vert_5002_5003_5004_5005();
-  int c_encode_vert_5100();
-  int c_encode_vert_5999(int nk);
-  int c_encode_vert_21001();
-  int c_encode_vert_21002();
   int C_load_toctoc(VGD_TFSTD_ext var, int key);
   int Cvgd_vgdcmp(vgrid *vgd2);
   void Cvgd_free();
@@ -218,10 +228,7 @@ public:
   int Cvgd_write_desc (int unit);
   int Cvgd_stda76_temp(int *i_val, int nl_t, float *temp);
   int Cvgd_stda76_pres(int *i_val, int nl_t, float *pres, float *sfc_temp, float *sfc_pres);
-private:
-  static int C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, char *nomvar);
-  static int C_get_consistent_pt_e1(int iun, float *val, char *nomvar);
-  public:
+public:
   static int Cvgd_stda76_hgts_from_pres_list(float *hgts, float *pres, int nb);
   static int Cvgd_stda76_pres_from_hgts_list(float *pres, float *hgts, int nb);
 
@@ -235,11 +242,11 @@ public:
 public:
   virtual int c_decode_vert() = 0;
   virtual int c_encode_vert() = 0;
+  void build_vgrid_from_key(int key);
 
 protected:
-  void build_vgrid_from_key(int key);
   virtual void set_table_nj(int nk) = 0;
-  virtual int allocate_table(int nk) = 0;
+  int allocate_table(int nk);
   virtual void fstd_subinit() = 0;  // subclass-specific assignments to initialize the fstd record
 
   // Most subclasses have a private C_genab method, but the arguments are diffent for each one

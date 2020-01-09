@@ -29,7 +29,9 @@ public:
   vgrid_0001(int key);
   int c_decode_vert();
   int c_encode_vert();
+private:
   void fstd_subinit();
+  void set_table_nj(int nk);
 };
 
 class vgrid_1001 : public vgrid
@@ -40,7 +42,9 @@ public:
   int c_decode_vert();
   int c_encode_vert();
   int C_genab(float *hyb, int nk, double **a_m_8, double **b_m_8, int **ip1_m);
+private:
   void fstd_subinit();
+  void set_table_nj(int nk);
 };
 
 class vgrid_1002 : public vgrid
@@ -51,14 +55,19 @@ public:
   int c_decode_vert();
   int c_encode_vert();
   int C_genab(float *etauser, int nk, double *ptop_8, double **a_m_8, double **b_m_8, int **ip1_m);
+private:
   void fstd_subinit();
+  void set_table_nj(int nk);
 };
 
 class vgrid_1003_5001 : public vgrid
 {
 public:
+  vgrid_1003_5001();
   int c_decode_vert();
   int c_encode_vert();
+private:
+  void set_table_nj(int nk);
 };
 
 class vgrid_1003 : public vgrid_1003_5001
@@ -69,8 +78,9 @@ public:
   int c_decode_vert();
   int c_encode_vert();
   int C_genab(float *hybuser, int nk, float rcoef, double ptop_8, double pref_8, double **a_m_8, double **b_m_8, int **ip1_m);
-};
+private:
   void fstd_subinit();
+};
 
 class vgrid_2001 : public vgrid
 {
@@ -80,7 +90,9 @@ public:
   int c_decode_vert();
   int c_encode_vert();
   int C_genab(float *pres, int nk, double **a_m_8, double **b_m_8, int **ip1_m);
+private:
   void fstd_subinit();
+  void set_table_nj(int nk);
 };
 
 class vgrid_4001 : public vgrid
@@ -91,7 +103,9 @@ public:
   int c_decode_vert();
   int c_encode_vert();
   int C_genab(float *hgts, int nk, double **a_m_8, double **b_m_8, int **ip1_m);
+private:
   void fstd_subinit();
+  void set_table_nj(int nk);
 };
 
 class vgrid_5001 : public vgrid_1003_5001
@@ -100,16 +114,20 @@ public:
   vgrid_5001();
   vgrid_5001(int key);
   int C_genab(float *hybuser, int nk, float rcoef, double ptop_8, double pref_8, double **a_m_8, double **b_m_8, int **ip1_m);
-};
+private:
   void fstd_subinit();
+  void set_table_nj(int nk);
+};
 
 class vgrid_5002_5003_5004_5005 : public vgrid
 {
 public:
+  vgrid_5002_5003_5004_5005();
   int c_decode_vert();
   int c_encode_vert();
-protected:
   int C_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t, int tlift);
+private:
+  void set_table_nj(int nk);
 };
 
 class vgrid_5002 : public vgrid_5002_5003_5004_5005
@@ -117,6 +135,7 @@ class vgrid_5002 : public vgrid_5002_5003_5004_5005
 public:
   vgrid_5002();
   vgrid_5002(int key);
+private:
   void fstd_subinit();
 };
 
@@ -125,6 +144,7 @@ class vgrid_5003 : public vgrid_5002_5003_5004_5005
 public:
   vgrid_5003();
   vgrid_5003(int key);
+private:
   void fstd_subinit();
 };
 
@@ -134,6 +154,7 @@ public:
   vgrid_5004();
   vgrid_5004(int key);
   int C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t);
+private:
   void fstd_subinit();
 };
 
@@ -143,6 +164,7 @@ public:
   vgrid_5005();
   vgrid_5005(int key);
   int C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double **ptop_out_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t, float dhm, float dht);
+private:
   void fstd_subinit();
 };
 
@@ -154,6 +176,9 @@ public:
   int C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **ptop_out_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, float dhm, float dht, int avg);
   int c_decode_vert();
   int c_encode_vert();
+private:
+  void fstd_subinit();
+  void set_table_nj(int nk);
 };
 
 class vgrid_5999 : public vgrid
@@ -163,7 +188,9 @@ public:
   vgrid_5999(int key);
   int c_decode_vert();
   int c_encode_vert();
+private:
   void fstd_subinit();
+  void set_table_nj(int nk);
 };
 
 class vgrid_21001 : public vgrid
@@ -171,10 +198,12 @@ class vgrid_21001 : public vgrid
 public:
   vgrid_21001();
   vgrid_21001(int key);
-  int C__genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, float dhm, float dht);
+  int C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, float dhm, float dht);
   int c_decode_vert();
   int c_encode_vert();
+private:
   void fstd_subinit();
+  void set_table_nj(int nk);
 };
 
 class vgrid_21002 : public vgrid
@@ -185,7 +214,9 @@ public:
   int C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, int *nl_w, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, double **PP_a_w_8, double **PP_b_w_8, double **PP_c_w_8, int **PP_ip1_w, float dhm, float dht, float dhw);
   int c_decode_vert();
   int c_encode_vert();
+private:
   void fstd_subinit();
+  void set_table_nj(int nk);
 };
 
 #endif // VGRID_SUBCLASSES_H

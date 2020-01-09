@@ -34,14 +34,9 @@ static float stda76_tgrad[STDA76_N_LAYER]     = { -6.5E-3,    0.0,    1.0E-3, 2.
 static float stda76_zgrad[STDA76_N_LAYER + 1] = { 0., 11000., 20000., 32000., 47000., 51000.,  71000.,  84852. };
 
 // Constants
-#define MAX_DESC_REC 10000      //maximum number of descriptor records in a single file
 #define MAX_VKIND    100
-#define ZNAME "!!"              //name of the vertical coodinate
 // Macros
 #define FREE(x) if(x) { free(x); x=NULL; }
-
-// Options
-static int ALLOW_SIGMA = 0;
 
 // Don't want to depend on modelutils so define constantes here.
 // These are not used to transform variables like T to GZ so it will not
@@ -203,6 +198,11 @@ int vgrid::is_required_float(float *ptr, int *table_valid, char *message) {
   return(1);
 }
 
+void vgrid::set_match_ipig(int match_ipig)
+{
+  this->match_ipig = match_ipig;
+}
+
 int my_alloc_int(int **vec, int size, char *message){
   *vec = (int*)malloc ( size * sizeof(int) );
   if(! *vec){    
@@ -270,7 +270,7 @@ void flip_transfer_c2d(char *name, void *val_8) {
   //printf("ENCODE tt=%16.16lx\n",tt);
 }
 
-int vgrid::max_int(int *vec, int ni) {
+int max_int(int *vec, int ni) {
   int i, ind = 0;
   for( i = 1; i < ni; i++){
     if( vec[i] > vec[ind] )
@@ -499,13 +499,13 @@ void vgrid::Cvgd_table_shape(int **tshape) {
   (*tshape)[2] = this->table_nk;
 }
 
-void vgrid::my_copy_double(double *aa, double **bb, int ind){
+void my_copy_double(double *aa, double **bb, int ind){
   while (ind--) {
     (*bb)[ind] = aa[ind];
   }
 }
 
-void vgrid::my_copy_int(int *aa, int **bb, int ind){
+void my_copy_int(int *aa, int **bb, int ind){
   while (ind--) {
     (*bb)[ind] = aa[ind];
   }
@@ -607,7 +607,7 @@ int vgrid::c_convip_Level2IP_old_style(float level, int kind) {
   return(IP);
 }
 
-float vgrid::c_convip_IP2Level(int IP,int *kind) {
+float c_convip_IP2Level(int IP,int *kind) {
 
    int    mode=-1,flag=0, strglen=0;
    float  level=0.0;
@@ -619,7 +619,7 @@ float vgrid::c_convip_IP2Level(int IP,int *kind) {
    return(level);
 }
 
-void vgrid::decode_HY(VGD_TFSTD_ext var, double *ptop_8, double *pref_8, float *rcoef){
+void decode_HY(VGD_TFSTD_ext var, double *ptop_8, double *pref_8, float *rcoef){
   // In consultation with Vivian Lee, with decode explicitly instead of using f77 read_decode_hyb
   int kind;
   *ptop_8 = c_convip_IP2Level(var.ip1, &kind) * 100.;
@@ -2593,6 +2593,605 @@ void vgrid::c_vgd_free_abci() {
     FREE(this->c_m_8);
 }
 
+
+
+int vgrid::Cvgd_new_build_vert2(int kind, int version, int nk, int ip1, int ip2, double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
+		     double *a_m_8, double *b_m_8, double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8, double *a_w_8, double *b_w_8, double *c_w_8, int *ip1_m, int *ip1_t, int *ip1_w, int nl_m, int nl_t, int nl_w)
+{
+  // N.B.:  'this' must be a SUBCLASS of vgrid
+
+  int errorInput = 0, vcode;
+
+  // Complete the initializations
+  this->unit       = -1;
+  this->match_ipig = 1;
+  this->nk         = nk;
+  this->nl_m       = nl_m;
+  // Note that this->nl_t and this->nl_w may be overwritten in c_encode_vert function below
+  this->nl_t       = nl_t;
+  this->nl_w       = nl_w;
+  this->rec.ip1    = (int) fmax(0,ip1);
+  this->rec.ip2    = (int) fmax(0,ip2);
+  strcpy(this->rec.nomvar,"!!  ");
+  this->rec.ig1   = this->vcode;
+
+
+
+  // Check for required inputs
+  if( this->is_valid( ptop_8_valid) ) {
+    if(ptop_8) {
+      this->ptop_8 = *ptop_8;
+    } else {
+      printf("(Cvgd) ptop_8 is a required constructor entry\n");
+      errorInput = 1;
+    }
+  }
+  if(this->is_valid( pref_8_valid)) {
+    if(pref_8){
+      this->pref_8 = *pref_8;
+    } else {
+      printf("(Cvgd) pref_8 is a required constructor entry\n");
+      errorInput = 1;
+    }
+  }
+  if(this->is_valid( rcoef1_valid)) {
+    if(rcoef1){
+      this->rcoef1 = *rcoef1;
+    } else {
+      printf("(Cvgd) rcoef1 is a required constructor entry\n");
+      errorInput = 1;
+    }
+  }
+  if(this->is_valid( rcoef2_valid)) {
+    if(rcoef2){
+      this->rcoef2 = *rcoef2;
+    } else {
+      printf("(Cvgd) rcoef2 is a required constructor entry\n");
+      errorInput = 1;
+    }
+  }
+  if(this->is_valid( rcoef3_valid)) {
+    if(rcoef3){
+      this->rcoef3 = *rcoef3;
+    } else {
+      printf("(Cvgd) rcoef3 is a required constructor entry\n");
+      errorInput = 1;
+    }
+  }
+  if(this->is_valid( rcoef4_valid)) {
+    if(rcoef4){
+      this->rcoef4 = *rcoef4;
+    } else {
+      printf("(Cvgd) rcoef4 is a required constructor entry\n");
+      errorInput = 1;
+    }
+  }
+  if(this->is_valid( a_m_8_valid)) {
+    if(a_m_8){
+      free(this->a_m_8);
+      this->a_m_8 = (double*)malloc( nl_m * sizeof(double) );
+      if(! this->a_m_8){ 
+	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating a_m_8 of size = %d\n", nl_m);
+	return(VGD_ERROR);
+      }
+      my_copy_double(a_m_8, &(this->a_m_8), nl_m);
+    } else {
+      printf("(Cvgd) a_m_8 is a required constructor entry\n");
+      errorInput = 1;
+    }
+  }
+  if(this->is_valid( b_m_8_valid)) {
+    if(b_m_8){
+      free(this->b_m_8);
+      this->b_m_8 = (double*)malloc( nl_m * sizeof(double) );
+      if(! this->b_m_8) {
+	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating b_m_8\n");
+	return(VGD_ERROR);
+      }
+      my_copy_double(b_m_8, &(this->b_m_8), nl_m);
+    } else {
+      printf("(Cvgd) b_m_8 is a required constructor entry\n");
+      errorInput = 1;
+    }
+  }
+  if(this->is_valid( c_m_8_valid)) {
+    if(c_m_8){
+      free(this->c_m_8);
+      this->c_m_8 = (double*)malloc( nl_m * sizeof(double) );
+      if(! this->c_m_8) {
+	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating c_m_8\n");
+	return(VGD_ERROR);
+      }
+      my_copy_double(c_m_8, &(this->c_m_8), nl_m);
+    } else {
+      printf("(Cvgd) c_m_8 is a required constructor entry\n");
+      errorInput = 1;
+    }
+  }
+  if(this->is_valid( a_t_8_valid)) {
+    if(a_t_8){
+      free(this->a_t_8);
+      this->a_t_8 = (double*)malloc( nl_t * sizeof(double) );
+      if(! this->a_t_8) {
+	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating a_t_8\n");
+	return(VGD_ERROR);
+      }
+      my_copy_double(a_t_8, &(this->a_t_8), nl_t);
+    } else {
+      printf("(Cvgd) a_t_8 is a required constructor entry\n");
+      errorInput = 1;
+    }
+  }
+  if(this->is_valid( b_t_8_valid)) {
+    if(b_t_8){
+      free(this->b_t_8);
+      this->b_t_8 = (double*)malloc( nl_t * sizeof(double) );
+      if(! this->b_t_8) {
+	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating b_t_8\n");
+	return(VGD_ERROR);
+      }
+      my_copy_double(b_t_8, &(this->b_t_8), nl_t);
+    } else {
+      printf("(Cvgd) b_t_8 is a required constructor entry\n");
+      errorInput = 1;
+    }
+  }
+  if(this->is_valid( c_t_8_valid)) {
+    if(c_t_8){
+      free(this->c_t_8);
+      this->c_t_8 = (double*)malloc( nl_t * sizeof(double) );
+      if(! this->c_t_8) {
+	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating c_t_8\n");
+	return(VGD_ERROR);
+      }
+      my_copy_double(c_t_8, &(this->c_t_8), nl_t);
+    } else {
+      printf("(Cvgd) c_t_8 is a required constructor entry\n");
+      errorInput = 1;
+    }
+  }
+  if(this->is_valid( a_w_8_valid)) {
+    if(a_w_8){
+      free(this->a_w_8);
+      this->a_w_8 = (double*)malloc( nl_w * sizeof(double) );
+      if(! this->a_w_8) {
+	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating a_w_8\n");
+	return(VGD_ERROR);
+      }
+      my_copy_double(a_w_8, &(this->a_w_8), nl_w);
+    } else {
+      printf("(Cvgd) a_w_8 is a required constructor entry\n");
+      errorInput = 1;
+    }
+  }
+  if(this->is_valid( b_w_8_valid)) {
+    if(b_w_8){
+      free(this->b_w_8);
+      this->b_w_8 = (double*)malloc( nl_w * sizeof(double) );
+      if(! this->b_w_8) {
+	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating b_w_8\n");
+	return(VGD_ERROR);
+      }
+      my_copy_double(b_w_8, &(this->b_w_8), nl_w);
+    } else {
+      printf("(Cvgd) b_w_8 is a required constructor entry\n");
+      errorInput = 1;
+    }
+  }
+  if(this->is_valid( c_w_8_valid)) {
+    if(c_w_8){
+      free(this->c_w_8);
+      this->c_w_8 = (double*)malloc( nl_w * sizeof(double) );
+      if(! this->c_w_8) {
+	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating c_w_8\n");
+	return(VGD_ERROR);
+      }
+      my_copy_double(c_w_8, &(this->c_w_8), nl_w);
+    } else {
+      printf("(Cvgd) c_w_8 is a required constructor entry\n");
+      errorInput = 1;
+    }
+  }
+
+  if(this->is_valid( ip1_m_valid)) {
+    if(ip1_m){
+      free(this->ip1_m);
+      this->ip1_m = (int*)malloc( nl_m * sizeof(int) );
+      if(! this->ip1_m) {
+	printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem allocating ip1_m in Cvgd_new_build_vert2\n");
+	return(VGD_ERROR);
+      }
+      my_copy_int(ip1_m, &(this->ip1_m), nl_m);
+    } else {
+      printf("(Cvgd) ip1_m is a required constructor entry\n");
+      errorInput = 1;
+    }
+  }
+  if(this->is_valid( ip1_t_valid)) {
+    if(ip1_t){
+      free(this->ip1_t);
+      this->ip1_t = (int*)malloc( nl_t * sizeof(int) );
+      if(! this->ip1_t) {
+	printf("(Cvgd) ERROR: in Cvgd_new_build_vert2, problem allocating ip1_t\n");
+	return(VGD_ERROR);
+      }
+      my_copy_int(ip1_t, &(this->ip1_t), nl_t);
+    } else {
+      printf("(Cvgd) ip1_t is a required constructor entry\n");
+      errorInput = 1;
+    }
+  }
+  if(this->is_valid( ip1_w_valid)) {
+    if(ip1_w){
+      free(this->ip1_w);
+      this->ip1_w = (int*)malloc( nl_w * sizeof(int) );
+      if(! this->ip1_w) {
+	printf("(Cvgd) ERROR: in Cvgd_new_build_vert2, problem allocating ip1_w\n");
+	return(VGD_ERROR);
+      }
+      my_copy_int(ip1_w, &(this->ip1_w), nl_w);
+    } else {
+      printf("(Cvgd) ip1_w is a required constructor entry\n");
+      errorInput = 1;
+    }
+  }
+  if (errorInput > 0)
+  {
+    return (VGD_ERROR);
+  }
+
+
+
+  // Fill the table (encode the vertical co-ordinate)
+  if(this->allocate_table(nk) == VGD_ERROR)
+  {
+    printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem with allocate_table for vcode=_%s\n",this->vcode);
+    return(VGD_ERROR);
+  }
+  if(this->c_encode_vert() == VGD_ERROR)
+  {
+    printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem with c_encode_vert for vcode=_%s\n",this->vcode);
+    return(VGD_ERROR);
+  }
+
+
+  this->valid = 1;
+  if(this->fstd_init() == VGD_ERROR)
+  {
+    printf("(Cvgd) ERROR in Cvgd_new_build_vert2, problem with fstd_init\n");
+  }
+
+  return(VGD_OK);
+}
+
+int vgrid::Cvgd_new_from_table(double *table, int ni, int nj, int nk)
+{
+  // N.B.:  'this' must be a SUBCLASS of vgrid
+
+  int table_size, i;
+  double *ltable;
+
+  // Coordinate constructor - build vertical descriptor from table input
+  // Set internal vcode (if all above was successful)
+
+  this->valid = 0;
+
+  // V V V V V   THIS SHOULD NO LONGER BE NECESSARY   V V V V V
+  // Since table passed in argument may be the this->table, we take a copy before the call to free
+  table_size = ni * nj * nk;
+  ltable = (double*)malloc ( table_size * sizeof(double) );
+  if(! ltable ) {
+    printf("(Cvgd) ERROR in Cvgd_new_from_table, cannot allocate ltable of bouble of size %d\n", table_size);
+    return(VGD_ERROR);
+  }
+  my_copy_double(table, &ltable, table_size);
+  // ^ ^ ^ ^ ^  THIS SHOULD NO LONGER BE NECESSARY   ^ ^ ^ ^ ^
+
+
+  this->table_ni = ni;
+  this->table_nj = nj;
+  this->table_nk = nk;
+
+  this->table = (double*)malloc ( ni * nj * nk * sizeof(double) );
+  if(! this->table ) {
+    printf("(Cvgd) ERROR in Cvgd_new_from_table, cannot allocate table of double of size %d\n",table_size );
+    return(VGD_ERROR);
+  }
+  for(i = 0; i < table_size; i++) {
+    this->table[i] = ltable[i];
+  }
+  free(ltable);
+
+  // Fill remainder of structure
+  if( this->c_decode_vert() == VGD_ERROR )
+  {
+    printf("(Cvgd) in Cvgd_new_from_table, problem decoding table with vcode %d\n", this->vcode);
+    return(VGD_ERROR);
+  }
+
+  this->valid = 1;
+  if(this->fstd_init() == VGD_ERROR)
+  {
+    printf("(Cvgd) ERROR in Cvgd_new_from_table, problem creating record information\n");
+  }
+
+  return(VGD_OK);
+}
+
+int vgrid::Cvgd_new_gen2(int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
+	      double *ptop_8, double *pref_8, double *ptop_out_8,
+	      int ip1, int ip2, float *dhm, float *dht, float *dhw, int avg)
+{
+  // N.B.:  'this' must be a SUBCLASS of vgrid
+
+  float *l_rcoef3 = NULL, *l_rcoef4 = NULL, minus_one = -1.;
+  double *a_m_8 = NULL, *b_m_8 = NULL, *c_m_8 = NULL, *a_t_8 = NULL, *b_t_8 = NULL, *c_t_8 = NULL, *a_w_8 = NULL, *b_w_8 = NULL, *c_w_8 = NULL;
+  int *ip1_m = NULL, *ip1_t = NULL, *ip1_w = NULL, tlift, OKInput;
+
+  
+  //TODO get better error handling like in new_build
+  OKInput = 0;
+  OKInput = OKInput + this->is_required_double(ptop_8,     ptop_8_valid,     "ptop_8"    );
+  OKInput = OKInput + this->is_required_double(ptop_out_8, ptop_out_8_valid, "ptop_out_8");
+  OKInput = OKInput + this->is_required_double(pref_8,     pref_8_valid,     "pref_8"    );
+  OKInput = OKInput + this->is_required_float (rcoef1,     rcoef1_valid,     "rcoef1"    );
+  OKInput = OKInput + this->is_required_float (rcoef2,     rcoef2_valid,     "rcoef2"    );
+  OKInput = OKInput + this->is_required_float (dhm,        dhm_valid,        "dhm"       );
+  OKInput = OKInput + this->is_required_float (dht,        dht_valid,        "dht"       );  
+  OKInput = OKInput + this->is_required_float (dhw,        dhw_valid,        "dhw"       );  
+
+  if (OKInput != 8 ) {
+    return(VGD_ERROR);
+  }
+  OKInput = 0;
+  if(this->is_option(rcoef3_option)) {
+    OKInput++;
+    l_rcoef3 = &minus_one;
+    if(rcoef3){
+      l_rcoef3 = rcoef3;
+    }
+  } else {    
+    OKInput = OKInput + this->is_required_float (rcoef3, rcoef3_valid, "rcoef3");
+    l_rcoef3 = rcoef3;
+  }
+  if(this->is_option(rcoef4_option)) {
+    OKInput++;
+    l_rcoef4 = &minus_one;
+    if(rcoef4){
+      l_rcoef4 = rcoef4;
+    }
+  } else {    
+    OKInput = OKInput + this->is_required_float (rcoef4, rcoef4_valid, "rcoef4");
+    l_rcoef4 = rcoef4;
+  }  
+  if (OKInput != 2 ) {
+    return(VGD_ERROR);
+  }
+  int nk = -1, nl_m = -1, nl_t = -1, nl_w = -1;
+
+  try
+  {
+    switch(this->vcode) 
+    {
+    case 1:	
+      fprintf(stderr,"(Cvgd) ERROR in Cvgd_new_gen2, kind=%d, version=%d\n cannot be generated, function to di so is in Nemo\n",kind,version);
+      return(VGD_ERROR);
+      break;
+
+    case 1001:	
+      nk   = size_hyb;
+      nl_m = size_hyb;
+      nl_t = size_hyb;
+      if(((vgrid_1001*)this)->C_genab(hyb, size_hyb, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR )
+      {
+        free(a_m_8);
+        free(b_m_8);
+        free(ip1_m);
+        return(VGD_ERROR);
+      }
+      break;
+
+  case 1002:
+    nk   = size_hyb;
+    nl_m = size_hyb;
+    nl_t = size_hyb;
+    if(((vgrid_1002*)this)->C_genab(hyb, size_hyb, ptop_8, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR )
+    {
+      free(a_m_8);
+      free(b_m_8);
+      free(ip1_m);
+      return(VGD_ERROR);
+    }
+    break;
+
+    case 1003:
+      fprintf(stderr,"(Cvgd) ERROR in Cvgd_new_gen2, kind=%d, version=%d\n cannot be generated, please use kind 1 of version 2\n",kind,version);
+      return(VGD_ERROR);
+      break;
+
+    case 2001:
+      nk   = size_hyb;
+      nl_m = size_hyb;
+      nl_t = -1;
+      if(((vgrid_2001*)this)->C_genab(hyb, size_hyb, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR )
+      {
+        free(a_m_8);
+        free(b_m_8);
+        free(ip1_m);
+        return(VGD_ERROR);
+      }
+      break;
+
+  case 4001:
+    nk   = size_hyb;
+    nl_m = size_hyb;
+    nl_t = -1;
+    if(((vgrid_4001*)this)->C_genab(hyb, size_hyb, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR )
+    {
+      free(a_m_8);
+      free(b_m_8);
+      free(ip1_m);
+      return(VGD_ERROR);
+    }
+    break;
+
+    case 5001:
+      nk   = size_hyb;
+      nl_m = size_hyb;
+      nl_t = size_hyb;
+      if(((vgrid_5001*)this)->C_genab(hyb, size_hyb, *rcoef1, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR )
+      {
+        free(a_m_8);
+        free(b_m_8);
+        free(ip1_m);
+        return(VGD_ERROR);
+      }
+      break;
+
+    case 5002:
+      nk   = size_hyb;
+      tlift = 0;
+      if(((vgrid_5002*)this)->C_genab_5002_5003(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t, tlift) == VGD_ERROR )
+      {
+        free(a_m_8);
+        free(b_m_8);
+        free(ip1_m);
+        free(a_t_8);
+        free(b_t_8);
+        free(ip1_t);
+        return(VGD_ERROR);
+      }    
+      break;
+
+    case 5003:
+      nk   = size_hyb;
+      tlift = 1;
+      if(((vgrid_5003*)this)->C_genab_5002_5003(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t, tlift) == VGD_ERROR )
+      {
+        free(a_m_8);
+        free(b_m_8);
+        free(ip1_m);
+        free(a_t_8);
+        free(b_t_8);
+        free(ip1_t);
+        return(VGD_ERROR);
+      }    
+      break;
+
+    case 5004:
+      nk   = size_hyb;
+      if(((vgrid_5004*)this)->C_genab(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *ptop_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t) == VGD_ERROR )
+      {
+        free(a_m_8);
+        free(b_m_8);
+        free(ip1_m);
+        free(a_t_8);
+        free(b_t_8);
+        free(ip1_t);
+        return(VGD_ERROR);
+      }    
+      break;
+
+    case 5005:
+      nk   = size_hyb;
+      if(((vgrid_5005*)this)->C_genab(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, &ptop_out_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t, *dhm, *dht) == VGD_ERROR )
+      {
+        free(a_m_8);
+        free(b_m_8);
+        free(ip1_m);
+        free(a_t_8);
+        free(b_t_8);
+        free(ip1_t);
+        return(VGD_ERROR);
+      }
+      break;
+
+    case 5100:
+      nk   = size_hyb;
+      if(((vgrid_5100*)this)->C_genab(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *l_rcoef3, *l_rcoef4, &ptop_out_8, *pref_8, &a_m_8, &b_m_8, &c_m_8, &ip1_m, &a_t_8, &b_t_8, &c_t_8, &ip1_t, *dhm, *dht, avg) == VGD_ERROR )
+      {
+        free(a_m_8);
+        free(b_m_8);
+        free(c_m_8);
+        free(ip1_m);
+        free(a_t_8);
+        free(b_t_8);
+        free(c_t_8);
+        free(ip1_t);
+        return(VGD_ERROR);
+      }
+      break;
+
+    case 21001:
+      nk   = size_hyb;
+      if(((vgrid_21001*)this)->C_genab(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *l_rcoef3, *l_rcoef4, &a_m_8, &b_m_8, &c_m_8, &ip1_m, &a_t_8, &b_t_8, &c_t_8, &ip1_t, *dhm, *dht) == VGD_ERROR )
+      {
+        free(a_m_8);
+        free(b_m_8);
+        free(c_m_8);
+        free(ip1_m);
+        free(a_t_8);
+        free(b_t_8);
+        free(c_t_8);
+        free(ip1_t);
+        return(VGD_ERROR);
+      }
+      break;
+
+    case 21002:
+      nk   = size_hyb;    
+      if(((vgrid_21002*)this)->C_genab(hyb, size_hyb, &nl_m, &nl_t, &nl_w, *rcoef1, *rcoef2, *l_rcoef3, *l_rcoef4, &a_m_8, &b_m_8, &c_m_8, &ip1_m, &a_t_8, &b_t_8, &c_t_8, &ip1_t, &a_w_8, &b_w_8, &c_w_8, &ip1_w, *dhm, *dht, *dhw) == VGD_ERROR )
+      {
+        free(a_m_8);
+        free(b_m_8);
+        free(c_m_8);
+        free(ip1_m);
+        free(a_t_8);
+        free(b_t_8);
+        free(c_t_8);
+        free(ip1_t);
+        free(a_w_8);
+        free(b_w_8);
+        free(c_w_8);
+        free(ip1_w);
+        return(VGD_ERROR);
+      }
+      break;
+
+    default:
+      printf("(Cvgd) ERROR in Cvgd_new_gen2, invalid kind or version, kind = %d, version = %d\n",kind,version);
+      return(VGD_ERROR);
+    }
+  }
+  catch (vgrid_exception)
+  {
+    free(a_m_8);
+    free(b_m_8);
+    free(c_m_8);
+    free(a_t_8);
+    free(b_t_8);
+    free(c_t_8);
+    free(ip1_m);
+    free(ip1_t);
+
+    return(VGD_ERROR);
+  }
+  if( VGD_ERROR == this->Cvgd_new_build_vert2(kind,version,nk,ip1,ip2,ptop_8,pref_8,rcoef1,rcoef2,l_rcoef3,l_rcoef4,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,a_w_8,b_w_8,c_w_8,ip1_m,ip1_t,ip1_w,nl_m,nl_t,nl_w) ) {
+    fprintf(stderr,"(Cvgd) ERROR in Cvgd_new_gen2, problem with new_build_vert for kind = %d, version = %d\n",kind,version);
+    return(VGD_ERROR);
+  }
+  free(a_m_8);
+  free(b_m_8);
+  free(c_m_8);
+  free(a_t_8);
+  free(b_t_8);
+  free(c_t_8);
+  free(ip1_m);  
+  free(ip1_t);  
+
+  return (VGD_OK);
+}
+
 void vgrid::Cvgd_free() {
 // Avoid crashing:  don't free
 //    if( *self ) {
@@ -3751,7 +4350,7 @@ int vgrid::Cvgd_stda76_pres_from_hgts_list(float *pres, float *hgts,
 
 
 // Construct a vgrid from key
-void vgrid::build_vgrid_from_key(int key) : vgrid()
+void vgrid::build_vgrid_from_key(int key)
 {
   double *table;
   VGD_TFSTD_ext var;

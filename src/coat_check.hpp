@@ -22,7 +22,8 @@
 
 #include "vgrid.hpp"
 
-class coat_hanger{
+class coat_hanger
+{
 public:
   // A coat_hanger holds all data relevant to one vertical grid
     vgrid vgd;
