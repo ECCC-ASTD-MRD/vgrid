@@ -18,7 +18,7 @@
 // Boston, MA 02111-1307, USA.
 
 #include <stdio.h>
-#include "vgrid.hpp"
+#include "vgrid_subclasses.hpp"
 #include "coat_check.hpp"
 #include "c_ut_report.h"
 
@@ -29,7 +29,8 @@ extern "C" void c_coat_check() {
 
   coat_check my_coat_check;
 
-  vgrid my_vgrid_a, my_vgrid_b;
+  vgrid_2001 my_vgrid_a;
+  vgrid_5005 my_vgrid_b;
   vgrid *my_vgrid_a_p, *my_vgrid_b_p, *checked_vgrid_p;
 
   my_vgrid_a_p = &my_vgrid_a;
@@ -40,8 +41,6 @@ extern "C" void c_coat_check() {
 
   // Test 1:  If I put a second (different) grid in the coat check, I should get
   //          a tag that is different from the first one
-  my_vgrid_a_p->vcode = 768; // Leave a fingerprint
-  my_vgrid_b_p->vcode = 999; // Leave a fingerprint
   tag1 = my_coat_check.get_tag(my_vgrid_a_p);
   tag2 = my_coat_check.get_tag(my_vgrid_b_p);
 

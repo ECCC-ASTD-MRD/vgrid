@@ -246,7 +246,7 @@ void vgrid::flip_transfer_d2c(char *name, double val_8) {
   //printf("DECODE '%s'\n",name);
 }
 
-void flip_transfer_c2d(char *name, void *val_8) {
+void vgrid::flip_transfer_c2d(char *name, void *val_8) {
   // NOTE : Character stuffing into double is done right to left (Little endian style)
   int i;
   uint64_t *xx = (unsigned long *)val_8;
@@ -554,7 +554,7 @@ int vgrid::same_vec_r8(double *vec1, int n1, double *vec2, int n2) {
   return(0);
 }
 
-int similar_vec_r8(double *vec1, int n1, double *vec2, int n2) {
+int vgrid::similar_vec_r8(double *vec1, int n1, double *vec2, int n2) {
   int i;
   if(vec1) {
     if (vec2) {
