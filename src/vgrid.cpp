@@ -685,10 +685,9 @@ int vgrid::correct_kind_and_version(int key, int kind, int version, VGD_TFSTD_ex
 
 }
 
-int vgrid::C_load_toctoc( VGD_TFSTD_ext var, int key) {
-
-  int table_size, istat, ni, nj
-    , nk;
+int vgrid::C_load_toctoc( VGD_TFSTD_ext var, int key)
+{
+  int table_size, istat, ni, nj, nk;
 
   this->table_ni = var.ni;
   this->table_nj = var.nj;
@@ -708,10 +707,25 @@ int vgrid::C_load_toctoc( VGD_TFSTD_ext var, int key) {
   }
   this->kind             = (int) this->table[0];
   this->version          = (int) this->table[1];
-  if(this->fstd_init() == VGD_ERROR) {
-    printf("(Cvgd) ERROR in C_load_toctoc, problem creating record information\n");
+
+  istat = C_load_var(var);
+
+  return(istat);
+}
+
+
+int vgrid::C_load_var(VGD_TFSTD_ext var)
+{
+  //this->table_ni = var.ni;
+  //this->table_nj = var.nj;
+  //this->table_nk = var.nk;
+
+  if(this->fstd_init() == VGD_ERROR)
+  {
+    printf("(Cvgd) ERROR in C_load_var, problem creating record information\n");
     return(VGD_ERROR);
   }
+
   this->rec.dateo        = var.dateo;
   this->rec.deet         = var.deet;
   this->rec.npas         = var.npas;
@@ -2437,7 +2451,7 @@ int vgrid::Cvgd_diag_withref_2ref(int ni, int nj, int nk, int *ip1_list, float *
     }
     break;
   default:
-    printf("(Cvgd) ERROR in %s, invalid kind or version: kind = %d, version = %d\n", proc_name, this->kind, this->version);
+    printf("(Cvgd) ERROR in %s, invalid kind or version: kind = %d, version = %d, vcode=%d\n", proc_name, this->kind, this->version, this->vcode);
     return(VGD_ERROR);
   }
   
@@ -3271,8 +3285,8 @@ int vgrid::Cvgd_set_vcode() {
  *
  *----------------------------------------------------------------------------
  */
-int vgrid::fstd_init() {
-
+int vgrid::fstd_init()
+{
    VGD_TFSTD *h = &this->rec;
 
    if( h->fstd_initialized )
@@ -4357,14 +4371,14 @@ void vgrid::build_vgrid_from_key(int key)
 
   // Read all the description information, var, for the key
   if( my_fstprm(key, &var) == VGD_ERROR ) {
-    printf("(Cvgd) ERROR in vgrid::vgrid(key), with my_fstprm on key %d\n",key);
+    printf("(Cvgd) ERROR in vgrid::build_vgrid_from_key, with my_fstprm on key %d\n",key);
     throw vgrid_exception();
   }
 
   // Enter var data into this; and read the field into this->table
   if( this->C_load_toctoc(var, key) == VGD_ERROR )
   {
-    printf("(Cvgd) ERROR in vgrid::vgrid(key), cannot load !!\n");
+    printf("(Cvgd) ERROR in vgrid::build_vgrid_from_key, cannot load !!\n");
   }
 
   this->kind    = (int) this->table[0];

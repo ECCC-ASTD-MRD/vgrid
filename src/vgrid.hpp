@@ -201,6 +201,7 @@ public:
   int C_compute_pressure_5100(int ni, int nj, int nk, int *ip1_list, float *levels, float *sfc_field, float *sfc_field_ls, int in_log, int dpidpis);
   int C_compute_pressure_5100_8(int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, double *sfc_field_ls, int in_log, int dpidpis);
   int C_load_toctoc(VGD_TFSTD_ext var, int key);
+  int C_load_var(VGD_TFSTD_ext var);
   int Cvgd_vgdcmp(vgrid *vgd2);
   void Cvgd_free();
   int Cvgd_get_int(char *key, int *value, int quiet);

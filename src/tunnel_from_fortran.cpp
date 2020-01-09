@@ -200,20 +200,6 @@ int Cvgd_read_vgrid_from_file(int *vgdid, int unit, int ip1,int ip2,
   return status;
 }
 
-// Replaced by Cvgd_read_vgrid_from_file
-// int Cvgd_new_read(int *vgdid, int unit, int ip1,int ip2, 
-//                   int kind, int version)
-// {
-//   vgrid *my_vgd;
-//   int status;
-//   status=my_vgd->Cvgd_new_read(unit, ip1, ip2, kind, version);
-//   if(status != VGD_ERROR)
-//     {
-//       *vgdid=grid_check.get_tag(my_vgd);
-//     }
-//   return status;
-// }
-
 int Cvgd_print_desc(int vgdid, int sout, int convip)
 {
   vgrid *vgd;

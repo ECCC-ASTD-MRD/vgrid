@@ -34,67 +34,84 @@ void Cvgd_create_vgrid_from_vcode(vgrid **new_vgrid, int vcode)
   switch (vcode)
   {
   case 0001:
-    vgrid_0001 new_vgrid_0001(vcode);
-    *new_vgrid = & new_vgrid_0001;
+    vgrid_0001 new_vgrid_0001;
+    *new_vgrid = &new_vgrid_0001;
+    break;
 
   case 1001:
-    vgrid_1001 new_vgrid_1001(vcode);
-    *new_vgrid = & new_vgrid_1001;
+    vgrid_1001 new_vgrid_1001;
+    *new_vgrid = &new_vgrid_1001;
+    break;
 
   case 1002:
-    vgrid_1002 new_vgrid_1002(vcode);
-    *new_vgrid = & new_vgrid_1002;
+    vgrid_1002 new_vgrid_1002;
+    *new_vgrid = &new_vgrid_1002;
+    break;
 
   case 1003:
-    vgrid_1003 new_vgrid_1003(vcode);
-    *new_vgrid = & new_vgrid_1003;
+    vgrid_1003 new_vgrid_1003;
+    *new_vgrid = &new_vgrid_1003;
+    break;
 
   case 2001:
-    vgrid_2001 new_vgrid_2001(vcode);
-    *new_vgrid = & new_vgrid_2001;
+    vgrid_2001 new_vgrid_2001;
+    *new_vgrid = &new_vgrid_2001;
+    break;
 
   case 4001:
-    vgrid_4001 new_vgrid_4001(vcode);
-    *new_vgrid = & new_vgrid_4001;
+    vgrid_4001 new_vgrid_4001;
+    *new_vgrid = &new_vgrid_4001;
+    break;
 
   case 5001:
-    vgrid_5001 new_vgrid_5001(vcode);
+    vgrid_5001 new_vgrid_5001;
     *new_vgrid = &new_vgrid_5001;
+    break;
 
   case 5002:
-    vgrid_5002 new_vgrid_5002(vcode);
+    vgrid_5002 new_vgrid_5002;
     *new_vgrid = &new_vgrid_5002;
+    break;
 
   case 5003:
-    vgrid_5003 new_vgrid_5003(vcode);
+    vgrid_5003 new_vgrid_5003;
     *new_vgrid = &new_vgrid_5003;
+    break;
 
   case 5004:
-    vgrid_5004 new_vgrid_5004(vcode);
+    vgrid_5004 new_vgrid_5004;
     *new_vgrid = &new_vgrid_5004;
+    break;
 
   case 5005:
-    vgrid_5005 new_vgrid_5005(vcode);
+    vgrid_5005 new_vgrid_5005;
     *new_vgrid = &new_vgrid_5005;
+    break;
 
   case 5100:
-    vgrid_5100 new_vgrid_5100(vcode);
-    *new_vgrid = & new_vgrid_5100;
+    vgrid_5100 new_vgrid_5100;
+    *new_vgrid = &new_vgrid_5100;
+    break;
 
   case 5999:
-    vgrid_5999 new_vgrid_5999(vcode);
-    *new_vgrid = & new_vgrid_5999;
+    vgrid_5999 new_vgrid_5999;
+    *new_vgrid = &new_vgrid_5999;
+    break;
 
   case 21001:
-    vgrid_21001 new_vgrid_21001(vcode);
-    *new_vgrid = & new_vgrid_21001;
+    vgrid_21001 new_vgrid_21001;
+    *new_vgrid = &new_vgrid_21001;
+    break;
 
   case 21002:
-    vgrid_21002 new_vgrid_21002(vcode);
-    *new_vgrid = & new_vgrid_21002;
+    vgrid_21002 new_vgrid_21002;
+    *new_vgrid = &new_vgrid_21002;
+    break;
 
   default:
+    printf("In Cvgd_create_vgrid_from_vcode, vcode %d not recognized\n", vcode);
     throw vgrid_exception();
+    break;
   }
 }
 
@@ -206,7 +223,6 @@ int Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, int ip2, 
 	}
 	kind_found    = (int) table2[0];
 	version_found = (int) table2[1];
-	free(table2);
       }
       else // A matching toctoc has already been found
       {
@@ -259,12 +275,22 @@ int Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, int ip2, 
   }
   catch(vgrid_exception)
   {
-    printf("(Cvgd) ERROR in Cvgd_read_vgrid_from_file, unable to construct from a key %d\n", key);
+    printf("(Cvgd) ERROR in Cvgd_read_vgrid_from_file, unable to construct from a key %d for vcode %d\n", key, vcode);
     return(VGD_ERROR);
   }
+  if( (*my_new_vgrid)->C_load_var(var) == VGD_ERROR )
+  {
+    printf("(Cvgd) ERROR in Cvgd_new_read, cannot load !!\n");
+    return(VGD_ERROR);
+  }
+
+
+  status=(*my_new_vgrid)->Cvgd_build_from_table(table2, ni, nj, nk);
+  free(table2);
+
   (*my_new_vgrid)->set_match_ipig(match_ipig);
 
-  return(VGD_OK);
+  return(status);
 }
 
 
@@ -790,6 +816,7 @@ int C_gen_legacy_desc( vgrid **my_new_vgrid, int unit, int *keylist , int nb )
       {
 	goto bomb;
       }
+      break;
 
     case 1002:
       //=============================================
@@ -805,6 +832,7 @@ int C_gen_legacy_desc( vgrid **my_new_vgrid, int unit, int *keylist , int nb )
       {
         goto bomb;
       }
+      break;
 
     case 1003:
       //================================================
@@ -821,11 +849,13 @@ int C_gen_legacy_desc( vgrid **my_new_vgrid, int unit, int *keylist , int nb )
       }
       if(Cvgd_new_build_vert2(my_new_vgrid, 1, 3, nb, var.ig1, var.ig2, &ptop_8, &pref_8, &rcoef, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR ){
 	goto bomb;
-      }      
+      }   
+      break;   
 
     case 1004:
       printf("(Cvgd) TODO in C_gen_legacy_desc, add support to 1004 etasef coordinate");
       goto bomb;
+      break;
 
     case 2001:
       printf("(Cvgd)   pressure coordinate found\n");
@@ -837,6 +867,7 @@ int C_gen_legacy_desc( vgrid **my_new_vgrid, int unit, int *keylist , int nb )
       {
         goto bomb;
       }	
+      break;
 
     case 5001:
       printf("(Cvgd)   Hybrid coordinate found\n");
