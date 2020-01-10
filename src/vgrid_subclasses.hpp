@@ -126,6 +126,7 @@ public:
   int C_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t, int tlift);
 private:
   void set_table_nj(int nk);
+  void set_refnames();
 };
 
 class vgrid_5002 : public vgrid_5002_5003_5004_5005
@@ -177,6 +178,7 @@ public:
 private:
   void fstd_subinit();
   void set_table_nj(int nk);
+  void set_refnames();
 };
 
 class vgrid_5999 : public vgrid
@@ -202,6 +204,7 @@ public:
 private:
   void fstd_subinit();
   void set_table_nj(int nk);
+  void set_refnames();
 };
 
 class vgrid_21002 : public vgrid
@@ -215,6 +218,7 @@ public:
 private:
   void fstd_subinit();
   void set_table_nj(int nk);
+  void set_refnames();
 };
 
 #endif // VGRID_SUBCLASSES_H

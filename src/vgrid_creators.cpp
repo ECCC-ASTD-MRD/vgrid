@@ -265,7 +265,7 @@ int Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, int ip2, 
   }
   if( (*my_new_vgrid)->C_load_var(var) == VGD_ERROR )
   {
-    printf("(Cvgd) ERROR in Cvgd_new_read, cannot load !!\n");
+    printf("(Cvgd) ERROR in Cvgd_read_vgrid_from_file, cannot load !!\n");
     return(VGD_ERROR);
   }
 

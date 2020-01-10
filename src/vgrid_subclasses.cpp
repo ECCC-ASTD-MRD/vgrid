@@ -1341,6 +1341,12 @@ void vgrid_5001::fstd_subinit()
   h->ig3=(int)roundf(this->rcoef1*100.0f);
 };
 
+void vgrid_5002_5003_5004_5005::set_refnames()
+{
+  strcpy(this->ref_name,"P0  ");
+  strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
+};
+
 // ########## class 5002 ##########
 vgrid_5002::vgrid_5002() : vgrid_5002_5003_5004_5005()
 {
@@ -1921,6 +1927,12 @@ void vgrid_5100::set_table_nj(int nk)
   table_nj = this->nl_m + this->nl_t + skip;
 }
 
+void vgrid_5100::set_refnames()
+{
+  strcpy(this->ref_name,"P0  ");
+  strcpy(this->ref_namel,"P0LS");
+}
+
 int vgrid_5100::c_decode_vert()
 {
   int k, ind, nb, kind;
@@ -2370,6 +2382,23 @@ void vgrid_21001::set_table_nj(int nk)
   table_nj = this->nl_m + this->nl_t + skip;
 }
 
+void vgrid_21001::set_refnames()
+{
+  strcpy(this->ref_name,"ME  ");
+  strcpy(this->ref_namel,"MELS");
+
+  if (   fabs( this->rcoef3 - this->rcoef1 ) < 1.0e-6
+      && fabs( this->rcoef4 - this->rcoef2 ) < 1.0e-6)
+  {
+    strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
+  }
+
+  if ( this->rcoef3 < 0. || this->rcoef4 < 0. )
+  {
+    strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
+  }
+}
+
 int vgrid_21001::c_decode_vert()
 {
   int k, ind, nb, kind;
@@ -2736,6 +2765,23 @@ int vgrid_21002::C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, int *nl_w
 void vgrid_21002::set_table_nj(int nk)
 {
   table_nj = this->nl_m + this->nl_w + 1 + skip;
+}
+
+void vgrid_21002::set_refnames()
+{
+  strcpy(this->ref_name,"ME  ");
+  strcpy(this->ref_namel,"MELS");
+
+  if (   fabs( this->rcoef3 - this->rcoef1 ) < 1.0e-6
+      && fabs( this->rcoef4 - this->rcoef2 ) < 1.0e-6)
+  {
+    strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
+  }
+
+  if ( this->rcoef3 < 0. || this->rcoef4 < 0. )
+  {
+    strcpy(this->ref_namel,VGD_NO_REF_NOMVAR);
+  }
 }
 
 int vgrid_21002::c_decode_vert()

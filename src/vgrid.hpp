@@ -67,7 +67,7 @@ static int vcode_valid      [VALID_TABLE_SIZE] = {1, 1001, 1002, 1003, 2001, 400
 
 
 // Options
-static int ALLOW_SIGMA = 0;
+extern int ALLOW_SIGMA;
 
 int max_int(int *vec, int ni);
 int my_fstprm(int key,VGD_TFSTD_ext *ff);
@@ -137,6 +137,7 @@ private:
   static int same_vec_i(int *vec1, int n1, int *vec2, int n2);
   static int same_vec_r8(double *vec1, int n1, double *vec2, int n2);
   static int similar_vec_r8(double *vec1, int n1, double *vec2, int n2);  static int Cvgd_FindIp1Idx(int Ip1,int *Lst,int Size);
+  virtual void set_refnames();
 
 protected:
   static void flip_transfer_d2c(char *name, double val_8);
@@ -217,7 +218,6 @@ public:
   int Cvgd_put_int(char *key, int value);
 
 
-  int Cvgd_new_read(int unit, int ip1, int ip2, int kind, int version);
   int Cvgd_write_desc (int unit);
   int Cvgd_stda76_temp(int *i_val, int nl_t, float *temp);
   int Cvgd_stda76_pres(int *i_val, int nl_t, float *pres, float *sfc_temp, float *sfc_pres);
