@@ -22,6 +22,7 @@
 #include <string.h>
 #include <math.h>
 #include "vgrid.hpp"
+#include "vgrid_creators.hpp"
 #include "c_ut_report.h"
 #include "armnlib.hpp"
 
@@ -109,7 +110,7 @@ int test_it(char *filename, int ind) {
   char mode[]="RND";
   char nomvar[] = "1234";
   float *temp = NULL, *pres = NULL, temp_c, sfc_pres, sfc_temp;
-  vgrid my_vgrid;
+  vgrid *my_vgrid;
       
   iun = 10 + ind;
   
@@ -124,18 +125,18 @@ int test_it(char *filename, int ind) {
     return(VGD_ERROR);
   }
 
-  if( my_vgrid.Cvgd_new_read(iun, -1, -1, -1, -1) == VGD_ERROR ) {
+  if( Cvgd_read_vgrid_from_file(&my_vgrid, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
     return(VGD_ERROR);
   }
-  //ier = my_vgrid.Cvgd_print_desc(-1, -1);
+  //ier = my_vgrid->Cvgd_print_desc(-1, -1);
 
-  if( my_vgrid.Cvgd_get_int_1d("VIPT", &i_val, NULL, quiet) ==  VGD_ERROR ) {
+  if( my_vgrid->Cvgd_get_int_1d("VIPT", &i_val, NULL, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_int for VIPT\n");
     return(VGD_ERROR);
   }
 
-  if( my_vgrid.Cvgd_get_int("NL_T", &nl_t, quiet) == VGD_ERROR){
+  if( my_vgrid->Cvgd_get_int("NL_T", &nl_t, quiet) == VGD_ERROR){
     printf("ERROR cannot Cvgd_get_int on NL_T\n");
     return(VGD_ERROR);
   }
@@ -146,14 +147,14 @@ int test_it(char *filename, int ind) {
     free(temp);
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_stda76_temp(i_val, nl_t, temp) == VGD_ERROR ) {
+  if( my_vgrid->Cvgd_stda76_temp(i_val, nl_t, temp) == VGD_ERROR ) {
     printf("ERROR with Cvgd_stda76_temp\n");
     return(VGD_ERROR);
   }
   if( compare(filename, "_stda76_temp.txt", i_val, temp, nl_t) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  ier = my_vgrid.Cvgd_get_char("RFLD", nomvar, 1);
+  ier = my_vgrid->Cvgd_get_char("RFLD", nomvar, 1);
   if(! strcmp(nomvar,"ME  ")){
     printf("   Testing pressure\n");
     pres = (float*)malloc( nl_t * sizeof(float) );
@@ -162,7 +163,7 @@ int test_it(char *filename, int ind) {
       free(pres);
       return(VGD_ERROR);
     }
-    if( my_vgrid.Cvgd_stda76_pres(i_val, nl_t, pres, NULL, NULL) == VGD_ERROR ) {
+    if( my_vgrid->Cvgd_stda76_pres(i_val, nl_t, pres, NULL, NULL) == VGD_ERROR ) {
       printf("ERROR with Cvgd_stda76_pres\n");
       return(VGD_ERROR);
     }
@@ -171,7 +172,7 @@ int test_it(char *filename, int ind) {
     }
     printf("   Testing pressure, option sfc_pres\n");
     sfc_pres=100000.;
-    if( my_vgrid.Cvgd_stda76_pres(i_val, nl_t, pres, NULL, &sfc_pres) == VGD_ERROR ) {
+    if( my_vgrid->Cvgd_stda76_pres(i_val, nl_t, pres, NULL, &sfc_pres) == VGD_ERROR ) {
       printf("ERROR with Cvgd_stda76_pres, option sfc_pres\n");
       return(VGD_ERROR);
     }
@@ -180,7 +181,7 @@ int test_it(char *filename, int ind) {
     }
     printf("   Testing pressure, option sfc_temp\n");
     sfc_temp=273.;
-    if( my_vgrid.Cvgd_stda76_pres(i_val, nl_t, pres, &sfc_temp, NULL) == VGD_ERROR ) {
+    if( my_vgrid->Cvgd_stda76_pres(i_val, nl_t, pres, &sfc_temp, NULL) == VGD_ERROR ) {
       printf("ERROR with Cvgd_stda76_pres, option sfc_pres\n");
       return(VGD_ERROR);
     }
@@ -206,9 +207,8 @@ int test_it(char *filename, int ind) {
 extern "C" void c_stda76_all() {
   
   int i, ier, status = VGD_OK;
-  vgrid my_vgrid;
 
-  ier = my_vgrid.Cvgd_putopt_int("ALLOW_SIGMA",1);
+  ier = vgrid::Cvgd_putopt_int("ALLOW_SIGMA",1);
 
   // Tests avalability and value of VGD_STDA76_SFC_T VGD_STDA76_SFC_P
     if(fabs(VGD_STDA76_SFC_T - (273.15 +15))/(273.15 +15) > 1.e-5){

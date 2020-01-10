@@ -22,6 +22,7 @@
 #include <string.h>
 #include <math.h>
 #include "vgrid.hpp"
+#include "vgrid_creators.hpp"
 #include "c_ut_report.h"
 #include "armnlib.hpp"
 
@@ -42,7 +43,7 @@ extern "C" void c_stda76_pres_from_hgts() {
   char *filename = "data/dm_21001_from_model_run_NON_SLEVE";
   char *filename_c ="data/c_stda76_pres_from_ghts.txt";
   char buff[255];
-  vgrid my_vgrid;
+  vgrid *my_vgrid;
 
   // Get any heights vertical descriptor
   if(c_fnom(&iun,filename,mode,0) < 0 ) {
@@ -53,11 +54,11 @@ extern "C" void c_stda76_pres_from_hgts() {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
     exit(1);
   }
-  if( my_vgrid.Cvgd_new_read(iun, -1, -1, -1, -1) == VGD_ERROR ) {
+  if( Cvgd_read_vgrid_from_file(&my_vgrid, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read\n");
     exit(1);
   }
-  if( my_vgrid.Cvgd_get_int("NL_M", &nl, quiet) == VGD_ERROR){
+  if( my_vgrid->Cvgd_get_int("NL_M", &nl, quiet) == VGD_ERROR){
     printf("ERROR cannot Cvgd_get_int on NL_M\n");
     exit(1);
   }
@@ -68,7 +69,7 @@ extern "C" void c_stda76_pres_from_hgts() {
     printf("Problem allocating i_val of size %d\n",nl);
     exit(1);
   }
-  if(my_vgrid.Cvgd_get_int_1d("VIPM", &i_val, NULL, quiet) ==  VGD_ERROR ) {
+  if(my_vgrid->Cvgd_get_int_1d("VIPM", &i_val, NULL, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_int for VIPM\n");
     exit(1);
   }
@@ -83,7 +84,7 @@ extern "C" void c_stda76_pres_from_hgts() {
     printf("Problem allocating hgts of size %d\n",nl);
     exit(1);
   }
-  if(my_vgrid.Cvgd_levels(1, 1, nl, i_val, hgts, &me, 0) == VGD_ERROR){
+  if(my_vgrid->Cvgd_levels(1, 1, nl, i_val, hgts, &me, 0) == VGD_ERROR){
     printf("Problem Computing heights");
     exit(1);
   }
@@ -95,7 +96,7 @@ extern "C" void c_stda76_pres_from_hgts() {
     printf("Problem allocating pres of size %d\n",nl);
     exit(1);
   }
-  if(my_vgrid.Cvgd_stda76_pres_from_hgts_list(pres, hgts, nl)
+  if(my_vgrid->Cvgd_stda76_pres_from_hgts_list(pres, hgts, nl)
      == VGD_ERROR){
     printf("Problem Computing pres from heights value");
     exit(1);
@@ -130,7 +131,7 @@ extern "C" void c_stda76_pres_from_hgts() {
   }
   printf("The following error is expected\n");
   hgts[0]=84852. + 1.;
-  if(my_vgrid.Cvgd_stda76_pres_from_hgts_list(pres,hgts,nl)
+  if(my_vgrid->Cvgd_stda76_pres_from_hgts_list(pres,hgts,nl)
      == VGD_OK){
     printf("Problem: call sould have produce a bound error by did not\n");
     exit(1);

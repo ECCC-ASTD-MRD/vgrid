@@ -22,6 +22,7 @@
 #include <string.h>
 #include <math.h>
 #include "vgrid.hpp"
+#include "vgrid_creators.hpp"
 #include "c_ut_report.h"
 #include "armnlib.hpp"
 
@@ -51,22 +52,22 @@ static float c_convip_IP2Level(int IP,int *kind) {
 }
 
 //========================================================================
-int check_gen_1001_2001_4001(vgrid my_vgrid, int vcode){
+int check_gen_1001_2001_4001(vgrid *my_vgrid, int vcode){
   int kind, kind2, version, nk, ier, k;
   int *ip1_m = NULL;
   float *hyb;
   vgrid *my_vgrid2;
 
-  if( my_vgrid.Cvgd_get_int("KIND", &kind, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_int("KIND", &kind, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_int("VERS", &version, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_int("VERS", &version, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_int("NL_M", &nk, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_int("NL_M", &nk, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_int_1d("VIPM", &ip1_m, &nk, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_int_1d("VIPM", &ip1_m, &nk, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
   hyb = (float*)malloc( nk * sizeof(float) );
@@ -84,7 +85,7 @@ int check_gen_1001_2001_4001(vgrid my_vgrid, int vcode){
     return(VGD_ERROR);
   }
   // Test equality
-  ier = my_vgrid.Cvgd_vgdcmp(my_vgrid2);
+  ier = my_vgrid->Cvgd_vgdcmp(my_vgrid2);
   if( ier != 0 ){
     printf("     Descritors not equal, Cvgd_vgdcmp code is %d\n", ier);
     return(VGD_ERROR);
@@ -116,7 +117,7 @@ int check_gen_1001_2001_4001(vgrid my_vgrid, int vcode){
     return(VGD_ERROR);
   }
   //Test equality
-  ier = my_vgrid.Cvgd_vgdcmp(my_vgrid2);
+  ier = my_vgrid->Cvgd_vgdcmp(my_vgrid2);
   if( ier != 0 ){
     printf("     Descritors not equal, Cvgd_vgdcmp code is %d\n", ier);
     return(VGD_ERROR);
@@ -128,26 +129,26 @@ int check_gen_1001_2001_4001(vgrid my_vgrid, int vcode){
   return(VGD_OK);
 }
 //========================================================================
-int check_gen_1002(vgrid my_vgrid){
+int check_gen_1002(vgrid *my_vgrid){
   int kind, kind2, version, nk, ier, k;
   int *ip1_m = NULL;
   float *hyb;
   double ptop_8;
-  vgrid my_vgrid2;
+  vgrid *my_vgrid2;
 
-  if( my_vgrid.Cvgd_get_int("KIND", &kind, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_int("KIND", &kind, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_int("VERS", &version, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_int("VERS", &version, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_int("NL_M", &nk, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_int("NL_M", &nk, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_int_1d("VIPM", &ip1_m, &nk, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_int_1d("VIPM", &ip1_m, &nk, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_double("PTOP", &ptop_8, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_double("PTOP", &ptop_8, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
   hyb = (float*)malloc( nk * sizeof(float) );
@@ -164,7 +165,7 @@ int check_gen_1002(vgrid my_vgrid){
     return(VGD_ERROR);
   }
   // Test equality
-  ier = my_vgrid.Cvgd_vgdcmp(my_vgrid2);
+  ier = my_vgrid->Cvgd_vgdcmp(my_vgrid2);
   if( ier != 0 ){
     printf("     Descritors not equal, Cvgd_vgdcmp code is %d\n", ier);
     return(VGD_ERROR);
@@ -179,7 +180,7 @@ int check_gen_1002(vgrid my_vgrid){
     return(VGD_ERROR);
   }
   //Test equality
-  ier = my_vgrid.Cvgd_vgdcmp(my_vgrid2);
+  ier = my_vgrid->Cvgd_vgdcmp(my_vgrid2);
   if( ier != 0 ){
     printf("     Descritors not equal, Cvgd_vgdcmp code is %d\n", ier);
     return(VGD_ERROR);
@@ -192,32 +193,32 @@ int check_gen_1002(vgrid my_vgrid){
 }
 
 //========================================================================
-int check_gen_5001(vgrid my_vgrid){
+int check_gen_5001(vgrid *my_vgrid){
   int kind, kind2, version, nk, ier, k;
   int *ip1_m = NULL;
   float rc_1, *hyb;
   double ptop_8, pref_8;
-  vgrid my_vgrid2;
+  vgrid *my_vgrid2;
 
-  if( my_vgrid.Cvgd_get_int("KIND", &kind, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_int("KIND", &kind, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_int("VERS", &version, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_int("VERS", &version, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_int("NL_M", &nk, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_int("NL_M", &nk, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_int_1d("VIPM", &ip1_m, &nk, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_int_1d("VIPM", &ip1_m, &nk, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_double("PTOP", &ptop_8, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_double("PTOP", &ptop_8, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_double("PREF", &pref_8, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_double("PREF", &pref_8, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_float("RC_1", &rc_1, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_float("RC_1", &rc_1, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
   hyb = (float*)malloc( nk * sizeof(float) );
@@ -235,7 +236,7 @@ int check_gen_5001(vgrid my_vgrid){
     return(VGD_ERROR);
   }
   // Test equality
-  ier = my_vgrid.Cvgd_vgdcmp(my_vgrid2);
+  ier = my_vgrid->Cvgd_vgdcmp(my_vgrid2);
   if( ier != 0 ){
     printf("     Descritors not equal, Cvgd_vgdcmp code is %d\n", ier);
     return(VGD_ERROR);
@@ -251,7 +252,7 @@ int check_gen_5001(vgrid my_vgrid){
     return(VGD_ERROR);
   }
   //Test equality
-  ier = my_vgrid.Cvgd_vgdcmp(my_vgrid2);
+  ier = my_vgrid->Cvgd_vgdcmp(my_vgrid2);
   if( ier != 0 ){
     printf("     Descritors not equal, Cvgd_vgdcmp code is %d\n", ier);
     return(VGD_ERROR);
@@ -266,32 +267,32 @@ int check_gen_5001(vgrid my_vgrid){
 }
 
 //========================================================================
-int check_gen_5002(vgrid my_vgrid){
+int check_gen_5002(vgrid *my_vgrid){
   int kind, kind2, version, nl_m, ier, nk, k;
   int *ip1_m = NULL;
   float rc_1, rc_2, *hyb;
   double ptop_8, pref_8;
-  vgrid my_vgrid2;
+  vgrid *my_vgrid2;
 
-  if( my_vgrid.Cvgd_get_int("KIND", &kind, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_int("KIND", &kind, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_int("VERS", &version, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_int("VERS", &version, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_int_1d("VIPM", &ip1_m, &nl_m, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_int_1d("VIPM", &ip1_m, &nl_m, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_double("PTOP", &ptop_8, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_double("PTOP", &ptop_8, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_double("PREF", &pref_8, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_double("PREF", &pref_8, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_float("RC_1", &rc_1, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_float("RC_1", &rc_1, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_float("RC_2", &rc_2, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_float("RC_2", &rc_2, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
   nk = nl_m - 1;
@@ -312,7 +313,7 @@ int check_gen_5002(vgrid my_vgrid){
     return(VGD_ERROR);
   }
   // Test equality
-  ier = my_vgrid.Cvgd_vgdcmp(my_vgrid2);
+  ier = my_vgrid->Cvgd_vgdcmp(my_vgrid2);
   if( ier != 0 ){
     printf("     Descritors not equal, Cvgd_vgdcmp code is %d\n", ier);
     return(VGD_ERROR);
@@ -327,7 +328,7 @@ int check_gen_5002(vgrid my_vgrid){
     return(VGD_ERROR);
   }
   //Test equality
-  ier = my_vgrid.Cvgd_vgdcmp(my_vgrid2);
+  ier = my_vgrid->Cvgd_vgdcmp(my_vgrid2);
   if( ier != 0 ){
     printf("     Descritors not equal, Cvgd_vgdcmp code is %d\n", ier);
     return(VGD_ERROR);
@@ -340,35 +341,35 @@ int check_gen_5002(vgrid my_vgrid){
   return(VGD_OK);
 }
 //========================================================================
-int check_gen_5005(vgrid my_vgrid){
+int check_gen_5005(vgrid *my_vgrid){
   int kind, kind2, version, nl, ier, nk, k;
   int *ip1_m = NULL;
   float rc_1, rc_2, *hyb, dhm, dht;
   double pref_8, ptop_out_8;
-  vgrid my_vgrid2;
+  vgrid *my_vgrid2;
 
-  if( my_vgrid.Cvgd_get_int("KIND", &kind, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_int("KIND", &kind, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_int("VERS", &version, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_int("VERS", &version, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_int_1d("VIPM", &ip1_m, &nl, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_int_1d("VIPM", &ip1_m, &nl, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_double("PREF", &pref_8, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_double("PREF", &pref_8, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_float("RC_1", &rc_1, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_float("RC_1", &rc_1, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_float("RC_2", &rc_2, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_float("RC_2", &rc_2, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_float("DHM ", &dhm, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_float("DHM ", &dhm, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_float("DHT ", &dht, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_float("DHT ", &dht, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
   nk = nl - 2;
@@ -388,7 +389,7 @@ int check_gen_5005(vgrid my_vgrid){
     return(VGD_ERROR);
   }
   // Test equality
-  ier = my_vgrid.Cvgd_vgdcmp(my_vgrid2);
+  ier = my_vgrid->Cvgd_vgdcmp(my_vgrid2);
   if( ier != 0 ){
     printf("     Descritors not equal, Cvgd_vgdcmp code is %d\n", ier);
     return(VGD_ERROR);
@@ -403,7 +404,7 @@ int check_gen_5005(vgrid my_vgrid){
     return(VGD_ERROR);
   }
   //Test equality
-  ier = my_vgrid.Cvgd_vgdcmp(my_vgrid2);
+  ier = my_vgrid->Cvgd_vgdcmp(my_vgrid2);
   if( ier != 0 ){
     printf("     Descritors not equal, Cvgd_vgdcmp code is %d\n", ier);
     return(VGD_ERROR);
@@ -417,41 +418,41 @@ int check_gen_5005(vgrid my_vgrid){
 }
 
 //========================================================================
-int check_gen_5100(vgrid my_vgrid){
+int check_gen_5100(vgrid *my_vgrid){
   int kind, kind2, version, nl, ier, nk, k;
   int *ip1_m = NULL, *ip1_t = NULL;
   float rc_1, rc_2, rc_3, rc_4, *hyb, dhm, dht;
   double pref_8, ptop_out_8;
-  vgrid my_vgrid2;
+  vgrid *my_vgrid2;
 
-  if( my_vgrid.Cvgd_get_int("KIND", &kind, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_int("KIND", &kind, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_int("VERS", &version, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_int("VERS", &version, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_int_1d("VIPM", &ip1_m, &nl, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_int_1d("VIPM", &ip1_m, &nl, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_double("PREF", &pref_8, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_double("PREF", &pref_8, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_float("RC_1", &rc_1, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_float("RC_1", &rc_1, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_float("RC_2", &rc_2, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_float("RC_2", &rc_2, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_float("RC_3", &rc_3, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_float("RC_3", &rc_3, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_float("RC_4", &rc_4, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_float("RC_4", &rc_4, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_float("DHM ", &dhm, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_float("DHM ", &dhm, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_float("DHT ", &dht, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_float("DHT ", &dht, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   }
   nk = nl - 2;
@@ -470,7 +471,7 @@ int check_gen_5100(vgrid my_vgrid){
     return(VGD_ERROR);
   }
   //Test equality
-  ier = my_vgrid.Cvgd_vgdcmp(my_vgrid2);
+  ier = my_vgrid->Cvgd_vgdcmp(my_vgrid2);
   if( ier != 0 ){
     printf("     Descritors not equal, Cvgd_vgdcmp code is %d\n", ier);
     return(VGD_ERROR);
@@ -489,7 +490,7 @@ int test_it(char *filename, int ind) {
   int ier, iun, vcode;
   iun = 10 + ind;
   char mode[]="RND+R/O";
-  vgrid my_vgrid;
+  vgrid *my_vgrid;
 
   ier = c_fnom(&iun,filename,mode,0);
   if( ier < 0 ) {
@@ -502,11 +503,11 @@ int test_it(char *filename, int ind) {
     return(VGD_ERROR);
   }
 
-  if( my_vgrid.Cvgd_new_read(iun, -1, -1, -1, -1) == VGD_ERROR ) {
+  if( Cvgd_read_vgrid_from_file(&my_vgrid, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
     return(VGD_ERROR);
   }
-  if( my_vgrid.Cvgd_get_int("VCOD", &vcode, 0) == VGD_ERROR ){
+  if( my_vgrid->Cvgd_get_int("VCOD", &vcode, 0) == VGD_ERROR ){
     printf("ERROR with  Cvgd_get_int on VCOD\n");
     return(VGD_ERROR);
   }
@@ -554,9 +555,8 @@ int test_it(char *filename, int ind) {
 extern "C" void c_new_gen_all() {
   
   int i, ier, status = VGD_OK;
-  vgrid my_vgrid;
 
-  ier = my_vgrid.Cvgd_putopt_int("ALLOW_SIGMA",1);
+  ier = vgrid::Cvgd_putopt_int("ALLOW_SIGMA",1);
 
   for (i = 0; i < (int) n_file; i++) {
     printf ("Testing %s\n", filenames[i]);

@@ -22,6 +22,7 @@
 #include <string.h>
 #include <math.h>
 #include "vgrid.hpp"
+#include "vgrid_creators.hpp"
 #include "c_ut_report.h"
 #include "armnlib.hpp"
 
@@ -42,7 +43,7 @@ extern "C" void c_stda76_hgts_from_pres() {
   char *filename = "data/dm_5001_from_model_run";
   char *filename_c ="data/c_stda76_hgts_from_pres.txt";
   char buff[255];
-  vgrid my_vgrid;
+  vgrid *my_vgrid;
 
   // Get any pressure vertical descriptor
   if(c_fnom(&iun,filename,mode,0) < 0 ) {
@@ -53,11 +54,11 @@ extern "C" void c_stda76_hgts_from_pres() {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
     exit(1);
   }
-  if( my_vgrid.Cvgd_new_read(iun, -1, -1, -1, -1) == VGD_ERROR ) {
+  if( Cvgd_read_vgrid_from_file(&my_vgrid, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read\n");
     exit(1);
   }
-  if( my_vgrid.Cvgd_get_int("NL_M", &nl, quiet) == VGD_ERROR){
+  if( my_vgrid->Cvgd_get_int("NL_M", &nl, quiet) == VGD_ERROR){
     printf("ERROR cannot Cvgd_get_int on NL_M\n");
     exit(1);
   }
@@ -67,7 +68,7 @@ extern "C" void c_stda76_hgts_from_pres() {
     printf("Problem allocating i_val of size %d\n",nl);
     exit(1);
   }
-  if(my_vgrid.Cvgd_get_int_1d("VIPM", &i_val, NULL, quiet) ==  VGD_ERROR ) {
+  if(my_vgrid->Cvgd_get_int_1d("VIPM", &i_val, NULL, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_int for VIPM\n");
     exit(1);
   }
@@ -81,7 +82,7 @@ extern "C" void c_stda76_hgts_from_pres() {
     printf("Problem allocating pres of size %d\n",nl);
     exit(1);
   }
-  if(my_vgrid.Cvgd_levels(1, 1, nl, i_val, pres, &p0, in_log) == VGD_ERROR){
+  if(my_vgrid->Cvgd_levels(1, 1, nl, i_val, pres, &p0, in_log) == VGD_ERROR){
     printf("Problem Computing pressure pres");
     exit(1);
   }
@@ -93,7 +94,7 @@ extern "C" void c_stda76_hgts_from_pres() {
     printf("Problem allocating hgts of size %d\n",nl);
     exit(1);
   }
-  if(my_vgrid.Cvgd_stda76_hgts_from_pres_list(hgts, pres, nl)
+  if(my_vgrid->Cvgd_stda76_hgts_from_pres_list(hgts, pres, nl)
      == VGD_ERROR){
     printf("Problem Computing heights from pressure value");
     exit(1);
@@ -128,7 +129,7 @@ extern "C" void c_stda76_hgts_from_pres() {
   }
   printf("The following error is expected\n");
   pres[0]=.3;
-  if(my_vgrid.Cvgd_stda76_hgts_from_pres_list(hgts,pres,nl)
+  if(my_vgrid->Cvgd_stda76_hgts_from_pres_list(hgts,pres,nl)
      == VGD_OK){
     printf("Problem: call sould have produce a bound error by did not\n");
     exit(1);
