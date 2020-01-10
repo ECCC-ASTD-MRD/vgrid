@@ -30,82 +30,67 @@
 
 void Cvgd_create_vgrid_from_vcode(vgrid **new_vgrid, int vcode)
 {
-  // Instantiate a vgrid subclass from the key, according to the vcode
+  // Instantiate a vgrid subclass on the heap, according to the vcode
   switch (vcode)
   {
   case 0001:
-    vgrid_0001 new_vgrid_0001;
-    *new_vgrid = &new_vgrid_0001;
+    *new_vgrid = new vgrid_0001();
     break;
 
   case 1001:
-    vgrid_1001 new_vgrid_1001;
-    *new_vgrid = &new_vgrid_1001;
+    *new_vgrid = new vgrid_1001();
     break;
 
   case 1002:
-    vgrid_1002 new_vgrid_1002;
-    *new_vgrid = &new_vgrid_1002;
+    *new_vgrid = new vgrid_1002();
     break;
 
   case 1003:
-    vgrid_1003 new_vgrid_1003;
-    *new_vgrid = &new_vgrid_1003;
+    *new_vgrid = new vgrid_1003();
     break;
 
   case 2001:
-    vgrid_2001 new_vgrid_2001;
-    *new_vgrid = &new_vgrid_2001;
+    *new_vgrid = new vgrid_2001();
     break;
 
   case 4001:
-    vgrid_4001 new_vgrid_4001;
-    *new_vgrid = &new_vgrid_4001;
+    *new_vgrid = new vgrid_4001();
     break;
 
   case 5001:
-    vgrid_5001 new_vgrid_5001;
-    *new_vgrid = &new_vgrid_5001;
+    *new_vgrid = new vgrid_5001();
     break;
 
   case 5002:
-    vgrid_5002 new_vgrid_5002;
-    *new_vgrid = &new_vgrid_5002;
+    *new_vgrid = new vgrid_5002();
     break;
 
   case 5003:
-    vgrid_5003 new_vgrid_5003;
-    *new_vgrid = &new_vgrid_5003;
+    *new_vgrid = new vgrid_5003();
     break;
 
   case 5004:
-    vgrid_5004 new_vgrid_5004;
-    *new_vgrid = &new_vgrid_5004;
+    *new_vgrid = new vgrid_5004();
     break;
 
   case 5005:
-    vgrid_5005 new_vgrid_5005;
-    *new_vgrid = &new_vgrid_5005;
+    *new_vgrid = new vgrid_5005();
     break;
 
   case 5100:
-    vgrid_5100 new_vgrid_5100;
-    *new_vgrid = &new_vgrid_5100;
+    *new_vgrid = new vgrid_5100();
     break;
 
   case 5999:
-    vgrid_5999 new_vgrid_5999;
-    *new_vgrid = &new_vgrid_5999;
+    *new_vgrid = new vgrid_5999();
     break;
 
   case 21001:
-    vgrid_21001 new_vgrid_21001;
-    *new_vgrid = &new_vgrid_21001;
+    *new_vgrid = new vgrid_21001();
     break;
 
   case 21002:
-    vgrid_21002 new_vgrid_21002;
-    *new_vgrid = &new_vgrid_21002;
+    *new_vgrid = new vgrid_21002();
     break;
 
   default:
@@ -186,7 +171,7 @@ int Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, int ip2, 
     return(VGD_OK);
   }
 
-  else
+  else // count != 0
   {
     // Loop on all !! records found
     for( i=0; i < count; i++)
@@ -884,7 +869,8 @@ int C_gen_legacy_desc( vgrid **my_new_vgrid, int unit, int *keylist , int nb )
       if(Cvgd_new_build_vert2(my_new_vgrid, kind, 1, nb, var.ig1, var.ig2, &ptop_8, &pref_8, &rcoef, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR )
       {
         goto bomb;
-      }	
+      }
+      break;
 
     default:
       printf("(Cvgd ERROR: in C_gen_legacy_desc, kind %d is not supported\n",kind);

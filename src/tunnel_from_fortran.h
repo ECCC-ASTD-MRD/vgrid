@@ -53,9 +53,6 @@ int Cvgd_new_gen2(int *vgdid, int kind, int version, float *hyb,
                   double *ptop_out_8, int ip1, int ip2, float *dhm, float *dht,
                   float *dhw, int avg);
 
-int Cvgd_new_read(int *vgdid, int unit, int ip1,int ip2,
-                  int kind, int version);
-
 int Cvgd_print_desc(int vgdid, int sout, int convip);
 
 int Cvgd_print_vcode_description(int vcode);
