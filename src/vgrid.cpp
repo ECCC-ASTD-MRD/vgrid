@@ -49,43 +49,43 @@ static float VGD_GRAV  = 0.980616000000E+01;
 static float VGD_TCDK  = 0.273150000000E+03;
 
 // equality operator for VGD_TFSTD_ext
-bool operator==(const VGD_TFSTD_ext& lhs, const VGD_TFSTD_ext& rhs)
-{
-  if(lhs.dateo != rhs.dateo)return false;
-  if(lhs.datev != rhs.datev)return false;
-  if(lhs.deet != rhs.deet)return false;
-  if(lhs.npas != rhs.npas)return false;
-  if(lhs.nbits != rhs.nbits)return false;
-  if(lhs.datyp != rhs.datyp)return false;
-  if(lhs.ip1 != rhs.ip1)return false;
-  if(lhs.ip2 != rhs.ip2)return false;
-  if(lhs.ip3 != rhs.ip3)return false;
-  if(lhs.ni != rhs.ni)return false;
-  if(lhs.nj != rhs.nj)return false;
-  if(lhs.nk != rhs.nk)return false;
-  if(lhs.ig1 != rhs.ig1)return false;
-  if(lhs.ig2 != rhs.ig2)return false;
-  if(lhs.ig3 != rhs.ig3)return false;
-  if(lhs.ig4 != rhs.ig4)return false;
-  if(lhs.swa != rhs.swa)return false;
-  if(lhs.lng != rhs.lng)return false;
-  if(lhs.dltf != rhs.dltf)return false;
-  if(lhs.ubc != rhs.ubc)return false;
-  if(lhs.extra1 != rhs.extra1)return false;
-  if(lhs.extra2 != rhs.extra2)return false;
-  if(lhs.extra3 != rhs.extra3)return false;
-  if(strcmp(lhs.typvar, rhs.typvar) != 0)return false;
-  if(strcmp(lhs.nomvar, rhs.nomvar) != 0)return false;
-  if(strcmp(lhs.etiket, rhs.etiket) != 0)return false;
-  if(strcmp(lhs.grtyp, rhs.grtyp) != 0)return false;
-  return true;
-}
+// bool operator==(const VGD_TFSTD_ext& lhs, const VGD_TFSTD_ext& rhs)
+// {
+//   if(lhs.dateo != rhs.dateo)return false;
+//   if(lhs.datev != rhs.datev)return false;
+//   if(lhs.deet != rhs.deet)return false;
+//   if(lhs.npas != rhs.npas)return false;
+//   if(lhs.nbits != rhs.nbits)return false;
+//   if(lhs.datyp != rhs.datyp)return false;
+//   if(lhs.ip1 != rhs.ip1)return false;
+//   if(lhs.ip2 != rhs.ip2)return false;
+//   if(lhs.ip3 != rhs.ip3)return false;
+//   if(lhs.ni != rhs.ni)return false;
+//   if(lhs.nj != rhs.nj)return false;
+//   if(lhs.nk != rhs.nk)return false;
+//   if(lhs.ig1 != rhs.ig1)return false;
+//   if(lhs.ig2 != rhs.ig2)return false;
+//   if(lhs.ig3 != rhs.ig3)return false;
+//   if(lhs.ig4 != rhs.ig4)return false;
+//   if(lhs.swa != rhs.swa)return false;
+//   if(lhs.lng != rhs.lng)return false;
+//   if(lhs.dltf != rhs.dltf)return false;
+//   if(lhs.ubc != rhs.ubc)return false;
+//   if(lhs.extra1 != rhs.extra1)return false;
+//   if(lhs.extra2 != rhs.extra2)return false;
+//   if(lhs.extra3 != rhs.extra3)return false;
+//   if(strcmp(lhs.typvar, rhs.typvar) != 0)return false;
+//   if(strcmp(lhs.nomvar, rhs.nomvar) != 0)return false;
+//   if(strcmp(lhs.etiket, rhs.etiket) != 0)return false;
+//   if(strcmp(lhs.grtyp, rhs.grtyp) != 0)return false;
+//   return true;
+// }
 
 // inequality operator for VGD_TFSTD_ext
-bool operator!=(const VGD_TFSTD_ext& lhs, const VGD_TFSTD_ext& rhs)
-{
-  return !(lhs == rhs);
-}
+// bool operator!=(const VGD_TFSTD_ext& lhs, const VGD_TFSTD_ext& rhs)
+// {
+//   return !(lhs == rhs);
+// }
 
 
 // beginning of class vgrid
@@ -2868,7 +2868,7 @@ int vgrid::Cvgd_build_from_ab(int kind, int version, int nk, int ip1, int ip2, d
   this->set_refnames();
   if(this->c_encode_vert() == VGD_ERROR)
   {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem with c_encode_vert for vcode=_%s\n",this->vcode);
+    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem with c_encode_vert for vcode=%d\n",this->vcode);
     return(VGD_ERROR);
   }
 

@@ -106,12 +106,13 @@ int Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, int ip2, 
   int error, i, ni, nj, nk;
   int toc_found = 0, count, nkeyList = MAX_DESC_REC;
   int keyList[nkeyList], status;
-  VGD_TFSTD_ext var, var2;
+  VGD_TFSTD_ext var;
   double *table, *table2;
   int table_size;
   int ni_dummy, nj_dummy, nk_dummy, istat;
   int key, kind_found, version_found, vcode;
   const int KEY_NOT_FOUND = -997;
+  vgrid *vgrid_first_found;
 
   key = KEY_NOT_FOUND;
   kind_found    = 0;
@@ -140,7 +141,7 @@ int Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, int ip2, 
   }
   
   // Get a list of !! records
-  error = c_fstinl(unit, &ni, &nj, &nk, -1, " ", ip1, ip2, -1, " ", ZNAME, keyList,
+  error = c_fstinl(unit, &ni_dummy, &nj_dummy, &nk_dummy, -1, " ", ip1, ip2, -1, " ", ZNAME, keyList,
 		   &count, nkeyList);
   if (error < 0)
   {
@@ -194,10 +195,9 @@ int Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, int ip2, 
 	// This is the first toctoc
 	toc_found = 1;
 
-	// Save the record information
+	// Save the record information.  Load var into a vgrid.
 	key = keyList[i];
-	var2 = var;
-	table_size = var2.ni*var2.nj*var2.nk;
+	table_size = var.ni*var.nj*var.nk;
 	table2 = (double*)malloc(table_size * sizeof(double));
 	istat = c_fstluk(table2, keyList[i], &ni_dummy, &nj_dummy, &nk_dummy);
 	if(istat < 0)
@@ -208,6 +208,21 @@ int Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, int ip2, 
 	}
 	kind_found    = (int) table2[0];
 	version_found = (int) table2[1];
+        vcode = kind_found*1000 + version_found;
+	try
+	{
+          Cvgd_create_vgrid_from_vcode(&vgrid_first_found, vcode);
+	}
+        catch(vgrid_exception)
+        {
+          printf("(Cvgd) ERROR in Cvgd_read_vgrid_from_file, unable to construct from a key %d, for vcode %d\n", key, vcode);
+          return(VGD_ERROR);
+        }
+        if( vgrid_first_found->C_load_var(var) == VGD_ERROR )
+        {
+          printf("(Cvgd) ERROR in Cvgd_read_vgrid_from_file: cannot load !!\n");
+          return(VGD_ERROR);
+        }
       }
       else // A matching toctoc has already been found
       {
@@ -229,17 +244,32 @@ int Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, int ip2, 
 	  free(table);
 	  return(VGD_ERROR);
 	}
+
+	// Compare the record information to that of the first matching record
+	// Load the var information into a vgrid before comparison, because not all of
+	// the var content is pertinent
 	kind_found    = (int) table[0];
 	version_found = (int) table[1];
 	free(table);
-
-	// Compare the record information to that of the first matching record
-	if (   var     != var2
-	    || kind_sought    != kind_found
-	    || version_sought != version_found
-	   )
+        vcode = kind_found*1000 + version_found;
+	try
 	{
-	  printf("(Cvgd) ERROR in Cvgd_read_vgrid_from_file, found different entries in vertical descriptors after search on ip1 = %d, ip2 = %d, kind = %d, version = %d\n",ip1,ip2,kind_found,version_found);
+          Cvgd_create_vgrid_from_vcode(my_new_vgrid, vcode);
+	}
+        catch(vgrid_exception)
+        {
+          printf("(Cvgd) ERROR in Cvgd_read_vgrid_from_file, unable to construct from a key %d, for vcode %d\n", key, vcode);
+          return(VGD_ERROR);
+        }
+        if( (*my_new_vgrid)->C_load_var(var) == VGD_ERROR )
+        {
+          printf("(Cvgd) ERROR in Cvgd_read_vgrid_from_file: cannot load !!\n");
+          return(VGD_ERROR);
+        }
+
+	if ((*my_new_vgrid)->Cvgd_vgdcmp(vgrid_first_found) != 0)
+	{
+	  printf("(Cvgd) ERROR in Cvgd_read_vgrid_from_file, found different entries in vertical descriptors after search on ip1 = %d, ip2 = %d, kind = %d, version = %d\n",ip1,ip2,kind_sought,version_sought);
 	  return(VGD_ERROR);
 	}
       } // toc_ // Loop in !!
@@ -270,7 +300,7 @@ int Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, int ip2, 
   }
 
 
-  status=(*my_new_vgrid)->Cvgd_build_from_table(table2, ni, nj, nk);
+  status=(*my_new_vgrid)->Cvgd_build_from_table(table2, var.ni, var.nj, var.nk);
   free(table2);
 
   (*my_new_vgrid)->set_match_ipig(match_ipig);
@@ -795,7 +825,7 @@ int C_gen_legacy_desc( vgrid **my_new_vgrid, int unit, int *keylist , int nb )
       printf("(Cvgd)   sigma coordinate found\n");
       if( ((vgrid_1001*)(*my_new_vgrid))->C_genab(hyb, nb, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
       {
-	goto bomb;
+      	goto bomb;
       }
       if(Cvgd_new_build_vert2(my_new_vgrid, kind, 1, nb, var.ig1, var.ig2, NULL, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR )
       {
@@ -808,6 +838,10 @@ int C_gen_legacy_desc( vgrid **my_new_vgrid, int unit, int *keylist , int nb )
       // PT PT PT PT PT PT PT PT PT PT PT PT PT PT PT
       //---------------------------------------------
       printf("(Cvgd)   eta coordinate found\n");
+      if( vgrid::C_get_consistent_pt_e1(unit, &ptop,"PT  ") == VGD_ERROR ){
+	printf("(Cvgd) ERROR in C_gen_legacy_desc, consistency check on PT failed\n");
+	goto bomb;
+      }
       ptop_8 = ptop*100.;
       if( ((vgrid_1002*)(*my_new_vgrid))->C_genab(hyb, nb, &ptop_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR )
       {	  

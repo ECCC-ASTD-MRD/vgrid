@@ -358,7 +358,7 @@ contains
       integer, target,optional, intent(in) :: version     ! Level version requested by user.
       
       ! Local variables
-      type(c_ptr) :: vgdid_p
+      type(c_ptr) :: vgdid_p, table_8_cptr
       integer :: ni,nj,nk, istat, error, l_ip1, l_ip2, l_kind, l_version
       character(len=100) :: myformat
       real(kind=8), dimension(:,:,:), pointer :: table_8
@@ -397,6 +397,25 @@ contains
             print*,'(F_vgd) ERROR: In read_vgrid_from_file, problem with f_read_vgrid_from_file'
             return
          endif
+      case ('BIN')
+         read(unit) ni,nj,nk
+         allocate(table_8(ni,nj,nk),stat=istat)
+         if (istat /= 0) then
+            write(for_msg,*) 'unable to allocate table_8'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            return
+         endif
+         read(unit) table_8
+         print*,'table_8(1:3,1,1)',table_8(1:3,1,1)
+
+         table_8_cptr = c_loc(table_8(1,1,1))
+         error = f_new_from_table(vgdid,table_8_cptr,ni,nj,nk)
+         if (error < 0) then
+            write(for_msg,*) 'In new_read, problem creating record information'
+            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            return
+         endif
+         
       case DEFAULT
          write(for_msg,*) 'invalid constructor format request ',trim(myformat)
          call msg(MSG_ERROR,VGD_PRFX//for_msg)

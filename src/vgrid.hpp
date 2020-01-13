@@ -76,8 +76,8 @@ int my_alloc_float(float **vec, int size, char *message);
 int my_alloc_double(double **vec, int size, char *message);
 void my_copy_double(double *aa, double **bb, int ind);
 void my_copy_int(int *aa, int **bb, int ind);
-bool operator==(const VGD_TFSTD_ext& lhs, const VGD_TFSTD_ext& rhs);
-bool operator!=(const VGD_TFSTD_ext& lhs, const VGD_TFSTD_ext& rhs);
+//bool operator==(const VGD_TFSTD_ext& lhs, const VGD_TFSTD_ext& rhs);
+//bool operator!=(const VGD_TFSTD_ext& lhs, const VGD_TFSTD_ext& rhs);
 
 
 class vgrid

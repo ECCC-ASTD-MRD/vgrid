@@ -94,6 +94,9 @@ int vgrid_0001::c_decode_vert()
 
 int vgrid_0001::c_encode_vert()
 {
+  this->table_ni = 3;
+  this->table_nk = 1;
+
   //Fill header
   this->table[0] = this->kind;
   this->table[1] = this->version;
@@ -192,6 +195,9 @@ int vgrid_1001::c_decode_vert()
 
 int vgrid_1001::c_encode_vert()
 {
+  this->table_ni = 3;
+  this->table_nk = 1;
+
   //Fill header
   this->table[0] = this->kind;
   this->table[1] = this->version;
@@ -344,6 +350,9 @@ int vgrid_1002::c_decode_vert()
 
 int vgrid_1002::c_encode_vert()
 {
+  this->table_ni = 3;
+  this->table_nk = 1;
+
   //Fill header
   this->table[0] = this->kind;
   this->table[1] = this->version;
@@ -439,6 +448,9 @@ int vgrid_1002::C_genab(float *etauser, int nk, double *ptop_8, double **a_m_8, 
 // ########## common to classes vgrid_1003, vgrid_5001 ##########
 int vgrid_1003_5001::c_encode_vert()
 {
+  this->table_ni = 3;
+  this->table_nk = 1;
+
   //Fill header
   this->table[0] = this->kind;
   this->table[1] = this->version;
@@ -705,6 +717,9 @@ int vgrid_2001::c_decode_vert()
 
 int vgrid_2001::c_encode_vert()
 {
+  this->table_ni = 3;
+  this->table_nk = 1;
+
   //Fill header
   this->table[0] = this->kind;
   this->table[1] = this->version;
@@ -843,6 +858,9 @@ int vgrid_4001::c_decode_vert()
 
 int vgrid_4001::c_encode_vert()
 {
+  this->table_ni = 3;
+  this->table_nk = 1;
+
   //Fill header
   this->table[0] = this->kind;
   this->table[1] = this->version;
@@ -1125,6 +1143,9 @@ int vgrid_5002_5003_5004_5005::c_decode_vert()
 
 int vgrid_5002_5003_5004_5005::c_encode_vert()
 {
+  this->table_ni = 3;
+  this->table_nk = 1;
+
   //Fill header
   this->table[0] = this->kind;
   this->table[1] = this->version;
@@ -2007,6 +2028,9 @@ int vgrid_5100::c_decode_vert()
 
 int vgrid_5100::c_encode_vert()
 {
+  this->table_ni = 4;
+  this->table_nk = 1;
+
   //Fill header
   this->table[0] = this->kind;
   this->table[1] = this->version;
@@ -2140,6 +2164,9 @@ int vgrid_5999::c_encode_vert()
       }
     }
   }
+
+  this->table_ni = 3;
+  this->table_nk = 1;
 
   //Fill header
   this->table[0] = this->kind;
@@ -2466,6 +2493,9 @@ int vgrid_21001::c_decode_vert()
 
 int vgrid_21001::c_encode_vert()
 {
+  this->table_ni = 4;
+  this->table_nk = 1;
+
   //Fill header
   this->table[0] = this->kind;
   this->table[1] = this->version;
@@ -2873,6 +2903,9 @@ int vgrid_21002::c_decode_vert()
 
 int vgrid_21002::c_encode_vert()
 {
+  this->table_ni = 4;
+  this->table_nk = 1;
+
   //Fill header
   this->table[0] = this->kind;
   this->table[1] = this->version;
