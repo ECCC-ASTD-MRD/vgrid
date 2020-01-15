@@ -23,7 +23,7 @@ DESCRIP_PATH = ../src
 OBJECTS = unit_testing.o c_ut_report.o
 
 UNIT_TEST_F: $(OBJECTS) UNIT_TEST_F.F90 $(DESCRIP_PATH)/libvgrid.a
-	# Ne trmake touve pas msg avec commande suivnate (ajouter  UNIT_TEST_F.o a liste OBJECTS = pour tester)
+	# Ne trtouve pas msg avec commande suivante (ajouter  UNIT_TEST_F.o a liste OBJECTS = pour tester)
 	# s.f90 $(OBJECTS) -o UNIT_TEST_F -I$(DESCRIP_PATH) -L$(DESCRIP_PATH) -lrmn -vgrid $(OPENMP) $(MY_FFLAGS) $(FFLAGS)
 	s.compile $(OPENMP) -optf "=$(MY_FFLAGS) $(FFLAGS)" -includes $(DESCRIP_PATH) -src UNIT_TEST_F.F90 -o UNIT_TEST_F -obj $(OBJECTS) -libpath $(DESCRIP_PATH) $(GFORTRAN_LIB) -librmn $(RMN) -libappl vgrid $(EFENCE)
 

@@ -294,9 +294,9 @@ void c_hypsometric (float *pkp, float pk, float Tk, float gammaT, float zk, floa
   // Compute pressure pkp which is at top of the following atmopheric layer
   //
   //  \(pkp,zkp)
-  //   \  
+  //   \
   //    \ gammaT (laspe rate in the layer, may be zero or very small)
-  //     \  
+  //     \
   //      \(Tk,pk,zk) 
   //
   static float epsilon = 1.e-6;
@@ -314,9 +314,9 @@ static int c_set_stda_layer(int ind, float Tk, float pk, float *zk, float *zkp, 
   //Example of a Standard Atmophere Layer
   //
   //  \(pkp,zkp)
-  //   \  
+  //   \
   //    \ gammaT (laspe rate in the layer)
-  //     \  
+  //     \
   //      \(Tk,pk,zk) 
   //
   //Where
