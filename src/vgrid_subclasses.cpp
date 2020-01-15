@@ -33,6 +33,7 @@ vgrid_0001::vgrid_0001() : vgrid()
   this->vcode   = 0001;
   this->skip    = 1;  // Could be changed by c_decode_vert
   this->table_ni = 3;
+  this->table_nk = 1;
 }
 
 vgrid_0001::vgrid_0001(int key) : vgrid()
@@ -141,6 +142,7 @@ vgrid_1001::vgrid_1001() : vgrid()
   this->vcode   = 1001;
   this->skip    = 2; // Could be changed by c_decode_vert
   this->table_ni = 3;
+  this->table_nk = 1;
   strcpy(this->ref_name,"P0  ");
 }
 
@@ -294,6 +296,7 @@ vgrid_1002::vgrid_1002() : vgrid()
   this->vcode   = 1002;
   this->skip    = 2; // Could be changed by c_decode_vert
   this->table_ni = 3;
+  this->table_nk = 1;
   strcpy(this->ref_name,"P0  ");
 }
 
@@ -546,6 +549,8 @@ void vgrid_1002::fstd_subinit()
 // ########## class 1003 ##########
 vgrid_1003_5001::vgrid_1003_5001() : vgrid()
 {
+  this->table_ni = 3;
+  this->table_nk = 1;
 }
 
 void vgrid_1003_5001::set_table_nj(int nk)
@@ -558,7 +563,7 @@ vgrid_1003::vgrid_1003() : vgrid_1003_5001()
   this->kind    = 1;
   this->version = 3;
   this->vcode   = 1003;
-  this->skip    = 0; // Could be change by c_decode_vert
+  this->skip    = 9; // Could be changed by c_decode_vert
   strcpy(this->ref_name,"P0  ");
 }
 
@@ -665,6 +670,7 @@ vgrid_2001::vgrid_2001() : vgrid()
   this->vcode   = 2001;
   this->skip    = 1;
   this->table_ni = 3;
+  this->table_nk = 1;
 }
 
 vgrid_2001::vgrid_2001(int key) : vgrid()
@@ -806,6 +812,7 @@ vgrid_4001::vgrid_4001() : vgrid()
   this->vcode = 4001;
   this->skip    = 1; // Could be changed by c_decode_vert
   this->table_ni = 3;
+  this->table_nk = 1;
 }
 
 vgrid_4001::vgrid_4001(int key) : vgrid()
@@ -952,7 +959,6 @@ vgrid_5001::vgrid_5001() : vgrid_1003_5001()
   this->version = 1;
   this->vcode   = 5001;
   this->skip    = 3;
-  this->table_ni = 3;
   strcpy(this->ref_name,"P0  ");
 }
 
@@ -1054,6 +1060,8 @@ int vgrid_5001::C_genab(float *hybuser, int nk, float rcoef, double ptop_8, doub
 // ########## common to classes vgrid_5002, vgrid_5003, vgrid_5004, vgrid_5005 ##########
 vgrid_5002_5003_5004_5005::vgrid_5002_5003_5004_5005() : vgrid()
 {
+  this->table_ni = 3;
+  this->table_nk = 1;
 }
 
 void vgrid_5002_5003_5004_5005::set_table_nj(int nk)
@@ -1376,7 +1384,6 @@ vgrid_5002::vgrid_5002() : vgrid_5002_5003_5004_5005()
   this->vcode   = 5002;
   this->skip    = 3; // Could be changed by c_decode_vert
   this->k_plus_top = 1;
-  this->table_ni = 3;
 }
 
 vgrid_5002::vgrid_5002(int key) : vgrid_5002_5003_5004_5005()
@@ -1401,7 +1408,6 @@ vgrid_5003::vgrid_5003() : vgrid_5002_5003_5004_5005()
   this->vcode   = 5003;
   this->skip    = 3; // Could be changed by c_decode_vert
   this->k_plus_top = 1;
-  this->table_ni = 3;
 }
 
 vgrid_5003::vgrid_5003(int key) : vgrid_5002_5003_5004_5005()
@@ -1425,7 +1431,6 @@ vgrid_5004::vgrid_5004() : vgrid_5002_5003_5004_5005()
   this->version = 4;
   this->vcode   = 5004;
   this->skip    = 3; // Could be changed by c_decode_vert
-  this->table_ni = 3;
 }
 
 vgrid_5004::vgrid_5004(int key) : vgrid_5002_5003_5004_5005()
@@ -1590,7 +1595,6 @@ vgrid_5005::vgrid_5005() : vgrid_5002_5003_5004_5005()
   this->version = 5;
   this->vcode   = 5005;
   this->skip    = 3; // Could be changed by c_decode_vert
-  this->table_ni = 3;
   strcpy(this->ref_name,"P0  ");
 }
 
@@ -1756,6 +1760,7 @@ vgrid_5100::vgrid_5100() : vgrid()
   this->vcode   = 5100;
   this->skip    = 3; // Could be changed by c_decode_vert
   this->table_ni = 4;
+  this->table_nk = 1;
   strcpy(this->ref_name,"P0  ");
   strcpy(this->ref_namel,"P0LS");
 }
@@ -2089,6 +2094,7 @@ vgrid_5999::vgrid_5999() : vgrid()
   this->vcode   = 5999;
   this->skip    = 2; // Could be changed by c_decode_vert
   this->table_ni = 3;
+  this->table_nk = 1;
   strcpy(this->ref_name,"P0  ");
 }
 
@@ -2217,6 +2223,7 @@ vgrid_21001::vgrid_21001() : vgrid()
   this->vcode   = 21001;
   this->skip    = 3; // Could be changed by c_decode_vert
   this->table_ni = 4;
+  this->table_nk = 1;
   strcpy(this->ref_name,"ME  ");
   strcpy(this->ref_namel,"MELS");
   if (   fabs( this->rcoef3 - this->rcoef1 ) < 1.0e-6
@@ -2561,6 +2568,7 @@ vgrid_21002::vgrid_21002() : vgrid()
   this->vcode   = 21002;
   this->skip    = 3; // Could be changed by c_decode_vert
   this->table_ni = 4;
+  this->table_nk = 1;
 
   // To have a complete set of levels parameters, we need all momentum and Vertical-Velocity
   // levels, the thermo levels set only differs for the diag level. Therefor we only write
