@@ -204,6 +204,12 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
          p0ls = 0.
       endif
    endif
+
+   !print*,'p0(minx,miny),pres(minx,miny,G_nk)',p0(minx,miny),pres(minx,miny,G_nk)
+   !print*,'shape(p0)',shape(p0)
+   !print*,'shape(pres)',shape(pres)
+   !print*,'lbound(p0,1),ubound(p0,1)',lbound(p0,1),ubound(p0,1)
+   !print*,'lbound(pres,1),ubound(pres,1)',lbound(pres,1),ubound(pres,1)
       
    allocate(p0_8(minx:maxx,miny:maxy),p0ls_8(minx:maxx,miny:maxy),pres_8(minx:maxx,miny:maxy,G_nk))
    p0_8=p0
@@ -219,14 +225,6 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
       return
    endif
 
-   
-   !print*,'p0(minx,miny),pres(minx,miny,G_nk)',p0(minx,miny),pres(minx,miny,G_nk)
-   !print*,'shape(p0)',shape(p0)
-   !print*,'shape(pres)',shape(pres)
-   !print*,'lbound(p0,1),ubound(p0,2)',lbound(p0,1),ubound(p0,2)
-   !print*,'lbound(pres,1),ubound(pres,2)',lbound(pres,1),ubound(pres,2)
-   !stop
-   
    do k=1,infon
       ier = fstprm(liste(k),dateo,deet,npas,ni,nj,nk,nbits,datyp, &
            ip1,ip2,ip3,typvar,nomvar,etiket,grtyp,ig1,ig2,ig3,ig4,swa,lng, &
