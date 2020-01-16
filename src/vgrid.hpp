@@ -137,7 +137,6 @@ private:
   static int same_vec_i(int *vec1, int n1, int *vec2, int n2);
   static int same_vec_r8(double *vec1, int n1, double *vec2, int n2);
   static int similar_vec_r8(double *vec1, int n1, double *vec2, int n2);  static int Cvgd_FindIp1Idx(int Ip1,int *Lst,int Size);
-  virtual void set_refnames();
 
 protected:
   static void flip_transfer_d2c(char *name, double val_8);
@@ -146,6 +145,7 @@ protected:
   static int c_convip_Level2IP_old_style(float level, int kind);
   static double c_comp_diag_a_height(double pref_8, float height);
   static double c_comp_diag_a_ip1(double pref_8, int ip1);
+  virtual void set_refnames();
 
 
 public:
@@ -173,7 +173,7 @@ public:
   int Cvgd_set_vcode_i(int Kind,int Version);
   int fstd_init();
   int Cvgd_set_vcode();
-  int Cvgd_build_from_ab(int kind, int version, int nk, int ip1, int ip2,
+  int Cvgd_build_from_ab_old(int kind, int version, int nk, int ip1, int ip2,
 			 double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2,
 			 float *rcoef3, float *rcoef4, double *a_m_8, double *b_m_8,
 			 double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8,

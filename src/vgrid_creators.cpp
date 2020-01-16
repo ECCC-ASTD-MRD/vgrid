@@ -380,7 +380,7 @@ int Cvgd_new_build_vert2(vgrid **my_new_vgrid, int kind, int version, int nk, in
     return(VGD_ERROR);
   }
 
-  status=(*my_new_vgrid)->Cvgd_build_from_ab(
+  status=(*my_new_vgrid)->Cvgd_build_from_ab_old(
 			    kind, version, nk, ip1, ip2,
 			    ptop_8, pref_8, rcoef1, rcoef2,
 			    rcoef3, rcoef4, a_m_8, b_m_8,
@@ -461,6 +461,28 @@ int Cvgd_new_gen2(vgrid **my_new_vgrid, int kind, int version, float *hyb, int s
 
 
 
+//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+//
+// VCODE-SPECIFIC CREATORS
+//
+//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+int Create_from_ab_2001(vgrid** new_vgrid, int ip1, int ip2, double *a_m_8,
+			double *b_m_8, int *ip1_m, int nl_m)
+{
+  try
+  {
+    Cvgd_create_vgrid_from_vcode(new_vgrid, 2001);
+    ((vgrid_2001*)(*new_vgrid))->Cvgd_build_from_ab(ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m);
+  }
+  catch(vgrid_exception)
+  {
+    printf("(Cvgd) ERROR in Create_from_ab_2001\n");
+    return(VGD_ERROR);
+  }
+}
+
+
+
 
 
 int Cvgd_new_build_vert(vgrid **my_new_vgrid, int kind, int version, int nk, int ip1, int ip2, double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2,
@@ -488,16 +510,6 @@ int Cvgd_new_build_vert_1002(vgrid **my_new_vgrid, int ip1, int ip2, double ptop
   if( Cvgd_new_build_vert2(my_new_vgrid, 1, 2, nk, ip1, ip2, &ptop_8, NULL, NULL, NULL, NULL, NULL,
 		       a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1_m, NULL, NULL, nk, 0, 0) == VGD_ERROR ){
     printf("(Cvgd) ERROR with Cvgd_new_build_vert_1001 see details above\n");
-    return(VGD_ERROR);
-  }
-  return(VGD_OK);
-}
-
-int Cvgd_new_build_vert_2001(vgrid **my_new_vgrid, int ip1, int ip2, 
-			     double *a_m_8, double *b_m_8, int *ip1_m, int nk){
-  if( Cvgd_new_build_vert2(my_new_vgrid, 2, 1, nk, ip1, ip2, NULL, NULL, NULL, NULL, NULL, NULL,
-		       a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1_m, NULL, NULL, nk, 0, 0) == VGD_ERROR ){
-    printf("(Cvgd) ERROR with Cvgd_new_build_vert_2001 see details above\n");
     return(VGD_ERROR);
   }
   return(VGD_OK);

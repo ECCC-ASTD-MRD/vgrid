@@ -39,6 +39,7 @@ module vGrid_Descriptors
    public :: vgd_get                             !get instance variable value
    public :: vgd_put                             !set instance variable value
    public :: read_vgrid_from_file                !class constructor
+   public :: Create_from_ab_2001                 !class constructor
    public :: vgd_new                             !class constructor
    public :: vgd_getopt                          !get class variable value
    public :: vgd_putopt                          !set class variable value
@@ -216,6 +217,15 @@ module vGrid_Descriptors
          type(c_ptr), value :: vgdid
          integer (c_int), value :: unit, ip1, ip2, kind, version
       end function f_read_vgrid_from_file
+
+      integer(c_int) function f_create_from_ab_2001(vgdid, ip1, ip2, a_m_8, b_m_8, &
+                       ip1_m, nl_m) bind(c, name='Create_from_ab_2001')
+         use iso_c_binding, only : c_ptr, c_int, c_char
+         type(c_ptr),     value :: vgdid
+         integer (c_int), value :: ip1, ip2
+         type(c_ptr),     value :: a_m_8, b_m_8, ip1_m
+         integer (c_int), value :: nl_m
+      end function f_create_from_ab_2001
       
       integer(c_int) function f_new_from_table(vgdid, table_CP, ni, nj, nk) bind(c, name='Cvgd_new_from_table')
          use iso_c_binding, only : c_ptr, c_int
@@ -424,7 +434,32 @@ contains
 
       status = VGD_OK
 
-   end function read_vgrid_from_file
+    end function read_vgrid_from_file
+
+    integer function Create_from_ab_2001(vgdid, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m &
+                                        ) result(status)
+      integer, target :: vgdid
+      integer :: ip1, ip2
+      real(kind=8), dimension(:) :: a_m_8, b_m_8, ip1_m
+      integer :: nl_m
+
+      type(c_ptr) :: vgdid_p, a_m_8_p, b_m_8_p, ip1_m_p
+      vgdid_p = c_loc(vgdid)
+      a_m_8_p = c_loc(a_m_8)
+      b_m_8_p = c_loc(b_m_8)
+      ip1_m_p = c_loc(ip1_m)
+
+      status = VGD_ERROR
+
+      if( f_create_from_ab_2001(vgdid_p, ip1, ip2, a_m_8_p, b_m_8_p, ip1_m_p, nl_m &
+                               )== VGD_ERROR )then
+        print*,'(F_vgd) ERROR: In Create_from_ab_2001'
+        return
+      end if
+
+      status = VGD_OK
+      return
+    end function Create_from_ab_2001
 
     integer function new_from_table(vgdid,table) result(status)
        ! Coordinate constructor - build vertical descriptor from table input

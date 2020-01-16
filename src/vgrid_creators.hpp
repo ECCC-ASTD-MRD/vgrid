@@ -58,6 +58,11 @@ int Cvgd_new_gen2(vgrid **my_new_vgrid, int kind, int version, float *hyb, int s
 
 
 
+int Create_from_ab_2001(vgrid** new_vgrid, int ip1, int ip2, double *a_m_8,
+			double *b_m_8, int *ip1_m, int nl_m);
+
+
+
 
 // Front ends to call Cvgd_new_build_vert2 to create a vgrid
 int Cvgd_new_build_vert(vgrid **my_new_vgrid, int kind, int version, int nk, int ip1, int ip2, double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2,
@@ -65,8 +70,6 @@ int Cvgd_new_build_vert(vgrid **my_new_vgrid, int kind, int version, int nk, int
 int Cvgd_new_build_vert_1001(vgrid **my_new_vgrid, int ip1, int ip2, 
 			     double *a_m_8, double *b_m_8, int *ip1_m, int nk);
 int Cvgd_new_build_vert_1002(vgrid **my_new_vgrid, int ip1, int ip2, double ptop_8,
-			     double *a_m_8, double *b_m_8, int *ip1_m, int nk);
-int Cvgd_new_build_vert_2001(vgrid **my_new_vgrid, int ip1, int ip2, 
 			     double *a_m_8, double *b_m_8, int *ip1_m, int nk);
 int Cvgd_new_build_vert_4001(vgrid **my_new_vgrid, int ip1, int ip2, 
 			     double *a_m_8, double *b_m_8, int *ip1_m, int nk);
