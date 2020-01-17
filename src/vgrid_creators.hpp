@@ -58,6 +58,9 @@ int Cvgd_new_gen2(vgrid **my_new_vgrid, int kind, int version, float *hyb, int s
 
 
 
+int Create_from_ab_1001(vgrid** new_vgrid, int ip1, int ip2, double *a_m_8, double *b_m_8,
+                         int *ip1_m, int nl_m);
+
 int Create_from_ab_2001(vgrid** new_vgrid, int ip1, int ip2, double *a_m_8,
 			double *b_m_8, int *ip1_m, int nl_m);
 

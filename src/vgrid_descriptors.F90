@@ -218,6 +218,14 @@ module vGrid_Descriptors
          integer (c_int), value :: unit, ip1, ip2, kind, version
       end function f_read_vgrid_from_file
 
+      integer(c_int) function f_create_from_ab_1001(vgdid, ip1, a_m_8, b_m_8, ip1_m, nl_m) bind(c, name='Create_from_ab_1001')
+         use iso_c_binding, only : c_ptr, c_int, c_char
+         type(c_ptr),     value :: vgdid
+         integer (c_int), value :: ip1
+         type(c_ptr),     value :: a_m_8, b_m_8, ip1_m
+         integer (c_int), value :: nl_m
+      end function f_create_from_ab_1001
+
       integer(c_int) function f_create_from_ab_2001(vgdid, ip1, ip2, a_m_8, b_m_8, &
                        ip1_m, nl_m) bind(c, name='Create_from_ab_2001')
          use iso_c_binding, only : c_ptr, c_int, c_char
@@ -435,6 +443,31 @@ contains
       status = VGD_OK
 
     end function read_vgrid_from_file
+
+    integer function Create_from_ab_1001(vgdid, ip1, a_m_8, b_m_8, ip1_m, nl_m &
+                                        ) result(status)
+      integer, target :: vgdid
+      integer :: ip1
+      real(kind=8), dimension(:) :: a_m_8, b_m_8, ip1_m
+      integer :: nl_m, nl_t, nl_w
+
+      type(c_ptr) :: vgdid_p, a_m_8_p, b_m_8_p, ip1_m_p
+      vgdid_p = c_loc(vgdid)
+      a_m_8_p = c_loc(a_m_8)
+      b_m_8_p = c_loc(b_m_8)
+      ip1_m_p = c_loc(ip1_m)
+
+      status = VGD_ERROR
+
+      if( f_create_from_ab_1001(vgdid_p, ip1, a_m_8_p, b_m_8_p, ip1_m_p, nl_m &
+                               )== VGD_ERROR )then
+        print*,'(F_vgd) ERROR: In Create_from_ab_1001'
+        return
+      end if
+
+      status = VGD_OK
+      return
+    end function Create_from_ab_1001
 
     integer function Create_from_ab_2001(vgdid, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m &
                                         ) result(status)

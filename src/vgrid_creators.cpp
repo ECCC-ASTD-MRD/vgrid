@@ -466,6 +466,21 @@ int Cvgd_new_gen2(vgrid **my_new_vgrid, int kind, int version, float *hyb, int s
 // VCODE-SPECIFIC CREATORS
 //
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+int Create_from_ab_1001(vgrid** new_vgrid, int ip1, int ip2, double *a_m_8, double *b_m_8,
+                         int *ip1_m, int nl_m)
+{
+  try
+  {
+    Cvgd_create_vgrid_from_vcode(new_vgrid, 1001);
+    ((vgrid_1001*)(*new_vgrid))->Cvgd_build_from_ab(ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m);
+  }
+  catch(vgrid_exception)
+  {
+    printf("(Cvgd) ERROR in Create_from_ab_1001\n");
+    return(VGD_ERROR);
+  }
+}
+
 int Create_from_ab_2001(vgrid** new_vgrid, int ip1, int ip2, double *a_m_8,
 			double *b_m_8, int *ip1_m, int nl_m)
 {
@@ -514,6 +529,7 @@ int Cvgd_new_build_vert_1002(vgrid **my_new_vgrid, int ip1, int ip2, double ptop
   }
   return(VGD_OK);
 }
+
 int Cvgd_new_build_vert_4001(vgrid **my_new_vgrid, int ip1, int ip2, 
 			     double *a_m_8, double *b_m_8, int *ip1_m, int nk){
   if( Cvgd_new_build_vert2(my_new_vgrid, 4, 1, nk, ip1, ip2, NULL, NULL, NULL, NULL, NULL, NULL,
@@ -523,6 +539,7 @@ int Cvgd_new_build_vert_4001(vgrid **my_new_vgrid, int ip1, int ip2,
   }
   return(VGD_OK);
 }
+
 int Cvgd_new_build_vert_5999(vgrid **my_new_vgrid, int ip1, int ip2, 
 			     double *a_m_8, double *b_m_8, int *ip1_m, int nk){
   if( Cvgd_new_build_vert2(my_new_vgrid, 5, 999, nk, ip1, ip2, NULL, NULL, NULL, NULL, NULL, NULL,

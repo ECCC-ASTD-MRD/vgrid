@@ -90,8 +90,7 @@ int check_build_1001_2001_5999_4001(vgrid *my_vgrid, int vcode){
   my_vgrid2 = nullptr;
   switch(vcode) {
   case 1001:
-    if( Cvgd_new_build_vert_1001(&my_vgrid2, -1, -1,
-				 a_m_8, b_m_8, ip1_m, nk) == VGD_ERROR) {
+    if( Create_from_ab_1001(&my_vgrid2, -1, -1, a_m_8, b_m_8, ip1_m, nk) == VGD_ERROR) {
       return(VGD_ERROR);
     }
     break;
