@@ -91,4 +91,6 @@ int Create_from_ab_1003(int *vgdid, int ip1, int ip2, double ptop_8, double pref
 			double *b_m_8, int *ip1_m, int nl_m);
 int Create_from_ab_2001(int *vgdid, int ip1, int ip2, double *a_m_8, double *b_m_8,
 			int *ip1_m, int nl_m);
+int Create_from_ab_4001(int *vgdid, int ip1, int ip2, double *a_m_8, double *b_m_8,
+                        int *ip1_m, int nl_m);
 #endif
