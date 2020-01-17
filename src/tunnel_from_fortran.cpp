@@ -206,7 +206,21 @@ int Create_from_ab_1001(int *vgdid, int ip1, int ip2, double *a_m_8, double *b_m
   vgrid *my_vgd;
   int status;
 
-  status=Create_from_ab_2001(&my_vgd, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m);
+  status=Create_from_ab_1001(&my_vgd, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m);
+  if(status != VGD_ERROR)
+    {
+      *vgdid=grid_check.get_tag(my_vgd);
+    }
+  return status;
+}
+
+int Create_from_ab_1002(int *vgdid, int ip1, int ip2, double ptop_8, double *a_m_8,
+			double *b_m_8, int *ip1_m, int nl_m)
+{
+  vgrid *my_vgd;
+  int status;
+
+  status=Create_from_ab_1002(&my_vgd, ip1, ip2, ptop_8, a_m_8, b_m_8, ip1_m, nl_m);
   if(status != VGD_ERROR)
     {
       *vgdid=grid_check.get_tag(my_vgd);
