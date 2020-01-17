@@ -73,6 +73,8 @@ public:
   vgrid_1003_5001();
   int c_decode_vert();
   int c_encode_vert();
+  int Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_8, float rcoef1,
+			 double *a_m_8, double *b_m_8, int *ip1_m, int nl_m);
 private:
   void set_table_nj(int nk);
 };

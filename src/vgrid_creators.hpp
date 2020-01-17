@@ -62,6 +62,9 @@ int Create_from_ab_1001(vgrid** new_vgrid, int ip1, int ip2, double *a_m_8, doub
                          int *ip1_m, int nl_m);
 int Create_from_ab_1002(vgrid** new_vgrid, int ip1, int ip2, double ptop_8,
 			double *a_m_8, double *b_m_8, int *ip1_m, int nl_m);
+int Create_from_ab_1003(vgrid** new_vgrid, int ip1, int ip2, double ptop_8,
+			double pref_8, float rcoef1,
+			double *a_m_8, double *b_m_8, int *ip1_m, int nl_m);
 int Create_from_ab_2001(vgrid** new_vgrid, int ip1, int ip2, double *a_m_8,
 			double *b_m_8, int *ip1_m, int nl_m);
 
