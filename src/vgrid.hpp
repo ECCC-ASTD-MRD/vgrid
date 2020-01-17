@@ -151,6 +151,7 @@ protected:
 public:
   int is_valid(int *table_valid);
   int is_option(int *table_option);
+
   int Cvgd_is_valid(char *valid_table_name);
   int is_required_double(double *ptr, int *table_valid, char *message);
   int is_required_float(float *ptr, int *table_valid, char *message);
@@ -248,6 +249,7 @@ public:
 
 protected:
   virtual void set_table_nj(int nk) = 0;
+  int allocate_and_fill_table(int nk);
   int allocate_table(int nk);
   virtual void fstd_subinit() = 0;  // subclass-specific assignments to initialize the fstd record
 

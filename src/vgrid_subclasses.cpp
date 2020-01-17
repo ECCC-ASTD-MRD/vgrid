@@ -429,27 +429,11 @@ int vgrid_1001::Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_
   }
   my_copy_int(ip1_m, &(this->ip1_m), nl_m);
 
-
-
-  // Fill the table (encode the vertical co-ordinate)
-  if(this->allocate_table(nk) == VGD_ERROR)
+  if(this->allocate_and_fill_table(nk) == VGD_ERROR)
   {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem with allocate_table for vcode=%d\n",this->vcode);
+    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem filling in the table\n");
     return(VGD_ERROR);
-  }
-  this->set_refnames();
-  if(this->c_encode_vert() == VGD_ERROR)
-  {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem with c_encode_vert for vcode=%d\n",this->vcode);
-    return(VGD_ERROR);
-  }
-
-
-  this->valid = 1;
-  if(this->fstd_init() == VGD_ERROR)
-  {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem with fstd_init\n");
-  }
+  };
 
   return(VGD_OK);
 }
@@ -1003,28 +987,11 @@ int vgrid_2001::Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_
   }
   my_copy_int(ip1_m, &(this->ip1_m), nl_m);
 
-
-
-
-  // Fill the table (encode the vertical co-ordinate)
-  if(this->allocate_table(nk) == VGD_ERROR)
+  if(this->allocate_and_fill_table(nk) == VGD_ERROR)
   {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem with allocate_table for vcode=%d\n",this->vcode);
+    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem filling in the table\n");
     return(VGD_ERROR);
-  }
-  this->set_refnames();
-  if(this->c_encode_vert() == VGD_ERROR)
-  {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem with c_encode_vert for vcode=%d\n",this->vcode);
-    return(VGD_ERROR);
-  }
-
-
-  this->valid = 1;
-  if(this->fstd_init() == VGD_ERROR)
-  {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem with fstd_init\n");
-  }
+  };
 
   return(VGD_OK);
 }

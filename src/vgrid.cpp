@@ -2882,6 +2882,31 @@ int vgrid::Cvgd_build_from_ab_old(int kind, int version, int nk, int ip1, int ip
   return(VGD_OK);
 }
 
+int vgrid::allocate_and_fill_table(int nk)
+{
+  // Fill in the table (encode the vertical co-ordinate)
+  if(this->allocate_table(nk) == VGD_ERROR)
+  {
+    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem with allocate_table for vcode=%d\n",this->vcode);
+    return(VGD_ERROR);
+  }
+  this->set_refnames();
+  if(this->c_encode_vert() == VGD_ERROR)
+  {
+    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem with c_encode_vert for vcode=%d\n",this->vcode);
+    return(VGD_ERROR);
+  }
+
+
+  this->valid = 1;
+  if(this->fstd_init() == VGD_ERROR)
+  {
+    printf("(Cvgd) ERROR in allocate_and_fill_table, problem with fstd_init\n");
+  }
+
+  return(VGD_OK);
+}
+
 int vgrid::Cvgd_build_from_table(double *table, int ni, int nj, int nk)
 {
   // N.B.:  'this' must be a SUBCLASS of vgrid
