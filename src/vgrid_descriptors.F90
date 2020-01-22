@@ -49,6 +49,7 @@ module vGrid_Descriptors
    public :: Create_from_ab_5100                 !class constructor
    public :: Create_from_ab_5999                 !class constructor
    public :: Create_from_ab_21001                !class constructor
+   public :: Create_from_ab_21002                !class constructor
    public :: vgd_new                             !class constructor
    public :: vgd_getopt                          !get class variable value
    public :: vgd_putopt                          !set class variable value
@@ -329,6 +330,22 @@ module vGrid_Descriptors
          type(c_ptr),     value :: a_m_8, b_m_8, c_m_8,a_t_8, b_t_8, c_t_8, ip1_m, ip1_t
          integer (c_int), value :: nl_m
       end function f_create_from_ab_21001
+
+      integer(c_int) function f_create_from_ab_21002(vgdid, ip1, ip2, rcoef1, rcoef2, &
+			      rcoef3, rcoef4, &
+			      a_m_8, b_m_8, c_m_8, &
+			      a_t_8, b_t_8, c_t_8, &
+			      a_w_8, b_w_8, c_w_8, &
+			      ip1_m, ip1_t, ip1_w, nl_m) &
+                              bind(c, name='Create_from_ab_21001')
+         use iso_c_binding, only : c_ptr, c_int, c_double, c_float
+         type(c_ptr),     value :: vgdid
+         integer (c_int), value :: ip1, ip2
+         real (c_float),  value :: rcoef1, rcoef2, rcoef3, rcoef4
+         type(c_ptr),     value :: a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8
+         type(c_ptr),     value :: a_w_8, b_w_8, c_w_8, ip1_m, ip1_t, ip1_w
+         integer (c_int), value :: nl_m
+      end function f_create_from_ab_21002
       
       integer(c_int) function f_new_from_table(vgdid, table_CP, ni, nj, nk) bind(c, name='Cvgd_new_from_table')
          use iso_c_binding, only : c_ptr, c_int
@@ -818,6 +835,50 @@ contains
       status = VGD_OK
       return
     end function Create_from_ab_21001
+
+    integer function Create_from_ab_21002(vgdid, ip1, ip2, rcoef1, &
+                          rcoef2, rcoef3, rcoef4, a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, &
+                          c_t_8, a_w_8, b_w_8, c_w_8, ip1_m, ip1_t, ip1_w, nl_m) &
+                          result(status)
+      integer, target :: vgdid
+      integer :: ip1, ip2
+      real :: rcoef1, rcoef2, rcoef3, rcoef4
+      real(kind=8), dimension(:) :: a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8
+      real(kind=8), dimension(:) :: a_w_8, b_w_8, c_w_8, ip1_m, ip1_t, ip1_w
+      integer :: nl_m
+
+      type(c_ptr) :: vgdid_p, a_m_8_p, b_m_8_p, c_m_8_p, a_t_8_p, b_t_8_p, c_t_8_p
+      type(c_ptr) :: a_w_8_p, b_w_8_p, c_w_8_p, ip1_m_p, ip1_t_p, ip1_w_p
+      vgdid_p = c_loc(vgdid)
+      a_m_8_p = c_loc(a_m_8)
+      b_m_8_p = c_loc(b_m_8)
+      c_m_8_p = c_loc(c_m_8)
+      a_t_8_p = c_loc(a_t_8)
+      b_t_8_p = c_loc(b_t_8)
+      c_t_8_p = c_loc(c_t_8)
+      a_w_8_p = c_loc(a_w_8)
+      b_w_8_p = c_loc(b_w_8)
+      c_w_8_p = c_loc(c_w_8)
+      ip1_m_p = c_loc(ip1_m)
+      ip1_t_p = c_loc(ip1_t)
+      ip1_w_p = c_loc(ip1_w)
+
+      status = VGD_ERROR
+
+      if( f_create_from_ab_21002(vgdid_p, ip1, ip2, rcoef1, rcoef2, &
+		 	         rcoef3, rcoef4, &
+			         a_m_8_p, b_m_8_p, c_m_8_p, &
+			         a_t_8_p, b_t_8_p, c_t_8_p, &
+			         a_w_8_p, b_w_8_p, c_w_8_p, &
+			         ip1_m_p, ip1_t_p, ip1_w_p, nl_m)== VGD_ERROR &
+                                )then
+        print*,'(F_vgd) ERROR: In Create_from_ab_21002'
+        return
+      end if
+
+      status = VGD_OK
+      return
+    end function Create_from_ab_21002
 
     integer function new_from_table(vgdid,table) result(status)
        ! Coordinate constructor - build vertical descriptor from table input

@@ -672,9 +672,9 @@ int check_build_21002(vgrid *my_vgrid){
   
   // No generic interface for 21001
   printf("  Testing specific interface\n");
-  if( Cvgd_new_build_vert_21002(&my_vgrid2, -1, -1, rc_1, rc_2, rc_3, rc_4,
-				a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8, a_w_8, b_w_8, c_w_8,
-				ip1_m, ip1_t, ip1_w, nl) == VGD_ERROR) {
+  if( Create_from_ab_21002(&my_vgrid2, -1, -1, rc_1, rc_2, rc_3, rc_4,
+			   a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8, a_w_8, b_w_8, c_w_8,
+		           ip1_m, ip1_t, ip1_w, nl) == VGD_ERROR) {
     return(VGD_ERROR);
   }
   //Test equality

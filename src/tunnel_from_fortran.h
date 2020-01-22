@@ -112,4 +112,10 @@ int Create_from_ab_21001(int *vgdid, int ip1, int ip2,
 			 double *a_m_8, double *b_m_8, double *c_m_8,
 			 double *a_t_8, double *b_t_8, double *c_t_8,
 			 int *ip1_m, int *ip1_t, int nl_m);
+int Create_from_ab_21002(int *vgdid, int ip1, int ip2, float rcoef1, float rcoef2,
+			 float rcoef3, float rcoef4,
+			 double *a_m_8, double *b_m_8, double *c_m_8,
+			 double *a_t_8, double *b_t_8, double *c_t_8,
+			 double *a_w_8, double *b_w_8, double *c_w_8,
+			 int *ip1_m, int *ip1_t, int *ip1_w, int nl_m);
 #endif

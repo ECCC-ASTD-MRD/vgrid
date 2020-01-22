@@ -637,6 +637,30 @@ int Create_from_ab_21001(vgrid** new_vgrid, int ip1, int ip2,
   }
 }
 
+int Create_from_ab_21002(vgrid** new_vgrid, int ip1, int ip2, float rcoef1, float rcoef2,
+			 float rcoef3, float rcoef4,
+			 double *a_m_8, double *b_m_8, double *c_m_8,
+			 double *a_t_8, double *b_t_8, double *c_t_8,
+			 double *a_w_8, double *b_w_8, double *c_w_8,
+			 int *ip1_m, int *ip1_t, int *ip1_w, int nl_m)
+{
+  try
+  {
+    Cvgd_create_vgrid_from_vcode(new_vgrid, 21002);
+    ((vgrid_21002*)(*new_vgrid))->Cvgd_build_from_ab(ip1, ip2, rcoef1, rcoef2,
+						     rcoef3, rcoef4,
+						     a_m_8, b_m_8, c_m_8,
+						     a_t_8, b_t_8, c_t_8,
+						     a_w_8, b_w_8, c_w_8,
+						     ip1_m, ip1_t, ip1_w, nl_m);
+  }
+  catch(vgrid_exception)
+  {
+    printf("(Cvgd) ERROR in Create_from_ab_21002\n");
+    return(VGD_ERROR);
+  }
+}
+
 
 
 
