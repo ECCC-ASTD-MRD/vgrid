@@ -32,7 +32,14 @@ char *filenames[] = {
     "data/2001_from_model_run",
     "data/dm_4001_from_model_run",
     "data/dm_5001_from_model_run",
-    "data/dm_5005_from_model_run"
+    "data/dm_5002_from_model_run",
+    "data/dm_5005_from_model_run",
+    "data/dm_5100_from_model_run",
+    "data/dm_5999_from_model_run",
+    "data/dm_21001_from_model_run_SLEVE",
+    "data/dm_21001_from_model_run_NON_SLEVE",
+    "data/dm_21002_from_model_run_SLEVE",
+    "data/dm_21002_from_model_run_NON_SLEVE"
 };
 
 #define n_file (sizeof (filenames) / sizeof (const char *))
@@ -389,23 +396,23 @@ int check_build_5005(vgrid *my_vgrid){
     return(VGD_ERROR);
   }
   
-  // printf("  Testing generic interface\n");
-  // if( Cvgd_new_build_vert(&my_vgrid2, kind, version, -1, -1, -1, NULL, &pref_8, &rc_1, &rc_2,
-  // 			  a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, ip1_t, nl, nl) == VGD_ERROR) {
-  //   return(VGD_ERROR);
-  // }
-  // // Test equality
-  // ier = my_vgrid->Cvgd_vgdcmp(my_vgrid2);
-  // if( ier != 0 ){
-  //   printf("     Descritors not equal, Cvgd_vgdcmp code is %d\n", ier);
-  //   return(VGD_ERROR);
-  // } else {
-  //   printf("     Descritors are equal.\n");
-  // }
+  printf("  Testing generic interface\n");
+  if( Cvgd_new_build_vert(&my_vgrid2, kind, version, -1, -1, -1, NULL, &pref_8, &rc_1, &rc_2,
+  			  a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, ip1_t, nl, nl) == VGD_ERROR) {
+    return(VGD_ERROR);
+  }
+  // Test equality
+  ier = my_vgrid->Cvgd_vgdcmp(my_vgrid2);
+  if( ier != 0 ){
+    printf("     Descritors not equal, Cvgd_vgdcmp code is %d\n", ier);
+    return(VGD_ERROR);
+  } else {
+    printf("     Descritors are equal.\n");
+  }
 
-  // printf("  Testing specific interface\n");
-  // free(my_vgrid2);
-  // my_vgrid2 = nullptr;
+  printf("  Testing specific interface\n");
+  free(my_vgrid2);
+  my_vgrid2 = nullptr;
   if( Create_from_ab_5005(&my_vgrid2, -1, -1, pref_8, rc_1, rc_2,
 			  a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, ip1_t, nl) == VGD_ERROR)
   {

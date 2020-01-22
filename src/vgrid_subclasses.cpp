@@ -2527,6 +2527,7 @@ int vgrid_5100::Cvgd_build_from_ab(int ip1, int ip2, double pref_8, float rcoef1
   this->match_ipig = 1;
   this->nk         = nl_m;
   this->nl_m       = nl_m;
+  this->nl_t       = nl_m;
   this->rec.ip1    = (int) fmax(0,ip1);
   this->rec.ip2    = (int) fmax(0,ip2);
   strcpy(this->rec.nomvar,"!!  ");
