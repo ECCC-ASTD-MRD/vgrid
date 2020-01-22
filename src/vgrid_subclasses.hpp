@@ -209,6 +209,8 @@ public:
   vgrid_5999(int key);
   int c_decode_vert();
   int c_encode_vert();
+  int Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
+			 int *ip1_m, int nl_m);
 private:
   void fstd_subinit();
   void set_table_nj(int nk);

@@ -105,4 +105,6 @@ int Create_from_ab_5100(int *vgdid, int ip1, int ip2, double pref_8, float rcoef
 			double *a_m_8, double *b_m_8, double *c_m_8,
 			double *a_t_8, double *b_t_8, double *c_t_8,
 			int *ip1_m, int *ip1_t, int nl_m);
+int Create_from_ab_5999(int *vgdid, int ip1, int ip2, double *a_m_8, double *b_m_8,
+			int *ip1_m, int nl_m);
 #endif
