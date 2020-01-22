@@ -288,6 +288,23 @@ int Create_from_ab_5001(int *vgdid, int ip1, int ip2, double ptop_8, double pref
   return status;
 }
 
+int Create_from_ab_5005(int *vgdid, int ip1, int ip2,
+			double pref_8, float rcoef1, float rcoef2,
+			double *a_m_8, double *b_m_8, int *ip1_m, int *ip1_t, int nl_m,
+			int nl_t, int nl_w)
+{
+  vgrid *my_vgd;
+  int status;
+
+  status=Create_from_ab_5005(&my_vgd, ip1, ip2, pref_8, rcoef1, rcoef2,
+                             a_m_8, b_m_8, ip1_m, ip1_t, nl_m, nl_t, nl_w);
+  if(status != VGD_ERROR)
+    {
+      *vgdid=grid_check.get_tag(my_vgd);
+    }
+  return status;
+}
+
 int Cvgd_print_desc(int vgdid, int sout, int convip)
 {
   vgrid *vgd;
