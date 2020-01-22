@@ -47,6 +47,8 @@ module vGrid_Descriptors
    public :: Create_from_ab_5001                 !class constructor
    public :: Create_from_ab_5005                 !class constructor
    public :: Create_from_ab_5100                 !class constructor
+   public :: Create_from_ab_5999                 !class constructor
+   public :: Create_from_ab_21001                !class constructor
    public :: vgd_new                             !class constructor
    public :: vgd_getopt                          !get class variable value
    public :: vgd_putopt                          !set class variable value
@@ -283,20 +285,20 @@ module vGrid_Descriptors
       end function f_create_from_ab_5001
 
       integer(c_int) function f_create_from_ab_5005(vgdid, ip1, ip2, pref_8, rcoef1, &
-                                     rcoef2, a_m_8, b_m_8, ip1_m, ip1_t, nl_m, nl_t, &
-                                     nl_w) bind(c, name='Create_from_ab_5005')
+                                     rcoef2, a_m_8, b_m_8, ip1_m, ip1_t, nl_m) &
+                                     bind(c, name='Create_from_ab_5005')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
          real (c_double), value :: pref_8
          real (c_float),  value :: rcoef1, rcoef2
          type(c_ptr),     value :: a_m_8, b_m_8, ip1_m, ip1_t
-         integer (c_int), value :: nl_m, nl_t, nl_w
+         integer (c_int), value :: nl_m
       end function f_create_from_ab_5005
 
       integer(c_int) function f_create_from_ab_5100(vgdid, ip1, ip2, pref_8, rcoef1, &
                           rcoef2, rcoef3, rcoef4, a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, &
-                          c_t_8, ip1_m, ip1_t, nl_m, nl_t, nl_w) &
+                          c_t_8, ip1_m, ip1_t, nl_m) &
                           bind(c, name='Create_from_ab_5100')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid
@@ -304,8 +306,29 @@ module vGrid_Descriptors
          real (c_double), value :: pref_8
          real (c_float),  value :: rcoef1, rcoef2, rcoef3, rcoef4
          type(c_ptr),     value :: a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8, ip1_m, ip1_t
-         integer (c_int), value :: nl_m, nl_t, nl_w
+         integer (c_int), value :: nl_m
       end function f_create_from_ab_5100
+
+      integer(c_int) function f_create_from_ab_5999(vgdid, ip1, ip2, a_m_8, b_m_8, &
+                          ip1_m, nl_m) bind(c, name='Create_from_ab_5999')
+         use iso_c_binding, only : c_ptr, c_int, c_double, c_float
+         type(c_ptr),     value :: vgdid
+         integer (c_int), value :: ip1, ip2
+         type(c_ptr),     value :: a_m_8, b_m_8, ip1_m
+         integer (c_int), value :: nl_m
+      end function f_create_from_ab_5999
+
+      integer(c_int) function f_create_from_ab_21001(vgdid, ip1, ip2, &
+			      rcoef1, rcoef2, rcoef3, rcoef4, &
+			      a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8, ip1_m, &
+			      ip1_t, nl_m) bind(c, name='Create_from_ab_21001')
+         use iso_c_binding, only : c_ptr, c_int, c_double, c_float
+         type(c_ptr),     value :: vgdid
+         integer (c_int), value :: ip1, ip2
+         real (c_float),  value :: rcoef1, rcoef2, rcoef3, rcoef4
+         type(c_ptr),     value :: a_m_8, b_m_8, c_m_8,a_t_8, b_t_8, c_t_8, ip1_m, ip1_t
+         integer (c_int), value :: nl_m
+      end function f_create_from_ab_21001
       
       integer(c_int) function f_new_from_table(vgdid, table_CP, ni, nj, nk) bind(c, name='Cvgd_new_from_table')
          use iso_c_binding, only : c_ptr, c_int
@@ -332,7 +355,7 @@ module vGrid_Descriptors
          integer (c_int), value :: kind,version,nk,ip1,ip2
          type(c_ptr), value :: ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP
          type(c_ptr), value :: a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, ip1_m_CP, ip1_t_CP, ip1_w_CP
-         integer (c_int), value :: nl_m, nl_t, nl_w
+         integer (c_int), value :: nl_m
       end function f_new_build_vert
       
       subroutine f_table_shape(vgdid, tshape_CP) bind(c, name='Cvgd_table_shape')
@@ -521,7 +544,7 @@ contains
       integer, target :: vgdid
       integer :: ip1, ip2
       real(kind=8), dimension(:) :: a_m_8, b_m_8, ip1_m
-      integer :: nl_m, nl_t, nl_w
+      integer :: nl_m
 
       type(c_ptr) :: vgdid_p, a_m_8_p, b_m_8_p, ip1_m_p
       vgdid_p = c_loc(vgdid)
@@ -624,7 +647,7 @@ contains
       integer, target :: vgdid
       integer :: ip1, ip2
       real(kind=8), dimension(:) :: a_m_8, b_m_8, ip1_m
-      integer :: nl_m, nl_t, nl_w
+      integer :: nl_m
 
       type(c_ptr) :: vgdid_p, a_m_8_p, b_m_8_p, ip1_m_p
       vgdid_p = c_loc(vgdid)
@@ -672,13 +695,13 @@ contains
     end function Create_from_ab_5001
 
     integer function Create_from_ab_5005(vgdid, ip1, ip2, pref_8, rcoef1, rcoef2, &
-                             a_m_8, b_m_8, ip1_m, ip1_t, nl_m, nl_t, nl_w) result(status)
+                             a_m_8, b_m_8, ip1_m, ip1_t, nl_m) result(status)
       integer, target :: vgdid
       integer :: ip1, ip2
       real(kind=8) :: pref_8
       real :: rcoef1, rcoef2
       real(kind=8), dimension(:) :: a_m_8, b_m_8, ip1_m, ip1_t
-      integer :: nl_m, nl_t, nl_w
+      integer :: nl_m
 
       type(c_ptr) :: vgdid_p, a_m_8_p, b_m_8_p, ip1_m_p, ip1_t_p
       vgdid_p = c_loc(vgdid)
@@ -690,7 +713,7 @@ contains
       status = VGD_ERROR
 
       if( f_create_from_ab_5005(vgdid_p, ip1, ip2, pref_8, rcoef1, rcoef2, a_m_8_p, &
-                                b_m_8_p, ip1_m_p, ip1_t_p, nl_m, nl_t, nl_w)== VGD_ERROR &
+                                b_m_8_p, ip1_m_p, ip1_t_p, nl_m)== VGD_ERROR &
                                )then
         print*,'(F_vgd) ERROR: In Create_from_ab_5005'
         return
@@ -702,13 +725,13 @@ contains
 
     integer function Create_from_ab_5100(vgdid, ip1, ip2, pref_8, rcoef1, &
                           rcoef2, rcoef3, rcoef4, a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, &
-                          c_t_8, ip1_m, ip1_t, nl_m, nl_t, nl_w) result(status)
+                          c_t_8, ip1_m, ip1_t, nl_m) result(status)
       integer, target :: vgdid
       integer :: ip1, ip2
       real(kind=8) :: pref_8
       real :: rcoef1, rcoef2, rcoef3, rcoef4
       real(kind=8), dimension(:) :: a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8, ip1_m, ip1_t
-      integer :: nl_m, nl_t, nl_w
+      integer :: nl_m
 
       type(c_ptr) :: vgdid_p, a_m_8_p, b_m_8_p, c_m_8_p, a_t_8_p, b_t_8_p, c_t_8_p
       type(c_ptr) :: ip1_m_p, ip1_t_p
@@ -726,7 +749,7 @@ contains
 
       if( f_create_from_ab_5100(vgdid_p, ip1, ip2, pref_8, rcoef1, rcoef2, rcoef3, &
                                 rcoef4, a_m_8_p, b_m_8_p, c_m_8_p, a_t_8_p, b_t_8_p, &
-                                c_t_8_p, ip1_m_p, ip1_t_p, nl_m, nl_t, nl_w)== VGD_ERROR &
+                                c_t_8_p, ip1_m_p, ip1_t_p, nl_m)== VGD_ERROR &
                                )then
         print*,'(F_vgd) ERROR: In Create_from_ab_5100'
         return
@@ -735,6 +758,66 @@ contains
       status = VGD_OK
       return
     end function Create_from_ab_5100
+
+    integer function Create_from_ab_5999(vgdid, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m) &
+                                        result(status)
+      integer, target :: vgdid
+      integer :: ip1, ip2
+      real(kind=8), dimension(:) :: a_m_8, b_m_8, ip1_m
+      integer :: nl_m
+
+      type(c_ptr) :: vgdid_p, a_m_8_p, b_m_8_p, ip1_m_p
+      vgdid_p = c_loc(vgdid)
+      a_m_8_p = c_loc(a_m_8)
+      b_m_8_p = c_loc(b_m_8)
+      ip1_m_p = c_loc(ip1_m)
+
+      status = VGD_ERROR
+
+      if( f_create_from_ab_5999(vgdid_p, ip1, ip2, a_m_8_p, b_m_8_p, ip1_m_p, nl_m) &
+                               == VGD_ERROR )then
+        print*,'(F_vgd) ERROR: In Create_from_ab_5999'
+        return
+      end if
+
+      status = VGD_OK
+      return
+    end function Create_from_ab_5999
+
+    integer function Create_from_ab_21001(vgdid, ip1, ip2, rcoef1, &
+                          rcoef2, rcoef3, rcoef4, a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, &
+                          c_t_8, ip1_m, ip1_t, nl_m) result(status)
+      integer, target :: vgdid
+      integer :: ip1, ip2
+      real :: rcoef1, rcoef2, rcoef3, rcoef4
+      real(kind=8), dimension(:) :: a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8, ip1_m, ip1_t
+      integer :: nl_m
+
+      type(c_ptr) :: vgdid_p, a_m_8_p, b_m_8_p, c_m_8_p, a_t_8_p, b_t_8_p, c_t_8_p
+      type(c_ptr) :: ip1_m_p, ip1_t_p
+      vgdid_p = c_loc(vgdid)
+      a_m_8_p = c_loc(a_m_8)
+      b_m_8_p = c_loc(b_m_8)
+      c_m_8_p = c_loc(c_m_8)
+      a_t_8_p = c_loc(a_t_8)
+      b_t_8_p = c_loc(b_t_8)
+      c_t_8_p = c_loc(c_t_8)
+      ip1_m_p = c_loc(ip1_m)
+      ip1_t_p = c_loc(ip1_t)
+
+      status = VGD_ERROR
+
+      if( f_create_from_ab_21001(vgdid_p, ip1, ip2, rcoef1, rcoef2, rcoef3, &
+                                rcoef4, a_m_8_p, b_m_8_p, c_m_8_p, a_t_8_p, b_t_8_p, &
+                                c_t_8_p, ip1_m_p, ip1_t_p, nl_m)== VGD_ERROR &
+                               )then
+        print*,'(F_vgd) ERROR: In Create_from_ab_21001'
+        return
+      end if
+
+      status = VGD_OK
+      return
+    end function Create_from_ab_21001
 
     integer function new_from_table(vgdid,table) result(status)
        ! Coordinate constructor - build vertical descriptor from table input
