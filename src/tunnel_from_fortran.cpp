@@ -290,14 +290,32 @@ int Create_from_ab_5001(int *vgdid, int ip1, int ip2, double ptop_8, double pref
 
 int Create_from_ab_5005(int *vgdid, int ip1, int ip2,
 			double pref_8, float rcoef1, float rcoef2,
-			double *a_m_8, double *b_m_8, int *ip1_m, int *ip1_t, int nl_m,
-			int nl_t, int nl_w)
+			double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int nl_m)
 {
   vgrid *my_vgd;
   int status;
 
   status=Create_from_ab_5005(&my_vgd, ip1, ip2, pref_8, rcoef1, rcoef2,
-                             a_m_8, b_m_8, ip1_m, ip1_t, nl_m, nl_t, nl_w);
+                             a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, ip1_t, nl_m);
+  if(status != VGD_ERROR)
+    {
+      *vgdid=grid_check.get_tag(my_vgd);
+    }
+  return status;
+}
+
+int Create_from_ab_5100(int *vgdid, int ip1, int ip2, double pref_8, float rcoef1,
+			float rcoef2, float rcoef3, float rcoef4,
+			double *a_m_8, double *b_m_8, double *c_m_8,
+			double *a_t_8, double *b_t_8, double *c_t_8,
+			int *ip1_m, int *ip1_t, int nl_m)
+{
+  vgrid *my_vgd;
+  int status;
+
+  status=Create_from_ab_5100(&my_vgd, ip1, ip2, pref_8, rcoef1, rcoef2, rcoef3, rcoef4,
+			     a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8,
+			     ip1_m, ip1_t, nl_m);
   if(status != VGD_ERROR)
     {
       *vgdid=grid_check.get_tag(my_vgd);

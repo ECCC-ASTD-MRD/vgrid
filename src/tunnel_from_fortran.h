@@ -98,6 +98,11 @@ int Create_from_ab_5001(int *vgdid, int ip1, int ip2, double ptop_8, double pref
 			double *b_m_8, int *ip1_m, int nl_m);
 int Create_from_ab_5005(int *vgdid, int ip1, int ip2,
 			double pref_8, float rcoef1, float rcoef2,
-			double *a_m_8, double *b_m_8, int *ip1_m, int *ip1_t, int nl_m,
-			int nl_t, int nl_w);
+			double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8,
+			int *ip1_m, int *ip1_t, int nl_m);
+int Create_from_ab_5100(int *vgdid, int ip1, int ip2, double pref_8, float rcoef1,
+			float rcoef2, float rcoef3, float rcoef4,
+			double *a_m_8, double *b_m_8, double *c_m_8,
+			double *a_t_8, double *b_t_8, double *c_t_8,
+			int *ip1_m, int *ip1_t, int nl_m);
 #endif
