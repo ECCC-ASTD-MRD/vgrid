@@ -561,6 +561,26 @@ int Create_from_ab_5001(vgrid** new_vgrid, int ip1, int ip2, double ptop_8,
   }
 }
 
+int Create_from_ab_5002(vgrid** new_vgrid, int ip1, int ip2, double ptop_8, double pref_8,
+			float rcoef1, float rcoef2, double *a_m_8,
+			double *b_m_8, double *a_t_8, double *b_t_8,
+			int *ip1_m, int *ip1_t,
+			int nl_m, int nl_t)
+{
+  try
+  {
+    Cvgd_create_vgrid_from_vcode(new_vgrid, 5002);
+    ((vgrid_5002*)(*new_vgrid))->Cvgd_build_from_ab(ip1, ip2, ptop_8, pref_8,
+                                                    rcoef1, rcoef2, a_m_8, b_m_8, a_t_8,
+						    b_t_8, ip1_m, ip1_t ,nl_m, nl_t);
+  }
+  catch(vgrid_exception)
+  {
+    printf("(Cvgd) ERROR in Create_from_ab_5002\n");
+    return(VGD_ERROR);
+  }
+}
+
 int Create_from_ab_5005(vgrid** new_vgrid, int ip1, int ip2,
 			double pref_8, float rcoef1, float rcoef2,
 			double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8,

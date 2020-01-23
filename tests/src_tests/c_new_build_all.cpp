@@ -329,8 +329,9 @@ int check_build_5002(vgrid *my_vgrid){
   printf("  Testing specific interface\n");
   free(my_vgrid2);
   my_vgrid2 = nullptr;
-  if( Cvgd_new_build_vert_5002(&my_vgrid2, -1, -1, ptop_8, pref_8, rc_1, rc_2,
-			       a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, ip1_t, nl_m, nl_t) == VGD_ERROR) {
+  if( Create_from_ab_5002(&my_vgrid2, -1, -1, ptop_8, pref_8, rc_1, rc_2,
+			  a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, ip1_t, nl_m, nl_t)
+                         == VGD_ERROR) {
     return(VGD_ERROR);
   }
   // Test equality
