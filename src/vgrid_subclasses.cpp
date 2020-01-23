@@ -1763,7 +1763,7 @@ int vgrid_5002::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_
   // Complete the initializations
   this->unit       = -1;
   this->match_ipig = 1;
-  this->nk         = nk;
+  this->nk         = nl_m;
   this->nl_m       = nl_m;
   
   // Note that this->nl_t and this->nl_w may be overwritten in c_encode_vert()
@@ -2832,7 +2832,7 @@ int vgrid_5999::Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_
   // Complete the initializations
   this->unit       = -1;
   this->match_ipig = 1;
-  this->nk         = nk;
+  this->nk         = nl_m;
   this->nl_m       = nl_m;
   
   // Note that this->nl_t and this->nl_w may be overwritten in c_encode_vert()
@@ -3230,7 +3230,7 @@ int vgrid_21001::Cvgd_build_from_ab(int ip1, int ip2, float rcoef1, float rcoef2
   // Complete the initializations
   this->unit       = -1;
   this->match_ipig = 1;
-  this->nk         = nk;
+  this->nk         = nl_m;
   this->nl_m       = nl_m;
 
   // Note that this->nl_t and this->nl_w may be overwritten in c_encode_vert()
@@ -3733,7 +3733,7 @@ int vgrid_21002::Cvgd_build_from_ab(int ip1, int ip2, float rcoef1, float rcoef2
   // Complete the initializations
   this->unit       = -1;
   this->match_ipig = 1;
-  this->nk         = nk;
+  this->nk         = nl_m;
   this->nl_m       = nl_m;
   
   // Note that this->nl_t and this->nl_w may be overwritten in c_encode_vert()

@@ -386,7 +386,7 @@ module vGrid_Descriptors
          integer (c_int), value :: kind,version,nk,ip1,ip2
          type(c_ptr), value :: ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP
          type(c_ptr), value :: a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, ip1_m_CP, ip1_t_CP, ip1_w_CP
-         integer (c_int), value :: nl_m
+         integer (c_int), value :: nl_m, nl_t, nl_w
       end function f_new_build_vert
       
       subroutine f_table_shape(vgdid, tshape_CP) bind(c, name='Cvgd_table_shape')
