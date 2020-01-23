@@ -101,6 +101,10 @@ int Create_from_ab_21002(vgrid** new_vgrid, int ip1, int ip2, float rcoef1, floa
 			 int *ip1_m, int *ip1_t, int *ip1_w, int nl_m);
 
 
+int Cvgd_build_from_hyb_2001(vgrid **my_new_vgrid, float *hyb, int size_hyb,
+				   int ip1, int ip2);
+
+
 
 
 // Front ends to call Cvgd_new_build_vert2 to create a vgrid
