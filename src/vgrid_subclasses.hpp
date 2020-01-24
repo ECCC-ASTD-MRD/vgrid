@@ -259,6 +259,10 @@ public:
 			 double *a_t_8, double *b_t_8, double *c_t_8,
 			 double *a_w_8, double *b_w_8, double *c_w_8,
 			 int *ip1_m, int *ip1_t, int *ip1_w, int nl_m);
+  int Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef1,
+				float rcoef2, int ip1, int ip2, float *dhm,
+				float *dht, float *dhw, float rcoef3=-1,
+				float rcoef4=-1);
 private:
   void fstd_subinit();
   void set_table_nj(int nk);
