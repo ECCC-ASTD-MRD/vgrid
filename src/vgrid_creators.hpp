@@ -103,6 +103,8 @@ int Create_from_ab_21002(vgrid** new_vgrid, int ip1, int ip2, float rcoef1, floa
 
 int Cvgd_build_from_hyb_1001(vgrid **my_new_vgrid, float *hyb, int size_hyb, int ip1,
 			     int ip2);
+int Cvgd_build_from_hyb_1002(vgrid **my_new_vgrid, float *hyb, int size_hyb,
+			     double ptop_8, int ip1, int ip2);
 int Cvgd_build_from_hyb_2001(vgrid **my_new_vgrid, float *hyb, int size_hyb, int ip1,
 			     int ip2);
 

@@ -3038,7 +3038,7 @@ int vgrid::Cvgd_build_from_hyb(int kind, int version, float *hyb, int size_hyb, 
     nk   = size_hyb;
     nl_m = size_hyb;
     nl_t = size_hyb;
-    if(((vgrid_1002*)this)->C_genab(hyb, size_hyb, ptop_8, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR )
+    if(((vgrid_1002*)this)->C_genab(hyb, size_hyb, *ptop_8, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR )
     {
       free(a_m_8);
       free(b_m_8);

@@ -60,9 +60,12 @@ public:
   vgrid_1002(int key);
   int c_decode_vert();
   int c_encode_vert();
-  int C_genab(float *etauser, int nk, double *ptop_8, double **a_m_8, double **b_m_8, int **ip1_m);
+  int C_genab(float *etauser, int nk, double ptop_8, double **a_m_8, double **b_m_8,
+	      int **ip1_m);
   int Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double *a_m_8,
 			 double *b_m_8, int *ip1_m, int nl_m);
+  int Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, double ptop_8,
+				int ip1, int ip2);
 private:
   void fstd_subinit();
   void set_table_nj(int nk);

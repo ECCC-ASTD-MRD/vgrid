@@ -574,7 +574,7 @@ int vgrid_1002::c_encode_vert()
   return(VGD_OK);
 }
 
-int vgrid_1002::C_genab(float *etauser, int nk, double *ptop_8, double **a_m_8, double **b_m_8, int **ip1_m)
+int vgrid_1002::C_genab(float *etauser, int nk, double ptop_8, double **a_m_8, double **b_m_8, int **ip1_m)
 {
   char ok=1;
   int k;
@@ -616,9 +616,9 @@ int vgrid_1002::C_genab(float *etauser, int nk, double *ptop_8, double **a_m_8, 
     return(VGD_ERROR);
   }
 
-  if( *ptop_8 <= 0.)
+  if( ptop_8 <= 0.)
   {
-    printf("(Cvgd) ERROR in vgrid_1002::C_genab: ptop = %f must be greater than zero\n", *ptop_8);
+    printf("(Cvgd) ERROR in vgrid_1002::C_genab: ptop = %f must be greater than zero\n", ptop_8);
     return(VGD_ERROR);
   }
 
@@ -629,7 +629,7 @@ int vgrid_1002::C_genab(float *etauser, int nk, double *ptop_8, double **a_m_8, 
     ip1 = c_convip_Level2IP_old_style(etauser[k],1);
     eta = c_convip_IP2Level(ip1,&kind);
     (*ip1_m)[k] = ip1;
-    (*a_m_8)[k] = (1. - eta) * (*ptop_8);
+    (*a_m_8)[k] = (1. - eta) * ptop_8;
     (*b_m_8)[k] = eta;
   }
 
@@ -782,6 +782,48 @@ int vgrid_1002::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double *a_m_
   };
 
   return(VGD_OK);
+}
+
+int vgrid_1002::Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, double ptop_8,
+					  int ip1, int ip2)
+{
+  double *a_m_8 = NULL, *b_m_8 = NULL;
+  int *ip1_m = NULL;
+  int nk = -1, nl_m = -1, nl_t = -1;
+
+  try
+  {
+    nk   = size_hyb;
+    nl_m = size_hyb;
+    nl_t = -1;
+    if(this->C_genab(hyb, size_hyb, ptop_8, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR )
+    {
+      free(a_m_8);
+      free(b_m_8);
+      free(ip1_m);
+      return(VGD_ERROR);
+    }
+  }
+  catch (vgrid_exception)
+  {
+    free(a_m_8);
+    free(b_m_8);
+    free(ip1_m);
+    return(VGD_ERROR);
+  }
+  if( VGD_ERROR == this->Cvgd_build_from_ab(ip1,ip2,ptop_8,a_m_8,b_m_8,ip1_m,nl_m) )
+  {
+    fprintf(stderr,"(Cvgd) ERROR in Cvgd_build_from_hyb, problem with new_build_vert for kind = %d, version = %d\n",kind,version);
+    free(a_m_8);
+    free(b_m_8);
+    free(ip1_m);
+    return(VGD_ERROR);
+  }
+  free(a_m_8);
+  free(b_m_8);
+  free(ip1_m);
+
+  return (VGD_OK);
 }
 
 
