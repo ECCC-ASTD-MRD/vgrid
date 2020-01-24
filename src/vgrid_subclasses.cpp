@@ -2828,6 +2828,63 @@ int vgrid_5100::Cvgd_build_from_ab(int ip1, int ip2, double pref_8, float rcoef1
   return(VGD_OK);
 }
 
+int vgrid_5100::Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef1,
+					  float rcoef2, float rcoef3, float rcoef4,
+					  double pref_8, double *ptop_out_8, int ip1,
+					  int ip2, float *dhm, float *dht, int avg)
+{
+  double *a_m_8 = NULL, *b_m_8 = NULL, *c_m_8 = NULL, *a_t_8 = NULL, *b_t_8 = NULL, *c_t_8 = NULL;
+  int *ip1_m = NULL, *ip1_t = NULL, tlift;
+
+  int nk = -1, nl_m = -1, nl_t = -1;
+
+  try
+  {
+    nk   = size_hyb;
+    if(((vgrid_5100*)this)->C_genab(hyb, size_hyb, &nl_m, &nl_t, rcoef1, rcoef2, rcoef3,
+				    rcoef4, &ptop_out_8, pref_8, &a_m_8, &b_m_8, &c_m_8, &ip1_m, &a_t_8, &b_t_8, &c_t_8, &ip1_t, *dhm, *dht, avg) == VGD_ERROR )
+    {
+      free(a_m_8);
+      free(b_m_8);
+      free(c_m_8);
+      free(ip1_m);
+      free(ip1_t);
+      free(a_t_8);
+      free(b_t_8);
+      free(c_t_8);
+      return(VGD_ERROR);
+    }
+  }
+  catch (vgrid_exception)
+  {
+    free(a_m_8);
+    free(b_m_8);
+    free(c_m_8);
+    free(ip1_m);
+    free(ip1_t);
+    free(a_t_8);
+    free(b_t_8);
+    free(c_t_8);
+
+    return(VGD_ERROR);
+  }
+  if( VGD_ERROR == this->Cvgd_build_from_ab(ip1,ip2,pref_8,rcoef1,rcoef2,rcoef3,rcoef4,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,ip1_m,ip1_t,nl_m) ) {
+    fprintf(stderr,"(Cvgd) ERROR in Cvgd_build_from_hyb for kind = %d, version = %d\n",
+ kind,version);
+    return(VGD_ERROR);
+  }
+  free(a_m_8);
+  free(b_m_8);
+  free(c_m_8);
+  free(a_t_8);
+  free(b_t_8);
+  free(c_t_8);
+  free(ip1_m);  
+  free(ip1_t);  
+
+  return (VGD_OK);
+}
+
 
 // ########## class 5999 ##########
 vgrid_5999::vgrid_5999() : vgrid()
@@ -3455,7 +3512,7 @@ int vgrid_21001::Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef
 					   float rcoef2, int ip1, int ip2, float *dhm,
 					   float *dht, float rcoef3,
 					   float rcoef4)
-{
+ {
   double *a_m_8 = NULL, *b_m_8 = NULL, *c_m_8 = NULL, *a_t_8 = NULL, *b_t_8 = NULL, *c_t_8 = NULL;
   int *ip1_m = NULL, *ip1_t = NULL, tlift;
 

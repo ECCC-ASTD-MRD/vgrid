@@ -467,7 +467,7 @@ int check_gen_5100(vgrid *my_vgrid){
   }
   // No generic interface for 5100
   printf("  Testing specific interface\n");
-  if( Cvgd_new_gen_5100(&my_vgrid2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, rc_3, rc_4, 0, 0, dhm, dht, 1) == VGD_ERROR) {
+  if( Cvgd_build_from_hyb_5100(&my_vgrid2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, rc_3, rc_4, 0, 0, &dhm, &dht, 1) == VGD_ERROR) {
     return(VGD_ERROR);
   }
   //Test equality
