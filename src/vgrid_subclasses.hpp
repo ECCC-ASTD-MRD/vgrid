@@ -130,6 +130,8 @@ public:
   vgrid_5001();
   vgrid_5001(int key);
   int C_genab(float *hybuser, int nk, float rcoef, double ptop_8, double pref_8, double **a_m_8, double **b_m_8, int **ip1_m);
+  int Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef1,
+				double ptop_8, double pref_8, int ip1, int ip2);
 private:
   void fstd_subinit();
   void set_table_nj(int nk);

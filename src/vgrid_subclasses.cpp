@@ -1851,6 +1851,46 @@ void vgrid_5001::fstd_subinit()
   h->ig3=(int)roundf(this->rcoef1*100.0f);
 };
 
+int vgrid_5001::Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef1,
+					  double ptop_8, double pref_8, int ip1, int ip2)
+{
+  double *a_m_8 = NULL, *b_m_8 = NULL;
+  int *ip1_m = NULL;
+
+  int nk = -1, nl_m = -1;
+
+  try
+  {
+    nk   = size_hyb;
+    if(((vgrid_5001*)this)->C_genab(hyb, size_hyb, rcoef1, ptop_8, pref_8, &a_m_8, &b_m_8,
+				    &ip1_m) == VGD_ERROR )
+    {
+      free(a_m_8);
+      free(b_m_8);
+      free(ip1_m);
+      return(VGD_ERROR);
+    }
+  }
+  catch (vgrid_exception)
+  {
+    free(a_m_8);
+    free(b_m_8);
+    free(ip1_m);
+
+    return(VGD_ERROR);
+  }
+  if( VGD_ERROR == this->Cvgd_build_from_ab(ip1,ip2,ptop_8,pref_8,rcoef1,a_m_8,b_m_8,ip1_m,nl_m) ) {
+    fprintf(stderr,"(Cvgd) ERROR in Cvgd_build_from_hyb for kind = %d, version = %d\n",
+ kind,version);
+    return(VGD_ERROR);
+  }
+  free(a_m_8);
+  free(b_m_8);
+  free(ip1_m); 
+
+  return (VGD_OK);
+}
+
 void vgrid_5002_5003_5004_5005::set_refnames()
 {
   strcpy(this->ref_name,"P0  ");
