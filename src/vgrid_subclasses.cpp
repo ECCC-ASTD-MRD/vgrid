@@ -3399,6 +3399,13 @@ void vgrid_5999::set_table_nj(int nk)
   table_nj = nk+skip;
 }
 
+int vgrid_5999::C_genab(float *hyb, int size_hyb, double **a_m_8, double **b_m_8,
+			int **ip1_m)
+{
+    printf("(Cvgd) ERROR in vgrid_5999::C_genab.  This method of creating 5999 is not supported\n");
+    return(VGD_ERROR);
+}
+
 int vgrid_5999::c_decode_vert()
 {
   int k, ind, nk;
@@ -3553,6 +3560,48 @@ int vgrid_5999::Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_
   };
 
   return(VGD_OK);
+}
+
+int vgrid_5999::Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, int ip1, int ip2)
+{
+  double *a_m_8 = NULL, *b_m_8 = NULL;
+  int *ip1_m = NULL;
+  int nk = -1, nl_m = -1, nl_t = -1;
+
+  try
+  {
+    nk   = size_hyb;
+    nl_m = size_hyb;
+    nl_t = -1;
+    if(this->C_genab(hyb, size_hyb, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR )
+    {
+      free(a_m_8);
+      free(b_m_8);
+      free(ip1_m);
+      return(VGD_ERROR);
+    }
+  }
+  catch (vgrid_exception)
+  {
+    free(a_m_8);
+    free(b_m_8);
+    free(ip1_m);
+    return(VGD_ERROR);
+  }
+  if( VGD_ERROR == this->Cvgd_build_from_ab(ip1,ip2,a_m_8,b_m_8,ip1_m,nl_m) )
+  {
+    fprintf(stderr,"(Cvgd) ERROR in Cvgd_build_from_hyb for kind = %d, version = %d\n",
+	    kind,version);
+    free(a_m_8);
+    free(b_m_8);
+    free(ip1_m);
+    return(VGD_ERROR);
+  }
+  free(a_m_8);
+  free(b_m_8);
+  free(ip1_m);
+
+  return (VGD_OK);
 }
 
 

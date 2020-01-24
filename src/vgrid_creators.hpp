@@ -138,6 +138,8 @@ int Cvgd_build_from_hyb_5100(vgrid **my_new_vgrid, float *hyb, int size_hyb,
 			     double pref_8, double *ptop_out_8, float rcoef1,
 			     float rcoef2, float rcoef3, float rcoef4, int ip1,
 			     int ip2, float *dhm, float *dht, int avg);
+int Cvgd_build_from_hyb_5999(vgrid **my_new_vgrid, float *hyb, int size_hyb,
+			     int ip1, int ip2);
 int Cvgd_build_from_hyb_21001(vgrid **my_new_vgrid, float *hyb, int size_hyb,
 			      float rcoef1, float rcoef2, int ip1, int ip2, float *dhm,
 			      float *dht, float *dhw, float rcoef3,float rcoef4);
