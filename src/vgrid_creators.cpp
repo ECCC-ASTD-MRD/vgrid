@@ -848,23 +848,21 @@ int Cvgd_new_gen(vgrid **my_new_vgrid, int kind, int version, float *hyb, int si
 int Cvgd_build_from_hyb_1001(vgrid **my_new_vgrid, float *hyb, int size_hyb,
 			     int ip1, int ip2)
 {
-  int vcode;
-
   try
   {
-    vcode = 1001;
-    Cvgd_create_vgrid_from_vcode(my_new_vgrid, vcode);
+    vgrid_1001 *my_grid = new vgrid_1001();
+
+    if(my_grid->Cvgd_build_vgrid_from_hyb(hyb, size_hyb, ip1, ip2)
+							   == VGD_ERROR )
+    {
+      printf("(Cvgd) ERROR in Cvgd_build_from_hyb_1001\n");
+      return(VGD_ERROR);
+    }
+    *my_new_vgrid = (vgrid*)my_grid;
   }
   catch(vgrid_exception)
   {
     printf("(Cvgd) ERROR in Cvgd_build_vgrid_from_hyb_1001\n");
-    return(VGD_ERROR);
-  }
-
-  if(((vgrid_1001*)*my_new_vgrid)->Cvgd_build_vgrid_from_hyb(hyb, size_hyb, ip1, ip2)
-							   == VGD_ERROR )
-  {
-    printf("(Cvgd) ERROR in Cvgd_build_from_hyb_1001\n");
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -873,23 +871,21 @@ int Cvgd_build_from_hyb_1001(vgrid **my_new_vgrid, float *hyb, int size_hyb,
 int Cvgd_build_from_hyb_1002(vgrid **my_new_vgrid, float *hyb, int size_hyb,
 			     double ptop_8, int ip1, int ip2)
 {
-  int vcode;
-
   try
   {
-    vcode = 1002;
-    Cvgd_create_vgrid_from_vcode(my_new_vgrid, vcode);
+    vgrid_1002 *my_grid = new vgrid_1002();
+
+    if(my_grid->Cvgd_build_vgrid_from_hyb(hyb, size_hyb, ptop_8, ip1,
+							     ip2) == VGD_ERROR )
+    {
+      printf("(Cvgd) ERROR in Cvgd_build_from_hyb_1002\n");
+      return(VGD_ERROR);
+    }
+    *my_new_vgrid = (vgrid*)my_grid;
   }
   catch(vgrid_exception)
   {
     printf("(Cvgd) ERROR in Cvgd_build_vgrid_from_hyb_1002\n");
-    return(VGD_ERROR);
-  }
-
-  if(((vgrid_1002*)*my_new_vgrid)->Cvgd_build_vgrid_from_hyb(hyb, size_hyb, ptop_8, ip1,
-							     ip2) == VGD_ERROR )
-  {
-    printf("(Cvgd) ERROR in Cvgd_build_from_hyb_1002\n");
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -898,23 +894,21 @@ int Cvgd_build_from_hyb_1002(vgrid **my_new_vgrid, float *hyb, int size_hyb,
 int Cvgd_build_from_hyb_2001(vgrid **my_new_vgrid, float *hyb, int size_hyb,
 			     int ip1, int ip2)
 {
-  int vcode;
-
   try
   {
-    vcode = 2001;
-    Cvgd_create_vgrid_from_vcode(my_new_vgrid, vcode);
+    vgrid_2001 *my_grid = new vgrid_2001();
+
+    if(my_grid->Cvgd_build_vgrid_from_hyb(hyb, size_hyb, ip1, ip2)
+							   == VGD_ERROR )
+    {
+      printf("(Cvgd) ERROR in _Cvgd_build_from_hyb2001\n");
+      return(VGD_ERROR);
+    }
+    *my_new_vgrid = (vgrid*)my_grid;
   }
   catch(vgrid_exception)
   {
     printf("(Cvgd) ERROR in Cvgd_build_vgrid_from_hyb_2001\n");
-    return(VGD_ERROR);
-  }
-
-  if(((vgrid_2001*)*my_new_vgrid)->Cvgd_build_vgrid_from_hyb(hyb, size_hyb, ip1, ip2)
-							   == VGD_ERROR )
-  {
-    printf("(Cvgd) ERROR in _Cvgd_build_from_hyb2001\n");
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -1010,7 +1004,7 @@ int Cvgd_build_from_hyb_21002(vgrid **my_new_vgrid, float *hyb, int size_hyb,
       printf("(Cvgd) ERROR in Cvgd_build_from_hyb_21002\n");
       return(VGD_ERROR);
     }
-    my_new_vgrid = (vgrid**)&my_grid;
+    *my_new_vgrid = (vgrid*)my_grid;
   }
   catch(vgrid_exception)
   {
