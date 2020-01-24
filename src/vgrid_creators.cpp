@@ -981,6 +981,29 @@ int Cvgd_build_from_hyb_2001(vgrid **my_new_vgrid, float *hyb, int size_hyb,
   return(VGD_OK);
 }
 
+int Cvgd_build_from_hyb_4001(vgrid **my_new_vgrid, float *hyb, int size_hyb,
+			     int ip1, int ip2)
+{
+  try
+  {
+    vgrid_4001 *my_grid = new vgrid_4001();
+
+    if(my_grid->Cvgd_build_vgrid_from_hyb(hyb, size_hyb, ip1, ip2)
+							   == VGD_ERROR )
+    {
+      printf("(Cvgd) ERROR in Cvgd_build_from_hyb_4001\n");
+      return(VGD_ERROR);
+    }
+    *my_new_vgrid = (vgrid*)my_grid;
+  }
+  catch(vgrid_exception)
+  {
+    printf("(Cvgd) ERROR in Cvgd_build_vgrid_from_hyb_4001\n");
+    return(VGD_ERROR);
+  }
+  return(VGD_OK);
+}
+
 int Cvgd_build_from_hyb_5001(vgrid **my_new_vgrid, float *hyb, int size_hyb,
 			     double ptop_8, double pref_8, float rcoef1, int ip1, int ip2)
 {

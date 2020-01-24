@@ -121,6 +121,7 @@ public:
   int C_genab(float *hgts, int nk, double **a_m_8, double **b_m_8, int **ip1_m);
   int Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
                          int *ip1_m, int nl_m);
+  int Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, int ip1, int ip2);
 private:
   void fstd_subinit();
   void set_table_nj(int nk);

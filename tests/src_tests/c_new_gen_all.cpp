@@ -108,7 +108,7 @@ int check_gen_1001_2001_4001(vgrid *my_vgrid, int vcode){
     }
     break;
   case 4001:
-    if( Cvgd_new_gen_4001(&my_vgrid2, hyb, nk, 0, 0) == VGD_ERROR) {
+    if( Cvgd_build_from_hyb_4001(&my_vgrid2, hyb, nk, 0, 0) == VGD_ERROR) {
       return(VGD_ERROR);
     }
     break;
