@@ -176,6 +176,10 @@ public:
   vgrid_5004();
   vgrid_5004(int key);
   int C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t);
+  int Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_8, float rcoef1,
+			 float rcoef2, double *a_m_8, double *b_m_8,
+			 double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t,
+			 int nl_m);
 private:
   void fstd_subinit();
 };
