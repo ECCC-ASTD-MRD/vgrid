@@ -400,7 +400,7 @@ int check_gen_5005(vgrid *my_vgrid){
   printf("  Testing specific interface\n");
   free(my_vgrid2);
   my_vgrid2 = nullptr;
-  if( Cvgd_new_gen_5005(&my_vgrid2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, 0, 0, dhm, dht) == VGD_ERROR) {
+  if( Cvgd_build_from_hyb_5005(&my_vgrid2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, 0, 0, &dhm, &dht) == VGD_ERROR) {
     return(VGD_ERROR);
   }
   //Test equality
