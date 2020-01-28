@@ -28,6 +28,8 @@ DEFINE = -DFICHSTD98
 
 OBJECTS = vgrid_utils.o vgrid.o vgrid_descriptors.o
 
+default: genlib
+
 obj:	$(OBJECTS)
 
 vgrid.o:	vgrid.c \
@@ -49,3 +51,6 @@ genlib: $(OBJECTS)
 
 clean:
 	rm -f *.o *.mod
+
+distclean: clean
+	rm -f libvgrid.a
