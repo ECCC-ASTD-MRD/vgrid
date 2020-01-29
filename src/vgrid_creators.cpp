@@ -463,6 +463,11 @@ int Cvgd_new_gen2(vgrid **my_new_vgrid, int kind, int version, float *hyb, int s
 								   ip1, ip2);
     break;
 
+  case 1003:
+    status=((vgrid_1003*)*my_new_vgrid)->Cvgd_build_vgrid_from_hyb(hyb, size_hyb, *rcoef1,
+       				          *ptop_8, *pref_8, ip1, ip2);
+    break;
+
   case 2001:
     status=((vgrid_2001*)*my_new_vgrid)->Cvgd_build_vgrid_from_hyb(hyb, size_hyb, ip1,
 								   ip2);
@@ -483,10 +488,31 @@ int Cvgd_new_gen2(vgrid **my_new_vgrid, int kind, int version, float *hyb, int s
 						    *rcoef2, *ptop_8, *pref_8, ip1, ip2);
     break;
 
+  case 5003:
+    status=((vgrid_5003*)*my_new_vgrid)->Cvgd_build_vgrid_from_hyb(hyb, size_hyb, *rcoef1,
+						    *rcoef2, *ptop_8, *pref_8, ip1, ip2);
+    break;
+
+  case 5004:
+    status=((vgrid_5004*)*my_new_vgrid)->Cvgd_build_vgrid_from_hyb(hyb, size_hyb, *rcoef1,
+						    *rcoef2, *ptop_8, *pref_8, ip1, ip2);
+    break;
+
   case 5005:
     status=((vgrid_5005*)*my_new_vgrid)->Cvgd_build_vgrid_from_hyb(
 				       hyb, size_hyb, *rcoef1, *rcoef2,
 				       *pref_8, ptop_out_8, ip1, ip2, dhm, dht);
+    break;
+
+  case 5100:
+    status=((vgrid_5100*)*my_new_vgrid)->Cvgd_build_vgrid_from_hyb(
+                                       hyb, size_hyb, *rcoef1, *rcoef2, *rcoef3, *rcoef4,
+                                       *pref_8, ptop_out_8, ip1, ip2, dhm, dht, avg);
+    break;
+
+  case 5999:
+    status=((vgrid_5999*)*my_new_vgrid)->Cvgd_build_vgrid_from_hyb(hyb, size_hyb, ip1,
+								   ip2);
     break;
 
   case 21001:
