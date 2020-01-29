@@ -468,6 +468,27 @@ int Cvgd_new_gen2(vgrid **my_new_vgrid, int kind, int version, float *hyb, int s
 								   ip2);
     break;
 
+  case 4001:
+    status=((vgrid_4001*)*my_new_vgrid)->Cvgd_build_vgrid_from_hyb(hyb, size_hyb, ip1,
+								   ip2);
+    break;
+
+  case 5001:
+    status=((vgrid_5001*)*my_new_vgrid)->Cvgd_build_vgrid_from_hyb(hyb, size_hyb, *rcoef1,
+       				          *ptop_8, *pref_8, ip1, ip2);
+    break;
+
+  case 5002:
+    status=((vgrid_5002*)*my_new_vgrid)->Cvgd_build_vgrid_from_hyb(hyb, size_hyb, *rcoef1,
+						    *rcoef2, *ptop_8, *pref_8, ip1, ip2);
+    break;
+
+  case 5005:
+    status=((vgrid_5005*)*my_new_vgrid)->Cvgd_build_vgrid_from_hyb(
+				       hyb, size_hyb, *rcoef1, *rcoef2,
+				       *pref_8, ptop_out_8, ip1, ip2, dhm, dht);
+    break;
+
   case 21001:
     status=((vgrid_21001*)*my_new_vgrid)->Cvgd_build_vgrid_from_hyb(
                                        hyb, size_hyb, *rcoef1, *rcoef2,
@@ -481,11 +502,9 @@ int Cvgd_new_gen2(vgrid **my_new_vgrid, int kind, int version, float *hyb, int s
     break;
 
   default:
-    // Eventually, this case will be replaced simply by an error message
-    status=(*my_new_vgrid)->Cvgd_build_from_hyb(kind, version, hyb, size_hyb,
-						rcoef1, rcoef2, rcoef3, rcoef4,
-						ptop_8, pref_8, ptop_out_8, ip1, ip2,
-						dhm, dht, dhw, avg);
+    printf("(Cvgd) Error in Cvgd_new_gen2.  Unsupported kind:version=%d:%d\n", kind,
+	   version);
+    status=VGD_ERROR;
     break;
   }
 

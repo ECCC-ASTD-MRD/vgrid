@@ -1627,15 +1627,13 @@ int vgrid_5001::Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef1
 					  double ptop_8, double pref_8, int ip1, int ip2)
 {
   double *a_m_8 = NULL, *b_m_8 = NULL;
-  int *ip1_m = NULL;
-
-  int nk = -1, nl_m = -1;
+  int *ip1_m = NULL, nl_m;
 
   try
   {
-    nk   = size_hyb;
-    if(this->C_genab(hyb, size_hyb, rcoef1, ptop_8, pref_8, &a_m_8, &b_m_8,
-				    &ip1_m) == VGD_ERROR )
+    nl_m = size_hyb;
+    if(((vgrid_5001*)this)->C_genab(hyb, size_hyb, rcoef1, ptop_8, pref_8, &a_m_8,
+				    &b_m_8, &ip1_m) == VGD_ERROR )
     {
       free(a_m_8);
       free(b_m_8);
@@ -1651,14 +1649,16 @@ int vgrid_5001::Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef1
 
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_build_from_ab(ip1,ip2,ptop_8,pref_8,rcoef1,a_m_8,b_m_8,ip1_m,nl_m) ) {
+  if( VGD_ERROR == this->Cvgd_build_from_ab(ip1,ip2,ptop_8,pref_8,rcoef1,a_m_8,b_m_8,
+					    ip1_m,nl_m) )
+  {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_build_from_hyb for kind = %d, version = %d\n",
- kind,version);
+	    kind,version);
     return(VGD_ERROR);
   }
   free(a_m_8);
   free(b_m_8);
-  free(ip1_m); 
+  free(ip1_m);
 
   return (VGD_OK);
 }
@@ -2096,11 +2096,10 @@ int vgrid_5002::Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef1
   double *a_m_8 = NULL, *b_m_8 = NULL, *a_t_8 = NULL, *b_t_8 = NULL;
   int *ip1_m = NULL, *ip1_t = NULL, tlift=0;
 
-  int nk = -1, nl_m = -1, nl_t = -1;
+  int nl_m = -1, nl_t = -1;
 
   try
   {
-    nk   = size_hyb;
     if(((vgrid_5002*)this)->C_genab_5002_5003(hyb, size_hyb, &nl_m, &nl_t, rcoef1, rcoef2,
 				    ptop_8, pref_8, &a_m_8, &b_m_8, &ip1_m,
 			      	    &a_t_8, &b_t_8, &ip1_t, tlift) == VGD_ERROR )
@@ -2125,9 +2124,10 @@ int vgrid_5002::Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef1
 
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_build_from_ab(ip1,ip2,ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,nl_m, nl_t) ) {
+  if( VGD_ERROR == this->Cvgd_build_from_ab(ip1,ip2,ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,nl_m, nl_t) )
+  {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_build_from_hyb for kind = %d, version = %d\n",
- kind,version);
+	    kind,version);
     return(VGD_ERROR);
   }
   free(a_m_8);

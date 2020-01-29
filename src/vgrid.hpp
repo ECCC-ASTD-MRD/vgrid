@@ -181,10 +181,6 @@ public:
 			 double *a_w_8, double *b_w_8, double *c_w_8, int *ip1_m,
 			 int *ip1_t, int *ip1_w, int nl_m, int nl_t, int nl_w);
   int Cvgd_build_from_table(double *table, int ni, int nj, int nk);
-  int Cvgd_build_from_hyb(int kind, int version, float *hyb, int size_hyb, float *rcoef1,
-                          float *rcoef2, float *rcoef3, float *rcoef4,
-                          double *ptop_8, double *pref_8, double *ptop_out_8,
-                          int ip1, int ip2, float *dhm, float *dht, float *dhw, int avg);
 
   int C_compute_heights_0001(int ni, int nj, int nk, int *ip1_list, float *levels);
   int C_compute_heights_0001_8(int ni, int nj, int nk, int *ip1_list, double *levels);
