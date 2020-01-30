@@ -133,7 +133,7 @@ void vgrid_0001::fstd_subinit()
 
 // The predecessor, Cvgd_new_build_vert_0001, of this method never existed.
 // Leave it commented out.
-// int vgrid_0001::Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
+// int vgrid_0001::Cvgd_create_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
 // 				   double *a_w_8, double *b_w_8, int *ip1_m, int *ip1_w,
 // 				   int nl_m, int nl_t, int nl_w)
 // {
@@ -157,7 +157,7 @@ void vgrid_0001::fstd_subinit()
 //   this->a_m_8 = (double*)malloc( nl_m * sizeof(double) );
 //   if(! this->a_m_8)
 //   { 
-//     printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
+//     printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
 //     return(VGD_ERROR);
 //   }
 //   my_copy_double(a_m_8, &(this->a_m_8), nl_m);
@@ -166,7 +166,7 @@ void vgrid_0001::fstd_subinit()
 //   this->b_m_8 = (double*)malloc( nl_m * sizeof(double) );
 //   if(! this->b_m_8)
 //   {
-//     printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating b_m_8\n");
+//     printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating b_m_8\n");
 //     return(VGD_ERROR);
 //   }
 //       my_copy_double(b_m_8, &(this->b_m_8), nl_m);
@@ -175,7 +175,7 @@ void vgrid_0001::fstd_subinit()
 //   this->a_w_8 = (double*)malloc( nl_w * sizeof(double) );
 //   if(! this->a_w_8)
 //   {
-//     printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating a_w_8\n");
+//     printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating a_w_8\n");
 //     return(VGD_ERROR);
 //   }
 //   my_copy_double(a_w_8, &(this->a_w_8), nl_w);
@@ -184,7 +184,7 @@ void vgrid_0001::fstd_subinit()
 //   this->b_w_8 = (double*)malloc( nl_w * sizeof(double) );
 //   if(! this->b_w_8)
 //   {
-//     printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating b_w_8\n");
+//     printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating b_w_8\n");
 //     return(VGD_ERROR);
 //   }
 //   my_copy_double(b_w_8, &(this->b_w_8), nl_w);
@@ -193,7 +193,7 @@ void vgrid_0001::fstd_subinit()
 //   this->ip1_m = (int*)malloc( nl_m * sizeof(int) );
 //   if(! this->ip1_m)
 //   {
-//     printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating ip1_m\n");
+//     printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating ip1_m\n");
 //     return(VGD_ERROR);
 //   }
 //   my_copy_int(ip1_m, &(this->ip1_m), nl_m);
@@ -202,7 +202,7 @@ void vgrid_0001::fstd_subinit()
 //   this->ip1_w = (int*)malloc( nl_w * sizeof(int) );
 //   if(! this->ip1_w)
 //   {
-//     printf("(Cvgd) ERROR: in Cvgd_build_from_ab, problem allocating ip1_w\n");
+//     printf("(Cvgd) ERROR: in Cvgd_create_from_ab, problem allocating ip1_w\n");
 //     return(VGD_ERROR);
 //   }
 //   my_copy_int(ip1_w, &(this->ip1_w), nl_w);
@@ -212,13 +212,13 @@ void vgrid_0001::fstd_subinit()
 //   // Fill the table (encode the vertical co-ordinate)
 //   if(this->allocate_table(nk) == VGD_ERROR)
 //   {
-//     printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem with allocate_table for vcode=%d\n",this->vcode);
+//     printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem with allocate_table for vcode=%d\n",this->vcode);
 //     return(VGD_ERROR);
 //   }
 //   this->set_refnames();
 //   if(this->c_encode_vert() == VGD_ERROR)
 //   {
-//     printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem with c_encode_vert for vcode=%d\n",this->vcode);
+//     printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem with c_encode_vert for vcode=%d\n",this->vcode);
 //     return(VGD_ERROR);
 //   }
 
@@ -226,7 +226,7 @@ void vgrid_0001::fstd_subinit()
 //   this->valid = 1;
 //   if(this->fstd_init() == VGD_ERROR)
 //   {
-//     printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem with fstd_init\n");
+//     printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem with fstd_init\n");
 //   }
 
 //   return(VGD_OK);
@@ -386,7 +386,7 @@ void vgrid_1001::fstd_subinit()
 
 
 
-int vgrid_1001::Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
+int vgrid_1001::Cvgd_create_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
 				   int *ip1_m, int nl_m)
 {
   // Complete the initializations
@@ -406,7 +406,7 @@ int vgrid_1001::Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_
   this->a_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->a_m_8)
   { 
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
     return(VGD_ERROR);
   }
   my_copy_double(a_m_8, &(this->a_m_8), nl_m);
@@ -415,7 +415,7 @@ int vgrid_1001::Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_
   this->b_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->b_m_8)
   {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating b_m_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating b_m_8\n");
     return(VGD_ERROR);
   }
       my_copy_double(b_m_8, &(this->b_m_8), nl_m);
@@ -424,14 +424,14 @@ int vgrid_1001::Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_
   this->ip1_m = (int*)malloc( nl_m * sizeof(int) );
   if(! this->ip1_m)
   {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating ip1_m\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating ip1_m\n");
     return(VGD_ERROR);
   }
   my_copy_int(ip1_m, &(this->ip1_m), nl_m);
 
   if(this->allocate_and_fill_table(nk) == VGD_ERROR)
   {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem filling in the table\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem filling in the table\n");
     return(VGD_ERROR);
   };
 
@@ -464,7 +464,7 @@ int vgrid_1001::Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, int ip1, int
     free(ip1_m);
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_build_from_ab(ip1,ip2,a_m_8,b_m_8,ip1_m,nl_m) )
+  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,a_m_8,b_m_8,ip1_m,nl_m) )
   {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_build_from_hyb for kind = %d, version = %d\n",
 	    kind,version);
@@ -731,7 +731,7 @@ void vgrid_1002::fstd_subinit()
 
 
 
-int vgrid_1002::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double *a_m_8,
+int vgrid_1002::Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double *a_m_8,
 				   double *b_m_8, int *ip1_m, int nl_m)
 {
   // Complete the initializations
@@ -753,7 +753,7 @@ int vgrid_1002::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double *a_m_
   this->a_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->a_m_8)
   { 
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
     return(VGD_ERROR);
   }
   my_copy_double(a_m_8, &(this->a_m_8), nl_m);
@@ -762,7 +762,7 @@ int vgrid_1002::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double *a_m_
   this->b_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->b_m_8)
   {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating b_m_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating b_m_8\n");
     return(VGD_ERROR);
   }
       my_copy_double(b_m_8, &(this->b_m_8), nl_m);
@@ -771,14 +771,14 @@ int vgrid_1002::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double *a_m_
   this->ip1_m = (int*)malloc( nl_m * sizeof(int) );
   if(! this->ip1_m)
   {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating ip1_m\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating ip1_m\n");
     return(VGD_ERROR);
   }
   my_copy_int(ip1_m, &(this->ip1_m), nl_m);
 
   if(this->allocate_and_fill_table(nk) == VGD_ERROR)
   {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem filling in the table\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem filling in the table\n");
     return(VGD_ERROR);
   };
 
@@ -812,7 +812,7 @@ int vgrid_1002::Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, double ptop_
     free(ip1_m);
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_build_from_ab(ip1,ip2,ptop_8,a_m_8,b_m_8,ip1_m,nl_m) )
+  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,ptop_8,a_m_8,b_m_8,ip1_m,nl_m) )
   {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_build_from_hyb for kind = %d, version = %d\n",
 	    kind,version);
@@ -843,7 +843,7 @@ void vgrid_1003_5001::set_table_nj(int nk)
 
 
 
-int vgrid_1003_5001::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_8,
+int vgrid_1003_5001::Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double pref_8,
 					float rcoef1, double *a_m_8,
 					double *b_m_8, int *ip1_m, int nl_m)
 {
@@ -868,7 +868,7 @@ int vgrid_1003_5001::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double 
   this->a_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->a_m_8)
   { 
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
     return(VGD_ERROR);
   }
   my_copy_double(a_m_8, &(this->a_m_8), nl_m);
@@ -877,7 +877,7 @@ int vgrid_1003_5001::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double 
   this->b_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->b_m_8)
   {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating b_m_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating b_m_8\n");
     return(VGD_ERROR);
   }
       my_copy_double(b_m_8, &(this->b_m_8), nl_m);
@@ -886,14 +886,14 @@ int vgrid_1003_5001::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double 
   this->ip1_m = (int*)malloc( nl_m * sizeof(int) );
   if(! this->ip1_m)
   {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating ip1_m\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating ip1_m\n");
     return(VGD_ERROR);
   }
   my_copy_int(ip1_m, &(this->ip1_m), nl_m);
 
   if(this->allocate_and_fill_table(nk) == VGD_ERROR)
   {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem filling in the table\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem filling in the table\n");
     return(VGD_ERROR);
   };
 
@@ -1031,7 +1031,7 @@ int vgrid_1003::Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef1
 
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_build_from_ab(ip1,ip2,ptop_8,pref_8,rcoef1,a_m_8,b_m_8,ip1_m,nl_m) ) {
+  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,ptop_8,pref_8,rcoef1,a_m_8,b_m_8,ip1_m,nl_m) ) {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_build_from_hyb for kind = %d, version = %d\n",
  kind,version);
     return(VGD_ERROR);
@@ -1188,7 +1188,7 @@ void vgrid_2001::fstd_subinit()
 
 
 
-int vgrid_2001::Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
+int vgrid_2001::Cvgd_create_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
                                    int *ip1_m, int nl_m)
 {
   // Complete the initializations
@@ -1206,7 +1206,7 @@ int vgrid_2001::Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_
   free(this->a_m_8);
   this->a_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->a_m_8){ 
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
     return(VGD_ERROR);
   }
   my_copy_double(a_m_8, &(this->a_m_8), nl_m);
@@ -1214,7 +1214,7 @@ int vgrid_2001::Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_
   free(this->b_m_8);
   this->b_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->b_m_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating b_m_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating b_m_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(b_m_8, &(this->b_m_8), nl_m);
@@ -1222,14 +1222,14 @@ int vgrid_2001::Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_
   free(this->ip1_m);
   this->ip1_m = (int*)malloc( nl_m * sizeof(int) );
   if(! this->ip1_m) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating ip1_m in Cvgd_build_from_ab\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating ip1_m in Cvgd_create_from_ab\n");
     return(VGD_ERROR);
   }
   my_copy_int(ip1_m, &(this->ip1_m), nl_m);
 
   if(this->allocate_and_fill_table(nk) == VGD_ERROR)
   {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem filling in the table\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem filling in the table\n");
     return(VGD_ERROR);
   };
 
@@ -1262,7 +1262,7 @@ int vgrid_2001::Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, int ip1, int
     free(ip1_m);
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_build_from_ab(ip1,ip2,a_m_8,b_m_8,ip1_m,nl_m) )
+  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,a_m_8,b_m_8,ip1_m,nl_m) )
   {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_build_from_hyb for kind = %d, version = %d\n",
 	    kind,version);
@@ -1424,7 +1424,7 @@ void vgrid_4001::fstd_subinit()
 
 
 
-int vgrid_4001::Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
+int vgrid_4001::Cvgd_create_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
 				   int *ip1_m, int nl_m)
 {
   // Complete the initializations
@@ -1444,7 +1444,7 @@ int vgrid_4001::Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_
   this->a_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->a_m_8)
   { 
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
     return(VGD_ERROR);
   }
   my_copy_double(a_m_8, &(this->a_m_8), nl_m);
@@ -1453,7 +1453,7 @@ int vgrid_4001::Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_
   this->b_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->b_m_8)
   {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating b_m_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating b_m_8\n");
     return(VGD_ERROR);
   }
       my_copy_double(b_m_8, &(this->b_m_8), nl_m);
@@ -1462,14 +1462,14 @@ int vgrid_4001::Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_
   this->ip1_m = (int*)malloc( nl_m * sizeof(int) );
   if(! this->ip1_m)
   {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating ip1_m\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating ip1_m\n");
     return(VGD_ERROR);
   }
   my_copy_int(ip1_m, &(this->ip1_m), nl_m);
 
   if(this->allocate_and_fill_table(nk) == VGD_ERROR)
   {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem filling in the table\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem filling in the table\n");
     return(VGD_ERROR);
   };
 
@@ -1502,7 +1502,7 @@ int vgrid_4001::Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, int ip1, int
     free(ip1_m);
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_build_from_ab(ip1,ip2,a_m_8,b_m_8,ip1_m,nl_m) )
+  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,a_m_8,b_m_8,ip1_m,nl_m) )
   {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_build_from_hyb for kind = %d, version = %d\n",
 	    kind,version);
@@ -1649,7 +1649,7 @@ int vgrid_5001::Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef1
 
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_build_from_ab(ip1,ip2,ptop_8,pref_8,rcoef1,a_m_8,b_m_8,
+  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,ptop_8,pref_8,rcoef1,a_m_8,b_m_8,
 					    ip1_m,nl_m) )
   {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_build_from_hyb for kind = %d, version = %d\n",
@@ -2003,7 +2003,7 @@ void vgrid_5002::fstd_subinit()
   h->ig4=(int)roundf(this->rcoef2*100.0f);
 }
 
-int vgrid_5002::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_8,
+int vgrid_5002::Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double pref_8,
 				   float rcoef1, float rcoef2, double *a_m_8,
 				   double *b_m_8, double *a_t_8, double *b_t_8,
 				   int *ip1_m, int *ip1_t,
@@ -2035,7 +2035,7 @@ int vgrid_5002::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_
   free(this->a_m_8);
   this->a_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->a_m_8){ 
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
     return(VGD_ERROR);
   }
   my_copy_double(a_m_8, &(this->a_m_8), nl_m);
@@ -2043,7 +2043,7 @@ int vgrid_5002::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_
   free(this->b_m_8);
   this->b_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->b_m_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating b_m_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating b_m_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(b_m_8, &(this->b_m_8), nl_m);
@@ -2051,7 +2051,7 @@ int vgrid_5002::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_
   free(this->a_t_8);
   this->a_t_8 = (double*)malloc( nl_t * sizeof(double) );
   if(! this->a_t_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating a_t_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating a_t_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(a_t_8, &(this->a_t_8), nl_t);
@@ -2059,7 +2059,7 @@ int vgrid_5002::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_
   free(this->b_t_8);
   this->b_t_8 = (double*)malloc( nl_t * sizeof(double) );
   if(! this->b_t_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating b_t_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating b_t_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(b_t_8, &(this->b_t_8), nl_t);
@@ -2067,7 +2067,7 @@ int vgrid_5002::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_
   free(this->ip1_m);
   this->ip1_m = (int*)malloc( nl_m * sizeof(int) );
   if(! this->ip1_m) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating ip1_m in Cvgd_build_from_ab\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating ip1_m in Cvgd_create_from_ab\n");
     return(VGD_ERROR);
   }
   my_copy_int(ip1_m, &(this->ip1_m), nl_m);
@@ -2075,14 +2075,14 @@ int vgrid_5002::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_
   free(this->ip1_t);
   this->ip1_t = (int*)malloc( nl_t * sizeof(int) );
   if(! this->ip1_t) {
-    printf("(Cvgd) ERROR: in Cvgd_build_from_ab, problem allocating ip1_t\n");
+    printf("(Cvgd) ERROR: in Cvgd_create_from_ab, problem allocating ip1_t\n");
     return(VGD_ERROR);
   }
   my_copy_int(ip1_t, &(this->ip1_t), nl_t);
 
   if(this->allocate_and_fill_table(nk) == VGD_ERROR)
   {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem filling in the table\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem filling in the table\n");
     return(VGD_ERROR);
   };
 
@@ -2124,7 +2124,7 @@ int vgrid_5002::Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef1
 
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_build_from_ab(ip1,ip2,ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,nl_m, nl_t) )
+  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,nl_m, nl_t) )
   {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_build_from_hyb for kind = %d, version = %d\n",
 	    kind,version);
@@ -2164,7 +2164,7 @@ void vgrid_5003::fstd_subinit()
   h->ig4=(int)roundf(this->rcoef2*100.0f);
 };
 
-int vgrid_5003::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_8,
+int vgrid_5003::Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double pref_8,
 				   float rcoef1, float rcoef2, double *a_m_8,
 				   double *b_m_8, double *a_t_8, double *b_t_8,
 				   int *ip1_m, int *ip1_t, int nl_m)
@@ -2192,7 +2192,7 @@ int vgrid_5003::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_
   free(this->a_m_8);
   this->a_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->a_m_8){ 
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
     return(VGD_ERROR);
   }
   my_copy_double(a_m_8, &(this->a_m_8), nl_m);
@@ -2200,7 +2200,7 @@ int vgrid_5003::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_
   free(this->b_m_8);
   this->b_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->b_m_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating b_m_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating b_m_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(b_m_8, &(this->b_m_8), nl_m);
@@ -2208,7 +2208,7 @@ int vgrid_5003::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_
   free(this->a_t_8);
   this->a_t_8 = (double*)malloc( nl_t * sizeof(double) );
   if(! this->a_t_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating a_t_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating a_t_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(a_t_8, &(this->a_t_8), nl_t);
@@ -2216,7 +2216,7 @@ int vgrid_5003::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_
   free(this->b_t_8);
   this->b_t_8 = (double*)malloc( nl_t * sizeof(double) );
   if(! this->b_t_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating b_t_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating b_t_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(b_t_8, &(this->b_t_8), nl_t);
@@ -2224,7 +2224,7 @@ int vgrid_5003::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_
   free(this->ip1_m);
   this->ip1_m = (int*)malloc( nl_m * sizeof(int) );
   if(! this->ip1_m) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating ip1_m in Cvgd_build_from_ab\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating ip1_m in Cvgd_create_from_ab\n");
     return(VGD_ERROR);
   }
   my_copy_int(ip1_m, &(this->ip1_m), nl_m);
@@ -2232,14 +2232,14 @@ int vgrid_5003::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_
   free(this->ip1_t);
   this->ip1_t = (int*)malloc( nl_t * sizeof(int) );
   if(! this->ip1_t) {
-    printf("(Cvgd) ERROR: in Cvgd_build_from_ab, problem allocating ip1_t\n");
+    printf("(Cvgd) ERROR: in Cvgd_create_from_ab, problem allocating ip1_t\n");
     return(VGD_ERROR);
   }
   my_copy_int(ip1_t, &(this->ip1_t), nl_t);
 
   if(this->allocate_and_fill_table(nk) == VGD_ERROR)
   {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem filling in the table\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem filling in the table\n");
     return(VGD_ERROR);
   };
 
@@ -2282,7 +2282,7 @@ int vgrid_5003::Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef1
 
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_build_from_ab(ip1,ip2,ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,nl_m) ) {
+  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,nl_m) ) {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_build_from_hyb for kind = %d, version = %d\n",
  kind,version);
     return(VGD_ERROR);
@@ -2461,7 +2461,7 @@ void vgrid_5004::fstd_subinit()
   h->ig4=(int)roundf(this->rcoef2*100.0f);
 };
 
-int vgrid_5004::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_8,
+int vgrid_5004::Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double pref_8,
 				   float rcoef1, float rcoef2, double *a_m_8,
 				   double *b_m_8, double *a_t_8, double *b_t_8,
 				   int *ip1_m, int *ip1_t, int nl_m)
@@ -2489,7 +2489,7 @@ int vgrid_5004::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_
   free(this->a_m_8);
   this->a_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->a_m_8){ 
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
     return(VGD_ERROR);
   }
   my_copy_double(a_m_8, &(this->a_m_8), nl_m);
@@ -2497,7 +2497,7 @@ int vgrid_5004::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_
   free(this->b_m_8);
   this->b_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->b_m_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating b_m_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating b_m_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(b_m_8, &(this->b_m_8), nl_m);
@@ -2505,7 +2505,7 @@ int vgrid_5004::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_
   free(this->a_t_8);
   this->a_t_8 = (double*)malloc( nl_t * sizeof(double) );
   if(! this->a_t_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating a_t_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating a_t_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(a_t_8, &(this->a_t_8), nl_t);
@@ -2513,7 +2513,7 @@ int vgrid_5004::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_
   free(this->b_t_8);
   this->b_t_8 = (double*)malloc( nl_t * sizeof(double) );
   if(! this->b_t_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating b_t_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating b_t_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(b_t_8, &(this->b_t_8), nl_t);
@@ -2521,7 +2521,7 @@ int vgrid_5004::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_
   free(this->ip1_m);
   this->ip1_m = (int*)malloc( nl_m * sizeof(int) );
   if(! this->ip1_m) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating ip1_m in Cvgd_build_from_ab\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating ip1_m in Cvgd_create_from_ab\n");
     return(VGD_ERROR);
   }
   my_copy_int(ip1_m, &(this->ip1_m), nl_m);
@@ -2529,14 +2529,14 @@ int vgrid_5004::Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_
   free(this->ip1_t);
   this->ip1_t = (int*)malloc( nl_t * sizeof(int) );
   if(! this->ip1_t) {
-    printf("(Cvgd) ERROR: in Cvgd_build_from_ab, problem allocating ip1_t\n");
+    printf("(Cvgd) ERROR: in Cvgd_create_from_ab, problem allocating ip1_t\n");
     return(VGD_ERROR);
   }
   my_copy_int(ip1_t, &(this->ip1_t), nl_t);
 
   if(this->allocate_and_fill_table(nk) == VGD_ERROR)
   {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem filling in the table\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem filling in the table\n");
     return(VGD_ERROR);
   };
 
@@ -2579,7 +2579,7 @@ int vgrid_5004::Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef1
 
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_build_from_ab(ip1,ip2,ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,nl_m) ) {
+  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,nl_m) ) {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_build_from_hyb for kind = %d, version = %d\n",
  kind,version);
     return(VGD_ERROR);
@@ -2757,7 +2757,7 @@ void vgrid_5005::fstd_subinit()
   h->ig4=(int)roundf(this->rcoef2*100.0f);
 };
 
-int vgrid_5005::Cvgd_build_from_ab(int ip1, int ip2,
+int vgrid_5005::Cvgd_create_from_ab(int ip1, int ip2,
 				   double pref_8, float rcoef1, float rcoef2,
 				   double *a_m_8, double *b_m_8, double *a_t_8,
 				   double *b_t_8, int *ip1_m, int *ip1_t,
@@ -2784,7 +2784,7 @@ int vgrid_5005::Cvgd_build_from_ab(int ip1, int ip2,
   free(this->a_m_8);
   this->a_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->a_m_8){ 
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
     return(VGD_ERROR);
   }
   my_copy_double(a_m_8, &(this->a_m_8), nl_m);
@@ -2792,7 +2792,7 @@ int vgrid_5005::Cvgd_build_from_ab(int ip1, int ip2,
   free(this->b_m_8);
   this->b_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->b_m_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating b_m_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating b_m_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(b_m_8, &(this->b_m_8), nl_m);
@@ -2800,7 +2800,7 @@ int vgrid_5005::Cvgd_build_from_ab(int ip1, int ip2,
   free(this->a_t_8);
   this->a_t_8 = (double*)malloc( nl_t * sizeof(double) );
   if(! this->a_t_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating a_t_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating a_t_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(a_t_8, &(this->a_t_8), nl_t);
@@ -2808,7 +2808,7 @@ int vgrid_5005::Cvgd_build_from_ab(int ip1, int ip2,
   free(this->b_t_8);
   this->b_t_8 = (double*)malloc( nl_t * sizeof(double) );
   if(! this->b_t_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating b_t_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating b_t_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(b_t_8, &(this->b_t_8), nl_t);
@@ -2816,7 +2816,7 @@ int vgrid_5005::Cvgd_build_from_ab(int ip1, int ip2,
   free(this->ip1_m);
   this->ip1_m = (int*)malloc( nl_m * sizeof(int) );
   if(! this->ip1_m) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating ip1_m in Cvgd_build_from_ab\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating ip1_m in Cvgd_create_from_ab\n");
     return(VGD_ERROR);
   }
   my_copy_int(ip1_m, &(this->ip1_m), nl_m);
@@ -2824,14 +2824,14 @@ int vgrid_5005::Cvgd_build_from_ab(int ip1, int ip2,
   free(this->ip1_t);
   this->ip1_t = (int*)malloc( nl_t * sizeof(int) );
   if(! this->ip1_t) {
-    printf("(Cvgd) ERROR: in Cvgd_build_from_ab, problem allocating ip1_t\n");
+    printf("(Cvgd) ERROR: in Cvgd_create_from_ab, problem allocating ip1_t\n");
     return(VGD_ERROR);
   }
   my_copy_int(ip1_t, &(this->ip1_t), nl_t);
 
   if(this->allocate_and_fill_table(nk) == VGD_ERROR)
   {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem filling in the table\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem filling in the table\n");
     return(VGD_ERROR);
   };
 
@@ -2875,7 +2875,7 @@ int vgrid_5005::Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef1
 
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_build_from_ab(ip1,ip2,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,nl_m) ) {
+  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,nl_m) ) {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_build_from_hyb for kind = %d, version = %d\n",
  kind,version);
     return(VGD_ERROR);
@@ -3220,7 +3220,7 @@ void vgrid_5100::fstd_subinit()
   h->ig4=0;
 };
 
-int vgrid_5100::Cvgd_build_from_ab(int ip1, int ip2, double pref_8, float rcoef1,
+int vgrid_5100::Cvgd_create_from_ab(int ip1, int ip2, double pref_8, float rcoef1,
 				   float rcoef2, float rcoef3, float rcoef4,
 				   double *a_m_8, double *b_m_8, double *c_m_8,
 				   double *a_t_8, double *b_t_8, double *c_t_8,
@@ -3249,7 +3249,7 @@ int vgrid_5100::Cvgd_build_from_ab(int ip1, int ip2, double pref_8, float rcoef1
   free(this->a_m_8);
   this->a_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->a_m_8){ 
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
     return(VGD_ERROR);
   }
   my_copy_double(a_m_8, &(this->a_m_8), nl_m);
@@ -3257,7 +3257,7 @@ int vgrid_5100::Cvgd_build_from_ab(int ip1, int ip2, double pref_8, float rcoef1
   free(this->b_m_8);
   this->b_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->b_m_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating b_m_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating b_m_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(b_m_8, &(this->b_m_8), nl_m);
@@ -3265,7 +3265,7 @@ int vgrid_5100::Cvgd_build_from_ab(int ip1, int ip2, double pref_8, float rcoef1
   free(this->c_m_8);
   this->c_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->c_m_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating c_m_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating c_m_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(c_m_8, &(this->c_m_8), nl_m);
@@ -3273,7 +3273,7 @@ int vgrid_5100::Cvgd_build_from_ab(int ip1, int ip2, double pref_8, float rcoef1
   free(this->a_t_8);
   this->a_t_8 = (double*)malloc( nl_t * sizeof(double) );
   if(! this->a_t_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating a_t_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating a_t_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(a_t_8, &(this->a_t_8), nl_t);
@@ -3281,7 +3281,7 @@ int vgrid_5100::Cvgd_build_from_ab(int ip1, int ip2, double pref_8, float rcoef1
   free(this->b_t_8);
   this->b_t_8 = (double*)malloc( nl_t * sizeof(double) );
   if(! this->b_t_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating b_t_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating b_t_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(b_t_8, &(this->b_t_8), nl_t);
@@ -3289,7 +3289,7 @@ int vgrid_5100::Cvgd_build_from_ab(int ip1, int ip2, double pref_8, float rcoef1
   free(this->c_t_8);
   this->c_t_8 = (double*)malloc( nl_t * sizeof(double) );
   if(! this->c_t_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating c_t_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating c_t_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(c_t_8, &(this->c_t_8), nl_t);
@@ -3297,7 +3297,7 @@ int vgrid_5100::Cvgd_build_from_ab(int ip1, int ip2, double pref_8, float rcoef1
   free(this->ip1_m);
   this->ip1_m = (int*)malloc( nl_m * sizeof(int) );
   if(! this->ip1_m) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating ip1_m in Cvgd_build_from_ab\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating ip1_m in Cvgd_create_from_ab\n");
     return(VGD_ERROR);
   }
   my_copy_int(ip1_m, &(this->ip1_m), nl_m);
@@ -3305,14 +3305,14 @@ int vgrid_5100::Cvgd_build_from_ab(int ip1, int ip2, double pref_8, float rcoef1
   free(this->ip1_t);
   this->ip1_t = (int*)malloc( nl_t * sizeof(int) );
   if(! this->ip1_t) {
-    printf("(Cvgd) ERROR: in Cvgd_build_from_ab, problem allocating ip1_t\n");
+    printf("(Cvgd) ERROR: in Cvgd_create_from_ab, problem allocating ip1_t\n");
     return(VGD_ERROR);
   }
   my_copy_int(ip1_t, &(this->ip1_t), nl_t);
 
   if(this->allocate_and_fill_table(nk) == VGD_ERROR)
   {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem filling in the table\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem filling in the table\n");
     return(VGD_ERROR);
   };
 
@@ -3359,7 +3359,7 @@ int vgrid_5100::Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef1
 
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_build_from_ab(ip1,ip2,pref_8,rcoef1,rcoef2,rcoef3,rcoef4,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,ip1_m,ip1_t,nl_m) ) {
+  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,pref_8,rcoef1,rcoef2,rcoef3,rcoef4,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,ip1_m,ip1_t,nl_m) ) {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_build_from_hyb for kind = %d, version = %d\n",
  kind,version);
     return(VGD_ERROR);
@@ -3508,7 +3508,7 @@ void vgrid_5999::fstd_subinit()
   h->ig4=0;
 };
 
-int vgrid_5999::Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
+int vgrid_5999::Cvgd_create_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
 				   int *ip1_m, int nl_m)
 {
   // Complete the initializations
@@ -3532,7 +3532,7 @@ int vgrid_5999::Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_
   free(this->a_m_8);
   this->a_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->a_m_8){ 
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
     return(VGD_ERROR);
   }
   my_copy_double(a_m_8, &(this->a_m_8), nl_m);
@@ -3540,7 +3540,7 @@ int vgrid_5999::Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_
   free(this->b_m_8);
   this->b_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->b_m_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating b_m_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating b_m_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(b_m_8, &(this->b_m_8), nl_m);
@@ -3548,14 +3548,14 @@ int vgrid_5999::Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_
   free(this->ip1_m);
   this->ip1_m = (int*)malloc( nl_m * sizeof(int) );
   if(! this->ip1_m) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating ip1_m in Cvgd_build_from_ab\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating ip1_m in Cvgd_create_from_ab\n");
     return(VGD_ERROR);
   }
   my_copy_int(ip1_m, &(this->ip1_m), nl_m);
 
   if(this->allocate_and_fill_table(nk) == VGD_ERROR)
   {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem filling in the table\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem filling in the table\n");
     return(VGD_ERROR);
   };
 
@@ -3588,7 +3588,7 @@ int vgrid_5999::Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, int ip1, int
     free(ip1_m);
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_build_from_ab(ip1,ip2,a_m_8,b_m_8,ip1_m,nl_m) )
+  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,a_m_8,b_m_8,ip1_m,nl_m) )
   {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_build_from_hyb for kind = %d, version = %d\n",
 	    kind,version);
@@ -3945,7 +3945,7 @@ void vgrid_21001::fstd_subinit()
   h->ig4=0;
 };
 
-int vgrid_21001::Cvgd_build_from_ab(int ip1, int ip2, float rcoef1, float rcoef2,
+int vgrid_21001::Cvgd_create_from_ab(int ip1, int ip2, float rcoef1, float rcoef2,
 				    float rcoef3, float rcoef4,
 				    double *a_m_8, double *b_m_8, double *c_m_8,
 				    double *a_t_8, double *b_t_8, double *c_t_8,
@@ -3977,7 +3977,7 @@ int vgrid_21001::Cvgd_build_from_ab(int ip1, int ip2, float rcoef1, float rcoef2
   free(this->a_m_8);
   this->a_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->a_m_8){ 
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
     return(VGD_ERROR);
   }
   my_copy_double(a_m_8, &(this->a_m_8), nl_m);
@@ -3985,7 +3985,7 @@ int vgrid_21001::Cvgd_build_from_ab(int ip1, int ip2, float rcoef1, float rcoef2
   free(this->b_m_8);
   this->b_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->b_m_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating b_m_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating b_m_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(b_m_8, &(this->b_m_8), nl_m);
@@ -3993,7 +3993,7 @@ int vgrid_21001::Cvgd_build_from_ab(int ip1, int ip2, float rcoef1, float rcoef2
   free(this->c_m_8);
   this->c_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->c_m_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating c_m_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating c_m_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(c_m_8, &(this->c_m_8), nl_m);
@@ -4001,7 +4001,7 @@ int vgrid_21001::Cvgd_build_from_ab(int ip1, int ip2, float rcoef1, float rcoef2
   free(this->a_t_8);
   this->a_t_8 = (double*)malloc( nl_t * sizeof(double) );
   if(! this->a_t_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating a_t_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating a_t_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(a_t_8, &(this->a_t_8), nl_t);
@@ -4009,7 +4009,7 @@ int vgrid_21001::Cvgd_build_from_ab(int ip1, int ip2, float rcoef1, float rcoef2
   free(this->b_t_8);
   this->b_t_8 = (double*)malloc( nl_t * sizeof(double) );
   if(! this->b_t_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating b_t_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating b_t_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(b_t_8, &(this->b_t_8), nl_t);
@@ -4017,7 +4017,7 @@ int vgrid_21001::Cvgd_build_from_ab(int ip1, int ip2, float rcoef1, float rcoef2
   free(this->c_t_8);
   this->c_t_8 = (double*)malloc( nl_t * sizeof(double) );
   if(! this->c_t_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating c_t_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating c_t_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(c_t_8, &(this->c_t_8), nl_t);
@@ -4025,7 +4025,7 @@ int vgrid_21001::Cvgd_build_from_ab(int ip1, int ip2, float rcoef1, float rcoef2
   free(this->ip1_m);
   this->ip1_m = (int*)malloc( nl_m * sizeof(int) );
   if(! this->ip1_m) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating ip1_m in Cvgd_build_from_ab\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating ip1_m in Cvgd_create_from_ab\n");
     return(VGD_ERROR);
   }
   my_copy_int(ip1_m, &(this->ip1_m), nl_m);
@@ -4033,14 +4033,14 @@ int vgrid_21001::Cvgd_build_from_ab(int ip1, int ip2, float rcoef1, float rcoef2
   free(this->ip1_t);
   this->ip1_t = (int*)malloc( nl_t * sizeof(int) );
   if(! this->ip1_t) {
-    printf("(Cvgd) ERROR: in Cvgd_build_from_ab, problem allocating ip1_t\n");
+    printf("(Cvgd) ERROR: in Cvgd_create_from_ab, problem allocating ip1_t\n");
     return(VGD_ERROR);
   }
   my_copy_int(ip1_t, &(this->ip1_t), nl_t);
 
   if(this->allocate_and_fill_table(nk) == VGD_ERROR)
   {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem filling in the table\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem filling in the table\n");
     return(VGD_ERROR);
   };
 
@@ -4086,7 +4086,7 @@ int vgrid_21001::Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef
 
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_build_from_ab(ip1,ip2,rcoef1,rcoef2,rcoef3,rcoef4,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,ip1_m,ip1_t,nl_m) )
+  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,rcoef1,rcoef2,rcoef3,rcoef4,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,ip1_m,ip1_t,nl_m) )
   {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_build_from_hyb for kind = %d, version = %d\n",
 	    kind,version);
@@ -4512,7 +4512,7 @@ void vgrid_21002::fstd_subinit()
   h->ig4=0;
 };
 
-int vgrid_21002::Cvgd_build_from_ab(int ip1, int ip2, float rcoef1, float rcoef2,
+int vgrid_21002::Cvgd_create_from_ab(int ip1, int ip2, float rcoef1, float rcoef2,
 				    float rcoef3, float rcoef4,
 				    double *a_m_8, double *b_m_8, double *c_m_8,
 				    double *a_t_8, double *b_t_8, double *c_t_8,
@@ -4545,7 +4545,7 @@ int vgrid_21002::Cvgd_build_from_ab(int ip1, int ip2, float rcoef1, float rcoef2
   free(this->a_m_8);
   this->a_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->a_m_8){ 
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating a_m_8 of size = %d\n", nl_m);
     return(VGD_ERROR);
   }
   my_copy_double(a_m_8, &(this->a_m_8), nl_m);
@@ -4553,7 +4553,7 @@ int vgrid_21002::Cvgd_build_from_ab(int ip1, int ip2, float rcoef1, float rcoef2
   free(this->b_m_8);
   this->b_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->b_m_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating b_m_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating b_m_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(b_m_8, &(this->b_m_8), nl_m);
@@ -4561,7 +4561,7 @@ int vgrid_21002::Cvgd_build_from_ab(int ip1, int ip2, float rcoef1, float rcoef2
   free(this->c_m_8);
   this->c_m_8 = (double*)malloc( nl_m * sizeof(double) );
   if(! this->c_m_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating c_m_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating c_m_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(c_m_8, &(this->c_m_8), nl_m);
@@ -4569,7 +4569,7 @@ int vgrid_21002::Cvgd_build_from_ab(int ip1, int ip2, float rcoef1, float rcoef2
   free(this->a_t_8);
   this->a_t_8 = (double*)malloc( nl_t * sizeof(double) );
   if(! this->a_t_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating a_t_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating a_t_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(a_t_8, &(this->a_t_8), nl_t);
@@ -4577,7 +4577,7 @@ int vgrid_21002::Cvgd_build_from_ab(int ip1, int ip2, float rcoef1, float rcoef2
   free(this->b_t_8);
   this->b_t_8 = (double*)malloc( nl_t * sizeof(double) );
   if(! this->b_t_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating b_t_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating b_t_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(b_t_8, &(this->b_t_8), nl_t);
@@ -4585,7 +4585,7 @@ int vgrid_21002::Cvgd_build_from_ab(int ip1, int ip2, float rcoef1, float rcoef2
   free(this->c_t_8);
   this->c_t_8 = (double*)malloc( nl_t * sizeof(double) );
   if(! this->c_t_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating c_t_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating c_t_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(c_t_8, &(this->c_t_8), nl_t);
@@ -4593,7 +4593,7 @@ int vgrid_21002::Cvgd_build_from_ab(int ip1, int ip2, float rcoef1, float rcoef2
   free(this->a_w_8);
   this->a_w_8 = (double*)malloc( nl_w * sizeof(double) );
   if(! this->a_w_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating a_w_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating a_w_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(a_w_8, &(this->a_w_8), nl_w);
@@ -4601,7 +4601,7 @@ int vgrid_21002::Cvgd_build_from_ab(int ip1, int ip2, float rcoef1, float rcoef2
   free(this->b_w_8);
   this->b_w_8 = (double*)malloc( nl_w * sizeof(double) );
   if(! this->b_w_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating b_w_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating b_w_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(b_w_8, &(this->b_w_8), nl_w);
@@ -4609,7 +4609,7 @@ int vgrid_21002::Cvgd_build_from_ab(int ip1, int ip2, float rcoef1, float rcoef2
   free(this->c_w_8);
   this->c_w_8 = (double*)malloc( nl_w * sizeof(double) );
   if(! this->c_w_8) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating c_w_8\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating c_w_8\n");
     return(VGD_ERROR);
   }
   my_copy_double(c_w_8, &(this->c_w_8), nl_w);
@@ -4617,7 +4617,7 @@ int vgrid_21002::Cvgd_build_from_ab(int ip1, int ip2, float rcoef1, float rcoef2
   free(this->ip1_m);
   this->ip1_m = (int*)malloc( nl_m * sizeof(int) );
   if(! this->ip1_m) {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem allocating ip1_m in Cvgd_build_from_ab\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem allocating ip1_m in Cvgd_create_from_ab\n");
     return(VGD_ERROR);
   }
   my_copy_int(ip1_m, &(this->ip1_m), nl_m);
@@ -4625,7 +4625,7 @@ int vgrid_21002::Cvgd_build_from_ab(int ip1, int ip2, float rcoef1, float rcoef2
   free(this->ip1_t);
   this->ip1_t = (int*)malloc( nl_t * sizeof(int) );
   if(! this->ip1_t) {
-    printf("(Cvgd) ERROR: in Cvgd_build_from_ab, problem allocating ip1_t\n");
+    printf("(Cvgd) ERROR: in Cvgd_create_from_ab, problem allocating ip1_t\n");
     return(VGD_ERROR);
   }
   my_copy_int(ip1_t, &(this->ip1_t), nl_t);
@@ -4633,14 +4633,14 @@ int vgrid_21002::Cvgd_build_from_ab(int ip1, int ip2, float rcoef1, float rcoef2
   free(this->ip1_w);
   this->ip1_w = (int*)malloc( nl_w * sizeof(int) );
   if(! this->ip1_w) {
-    printf("(Cvgd) ERROR: in Cvgd_build_from_ab, problem allocating ip1_w\n");
+    printf("(Cvgd) ERROR: in Cvgd_create_from_ab, problem allocating ip1_w\n");
     return(VGD_ERROR);
   }
   my_copy_int(ip1_w, &(this->ip1_w), nl_w);
 
   if(this->allocate_and_fill_table(nk) == VGD_ERROR)
   {
-    printf("(Cvgd) ERROR in Cvgd_build_from_ab, problem filling in the table\n");
+    printf("(Cvgd) ERROR in Cvgd_create_from_ab, problem filling in the table\n");
     return(VGD_ERROR);
   };
 
@@ -4691,7 +4691,7 @@ int vgrid_21002::Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef
 
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_build_from_ab(ip1,ip2,rcoef1,rcoef2,rcoef3,rcoef4,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,a_w_8,b_w_8,c_w_8,ip1_m,ip1_t,ip1_w,nl_m) )
+  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,rcoef1,rcoef2,rcoef3,rcoef4,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,a_w_8,b_w_8,c_w_8,ip1_m,ip1_t,ip1_w,nl_m) )
   {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_build_from_hyb for kind = %d, version = %d\n",
 	    kind,version);

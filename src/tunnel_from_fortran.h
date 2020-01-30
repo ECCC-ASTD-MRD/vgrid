@@ -36,7 +36,7 @@ int Cvgd_getopt_int(char *key, int *value, int quiet);
 
 int Cvgd_is_valid(int vgdid, char *valid_table_name);
 
-int Cvgd_new_build_vert2(int *vgdid, int kind, int version, int nk,
+int Cvgd_create_from_ab2(int *vgdid, int kind, int version, int nk,
                          int ip1, int ip2, double *ptop_8, double *pref_8,
                          float *rcoef1, float *rcoef2, float *rcoef3,
                          float *rcoef4, double *a_m_8, double *b_m_8,
@@ -82,50 +82,50 @@ int Cvgd_write_desc(int vgdid, int unit);
 // ########## N E W   I N T E R F A C E ##########
 int Cvgd_read_vgrid_from_file(int *vgdid, int unit, int ip1,int ip2, 
                               int kind, int version);
-int Create_from_ab_1001(int *vgdid, int ip1, int ip2, double *a_m_8, double *b_m_8,
+int c_create_from_ab_1001(int *vgdid, int ip1, int ip2, double *a_m_8, double *b_m_8,
                         int *ip1_m, int nl_m);
-int Create_from_ab_1002(int *vgdid, int ip1, int ip2, double ptop_8, double *a_m_8,
+int c_create_from_ab_1002(int *vgdid, int ip1, int ip2, double ptop_8, double *a_m_8,
 			double *b_m_8, int *ip1_m, int nl_m);
-int Create_from_ab_1003(int *vgdid, int ip1, int ip2, double ptop_8, double pref_8,
+int c_create_from_ab_1003(int *vgdid, int ip1, int ip2, double ptop_8, double pref_8,
 			float rcoef1, double *a_m_8,
 			double *b_m_8, int *ip1_m, int nl_m);
-int Create_from_ab_2001(int *vgdid, int ip1, int ip2, double *a_m_8, double *b_m_8,
+int c_create_from_ab_2001(int *vgdid, int ip1, int ip2, double *a_m_8, double *b_m_8,
 			int *ip1_m, int nl_m);
-int Create_from_ab_4001(int *vgdid, int ip1, int ip2, double *a_m_8, double *b_m_8,
+int c_create_from_ab_4001(int *vgdid, int ip1, int ip2, double *a_m_8, double *b_m_8,
                         int *ip1_m, int nl_m);
-int Create_from_ab_5001(int *vgdid, int ip1, int ip2, double ptop_8, double pref_8,
+int c_create_from_ab_5001(int *vgdid, int ip1, int ip2, double ptop_8, double pref_8,
 			float rcoef1, double *a_m_8,
 			double *b_m_8, int *ip1_m, int nl_m);
-int Create_from_ab_5002(int *vgdid, int ip1, int ip2, double ptop_8, double pref_8,
+int c_create_from_ab_5002(int *vgdid, int ip1, int ip2, double ptop_8, double pref_8,
 			float rcoef1, float rcoef2, double *a_m_8j,
 			double *b_m_8, double *a_t_8, double *b_t_8,
 			int *ip1_m, int *ip1_t,
 			int nl_m, int nl_t);
-int Create_from_ab_5003(int *vgdid, int ip1, int ip2,
+int c_create_from_ab_5003(int *vgdid, int ip1, int ip2,
 			double ptop_8, double pref_8, float rcoef1, float rcoef2,
 			double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8,
 			int *ip1_m, int *ip1_t, int nl_m);
-int Create_from_ab_5004(int *vgdid, int ip1, int ip2,
+int c_create_from_ab_5004(int *vgdid, int ip1, int ip2,
 			double ptop_8, double pref_8, float rcoef1, float rcoef2,
 			double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8,
 			int *ip1_m, int *ip1_t, int nl_m);
-int Create_from_ab_5005(int *vgdid, int ip1, int ip2,
+int c_create_from_ab_5005(int *vgdid, int ip1, int ip2,
 			double pref_8, float rcoef1, float rcoef2,
 			double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8,
 			int *ip1_m, int *ip1_t, int nl_m);
-int Create_from_ab_5100(int *vgdid, int ip1, int ip2, double pref_8, float rcoef1,
+int c_create_from_ab_5100(int *vgdid, int ip1, int ip2, double pref_8, float rcoef1,
 			float rcoef2, float rcoef3, float rcoef4,
 			double *a_m_8, double *b_m_8, double *c_m_8,
 			double *a_t_8, double *b_t_8, double *c_t_8,
 			int *ip1_m, int *ip1_t, int nl_m);
-int Create_from_ab_5999(int *vgdid, int ip1, int ip2, double *a_m_8, double *b_m_8,
+int c_create_from_ab_5999(int *vgdid, int ip1, int ip2, double *a_m_8, double *b_m_8,
 			int *ip1_m, int nl_m);
-int Create_from_ab_21001(int *vgdid, int ip1, int ip2,
+int c_create_from_ab_21001(int *vgdid, int ip1, int ip2,
 			 float rcoef1, float rcoef2, float rcoef3, float rcoef4,
 			 double *a_m_8, double *b_m_8, double *c_m_8,
 			 double *a_t_8, double *b_t_8, double *c_t_8,
 			 int *ip1_m, int *ip1_t, int nl_m);
-int Create_from_ab_21002(int *vgdid, int ip1, int ip2, float rcoef1, float rcoef2,
+int c_create_from_ab_21002(int *vgdid, int ip1, int ip2, float rcoef1, float rcoef2,
 			 float rcoef3, float rcoef4,
 			 double *a_m_8, double *b_m_8, double *c_m_8,
 			 double *a_t_8, double *b_t_8, double *c_t_8,

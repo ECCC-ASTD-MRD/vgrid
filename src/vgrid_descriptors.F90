@@ -39,20 +39,20 @@ module vGrid_Descriptors
    public :: vgd_get                             !get instance variable value
    public :: vgd_put                             !set instance variable value
    public :: read_vgrid_from_file                !class constructor
-   public :: Create_from_ab_1001                 !class constructor
-   public :: Create_from_ab_1002                 !class constructor
-   public :: Create_from_ab_1003                 !class constructor
-   public :: Create_from_ab_2001                 !class constructor
-   public :: Create_from_ab_4001                 !class constructor
-   public :: Create_from_ab_5001                 !class constructor
-   public :: Create_from_ab_5002                 !class constructor
-   public :: Create_from_ab_5003                 !class constructor
-   public :: Create_from_ab_5004                 !class constructor
-   public :: Create_from_ab_5005                 !class constructor
-   public :: Create_from_ab_5100                 !class constructor
-   public :: Create_from_ab_5999                 !class constructor
-   public :: Create_from_ab_21001                !class constructor
-   public :: Create_from_ab_21002                !class constructor
+   public :: vgd_create_from_ab_1001             !class constructor
+   public :: vgd_create_from_ab_1002             !class constructor
+   public :: vgd_create_from_ab_1003             !class constructor
+   public :: vgd_create_from_ab_2001             !class constructor
+   public :: vgd_create_from_ab_4001             !class constructor
+   public :: vgd_create_from_ab_5001             !class constructor
+   public :: vgd_create_from_ab_5002             !class constructor
+   public :: vgd_create_from_ab_5003             !class constructor
+   public :: vgd_create_from_ab_5004             !class constructor
+   public :: vgd_create_from_ab_5005             !class constructor
+   public :: vgd_create_from_ab_5100             !class constructor
+   public :: vgd_create_from_ab_5999             !class constructor
+   public :: vgd_create_from_ab_21001            !class constructor
+   public :: vgd_create_from_ab_21002            !class constructor
    public :: vgd_new                             !class constructor
    public :: vgd_getopt                          !get class variable value
    public :: vgd_putopt                          !set class variable value
@@ -231,7 +231,7 @@ module vGrid_Descriptors
          integer (c_int), value :: unit, ip1, ip2, kind, version
       end function f_read_vgrid_from_file
 
-      integer(c_int) function f_create_from_ab_1001(vgdid, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m) bind(c, name='Create_from_ab_1001')
+      integer(c_int) function f_create_from_ab_1001(vgdid, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m) bind(c, name='c_create_from_ab_1001')
          use iso_c_binding, only : c_ptr, c_int
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -240,7 +240,7 @@ module vGrid_Descriptors
       end function f_create_from_ab_1001
 
       integer(c_int) function f_create_from_ab_1002(vgdid, ip1, ip2, ptop_8, a_m_8, &
-                       b_m_8, ip1_m, nl_m) bind(c, name='Create_from_ab_1002')
+                       b_m_8, ip1_m, nl_m) bind(c, name='c_create_from_ab_1002')
          use iso_c_binding, only : c_ptr, c_int, c_double
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -250,7 +250,7 @@ module vGrid_Descriptors
       end function f_create_from_ab_1002
 
       integer(c_int) function f_create_from_ab_1003(vgdid, ip1, ip2, ptop_8, pref_8, &
-                    rcoef1, a_m_8, b_m_8, ip1_m, nl_m) bind(c, name='Create_from_ab_1003')
+                    rcoef1, a_m_8, b_m_8, ip1_m, nl_m) bind(c, name='c_create_from_ab_1003')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -261,7 +261,7 @@ module vGrid_Descriptors
       end function f_create_from_ab_1003
 
       integer(c_int) function f_create_from_ab_2001(vgdid, ip1, ip2, a_m_8, b_m_8, &
-                       ip1_m, nl_m) bind(c, name='Create_from_ab_2001')
+                       ip1_m, nl_m) bind(c, name='c_create_from_ab_2001')
          use iso_c_binding, only : c_ptr, c_int, c_char
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -269,7 +269,7 @@ module vGrid_Descriptors
          integer (c_int), value :: nl_m
       end function f_create_from_ab_2001
 
-      integer(c_int) function f_create_from_ab_4001(vgdid, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m) bind(c, name='Create_from_ab_4001')
+      integer(c_int) function f_create_from_ab_4001(vgdid, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m) bind(c, name='c_create_from_ab_4001')
          use iso_c_binding, only : c_ptr, c_int
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -278,7 +278,7 @@ module vGrid_Descriptors
       end function f_create_from_ab_4001
 
       integer(c_int) function f_create_from_ab_5001(vgdid, ip1, ip2, ptop_8, pref_8, &
-                    rcoef1, a_m_8, b_m_8, ip1_m, nl_m) bind(c, name='Create_from_ab_5001')
+                    rcoef1, a_m_8, b_m_8, ip1_m, nl_m) bind(c, name='c_create_from_ab_5001')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -291,7 +291,7 @@ module vGrid_Descriptors
       integer(c_int) function f_create_from_ab_5002(vgdid, ip1, ip2, ptop_8, pref_8, &
                                   rcoef1, rcoef2, a_m_8, b_m_8, a_t_8, b_t_8, &
                                   ip1_m, ip1_t, nl_m, nl_t) &
-                                  bind(c, name='Create_from_ab_5002')
+                                  bind(c, name='c_create_from_ab_5002')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -303,7 +303,7 @@ module vGrid_Descriptors
 
       integer(c_int) function f_create_from_ab_5003(vgdid, ip1, ip2, ptop_8, pref_8, &
                                      rcoef1, rcoef2, a_m_8, b_m_8, ip1_m, ip1_t, nl_m) &
-                                     bind(c, name='Create_from_ab_5003')
+                                     bind(c, name='c_create_from_ab_5003')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -315,7 +315,7 @@ module vGrid_Descriptors
 
       integer(c_int) function f_create_from_ab_5004(vgdid, ip1, ip2, ptop_8, pref_8, &
                                      rcoef1, rcoef2, a_m_8, b_m_8, ip1_m, ip1_t, nl_m) &
-                                     bind(c, name='Create_from_ab_5004')
+                                     bind(c, name='c_create_from_ab_5004')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -327,7 +327,7 @@ module vGrid_Descriptors
 
       integer(c_int) function f_create_from_ab_5005(vgdid, ip1, ip2, pref_8, rcoef1, &
                                      rcoef2, a_m_8, b_m_8, ip1_m, ip1_t, nl_m) &
-                                     bind(c, name='Create_from_ab_5005')
+                                     bind(c, name='c_create_from_ab_5005')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -340,7 +340,7 @@ module vGrid_Descriptors
       integer(c_int) function f_create_from_ab_5100(vgdid, ip1, ip2, pref_8, rcoef1, &
                           rcoef2, rcoef3, rcoef4, a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, &
                           c_t_8, ip1_m, ip1_t, nl_m) &
-                          bind(c, name='Create_from_ab_5100')
+                          bind(c, name='c_create_from_ab_5100')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -351,7 +351,7 @@ module vGrid_Descriptors
       end function f_create_from_ab_5100
 
       integer(c_int) function f_create_from_ab_5999(vgdid, ip1, ip2, a_m_8, b_m_8, &
-                          ip1_m, nl_m) bind(c, name='Create_from_ab_5999')
+                          ip1_m, nl_m) bind(c, name='c_create_from_ab_5999')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -362,7 +362,7 @@ module vGrid_Descriptors
       integer(c_int) function f_create_from_ab_21001(vgdid, ip1, ip2, &
 			      rcoef1, rcoef2, rcoef3, rcoef4, &
 			      a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8, ip1_m, &
-			      ip1_t, nl_m) bind(c, name='Create_from_ab_21001')
+			      ip1_t, nl_m) bind(c, name='c_create_from_ab_21001')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -377,7 +377,7 @@ module vGrid_Descriptors
 			      a_t_8, b_t_8, c_t_8, &
 			      a_w_8, b_w_8, c_w_8, &
 			      ip1_m, ip1_t, ip1_w, nl_m) &
-                              bind(c, name='Create_from_ab_21001')
+                              bind(c, name='c_create_from_ab_21001')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -404,16 +404,16 @@ module vGrid_Descriptors
          integer (c_int), value :: ip1,ip2,avg
       end function f_new_gen
       
-      integer(c_int) function f_new_build_vert(vgdid,kind,version,nk,ip1,ip2, &
+      integer(c_int) function f_create_from_ab(vgdid,kind,version,nk,ip1,ip2, &
            ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, &
-           a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, ip1_m_CP, ip1_t_CP, ip1_w_CP, nl_m, nl_t, nl_w) bind(c, name='Cvgd_new_build_vert2')
+           a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, ip1_m_CP, ip1_t_CP, ip1_w_CP, nl_m, nl_t, nl_w) bind(c, name='Cvgd_create_from_ab2')
          use iso_c_binding, only : c_ptr, c_int
          integer :: vgdid
          integer (c_int), value :: kind,version,nk,ip1,ip2
          type(c_ptr), value :: ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP
          type(c_ptr), value :: a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, ip1_m_CP, ip1_t_CP, ip1_w_CP
          integer (c_int), value :: nl_m, nl_t, nl_w
-      end function f_new_build_vert
+      end function f_create_from_ab
       
       subroutine f_table_shape(vgdid, tshape_CP) bind(c, name='Cvgd_table_shape')
          use iso_c_binding, only : c_ptr, c_int
@@ -463,8 +463,8 @@ module vGrid_Descriptors
    interface vgd_new
       module procedure read_vgrid_from_file
       module procedure new_from_table
-      module procedure new_build_vert
-      module procedure new_gen      
+      module procedure vgd_create_from_ab
+      module procedure new_gen
    end interface vgd_new
 
    interface vgd_get
@@ -596,7 +596,7 @@ contains
 
     end function read_vgrid_from_file
 
-    integer function Create_from_ab_1001(vgdid, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m &
+    integer function vgd_create_from_ab_1001(vgdid, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m &
                                         ) result(status)
       integer, target :: vgdid
       integer :: ip1, ip2
@@ -613,15 +613,15 @@ contains
 
       if( f_create_from_ab_1001(vgdid_p, ip1, ip2, a_m_8_p, b_m_8_p, ip1_m_p, nl_m &
                                )== VGD_ERROR )then
-        print*,'(F_vgd) ERROR: In Create_from_ab_1001'
+        print*,'(F_vgd) ERROR: In vgd_create_from_ab_1001'
         return
       end if
 
       status = VGD_OK
       return
-    end function Create_from_ab_1001
+    end function vgd_create_from_ab_1001
 
-    integer function Create_from_ab_1002(vgdid, ip1, ip2, ptop_8, a_m_8, b_m_8, ip1_m, &
+    integer function vgd_create_from_ab_1002(vgdid, ip1, ip2, ptop_8, a_m_8, b_m_8, ip1_m, &
                                          nl_m) result(status)
       integer, target :: vgdid
       integer :: ip1, ip2
@@ -639,15 +639,15 @@ contains
 
       if( f_create_from_ab_1002(vgdid_p, ip1, ip2, ptop_8, a_m_8_p, b_m_8_p, ip1_m_p, &
                                nl_m)== VGD_ERROR )then
-        print*,'(F_vgd) ERROR: In Create_from_ab_1002'
+        print*,'(F_vgd) ERROR: In vgd_create_from_ab_1002'
         return
       end if
 
       status = VGD_OK
       return
-    end function Create_from_ab_1002
+    end function vgd_create_from_ab_1002
 
-    integer function Create_from_ab_1003(vgdid, ip1, ip2, ptop_8, pref_8, rcoef1, a_m_8, &
+    integer function vgd_create_from_ab_1003(vgdid, ip1, ip2, ptop_8, pref_8, rcoef1, a_m_8, &
                                          b_m_8, ip1_m, nl_m) result(status)
       integer, target :: vgdid
       integer :: ip1, ip2
@@ -666,15 +666,15 @@ contains
 
       if( f_create_from_ab_1003(vgdid_p, ip1, ip2, ptop_8, pref_8, rcoef1, a_m_8_p, &
                                 b_m_8_p, ip1_m_p, nl_m)== VGD_ERROR )then
-        print*,'(F_vgd) ERROR: In Create_from_ab_1003'
+        print*,'(F_vgd) ERROR: In vgd_create_from_ab_1003'
         return
       end if
 
       status = VGD_OK
       return
-    end function Create_from_ab_1003
+    end function vgd_create_from_ab_1003
 
-    integer function Create_from_ab_2001(vgdid, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m &
+    integer function vgd_create_from_ab_2001(vgdid, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m &
                                         ) result(status)
       integer, target :: vgdid
       integer :: ip1, ip2
@@ -691,15 +691,15 @@ contains
 
       if( f_create_from_ab_2001(vgdid_p, ip1, ip2, a_m_8_p, b_m_8_p, ip1_m_p, nl_m &
                                )== VGD_ERROR )then
-        print*,'(F_vgd) ERROR: In Create_from_ab_2001'
+        print*,'(F_vgd) ERROR: In vgd_create_from_ab_2001'
         return
       end if
 
       status = VGD_OK
       return
-    end function Create_from_ab_2001
+    end function vgd_create_from_ab_2001
 
-    integer function Create_from_ab_4001(vgdid, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m &
+    integer function vgd_create_from_ab_4001(vgdid, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m &
                                         ) result(status)
       integer, target :: vgdid
       integer :: ip1, ip2
@@ -716,15 +716,15 @@ contains
 
       if( f_create_from_ab_4001(vgdid_p, ip1, ip2, a_m_8_p, b_m_8_p, ip1_m_p, nl_m &
                                )== VGD_ERROR )then
-        print*,'(F_vgd) ERROR: In Create_from_ab_4001'
+        print*,'(F_vgd) ERROR: In vgd_create_from_ab_4001'
         return
       end if
 
       status = VGD_OK
       return
-    end function Create_from_ab_4001
+    end function vgd_create_from_ab_4001
 
-    integer function Create_from_ab_5001(vgdid, ip1, ip2, ptop_8, pref_8, rcoef1, a_m_8, &
+    integer function vgd_create_from_ab_5001(vgdid, ip1, ip2, ptop_8, pref_8, rcoef1, a_m_8, &
                                          b_m_8, ip1_m, nl_m) result(status)
       integer, target :: vgdid
       integer :: ip1, ip2
@@ -743,15 +743,15 @@ contains
 
       if( f_create_from_ab_5001(vgdid_p, ip1, ip2, ptop_8, pref_8, rcoef1, a_m_8_p, &
                                 b_m_8_p, ip1_m_p, nl_m)== VGD_ERROR )then
-        print*,'(F_vgd) ERROR: In Create_from_ab_5001'
+        print*,'(F_vgd) ERROR: In vgd_create_from_ab_5001'
         return
       end if
 
       status = VGD_OK
       return
-    end function Create_from_ab_5001
+    end function vgd_create_from_ab_5001
 
-    integer function Create_from_ab_5002(vgdid, ip1, ip2, ptop_8, pref_8, &
+    integer function vgd_create_from_ab_5002(vgdid, ip1, ip2, ptop_8, pref_8, &
            rcoef1, rcoef2, a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, ip1_t, nl_m, nl_t) &
            result(status)
       integer, target :: vgdid
@@ -775,15 +775,15 @@ contains
       if( f_create_from_ab_5002(vgdid_p, ip1, ip2, ptop_8, pref_8, rcoef1, rcoef2, &
                                 a_m_8_p, b_m_8_p, a_t_8_p, b_t_8_p, ip1_m_p, ip1_t_p, &
                                 nl_m, nl_t)== VGD_ERROR )then
-        print*,'(F_vgd) ERROR: In Create_from_ab_5002'
+        print*,'(F_vgd) ERROR: In vgd_create_from_ab_5002'
         return
       end if
 
       status = VGD_OK
       return
-    end function Create_from_ab_5002
+    end function vgd_create_from_ab_5002
 
-    integer function Create_from_ab_5003(vgdid, ip1, ip2, ptop_8, pref_8, rcoef1, rcoef2,&
+    integer function vgd_create_from_ab_5003(vgdid, ip1, ip2, ptop_8, pref_8, rcoef1, rcoef2,&
                              a_m_8, b_m_8, ip1_m, ip1_t, nl_m) result(status)
       integer, target :: vgdid
       integer :: ip1, ip2
@@ -804,15 +804,15 @@ contains
       if( f_create_from_ab_5003(vgdid_p, ip1, ip2, ptop_8, pref_8, rcoef1, rcoef2, &
                                 a_m_8_p, b_m_8_p, ip1_m_p, ip1_t_p, nl_m)== VGD_ERROR &
                                )then
-        print*,'(F_vgd) ERROR: In Create_from_ab_5003'
+        print*,'(F_vgd) ERROR: In vgd_create_from_ab_5003'
         return
       end if
 
       status = VGD_OK
       return
-    end function Create_from_ab_5003
+    end function vgd_create_from_ab_5003
 
-    integer function Create_from_ab_5004(vgdid, ip1, ip2, ptop_8, pref_8, rcoef1, rcoef2,&
+    integer function vgd_create_from_ab_5004(vgdid, ip1, ip2, ptop_8, pref_8, rcoef1, rcoef2,&
                              a_m_8, b_m_8, ip1_m, ip1_t, nl_m) result(status)
       integer, target :: vgdid
       integer :: ip1, ip2
@@ -833,15 +833,15 @@ contains
       if( f_create_from_ab_5004(vgdid_p, ip1, ip2, ptop_8, pref_8, rcoef1, rcoef2, &
                                 a_m_8_p, b_m_8_p, ip1_m_p, ip1_t_p, nl_m)== VGD_ERROR &
                                )then
-        print*,'(F_vgd) ERROR: In Create_from_ab_5004'
+        print*,'(F_vgd) ERROR: In vgd_create_from_ab_5004'
         return
       end if
 
       status = VGD_OK
       return
-    end function Create_from_ab_5004
+    end function vgd_create_from_ab_5004
 
-    integer function Create_from_ab_5005(vgdid, ip1, ip2, pref_8, rcoef1, rcoef2, &
+    integer function vgd_create_from_ab_5005(vgdid, ip1, ip2, pref_8, rcoef1, rcoef2, &
                              a_m_8, b_m_8, ip1_m, ip1_t, nl_m) result(status)
       integer, target :: vgdid
       integer :: ip1, ip2
@@ -862,15 +862,15 @@ contains
       if( f_create_from_ab_5005(vgdid_p, ip1, ip2, pref_8, rcoef1, rcoef2, a_m_8_p, &
                                 b_m_8_p, ip1_m_p, ip1_t_p, nl_m)== VGD_ERROR &
                                )then
-        print*,'(F_vgd) ERROR: In Create_from_ab_5005'
+        print*,'(F_vgd) ERROR: In vgd_create_from_ab_5005'
         return
       end if
 
       status = VGD_OK
       return
-    end function Create_from_ab_5005
+    end function vgd_create_from_ab_5005
 
-    integer function Create_from_ab_5100(vgdid, ip1, ip2, pref_8, rcoef1, &
+    integer function vgd_create_from_ab_5100(vgdid, ip1, ip2, pref_8, rcoef1, &
                           rcoef2, rcoef3, rcoef4, a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, &
                           c_t_8, ip1_m, ip1_t, nl_m) result(status)
       integer, target :: vgdid
@@ -898,15 +898,15 @@ contains
                                 rcoef4, a_m_8_p, b_m_8_p, c_m_8_p, a_t_8_p, b_t_8_p, &
                                 c_t_8_p, ip1_m_p, ip1_t_p, nl_m)== VGD_ERROR &
                                )then
-        print*,'(F_vgd) ERROR: In Create_from_ab_5100'
+        print*,'(F_vgd) ERROR: In vgd_create_from_ab_5100'
         return
       end if
 
       status = VGD_OK
       return
-    end function Create_from_ab_5100
+    end function vgd_create_from_ab_5100
 
-    integer function Create_from_ab_5999(vgdid, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m) &
+    integer function vgd_create_from_ab_5999(vgdid, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m) &
                                         result(status)
       integer, target :: vgdid
       integer :: ip1, ip2
@@ -923,15 +923,15 @@ contains
 
       if( f_create_from_ab_5999(vgdid_p, ip1, ip2, a_m_8_p, b_m_8_p, ip1_m_p, nl_m) &
                                == VGD_ERROR )then
-        print*,'(F_vgd) ERROR: In Create_from_ab_5999'
+        print*,'(F_vgd) ERROR: In vgd_create_from_ab_5999'
         return
       end if
 
       status = VGD_OK
       return
-    end function Create_from_ab_5999
+    end function vgd_create_from_ab_5999
 
-    integer function Create_from_ab_21001(vgdid, ip1, ip2, rcoef1, &
+    integer function vgd_create_from_ab_21001(vgdid, ip1, ip2, rcoef1, &
                           rcoef2, rcoef3, rcoef4, a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, &
                           c_t_8, ip1_m, ip1_t, nl_m) result(status)
       integer, target :: vgdid
@@ -958,15 +958,15 @@ contains
                                 rcoef4, a_m_8_p, b_m_8_p, c_m_8_p, a_t_8_p, b_t_8_p, &
                                 c_t_8_p, ip1_m_p, ip1_t_p, nl_m)== VGD_ERROR &
                                )then
-        print*,'(F_vgd) ERROR: In Create_from_ab_21001'
+        print*,'(F_vgd) ERROR: In vgd_create_from_ab_21001'
         return
       end if
 
       status = VGD_OK
       return
-    end function Create_from_ab_21001
+    end function vgd_create_from_ab_21001
 
-    integer function Create_from_ab_21002(vgdid, ip1, ip2, rcoef1, &
+    integer function vgd_create_from_ab_21002(vgdid, ip1, ip2, rcoef1, &
                           rcoef2, rcoef3, rcoef4, a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, &
                           c_t_8, a_w_8, b_w_8, c_w_8, ip1_m, ip1_t, ip1_w, nl_m) &
                           result(status)
@@ -1002,13 +1002,13 @@ contains
 			         a_w_8_p, b_w_8_p, c_w_8_p, &
 			         ip1_m_p, ip1_t_p, ip1_w_p, nl_m)== VGD_ERROR &
                                 )then
-        print*,'(F_vgd) ERROR: In Create_from_ab_21002'
+        print*,'(F_vgd) ERROR: In vgd_create_from_ab_21002'
         return
       end if
 
       status = VGD_OK
       return
-    end function Create_from_ab_21002
+    end function vgd_create_from_ab_21002
 
     integer function new_from_table(vgdid,table) result(status)
        ! Coordinate constructor - build vertical descriptor from table input
@@ -1141,8 +1141,10 @@ contains
          return
       endif
       status = VGD_OK
-   end function new_gen
-   integer function new_build_vert(vgdid,kind,version,nk,ip1,ip2, &
+    end function new_gen
+
+
+   integer function vgd_create_from_ab(vgdid,kind,version,nk,ip1,ip2, &
         ptop_8,pref_8,rcoef1,rcoef2,rcoef3,rcoef4,a_m_8,b_m_8,a_t_8,b_t_8, &
         ip1_m,ip1_t,c_m_8,c_t_8,a_w_8,b_w_8,c_w_8,ip1_w) result(status)
       ! Coordinate constructor - build vertical descriptor from arguments
@@ -1274,17 +1276,17 @@ contains
       else
          ip1_w_CP = C_NULL_PTR
       endif
-      if( f_new_build_vert(vgdid,kind,version,nk,l_ip1,l_ip2, &
+      if( f_create_from_ab(vgdid,kind,version,nk,l_ip1,l_ip2, &
            ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, &
            a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, &
            ip1_m_CP, ip1_t_CP, ip1_w_CP, nl_m, nl_t, nl_w) == VGD_ERROR )then
-         print*,'(F_vgd) ERROR in new_build_vert, problem with c_new_build_vert',VGD_ERROR
+         print*,'(F_vgd) ERROR in vgd_create_from_ab, problem with vgd_create_from_ab',VGD_ERROR
          return
       endif
 
       status = VGD_OK
 
-   end function new_build_vert
+   end function vgd_create_from_ab
 
    integer function getopt_logical(key,value,quiet) result(status)
       use vgrid_utils, only: up

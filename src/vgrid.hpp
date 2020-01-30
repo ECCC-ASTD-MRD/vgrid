@@ -174,7 +174,7 @@ public:
   int Cvgd_set_vcode_i(int Kind,int Version);
   int fstd_init();
   int Cvgd_set_vcode();
-  int Cvgd_build_from_ab_old(int kind, int version, int nk, int ip1, int ip2,
+  int Cvgd_create_from_ab_old(int kind, int version, int nk, int ip1, int ip2,
 			 double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2,
 			 float *rcoef3, float *rcoef4, double *a_m_8, double *b_m_8,
 			 double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8,

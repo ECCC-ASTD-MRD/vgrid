@@ -29,7 +29,7 @@ public:
   vgrid_0001(int key);
   int c_decode_vert();
   int c_encode_vert();
-//  int Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
+//  int Cvgd_create_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
 //                         double *a_w_8, double *b_w_8, int *ip1_m, int *ip1_w,
 //                         int nl_m, int nl_t, int nl_w)
 private:
@@ -45,7 +45,7 @@ public:
   int c_decode_vert();
   int c_encode_vert();
   int C_genab(float *hyb, int nk, double **a_m_8, double **b_m_8, int **ip1_m);
-  int Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
+  int Cvgd_create_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
                          int *ip1_m, int nl_m);
   int Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, int ip1, int ip2);
 private:
@@ -62,7 +62,7 @@ public:
   int c_encode_vert();
   int C_genab(float *etauser, int nk, double ptop_8, double **a_m_8, double **b_m_8,
 	      int **ip1_m);
-  int Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double *a_m_8,
+  int Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double *a_m_8,
 			 double *b_m_8, int *ip1_m, int nl_m);
   int Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, double ptop_8,
 				int ip1, int ip2);
@@ -77,7 +77,7 @@ public:
   vgrid_1003_5001();
   int c_decode_vert();
   int c_encode_vert();
-  int Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_8, float rcoef1,
+  int Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double pref_8, float rcoef1,
 			 double *a_m_8, double *b_m_8, int *ip1_m, int nl_m);
 private:
   void set_table_nj(int nk);
@@ -103,7 +103,7 @@ public:
   int c_decode_vert();
   int c_encode_vert();
   int C_genab(float *pres, int nk, double **a_m_8, double **b_m_8, int **ip1_m);
-  int Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
+  int Cvgd_create_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
                          int *ip1_m, int nl_m);
   int Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, int ip1, int ip2);
 private:
@@ -119,7 +119,7 @@ public:
   int c_decode_vert();
   int c_encode_vert();
   int C_genab(float *hgts, int nk, double **a_m_8, double **b_m_8, int **ip1_m);
-  int Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
+  int Cvgd_create_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
                          int *ip1_m, int nl_m);
   int Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, int ip1, int ip2);
 private:
@@ -157,7 +157,7 @@ class vgrid_5002 : public vgrid_5002_5003_5004_5005
 public:
   vgrid_5002();
   vgrid_5002(int key);
-  int Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_8,
+  int Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double pref_8,
 			 float rcoef1, float rcoef2, double *a_m_8,
 			 double *b_m_8, double *a_t_8, double *b_t_8,
 			 int *ip1_m, int *ip1_t,
@@ -174,7 +174,7 @@ class vgrid_5003 : public vgrid_5002_5003_5004_5005
 public:
   vgrid_5003();
   vgrid_5003(int key);
-  int Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_8,
+  int Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double pref_8,
 			 float rcoef1, float rcoef2, double *a_m_8,
 			 double *b_m_8, double *a_t_8, double *b_t_8,
 			 int *ip1_m, int *ip1_t, int nl_m);
@@ -191,7 +191,7 @@ public:
   vgrid_5004();
   vgrid_5004(int key);
   int C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t);
-  int Cvgd_build_from_ab(int ip1, int ip2, double ptop_8, double pref_8, float rcoef1,
+  int Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double pref_8, float rcoef1,
 			 float rcoef2, double *a_m_8, double *b_m_8,
 			 double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t,
 			 int nl_m);
@@ -208,7 +208,7 @@ public:
   vgrid_5005();
   vgrid_5005(int key);
   int C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double **ptop_out_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t, float dhm, float dht);
-  int Cvgd_build_from_ab(int ip1, int ip2, double pref_8, float rcoef1, float rcoef2,
+  int Cvgd_create_from_ab(int ip1, int ip2, double pref_8, float rcoef1, float rcoef2,
                          double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8,
 			 int *ip1_m, int *ip1_t, int nl_m);
   int Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef1,
@@ -227,7 +227,7 @@ public:
   int C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **ptop_out_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, float dhm, float dht, int avg);
   int c_decode_vert();
   int c_encode_vert();
-  int Cvgd_build_from_ab(int ip1, int ip2, double pref_8, float rcoef1,
+  int Cvgd_create_from_ab(int ip1, int ip2, double pref_8, float rcoef1,
 			 float rcoef2, float rcoef3, float rcoef4,
 			 double *a_m_8, double *b_m_8, double *c_m_8,
 			 double *a_t_8, double *b_t_8, double *c_t_8,
@@ -250,7 +250,7 @@ public:
   int C_genab(float *hyb, int size_hyb, double **a_m_8, double **b_m_8, int **ip1_m);
   int c_decode_vert();
   int c_encode_vert();
-  int Cvgd_build_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
+  int Cvgd_create_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
 			 int *ip1_m, int nl_m);
   int Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, int ip1, int ip2);
 private:
@@ -266,7 +266,7 @@ public:
   int C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, float dhm, float dht);
   int c_decode_vert();
   int c_encode_vert();
-  int Cvgd_build_from_ab(int ip1, int ip2, float rcoef1, float rcoef2,
+  int Cvgd_create_from_ab(int ip1, int ip2, float rcoef1, float rcoef2,
 			 float rcoef3, float rcoef4,
 			 double *a_m_8, double *b_m_8, double *c_m_8,
 			 double *a_t_8, double *b_t_8, double *c_t_8,
@@ -288,7 +288,7 @@ public:
   int C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, int *nl_w, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, double **PP_a_w_8, double **PP_b_w_8, double **PP_c_w_8, int **PP_ip1_w, float dhm, float dht, float dhw);
   int c_decode_vert();
   int c_encode_vert();
-  int Cvgd_build_from_ab(int ip1, int ip2, float rcoef1, float rcoef2,
+  int Cvgd_create_from_ab(int ip1, int ip2, float rcoef1, float rcoef2,
 			 float rcoef3, float rcoef4,
 			 double *a_m_8, double *b_m_8, double *c_m_8,
 			 double *a_t_8, double *b_t_8, double *c_t_8,
