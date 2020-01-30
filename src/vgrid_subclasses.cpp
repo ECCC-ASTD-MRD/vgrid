@@ -4052,7 +4052,7 @@ int vgrid_21001::Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef
 					   float rcoef2, int ip1, int ip2, float *dhm,
 					   float *dht, float rcoef3,
 					   float rcoef4)
- {
+{
   double *a_m_8 = NULL, *b_m_8 = NULL, *c_m_8 = NULL, *a_t_8 = NULL, *b_t_8 = NULL, *c_t_8 = NULL;
   int *ip1_m = NULL, *ip1_t = NULL, tlift;
 

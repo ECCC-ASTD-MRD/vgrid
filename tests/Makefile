@@ -21,7 +21,7 @@ tests:
 	cd data ; \
 	rm -rf WORK ; \
 	mkdir -p WORK ; \
-  ln -s ../data_Linux/* . ; \
+	ln -s ../data_Linux/* . ; \
 	cd .. ; \
 	./run_tests.ksh -only $(ONLY) -compile $(COMPILE) -execute $(EXECUTE) -valgrind $(VALGRIND)
 

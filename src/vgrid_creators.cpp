@@ -451,6 +451,26 @@ int Cvgd_new_gen2(vgrid **my_new_vgrid, int kind, int version, float *hyb, int s
     return(VGD_ERROR);
   }
 
+  if(vcode == 21001 || vcode == 21002)
+  {
+    if(rcoef3)
+    {
+      l_rcoef3 = rcoef3;
+    }
+    else
+    {
+      l_rcoef3 = &minus_one;
+    }
+    if(rcoef4)
+    {
+      l_rcoef4 = rcoef4;
+    }
+    else
+    {
+      l_rcoef4 = &minus_one;
+    }
+  }
+
   switch(vcode)
   {
   case 1001:
@@ -536,15 +556,16 @@ int Cvgd_new_gen2(vgrid **my_new_vgrid, int kind, int version, float *hyb, int s
 
   case 21001:
     vgrid_21001 *my_grid_21001 = new vgrid_21001();
-    status=my_grid_21001->Cvgd_build_vgrid_from_hyb(hyb, size_hyb, *rcoef1, *rcoef2, ip1,
-						    ip2, dhm, dht, *rcoef3, *rcoef4);
+     status=my_grid_21001->Cvgd_build_vgrid_from_hyb(hyb, size_hyb, *rcoef1, *rcoef2, ip1,
+     						     ip2, dhm, dht, *l_rcoef3, *l_rcoef4);
     *my_new_vgrid = (vgrid*)my_grid_21001;
     break;
 
   case 21002:
     vgrid_21002 *my_grid_21002 = new vgrid_21002();
     status=my_grid_21002->Cvgd_build_vgrid_from_hyb(hyb, size_hyb, *rcoef1, *rcoef2, ip1,
-						    ip2, dhm, dht, dhw, *rcoef3, *rcoef4);
+						    ip2, dhm, dht, dhw, *l_rcoef3,
+						    *l_rcoef4);
     *my_new_vgrid = (vgrid*)my_grid_21002;
     break;
 

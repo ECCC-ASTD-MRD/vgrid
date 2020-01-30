@@ -72,14 +72,15 @@ program constructor
      print*,'Test on wrong rcoef2 OK'
   endif
 
-  print*,'Test on missing rcoef2 ===='
-  stat = vgd_new(vgdid,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
-  if(stat.eq.VGD_OK)then
-     print*,'should have reported error on mising rcoef2'
-     test_OK=.false.
-  else
-     print*,'Test on missing rcoef2 OK'
-  endif
+! Such errors are no longer tolerated, and will result in a run-time crash.
+!!$  print*,'Test on missing rcoef2 ===='
+!!$  stat = vgd_new(vgdid,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,ptop_8=ptop,pref_8=pref)
+!!$  if(stat.eq.VGD_OK)then
+!!$     print*,'should have reported error on mising rcoef2'
+!!$     test_OK=.false.
+!!$  else
+!!$     print*,'Test on missing rcoef2 OK'
+!!$  endif
   
   call ut_report(test_OK,'Grid_Descriptors::vgd_new vertical generate initializer')
   
