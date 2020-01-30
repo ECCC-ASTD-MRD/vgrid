@@ -80,7 +80,7 @@ int Cvgd_create_from_ab_5001(vgrid** new_vgrid, int ip1, int ip2, double ptop_8,
 int Cvgd_create_from_ab_5002(vgrid** new_vgrid, int ip1, int ip2, double ptop_8,
 			     double pref_8, float rcoef1, float rcoef2, double *a_m_8j,
 			     double *b_m_8, double *a_t_8, double *b_t_8,
-			     int *ip1_m, int *ip1_t, int nl_m, int nl_t);
+			     int *ip1_m, int *ip1_t, int nl_m);
 int Cvgd_create_from_ab_5003(vgrid** new_vgrid, int ip1, int ip2,
 			     double ptop_8, double pref_8, float rcoef1, float rcoef2,
 			     double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8,

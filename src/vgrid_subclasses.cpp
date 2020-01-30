@@ -2007,7 +2007,7 @@ int vgrid_5002::Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double pref
 				   float rcoef1, float rcoef2, double *a_m_8,
 				   double *b_m_8, double *a_t_8, double *b_t_8,
 				   int *ip1_m, int *ip1_t,
-				   int nl_m, int nl_t)
+				   int nl_m)
 {
   // Complete the initializations
   this->unit       = -1;
@@ -2016,8 +2016,8 @@ int vgrid_5002::Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double pref
   this->nl_m       = nl_m;
   
   // Note that this->nl_t and this->nl_w may be overwritten in c_encode_vert()
-  this->nl_t       = nl_t;
-  this->nl_w       = nl_t;
+  this->nl_t       = nl_m+1;
+  this->nl_w       = nl_m+1;
 
   this->rec.ip1    = (int) fmax(0,ip1);
   this->rec.ip2    = (int) fmax(0,ip2);
@@ -2124,7 +2124,7 @@ int vgrid_5002::Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef1
 
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,nl_m, nl_t) )
+  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,nl_m) )
   {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_build_from_hyb for kind = %d, version = %d\n",
 	    kind,version);
@@ -2174,8 +2174,8 @@ int vgrid_5003::Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double pref
   this->match_ipig = 1;
   this->nk         = nk;
   this->nl_m       = nl_m;
-  this->nl_t       = nl_m;
-  this->nl_w       = nl_m;
+  this->nl_t       = nl_m+1;
+  this->nl_w       = nl_m+1;
   this->rec.ip1    = (int) fmax(0,ip1);
   this->rec.ip2    = (int) fmax(0,ip2);
   strcpy(this->rec.nomvar,"!!  ");

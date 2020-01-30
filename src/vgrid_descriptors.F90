@@ -290,7 +290,7 @@ module vGrid_Descriptors
 
       integer(c_int) function f_create_from_ab_5002(vgdid, ip1, ip2, ptop_8, pref_8, &
                                   rcoef1, rcoef2, a_m_8, b_m_8, a_t_8, b_t_8, &
-                                  ip1_m, ip1_t, nl_m, nl_t) &
+                                  ip1_m, ip1_t, nl_m) &
                                   bind(c, name='c_create_from_ab_5002')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid
@@ -298,42 +298,44 @@ module vGrid_Descriptors
          real (c_double), value :: ptop_8, pref_8
          real (c_float),  value :: rcoef1, rcoef2
          type(c_ptr),     value :: a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, ip1_t
-         integer (c_int), value :: nl_m, nl_t
+         integer (c_int), value :: nl_m
       end function f_create_from_ab_5002
 
       integer(c_int) function f_create_from_ab_5003(vgdid, ip1, ip2, ptop_8, pref_8, &
-                                     rcoef1, rcoef2, a_m_8, b_m_8, ip1_m, ip1_t, nl_m) &
+                                     rcoef1, rcoef2, a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, &
+                                     ip1_t, nl_m) &
                                      bind(c, name='c_create_from_ab_5003')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
          real (c_double), value :: ptop_8, pref_8
          real (c_float),  value :: rcoef1, rcoef2
-         type(c_ptr),     value :: a_m_8, b_m_8, ip1_m, ip1_t
+         type(c_ptr),     value :: a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, ip1_t
          integer (c_int), value :: nl_m
       end function f_create_from_ab_5003
 
       integer(c_int) function f_create_from_ab_5004(vgdid, ip1, ip2, ptop_8, pref_8, &
-                                     rcoef1, rcoef2, a_m_8, b_m_8, ip1_m, ip1_t, nl_m) &
+                                     rcoef1, rcoef2, a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, &
+                                     ip1_t, nl_m) &
                                      bind(c, name='c_create_from_ab_5004')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
          real (c_double), value :: ptop_8, pref_8
          real (c_float),  value :: rcoef1, rcoef2
-         type(c_ptr),     value :: a_m_8, b_m_8, ip1_m, ip1_t
+         type(c_ptr),     value :: a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, ip1_t
          integer (c_int), value :: nl_m
       end function f_create_from_ab_5004
 
       integer(c_int) function f_create_from_ab_5005(vgdid, ip1, ip2, pref_8, rcoef1, &
-                                     rcoef2, a_m_8, b_m_8, ip1_m, ip1_t, nl_m) &
-                                     bind(c, name='c_create_from_ab_5005')
+                                     rcoef2, a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, ip1_t, &
+                                     nl_m) bind(c, name='c_create_from_ab_5005')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
          real (c_double), value :: pref_8
          real (c_float),  value :: rcoef1, rcoef2
-         type(c_ptr),     value :: a_m_8, b_m_8, ip1_m, ip1_t
+         type(c_ptr),     value :: a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, ip1_t
          integer (c_int), value :: nl_m
       end function f_create_from_ab_5005
 
@@ -377,7 +379,7 @@ module vGrid_Descriptors
 			      a_t_8, b_t_8, c_t_8, &
 			      a_w_8, b_w_8, c_w_8, &
 			      ip1_m, ip1_t, ip1_w, nl_m) &
-                              bind(c, name='c_create_from_ab_21001')
+                              bind(c, name='c_create_from_ab_21002')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -600,7 +602,8 @@ contains
                                         ) result(status)
       integer, target :: vgdid
       integer :: ip1, ip2
-      real(kind=8), dimension(:) :: a_m_8, b_m_8, ip1_m
+      real(kind=8), dimension(:), pointer :: a_m_8, b_m_8
+      integer, dimension(:), pointer :: ip1_m
       integer :: nl_m
 
       type(c_ptr) :: vgdid_p, a_m_8_p, b_m_8_p, ip1_m_p
@@ -621,12 +624,13 @@ contains
       return
     end function vgd_create_from_ab_1001
 
-    integer function vgd_create_from_ab_1002(vgdid, ip1, ip2, ptop_8, a_m_8, b_m_8, ip1_m, &
-                                         nl_m) result(status)
+    integer function vgd_create_from_ab_1002(vgdid, ip1, ip2, ptop_8, a_m_8, b_m_8, &
+                                             ip1_m, nl_m) result(status)
       integer, target :: vgdid
       integer :: ip1, ip2
       real(kind=8) :: ptop_8
-      real(kind=8), dimension(:) :: a_m_8, b_m_8, ip1_m
+      real(kind=8), dimension(:), pointer :: a_m_8, b_m_8
+      integer, dimension(:), pointer :: ip1_m
       integer :: nl_m
 
       type(c_ptr) :: vgdid_p, a_m_8_p, b_m_8_p, ip1_m_p
@@ -647,13 +651,14 @@ contains
       return
     end function vgd_create_from_ab_1002
 
-    integer function vgd_create_from_ab_1003(vgdid, ip1, ip2, ptop_8, pref_8, rcoef1, a_m_8, &
-                                         b_m_8, ip1_m, nl_m) result(status)
+    integer function vgd_create_from_ab_1003(vgdid, ip1, ip2, ptop_8, pref_8, rcoef1, &
+                                            a_m_8, b_m_8, ip1_m, nl_m) result(status)
       integer, target :: vgdid
       integer :: ip1, ip2
       real(kind=8) :: ptop_8, pref_8
       real :: rcoef1 
-      real(kind=8), dimension(:) :: a_m_8, b_m_8, ip1_m
+      real(kind=8), dimension(:), pointer :: a_m_8, b_m_8
+      integer, dimension(:), pointer :: ip1_m
       integer :: nl_m
 
       type(c_ptr) :: vgdid_p, a_m_8_p, b_m_8_p, ip1_m_p
@@ -678,7 +683,8 @@ contains
                                         ) result(status)
       integer, target :: vgdid
       integer :: ip1, ip2
-      real(kind=8), dimension(:) :: a_m_8, b_m_8, ip1_m
+      real(kind=8), dimension(:), pointer :: a_m_8, b_m_8
+      integer, dimension(:), pointer :: ip1_m
       integer :: nl_m
 
       type(c_ptr) :: vgdid_p, a_m_8_p, b_m_8_p, ip1_m_p
@@ -703,7 +709,8 @@ contains
                                         ) result(status)
       integer, target :: vgdid
       integer :: ip1, ip2
-      real(kind=8), dimension(:) :: a_m_8, b_m_8, ip1_m
+      real(kind=8), dimension(:), pointer :: a_m_8, b_m_8
+      integer, dimension(:), pointer :: ip1_m
       integer :: nl_m
 
       type(c_ptr) :: vgdid_p, a_m_8_p, b_m_8_p, ip1_m_p
@@ -724,13 +731,14 @@ contains
       return
     end function vgd_create_from_ab_4001
 
-    integer function vgd_create_from_ab_5001(vgdid, ip1, ip2, ptop_8, pref_8, rcoef1, a_m_8, &
-                                         b_m_8, ip1_m, nl_m) result(status)
+    integer function vgd_create_from_ab_5001(vgdid, ip1, ip2, ptop_8, pref_8, rcoef1, &
+                                             a_m_8, b_m_8, ip1_m, nl_m) result(status)
       integer, target :: vgdid
       integer :: ip1, ip2
       real(kind=8) :: ptop_8, pref_8
       real :: rcoef1 
-      real(kind=8), dimension(:) :: a_m_8, b_m_8, ip1_m
+      real(kind=8), dimension(:), pointer :: a_m_8, b_m_8
+      integer, dimension(:), pointer :: ip1_m
       integer :: nl_m
 
       type(c_ptr) :: vgdid_p, a_m_8_p, b_m_8_p, ip1_m_p
@@ -752,14 +760,15 @@ contains
     end function vgd_create_from_ab_5001
 
     integer function vgd_create_from_ab_5002(vgdid, ip1, ip2, ptop_8, pref_8, &
-           rcoef1, rcoef2, a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, ip1_t, nl_m, nl_t) &
+           rcoef1, rcoef2, a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, ip1_t, nl_m) &
            result(status)
       integer, target :: vgdid
       integer :: ip1, ip2
       real(kind=8) :: ptop_8, pref_8
       real :: rcoef1, rcoef2
-      real(kind=8), dimension(:) :: a_m_8, b_m_8, a_t_8, b_t_8
-      integer :: ip1_m, ip1_t, nl_m, nl_t
+      real(kind=8), dimension(:), pointer :: a_m_8, b_m_8, a_t_8, b_t_8
+      integer, dimension(:), pointer :: ip1_m, ip1_t
+      integer :: nl_m
 
       type(c_ptr) :: vgdid_p, a_m_8_p, b_m_8_p, a_t_8_p, b_t_8_p, ip1_m_p, ip1_t_p
       vgdid_p = c_loc(vgdid)
@@ -774,7 +783,7 @@ contains
 
       if( f_create_from_ab_5002(vgdid_p, ip1, ip2, ptop_8, pref_8, rcoef1, rcoef2, &
                                 a_m_8_p, b_m_8_p, a_t_8_p, b_t_8_p, ip1_m_p, ip1_t_p, &
-                                nl_m, nl_t)== VGD_ERROR )then
+                                nl_m)== VGD_ERROR )then
         print*,'(F_vgd) ERROR: In vgd_create_from_ab_5002'
         return
       end if
@@ -783,26 +792,32 @@ contains
       return
     end function vgd_create_from_ab_5002
 
-    integer function vgd_create_from_ab_5003(vgdid, ip1, ip2, ptop_8, pref_8, rcoef1, rcoef2,&
-                             a_m_8, b_m_8, ip1_m, ip1_t, nl_m) result(status)
+    integer function vgd_create_from_ab_5003(vgdid, ip1, ip2, ptop_8, pref_8, rcoef1, &
+                               rcoef2, a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, ip1_t, nl_m) &
+                               result(status)
       integer, target :: vgdid
       integer :: ip1, ip2
       real(kind=8) :: ptop_8, pref_8
       real :: rcoef1, rcoef2
-      real(kind=8), dimension(:) :: a_m_8, b_m_8, ip1_m, ip1_t
+      real(kind=8), dimension(:), pointer :: a_m_8, b_m_8, a_t_8, b_t_8
+      
+      integer, dimension(:), pointer :: ip1_m, ip1_t
       integer :: nl_m
 
-      type(c_ptr) :: vgdid_p, a_m_8_p, b_m_8_p, ip1_m_p, ip1_t_p
+      type(c_ptr) :: vgdid_p, a_m_8_p, b_m_8_p, a_t_8_p, b_t_8_p, ip1_m_p, ip1_t_p
       vgdid_p = c_loc(vgdid)
       a_m_8_p = c_loc(a_m_8)
       b_m_8_p = c_loc(b_m_8)
+      a_t_8_p = c_loc(a_t_8)
+      b_t_8_p = c_loc(b_t_8)
       ip1_m_p = c_loc(ip1_m)
       ip1_t_p = c_loc(ip1_t)
 
       status = VGD_ERROR
 
       if( f_create_from_ab_5003(vgdid_p, ip1, ip2, ptop_8, pref_8, rcoef1, rcoef2, &
-                                a_m_8_p, b_m_8_p, ip1_m_p, ip1_t_p, nl_m)== VGD_ERROR &
+           a_m_8_p, b_m_8_p, a_t_8_p, b_t_8_p, ip1_m_p, ip1_t_p, &
+           nl_m)== VGD_ERROR &
                                )then
         print*,'(F_vgd) ERROR: In vgd_create_from_ab_5003'
         return
@@ -812,26 +827,31 @@ contains
       return
     end function vgd_create_from_ab_5003
 
-    integer function vgd_create_from_ab_5004(vgdid, ip1, ip2, ptop_8, pref_8, rcoef1, rcoef2,&
-                             a_m_8, b_m_8, ip1_m, ip1_t, nl_m) result(status)
+    integer function vgd_create_from_ab_5004(vgdid, ip1, ip2, ptop_8, pref_8, rcoef1, &
+                               rcoef2, a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, ip1_t, nl_m) &
+                               result(status)
       integer, target :: vgdid
       integer :: ip1, ip2
       real(kind=8) :: ptop_8, pref_8
       real :: rcoef1, rcoef2
-      real(kind=8), dimension(:) :: a_m_8, b_m_8, ip1_m, ip1_t
+      real(kind=8), dimension(:), pointer :: a_m_8, b_m_8, a_t_8, b_t_8
+      integer, dimension(:), pointer :: ip1_m, ip1_t
       integer :: nl_m
 
-      type(c_ptr) :: vgdid_p, a_m_8_p, b_m_8_p, ip1_m_p, ip1_t_p
+      type(c_ptr) :: vgdid_p, a_m_8_p, b_m_8_p, a_t_8_p, b_t_8_p, ip1_m_p, ip1_t_p
       vgdid_p = c_loc(vgdid)
       a_m_8_p = c_loc(a_m_8)
       b_m_8_p = c_loc(b_m_8)
+      a_t_8_p = c_loc(a_t_8)
+      b_t_8_p = c_loc(b_t_8)
       ip1_m_p = c_loc(ip1_m)
       ip1_t_p = c_loc(ip1_t)
 
       status = VGD_ERROR
 
       if( f_create_from_ab_5004(vgdid_p, ip1, ip2, ptop_8, pref_8, rcoef1, rcoef2, &
-                                a_m_8_p, b_m_8_p, ip1_m_p, ip1_t_p, nl_m)== VGD_ERROR &
+                                a_m_8_p, b_m_8_p, a_t_8_p, b_t_8_p, ip1_m_p, ip1_t_p, &
+                                nl_m)== VGD_ERROR &
                                )then
         print*,'(F_vgd) ERROR: In vgd_create_from_ab_5004'
         return
@@ -842,25 +862,28 @@ contains
     end function vgd_create_from_ab_5004
 
     integer function vgd_create_from_ab_5005(vgdid, ip1, ip2, pref_8, rcoef1, rcoef2, &
-                             a_m_8, b_m_8, ip1_m, ip1_t, nl_m) result(status)
+                           a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, ip1_t, nl_m) result(status)
       integer, target :: vgdid
       integer :: ip1, ip2
       real(kind=8) :: pref_8
       real :: rcoef1, rcoef2
-      real(kind=8), dimension(:) :: a_m_8, b_m_8, ip1_m, ip1_t
+      real(kind=8), dimension(:), pointer :: a_m_8, b_m_8, a_t_8, b_t_8
+      integer, dimension(:), pointer :: ip1_m, ip1_t
       integer :: nl_m
 
-      type(c_ptr) :: vgdid_p, a_m_8_p, b_m_8_p, ip1_m_p, ip1_t_p
+      type(c_ptr) :: vgdid_p, a_m_8_p, b_m_8_p, a_t_8_p, b_t_8_p, ip1_m_p, ip1_t_p
       vgdid_p = c_loc(vgdid)
       a_m_8_p = c_loc(a_m_8)
       b_m_8_p = c_loc(b_m_8)
+      a_t_8_p = c_loc(a_t_8)
+      b_t_8_p = c_loc(b_t_8)
       ip1_m_p = c_loc(ip1_m)
       ip1_t_p = c_loc(ip1_t)
 
       status = VGD_ERROR
 
       if( f_create_from_ab_5005(vgdid_p, ip1, ip2, pref_8, rcoef1, rcoef2, a_m_8_p, &
-                                b_m_8_p, ip1_m_p, ip1_t_p, nl_m)== VGD_ERROR &
+                                b_m_8_p, a_t_8_p, b_t_8_p, ip1_m_p, ip1_t_p, nl_m)== VGD_ERROR &
                                )then
         print*,'(F_vgd) ERROR: In vgd_create_from_ab_5005'
         return
@@ -877,7 +900,8 @@ contains
       integer :: ip1, ip2
       real(kind=8) :: pref_8
       real :: rcoef1, rcoef2, rcoef3, rcoef4
-      real(kind=8), dimension(:) :: a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8, ip1_m, ip1_t
+      real(kind=8), dimension(:), pointer :: a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8
+      integer, dimension(:), pointer :: ip1_m, ip1_t
       integer :: nl_m
 
       type(c_ptr) :: vgdid_p, a_m_8_p, b_m_8_p, c_m_8_p, a_t_8_p, b_t_8_p, c_t_8_p
@@ -910,7 +934,8 @@ contains
                                         result(status)
       integer, target :: vgdid
       integer :: ip1, ip2
-      real(kind=8), dimension(:) :: a_m_8, b_m_8, ip1_m
+      real(kind=8), dimension(:), pointer :: a_m_8, b_m_8
+      integer, dimension(:), pointer :: ip1_m
       integer :: nl_m
 
       type(c_ptr) :: vgdid_p, a_m_8_p, b_m_8_p, ip1_m_p
@@ -937,7 +962,8 @@ contains
       integer, target :: vgdid
       integer :: ip1, ip2
       real :: rcoef1, rcoef2, rcoef3, rcoef4
-      real(kind=8), dimension(:) :: a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8, ip1_m, ip1_t
+      real(kind=8), dimension(:), pointer :: a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8
+      integer, dimension(:), pointer :: ip1_m, ip1_t
       integer :: nl_m
 
       type(c_ptr) :: vgdid_p, a_m_8_p, b_m_8_p, c_m_8_p, a_t_8_p, b_t_8_p, c_t_8_p
@@ -973,8 +999,9 @@ contains
       integer, target :: vgdid
       integer :: ip1, ip2
       real :: rcoef1, rcoef2, rcoef3, rcoef4
-      real(kind=8), dimension(:) :: a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8
-      real(kind=8), dimension(:) :: a_w_8, b_w_8, c_w_8, ip1_m, ip1_t, ip1_w
+      real(kind=8), dimension(:), pointer :: a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8
+      real(kind=8), dimension(:), pointer :: a_w_8, b_w_8, c_w_8
+      integer, dimension(:), pointer :: ip1_m, ip1_t, ip1_w
       integer :: nl_m
 
       type(c_ptr) :: vgdid_p, a_m_8_p, b_m_8_p, c_m_8_p, a_t_8_p, b_t_8_p, c_t_8_p

@@ -100,7 +100,7 @@ int c_create_from_ab_5002(int *vgdid, int ip1, int ip2, double ptop_8, double pr
 			float rcoef1, float rcoef2, double *a_m_8j,
 			double *b_m_8, double *a_t_8, double *b_t_8,
 			int *ip1_m, int *ip1_t,
-			int nl_m, int nl_t);
+			int nl_m);
 int c_create_from_ab_5003(int *vgdid, int ip1, int ip2,
 			double ptop_8, double pref_8, float rcoef1, float rcoef2,
 			double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8,
