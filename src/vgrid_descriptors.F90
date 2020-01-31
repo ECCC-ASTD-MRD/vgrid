@@ -396,15 +396,15 @@ module vGrid_Descriptors
          integer (c_int), value :: ni, nj, nk
       end function f_new_from_table
 
-      integer(c_int) function f_new_gen(vgdid,kind,version,hyb_CP,size_hyb,rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP, &
-           ip1,ip2,dhm_CP,dht_CP,dhw_CP,avg) bind(c, name='Cvgd_new_gen2')
+      integer(c_int) function f_create_from_hyb(vgdid,kind,version,hyb_CP,size_hyb,rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP, &
+           ip1,ip2,dhm_CP,dht_CP,dhw_CP,avg) bind(c, name='Cvgd_create_from_hyb2')
          use iso_c_binding, only : c_ptr, c_int
          type(c_ptr), value :: vgdid
          integer (c_int), value :: kind, version, size_hyb
          type(c_ptr), value :: hyb_CP,rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP
          type(c_ptr), value :: dhm_CP,dht_CP,dhw_CP
          integer (c_int), value :: ip1,ip2,avg
-      end function f_new_gen
+      end function f_create_from_hyb
       
       integer(c_int) function f_create_from_ab(vgdid,kind,version,nk,ip1,ip2, &
            ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, &
@@ -466,7 +466,7 @@ module vGrid_Descriptors
       module procedure read_vgrid_from_file
       module procedure new_from_table
       module procedure vgd_create_from_ab
-      module procedure new_gen
+      module procedure vgd_create_from_hyb
    end interface vgd_new
 
    interface vgd_get
@@ -1058,7 +1058,7 @@ contains
       
     end function new_from_table
 
-   integer function new_gen(vgdid,kind,version,hyb,rcoef1,rcoef2,rcoef3,rcoef4,ptop_8,pref_8,ptop_out_8,ip1,ip2,stdout_unit,dhm,dht,dhw,avg_L) result(status)
+   integer function vgd_create_from_hyb(vgdid,kind,version,hyb,rcoef1,rcoef2,rcoef3,rcoef4,ptop_8,pref_8,ptop_out_8,ip1,ip2,stdout_unit,dhm,dht,dhw,avg_L) result(status)
       implicit none
 
       ! Coordinate constructor - build vertical descriptor from hybrid coordinate entries
@@ -1131,7 +1131,7 @@ contains
          my_ip2 = -1
       endif
       if(present(stdout_unit))then
-         write(for_msg,*) 'ERROR: in new_gen, implement option stdout_unit'         
+         write(for_msg,*) 'ERROR: in vgd_create_from_hyb, implement option stdout_unit'         
          call msg(MSG_ERROR,VGD_PRFX//for_msg)
          return
          stdout_unit_CP = c_loc(stdout_unit)
@@ -1163,12 +1163,12 @@ contains
       endif
 
       vgdid_ptr=c_loc(vgdid)
-      if(f_new_gen(vgdid_ptr,kind,version,hyb_CP,size(hyb),rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP,my_ip1,my_ip2,dhm_CP,dht_CP,dhw_CP,my_avg) == VGD_ERROR)then
-         print*,'(F_vgd) ERROR in new_gen, problem with f_new_gen'
+      if(f_create_from_hyb(vgdid_ptr,kind,version,hyb_CP,size(hyb),rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP,my_ip1,my_ip2,dhm_CP,dht_CP,dhw_CP,my_avg) == VGD_ERROR)then
+         print*,'(F_vgd) ERROR in vgd_create_from_hyb, problem with f_create_from_hyb'
          return
       endif
       status = VGD_OK
-    end function new_gen
+    end function vgd_create_from_hyb
 
 
    integer function vgd_create_from_ab(vgdid,kind,version,nk,ip1,ip2, &

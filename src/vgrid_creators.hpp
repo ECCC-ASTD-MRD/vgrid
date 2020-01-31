@@ -50,9 +50,11 @@ int Cvgd_create_from_ab2(vgrid **my_new_vgrid, int kind, int version, int nk, in
 int Cvgd_new_from_table(vgrid **my_new_vgrid, double *table, int ni, int nj, int nk);
 
 // A generic work-horse to validate arguments and to construct a vgrid using C_genab and Cvgd_create_from_ab2
-int Cvgd_new_gen2(vgrid **my_new_vgrid, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
-	      double *ptop_8, double *pref_8, double *ptop_out_8,
-	      int ip1, int ip2, float *dhm, float *dht, float *dhw, int avg);
+int Cvgd_create_from_hyb2(vgrid **my_new_vgrid, int kind, int version, float *hyb,
+			  int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3,
+			  float *rcoef4, double *ptop_8, double *pref_8,
+			  double *ptop_out_8, int ip1, int ip2, float *dhm, float *dht,
+			  float *dhw, int avg);
 
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -63,6 +65,9 @@ int Cvgd_new_gen2(vgrid **my_new_vgrid, int kind, int version, float *hyb, int s
 
 
 
+// Front ends to call Cvgd_create_from_ab2 to create a vgrid
+int Cvgd_create_from_ab(vgrid **my_new_vgrid, int kind, int version, int nk, int ip1, int ip2, double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2,
+			double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int nl_m, int nl_t);
 int Cvgd_create_from_ab_1001(vgrid** new_vgrid, int ip1, int ip2, double *a_m_8,
 			     double *b_m_8, int *ip1_m, int nl_m);
 int Cvgd_create_from_ab_1002(vgrid** new_vgrid, int ip1, int ip2, double ptop_8,
@@ -113,95 +118,47 @@ int Cvgd_create_from_ab_21002(vgrid** new_vgrid, int ip1, int ip2, float rcoef1,
 			      int *ip1_m, int *ip1_t, int *ip1_w, int nl_m);
 
 
-int Cvgd_build_from_hyb_1001(vgrid **my_new_vgrid, float *hyb, int size_hyb, int ip1,
+// Front ends to call Cvgd_create_from_hyb2 to construct a vgrid
+int Cvgd_create_from_hyb(vgrid **my_new_vgrid, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2,
+                 double *ptop_8, double *pref_8, double *ptop_out_8,
+                 int ip1, int ip2, float *dhm, float *dht, int avg);
+int Cvgd_create_from_hyb_1001(vgrid **my_new_vgrid, float *hyb, int size_hyb, int ip1,
 			     int ip2);
-int Cvgd_build_from_hyb_1002(vgrid **my_new_vgrid, float *hyb, int size_hyb,
+int Cvgd_create_from_hyb_1002(vgrid **my_new_vgrid, float *hyb, int size_hyb,
 			     double ptop_8, int ip1, int ip2);
-int Cvgd_build_from_hyb_1003(vgrid **my_new_vgrid, float *hyb, int size_hyb,
+int Cvgd_create_from_hyb_1003(vgrid **my_new_vgrid, float *hyb, int size_hyb,
 			     double ptop_8, double pref_8, float rcoef1, int ip1,int ip2);
-int Cvgd_build_from_hyb_2001(vgrid **my_new_vgrid, float *hyb, int size_hyb, int ip1,
+int Cvgd_create_from_hyb_2001(vgrid **my_new_vgrid, float *hyb, int size_hyb, int ip1,
 			     int ip2);
-int Cvgd_build_from_hyb_4001(vgrid **my_new_vgrid, float *hyb, int size_hyb,
+int Cvgd_create_from_hyb_4001(vgrid **my_new_vgrid, float *hyb, int size_hyb,
 			     int ip1, int ip2);
-int Cvgd_build_from_hyb_5001(vgrid **my_new_vgrid, float *hyb, int size_hyb,
+int Cvgd_create_from_hyb_5001(vgrid **my_new_vgrid, float *hyb, int size_hyb,
 			     double ptop_8, double pref_8, float rcoef1, int ip1,int ip2);
-int Cvgd_build_from_hyb_5002(vgrid **my_new_vgrid, float *hyb, int size_hyb,
+int Cvgd_create_from_hyb_5002(vgrid **my_new_vgrid, float *hyb, int size_hyb,
 			     double ptop_8, double pref_8,
 			     float rcoef1, float rcoef2, int ip1, int ip2);
-int Cvgd_build_from_hyb_5003(vgrid **my_new_vgrid, float *hyb, int size_hyb,
+int Cvgd_create_from_hyb_5003(vgrid **my_new_vgrid, float *hyb, int size_hyb,
 			     double ptop_8, double pref_8,
 			     float rcoef1, float rcoef2, int ip1, int ip2);
-int Cvgd_build_from_hyb_5004(vgrid **my_new_vgrid, float *hyb, int size_hyb,
+int Cvgd_create_from_hyb_5004(vgrid **my_new_vgrid, float *hyb, int size_hyb,
 			     double ptop_8, double pref_8, double *ptop_out_8,
 			     float rcoef1, float rcoef2, int ip1, int ip2);
-int Cvgd_build_from_hyb_5005(vgrid **my_new_vgrid, float *hyb, int size_hyb,
+int Cvgd_create_from_hyb_5005(vgrid **my_new_vgrid, float *hyb, int size_hyb,
 			     double pref_8, double *ptop_out_8, float rcoef1,
 			     float rcoef2, int ip1,
 			     int ip2, float *dhm, float *dht);
-int Cvgd_build_from_hyb_5100(vgrid **my_new_vgrid, float *hyb, int size_hyb,
+int Cvgd_create_from_hyb_5100(vgrid **my_new_vgrid, float *hyb, int size_hyb,
 			     double pref_8, double *ptop_out_8, float rcoef1,
 			     float rcoef2, float rcoef3, float rcoef4, int ip1,
 			     int ip2, float *dhm, float *dht, int avg);
-int Cvgd_build_from_hyb_5999(vgrid **my_new_vgrid, float *hyb, int size_hyb,
+int Cvgd_create_from_hyb_5999(vgrid **my_new_vgrid, float *hyb, int size_hyb,
 			     int ip1, int ip2);
-int Cvgd_build_from_hyb_21001(vgrid **my_new_vgrid, float *hyb, int size_hyb,
+int Cvgd_create_from_hyb_21001(vgrid **my_new_vgrid, float *hyb, int size_hyb,
 			      float rcoef1, float rcoef2, int ip1, int ip2, float *dhm,
 			      float *dht, float *dhw, float rcoef3,float rcoef4);
-int Cvgd_build_from_hyb_21002(vgrid **my_new_vgrid, float *hyb, int size_hyb,
+int Cvgd_create_from_hyb_21002(vgrid **my_new_vgrid, float *hyb, int size_hyb,
 			      float rcoef1, float rcoef2, int ip1, int ip2, float *dhm,
 			      float *dht, float *dhw, float rcoef3=-1,float rcoef4=-1);
-
-
-
-
-// Front ends to call Cvgd_create_from_ab2 to create a vgrid
-int Cvgd_create_from_ab(vgrid **my_new_vgrid, int kind, int version, int nk, int ip1, int ip2, double *ptop_8, double *pref_8, float *rcoef1, float *rcoef2,
-			double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int nl_m, int nl_t);
-int Cvgd_create_from_ab_1001(vgrid **my_new_vgrid, int ip1, int ip2, 
-			     double *a_m_8, double *b_m_8, int *ip1_m, int nk);
-int Cvgd_create_from_ab_1002(vgrid **my_new_vgrid, int ip1, int ip2, double ptop_8,
-			     double *a_m_8, double *b_m_8, int *ip1_m, int nk);
-int Cvgd_create_from_ab_4001(vgrid **my_new_vgrid, int ip1, int ip2, 
-			     double *a_m_8, double *b_m_8, int *ip1_m, int nk);
-int Cvgd_create_from_ab_5001(vgrid **my_new_vgrid, int ip1, int ip2, double ptop_8, double pref_8, float rcoef1,
-			     double *a_m_8, double *b_m_8, int *ip1_m, int nk);
-int Cvgd_create_from_ab_5002(vgrid **my_new_vgrid, int ip1, int ip2, double ptop_8, double pref_8, float rcoef1, float rcoef2,
-			     double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int nl_m, int nl_t);
-int Cvgd_create_from_ab_5005(vgrid **my_new_vgrid, int ip1, int ip2, double pref_8, float rcoef1, float rcoef2,
-			     double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t, int nl);
-int Cvgd_create_from_ab_5100(vgrid **my_new_vgrid, int ip1, int ip2, double pref_8, float rcoef1, float rcoef2, float rcoef3, float rcoef4,
-			     double *a_m_8, double *b_m_8, double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8, int *ip1_m, int *ip1_t, int nl);
-int Cvgd_create_from_ab_5999(vgrid **my_new_vgrid, int ip1, int ip2, 
-			     double *a_m_8, double *b_m_8, int *ip1_m, int nk);
-int Cvgd_create_from_ab_21001(vgrid **my_new_vgrid, int ip1, int ip2, float rcoef1, float rcoef2, float rcoef3, float rcoef4, 
-			      double *a_m_8, double *b_m_8, double *c_m_8, double *a_t_8, double *b_t_8, double *c_t_8, int *ip1_m, int *ip1_t, int nl);
-int Cvgd_create_from_ab_21002(vgrid **my_new_vgrid, int ip1, int ip2, float rcoef1, float rcoef2, float rcoef3, float rcoef4, 
-			      double *a_m_8, double *b_m_8, double *c_m_8,
-			      double *a_t_8, double *b_t_8, double *c_t_8,
-			      double *a_w_8, double *b_w_8, double *c_w_8,
-			      int *ip1_m, int *ip1_t, int *ip1_w, int nl);
-
-
-
-
-
-
-
-// Front ends to call Cvgd_new_gen2 to construct a vgrid
-int Cvgd_new_gen(vgrid **my_new_vgrid, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2,
-                 double *ptop_8, double *pref_8, double *ptop_out_8,
-                 int ip1, int ip2, float *dhm, float *dht, int avg);
-int Cvgd_new_gen_1001(vgrid **my_new_vgrid, float *hyb, int size_hyb, int ip1, int ip2);
-int Cvgd_new_gen_2001(vgrid **my_new_vgrid, float *hyb, int size_hyb, int ip1, int ip2);
-int Cvgd_new_gen_5999(vgrid **my_new_vgrid, float *hyb, int size_hyb, int ip1, int ip2);
-int Cvgd_new_gen_1002(vgrid **my_new_vgrid, float *hyb, int size_hyb, double ptop_8, int ip1, int ip2);
-int Cvgd_new_gen_4001(vgrid **my_new_vgrid, float *hyb, int size_hyb, int ip1, int ip2);
-int Cvgd_new_gen_5001(vgrid **my_new_vgrid, float *hyb, int size_hyb, double ptop_8, double pref_8, float rcoef1, int ip1, int ip2);
-int Cvgd_new_gen_5002(vgrid **my_new_vgrid, float *hyb, int size_hyb, double ptop_8, double pref_8, float rcoef1, float rcoef2, int ip1, int ip2);
-int Cvgd_new_gen_5005(vgrid **my_new_vgrid, float *hyb, int size_hyb, double pref_8, double *ptop_out_8, float rcoef1, float rcoef2, int ip1, int ip2, float dhm, float dht );
-int Cvgd_new_gen_5100(vgrid **my_new_vgrid, float *hyb, int size_hyb, double pref_8, double *ptop_out_8, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, int avg);
-int Cvgd_new_gen_21001(vgrid **my_new_vgrid, float *hyb, int size_hyb, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht);
-int Cvgd_new_gen_21002(vgrid **my_new_vgrid, float *hyb, int size_hyb, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, float dhw);
 
 
 

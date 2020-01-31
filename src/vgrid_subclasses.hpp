@@ -47,7 +47,7 @@ public:
   int C_genab(float *hyb, int nk, double **a_m_8, double **b_m_8, int **ip1_m);
   int Cvgd_create_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
                          int *ip1_m, int nl_m);
-  int Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, int ip1, int ip2);
+  int Cvgd_create_from_hyb(float *hyb, int size_hyb, int ip1, int ip2);
 private:
   void fstd_subinit();
   void set_table_nj(int nk);
@@ -64,8 +64,8 @@ public:
 	      int **ip1_m);
   int Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double *a_m_8,
 			 double *b_m_8, int *ip1_m, int nl_m);
-  int Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, double ptop_8,
-				int ip1, int ip2);
+  int Cvgd_create_from_hyb(float *hyb, int size_hyb, double ptop_8,
+			   int ip1, int ip2);
 private:
   void fstd_subinit();
   void set_table_nj(int nk);
@@ -89,8 +89,8 @@ public:
   vgrid_1003();
   vgrid_1003(int key);
   int C_genab(float *hybuser, int nk, float rcoef, double ptop_8, double pref_8, double **a_m_8, double **b_m_8, int **ip1_m);
-  int Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef1,
-				double ptop_8, double pref_8, int ip1, int ip2);
+  int Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
+			   double ptop_8, double pref_8, int ip1, int ip2);
 private:
   void fstd_subinit();
 };
@@ -105,7 +105,7 @@ public:
   int C_genab(float *pres, int nk, double **a_m_8, double **b_m_8, int **ip1_m);
   int Cvgd_create_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
                          int *ip1_m, int nl_m);
-  int Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, int ip1, int ip2);
+  int Cvgd_create_from_hyb(float *hyb, int size_hyb, int ip1, int ip2);
 private:
   void fstd_subinit();
   void set_table_nj(int nk);
@@ -121,7 +121,7 @@ public:
   int C_genab(float *hgts, int nk, double **a_m_8, double **b_m_8, int **ip1_m);
   int Cvgd_create_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
                          int *ip1_m, int nl_m);
-  int Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, int ip1, int ip2);
+  int Cvgd_create_from_hyb(float *hyb, int size_hyb, int ip1, int ip2);
 private:
   void fstd_subinit();
   void set_table_nj(int nk);
@@ -133,8 +133,8 @@ public:
   vgrid_5001();
   vgrid_5001(int key);
   int C_genab(float *hybuser, int nk, float rcoef, double ptop_8, double pref_8, double **a_m_8, double **b_m_8, int **ip1_m);
-  int Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef1,
-				double ptop_8, double pref_8, int ip1, int ip2);
+  int Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
+			   double ptop_8, double pref_8, int ip1, int ip2);
 private:
   void fstd_subinit();
   void set_table_nj(int nk);
@@ -162,9 +162,9 @@ public:
 			 double *b_m_8, double *a_t_8, double *b_t_8,
 			 int *ip1_m, int *ip1_t,
 			 int nl_m);
-  int Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef1,
-				float rcoef2, double ptop_8, double pref_8,
-				int ip1, int ip2);
+  int Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
+			   float rcoef2, double ptop_8, double pref_8,
+			   int ip1, int ip2);
 private:
   void fstd_subinit();
 };
@@ -178,9 +178,9 @@ public:
 			 float rcoef1, float rcoef2, double *a_m_8,
 			 double *b_m_8, double *a_t_8, double *b_t_8,
 			 int *ip1_m, int *ip1_t, int nl_m);
-  int Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef1,
-				float rcoef2, double ptop_8, double pref_8,
-				int ip1, int ip2);
+  int Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
+			   float rcoef2, double ptop_8, double pref_8,
+			   int ip1, int ip2);
 private:
   void fstd_subinit();
 };
@@ -195,9 +195,9 @@ public:
 			 float rcoef2, double *a_m_8, double *b_m_8,
 			 double *a_t_8, double *b_t_8, int *ip1_m, int *ip1_t,
 			 int nl_m);
-  int Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef1,
-				float rcoef2, double ptop_8, double pref_8,
-				int ip1, int ip2);
+  int Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
+			   float rcoef2, double ptop_8, double pref_8,
+			   int ip1, int ip2);
 private:
   void fstd_subinit();
 };
@@ -211,10 +211,10 @@ public:
   int Cvgd_create_from_ab(int ip1, int ip2, double pref_8, float rcoef1, float rcoef2,
                          double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8,
 			 int *ip1_m, int *ip1_t, int nl_m);
-  int Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef1,
-				float rcoef2, double pref_8,
-				double *ptop_out_8, int ip1, int ip2,
-				float *dhm, float *dht);
+  int Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
+			   float rcoef2, double pref_8,
+			   double *ptop_out_8, int ip1, int ip2,
+			   float *dhm, float *dht);
 private:
   void fstd_subinit();
 };
@@ -232,10 +232,10 @@ public:
 			 double *a_m_8, double *b_m_8, double *c_m_8,
 			 double *a_t_8, double *b_t_8, double *c_t_8,
 			 int *ip1_m, int *ip1_t, int nl_m);
-  int Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef1,
-				float rcoef2, float rcoef3, float rcoef4,
-				double pref_8, double *ptop_out_8, int ip1,
-				int ip2, float *dhm, float *dht, int avg);
+  int Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
+			   float rcoef2, float rcoef3, float rcoef4,
+			   double pref_8, double *ptop_out_8, int ip1,
+			   int ip2, float *dhm, float *dht, int avg);
 private:
   void fstd_subinit();
   void set_table_nj(int nk);
@@ -252,7 +252,7 @@ public:
   int c_encode_vert();
   int Cvgd_create_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
 			 int *ip1_m, int nl_m);
-  int Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, int ip1, int ip2);
+  int Cvgd_create_from_hyb(float *hyb, int size_hyb, int ip1, int ip2);
 private:
   void fstd_subinit();
   void set_table_nj(int nk);
@@ -271,9 +271,9 @@ public:
 			 double *a_m_8, double *b_m_8, double *c_m_8,
 			 double *a_t_8, double *b_t_8, double *c_t_8,
 			 int *ip1_m, int *ip1_t, int nl_m);
-  int Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef1,
-				float rcoef2, int ip1, int ip2, float *dhm,
-				float *dht, float rcoef3, float rcoef4);
+  int Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
+			   float rcoef2, int ip1, int ip2, float *dhm,
+			   float *dht, float rcoef3, float rcoef4);
 private:
   void fstd_subinit();
   void set_table_nj(int nk);
@@ -294,7 +294,7 @@ public:
 			 double *a_t_8, double *b_t_8, double *c_t_8,
 			 double *a_w_8, double *b_w_8, double *c_w_8,
 			 int *ip1_m, int *ip1_t, int *ip1_w, int nl_m);
-  int Cvgd_build_vgrid_from_hyb(float *hyb, int size_hyb, float rcoef1,
+  int Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
 				float rcoef2, int ip1, int ip2, float *dhm,
 				float *dht, float *dhw, float rcoef3=-1,
 				float rcoef4=-1);
