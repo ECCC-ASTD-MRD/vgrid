@@ -2476,8 +2476,11 @@ int vgrid::Cvgd_diag_withref_2ref(int ni, int nj, int nk, int *ip1_list, float *
  *----------------------------------------------------------------------------
  */
 
-vgrid::vgrid()
+vgrid::vgrid(int ip1, int ip2)
 {
+  rec.ip1    = (int) fmax(0,ip1);
+  rec.ip2    = (int) fmax(0,ip2);
+
   ptop_8        = VGD_MISSING;
   pref_8        = VGD_MISSING;  
   table         = NULL;

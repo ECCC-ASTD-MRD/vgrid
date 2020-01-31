@@ -26,7 +26,7 @@
 
 
 // ########## class 0001 ##########
-vgrid_0001::vgrid_0001() : vgrid()
+vgrid_0001::vgrid_0001(int ip1, int ip2) : vgrid(ip1, ip2)
 {
   this->kind    = 0;
   this->version = 1;
@@ -133,7 +133,7 @@ void vgrid_0001::fstd_subinit()
 
 // The predecessor, Cvgd_new_build_vert_0001, of this method never existed.
 // Leave it commented out.
-// int vgrid_0001::Cvgd_create_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
+// int vgrid_0001::Cvgd_create_from_ab(double *a_m_8, double *b_m_8,
 // 				   double *a_w_8, double *b_w_8, int *ip1_m, int *ip1_w,
 // 				   int nl_m, int nl_t, int nl_w)
 // {
@@ -145,8 +145,6 @@ void vgrid_0001::fstd_subinit()
 //   // Note that this->nl_t and this->nl_w may be overwritten in c_encode_vert()
 //   this->nl_t       = nl_t;
 //   this->nl_w       = nl_w;
-//   this->rec.ip1    = (int) fmax(0,ip1);
-//   this->rec.ip2    = (int) fmax(0,ip2);
 //   strcpy(this->rec.nomvar,"!!  ");
 //   this->rec.ig1   = this->vcode;
 
@@ -234,7 +232,7 @@ void vgrid_0001::fstd_subinit()
 
 
 // ########## class 1001 ##########
-vgrid_1001::vgrid_1001() : vgrid()
+vgrid_1001::vgrid_1001(int ip1, int ip2) : vgrid(ip1, ip2)
 {
   this->kind    = 1;
   this->version = 1;
@@ -386,16 +384,13 @@ void vgrid_1001::fstd_subinit()
 
 
 
-int vgrid_1001::Cvgd_create_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
-				   int *ip1_m, int nl_m)
+int vgrid_1001::Cvgd_create_from_ab(double *a_m_8, double *b_m_8, int *ip1_m, int nl_m)
 {
   // Complete the initializations
   this->unit       = -1;
   this->match_ipig = 1;
   this->nk         = nl_m;
   this->nl_m       = nl_m;
-  this->rec.ip1    = (int) fmax(0,ip1);
-  this->rec.ip2    = (int) fmax(0,ip2);
   strcpy(this->rec.nomvar,"!!  ");
   this->rec.ig1   = this->vcode;
 
@@ -438,7 +433,7 @@ int vgrid_1001::Cvgd_create_from_ab(int ip1, int ip2, double *a_m_8, double *b_m
   return(VGD_OK);
 }
 
-int vgrid_1001::Cvgd_create_from_hyb(float *hyb, int size_hyb, int ip1, int ip2)
+int vgrid_1001::Cvgd_create_from_hyb(float *hyb, int size_hyb)
 {
   double *a_m_8 = NULL, *b_m_8 = NULL;
   int *ip1_m = NULL;
@@ -464,7 +459,7 @@ int vgrid_1001::Cvgd_create_from_hyb(float *hyb, int size_hyb, int ip1, int ip2)
     free(ip1_m);
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,a_m_8,b_m_8,ip1_m,nl_m) )
+  if( VGD_ERROR == this->Cvgd_create_from_ab(a_m_8,b_m_8,ip1_m,nl_m) )
   {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_create_from_ab for kind = %d, version = %d\n",
 	    kind,version);
@@ -482,7 +477,7 @@ int vgrid_1001::Cvgd_create_from_hyb(float *hyb, int size_hyb, int ip1, int ip2)
 
 
 // ########## class 1002 ##########
-vgrid_1002::vgrid_1002() : vgrid()
+vgrid_1002::vgrid_1002(int ip1, int ip2) : vgrid(ip1, ip2)
 {
   this->kind    = 1;
   this->version = 2;
@@ -731,7 +726,7 @@ void vgrid_1002::fstd_subinit()
 
 
 
-int vgrid_1002::Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double *a_m_8,
+int vgrid_1002::Cvgd_create_from_ab(double ptop_8, double *a_m_8,
 				   double *b_m_8, int *ip1_m, int nl_m)
 {
   // Complete the initializations
@@ -739,8 +734,6 @@ int vgrid_1002::Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double *a_m
   this->match_ipig = 1;
   this->nk         = nl_m;
   this->nl_m       = nl_m;
-  this->rec.ip1    = (int) fmax(0,ip1);
-  this->rec.ip2    = (int) fmax(0,ip2);
   strcpy(this->rec.nomvar,"!!  ");
   this->rec.ig1   = this->vcode;
 
@@ -785,8 +778,7 @@ int vgrid_1002::Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double *a_m
   return(VGD_OK);
 }
 
-int vgrid_1002::Cvgd_create_from_hyb(float *hyb, int size_hyb, double ptop_8,
-				     int ip1, int ip2)
+int vgrid_1002::Cvgd_create_from_hyb(float *hyb, int size_hyb, double ptop_8)
 {
   double *a_m_8 = NULL, *b_m_8 = NULL;
   int *ip1_m = NULL;
@@ -812,7 +804,7 @@ int vgrid_1002::Cvgd_create_from_hyb(float *hyb, int size_hyb, double ptop_8,
     free(ip1_m);
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,ptop_8,a_m_8,b_m_8,ip1_m,nl_m) )
+  if( VGD_ERROR == this->Cvgd_create_from_ab(ptop_8,a_m_8,b_m_8,ip1_m,nl_m) )
   {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_create_from_ab for kind = %d, version = %d\n",
 	    kind,version);
@@ -830,7 +822,7 @@ int vgrid_1002::Cvgd_create_from_hyb(float *hyb, int size_hyb, double ptop_8,
 
 
 // ########## class 1003 ##########
-vgrid_1003_5001::vgrid_1003_5001() : vgrid()
+vgrid_1003_5001::vgrid_1003_5001(int ip1, int ip2) : vgrid(ip1, ip2)
 {
   this->table_ni = 3;
   this->table_nk = 1;
@@ -843,7 +835,7 @@ void vgrid_1003_5001::set_table_nj(int nk)
 
 
 
-int vgrid_1003_5001::Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double pref_8,
+int vgrid_1003_5001::Cvgd_create_from_ab(double ptop_8, double pref_8,
 					float rcoef1, double *a_m_8,
 					double *b_m_8, int *ip1_m, int nl_m)
 {
@@ -852,8 +844,6 @@ int vgrid_1003_5001::Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double
   this->match_ipig = 1;
   this->nk         = nl_m;
   this->nl_m       = nl_m;
-  this->rec.ip1    = (int) fmax(0,ip1);
-  this->rec.ip2    = (int) fmax(0,ip2);
   strcpy(this->rec.nomvar,"!!  ");
   this->rec.ig1   = this->vcode;
 
@@ -900,7 +890,7 @@ int vgrid_1003_5001::Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double
   return(VGD_OK);
 }
 
-vgrid_1003::vgrid_1003() : vgrid_1003_5001()
+vgrid_1003::vgrid_1003(int ip1, int ip2) : vgrid_1003_5001(ip1, ip2)
 {
   this->kind    = 1;
   this->version = 3;
@@ -1004,7 +994,7 @@ void vgrid_1003::fstd_subinit()
 };
 
 int vgrid_1003::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
-				     double ptop_8, double pref_8, int ip1, int ip2)
+				     double ptop_8, double pref_8)
 {
   double *a_m_8 = NULL, *b_m_8 = NULL;
   int *ip1_m = NULL;
@@ -1031,7 +1021,7 @@ int vgrid_1003::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
 
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,ptop_8,pref_8,rcoef1,a_m_8,b_m_8,ip1_m,nl_m) ) {
+  if( VGD_ERROR == this->Cvgd_create_from_ab(ptop_8,pref_8,rcoef1,a_m_8,b_m_8,ip1_m,nl_m) ) {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_create_from_ab for kind = %d, version = %d\n",
  kind,version);
     return(VGD_ERROR);
@@ -1045,7 +1035,7 @@ int vgrid_1003::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
 
 
 // ########## class 2001 ##########
-vgrid_2001::vgrid_2001() : vgrid()
+vgrid_2001::vgrid_2001(int ip1, int ip2) : vgrid(ip1, ip2)
 {
   this->kind    = 2;
   this->version = 1;
@@ -1188,7 +1178,7 @@ void vgrid_2001::fstd_subinit()
 
 
 
-int vgrid_2001::Cvgd_create_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
+int vgrid_2001::Cvgd_create_from_ab(double *a_m_8, double *b_m_8,
                                    int *ip1_m, int nl_m)
 {
   // Complete the initializations
@@ -1196,8 +1186,6 @@ int vgrid_2001::Cvgd_create_from_ab(int ip1, int ip2, double *a_m_8, double *b_m
   this->match_ipig = 1;
   this->nk         = nl_m;
   this->nl_m       = nl_m;
-  this->rec.ip1    = (int) fmax(0,ip1);
-  this->rec.ip2    = (int) fmax(0,ip2);
   strcpy(this->rec.nomvar,"!!  ");
   this->rec.ig1   = this->vcode;
 
@@ -1236,7 +1224,7 @@ int vgrid_2001::Cvgd_create_from_ab(int ip1, int ip2, double *a_m_8, double *b_m
   return(VGD_OK);
 }
 
-int vgrid_2001::Cvgd_create_from_hyb(float *hyb, int size_hyb, int ip1, int ip2)
+int vgrid_2001::Cvgd_create_from_hyb(float *hyb, int size_hyb)
 {
   double *a_m_8 = NULL, *b_m_8 = NULL;
   int *ip1_m = NULL;
@@ -1262,7 +1250,7 @@ int vgrid_2001::Cvgd_create_from_hyb(float *hyb, int size_hyb, int ip1, int ip2)
     free(ip1_m);
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,a_m_8,b_m_8,ip1_m,nl_m) )
+  if( VGD_ERROR == this->Cvgd_create_from_ab(a_m_8,b_m_8,ip1_m,nl_m) )
   {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_create_from_ab for kind = %d, version = %d\n",
 	    kind,version);
@@ -1280,7 +1268,7 @@ int vgrid_2001::Cvgd_create_from_hyb(float *hyb, int size_hyb, int ip1, int ip2)
 
 
 // ########## class 4001 ##########
-vgrid_4001::vgrid_4001() : vgrid()
+vgrid_4001::vgrid_4001(int ip1, int ip2) : vgrid(ip1, ip2)
 {
   this->kind = 4;
   this->version = 1;
@@ -1424,7 +1412,7 @@ void vgrid_4001::fstd_subinit()
 
 
 
-int vgrid_4001::Cvgd_create_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
+int vgrid_4001::Cvgd_create_from_ab(double *a_m_8, double *b_m_8,
 				   int *ip1_m, int nl_m)
 {
   // Complete the initializations
@@ -1432,8 +1420,6 @@ int vgrid_4001::Cvgd_create_from_ab(int ip1, int ip2, double *a_m_8, double *b_m
   this->match_ipig = 1;
   this->nk         = nl_m;
   this->nl_m       = nl_m;
-  this->rec.ip1    = (int) fmax(0,ip1);
-  this->rec.ip2    = (int) fmax(0,ip2);
   strcpy(this->rec.nomvar,"!!  ");
   this->rec.ig1   = this->vcode;
 
@@ -1476,7 +1462,7 @@ int vgrid_4001::Cvgd_create_from_ab(int ip1, int ip2, double *a_m_8, double *b_m
   return(VGD_OK);
 }
 
-int vgrid_4001::Cvgd_create_from_hyb(float *hyb, int size_hyb, int ip1, int ip2)
+int vgrid_4001::Cvgd_create_from_hyb(float *hyb, int size_hyb)
 {
   double *a_m_8 = NULL, *b_m_8 = NULL;
   int *ip1_m = NULL;
@@ -1502,7 +1488,7 @@ int vgrid_4001::Cvgd_create_from_hyb(float *hyb, int size_hyb, int ip1, int ip2)
     free(ip1_m);
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,a_m_8,b_m_8,ip1_m,nl_m) )
+  if( VGD_ERROR == this->Cvgd_create_from_ab(a_m_8,b_m_8,ip1_m,nl_m) )
   {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_create_from_ab for kind = %d, version = %d\n",
 	    kind,version);
@@ -1520,7 +1506,7 @@ int vgrid_4001::Cvgd_create_from_hyb(float *hyb, int size_hyb, int ip1, int ip2)
 
 
 // ########## class 5001 ##########
-vgrid_5001::vgrid_5001() : vgrid_1003_5001()
+vgrid_5001::vgrid_5001(int ip1, int ip2) : vgrid_1003_5001(ip1, ip2)
 {
   this->kind    = 5;
   this->version = 1;
@@ -1624,7 +1610,7 @@ int vgrid_5001::C_genab(float *hybuser, int nk, float rcoef, double ptop_8, doub
 }
 
 int vgrid_5001::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
-				     double ptop_8, double pref_8, int ip1, int ip2)
+				     double ptop_8, double pref_8)
 {
   double *a_m_8 = NULL, *b_m_8 = NULL;
   int *ip1_m = NULL, nl_m;
@@ -1649,7 +1635,7 @@ int vgrid_5001::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
 
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,ptop_8,pref_8,rcoef1,a_m_8,b_m_8,
+  if( VGD_ERROR == this->Cvgd_create_from_ab(ptop_8,pref_8,rcoef1,a_m_8,b_m_8,
 					    ip1_m,nl_m) )
   {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_create_from_ab for kind = %d, version = %d\n",
@@ -1665,7 +1651,7 @@ int vgrid_5001::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
 
 
 // ########## common to classes vgrid_5002, vgrid_5003, vgrid_5004, vgrid_5005 ##########
-vgrid_5002_5003_5004_5005::vgrid_5002_5003_5004_5005() : vgrid()
+vgrid_5002_5003_5004_5005::vgrid_5002_5003_5004_5005(int ip1, int ip2) : vgrid(ip1, ip2)
 {
   this->table_ni = 3;
   this->table_nk = 1;
@@ -1980,7 +1966,7 @@ void vgrid_5002_5003_5004_5005::set_refnames()
 };
 
 // ########## class 5002 ##########
-vgrid_5002::vgrid_5002() : vgrid_5002_5003_5004_5005()
+vgrid_5002::vgrid_5002(int ip1, int ip2) : vgrid_5002_5003_5004_5005(ip1, ip2)
 {
   this->kind    = 5;
   this->version = 2;
@@ -2003,7 +1989,7 @@ void vgrid_5002::fstd_subinit()
   h->ig4=(int)roundf(this->rcoef2*100.0f);
 }
 
-int vgrid_5002::Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double pref_8,
+int vgrid_5002::Cvgd_create_from_ab(double ptop_8, double pref_8,
 				   float rcoef1, float rcoef2, double *a_m_8,
 				   double *b_m_8, double *a_t_8, double *b_t_8,
 				   int *ip1_m, int *ip1_t,
@@ -2019,8 +2005,6 @@ int vgrid_5002::Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double pref
   this->nl_t       = nl_m+1;
   this->nl_w       = nl_m+1;
 
-  this->rec.ip1    = (int) fmax(0,ip1);
-  this->rec.ip2    = (int) fmax(0,ip2);
   strcpy(this->rec.nomvar,"!!  ");
   this->rec.ig1   = this->vcode;
 
@@ -2090,8 +2074,7 @@ int vgrid_5002::Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double pref
 }
 
 int vgrid_5002::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
-				     float rcoef2, double ptop_8, double pref_8,
-				     int ip1, int ip2)
+				     float rcoef2, double ptop_8, double pref_8)
 {
   double *a_m_8 = NULL, *b_m_8 = NULL, *a_t_8 = NULL, *b_t_8 = NULL;
   int *ip1_m = NULL, *ip1_t = NULL, tlift=0;
@@ -2124,7 +2107,7 @@ int vgrid_5002::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
 
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,nl_m) )
+  if( VGD_ERROR == this->Cvgd_create_from_ab(ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,nl_m) )
   {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_create_from_ab for kind = %d, version = %d\n",
 	    kind,version);
@@ -2141,7 +2124,7 @@ int vgrid_5002::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
 }
 
 // ########## class 5003 ##########
-vgrid_5003::vgrid_5003() : vgrid_5002_5003_5004_5005()
+vgrid_5003::vgrid_5003(int ip1, int ip2) : vgrid_5002_5003_5004_5005(ip1, ip2)
 {
   this->kind    = 5;
   this->version = 3;
@@ -2164,7 +2147,7 @@ void vgrid_5003::fstd_subinit()
   h->ig4=(int)roundf(this->rcoef2*100.0f);
 };
 
-int vgrid_5003::Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double pref_8,
+int vgrid_5003::Cvgd_create_from_ab(double ptop_8, double pref_8,
 				   float rcoef1, float rcoef2, double *a_m_8,
 				   double *b_m_8, double *a_t_8, double *b_t_8,
 				   int *ip1_m, int *ip1_t, int nl_m)
@@ -2176,8 +2159,6 @@ int vgrid_5003::Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double pref
   this->nl_m       = nl_m;
   this->nl_t       = nl_m+1;
   this->nl_w       = nl_m+1;
-  this->rec.ip1    = (int) fmax(0,ip1);
-  this->rec.ip2    = (int) fmax(0,ip2);
   strcpy(this->rec.nomvar,"!!  ");
   this->rec.ig1   = this->vcode;
 
@@ -2247,8 +2228,7 @@ int vgrid_5003::Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double pref
 }
 
 int vgrid_5003::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
-				     float rcoef2, double ptop_8, double pref_8,
-				     int ip1, int ip2)
+				     float rcoef2, double ptop_8, double pref_8)
 {
   double *a_m_8 = NULL, *b_m_8 = NULL, *a_t_8 = NULL, *b_t_8 = NULL;
   int *ip1_m = NULL, *ip1_t = NULL, tlift=1;
@@ -2282,7 +2262,7 @@ int vgrid_5003::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
 
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,nl_m) ) {
+  if( VGD_ERROR == this->Cvgd_create_from_ab(ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,nl_m) ) {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_create_from_ab for kind = %d, version = %d\n",
  kind,version);
     return(VGD_ERROR);
@@ -2298,7 +2278,7 @@ int vgrid_5003::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
 }
 
 // ########## class 5004 ##########
-vgrid_5004::vgrid_5004() : vgrid_5002_5003_5004_5005()
+vgrid_5004::vgrid_5004(int ip1, int ip2) : vgrid_5002_5003_5004_5005(ip1, ip2)
 {
   this->kind    = 5;
   this->version = 4;
@@ -2461,7 +2441,7 @@ void vgrid_5004::fstd_subinit()
   h->ig4=(int)roundf(this->rcoef2*100.0f);
 };
 
-int vgrid_5004::Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double pref_8,
+int vgrid_5004::Cvgd_create_from_ab(double ptop_8, double pref_8,
 				   float rcoef1, float rcoef2, double *a_m_8,
 				   double *b_m_8, double *a_t_8, double *b_t_8,
 				   int *ip1_m, int *ip1_t, int nl_m)
@@ -2473,8 +2453,6 @@ int vgrid_5004::Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double pref
   this->nl_m       = nl_m;
   this->nl_t       = nl_m;
   this->nl_w       = nl_m;
-  this->rec.ip1    = (int) fmax(0,ip1);
-  this->rec.ip2    = (int) fmax(0,ip2);
   strcpy(this->rec.nomvar,"!!  ");
   this->rec.ig1   = this->vcode;
 
@@ -2544,8 +2522,7 @@ int vgrid_5004::Cvgd_create_from_ab(int ip1, int ip2, double ptop_8, double pref
 }
 
 int vgrid_5004::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
-				     float rcoef2, double ptop_8, double pref_8,
-				     int ip1, int ip2)
+				     float rcoef2, double ptop_8, double pref_8)
 {
   double *a_m_8 = NULL, *b_m_8 = NULL, *a_t_8 = NULL, *b_t_8 = NULL;
   int *ip1_m = NULL, *ip1_t = NULL;
@@ -2579,7 +2556,7 @@ int vgrid_5004::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
 
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,nl_m) ) {
+  if( VGD_ERROR == this->Cvgd_create_from_ab(ptop_8,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,nl_m) ) {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_create_from_ab for kind = %d, version = %d\n",
  kind,version);
     return(VGD_ERROR);
@@ -2595,7 +2572,7 @@ int vgrid_5004::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
 }
 
 // ########## class 5005 ##########
-vgrid_5005::vgrid_5005() : vgrid_5002_5003_5004_5005()
+vgrid_5005::vgrid_5005(int ip1, int ip2) : vgrid_5002_5003_5004_5005(ip1, ip2)
 {
   this->kind    = 5;
   this->version = 5;
@@ -2757,8 +2734,7 @@ void vgrid_5005::fstd_subinit()
   h->ig4=(int)roundf(this->rcoef2*100.0f);
 };
 
-int vgrid_5005::Cvgd_create_from_ab(int ip1, int ip2,
-				   double pref_8, float rcoef1, float rcoef2,
+int vgrid_5005::Cvgd_create_from_ab(double pref_8, float rcoef1, float rcoef2,
 				   double *a_m_8, double *b_m_8, double *a_t_8,
 				   double *b_t_8, int *ip1_m, int *ip1_t,
 				   int nl_m)
@@ -2769,8 +2745,6 @@ int vgrid_5005::Cvgd_create_from_ab(int ip1, int ip2,
   this->nk         = nl_m;
   this->nl_m       = nl_m;
   this->nl_t       = nl_m;
-  this->rec.ip1    = (int) fmax(0,ip1);
-  this->rec.ip2    = (int) fmax(0,ip2);
   strcpy(this->rec.nomvar,"!!  ");
   this->rec.ig1   = this->vcode;
 
@@ -2840,7 +2814,7 @@ int vgrid_5005::Cvgd_create_from_ab(int ip1, int ip2,
 
 int vgrid_5005::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
 				     float rcoef2, double pref_8,
-				     double *ptop_out_8, int ip1, int ip2,
+				     double *ptop_out_8,
 				     float *dhm, float *dht)
 {
   double *a_m_8 = NULL, *b_m_8 = NULL, *a_t_8 = NULL, *b_t_8 = NULL;
@@ -2875,7 +2849,7 @@ int vgrid_5005::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
 
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,nl_m) ) {
+  if( VGD_ERROR == this->Cvgd_create_from_ab(pref_8,rcoef1,rcoef2,a_m_8,b_m_8,a_t_8,b_t_8,ip1_m,ip1_t,nl_m) ) {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_create_from_ab for kind = %d, version = %d\n",
  kind,version);
     return(VGD_ERROR);
@@ -2892,7 +2866,7 @@ int vgrid_5005::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
 
 
 // ########## class 5100 ##########
-vgrid_5100::vgrid_5100() : vgrid()
+vgrid_5100::vgrid_5100(int ip1, int ip2) : vgrid(ip1, ip2)
 {
   this->kind    = 5;
   this->version = 100;
@@ -3220,7 +3194,7 @@ void vgrid_5100::fstd_subinit()
   h->ig4=0;
 };
 
-int vgrid_5100::Cvgd_create_from_ab(int ip1, int ip2, double pref_8, float rcoef1,
+int vgrid_5100::Cvgd_create_from_ab(double pref_8, float rcoef1,
 				   float rcoef2, float rcoef3, float rcoef4,
 				   double *a_m_8, double *b_m_8, double *c_m_8,
 				   double *a_t_8, double *b_t_8, double *c_t_8,
@@ -3232,8 +3206,6 @@ int vgrid_5100::Cvgd_create_from_ab(int ip1, int ip2, double pref_8, float rcoef
   this->nk         = nl_m;
   this->nl_m       = nl_m;
   this->nl_t       = nl_m;
-  this->rec.ip1    = (int) fmax(0,ip1);
-  this->rec.ip2    = (int) fmax(0,ip2);
   strcpy(this->rec.nomvar,"!!  ");
   this->rec.ig1   = this->vcode;
 
@@ -3321,8 +3293,8 @@ int vgrid_5100::Cvgd_create_from_ab(int ip1, int ip2, double pref_8, float rcoef
 
 int vgrid_5100::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
 				     float rcoef2, float rcoef3, float rcoef4,
-				     double pref_8, double *ptop_out_8, int ip1,
-				     int ip2, float *dhm, float *dht, int avg)
+				     double pref_8, double *ptop_out_8,
+				     float *dhm, float *dht, int avg)
 {
   double *a_m_8 = NULL, *b_m_8 = NULL, *c_m_8 = NULL, *a_t_8 = NULL, *b_t_8 = NULL, *c_t_8 = NULL;
   int *ip1_m = NULL, *ip1_t = NULL, tlift;
@@ -3359,7 +3331,7 @@ int vgrid_5100::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
 
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,pref_8,rcoef1,rcoef2,rcoef3,rcoef4,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,ip1_m,ip1_t,nl_m) ) {
+  if( VGD_ERROR == this->Cvgd_create_from_ab(pref_8,rcoef1,rcoef2,rcoef3,rcoef4,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,ip1_m,ip1_t,nl_m) ) {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_create_from_ab for kind = %d, version = %d\n",
  kind,version);
     return(VGD_ERROR);
@@ -3378,7 +3350,7 @@ int vgrid_5100::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
 
 
 // ########## class 5999 ##########
-vgrid_5999::vgrid_5999() : vgrid()
+vgrid_5999::vgrid_5999(int ip1, int ip2) : vgrid(ip1, ip2)
 {
   this->kind    = 5;
   this->version = 999;
@@ -3508,7 +3480,7 @@ void vgrid_5999::fstd_subinit()
   h->ig4=0;
 };
 
-int vgrid_5999::Cvgd_create_from_ab(int ip1, int ip2, double *a_m_8, double *b_m_8,
+int vgrid_5999::Cvgd_create_from_ab(double *a_m_8, double *b_m_8,
 				   int *ip1_m, int nl_m)
 {
   // Complete the initializations
@@ -3521,8 +3493,6 @@ int vgrid_5999::Cvgd_create_from_ab(int ip1, int ip2, double *a_m_8, double *b_m
   this->nl_t       = nl_m;
   this->nl_w       = nl_m;
 
-  this->rec.ip1    = (int) fmax(0,ip1);
-  this->rec.ip2    = (int) fmax(0,ip2);
   strcpy(this->rec.nomvar,"!!  ");
   this->rec.ig1   = this->vcode;
 
@@ -3562,7 +3532,7 @@ int vgrid_5999::Cvgd_create_from_ab(int ip1, int ip2, double *a_m_8, double *b_m
   return(VGD_OK);
 }
 
-int vgrid_5999::Cvgd_create_from_hyb(float *hyb, int size_hyb, int ip1, int ip2)
+int vgrid_5999::Cvgd_create_from_hyb(float *hyb, int size_hyb)
 {
   double *a_m_8 = NULL, *b_m_8 = NULL;
   int *ip1_m = NULL;
@@ -3588,7 +3558,7 @@ int vgrid_5999::Cvgd_create_from_hyb(float *hyb, int size_hyb, int ip1, int ip2)
     free(ip1_m);
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,a_m_8,b_m_8,ip1_m,nl_m) )
+  if( VGD_ERROR == this->Cvgd_create_from_ab(a_m_8,b_m_8,ip1_m,nl_m) )
   {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_create_from_ab for kind = %d, version = %d\n",
 	    kind,version);
@@ -3606,7 +3576,7 @@ int vgrid_5999::Cvgd_create_from_hyb(float *hyb, int size_hyb, int ip1, int ip2)
 
 
 // ########## class 21001 ##########
-vgrid_21001::vgrid_21001() : vgrid()
+vgrid_21001::vgrid_21001(int ip1, int ip2) : vgrid(ip1, ip2)
 {
   this->kind    = 21;
   this->version = 1;
@@ -3945,7 +3915,7 @@ void vgrid_21001::fstd_subinit()
   h->ig4=0;
 };
 
-int vgrid_21001::Cvgd_create_from_ab(int ip1, int ip2, float rcoef1, float rcoef2,
+int vgrid_21001::Cvgd_create_from_ab(float rcoef1, float rcoef2,
 				    float rcoef3, float rcoef4,
 				    double *a_m_8, double *b_m_8, double *c_m_8,
 				    double *a_t_8, double *b_t_8, double *c_t_8,
@@ -3961,8 +3931,6 @@ int vgrid_21001::Cvgd_create_from_ab(int ip1, int ip2, float rcoef1, float rcoef
   this->nl_t       = nl_m;
   this->nl_w       = nl_m;
 
-  this->rec.ip1    = (int) fmax(0,ip1);
-  this->rec.ip2    = (int) fmax(0,ip2);
   strcpy(this->rec.nomvar,"!!  ");
   this->rec.ig1   = this->vcode;
 
@@ -4049,7 +4017,7 @@ int vgrid_21001::Cvgd_create_from_ab(int ip1, int ip2, float rcoef1, float rcoef
 
 
 int vgrid_21001::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
-				      float rcoef2, int ip1, int ip2, float *dhm,
+				      float rcoef2, float *dhm,
 				      float *dht, float rcoef3,
 				      float rcoef4)
 {
@@ -4086,7 +4054,7 @@ int vgrid_21001::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
 
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,rcoef1,rcoef2,rcoef3,rcoef4,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,ip1_m,ip1_t,nl_m) )
+  if( VGD_ERROR == this->Cvgd_create_from_ab(rcoef1,rcoef2,rcoef3,rcoef4,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,ip1_m,ip1_t,nl_m) )
   {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_create_from_ab for kind = %d, version = %d\n",
 	    kind,version);
@@ -4114,7 +4082,7 @@ int vgrid_21001::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
 
 
 // ########## class 21002 ##########
-vgrid_21002::vgrid_21002() : vgrid()
+vgrid_21002::vgrid_21002(int ip1, int ip2) : vgrid(ip1, ip2)
 {
   this->kind    = 21;
   this->version = 2;
@@ -4512,7 +4480,7 @@ void vgrid_21002::fstd_subinit()
   h->ig4=0;
 };
 
-int vgrid_21002::Cvgd_create_from_ab(int ip1, int ip2, float rcoef1, float rcoef2,
+int vgrid_21002::Cvgd_create_from_ab(float rcoef1, float rcoef2,
 				    float rcoef3, float rcoef4,
 				    double *a_m_8, double *b_m_8, double *c_m_8,
 				    double *a_t_8, double *b_t_8, double *c_t_8,
@@ -4529,8 +4497,6 @@ int vgrid_21002::Cvgd_create_from_ab(int ip1, int ip2, float rcoef1, float rcoef
   this->nl_t       = nl_m;
   this->nl_w       = nl_m;
 
-  this->rec.ip1    = (int) fmax(0,ip1);
-  this->rec.ip2    = (int) fmax(0,ip2);
   strcpy(this->rec.nomvar,"!!  ");
   this->rec.ig1   = this->vcode;
 
@@ -4633,7 +4599,7 @@ int vgrid_21002::Cvgd_create_from_ab(int ip1, int ip2, float rcoef1, float rcoef
   free(this->ip1_w);
   this->ip1_w = (int*)malloc( nl_w * sizeof(int) );
   if(! this->ip1_w) {
-    printf("(Cvgd) ERROR: in Cvgd_create_from_ab, problem allocating ip1_w\n");
+    printf("(Cvgd) ERROR: in Cvgd_create_from_ab, problem allocatinint ip1, int ip2, g ip1_w\n");
     return(VGD_ERROR);
   }
   my_copy_int(ip1_w, &(this->ip1_w), nl_w);
@@ -4649,7 +4615,7 @@ int vgrid_21002::Cvgd_create_from_ab(int ip1, int ip2, float rcoef1, float rcoef
 
 
 int vgrid_21002::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
-				      float rcoef2, int ip1, int ip2, float *dhm,
+				      float rcoef2, float *dhm,
 				      float *dht, float *dhw, float rcoef3,
 				      float rcoef4)
 {
@@ -4691,7 +4657,7 @@ int vgrid_21002::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
 
     return(VGD_ERROR);
   }
-  if( VGD_ERROR == this->Cvgd_create_from_ab(ip1,ip2,rcoef1,rcoef2,rcoef3,rcoef4,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,a_w_8,b_w_8,c_w_8,ip1_m,ip1_t,ip1_w,nl_m) )
+  if( VGD_ERROR == this->Cvgd_create_from_ab(rcoef1,rcoef2,rcoef3,rcoef4,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,a_w_8,b_w_8,c_w_8,ip1_m,ip1_t,ip1_w,nl_m) )
   {
     fprintf(stderr,"(Cvgd) ERROR in Cvgd_create_from_ab for kind = %d, version = %d\n",
 	    kind,version);

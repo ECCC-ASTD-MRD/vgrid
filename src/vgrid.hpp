@@ -235,7 +235,7 @@ public:
 // ########## N E W   I N T E R F A C E ##########
 public:
   // Constructors
-  vgrid();
+  vgrid(int ip1=-1, int ip2=-1);
   vgrid(int unit, int ip1, int ip2, int kind, int version);
 
 public:

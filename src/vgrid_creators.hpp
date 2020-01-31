@@ -31,7 +31,7 @@
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
 // Create a bare vgrid object of the correct subclass
-static void Cvgd_create_vgrid_from_vcode(vgrid **new_vgrid, int vcode);
+static void Cvgd_create_vgrid_from_vcode(vgrid **new_vgrid, int vcode, int ip1, int ip2);
 
 int Cvgd_read_vgrid_from_file(vgrid **my_new_vgrid, int unit, int ip1, int ip2, int kind, int version);
 

@@ -80,7 +80,7 @@ int check_gen_1001_2001_4001(vgrid *my_vgrid, int vcode){
   }
   
   printf("  Testing generic interface\n");
-  if( Cvgd_new_gen(&my_vgrid2, kind, version, hyb, nk, NULL, NULL, NULL, NULL, NULL,
+  if( Cvgd_create_from_hyb(&my_vgrid2, kind, version, hyb, nk, NULL, NULL, NULL, NULL, NULL,
 		   -1, -1, NULL, NULL, 0) == VGD_ERROR ) {
     return(VGD_ERROR);
   }
@@ -98,17 +98,17 @@ int check_gen_1001_2001_4001(vgrid *my_vgrid, int vcode){
   my_vgrid2 = nullptr;
   switch(vcode) {
   case 1001:
-    if( Cvgd_build_from_hyb_1001(&my_vgrid2, hyb, nk, 0, 0) == VGD_ERROR) {
+    if( Cvgd_create_from_hyb_1001(&my_vgrid2, hyb, nk, 0, 0) == VGD_ERROR) {
       return(VGD_ERROR);
     }
     break;
   case 2001:
-    if( Cvgd_build_from_hyb_2001(&my_vgrid2, hyb, nk, 0, 0) == VGD_ERROR) {
+    if( Cvgd_create_from_hyb_2001(&my_vgrid2, hyb, nk, 0, 0) == VGD_ERROR) {
       return(VGD_ERROR);
     }
     break;
   case 4001:
-    if( Cvgd_build_from_hyb_4001(&my_vgrid2, hyb, nk, 0, 0) == VGD_ERROR) {
+    if( Cvgd_create_from_hyb_4001(&my_vgrid2, hyb, nk, 0, 0) == VGD_ERROR) {
       return(VGD_ERROR);
     }
     break;
@@ -160,7 +160,7 @@ int check_gen_1002(vgrid *my_vgrid){
     hyb[k] = c_convip_IP2Level(ip1_m[k], &kind2);
   }
   printf("  Testing generic interface\n");
-  if( Cvgd_new_gen(&my_vgrid2, kind, version, hyb, nk, NULL, NULL, &ptop_8, NULL, NULL,
+  if( Cvgd_create_from_hyb(&my_vgrid2, kind, version, hyb, nk, NULL, NULL, &ptop_8, NULL, NULL,
 		   0, 0, NULL, NULL, 0) == VGD_ERROR) {
     return(VGD_ERROR);
   }
@@ -176,7 +176,7 @@ int check_gen_1002(vgrid *my_vgrid){
   printf("  Testing specific interface\n");
   free(my_vgrid2);
   my_vgrid2 = nullptr;
-  if( Cvgd_build_from_hyb_1002(&my_vgrid2, hyb, nk, ptop_8, 0, 0) == VGD_ERROR) {
+  if( Cvgd_create_from_hyb_1002(&my_vgrid2, hyb, nk, ptop_8, 0, 0) == VGD_ERROR) {
     return(VGD_ERROR);
   }
   //Test equality
@@ -231,7 +231,7 @@ int check_gen_5001(vgrid *my_vgrid){
   }
   
   printf("  Testing generic interface\n");
-  if( Cvgd_new_gen(&my_vgrid2, kind, version, hyb, nk, &rc_1, NULL,
+  if( Cvgd_create_from_hyb(&my_vgrid2, kind, version, hyb, nk, &rc_1, NULL,
 	      &ptop_8, &pref_8, NULL, 0, 0, NULL, NULL, 0) == VGD_ERROR) {
     return(VGD_ERROR);
   }
@@ -248,7 +248,7 @@ int check_gen_5001(vgrid *my_vgrid){
   printf("  Testing specific interface\n");
   free(my_vgrid2);
   my_vgrid2 = nullptr;
-  if( Cvgd_new_gen_5001(&my_vgrid2, hyb, nk, ptop_8, pref_8, rc_1, 0, 0) == VGD_ERROR) {
+  if( Cvgd_create_from_hyb_5001(&my_vgrid2, hyb, nk, ptop_8, pref_8, rc_1, 0, 0) == VGD_ERROR) {
     return(VGD_ERROR);
   }
   //Test equality
@@ -307,9 +307,9 @@ int check_gen_5002(vgrid *my_vgrid){
   }
  
   printf("  Testing generic interface\n");
-  if( Cvgd_new_gen(&my_vgrid2, kind, version, hyb, nk, &rc_1, &rc_2,
+  if( Cvgd_create_from_hyb(&my_vgrid2, kind, version, hyb, nk, &rc_1, &rc_2,
 		   &ptop_8, &pref_8, NULL,0, 0, NULL, NULL, 0) == VGD_ERROR ) {
-    printf("ERROR: check_gen_5002, problem with Cvgd_new_gen\n");
+    printf("ERROR: check_gen_5002, problem with Cvgd_create_from_hyb\n");
     return(VGD_ERROR);
   }
   // Test equality
@@ -324,7 +324,7 @@ int check_gen_5002(vgrid *my_vgrid){
   printf("  Testing specific interface\n");
   free(my_vgrid2);
   my_vgrid2 = nullptr;
-  if( Cvgd_build_from_hyb_5002(&my_vgrid2, hyb, nk, ptop_8, pref_8, rc_1, rc_2, 0, 0) == VGD_ERROR) {
+  if( Cvgd_create_from_hyb_5002(&my_vgrid2, hyb, nk, ptop_8, pref_8, rc_1, rc_2, 0, 0) == VGD_ERROR) {
     return(VGD_ERROR);
   }
   //Test equality
@@ -384,7 +384,7 @@ int check_gen_5005(vgrid *my_vgrid){
   }
   
   printf("  Testing generic interface\n");
-  if( Cvgd_new_gen(&my_vgrid2, kind, version, hyb, nk, &rc_1, &rc_2, 
+  if( Cvgd_create_from_hyb(&my_vgrid2, kind, version, hyb, nk, &rc_1, &rc_2, 
 		      NULL, &pref_8, &ptop_out_8, 0, 0, &dhm, &dht, 0) == VGD_ERROR) {
     return(VGD_ERROR);
   }
@@ -400,7 +400,7 @@ int check_gen_5005(vgrid *my_vgrid){
   printf("  Testing specific interface\n");
   free(my_vgrid2);
   my_vgrid2 = nullptr;
-  if( Cvgd_build_from_hyb_5005(&my_vgrid2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, 0, 0, &dhm, &dht) == VGD_ERROR) {
+  if( Cvgd_create_from_hyb_5005(&my_vgrid2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, 0, 0, &dhm, &dht) == VGD_ERROR) {
     return(VGD_ERROR);
   }
   //Test equality
@@ -467,7 +467,7 @@ int check_gen_5100(vgrid *my_vgrid){
   }
   // No generic interface for 5100
   printf("  Testing specific interface\n");
-  if( Cvgd_build_from_hyb_5100(&my_vgrid2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, rc_3, rc_4, 0, 0, &dhm, &dht, 1) == VGD_ERROR) {
+  if( Cvgd_create_from_hyb_5100(&my_vgrid2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, rc_3, rc_4, 0, 0, &dhm, &dht, 1) == VGD_ERROR) {
     return(VGD_ERROR);
   }
   //Test equality
