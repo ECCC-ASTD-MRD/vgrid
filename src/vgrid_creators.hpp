@@ -122,8 +122,8 @@ int Cvgd_create_from_ab_21002(vgrid** new_vgrid, int ip1, int ip2, float rcoef1,
 int Cvgd_create_from_hyb(vgrid **my_new_vgrid, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2,
                  double *ptop_8, double *pref_8, double *ptop_out_8,
                  int ip1, int ip2, float *dhm, float *dht, int avg);
-int Cvgd_create_from_hyb_1001(vgrid **my_new_vgrid, float *hyb, int size_hyb, int ip1,
-			     int ip2);
+int Cvgd_create_from_hyb_1001(vgrid **my_new_vgrid, float *hyb, int size_hyb,
+			      int ip1, int ip2);
 int Cvgd_create_from_hyb_1002(vgrid **my_new_vgrid, float *hyb, int size_hyb,
 			     double ptop_8, int ip1, int ip2);
 int Cvgd_create_from_hyb_1003(vgrid **my_new_vgrid, float *hyb, int size_hyb,

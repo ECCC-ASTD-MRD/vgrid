@@ -186,6 +186,21 @@ int Cvgd_create_from_hyb2(int *vgdid, int kind, int version, float *hyb,
   return status;
 }
 
+
+int c_create_from_hyb_1001(int *vgdid, float *hyb, int size_hyb, int ip1, int ip2)
+{
+  vgrid *my_vgd;
+  int status;
+  status=Cvgd_create_from_hyb_1001(&my_vgd, hyb, size_hyb, ip1, ip2);
+  if(status != VGD_ERROR)
+    {
+      *vgdid=grid_check.get_tag(my_vgd);
+    }
+  return status;
+}
+
+
+
 int Cvgd_read_vgrid_from_file(int *vgdid, int unit, int ip1,int ip2, 
                               int kind, int version)
 {
