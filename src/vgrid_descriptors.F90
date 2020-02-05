@@ -55,6 +55,7 @@ module vGrid_Descriptors
    public :: vgd_create_from_ab_21002            !class constructor
 
    public :: vgd_create_from_hyb_1001            !class constructor
+   public :: vgd_create_from_hyb_21002           !class constructor
 
    public :: vgd_new                             !class constructor
    public :: vgd_getopt                          !get class variable value
@@ -399,6 +400,16 @@ module vGrid_Descriptors
          type(c_ptr),     value :: hyb
          integer (c_int), value :: size_hyb, ip1, ip2
       end function f_create_from_hyb_1001
+
+      integer(c_int) function f_create_from_hyb_21002(vgdid, hyb, size_hyb, &
+                              rcoef1, rcoef2, rcoef3, rcoef4, ip1, ip2, dhm, dht, dhw) &
+                              bind(c, name='c_create_from_hyb_21002')
+         use iso_c_binding, only : c_ptr, c_int, c_double, c_float
+         type(c_ptr),     value :: vgdid, hyb, dhm, dht, dhw
+         integer (c_int), value :: size_hyb
+         integer (c_int), value :: ip1, ip2
+         real (c_float),  value :: rcoef1, rcoef2, rcoef3, rcoef4
+      end function f_create_from_hyb_21002
       
       integer(c_int) function f_new_from_table(vgdid, table_CP, ni, nj, nk) bind(c, name='Cvgd_new_from_table')
          use iso_c_binding, only : c_ptr, c_int
@@ -1184,40 +1195,96 @@ contains
    integer function vgd_create_from_hyb_1001(vgdid, hyb, ip1, ip2) result(status)
       implicit none
 
-      ! Coordinate constructor - build vertical descriptor from hybrid coordinate entries
       integer,target,intent(inout) :: vgdid         !Vertical descriptor id
       real, target, dimension(:),intent(in) :: hyb  !List of hybrid levels
       integer, optional, intent(in) :: ip1, ip2
 
       ! Local variables
       type(c_ptr) :: hyb_CP
-      type(c_ptr) :: vgdid_ptr
+      type(c_ptr) :: vgdid_p
       integer l_ip1,l_ip2
    
-         if(present(ip1))then
-            l_ip1 = ip1
-         else
-            l_ip1 = -1
-         endif
-         if(present(ip2))then
-            l_ip2 = ip2
-         else
-            l_ip2 = -1
-         endif
+      if(present(ip1))then
+         l_ip1 = ip1
+      else
+         l_ip1 = -1
+      endif
+      if(present(ip2))then
+         l_ip2 = ip2
+      else
+         l_ip2 = -1
+      endif
 
       hyb_CP = c_loc(hyb)
 
       status = VGD_ERROR;
-      ! Assign optional argument to C_NULL_PTR
 
-      vgdid_ptr=c_loc(vgdid)
-      if(f_create_from_hyb_1001(vgdid_ptr, hyb_CP, size(hyb),l_ip1, l_ip2) &
+      vgdid_p=c_loc(vgdid)
+      hyb_CP = c_loc(hyb)
+      if(f_create_from_hyb_1001(vgdid_p, hyb_CP, size(hyb),l_ip1, l_ip2) &
                                == VGD_ERROR)then
          print*,'(F_vgd) ERROR in vgd_create_from_hyb_1001, problem with f_create_from_hyb'
          return
       endif
       status = VGD_OK
     end function vgd_create_from_hyb_1001
+
+    integer function vgd_create_from_hyb_21002(vgdid, hyb, rcoef1, rcoef2, rcoef3, &
+                          rcoef4, ip1, ip2, dhm, dht, dhw) &
+                          result(status)
+      integer, target :: vgdid
+      real, target, dimension(:),intent(in) :: hyb
+      real :: rcoef1, rcoef2, dhm, dht, dhw
+      real, optional :: rcoef3, rcoef4
+      integer, optional, intent(in) :: ip1, ip2
+
+      real my_rcoef3, my_rcoef4
+      integer l_ip1,l_ip2
+      type(c_ptr) :: vgdid_p, hyb_p, dhm_p, dht_p, dhw_p
+
+      if(present(rcoef3))then
+         my_rcoef3 = rcoef3
+      else
+         my_rcoef3 = -1
+      endif
+
+      if(present(rcoef4))then
+         my_rcoef4 = rcoef4
+      else
+         my_rcoef4 = -1
+      endif
+
+      if(present(ip1))then
+         l_ip1 = ip1
+      else
+         l_ip1 = -1
+      endif
+      if(present(ip2))then
+         l_ip2 = ip2
+      else
+         
+         l_ip2 = -1
+      endif
+
+      vgdid_p = c_loc(vgdid)
+      hyb_p = c_loc(hyb)
+      dhm_p = c_loc(dhm)
+      dht_p = c_loc(dht)
+      dhw_p = c_loc(dhw)
+
+      status = VGD_ERROR
+
+      if( f_create_from_hyb_21002(vgdid_p, hyb_p, size(hyb), &
+                                  rcoef1, rcoef2, my_rcoef3, my_rcoef4, l_ip1, l_ip2, &
+                                  dhm_p, dht_p, dhw_p)== VGD_ERROR &
+                                )then
+        print*,'(F_vgd) ERROR: In vgd_create_from_hyb_21002'
+        return
+      end if
+
+      status = VGD_OK
+      return
+    end function vgd_create_from_hyb_21002
 
 
    integer function vgd_create_from_ab(vgdid,kind,version,nk,ip1,ip2, &

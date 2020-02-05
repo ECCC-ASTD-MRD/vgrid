@@ -168,9 +168,10 @@ int Cvgd_new_from_table(int *vgdid, double *table,
 
 
 int Cvgd_create_from_hyb2(int *vgdid, int kind, int version, float *hyb,
-                  int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3,                      float *rcoef4, double *ptop_8, double *pref_8,
-                  double *ptop_out_8, int ip1, int ip2, float *dhm, float *dht,
-                  float *dhw, int avg)
+			  int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3,
+			  float *rcoef4, double *ptop_8, double *pref_8,
+			  double *ptop_out_8, int ip1, int ip2, float *dhm, float *dht,
+			  float *dhw, int avg)
 {
   vgrid *my_vgd;
   int status;
@@ -192,6 +193,25 @@ int c_create_from_hyb_1001(int *vgdid, float *hyb, int size_hyb, int ip1, int ip
   vgrid *my_vgd;
   int status;
   status=Cvgd_create_from_hyb_1001(&my_vgd, hyb, size_hyb, ip1, ip2);
+  if(status != VGD_ERROR)
+    {
+      *vgdid=grid_check.get_tag(my_vgd);
+    }
+  return status;
+}
+
+
+int c_create_from_hyb_21002(int *vgdid, float *hyb, int size_hyb,
+			    float rcoef1, float rcoef2, float rcoef3,float rcoef4,
+			    int ip1, int ip2, float *dhm, float *dht, float *dhw)
+{
+  vgrid *my_vgd;
+  int status;
+
+  // rcoef3 and rcoef4 are switched to the end here, because they are optional
+  status=Cvgd_create_from_hyb_21002(&my_vgd, hyb, size_hyb,
+				    rcoef1, rcoef2, ip1, ip2, dhm,
+				    dht, dhw, rcoef3, rcoef4);
   if(status != VGD_ERROR)
     {
       *vgdid=grid_check.get_tag(my_vgd);

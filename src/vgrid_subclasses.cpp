@@ -4219,13 +4219,13 @@ int vgrid_21002::C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, int *nl_w
 
   if ( rcoef3 < 0. ){
     if( rcoef4 >= 0. ){
-      printf("(Cvgd) ERROR in vgrid_21002::C_genab, rcoef4 should not bet set since rcoef3 is not set\n");
+      printf("(Cvgd) ERROR in vgrid_21002::C_genab, rcoef4 should not be set since rcoef3 is not set\n");
       return(VGD_ERROR);
     }
   }
   if ( rcoef4 < 0. ){
     if( rcoef3 >= 0. ){
-      printf("(Cvgd) ERROR in vgrid_21002::C_genab, rcoef3 should not bet set since rcoef4 is not set\n");
+      printf("(Cvgd) ERROR in vgrid_21002::C_genab, rcoef3 should not be set since rcoef4 is not set\n");
       return(VGD_ERROR);
     }
   }
