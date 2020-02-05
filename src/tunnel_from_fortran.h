@@ -53,6 +53,9 @@ int Cvgd_create_from_hyb2(int *vgdid, int kind, int version, float *hyb,
                   double *ptop_out_8, int ip1, int ip2, float *dhm, float *dht,
                   float *dhw, int avg);
 int c_create_from_hyb_1001(int *vgdid, float *hyb, int size_hyb, int ip1, int ip2);
+int c_create_from_hyb_21001(int *vgdid, float *hyb, int size_hyb,
+			    float rcoef1, float rcoef2, float rcoef3,float rcoef4,
+			    int ip1, int ip2, float *dhm, float *dht, float *dhw);
 int c_create_from_hyb_21002(int *vgdid, float *hyb, int size_hyb,
 			    float rcoef1, float rcoef2, float rcoef3,float rcoef4,
 			    int ip1, int ip2, float *dhm, float *dht, float *dhw);
