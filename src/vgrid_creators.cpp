@@ -1057,8 +1057,8 @@ int Cvgd_create_from_hyb_5003(vgrid **my_new_vgrid, float *hyb, int size_hyb,
 }
 
 int Cvgd_create_from_hyb_5004(vgrid **my_new_vgrid, float *hyb, int size_hyb,
-			     double ptop_8, double pref_8, float rcoef1, float rcoef2,
-			     int ip1, int ip2)
+			      double ptop_8, double pref_8,
+			      float rcoef1, float rcoef2, int ip1, int ip2)
 {
   try
   {

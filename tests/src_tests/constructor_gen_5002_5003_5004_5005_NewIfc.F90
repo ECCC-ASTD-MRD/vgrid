@@ -21,7 +21,7 @@ program constructor
   ! Revision : Andre Plante test on B instead of A since A not sensitive to rcoefs
 
   use vGrid_Descriptors, only: vgd_new,vgd_get,VGD_ERROR,vgd_create_from_hyb_5002, &
-                               vgd_create_from_hyb_5003
+                               vgd_create_from_hyb_5003, vgd_create_from_hyb_5004
   use Unit_Testing, only: ut_report
   
 
@@ -101,20 +101,18 @@ endif
 
   ! Construct a new set of vertical coordinate descriptors 5004
   !
-  stat = vgd_new(vgdid,kind=5,version=4,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-1.d0,pref_8=pref,ptop_out_8=ptop,ip1=0)
+  stat = vgd_create_from_hyb_5004(vgdid,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-1.d0,pref_8=pref,ip1=0)
   
   file='data/data_constructor_gen_5004.txt'
   stat = test_5002(vgdid,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
-  print*,'ptop',ptop
 
   ! Construct a new set of vertical coordinate descriptors 5004 with flat Momentum(1) level B(1)=0.
   ! 
-  stat = vgd_new(vgdid,kind=5,version=4,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-2.d0,pref_8=pref,ptop_out_8=ptop,ip1=0)
+  stat = vgd_create_from_hyb_5004(vgdid,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-2.d0,pref_8=pref,ip1=0)
   file='data/data_constructor_gen_5004_B_0.txt'
   stat = test_5002(vgdid,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
-  print*,'ptop',ptop
  
   ! Construct a new set of vertical coordinate descriptors 5005
   !

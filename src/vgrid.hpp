@@ -38,6 +38,7 @@ extern float VGD_STDA76_SFC_P;
 // Validity table for self
 #define VALID_TABLE_SIZE 15
 
+// Note (JWB):  marking 5004 as ptop_out_8_valid seems to be an error.  The original code (C_genab_5004) does not set its value.
 static int ptop_out_8_valid [VALID_TABLE_SIZE] = {0,    0,    0,    0,    0,    0,    0,    0,    0, 5004, 5005, 5100,    0,     0,    0};
 static int ptop_8_valid     [VALID_TABLE_SIZE] = {0,    0, 1002, 1003,    0,    0, 5001, 5002, 5003, 5004,    0,    0,    0,     0,    0};
 static int pref_8_valid     [VALID_TABLE_SIZE] = {0,    0,    0, 1003,    0,    0, 5001, 5002, 5003, 5004, 5005, 5100,    0,     0,    0};

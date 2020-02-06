@@ -57,6 +57,7 @@ module vGrid_Descriptors
    public :: vgd_create_from_hyb_1001            !class constructor
    public :: vgd_create_from_hyb_5002            !class constructor
    public :: vgd_create_from_hyb_5003            !class constructor
+   public :: vgd_create_from_hyb_5004            !class constructor
    public :: vgd_create_from_hyb_5100            !class constructor
    public :: vgd_create_from_hyb_21001           !class constructor
    public :: vgd_create_from_hyb_21002           !class constructor
@@ -426,6 +427,17 @@ module vGrid_Descriptors
          integer (c_int), value :: ip1, ip2
          real (c_float),  value :: rcoef1, rcoef2
       end function f_create_from_hyb_5003
+
+      integer(c_int) function f_create_from_hyb_5004(vgdid, hyb, size_hyb, &
+                              ptop_8, pref_8, rcoef1, rcoef2, ip1, ip2) &
+                              bind(c, name='c_create_from_hyb_5004')
+         use iso_c_binding, only : c_ptr, c_int, c_double, c_float
+         type(c_ptr),     value :: vgdid, hyb
+         integer (c_int), value :: size_hyb
+         real (c_double), value :: ptop_8, pref_8
+         integer (c_int), value :: ip1, ip2
+         real (c_float),  value :: rcoef1, rcoef2
+      end function f_create_from_hyb_5004
 
       integer(c_int) function f_create_from_hyb_5100(vgdid, hyb, size_hyb, &
                               pref_8, ptop_out_8, &
@@ -1357,6 +1369,46 @@ contains
       status = VGD_OK
       return
     end function vgd_create_from_hyb_5003
+
+    integer function vgd_create_from_hyb_5004(vgdid, hyb, ptop_8, pref_8, &
+                          rcoef1, rcoef2, ip1, ip2) &
+                          result(status)
+      integer, target :: vgdid
+      real, target, dimension(:),intent(in) :: hyb
+      real(kind=8) :: ptop_8, pref_8
+      real :: rcoef1, rcoef2
+      integer, optional, intent(in) :: ip1, ip2
+
+      integer l_ip1,l_ip2
+      type(c_ptr) :: vgdid_p, hyb_p
+
+      if(present(ip1))then
+         l_ip1 = ip1
+      else
+         l_ip1 = -1
+      endif
+      if(present(ip2))then
+         l_ip2 = ip2
+      else
+         
+         l_ip2 = -1
+      endif
+
+      vgdid_p = c_loc(vgdid)
+      hyb_p = c_loc(hyb)
+
+      status = VGD_ERROR
+
+      if( f_create_from_hyb_5004(vgdid_p, hyb_p, size(hyb), &
+                                 ptop_8, pref_8, rcoef1, rcoef2, l_ip1, l_ip2 &
+                                )== VGD_ERROR )then
+        print*,'(F_vgd) ERROR: In vgd_create_from_hyb_5004'
+        return
+      end if
+
+      status = VGD_OK
+      return
+    end function vgd_create_from_hyb_5004
 
     integer function vgd_create_from_hyb_5100(vgdid, hyb, pref_8, ptop_out_8, &
                           rcoef1, rcoef2, rcoef3, rcoef4, ip1, ip2, dhm, dht, avg_l) &
