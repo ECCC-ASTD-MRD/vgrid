@@ -20,7 +20,7 @@ program constructor
 
   ! Revision : Andre Plante test on B instead of A since A not sensitive to rcoefs
 
-  use vGrid_Descriptors, only: vgd_get,vgd_print,VGD_ERROR
+  use vGrid_Descriptors, only: vgd_get,vgd_print,VGD_ERROR,vgd_create_from_hyb_21002
   use Unit_Testing, only: ut_report
 
   implicit none
@@ -57,7 +57,7 @@ program constructor
   if(stat.eq.VGD_ERROR)OK=.false.
 
   ! Construct a new set of vertical coordinate descriptors 21002 hyb heights on Lorenz grid with SLEVE
-  if( kind=21,version=2,(vgdid,hyb=hgts,rcoef1=0.,rcoef2=1.,rcoef3=0.,rcoef4=1000.,dhm=10.0,dht=1.5,dhw=0.) == VGD_ERROR )OK=.false.
+  if( vgd_create_from_hyb_21002(vgdid,hyb=hgts,rcoef1=0.,rcoef2=1.,rcoef3=0.,rcoef4=1000.,dhm=10.0,dht=1.5,dhw=0.) == VGD_ERROR )OK=.false.
   if( vgd_print(vgdid,vgdid,convip_L=.true.) == VGD_ERROR )then
      print*,'ERROR'
      stop
