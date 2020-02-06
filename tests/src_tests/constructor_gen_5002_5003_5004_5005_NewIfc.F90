@@ -20,8 +20,9 @@ program constructor
 
   ! Revision : Andre Plante test on B instead of A since A not sensitive to rcoefs
 
-  use vGrid_Descriptors, only: vgd_new,vgd_get,VGD_ERROR,vgd_create_from_hyb_5002, &
-                               vgd_create_from_hyb_5003, vgd_create_from_hyb_5004
+  use vGrid_Descriptors, only: vgd_get,VGD_ERROR,vgd_create_from_hyb_5002, &
+                               vgd_create_from_hyb_5003, vgd_create_from_hyb_5004, &
+                               vgd_create_from_hyb_5005
   use Unit_Testing, only: ut_report
   
 
@@ -49,13 +50,15 @@ program constructor
        (/.9,.5,.1/)
   real :: rcoef1=0.,rcoef2=1.
   
-  real(kind=8) :: ptop=805d0,pref=100000d0
+  real(kind=8), target  :: ptop=805d0,pref=100000d0
+  real(kind=8), pointer :: ptop_p
   logical :: OK=.true.
   integer :: test_5002, ier
   logical, parameter :: write_control_L=.false.
   character (len=256) :: file
 
   print*,'DEBUG'
+  ptop_p => ptop
 
   !ier = vgd_free(vgdid)
 
@@ -116,13 +119,13 @@ endif
  
   ! Construct a new set of vertical coordinate descriptors 5005
   !
-  stat = vgd_new(vgdid,kind=5,version=5,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,ip1=0)
+  stat = vgd_create_from_hyb_5005(vgdid,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop_p,ip1=0)
   file='data/data_constructor_gen_5005.txt'
   stat = test_5002(vgdid,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
   print*,'ptop',ptop
  
-  call ut_report(OK,'Grid_Descriptors::vgd_new vertical generate initializer (5002) value')
+  call ut_report(OK,'vgd_create_from_hyb_5002_5003_5004_5005 vertical generate initializer value')
 end program constructor
 !==============================================================================
 !===============================================================================
