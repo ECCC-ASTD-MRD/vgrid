@@ -201,6 +201,19 @@ int c_create_from_hyb_1001(int *vgdid, float *hyb, int size_hyb, int ip1, int ip
 }
 
 
+int c_create_from_hyb_4001(int *vgdid, float *hyb, int size_hyb, int ip1, int ip2)
+{
+  vgrid *my_vgd;
+  int status;
+  status=Cvgd_create_from_hyb_4001(&my_vgd, hyb, size_hyb, ip1, ip2);
+  if(status != VGD_ERROR)
+    {
+      *vgdid=grid_check.get_tag(my_vgd);
+    }
+  return status;
+}
+
+
 int c_create_from_hyb_5002(int *vgdid, float *hyb, int size_hyb, double ptop_8,
 			   double pref_8, float rcoef1, float rcoef2, int ip1, int ip2)
 {
