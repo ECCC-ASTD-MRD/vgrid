@@ -201,6 +201,22 @@ int c_create_from_hyb_1001(int *vgdid, float *hyb, int size_hyb, int ip1, int ip
 }
 
 
+int c_create_from_hyb_1002(int *vgdid, float *hyb, int size_hyb, double ptop_8,
+			   int ip1, int ip2)
+{
+  vgrid *my_vgd;
+  int status;
+
+  // rcoef3 and rcoef4 are switched to the end here, because they are optional
+  status=Cvgd_create_from_hyb_1002(&my_vgd, hyb, size_hyb, ptop_8, ip1, ip2);
+  if(status != VGD_ERROR)
+    {
+      *vgdid=grid_check.get_tag(my_vgd);
+    }
+  return status;
+}
+
+
 int c_create_from_hyb_4001(int *vgdid, float *hyb, int size_hyb, int ip1, int ip2)
 {
   vgrid *my_vgd;

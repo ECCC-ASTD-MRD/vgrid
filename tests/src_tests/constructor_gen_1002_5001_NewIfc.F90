@@ -18,7 +18,8 @@
 ! * Boston, MA 02111-1307, USA.
 program constructor
 
-  use vGrid_Descriptors, only: vgd_new,vgd_get,vgd_putopt,VGD_ERROR,vgd_create_from_hyb_5001
+  use vGrid_Descriptors, only: vgd_get,vgd_putopt,VGD_ERROR,vgd_create_from_hyb_5001, &
+                               vgd_create_from_hyb_1002
   use Unit_Testing, only: ut_report
   
    
@@ -64,18 +65,18 @@ program constructor
   !
   print*,''
   print*,'===== 1002 Test on Error ptop<0, error message is normal ===='
-  stat = vgd_new(vgdid,kind=1,version=2,hyb=hyb_N,ptop_8=-1.d0)
+  stat = vgd_create_from_hyb_1002(vgdid,hyb=hyb_N,ptop_8=-1.d0)
   if(stat.ne.VGD_ERROR)OK=.false.  
   !
   print*,''  
   print*,'===== 1002 Test on complete level set ===='
-  stat = vgd_new(vgdid,kind=1,version=2,hyb=hyb_N,ptop_8=ptop_N)
+  stat = vgd_create_from_hyb_1002(vgdid,hyb=hyb_N,ptop_8=ptop_N)
   file='data/data_constructor_gen_1002.txt'
   stat = test_1002_5001(vgdid,file,write_control_L)
   if(stat.eq.VGD_ERROR)OK=.false.
   print*,''  
   print*,'===== 1002 Test on incomplete level set ===='
-  stat = vgd_new(vgdid,kind=1,version=2,hyb=hyb_N(10:28),ptop_8=ptop_N)
+  stat = vgd_create_from_hyb_1002(vgdid,hyb=hyb_N(10:28),ptop_8=ptop_N)
   stat = vgd_get(vgdid,key='CB_M - vertical B coefficient',value=b_m_8)
   stat = vgd_get(vgdid,key='CA_M - vertical A coefficient',value=a_m_8)
   w1=0.2189999967813492
@@ -157,7 +158,7 @@ program constructor
   !stat = vgd_free(d)
   deallocate(b_m_8,a_m_8)
 
-  call ut_report(OK,'Grid_Descriptors::vgd_new vertical generate initializer (5001) value')
+  call ut_report(OK,'vgd_create_from_hyb_1002_5001 vertical generate initializer value')
 
 end program constructor
 !==============================================================================
