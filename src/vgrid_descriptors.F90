@@ -55,6 +55,7 @@ module vGrid_Descriptors
    public :: vgd_create_from_ab_21002            !class constructor
 
    public :: vgd_create_from_hyb_1001            !class constructor
+   public :: vgd_create_from_hyb_5100            !class constructor
    public :: vgd_create_from_hyb_21001           !class constructor
    public :: vgd_create_from_hyb_21002           !class constructor
 
@@ -401,6 +402,19 @@ module vGrid_Descriptors
          type(c_ptr),     value :: hyb
          integer (c_int), value :: size_hyb, ip1, ip2
       end function f_create_from_hyb_1001
+
+      integer(c_int) function f_create_from_hyb_5100(vgdid, hyb, size_hyb, &
+                              pref_8, ptop_out_8, &
+                              rcoef1, rcoef2, rcoef3, rcoef4, ip1, ip2, dhm, dht, avg) &
+                              bind(c, name='c_create_from_hyb_5100')
+         use iso_c_binding, only : c_ptr, c_int, c_double, c_float
+         type(c_ptr),     value :: vgdid, hyb, dhm, dht
+         integer (c_int), value :: size_hyb
+         real (c_double), value :: pref_8
+         type(c_ptr),     value :: ptop_out_8
+         integer (c_int), value :: ip1, ip2, avg
+         real (c_float),  value :: rcoef1, rcoef2, rcoef3, rcoef4
+      end function f_create_from_hyb_5100
 
       integer(c_int) function f_create_from_hyb_21001(vgdid, hyb, size_hyb, &
                               rcoef1, rcoef2, rcoef3, rcoef4, ip1, ip2, dhm, dht) &
@@ -1239,6 +1253,61 @@ contains
       endif
       status = VGD_OK
     end function vgd_create_from_hyb_1001
+
+    integer function vgd_create_from_hyb_5100(vgdid, hyb, pref_8, ptop_out_8, &
+                          rcoef1, rcoef2, rcoef3, rcoef4, ip1, ip2, dhm, dht, avg_l) &
+                          result(status)
+      integer, target :: vgdid
+      real, target, dimension(:),intent(in) :: hyb
+      real(kind=8) :: pref_8
+      real(kind=8), pointer :: ptop_out_8
+      real :: rcoef1, rcoef2, rcoef3, rcoef4, dhm, dht
+      integer, optional, intent(in) :: ip1, ip2
+      logical, optional, intent(in) :: avg_l
+
+      integer l_ip1,l_ip2, my_avg
+      type(c_ptr) :: vgdid_p, hyb_p, ptop_out_8_p, dhm_p, dht_p
+
+      if(present(ip1))then
+         l_ip1 = ip1
+      else
+         l_ip1 = -1
+      endif
+      if(present(ip2))then
+         l_ip2 = ip2
+      else
+         
+         l_ip2 = -1
+      endif
+
+      vgdid_p = c_loc(vgdid)
+      ptop_out_8_p = c_loc(ptop_out_8)
+      hyb_p = c_loc(hyb)
+      dhm_p = c_loc(dhm)
+      dht_p = c_loc(dht)
+      my_avg=1
+      if(present(avg_L))then
+         if(avg_L)then
+            my_avg=1
+         else
+            my_avg=0
+         endif
+      endif
+
+      status = VGD_ERROR
+
+      if( f_create_from_hyb_5100(vgdid_p, hyb_p, size(hyb), &
+                                 pref_8, ptop_out_8_p, &
+                                 rcoef1, rcoef2, rcoef3, rcoef4, l_ip1, l_ip2, &
+                                 dhm_p, dht_p, my_avg)== VGD_ERROR &
+                                )then
+        print*,'(F_vgd) ERROR: In vgd_create_from_hyb_5100'
+        return
+      end if
+
+      status = VGD_OK
+      return
+    end function vgd_create_from_hyb_5100
 
     integer function vgd_create_from_hyb_21001(vgdid, hyb, rcoef1, rcoef2, rcoef3, &
                           rcoef4, ip1, ip2, dhm, dht) &
