@@ -39,6 +39,8 @@ module vGrid_Descriptors
    public :: vgd_get                             !get instance variable value
    public :: vgd_put                             !set instance variable value
    public :: read_vgrid_from_file                !class constructor
+   public :: new_from_table                      !class constructor
+   public :: vgd_create_from_ab                  !class constructor (deprecated)
    public :: vgd_create_from_ab_1001             !class constructor
    public :: vgd_create_from_ab_1002             !class constructor
    public :: vgd_create_from_ab_1003             !class constructor
