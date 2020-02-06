@@ -20,7 +20,8 @@ program constructor
 
   ! Revision : Andre Plante test on B instead of A since A not sensitive to rcoefs
 
-  use vGrid_Descriptors, only: vgd_new,vgd_get,VGD_ERROR,vgd_create_from_hyb_5002
+  use vGrid_Descriptors, only: vgd_new,vgd_get,VGD_ERROR,vgd_create_from_hyb_5002, &
+                               vgd_create_from_hyb_5003
   use Unit_Testing, only: ut_report
   
 
@@ -93,7 +94,7 @@ endif
   if(stat.eq.VGD_ERROR)OK=.false.
 
   ! Construct a new set of vertical coordinate descriptors 5003
-  stat = vgd_new(vgdid,kind=5,version=3,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref,ip1=0)
+  stat = vgd_create_from_hyb_5003(vgdid,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref,ip1=0)
   file='data/data_constructor_gen_5003.txt'
   stat = test_5002(vgdid,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
