@@ -518,6 +518,11 @@ int Cvgd_create_from_ab2(vgrid **my_new_vgrid, int kind, int version, int nk, in
       *my_new_vgrid = (vgrid*)my_grid_21002;
       break;
 
+    default:
+      printf("In Cvgd_create_from_ab2, vcode %d not recognized\n", vcode);
+      throw vgrid_exception();
+      break;
+
     }
   }
   catch(vgrid_exception)

@@ -2530,8 +2530,6 @@ vgrid::vgrid(int ip1, int ip2)
   rec.npas = 0;
   rec.nbits = -64;
   rec.datyp = 0;
-  rec.ip1 = 0;
-  rec.ip2 = 0;
   rec.ip3 = 0;
   rec.ig1 = 0;
   rec.ig2 = 0;
