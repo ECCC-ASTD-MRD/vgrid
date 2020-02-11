@@ -377,6 +377,15 @@ int Cvgd_create_from_ab2(vgrid **my_new_vgrid, int kind, int version, int nk, in
     Cvgd_create_vgrid_from_vcode(my_new_vgrid, vcode, ip1, ip2);
     switch(vcode)
     {
+    case 0001:
+      vgrid_0001 *my_grid_0001 = new vgrid_0001(ip1, ip2);
+      status=my_grid_0001->Cvgd_create_from_ab(a_m_8, b_m_8, a_w_8, b_w_8,
+					       ip1_m, ip1_w, nl_m, nl_w);
+      if(status != VGD_OK)
+      {return(VGD_ERROR);}
+      *my_new_vgrid = (vgrid*)my_grid_0001;
+      break;
+
     case 1001:
       vgrid_1001 *my_grid_1001 = new vgrid_1001(ip1, ip2);
       status=my_grid_1001->Cvgd_create_from_ab(a_m_8, b_m_8, ip1_m, nl_m);
@@ -504,8 +513,6 @@ int Cvgd_create_from_ab2(vgrid **my_new_vgrid, int kind, int version, int nk, in
 						a_t_8, b_t_8, c_t_8,
 						a_w_8, b_w_8, c_w_8,
 						ip1_m, ip1_t, ip1_w, nl_m);
-      if(status != VGD_OK)
-      {return(VGD_ERROR);}
       if(status != VGD_OK)
       {return(VGD_ERROR);}
       *my_new_vgrid = (vgrid*)my_grid_21002;

@@ -43,7 +43,7 @@ int Cvgd_create_from_ab2(int *vgdid, int kind, int version, int nk,
                          double *c_m_8, double *a_t_8, double *b_t_8,
                          double *c_t_8, double *a_w_8, double *b_w_8,
                          double *c_w_8, int *ip1_m, int *ip1_t, int *ip1_w,
-                         int nl_m, int nl_t, int nl_2);
+                         int nl_m, int nl_t, int nl_w);
 
 int Cvgd_new_from_table(int *vgdid, double *table, 
                         int ni, int nj, int nk);

@@ -29,9 +29,9 @@ public:
   vgrid_0001(int key);
   int c_decode_vert();
   int c_encode_vert();
-//  int Cvgd_create_from_ab(double *a_m_8, double *b_m_8,
-//                         double *a_w_8, double *b_w_8, int *ip1_m, int *ip1_w,
-//                         int nl_m, int nl_t, int nl_w)
+  int Cvgd_create_from_ab(double *a_m_8, double *b_m_8,
+                          double *a_w_8, double *b_w_8, int *ip1_m, int *ip1_w,
+                          int nl_m, int nl_w);
 private:
   void fstd_subinit();
   void set_table_nj(int nk);
