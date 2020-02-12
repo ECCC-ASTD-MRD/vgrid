@@ -36,6 +36,7 @@ module vGrid_Descriptors
    private
 
    ! Public methods
+   public :: vgd_free                            !release the memory of a vgrid
    public :: vgd_get                             !get instance variable value
    public :: vgd_put                             !set instance variable value
    public :: read_vgrid_from_file                !class constructor
@@ -566,6 +567,11 @@ module vGrid_Descriptors
          type(c_ptr), value :: a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, ip1_m_CP, ip1_t_CP, ip1_w_CP
          integer (c_int), value :: nl_m, nl_t, nl_w
       end function f_create_from_ab
+
+      integer(c_int) function f_vgd_free(vgdid) bind(c, name='Cvgd_free')
+         use iso_c_binding, only : c_int
+         integer(c_int), value :: vgdid
+      end function f_vgd_free
       
       subroutine f_table_shape(vgdid, tshape_CP) bind(c, name='Cvgd_table_shape')
          use iso_c_binding, only : c_ptr, c_int
@@ -2026,6 +2032,12 @@ contains
       status = VGD_OK
 
    end function vgd_create_from_ab
+
+   integer function  vgd_free(vgdid)result(status)
+     integer vgdid
+     status = f_vgd_free(vgdid)
+     return
+   end function vgd_free
 
    integer function getopt_logical(key,value,quiet) result(status)
       use vgrid_utils, only: up

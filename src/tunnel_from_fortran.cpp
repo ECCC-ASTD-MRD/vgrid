@@ -31,6 +31,20 @@
 
 static coat_check grid_check;  // Object for checking in vgrids
 
+int Cvgd_free(int vgdid)
+{
+  try
+  {
+    grid_check.relinquish_tag(vgdid);
+  }
+  catch(vgrid_exception)
+  {
+    printf("(Cvgd) ERROR in Cvgd_free, \n");
+    return(VGD_ERROR);
+  }
+  return VGD_OK;
+}
+
 int Cvgd_diag_withref_2ref(int vgdid, int ni, int nj, int nk,
                            int *ip1_list, float *levels, float *sfc_field,
                            float *sfc_field_ls, int in_log, int dpidpis)

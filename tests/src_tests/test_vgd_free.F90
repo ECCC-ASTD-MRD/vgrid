@@ -21,7 +21,7 @@
 !        That means that this test necessarily fails.
 
 program tests
-  use vGrid_Descriptors, only: vgd_new,vgd_getopt,vgd_putopt,vgd_print,vgd_get,VGD_ERROR,VGD_OK
+  use vGrid_Descriptors, only: vgd_new,vgd_getopt,vgd_putopt,vgd_print,vgd_get,VGD_ERROR,VGD_OK, vgd_free
   use Unit_Testing, only: ut_report
   
 
@@ -53,18 +53,21 @@ program tests
      call exit(1)    
   endif
 
-!  stat = vgd_free(vgdid)
-!  if(stat==VGD_ERROR)then
-!     print*,'This vgd_free error should not happen, please fixit'
-!     call exit(1)
-!  end if  
+  stat = vgd_free(vgdid)
+  if(stat==VGD_ERROR)then
+     print*,'This Cvgd_free error should not happen, please fixit'
+     call exit(1)
+  end if  
 
   stat = vgd_get(vgdid,'PREF - reference pressure',value_8)
   if(stat==VGD_ERROR)then
      print*,'The above error in normal'
   else
-     print*,'The above call to vgd_get should produce an error and does not, please fixit'
-     call exit(1)    
+     ! Because freeing an object simply releases the memory without altering the content,
+     ! subsequent access to the object is undefined.  That means that it is allowed to
+     ! behave as if it were not freed.  Therefore, vgd_free cannot be tested like this.
+     ! However, this test does exercise the destructor and would detect a crash.
+     print*,'The above call to vgd_get did not produce an error.  This is not necessarily wrong.'   
   end if
 
   call ut_report(ok,message='Grid_Descriptors:: test allow reshape')

@@ -235,6 +235,9 @@ public:
   vgrid(const vgrid* original);  // copy constructor
   virtual vgrid *clone() = 0;    // copy constructor:  the interface for subclasses
 
+  // Destructor
+  virtual ~vgrid();
+
 public:
   virtual int c_decode_vert() = 0;
   virtual int c_encode_vert() = 0;

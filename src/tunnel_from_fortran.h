@@ -3,6 +3,8 @@
 
 #include "vgrid.hpp"
 
+int Cvgd_free(int vgdid);
+
 int Cvgd_diag_withref_2ref(int vgdid, int ni, int nj, int nk,
                            int *ip1_list, float *levels, float *sfc_field,
                            float *sfc_field_ls, int in_log, int dpidpis);
@@ -107,7 +109,6 @@ int Cvgd_vgdcmp(int vgdid1, int vgdid2);
 int Cvgd_write_desc(int vgdid, int unit);
 
 
-// ########## N E W   I N T E R F A C E ##########
 int Cvgd_read_vgrid_from_file(int *vgdid, int unit, int ip1,int ip2, 
                               int kind, int version);
 int c_create_from_ab_1001(int *vgdid, int ip1, int ip2, double *a_m_8, double *b_m_8,

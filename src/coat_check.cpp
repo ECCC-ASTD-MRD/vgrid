@@ -114,8 +114,8 @@ void coat_check::relinquish_tag(int tag)
 {
   if(--hangers[tag].num_tags_issued < 0)
     hangers[tag].num_tags_issued = 0;
-  // if(hangers[tag].num_tags_issued == 0)
-  //   could do something, like delete vgrid
+  else if(hangers[tag].num_tags_issued == 0)
+    hangers[tag].vgd->~vgrid();
 };
 
 // Debugging Instrumentation:  return the number of tags issued for this grid

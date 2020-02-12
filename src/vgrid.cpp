@@ -37,7 +37,7 @@ static float stda76_zgrad[STDA76_N_LAYER + 1] = { 0., 11000., 20000., 32000., 47
 // Constants
 #define MAX_VKIND    100
 // Macros
-#define FREE(x) if(x) { free(x); x=NULL; }
+#define FREE(x) free(x); x=nullptr;
 
 // Options
 int ALLOW_SIGMA = 0;
@@ -2802,6 +2802,18 @@ vgrid::vgrid(int ip1, int ip2)
   strcpy(rec.grtyp," ");
 }
 
+vgrid::~vgrid()
+{
+  free(this->ref_name);
+  free(this->ref_namel);
+  // Do this->rec.<strings> need to be freed?  Vgrid does not malloc them.
+  // free(this->rec.typvar);
+  // free(this->rec.nomvar);
+  // free(this->rec.etiket);
+  this->c_vgd_free_abci();
+  free(this->table);
+}
+
 int vgrid::allocate_table(int nk)
 {
   int table_size;
@@ -2951,18 +2963,6 @@ int vgrid::Cvgd_build_from_table(double *table, int ni, int nj, int nk)
   }
 
   return(VGD_OK);
-}
-
-void vgrid::Cvgd_free() {
-// Avoid crashing:  don't free
-//    if( *self ) {
-//       FREE((*self)->table);
-//       this->c_vgd_free_abci(self);
-//       FREE((*self)->ref_name);      
-//       FREE((*self)->ref_namel);      
-//       free(*self);
-//       *self = NULL;
-//    }
 }
 
 /*----------------------------------------------------------------------------
