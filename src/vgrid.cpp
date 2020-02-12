@@ -830,8 +830,8 @@ vgrid::vgrid(const vgrid *original)
   this->valid      = original->valid;
   this->skip       = original->skip;
   this->k_plus_top = original->k_plus_top;
-  ref_name         = strdup(VGD_NO_REF_NOMVAR); // Ensure that enough space is saved
-  ref_namel        = strdup(VGD_NO_REF_NOMVAR); //    "
+  ref_name         = (char*)malloc(5 * sizeof(char));
+  ref_namel        = (char*)malloc(5 * sizeof(char));
   strcpy(this->ref_name,  original->ref_name);
   strcpy(this->ref_namel, original->ref_namel);
 
@@ -2765,8 +2765,10 @@ vgrid::vgrid(int ip1, int ip2)
   dht           = VGD_MISSING;
   dhw           = VGD_MISSING;
   
-  ref_name      = strdup(VGD_NO_REF_NOMVAR);
-  ref_namel     = strdup(VGD_NO_REF_NOMVAR);
+  ref_name         = (char*)malloc(5 * sizeof(char));
+  ref_namel        = (char*)malloc(5 * sizeof(char));
+  strcpy(ref_name, VGD_NO_REF_NOMVAR);
+  strcpy(ref_namel, VGD_NO_REF_NOMVAR);
   rcoef1        = VGD_MISSING;
   rcoef2        = VGD_MISSING;
   rcoef3        = VGD_MISSING;
