@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <algorithm>  // std::copy
 #include "rpnmacros.h"
 #include "armnlib.hpp"
 
@@ -791,6 +792,264 @@ int vgrid::Cvgd_vgdcmp(vgrid *vgd2) {
   //if(same_vec_r8(table, nt1, vgd2->table, nt2 )            != 0) return (-15);
 
   return(0);
+}
+
+vgrid *vgrid::clone()
+{
+  printf("clone() is not supported for vcode=%d\n", vcode);
+}
+
+vgrid::vgrid(const vgrid *original)
+{
+  int table_size;
+
+  // Copy the content:  non-arrays
+  this->vcode      = original->vcode;
+  this->kind       = original->kind;
+  this->version    = original->version;
+  this->table_ni   = original->table_ni;
+  this->table_nj   = original->table_nj;
+  this->table_nk   = original->table_nk;
+  this->nl_m       = original->nl_m;
+  this->nl_t       = original->nl_t;
+  this->nl_w       = original->nl_w;
+  this->ptop_8     = original->ptop_8;
+  this->pref_8     = original->pref_8;
+  this->rcoef1     = original->rcoef1;
+  this->rcoef2     = original->rcoef2;
+  this->rcoef3     = original->rcoef3;
+  this->rcoef4     = original->rcoef4;
+  this->dhm        = original->dhm;
+  this->dht        = original->dht;
+  this->dhw        = original->dhw;
+  this->nk         = original->nk;
+  this->ip1        = original->ip1;
+  this->ip2        = original->ip2;
+  this->unit       = original->unit;
+  this->match_ipig = original->match_ipig;
+  this->valid      = original->valid;
+  this->skip       = original->skip;
+  this->k_plus_top = original->k_plus_top;
+  ref_name         = strdup(VGD_NO_REF_NOMVAR); // Ensure that enough space is saved
+  ref_namel        = strdup(VGD_NO_REF_NOMVAR); //    "
+  strcpy(this->ref_name,  original->ref_name);
+  strcpy(this->ref_namel, original->ref_namel);
+
+  
+  this->rec.dateo        = original->rec.dateo;
+  this->rec.deet         = original->rec.deet;
+  this->rec.npas         = original->rec.npas;
+  this->rec.nbits        = original->rec.nbits;
+  this->rec.datyp        = original->rec.datyp;
+  this->rec.ip1          = original->rec.ip1;
+  this->rec.ip2          = original->rec.ip2;
+  this->rec.ip3          = original->rec.ip3;
+  strcpy(this->rec.typvar, original->rec.typvar);
+  strcpy(this->rec.nomvar, original->rec.nomvar);
+  strcpy(this->rec.etiket, original->rec.etiket);
+  this->rec.ig1          = original->rec.ig1;
+  this->rec.ig2          = original->rec.ig2;
+  this->rec.ig3          = original->rec.ig3;
+  this->rec.ig4          = original->rec.ig4;
+
+  // Copy the content:  arrays
+  if(original->ip1_m == nullptr)
+    {
+      this->ip1_m = nullptr;
+    }
+  else
+    {
+      this->ip1_m = new int[original->nl_m];
+      if(this->ip1_m)
+	std::copy(original->ip1_m, original->ip1_m+original->nl_m, this->ip1_m);
+      else
+	printf("Error in copy constructor.  Could not allocate array size %d\n",
+	       original->nl_m);
+	throw vgrid_exception();
+    }
+ 
+  if(original->ip1_t == nullptr)
+    {
+      this->ip1_t = nullptr;
+    }
+  else
+    {
+      this->ip1_t = new int[original->nl_t];
+      if(this->ip1_t)
+	std::copy(original->ip1_t, original->ip1_t+original->nl_t, this->ip1_t);
+      else
+	printf("Error in copy constructor.  Could not allocate array size %d\n",
+	       original->nl_t);
+	throw vgrid_exception();
+    }
+ 
+  if(original->ip1_w == nullptr)
+    {
+      this->ip1_w = nullptr;
+    }
+  else
+    {
+      this->ip1_w = new int[original->nl_w];
+      if(this->ip1_w)
+	std::copy(original->ip1_w, original->ip1_w+original->nl_w, this->ip1_w);
+      else
+	printf("Error in copy constructor.  Could not allocate array size %d\n",
+	       original->nl_w);
+	throw vgrid_exception();
+    }
+ 
+  if(original->a_m_8 == nullptr)
+    {
+      this->a_m_8 = nullptr;
+    }
+  else
+    {
+      this->a_m_8 = new double[original->nl_m];
+      if(this->a_m_8)
+	std::copy(original->a_m_8, original->a_m_8+original->nl_m, this->a_m_8);
+      else
+	printf("Error in copy constructor.  Could not allocate array size %d\n",
+	       original->nl_m);
+	throw vgrid_exception();
+    }
+ 
+  if(original->b_m_8 == nullptr)
+    {
+      this->b_m_8 = nullptr;
+    }
+  else
+    {
+      this->b_m_8 = new double[original->nl_m];
+      if(this->b_m_8)
+	std::copy(original->b_m_8, original->b_m_8+original->nl_m, this->b_m_8);
+      else
+	printf("Error in copy constructor.  Could not allocate array size %d\n",
+	       original->nl_m);
+	throw vgrid_exception();
+    }
+ 
+  if(original->c_m_8 == nullptr)
+    {
+      this->c_m_8 = nullptr;
+    }
+  else
+    {
+      this->c_m_8 = new double[original->nl_m];
+      if(this->c_m_8)
+	std::copy(original->c_m_8, original->c_m_8+original->nl_m, this->c_m_8);
+      else
+	printf("Error in copy constructor.  Could not allocate array size %d\n",
+	       original->nl_m);
+	throw vgrid_exception();
+    }
+
+ 
+  if(original->a_t_8 == nullptr)
+    {
+      this->a_t_8 = nullptr;
+    }
+  else
+    {
+      this->a_t_8 = new double[original->nl_t];
+      if(this->a_t_8)
+	std::copy(original->a_t_8, original->a_t_8+original->nl_t, this->a_t_8);
+      else
+	printf("Error in copy constructor.  Could not allocate array size %d\n",
+	       original->nl_t);
+	throw vgrid_exception();
+    }
+ 
+  if(original->b_t_8 == nullptr)
+    {
+      this->b_t_8 = nullptr;
+    }
+  else
+    {
+      this->b_t_8 = new double[original->nl_t];
+      if(this->b_t_8)
+	std::copy(original->b_t_8, original->b_t_8+original->nl_t, this->b_t_8);
+      else
+	printf("Error in copy constructor.  Could not allocate array size %d\n",
+	       original->nl_t);
+	throw vgrid_exception();
+    }
+ 
+  if(original->c_t_8 == nullptr)
+    {
+      this->c_t_8 = nullptr;
+    }
+  else
+    {
+      this->c_t_8 = new double[original->nl_t];
+      if(this->c_t_8)
+	std::copy(original->c_t_8, original->c_t_8+original->nl_t, this->c_t_8);
+      else
+	printf("Error in copy constructor.  Could not allocate array size %d\n",
+	       original->nl_t);
+	throw vgrid_exception();
+    }
+
+ 
+  if(original->a_w_8 == nullptr)
+    {
+      this->a_w_8 = nullptr;
+    }
+  else
+    {
+      this->a_w_8 = new double[original->nl_w];
+      if(this->a_w_8)
+	std::copy(original->a_w_8, original->a_w_8+original->nl_w, this->a_w_8);
+      else
+	printf("Error in copy constructor.  Could not allocate array size %d\n",
+	       original->nl_w);
+	throw vgrid_exception();
+    }
+ 
+  if(original->b_w_8 == nullptr)
+    {
+      this->b_w_8 = nullptr;
+    }
+  else
+    {
+      this->b_w_8 = new double[original->nl_w];
+      if(this->b_w_8)
+	std::copy(original->b_w_8, original->b_w_8+original->nl_w, this->b_w_8);
+      else
+	printf("Error in copy constructor.  Could not allocate array size %d\n",
+	       original->nl_w);
+	throw vgrid_exception();
+    }
+ 
+  if(original->c_w_8 == nullptr)
+    {
+      this->c_w_8 = nullptr;
+    }
+  else
+    {
+      this->c_w_8 = new double[original->nl_w];
+      if(this->c_w_8)
+	std::copy(original->c_w_8, original->c_w_8+original->nl_w, this->c_w_8);
+      else
+	printf("Error in copy constructor.  Could not allocate array size %d\n",
+	       original->nl_w);
+	throw vgrid_exception();
+    }
+ 
+  if(original->table == nullptr)
+    {
+      this->table = nullptr;
+    }
+  else
+    {
+      table_size = this->table_ni * this->table_nj * this->table_nk;
+      this->table = new double[table_size];
+      if(this->table)
+	std::copy(original->table, original->table+table_size, this->table);
+      else
+	printf("Error in copy constructor.  Could not allocate array size %d\n",
+	       table_size);
+	throw vgrid_exception();
+    }
 }
 
 double vgrid::c_comp_diag_a_height(double pref_8, float height) {

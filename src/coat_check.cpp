@@ -31,7 +31,7 @@ coat_check::coat_check()
 }
 
 // Obtain the vgrid, given the coat-check tag
-vgrid* coat_check::get_vgrid(int tag)
+vgrid* coat_check::get_grid_keep_tag(int tag)
 {
   if(tag < 0 || tag > latest_hanger_filled)
     {
@@ -40,6 +40,29 @@ vgrid* coat_check::get_vgrid(int tag)
     }
   return hangers[tag].vgd;
   // Don't change num_tags_issued, because the client is still using the tag.
+};
+
+// Obtain the vgrid, given the coat-check tag
+vgrid* coat_check::get_grid_relinquish_tag(int tag)
+{
+  vgrid *unique_copy;
+
+  if(tag < 0 || tag > latest_hanger_filled)
+    {
+      printf("ERROR in coat_check:  invalid tag=%d\n",tag);
+      throw tag;
+    }
+
+  if(hangers[tag].num_tags_issued == 1)
+    // Give the client the existing copy
+    unique_copy = hangers[tag].vgd;  // client may modify the grid
+  else
+  {
+    // Make a copy of the vgrid, and give the copy to the client
+    unique_copy = hangers[tag].vgd->clone();
+  }
+  relinquish_tag(tag);             // client may not get the same grid again
+  return unique_copy;
 };
 
 
@@ -87,7 +110,7 @@ int coat_check::get_tag(vgrid *vgrid_p)
 };
 
 // Decrement the usage count on a particular vgrid
-void coat_check::release_vgrid(int tag)
+void coat_check::relinquish_tag(int tag)
 {
   if(--hangers[tag].num_tags_issued < 0)
     hangers[tag].num_tags_issued = 0;

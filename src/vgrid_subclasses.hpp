@@ -98,6 +98,8 @@ class vgrid_2001 : public vgrid
 public:
   vgrid_2001(int ip1=-1, int ip2=-1);
   vgrid_2001(int key);
+  vgrid_2001(const vgrid_2001 *original);
+  vgrid *clone();     // returns the clone as a pointer to the base class
   int c_decode_vert();
   int c_encode_vert();
   int C_genab(float *pres, int nk, double **a_m_8, double **b_m_8, int **ip1_m);

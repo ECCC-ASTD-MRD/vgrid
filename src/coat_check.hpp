@@ -57,14 +57,19 @@ public:
   // Constructor
   coat_check();
 
-  // Obtain the vgrid, given the coat-check tag
-  vgrid* get_vgrid(int tag);
+  // Obtain the vgrid, given the coat-check tag, and keep the tag/vgrid for later
+  // The client promises not to change the vgrid
+  vgrid* get_grid_keep_tag(int tag);
+
+  // Obtain the vgrid, given the coat-check tag, relinquishing ownership of the tag
+  // The client may get_tag later, probably with a modified grid.
+  vgrid* get_grid_relinquish_tag(int tag);
 
   // Obtain a coat-check tag, given a vgrid
   int get_tag(vgrid* vgrid);
 
   // Decrement the usage count on a particular vgrid
-  void release_vgrid(int tag);
+  void relinquish_tag(int tag);
 
   // Debugging Instrumentation:  return the number of tags outstanding for this
   // grid

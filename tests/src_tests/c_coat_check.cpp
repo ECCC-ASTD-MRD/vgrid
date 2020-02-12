@@ -69,12 +69,12 @@ extern "C" void c_coat_check() {
 
   // Test 3:  If I retrieve a grid from the coat check, it should be the same as
   //          the original grid (equal value)
-  checked_vgrid_p = my_coat_check.get_vgrid(tag_a);
+  checked_vgrid_p = my_coat_check.get_grid_keep_tag(tag_a);
 
   // TBD:  create and use vgrid operator ==
   if(my_vgrid_a.Cvgd_vgdcmp(checked_vgrid_p) != 0)
     {
-      printf("Error:  get_vgrid does not give back the original vgrid\n");
+      printf("Error:  get_grid_keep_tag does not give back the original vgrid\n");
       status = VGD_ERROR;
     }
 
@@ -90,37 +90,44 @@ extern "C" void c_coat_check() {
       status = VGD_ERROR;
     }
 
-  // Test 5:  Release_vgrid should reduce grid counts, but not beyond zero
-  my_coat_check.release_vgrid(tag_a); // Release a vgrid_a
+  // Test 5:  relinquish_tag should reduce grid counts, but not beyond zero
+  checked_vgrid_p = my_coat_check.get_grid_relinquish_tag(tag_a); // Release a vgrid_a
   grid_count_a = my_coat_check.grid_count(tag_a);
   if(grid_count_a != 1)
     {
-      printf("Error:  release_vgrid yielded %d instead of 1\n", grid_count_a);
+      printf("Error:  relinquish_tag yielded %d instead of 1\n", grid_count_a);
       status = VGD_ERROR;
     }
 
-  my_coat_check.release_vgrid(tag_a); // Release a 2nd vgrid_a
-  grid_count_a = my_coat_check.grid_count(tag_a);
-  if(grid_count_a != 0)
+  // and the retrieved grid should be the correct one
+  if(my_vgrid_a.Cvgd_vgdcmp(checked_vgrid_p) != 0)
     {
-      printf("Error:  release_vgrid yielded %d instead of 0\n", grid_count_a);
+      printf("Error:  get_grid_relinquish_tag does not give back the original vgrid\n");
       status = VGD_ERROR;
     }
 
-  my_coat_check.release_vgrid(tag_a); // Release a vgrid_a that never existed
+  my_coat_check.relinquish_tag(tag_a); // Release a 2nd vgrid_a
   grid_count_a = my_coat_check.grid_count(tag_a);
   if(grid_count_a != 0)
     {
-      printf("Error:  release_vgrid when none are left yielded %d "
+      printf("Error:  relinquish_tag yielded %d instead of 0\n", grid_count_a);
+      status = VGD_ERROR;
+    }
+
+  my_coat_check.relinquish_tag(tag_a); // Release a vgrid_a that never existed
+  grid_count_a = my_coat_check.grid_count(tag_a);
+  if(grid_count_a != 0)
+    {
+      printf("Error:  relinquish_tag when none are left yielded %d "
                      "instead of 0\n", grid_count_a);
       status = VGD_ERROR;
     }
 
-  my_coat_check.release_vgrid(tag_b); // Release the vgrid_b
+  my_coat_check.relinquish_tag(tag_b); // Release the vgrid_b
   grid_count_b = my_coat_check.grid_count(tag_b);
   if(grid_count_b != 0)
     {
-      printf("Error:  release_vgrid yielded %d instead of 0\n", grid_count_b);
+      printf("Error:  relinquish_tag yielded %d instead of 0\n", grid_count_b);
       status = VGD_ERROR;
     }
 

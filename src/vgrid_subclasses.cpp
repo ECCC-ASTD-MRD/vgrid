@@ -1049,6 +1049,17 @@ vgrid_2001::vgrid_2001(int key) : vgrid()
   this->build_vgrid_from_key(key);
 };
 
+// Make a copy of itself ...
+vgrid_2001::vgrid_2001(const vgrid_2001 *original) : vgrid((vgrid*)original)
+{
+}
+
+// ... and return the copy as a vgrid
+vgrid* vgrid_2001::clone()
+{
+  return new vgrid_2001(this);
+};
+
 void vgrid_2001::set_table_nj(int nk)
 {
   table_nj = nk+skip;
