@@ -233,8 +233,7 @@ public:
   vgrid(int ip1=-1, int ip2=-1);
   vgrid(int unit, int ip1, int ip2, int kind, int version);
   vgrid(const vgrid* original);  // copy constructor
-  virtual vgrid *clone();        // copy constructor:  the interface for subclasses
-  // virtual vgrid *clone() = 0;  make it pure eventually
+  virtual vgrid *clone() = 0;    // copy constructor:  the interface for subclasses
 
 public:
   virtual int c_decode_vert() = 0;

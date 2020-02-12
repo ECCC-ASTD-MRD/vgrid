@@ -27,6 +27,8 @@ class vgrid_0001 : public vgrid
 public:
   vgrid_0001(int ip1=-1, int ip2=-1);
   vgrid_0001(int key);
+  vgrid_0001(const vgrid_0001 *original);
+  vgrid *clone();     // returns the clone as a pointer to the base class
   int c_decode_vert();
   int c_encode_vert();
   int Cvgd_create_from_ab(double *a_m_8, double *b_m_8,
@@ -42,6 +44,8 @@ class vgrid_1001 : public vgrid
 public:
   vgrid_1001(int ip1=-1, int ip2=-1);
   vgrid_1001(int key);
+  vgrid_1001(const vgrid_1001 *original);
+  vgrid *clone();     // returns the clone as a pointer to the base class
   int c_decode_vert();
   int c_encode_vert();
   int C_genab(float *hyb, int nk, double **a_m_8, double **b_m_8, int **ip1_m);
@@ -57,6 +61,8 @@ class vgrid_1002 : public vgrid
 public:
   vgrid_1002(int ip1=-1, int ip2=-1);
   vgrid_1002(int key);
+  vgrid_1002(const vgrid_1002 *original);
+  vgrid *clone();     // returns the clone as a pointer to the base class
   int c_decode_vert();
   int c_encode_vert();
   int C_genab(float *etauser, int nk, double ptop_8, double **a_m_8, double **b_m_8,
@@ -73,6 +79,7 @@ class vgrid_1003_5001 : public vgrid
 {
 public:
   vgrid_1003_5001(int ip1=-1, int ip2=-1);
+  vgrid_1003_5001(const vgrid_1003_5001 *original);
   int c_decode_vert();
   int c_encode_vert();
   int Cvgd_create_from_ab(double ptop_8, double pref_8, float rcoef1,
@@ -86,6 +93,8 @@ class vgrid_1003 : public vgrid_1003_5001
 public:
   vgrid_1003(int ip1=-1, int ip2=-1);
   vgrid_1003(int key);
+  vgrid_1003(const vgrid_1003 *original);
+  vgrid *clone();     // returns the clone as a pointer to the base class
   int C_genab(float *hybuser, int nk, float rcoef, double ptop_8, double pref_8, double **a_m_8, double **b_m_8, int **ip1_m);
   int Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
 			   double ptop_8, double pref_8);
@@ -116,6 +125,8 @@ class vgrid_4001 : public vgrid
 public:
   vgrid_4001(int ip1=-1, int ip2=-1);
   vgrid_4001(int key);
+  vgrid_4001(const vgrid_4001 *original);
+  vgrid *clone();     // returns the clone as a pointer to the base class
   int c_decode_vert();
   int c_encode_vert();
   int C_genab(float *hgts, int nk, double **a_m_8, double **b_m_8, int **ip1_m);
@@ -132,6 +143,8 @@ class vgrid_5001 : public vgrid_1003_5001
 public:
   vgrid_5001(int ip1=-1, int ip2=-1);
   vgrid_5001(int key);
+  vgrid_5001(const vgrid_5001 *original);
+  vgrid *clone();     // returns the clone as a pointer to the base class
   int C_genab(float *hybuser, int nk, float rcoef, double ptop_8, double pref_8, double **a_m_8, double **b_m_8, int **ip1_m);
   int Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
 			   double ptop_8, double pref_8);
@@ -144,6 +157,7 @@ class vgrid_5002_5003_5004_5005 : public vgrid
 {
 public:
   vgrid_5002_5003_5004_5005(int ip1=-1, int ip2=-1);
+  vgrid_5002_5003_5004_5005(const vgrid_5002_5003_5004_5005 *original);
   int c_decode_vert();
   int c_encode_vert();
   int C_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t, int tlift);
@@ -157,6 +171,8 @@ class vgrid_5002 : public vgrid_5002_5003_5004_5005
 public:
   vgrid_5002(int ip1=-1, int ip2=-1);
   vgrid_5002(int key);
+  vgrid_5002(const vgrid_5002 *original);
+  vgrid *clone();     // returns the clone as a pointer to the base class
   int Cvgd_create_from_ab(double ptop_8, double pref_8,
 			 float rcoef1, float rcoef2, double *a_m_8,
 			 double *b_m_8, double *a_t_8, double *b_t_8,
@@ -173,6 +189,8 @@ class vgrid_5003 : public vgrid_5002_5003_5004_5005
 public:
   vgrid_5003(int ip1=-1, int ip2=-1);
   vgrid_5003(int key);
+  vgrid_5003(const vgrid_5003 *original);
+  vgrid *clone();     // returns the clone as a pointer to the base class
   int Cvgd_create_from_ab(double ptop_8, double pref_8,
 			 float rcoef1, float rcoef2, double *a_m_8,
 			 double *b_m_8, double *a_t_8, double *b_t_8,
@@ -188,6 +206,8 @@ class vgrid_5004 : public vgrid_5002_5003_5004_5005
 public:
   vgrid_5004(int ip1=-1, int ip2=-1);
   vgrid_5004(int key);
+  vgrid_5004(const vgrid_5004 *original);
+  vgrid *clone();     // returns the clone as a pointer to the base class
   int C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double ptop_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t);
   int Cvgd_create_from_ab(double ptop_8, double pref_8, float rcoef1,
 			 float rcoef2, double *a_m_8, double *b_m_8,
@@ -204,6 +224,8 @@ class vgrid_5005 : public vgrid_5002_5003_5004_5005
 public:
   vgrid_5005(int ip1=-1, int ip2=-1);
   vgrid_5005(int key);
+  vgrid_5005(const vgrid_5005 *original);
+  vgrid *clone();     // returns the clone as a pointer to the base class
   int C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double **ptop_out_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t, float dhm, float dht);
   int Cvgd_create_from_ab(double pref_8, float rcoef1, float rcoef2,
                          double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8,
@@ -220,6 +242,8 @@ class vgrid_5100 : public vgrid
 public:
   vgrid_5100(int ip1=-1, int ip2=-1);
   vgrid_5100(int key);
+  vgrid_5100(const vgrid_5100 *original);
+  vgrid *clone();     // returns the clone as a pointer to the base class
   int C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **ptop_out_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, float dhm, float dht, int avg);
   int c_decode_vert();
   int c_encode_vert();
@@ -243,6 +267,8 @@ class vgrid_5999 : public vgrid
 public:
   vgrid_5999(int ip1=-1, int ip2=-1);
   vgrid_5999(int key);
+  vgrid_5999(const vgrid_5999 *original);
+  vgrid *clone();     // returns the clone as a pointer to the base class
   int C_genab(float *hyb, int size_hyb, double **a_m_8, double **b_m_8, int **ip1_m);
   int c_decode_vert();
   int c_encode_vert();
@@ -259,6 +285,8 @@ class vgrid_21001 : public vgrid
 public:
   vgrid_21001(int ip1=-1, int ip2=-1);
   vgrid_21001(int key);
+  vgrid_21001(const vgrid_21001 *original);
+  vgrid *clone();     // returns the clone as a pointer to the base class
   int C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, float dhm, float dht);
   int c_decode_vert();
   int c_encode_vert();
@@ -281,6 +309,8 @@ class vgrid_21002 : public vgrid
 public:
   vgrid_21002(int ip1=-1, int ip2=-1);
   vgrid_21002(int key);
+  vgrid_21002(const vgrid_21002 *original);
+  vgrid *clone();     // returns the clone as a pointer to the base class
   int C_genab(float *hybuser, int nk, int *nl_m, int *nl_t, int *nl_w, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, double **PP_a_w_8, double **PP_b_w_8, double **PP_c_w_8, int **PP_ip1_w, float dhm, float dht, float dhw);
   int c_decode_vert();
   int c_encode_vert();
