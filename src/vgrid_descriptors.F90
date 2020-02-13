@@ -19,6 +19,7 @@
 
 module vGrid_Descriptors
 
+   ! Refactored to C++  : Jeff Blezius, Service RPN
    ! Autor of C version : Andre Plante
    !                      Based on fortran version from:
    !                      Ron MacTaggart-Cowan, Andre Plante and Cecilien Charette

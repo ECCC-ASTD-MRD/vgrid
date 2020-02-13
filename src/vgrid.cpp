@@ -309,8 +309,6 @@ void vgrid::c_hypsometric (float *pkp, float pk, float Tk, float gammaT, float z
 
 int vgrid::c_set_stda_layer(int ind, float Tk, float pk, float *zk, float *zkp, float *gammaT, float *pkp, int *zero_lapse_rate) {
 
-  //Andre PLante 2017
-  //
   //Example of a Standard Atmophere Layer
   //
   //  \(pkp,zkp)

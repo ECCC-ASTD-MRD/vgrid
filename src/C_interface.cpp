@@ -26,7 +26,7 @@
 #include "vgrid_creators.hpp"
 #include "vgrid.hpp"
 #include "vgrid_descriptor.h"
-#include "tunnel_from_fortran.hpp"
+#include "C_interface.hpp"
 #include <stdio.h>
 
 static coat_check grid_check;  // Object for checking in vgrids

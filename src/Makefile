@@ -30,7 +30,7 @@ DEFINE = -DFICHSTD98
 	s.cc -c -O $(OPTIMIZ) $(DEFINE) $(CFLAGS) $(SUPP_OPT) $(C_SUPP_OPT) $<
 
 
-OBJECTS = vgrid_utils.o vgrid.o vgrid_subclasses.o vgrid_creators.o vgrid_descriptors.o tunnel_from_fortran.o coat_check.o
+OBJECTS = vgrid_utils.o vgrid.o vgrid_subclasses.o vgrid_creators.o vgrid_descriptors.o C_interface.o coat_check.o
 
 # default:
 libvgrid.a: $(OBJECTS)
@@ -44,7 +44,7 @@ vgrid_subclasses.hpp:  vgrid.hpp
 
 coat_check.hpp:  vgrid_descriptor.h
 
-tunnel_from_fortran.hpp: tunnel_from_fortran.h
+C_interface.hpp: C_interface.h
 
 vgrid.o: vgrid.cpp armnlib.h vgrid.hpp vgrid_descriptor.h armnlib.hpp
 
@@ -56,7 +56,7 @@ vgrid_descriptors.o: vgrid_descriptors.F90 vgrid_utils.o vgrid_descriptors.hf
 
 vgrid_utils.o: vgrid_utils.F90 vgrid_descriptors.hf
 
-tunnel_from_fortran.o:  tunnel_from_fortran.cpp vgrid_creators.hpp tunnel_from_fortran.hpp tunnel_from_fortran.h vgrid.hpp vgrid_descriptor.h
+C_interface.o:  C_interface.cpp vgrid_creators.hpp C_interface.hpp C_interface.h vgrid.hpp vgrid_descriptor.h
 
 coat_check.o:  coat_check.cpp coat_check.hpp vgrid.h
 

@@ -1,5 +1,5 @@
-#ifndef TUNNEL_FROM_FORTRAN_H
-#define TUNNEL_FROM_FORTRAN_H
+#ifndef C_INTERFACE_H
+#define C_INTERFACE_H
 
 #include "vgrid.hpp"
 
