@@ -249,7 +249,7 @@ module vGrid_Descriptors
          integer (c_int), value :: unit, ip1, ip2, kind, version
       end function f_read_vgrid_from_file
 
-      integer(c_int) function f_create_from_ab_1001(vgdid, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m) bind(c, name='c_create_from_ab_1001')
+      integer(c_int) function f_create_from_ab_1001(vgdid, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m) bind(c, name='Cvgd_create_from_ab_1001')
          use iso_c_binding, only : c_ptr, c_int
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -258,7 +258,7 @@ module vGrid_Descriptors
       end function f_create_from_ab_1001
 
       integer(c_int) function f_create_from_ab_1002(vgdid, ip1, ip2, ptop_8, a_m_8, &
-                       b_m_8, ip1_m, nl_m) bind(c, name='c_create_from_ab_1002')
+                       b_m_8, ip1_m, nl_m) bind(c, name='Cvgd_create_from_ab_1002')
          use iso_c_binding, only : c_ptr, c_int, c_double
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -268,7 +268,7 @@ module vGrid_Descriptors
       end function f_create_from_ab_1002
 
       integer(c_int) function f_create_from_ab_1003(vgdid, ip1, ip2, ptop_8, pref_8, &
-                    rcoef1, a_m_8, b_m_8, ip1_m, nl_m) bind(c, name='c_create_from_ab_1003')
+                    rcoef1, a_m_8, b_m_8, ip1_m, nl_m) bind(c, name='Cvgd_create_from_ab_1003')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -279,7 +279,7 @@ module vGrid_Descriptors
       end function f_create_from_ab_1003
 
       integer(c_int) function f_create_from_ab_2001(vgdid, ip1, ip2, a_m_8, b_m_8, &
-                       ip1_m, nl_m) bind(c, name='c_create_from_ab_2001')
+                       ip1_m, nl_m) bind(c, name='Cvgd_create_from_ab_2001')
          use iso_c_binding, only : c_ptr, c_int, c_char
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -287,7 +287,7 @@ module vGrid_Descriptors
          integer (c_int), value :: nl_m
       end function f_create_from_ab_2001
 
-      integer(c_int) function f_create_from_ab_4001(vgdid, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m) bind(c, name='c_create_from_ab_4001')
+      integer(c_int) function f_create_from_ab_4001(vgdid, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m) bind(c, name='Cvgd_create_from_ab_4001')
          use iso_c_binding, only : c_ptr, c_int
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -296,7 +296,7 @@ module vGrid_Descriptors
       end function f_create_from_ab_4001
 
       integer(c_int) function f_create_from_ab_5001(vgdid, ip1, ip2, ptop_8, pref_8, &
-                    rcoef1, a_m_8, b_m_8, ip1_m, nl_m) bind(c, name='c_create_from_ab_5001')
+                    rcoef1, a_m_8, b_m_8, ip1_m, nl_m) bind(c, name='Cvgd_create_from_ab_5001')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -309,7 +309,7 @@ module vGrid_Descriptors
       integer(c_int) function f_create_from_ab_5002(vgdid, ip1, ip2, ptop_8, pref_8, &
                                   rcoef1, rcoef2, a_m_8, b_m_8, a_t_8, b_t_8, &
                                   ip1_m, ip1_t, nl_m) &
-                                  bind(c, name='c_create_from_ab_5002')
+                                  bind(c, name='Cvgd_create_from_ab_5002')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -322,7 +322,7 @@ module vGrid_Descriptors
       integer(c_int) function f_create_from_ab_5003(vgdid, ip1, ip2, ptop_8, pref_8, &
                                      rcoef1, rcoef2, a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, &
                                      ip1_t, nl_m) &
-                                     bind(c, name='c_create_from_ab_5003')
+                                     bind(c, name='Cvgd_create_from_ab_5003')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -335,7 +335,7 @@ module vGrid_Descriptors
       integer(c_int) function f_create_from_ab_5004(vgdid, ip1, ip2, ptop_8, pref_8, &
                                      rcoef1, rcoef2, a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, &
                                      ip1_t, nl_m) &
-                                     bind(c, name='c_create_from_ab_5004')
+                                     bind(c, name='Cvgd_create_from_ab_5004')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -347,7 +347,7 @@ module vGrid_Descriptors
 
       integer(c_int) function f_create_from_ab_5005(vgdid, ip1, ip2, pref_8, rcoef1, &
                                      rcoef2, a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, ip1_t, &
-                                     nl_m) bind(c, name='c_create_from_ab_5005')
+                                     nl_m) bind(c, name='Cvgd_create_from_ab_5005')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -360,7 +360,7 @@ module vGrid_Descriptors
       integer(c_int) function f_create_from_ab_5100(vgdid, ip1, ip2, pref_8, rcoef1, &
                           rcoef2, rcoef3, rcoef4, a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, &
                           c_t_8, ip1_m, ip1_t, nl_m) &
-                          bind(c, name='c_create_from_ab_5100')
+                          bind(c, name='Cvgd_create_from_ab_5100')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -371,7 +371,7 @@ module vGrid_Descriptors
       end function f_create_from_ab_5100
 
       integer(c_int) function f_create_from_ab_5999(vgdid, ip1, ip2, a_m_8, b_m_8, &
-                          ip1_m, nl_m) bind(c, name='c_create_from_ab_5999')
+                          ip1_m, nl_m) bind(c, name='Cvgd_create_from_ab_5999')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -382,7 +382,7 @@ module vGrid_Descriptors
       integer(c_int) function f_create_from_ab_21001(vgdid, ip1, ip2, &
 			      rcoef1, rcoef2, rcoef3, rcoef4, &
 			      a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8, ip1_m, &
-			      ip1_t, nl_m) bind(c, name='c_create_from_ab_21001')
+			      ip1_t, nl_m) bind(c, name='Cvgd_create_from_ab_21001')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -397,7 +397,7 @@ module vGrid_Descriptors
 			      a_t_8, b_t_8, c_t_8, &
 			      a_w_8, b_w_8, c_w_8, &
 			      ip1_m, ip1_t, ip1_w, nl_m) &
-                              bind(c, name='c_create_from_ab_21002')
+                              bind(c, name='Cvgd_create_from_ab_21002')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid
          integer (c_int), value :: ip1, ip2
@@ -408,7 +408,7 @@ module vGrid_Descriptors
       end function f_create_from_ab_21002
 
       integer(c_int) function f_create_from_hyb_1001(vgdid, hyb, size_hyb, ip1, ip2) &
-                                                   bind(c, name='c_create_from_hyb_1001')
+                                                   bind(c, name='Cvgd_create_from_hyb_1001')
          use iso_c_binding, only : c_ptr, c_int
          type(c_ptr),     value :: vgdid
          type(c_ptr),     value :: hyb
@@ -416,7 +416,7 @@ module vGrid_Descriptors
       end function f_create_from_hyb_1001
 
       integer(c_int) function f_create_from_hyb_1002(vgdid, hyb, size_hyb, &
-                              ptop_8, ip1, ip2) bind(c, name='c_create_from_hyb_1002')
+                              ptop_8, ip1, ip2) bind(c, name='Cvgd_create_from_hyb_1002')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid, hyb
          integer (c_int), value :: size_hyb
@@ -426,7 +426,7 @@ module vGrid_Descriptors
 
       integer(c_int) function f_create_from_hyb_1003(vgdid, hyb, size_hyb, &
                               ptop_8, pref_8, rcoef1, ip1, ip2) &
-                              bind(c, name='c_create_from_hyb_1003')
+                              bind(c, name='Cvgd_create_from_hyb_1003')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid, hyb
          integer (c_int), value :: size_hyb
@@ -436,7 +436,7 @@ module vGrid_Descriptors
       end function f_create_from_hyb_1003
 
       integer(c_int) function f_create_from_hyb_2001(vgdid, hyb, size_hyb, ip1, ip2) &
-                                                   bind(c, name='c_create_from_hyb_2001')
+                                                   bind(c, name='Cvgd_create_from_hyb_2001')
          use iso_c_binding, only : c_ptr, c_int
          type(c_ptr),     value :: vgdid
          type(c_ptr),     value :: hyb
@@ -444,7 +444,7 @@ module vGrid_Descriptors
       end function f_create_from_hyb_2001
 
       integer(c_int) function f_create_from_hyb_4001(vgdid, hyb, size_hyb, ip1, ip2) &
-                                                   bind(c, name='c_create_from_hyb_4001')
+                                                   bind(c, name='Cvgd_create_from_hyb_4001')
          use iso_c_binding, only : c_ptr, c_int
          type(c_ptr),     value :: vgdid
          type(c_ptr),     value :: hyb
@@ -453,7 +453,7 @@ module vGrid_Descriptors
 
       integer(c_int) function f_create_from_hyb_5001(vgdid, hyb, size_hyb, &
                               ptop_8, pref_8, rcoef1, ip1, ip2) &
-                              bind(c, name='c_create_from_hyb_5001')
+                              bind(c, name='Cvgd_create_from_hyb_5001')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid, hyb
          integer (c_int), value :: size_hyb
@@ -464,7 +464,7 @@ module vGrid_Descriptors
 
       integer(c_int) function f_create_from_hyb_5002(vgdid, hyb, size_hyb, &
                               ptop_8, pref_8, rcoef1, rcoef2, ip1, ip2) &
-                              bind(c, name='c_create_from_hyb_5002')
+                              bind(c, name='Cvgd_create_from_hyb_5002')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid, hyb
          integer (c_int), value :: size_hyb
@@ -475,7 +475,7 @@ module vGrid_Descriptors
 
       integer(c_int) function f_create_from_hyb_5003(vgdid, hyb, size_hyb, &
                               ptop_8, pref_8, rcoef1, rcoef2, ip1, ip2) &
-                              bind(c, name='c_create_from_hyb_5003')
+                              bind(c, name='Cvgd_create_from_hyb_5003')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid, hyb
          integer (c_int), value :: size_hyb
@@ -486,7 +486,7 @@ module vGrid_Descriptors
 
       integer(c_int) function f_create_from_hyb_5004(vgdid, hyb, size_hyb, &
                               ptop_8, pref_8, rcoef1, rcoef2, ip1, ip2) &
-                              bind(c, name='c_create_from_hyb_5004')
+                              bind(c, name='Cvgd_create_from_hyb_5004')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid, hyb
          integer (c_int), value :: size_hyb
@@ -497,7 +497,7 @@ module vGrid_Descriptors
 
       integer(c_int) function f_create_from_hyb_5005(vgdid, hyb, size_hyb, &
                               pref_8, ptop_out_8, rcoef1, rcoef2, ip1, ip2, dhm, dht) &
-                              bind(c, name='c_create_from_hyb_5005')
+                              bind(c, name='Cvgd_create_from_hyb_5005')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid, hyb, dhm, dht
          integer (c_int), value :: size_hyb
@@ -510,7 +510,7 @@ module vGrid_Descriptors
       integer(c_int) function f_create_from_hyb_5100(vgdid, hyb, size_hyb, &
                               pref_8, ptop_out_8, &
                               rcoef1, rcoef2, rcoef3, rcoef4, ip1, ip2, dhm, dht, avg) &
-                              bind(c, name='c_create_from_hyb_5100')
+                              bind(c, name='Cvgd_create_from_hyb_5100')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid, hyb, dhm, dht
          integer (c_int), value :: size_hyb
@@ -522,7 +522,7 @@ module vGrid_Descriptors
 
       integer(c_int) function f_create_from_hyb_21001(vgdid, hyb, size_hyb, &
                               rcoef1, rcoef2, rcoef3, rcoef4, ip1, ip2, dhm, dht) &
-                              bind(c, name='c_create_from_hyb_21001')
+                              bind(c, name='Cvgd_create_from_hyb_21001')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid, hyb, dhm, dht
          integer (c_int), value :: size_hyb
@@ -532,7 +532,7 @@ module vGrid_Descriptors
 
       integer(c_int) function f_create_from_hyb_21002(vgdid, hyb, size_hyb, &
                               rcoef1, rcoef2, rcoef3, rcoef4, ip1, ip2, dhm, dht, dhw) &
-                              bind(c, name='c_create_from_hyb_21002')
+                              bind(c, name='Cvgd_create_from_hyb_21002')
          use iso_c_binding, only : c_ptr, c_int, c_double, c_float
          type(c_ptr),     value :: vgdid, hyb, dhm, dht, dhw
          integer (c_int), value :: size_hyb

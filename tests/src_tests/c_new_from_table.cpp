@@ -60,8 +60,8 @@ int test_it(char *filename, int ind) {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
     return (VGD_ERROR);
   }  
-  if( Cvgd_read_vgrid_from_file(&my_vgrid, iun, -1, -1, -1, -1) == VGD_ERROR ) {
-    printf("ERROR with Cvgd_new_read on iun\n");
+  if( c_read_vgrid_from_file(&my_vgrid, iun, -1, -1, -1, -1) == VGD_ERROR ) {
+    printf("ERROR with c_read_vgrid_from_file on iun\n");
     return (VGD_ERROR);
   }
   // Get table  
@@ -69,8 +69,8 @@ int test_it(char *filename, int ind) {
     printf("ERROR with Cvgd_get_double_3d on VTBL\n");
     return (VGD_ERROR);
   }
-  if( Cvgd_new_from_table(&my_vgd2, table, ni, nj, nk) == VGD_ERROR ){
-    printf("ERROR with Cvgd_new_from_table\n");
+  if( c_new_from_table(&my_vgd2, table, ni, nj, nk) == VGD_ERROR ){
+    printf("ERROR with c_new_from_table\n");
     return (VGD_ERROR);
   }
   // Test equality

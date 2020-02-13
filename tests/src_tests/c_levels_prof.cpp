@@ -47,8 +47,8 @@ extern "C" void c_levels_prof() {
     return;
   }
   
-  if( Cvgd_read_vgrid_from_file(&my_vgrid, iun, -1, -1, -1, -1) == VGD_ERROR ) {
-    printf("ERROR with Cvgd_read_vgrid_from_file on iun\n");
+  if( c_read_vgrid_from_file(&my_vgrid, iun, -1, -1, -1, -1) == VGD_ERROR ) {
+    printf("ERROR with c_read_vgrid_from_file on iun\n");
     return;
   }
 

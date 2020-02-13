@@ -54,8 +54,8 @@ extern "C" void c_stda76_hgts_from_pres() {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
     exit(1);
   }
-  if( Cvgd_read_vgrid_from_file(&my_vgrid, iun, -1, -1, -1, -1) == VGD_ERROR ) {
-    printf("ERROR with Cvgd_new_read\n");
+  if( c_read_vgrid_from_file(&my_vgrid, iun, -1, -1, -1, -1) == VGD_ERROR ) {
+    printf("ERROR with c_read_vgrid_from_file\n");
     exit(1);
   }
   if( my_vgrid->Cvgd_get_int("NL_M", &nl, quiet) == VGD_ERROR){

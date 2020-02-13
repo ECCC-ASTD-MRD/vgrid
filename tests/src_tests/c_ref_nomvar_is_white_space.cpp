@@ -39,8 +39,8 @@ extern "C" int c_ref_nomvar_is_white_space() {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
     return(1);
   }
-  if( Cvgd_read_vgrid_from_file(&my_vgrid, iun, -1, -1, -1, -1) == VGD_ERROR ) {
-    printf("ERROR with Cvgd_new_read on iun\n");
+  if( c_read_vgrid_from_file(&my_vgrid, iun, -1, -1, -1, -1) == VGD_ERROR ) {
+    printf("ERROR with c_read_vgrid_from_file on iun\n");
     return(1);
   }
 

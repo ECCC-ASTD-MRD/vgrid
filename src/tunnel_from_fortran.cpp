@@ -149,7 +149,7 @@ int Cvgd_create_from_ab2(int *vgdid, int kind, int version, int nk,
 {
   vgrid *my_vgd;
   int status;
-  status=Cvgd_create_from_ab2(&my_vgd, kind, version,
+  status=c_create_from_ab2(&my_vgd, kind, version,
                                       nk, ip1, ip2, ptop_8,
                                       pref_8, rcoef1, rcoef2,
                                       rcoef3, rcoef4, a_m_8,
@@ -172,7 +172,7 @@ int Cvgd_new_from_table(int *vgdid, double *table,
   vgrid *my_vgd;
   int status;
 
-  status=Cvgd_new_from_table(&my_vgd, table, ni, nj, nk);
+  status=c_new_from_table(&my_vgd, table, ni, nj, nk);
   if(status != VGD_ERROR)
     {
       *vgdid=grid_check.get_tag(my_vgd);
@@ -189,7 +189,7 @@ int Cvgd_create_from_hyb2(int *vgdid, int kind, int version, float *hyb,
 {
   vgrid *my_vgd;
   int status;
-  status=Cvgd_create_from_hyb2(&my_vgd, kind, version, hyb,
+  status=c_create_from_hyb2(&my_vgd, kind, version, hyb,
                        size_hyb, rcoef1, rcoef2, rcoef3,
                        rcoef4, ptop_8, pref_8,
                        ptop_out_8, ip1, ip2, dhm, dht,
@@ -202,11 +202,11 @@ int Cvgd_create_from_hyb2(int *vgdid, int kind, int version, float *hyb,
 }
 
 
-int c_create_from_hyb_1001(int *vgdid, float *hyb, int size_hyb, int ip1, int ip2)
+int Cvgd_create_from_hyb_1001(int *vgdid, float *hyb, int size_hyb, int ip1, int ip2)
 {
   vgrid *my_vgd;
   int status;
-  status=Cvgd_create_from_hyb_1001(&my_vgd, hyb, size_hyb, ip1, ip2);
+  status=c_create_from_hyb_1001(&my_vgd, hyb, size_hyb, ip1, ip2);
   if(status != VGD_ERROR)
     {
       *vgdid=grid_check.get_tag(my_vgd);
@@ -215,14 +215,14 @@ int c_create_from_hyb_1001(int *vgdid, float *hyb, int size_hyb, int ip1, int ip
 }
 
 
-int c_create_from_hyb_1002(int *vgdid, float *hyb, int size_hyb, double ptop_8,
+int Cvgd_create_from_hyb_1002(int *vgdid, float *hyb, int size_hyb, double ptop_8,
 			   int ip1, int ip2)
 {
   vgrid *my_vgd;
   int status;
 
   // rcoef3 and rcoef4 are switched to the end here, because they are optional
-  status=Cvgd_create_from_hyb_1002(&my_vgd, hyb, size_hyb, ptop_8, ip1, ip2);
+  status=c_create_from_hyb_1002(&my_vgd, hyb, size_hyb, ptop_8, ip1, ip2);
   if(status != VGD_ERROR)
     {
       *vgdid=grid_check.get_tag(my_vgd);
@@ -231,14 +231,14 @@ int c_create_from_hyb_1002(int *vgdid, float *hyb, int size_hyb, double ptop_8,
 }
 
 
-int c_create_from_hyb_1003(int *vgdid, float *hyb, int size_hyb, double ptop_8,
+int Cvgd_create_from_hyb_1003(int *vgdid, float *hyb, int size_hyb, double ptop_8,
 			   double pref_8, float rcoef1, int ip1, int ip2)
 {
   vgrid *my_vgd;
   int status;
 
   // rcoef3 and rcoef4 are switched to the end here, because they are optional
-  status=Cvgd_create_from_hyb_1003(&my_vgd, hyb, size_hyb, ptop_8, pref_8,
+  status=c_create_from_hyb_1003(&my_vgd, hyb, size_hyb, ptop_8, pref_8,
 		          	   rcoef1, ip1, ip2);
   if(status != VGD_ERROR)
     {
@@ -248,11 +248,11 @@ int c_create_from_hyb_1003(int *vgdid, float *hyb, int size_hyb, double ptop_8,
 }
 
 
-int c_create_from_hyb_2001(int *vgdid, float *hyb, int size_hyb, int ip1, int ip2)
+int Cvgd_create_from_hyb_2001(int *vgdid, float *hyb, int size_hyb, int ip1, int ip2)
 {
   vgrid *my_vgd;
   int status;
-  status=Cvgd_create_from_hyb_2001(&my_vgd, hyb, size_hyb, ip1, ip2);
+  status=c_create_from_hyb_2001(&my_vgd, hyb, size_hyb, ip1, ip2);
   if(status != VGD_ERROR)
     {
       *vgdid=grid_check.get_tag(my_vgd);
@@ -261,11 +261,11 @@ int c_create_from_hyb_2001(int *vgdid, float *hyb, int size_hyb, int ip1, int ip
 }
 
 
-int c_create_from_hyb_4001(int *vgdid, float *hyb, int size_hyb, int ip1, int ip2)
+int Cvgd_create_from_hyb_4001(int *vgdid, float *hyb, int size_hyb, int ip1, int ip2)
 {
   vgrid *my_vgd;
   int status;
-  status=Cvgd_create_from_hyb_4001(&my_vgd, hyb, size_hyb, ip1, ip2);
+  status=c_create_from_hyb_4001(&my_vgd, hyb, size_hyb, ip1, ip2);
   if(status != VGD_ERROR)
     {
       *vgdid=grid_check.get_tag(my_vgd);
@@ -274,14 +274,14 @@ int c_create_from_hyb_4001(int *vgdid, float *hyb, int size_hyb, int ip1, int ip
 }
 
 
-int c_create_from_hyb_5001(int *vgdid, float *hyb, int size_hyb, double ptop_8,
+int Cvgd_create_from_hyb_5001(int *vgdid, float *hyb, int size_hyb, double ptop_8,
 			   double pref_8, float rcoef1, int ip1, int ip2)
 {
   vgrid *my_vgd;
   int status;
 
   // rcoef3 and rcoef4 are switched to the end here, because they are optional
-  status=Cvgd_create_from_hyb_5001(&my_vgd, hyb, size_hyb, ptop_8, pref_8,
+  status=c_create_from_hyb_5001(&my_vgd, hyb, size_hyb, ptop_8, pref_8,
 		          	   rcoef1, ip1, ip2);
   if(status != VGD_ERROR)
     {
@@ -291,14 +291,14 @@ int c_create_from_hyb_5001(int *vgdid, float *hyb, int size_hyb, double ptop_8,
 }
 
 
-int c_create_from_hyb_5002(int *vgdid, float *hyb, int size_hyb, double ptop_8,
+int Cvgd_create_from_hyb_5002(int *vgdid, float *hyb, int size_hyb, double ptop_8,
 			   double pref_8, float rcoef1, float rcoef2, int ip1, int ip2)
 {
   vgrid *my_vgd;
   int status;
 
   // rcoef3 and rcoef4 are switched to the end here, because they are optional
-  status=Cvgd_create_from_hyb_5002(&my_vgd, hyb, size_hyb, ptop_8, pref_8,
+  status=c_create_from_hyb_5002(&my_vgd, hyb, size_hyb, ptop_8, pref_8,
 		          	   rcoef1, rcoef2, ip1, ip2);
   if(status != VGD_ERROR)
     {
@@ -308,14 +308,14 @@ int c_create_from_hyb_5002(int *vgdid, float *hyb, int size_hyb, double ptop_8,
 }
 
 
-int c_create_from_hyb_5003(int *vgdid, float *hyb, int size_hyb, double ptop_8,
+int Cvgd_create_from_hyb_5003(int *vgdid, float *hyb, int size_hyb, double ptop_8,
 			   double pref_8, float rcoef1, float rcoef2, int ip1, int ip2)
 {
   vgrid *my_vgd;
   int status;
 
   // rcoef3 and rcoef4 are switched to the end here, because they are optional
-  status=Cvgd_create_from_hyb_5003(&my_vgd, hyb, size_hyb, ptop_8, pref_8,
+  status=c_create_from_hyb_5003(&my_vgd, hyb, size_hyb, ptop_8, pref_8,
 		          	   rcoef1, rcoef2, ip1, ip2);
   if(status != VGD_ERROR)
     {
@@ -325,14 +325,14 @@ int c_create_from_hyb_5003(int *vgdid, float *hyb, int size_hyb, double ptop_8,
 }
 
 
-int c_create_from_hyb_5004(int *vgdid, float *hyb, int size_hyb, double ptop_8,
+int Cvgd_create_from_hyb_5004(int *vgdid, float *hyb, int size_hyb, double ptop_8,
 			   double pref_8, float rcoef1, float rcoef2, int ip1, int ip2)
 {
   vgrid *my_vgd;
   int status;
 
   // rcoef3 and rcoef4 are switched to the end here, because they are optional
-  status=Cvgd_create_from_hyb_5004(&my_vgd, hyb, size_hyb, ptop_8, pref_8,
+  status=c_create_from_hyb_5004(&my_vgd, hyb, size_hyb, ptop_8, pref_8,
 		          	   rcoef1, rcoef2, ip1, ip2);
   if(status != VGD_ERROR)
     {
@@ -342,7 +342,7 @@ int c_create_from_hyb_5004(int *vgdid, float *hyb, int size_hyb, double ptop_8,
 }
 
 
-int c_create_from_hyb_5005(int *vgdid, float *hyb, int size_hyb,
+int Cvgd_create_from_hyb_5005(int *vgdid, float *hyb, int size_hyb,
 			   double pref_8, double *ptop_out_8, float rcoef1, float rcoef2,
 			   int ip1, int ip2, float *dhm, float *dht)
 {
@@ -350,7 +350,7 @@ int c_create_from_hyb_5005(int *vgdid, float *hyb, int size_hyb,
   int status;
 
   // rcoef3 and rcoef4 are switched to the end here, because they are optional
-  status=Cvgd_create_from_hyb_5005(&my_vgd, hyb, size_hyb, pref_8, ptop_out_8,
+  status=c_create_from_hyb_5005(&my_vgd, hyb, size_hyb, pref_8, ptop_out_8,
 		          	   rcoef1, rcoef2, ip1, ip2, dhm, dht);
   if(status != VGD_ERROR)
     {
@@ -360,7 +360,7 @@ int c_create_from_hyb_5005(int *vgdid, float *hyb, int size_hyb,
 }
 
 
-int c_create_from_hyb_5100(int *vgdid, float *hyb, int size_hyb,
+int Cvgd_create_from_hyb_5100(int *vgdid, float *hyb, int size_hyb,
 			   double pref_8, double *ptop_out_8,
 			   float rcoef1, float rcoef2, float rcoef3,float rcoef4,
 			   int ip1, int ip2, float *dhm, float *dht, int avg)
@@ -369,7 +369,7 @@ int c_create_from_hyb_5100(int *vgdid, float *hyb, int size_hyb,
   int status;
 
   // rcoef3 and rcoef4 are switched to the end here, because they are optional
-  status=Cvgd_create_from_hyb_5100(&my_vgd, hyb, size_hyb, pref_8, ptop_out_8,
+  status=c_create_from_hyb_5100(&my_vgd, hyb, size_hyb, pref_8, ptop_out_8,
 		          	   rcoef1, rcoef2, rcoef3, rcoef4, ip1, ip2, dhm,
 			           dht, avg);
   if(status != VGD_ERROR)
@@ -380,7 +380,7 @@ int c_create_from_hyb_5100(int *vgdid, float *hyb, int size_hyb,
 }
 
 
-int c_create_from_hyb_21001(int *vgdid, float *hyb, int size_hyb,
+int Cvgd_create_from_hyb_21001(int *vgdid, float *hyb, int size_hyb,
 			    float rcoef1, float rcoef2, float rcoef3,float rcoef4,
 			    int ip1, int ip2, float *dhm, float *dht)
 {
@@ -388,7 +388,7 @@ int c_create_from_hyb_21001(int *vgdid, float *hyb, int size_hyb,
   int status;
 
   // rcoef3 and rcoef4 are switched to the end here, because they are optional
-  status=Cvgd_create_from_hyb_21001(&my_vgd, hyb, size_hyb,
+  status=c_create_from_hyb_21001(&my_vgd, hyb, size_hyb,
 				    rcoef1, rcoef2, ip1, ip2, dhm,
 				    dht, rcoef3, rcoef4);
   if(status != VGD_ERROR)
@@ -399,7 +399,7 @@ int c_create_from_hyb_21001(int *vgdid, float *hyb, int size_hyb,
 }
 
 
-int c_create_from_hyb_21002(int *vgdid, float *hyb, int size_hyb,
+int Cvgd_create_from_hyb_21002(int *vgdid, float *hyb, int size_hyb,
 			    float rcoef1, float rcoef2, float rcoef3,float rcoef4,
 			    int ip1, int ip2, float *dhm, float *dht, float *dhw)
 {
@@ -407,7 +407,7 @@ int c_create_from_hyb_21002(int *vgdid, float *hyb, int size_hyb,
   int status;
 
   // rcoef3 and rcoef4 are switched to the end here, because they are optional
-  status=Cvgd_create_from_hyb_21002(&my_vgd, hyb, size_hyb,
+  status=c_create_from_hyb_21002(&my_vgd, hyb, size_hyb,
 				    rcoef1, rcoef2, ip1, ip2, dhm,
 				    dht, dhw, rcoef3, rcoef4);
   if(status != VGD_ERROR)
@@ -425,7 +425,7 @@ int Cvgd_read_vgrid_from_file(int *vgdid, int unit, int ip1,int ip2,
   vgrid *my_vgd;
   int status;
 
-  status=Cvgd_read_vgrid_from_file(&my_vgd, unit, ip1, ip2, kind, version);
+  status=c_read_vgrid_from_file(&my_vgd, unit, ip1, ip2, kind, version);
   if(status != VGD_ERROR)
     {
       *vgdid=grid_check.get_tag(my_vgd);
@@ -433,13 +433,13 @@ int Cvgd_read_vgrid_from_file(int *vgdid, int unit, int ip1,int ip2,
   return status;
 }
 
-int c_create_from_ab_1001(int *vgdid, int ip1, int ip2, double *a_m_8, double *b_m_8,
+int Cvgd_create_from_ab_1001(int *vgdid, int ip1, int ip2, double *a_m_8, double *b_m_8,
                         int *ip1_m, int nl_m)
 {
   vgrid *my_vgd;
   int status;
 
-  status=Cvgd_create_from_ab_1001(&my_vgd, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m);
+  status=c_create_from_ab_1001(&my_vgd, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m);
   if(status != VGD_ERROR)
     {
       *vgdid=grid_check.get_tag(my_vgd);
@@ -447,13 +447,13 @@ int c_create_from_ab_1001(int *vgdid, int ip1, int ip2, double *a_m_8, double *b
   return status;
 }
 
-int c_create_from_ab_1002(int *vgdid, int ip1, int ip2, double ptop_8, double *a_m_8,
+int Cvgd_create_from_ab_1002(int *vgdid, int ip1, int ip2, double ptop_8, double *a_m_8,
 			double *b_m_8, int *ip1_m, int nl_m)
 {
   vgrid *my_vgd;
   int status;
 
-  status=Cvgd_create_from_ab_1002(&my_vgd, ip1, ip2, ptop_8, a_m_8, b_m_8, ip1_m, nl_m);
+  status=c_create_from_ab_1002(&my_vgd, ip1, ip2, ptop_8, a_m_8, b_m_8, ip1_m, nl_m);
   if(status != VGD_ERROR)
     {
       *vgdid=grid_check.get_tag(my_vgd);
@@ -461,14 +461,14 @@ int c_create_from_ab_1002(int *vgdid, int ip1, int ip2, double ptop_8, double *a
   return status;
 }
 
-int c_create_from_ab_1003(int *vgdid, int ip1, int ip2, double ptop_8, double pref_8,
+int Cvgd_create_from_ab_1003(int *vgdid, int ip1, int ip2, double ptop_8, double pref_8,
 			float rcoef1, double *a_m_8,
 			double *b_m_8, int *ip1_m, int nl_m)
 {
   vgrid *my_vgd;
   int status;
 
-  status=Cvgd_create_from_ab_1003(&my_vgd, ip1, ip2, ptop_8, pref_8, rcoef1, a_m_8, b_m_8,
+  status=c_create_from_ab_1003(&my_vgd, ip1, ip2, ptop_8, pref_8, rcoef1, a_m_8, b_m_8,
 			     ip1_m, nl_m);
   if(status != VGD_ERROR)
     {
@@ -477,13 +477,13 @@ int c_create_from_ab_1003(int *vgdid, int ip1, int ip2, double ptop_8, double pr
   return status;
 }
 
-int c_create_from_ab_2001(int *vgdid, int ip1, int ip2, double *a_m_8, double *b_m_8,
+int Cvgd_create_from_ab_2001(int *vgdid, int ip1, int ip2, double *a_m_8, double *b_m_8,
 			int *ip1_m, int nl_m)
 {
   vgrid *my_vgd;
   int status;
 
-  status=Cvgd_create_from_ab_2001(&my_vgd, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m);
+  status=c_create_from_ab_2001(&my_vgd, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m);
   if(status != VGD_ERROR)
     {
       *vgdid=grid_check.get_tag(my_vgd);
@@ -491,13 +491,13 @@ int c_create_from_ab_2001(int *vgdid, int ip1, int ip2, double *a_m_8, double *b
   return status;
 }
 
-int c_create_from_ab_4001(int *vgdid, int ip1, int ip2, double *a_m_8, double *b_m_8,
+int Cvgd_create_from_ab_4001(int *vgdid, int ip1, int ip2, double *a_m_8, double *b_m_8,
                         int *ip1_m, int nl_m)
 {
   vgrid *my_vgd;
   int status;
 
-  status=Cvgd_create_from_ab_4001(&my_vgd, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m);
+  status=c_create_from_ab_4001(&my_vgd, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m);
   if(status != VGD_ERROR)
     {
       *vgdid=grid_check.get_tag(my_vgd);
@@ -505,14 +505,14 @@ int c_create_from_ab_4001(int *vgdid, int ip1, int ip2, double *a_m_8, double *b
   return status;
 }
 
-int c_create_from_ab_5001(int *vgdid, int ip1, int ip2, double ptop_8, double pref_8,
+int Cvgd_create_from_ab_5001(int *vgdid, int ip1, int ip2, double ptop_8, double pref_8,
 			float rcoef1, double *a_m_8,
 			double *b_m_8, int *ip1_m, int nl_m)
 {
   vgrid *my_vgd;
   int status;
 
-  status=Cvgd_create_from_ab_5001(&my_vgd, ip1, ip2, ptop_8, pref_8, rcoef1, a_m_8, b_m_8,
+  status=c_create_from_ab_5001(&my_vgd, ip1, ip2, ptop_8, pref_8, rcoef1, a_m_8, b_m_8,
 			     ip1_m, nl_m);
   if(status != VGD_ERROR)
     {
@@ -521,7 +521,7 @@ int c_create_from_ab_5001(int *vgdid, int ip1, int ip2, double ptop_8, double pr
   return status;
 }
 
-int c_create_from_ab_5002(int *vgdid, int ip1, int ip2, double ptop_8, double pref_8,
+int Cvgd_create_from_ab_5002(int *vgdid, int ip1, int ip2, double ptop_8, double pref_8,
 			float rcoef1, float rcoef2, double *a_m_8j,
 			double *b_m_8, double *a_t_8, double *b_t_8,
 			int *ip1_m, int *ip1_t,
@@ -530,7 +530,7 @@ int c_create_from_ab_5002(int *vgdid, int ip1, int ip2, double ptop_8, double pr
   vgrid *my_vgd;
   int status;
 
-  status=Cvgd_create_from_ab_5002(&my_vgd, ip1, ip2, ptop_8, pref_8,
+  status=c_create_from_ab_5002(&my_vgd, ip1, ip2, ptop_8, pref_8,
 			     rcoef1, rcoef2, a_m_8j, b_m_8, a_t_8,
 			     b_t_8, ip1_m, ip1_t, nl_m);
   if(status != VGD_ERROR)
@@ -540,7 +540,7 @@ int c_create_from_ab_5002(int *vgdid, int ip1, int ip2, double ptop_8, double pr
   return status;
 }
 
-int c_create_from_ab_5003(int *vgdid, int ip1, int ip2,
+int Cvgd_create_from_ab_5003(int *vgdid, int ip1, int ip2,
 			double ptop_8, double pref_8, float rcoef1, float rcoef2,
 			double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8,
 			int *ip1_m, int *ip1_t, int nl_m)
@@ -548,7 +548,7 @@ int c_create_from_ab_5003(int *vgdid, int ip1, int ip2,
   vgrid *my_vgd;
   int status;
 
-  status=Cvgd_create_from_ab_5003(&my_vgd, ip1, ip2, ptop_8, pref_8, rcoef1, rcoef2,
+  status=c_create_from_ab_5003(&my_vgd, ip1, ip2, ptop_8, pref_8, rcoef1, rcoef2,
                              a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, ip1_t, nl_m);
   if(status != VGD_ERROR)
     {
@@ -557,7 +557,7 @@ int c_create_from_ab_5003(int *vgdid, int ip1, int ip2,
   return status;
 }
 
-int c_create_from_ab_5004(int *vgdid, int ip1, int ip2,
+int Cvgd_create_from_ab_5004(int *vgdid, int ip1, int ip2,
 			double ptop_8, double pref_8, float rcoef1, float rcoef2,
 			double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8,
 			int *ip1_m, int *ip1_t, int nl_m)
@@ -565,7 +565,7 @@ int c_create_from_ab_5004(int *vgdid, int ip1, int ip2,
   vgrid *my_vgd;
   int status;
 
-  status=Cvgd_create_from_ab_5004(&my_vgd, ip1, ip2, ptop_8, pref_8, rcoef1, rcoef2,
+  status=c_create_from_ab_5004(&my_vgd, ip1, ip2, ptop_8, pref_8, rcoef1, rcoef2,
                              a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, ip1_t, nl_m);
   if(status != VGD_ERROR)
     {
@@ -574,7 +574,7 @@ int c_create_from_ab_5004(int *vgdid, int ip1, int ip2,
   return status;
 }
 
-int c_create_from_ab_5005(int *vgdid, int ip1, int ip2,
+int Cvgd_create_from_ab_5005(int *vgdid, int ip1, int ip2,
 			double pref_8, float rcoef1, float rcoef2,
 			double *a_m_8, double *b_m_8, double *a_t_8, double *b_t_8,
 			int *ip1_m, int *ip1_t, int nl_m)
@@ -582,7 +582,7 @@ int c_create_from_ab_5005(int *vgdid, int ip1, int ip2,
   vgrid *my_vgd;
   int status;
 
-  status=Cvgd_create_from_ab_5005(&my_vgd, ip1, ip2, pref_8, rcoef1, rcoef2,
+  status=c_create_from_ab_5005(&my_vgd, ip1, ip2, pref_8, rcoef1, rcoef2,
                              a_m_8, b_m_8, a_t_8, b_t_8, ip1_m, ip1_t, nl_m);
   if(status != VGD_ERROR)
     {
@@ -591,7 +591,7 @@ int c_create_from_ab_5005(int *vgdid, int ip1, int ip2,
   return status;
 }
 
-int c_create_from_ab_5100(int *vgdid, int ip1, int ip2, double pref_8, float rcoef1,
+int Cvgd_create_from_ab_5100(int *vgdid, int ip1, int ip2, double pref_8, float rcoef1,
 			float rcoef2, float rcoef3, float rcoef4,
 			double *a_m_8, double *b_m_8, double *c_m_8,
 			double *a_t_8, double *b_t_8, double *c_t_8,
@@ -600,7 +600,7 @@ int c_create_from_ab_5100(int *vgdid, int ip1, int ip2, double pref_8, float rco
   vgrid *my_vgd;
   int status;
 
-  status=Cvgd_create_from_ab_5100(&my_vgd, ip1, ip2, pref_8, rcoef1, rcoef2, rcoef3, rcoef4,
+  status=c_create_from_ab_5100(&my_vgd, ip1, ip2, pref_8, rcoef1, rcoef2, rcoef3, rcoef4,
 			     a_m_8, b_m_8, c_m_8, a_t_8, b_t_8, c_t_8,
 			     ip1_m, ip1_t, nl_m);
   if(status != VGD_ERROR)
@@ -610,13 +610,13 @@ int c_create_from_ab_5100(int *vgdid, int ip1, int ip2, double pref_8, float rco
   return status;
 }
 
-int c_create_from_ab_5999(int *vgdid, int ip1, int ip2, double *a_m_8, double *b_m_8,
+int Cvgd_create_from_ab_5999(int *vgdid, int ip1, int ip2, double *a_m_8, double *b_m_8,
 			int *ip1_m, int nl_m)
 {
   vgrid *my_vgd;
   int status;
 
-  status=Cvgd_create_from_ab_5999(&my_vgd, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m);
+  status=c_create_from_ab_5999(&my_vgd, ip1, ip2, a_m_8, b_m_8, ip1_m, nl_m);
   if(status != VGD_ERROR)
     {
       *vgdid=grid_check.get_tag(my_vgd);
@@ -624,7 +624,7 @@ int c_create_from_ab_5999(int *vgdid, int ip1, int ip2, double *a_m_8, double *b
   return status;
 }
 
-int c_create_from_ab_21001(int *vgdid, int ip1, int ip2,
+int Cvgd_create_from_ab_21001(int *vgdid, int ip1, int ip2,
 			 float rcoef1, float rcoef2, float rcoef3, float rcoef4,
 			 double *a_m_8, double *b_m_8, double *c_m_8,
 			 double *a_t_8, double *b_t_8, double *c_t_8,
@@ -633,7 +633,7 @@ int c_create_from_ab_21001(int *vgdid, int ip1, int ip2,
   vgrid *my_vgd;
   int status;
 
-  status=Cvgd_create_from_ab_21001(&my_vgd, ip1, ip2,
+  status=c_create_from_ab_21001(&my_vgd, ip1, ip2,
 			      rcoef1, rcoef2, rcoef3, rcoef4,
 			      a_m_8, b_m_8, c_m_8,a_t_8, b_t_8, c_t_8, ip1_m,
 			      ip1_t, nl_m);
@@ -644,7 +644,7 @@ int c_create_from_ab_21001(int *vgdid, int ip1, int ip2,
   return status;
 }
 
-int c_create_from_ab_21002(int *vgdid, int ip1, int ip2, float rcoef1, float rcoef2,
+int Cvgd_create_from_ab_21002(int *vgdid, int ip1, int ip2, float rcoef1, float rcoef2,
 			 float rcoef3, float rcoef4,
 			 double *a_m_8, double *b_m_8, double *c_m_8,
 			 double *a_t_8, double *b_t_8, double *c_t_8,
@@ -654,7 +654,7 @@ int c_create_from_ab_21002(int *vgdid, int ip1, int ip2, float rcoef1, float rco
   vgrid *my_vgd;
   int status;
 
-  status=Cvgd_create_from_ab_21002(&my_vgd, ip1, ip2, rcoef1, rcoef2,
+  status=c_create_from_ab_21002(&my_vgd, ip1, ip2, rcoef1, rcoef2,
 			      rcoef3, rcoef4,
 			      a_m_8, b_m_8, c_m_8,
 			      a_t_8, b_t_8, c_t_8,

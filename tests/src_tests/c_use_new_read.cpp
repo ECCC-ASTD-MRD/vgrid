@@ -50,8 +50,8 @@ extern "C" void c_use_new_read() {
     return;
   }
   
-  if( Cvgd_read_vgrid_from_file(&my_vgd ,iun, -1, -1, -1, -1) == VGD_ERROR ) {
-    printf("ERROR with Cvgd_new_read on iun\n");
+  if( c_read_vgrid_from_file(&my_vgd ,iun, -1, -1, -1, -1) == VGD_ERROR ) {
+    printf("ERROR with c_read_vgrid_from_file on iun\n");
     return;
   }
   if( my_vgd->Cvgd_get_int_1d("VIPT", &i_val, NULL, quiet) ==  VGD_ERROR ) {
@@ -92,8 +92,8 @@ extern "C" void c_use_new_read() {
   }
   
   // Constructing new vgd with this table
-  if ( Cvgd_new_from_table(&my_vgd2, table, ni, nj, nk) ==  VGD_ERROR ) {
-    printf("ERROR with Cvgd_new_from_table for VTBL\n");
+  if ( c_new_from_table(&my_vgd2, table, ni, nj, nk) ==  VGD_ERROR ) {
+    printf("ERROR with c_new_from_table for VTBL\n");
     return;
   }
 
@@ -189,8 +189,8 @@ extern "C" void c_use_new_read() {
     printf("ERROR with c_fstouv on iun2\n");
     return;
   }
-  if( Cvgd_read_vgrid_from_file(&my_vgd2, iun, -1, -1, -1, -1) == VGD_ERROR ) {
-    printf("ERROR with Cvgd_new_read vgd2\n");
+  if( c_read_vgrid_from_file(&my_vgd2, iun, -1, -1, -1, -1) == VGD_ERROR ) {
+    printf("ERROR with c_read_vgrid_from_file vgd2\n");
     return;
   }
   if( my_vgd->Cvgd_vgdcmp(my_vgd2) != 0 ){
