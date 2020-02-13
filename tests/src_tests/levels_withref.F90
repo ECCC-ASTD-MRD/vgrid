@@ -166,6 +166,10 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
          return
       endif
       key = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',rfld)
+      if(key < 0)then
+         print*,'Cannot find nomvar ',rfld,' in file ',F_fst
+         return
+      endif
       allocate(p0(ni,nj),px(ni,nj),p0ls(ni,nj))
       ier = fstluk(p0,key,ni,nj,nk)
       if(ier.lt.0)then
@@ -184,6 +188,10 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
       if(rfld /= VGD_NO_REF_NOMVAR)sfc_field_ls_L=.true.
       if(sfc_field_ls_L)then
          key = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',rfld)
+         if(key < 0)then
+            print*,'Cannot find nomvar ',rfld,' in file ',F_fst
+            return
+         endif
          ier = fstluk(p0ls,key,ni,nj,nk)
          if(ier.lt.0)then
             print*,'(Test) Problem with fstluk on ',rfld
@@ -216,22 +224,31 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
          print*,'(Test) Problem with fstprm on TT, ip1=',ip1
          return
       endif
-      ! Surface pressure must be equal to P0 for surface levels
-      call convip(ip1,pppp,kind,-1,dummy_S,.false.)
-      if(abs(pppp-1.).lt.epsilon)then
-         do j=1,nj
-            do i=1,ni
-               if(pres(i,j,k).ne.p0(i,j))then
-                  print*,'(Test) Surface pressure must be exacly equal to p0'
-                  print*,'i,j,k,pres(i,j,k),p0(i,j)',i,j,k,pres(i,j,k),p0(i,j)
-                  return
-               endif
+      if(kind .eq. 2)then
+         call convip(ip1,pppp,kind,-1,dummy_S,.false.)
+         px = pppp
+      else
+         ! Surface pressure must be equal to P0 for surface levels
+         call convip(ip1,pppp,kind,-1,dummy_S,.false.)
+         if(abs(pppp-1.).lt.epsilon)then
+            do j=1,nj
+               do i=1,ni
+                  if(pres(i,j,k).ne.p0(i,j))then
+                     print*,'(Test) Surface pressure must be exacly equal to p0'
+                     print*,'i,j,k,pres(i,j,k),p0(i,j)',i,j,k,pres(i,j,k),p0(i,j)
+                     return
+                  endif
+               enddo
             enddo
-         enddo
+         endif
+         call incdatr(datev,dateo,deet*npas/3600.d0)
+         key=fstinf(lu,ni,nj,nk,datev,' ',ip1,ip2,-1,typvar,nomvar_metric)
+         if(key < 0 )then
+            print*,'Cannot find nomvar ',nomvar_metric,' for ip1',ip1,' in file ',F_fst
+            return
+         endif
+         ier = fstluk(px,key,ni,nj,nk)
       endif
-      call incdatr(datev,dateo,deet*npas/3600.d0)
-      key=fstinf(lu,ni,nj,nk,datev,' ',ip1,ip2,-1,typvar,nomvar_metric)     
-      ier = fstluk(px,key,ni,nj,nk)
       px = px * factor
       if(ier.lt.0)then
          print*,'(Test) Problem with fstinf on PX, ip1=',ip1
@@ -266,23 +283,32 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
          print*,'Problem with fstprm on TT, ip1=',ip1
          return
       endif
-      ! Surface pressure must be equal to P0 for surface levels
-      call convip(ip1,pppp,kind,-1,dummy_S,.false.)
-      if(abs(pppp-1.).lt.epsilon)then
-         do j=1,nj
-            do i=1,ni
-               if(pres_8(i,j,k).ne.p0_8(i,j))then
-                  print*,'Surface pressure must be exacly equal to p0_8'
-                  print*,'File:',F_fst
-                  print*,'i,j,k,pres_8(i,j,k),p0_8(i,j)',i,j,k,pres_8(i,j,k),p0_8(i,j)
-                  return
-               endif
+      if(kind .eq. 2)then
+         call convip(ip1,pppp,kind,-1,dummy_S,.false.)
+         px = pppp
+      else
+         ! Surface pressure must be equal to P0 for surface levels
+         call convip(ip1,pppp,kind,-1,dummy_S,.false.)
+         if(abs(pppp-1.).lt.epsilon)then
+            do j=1,nj
+               do i=1,ni
+                  if(pres_8(i,j,k).ne.p0_8(i,j))then
+                     print*,'Surface pressure must be exacly equal to p0_8'
+                     print*,'File:',F_fst
+                     print*,'i,j,k,pres_8(i,j,k),p0_8(i,j)',i,j,k,pres_8(i,j,k),p0_8(i,j)
+                     return
+                  endif
+               enddo
             enddo
-         enddo
+         endif
+         call incdatr(datev,dateo,deet*npas/3600.d0)
+         key=fstinf(lu,ni,nj,nk,datev,' ',ip1,ip2,-1,typvar,nomvar_metric)
+         if(key < 0 )then
+            print*,'Cannot find nomvar ',nomvar_metric,' for ip1',ip1,' in file ',F_fst
+            return
+         endif
+         ier = fstluk(px,key,ni,nj,nk)
       endif
-      call incdatr(datev,dateo,deet*npas/3600.d0)
-      key=fstinf(lu,ni,nj,nk,datev,' ',ip1,ip2,-1,typvar,nomvar_metric)     
-      ier = fstluk(px,key,ni,nj,nk)
       px = px * factor
       if(ier.lt.0)then
          print*,'(Test) Problem with fstinf on PX, ip1=',ip1
