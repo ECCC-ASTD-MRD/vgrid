@@ -159,6 +159,7 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
       allocate(p0(ni,nj),px(ni,nj),p0ls(ni,nj))
       factor = 100.
       p0=0.
+      p0ls=0.
    else
       ier = vgd_get(vgd,'RFLD',rfld)
       if(ier == VGD_ERROR)then

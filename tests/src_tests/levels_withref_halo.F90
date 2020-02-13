@@ -170,6 +170,7 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
       allocate(p0(minx:maxx,miny:maxy),px(minx:maxx,miny:maxy),p0ls(minx:maxx,miny:maxy),pres(minx:maxx,miny:maxy,G_nk))
       factor = 100.
       p0=0.
+      p0ls=0.
    else
       ier = vgd_get(vgd,'RFLD',rfld)
       if(ier == VGD_ERROR)then
