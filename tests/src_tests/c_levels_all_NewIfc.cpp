@@ -270,8 +270,8 @@ int test_it(char *filename, char *ip1_name, int ind) {
   //===================================================
   printf("   testing Cvgd_diag_withref float interface\n");
   if(ref2){
-    //ier = my_vgrid->C_compute_pressures_5100(ni2, nj2, nl, i_val, levels, p0, p0ls, in_log, dpidpis);
-    ier = my_vgrid->Cvgd_diag_withref_2ref(ni2, nj2, nl, i_val, levels, p0, p0ls, in_log, dpidpis);
+    ier = my_vgrid->C_compute_pressures_5100_float(ni2, nj2, nl, i_val, levels, p0, p0ls, in_log, dpidpis);
+    //ier = my_vgrid->Cvgd_diag_withref_2ref(ni2, nj2, nl, i_val, levels, p0, p0ls, in_log, dpidpis);
   } else {
     ier = my_vgrid->Cvgd_diag_withref(ni2, nj2, nl, i_val, levels, p0, in_log, dpidpis);
   }
@@ -281,7 +281,8 @@ int test_it(char *filename, char *ip1_name, int ind) {
   }
   printf("   testing Cvgd_levels* double interface for ip1 list %s\n",ip1_name);
   if(ref2){
-    ier = my_vgrid->Cvgd_diag_withref_2ref_8(ni2, nj2, nl, i_val, levels_8, p0_8, p0ls_8, in_log, dpidpis);
+    ier = my_vgrid->C_compute_pressures_5100_double(ni2, nj2, nl, i_val, levels_8, p0_8, p0ls_8, in_log, dpidpis);
+    //ier = my_vgrid->Cvgd_diag_withref_2ref_8(ni2, nj2, nl, i_val, levels_8, p0_8, p0ls_8, in_log, dpidpis);
   } else {
     ier = my_vgrid->Cvgd_diag_withref_8(ni2, nj2, nl, i_val, levels_8, p0_8, in_log, dpidpis);
   }

@@ -21,6 +21,9 @@
 #define VGRID_SUBCLASSES_H
 
 #include "vgrid.hpp"
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
 
 class vgrid_0001 : public vgrid
 {
@@ -256,6 +259,18 @@ public:
 			   float rcoef2, float rcoef3, float rcoef4,
 			   double pref_8, double *ptop_out_8,
 			   float *dhm, float *dht, int avg);
+  int C_compute_pressures_5100_float(int ni, int nj, int nk, int *ip1_list,
+				     float *levels,
+				     float *sfc_field,
+				     float *sfc_field_ls,
+				     int in_log, int dpidpis);
+  int C_compute_pressures_5100_double(int ni, int nj, int nk, int *ip1_list,
+				      double *levels,
+				      double *sfc_field,
+				      double *sfc_field_ls,
+				      int in_log, int dpidpis);
+
+public:
   template<class FloatPrecision>
   int C_compute_pressures_5100(int ni, int nj, int nk, int *ip1_list,
 			       FloatPrecision *levels,
@@ -336,8 +351,9 @@ private:
   void set_refnames();
 };
 
-// DEFINITIONS OF TEMPLATE FUNCTIONS
 
+// DEFINITIONS OF TEMPLATE FUNCTIONS
+// Can these go in the *.cpp, since they are private?
 
 template<class FloatPrecision>
 int vgrid_5100::C_compute_pressures_5100(int ni, int nj, int nk, int *ip1_list,

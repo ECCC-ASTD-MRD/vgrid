@@ -3501,6 +3501,36 @@ int vgrid_5100::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
 //                                         float *sfc_field_ls, int in_log, int dpidpis)
 
 
+
+
+int vgrid_5100::C_compute_pressures_5100_float(int ni, int nj, int nk, int *ip1_list,
+				   float *levels,
+				   float *sfc_field,
+				   float *sfc_field_ls,
+				   int in_log, int dpidpis)
+{
+  return C_compute_pressures_5100<float>(ni, nj, nk, ip1_list,
+  				  levels,
+  				  sfc_field,
+  				  sfc_field_ls,
+  				  in_log, dpidpis);
+}
+
+
+int vgrid_5100::C_compute_pressures_5100_double(int ni, int nj, int nk, int *ip1_list,
+				   double *levels,
+				   double *sfc_field,
+				   double *sfc_field_ls,
+				   int in_log, int dpidpis)
+{
+  return C_compute_pressures_5100<double>(ni, nj, nk, ip1_list,
+  				  levels,
+  				  sfc_field,
+  				  sfc_field_ls,
+  				  in_log, dpidpis);
+}
+
+
 // ########## class 5999 ##########
 vgrid_5999::vgrid_5999(int ip1, int ip2) : vgrid(ip1, ip2)
 {

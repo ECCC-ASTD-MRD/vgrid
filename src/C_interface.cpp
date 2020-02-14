@@ -73,7 +73,7 @@ int Cvgd_compute_pressures_5100(int vgdid, int ni, int nj, int nk,
 {
   vgrid *vgd;
   vgd=grid_check.get_grid_keep_tag(vgdid);
-  return vgd->C_compute_pressures_5100(ni, nj, nk,
+  return vgd->C_compute_pressures_5100_float(ni, nj, nk,
                                        ip1_list, levels, sfc_field,
                                        sfc_field_ls, in_log, dpidpis);
 };
