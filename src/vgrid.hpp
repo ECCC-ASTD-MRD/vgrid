@@ -137,9 +137,10 @@ private:
   static int c_get_stda76(float *Tk, float *pk, float *zk, float *gammaT, int *zero_lapse_rate);
   static int same_vec_i(int *vec1, int n1, int *vec2, int n2);
   static int same_vec_r8(double *vec1, int n1, double *vec2, int n2);
-  static int similar_vec_r8(double *vec1, int n1, double *vec2, int n2);  static int Cvgd_FindIp1Idx(int Ip1,int *Lst,int Size);
+  static int similar_vec_r8(double *vec1, int n1, double *vec2, int n2);
 
 protected:
+  static int Cvgd_FindIp1Idx(int Ip1,int *Lst,int Size);
   static void flip_transfer_d2c(char *name, double val_8);
   static void flip_transfer_c2d(char *name, void *val_8);
   static int c_convip_Level2IP(float level, int kind);
@@ -189,8 +190,6 @@ public:
   int C_compute_heights_4001_8                (int ni, int nj, int nk, int *ip1_list, double *levels);
   int C_compute_pressure_5002_5003_5004_5005  (int ni, int nj, int nk, int *ip1_list, float  *levels, float  *sfc_field,                       int in_log, int dpidpis);
   int C_compute_pressure_5002_5003_5004_5005_8(int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field,                       int in_log, int dpidpis);
-  int C_compute_pressure_5100                 (int ni, int nj, int nk, int *ip1_list, float  *levels, float  *sfc_field, float  *sfc_field_ls, int in_log, int dpidpis);
-  int C_compute_pressure_5100_8               (int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, double *sfc_field_ls, int in_log, int dpidpis);
   int C_compute_heights_21001                 (int ni, int nj, int nk, int *ip1_list, float  *levels, float  *sfc_field, float  *sfc_field_ls);
   int C_compute_heights_21001_8               (int ni, int nj, int nk, int *ip1_list, double *levels, double *sfc_field, double *sfc_field_ls);
   int C_load_toctoc(VGD_TFSTD_ext var, int key);
@@ -242,6 +241,15 @@ public:
   virtual int c_decode_vert() = 0;
   virtual int c_encode_vert() = 0;
   void build_vgrid_from_key(int key);
+
+  // 5100 is just a name for this interface.  It does not necessarily restrict its use
+  //      to vcode=5100
+  template<class FloatPrecision>
+  virtual int C_compute_pressures_5100(int ni, int nj, int nk, int *ip1_list,
+				       FloatPrecision *levels,
+				       FloatPrecision *sfc_field,
+				       FloatPrecision *sfc_field_ls,
+				       int in_log, int dpidpis);
 
 protected:
   virtual void set_table_nj(int nk) = 0;

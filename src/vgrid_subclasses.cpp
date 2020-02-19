@@ -3495,6 +3495,11 @@ int vgrid_5100::Cvgd_create_from_hyb(float *hyb, int size_hyb, float rcoef1,
   return (VGD_OK);
 }
 
+// template - definition is in the header file
+//int vgrid_5100::C_compute_pressures_5100(int ni, int nj, int nk, int *ip1_list,
+//                                         float *levels, float *sfc_field,
+//                                         float *sfc_field_ls, int in_log, int dpidpis)
+
 
 // ########## class 5999 ##########
 vgrid_5999::vgrid_5999(int ip1, int ip2) : vgrid(ip1, ip2)
