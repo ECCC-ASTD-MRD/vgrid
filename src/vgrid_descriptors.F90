@@ -134,7 +134,7 @@ module vGrid_Descriptors
 
       integer(c_int) function f_compute_pressures_5100(vgdid, ni, nj, nk, ip1_list, &
                                                        levels, sfc_field, sfc_field_ls, &
-                                                       in_log, dpidpis) &
+                                                       in_log) &
                                               bind(c, name='Cvgd_compute_pressures_5100')
         use iso_c_binding, only: c_ptr, c_int
         integer (c_int), value :: vgdid
@@ -143,7 +143,7 @@ module vGrid_Descriptors
         type(c_ptr), value :: levels
         type(c_ptr), value :: sfc_field
         type(c_ptr), value :: sfc_field_ls
-        integer (c_int), value :: in_log, dpidpis
+        integer (c_int), value :: in_log
       end function f_compute_pressures_5100
 
       integer(c_int) function f_get_int(vgdid, key, value_CP, quiet) bind(c, name='Cvgd_get_int')
@@ -2475,7 +2475,7 @@ contains
    end function levels_withref_prof_8
 
    integer function vgd_compute_pressures_5100(vgdid, ip1_list, levels, &
-                                               sfc_field, sfc_field_ls, in_log, dpidpis)&
+                                               sfc_field, sfc_field_ls, in_log)&
                                                result(status)
 #undef REAL_8
 #define REAL_KIND 4
@@ -2486,13 +2486,13 @@ contains
      real(kind=REAL_KIND), dimension(:,:,:), intent(out), pointer :: levels
      real(kind=REAL_KIND), dimension(:,:),   intent(in),  target  :: sfc_field
      real(kind=REAL_KIND), dimension(:,:),   intent(in),  target  :: sfc_field_ls
-     logical, optional,                      intent(in)           :: in_log, dpidpis
+     logical, optional,                      intent(in)           :: in_log
 
      integer ni,nj,nk,error
      real, dimension(:,:), pointer :: my_sfc_field, my_sfc_field_ls
      real, dimension(:,:,:), pointer :: my_levels 
      type (c_ptr) :: ip1_list_CP ,levels_CP ,sfc_field_CP, sfc_field_ls_CP
-     integer :: in_log_int, dpidpis_int
+     integer :: in_log_int
      logical :: alloc_my_sfc_field_L, alloc_my_sfc_field_ls_L, alloc_my_levels_L
 
      status = VGD_ERROR
@@ -2504,15 +2504,6 @@ contains
          in_log_int = 1
        else
          in_log_int = 0
-       endif
-    endif
-      
-    dpidpis_int = 0
-     if (present(dpidpis))then
-       if(dpidpis)then
-         dpidpis_int = 1
-       else
-         dpidpis_int = 0
        endif
     endif
       
@@ -2623,21 +2614,14 @@ contains
     sfc_field_ls_CP = c_loc(my_sfc_field_ls(1,1))
 !!#if defined(REAL_8)
 !!    status = f_compute_pressures_5100_8(vgdid,ni,nj,nk,ip1_list_CP,levels_CP, &
-!!                                        sfc_field_CP,sfc_field_ls_CP,in_log_int, &
-!!                                        dpidpis_int)
+!!                                        sfc_field_CP,sfc_field_ls_CP,in_log_int)
 !!#else
     status = f_compute_pressures_5100(vgdid,ni,nj,nk,ip1_list_CP,levels_CP, &
-                                      sfc_field_CP,sfc_field_ls_CP,in_log_int, &
-                                      dpidpis_int)
+                                      sfc_field_CP,sfc_field_ls_CP,in_log_int)
 !!#endif
     if (status /= VGD_OK) then
-      if(dpidpis)then
-        write(for_msg,*) 'error computing dpidpis in vgd_compute_pressures_5100'//PROC_SUFF
-        call msg(MSG_ERROR,VGD_PRFX//for_msg)
-      else
-        write(for_msg,*) 'error computing pressure in vgd_compute_pressures_5100'//PROC_SUFF
-        call msg(MSG_ERROR,VGD_PRFX//for_msg)
-      endif
+      write(for_msg,*) 'error computing pressure in vgd_compute_pressures_5100'//PROC_SUFF
+      call msg(MSG_ERROR,VGD_PRFX//for_msg)
       return
     endif
 

@@ -1989,7 +1989,7 @@ int vgrid::C_compute_pressures_5100_float(int ni, int nj, int nk, int *ip1_list,
 					  float *levels,
 					  float *sfc_field,
 					  float *sfc_field_ls,
-					  int in_log, int dpidpis)
+					  int in_log)
 {
   printf("The method, vgrid::C_compute_pressures_5100_float, is not supported for vcode=%d\n",
 	 vcode);
@@ -2000,7 +2000,7 @@ int vgrid::C_compute_pressures_5100_double(int ni, int nj, int nk, int *ip1_list
 					   double *levels,
 					   double *sfc_field,
 					   double *sfc_field_ls,
-					   int in_log, int dpidpis)
+					   int in_log)
 {
   printf("The method, vgrid::C_compute_pressures_5100_double, is not supported for vcode=%d\n",
 	 vcode);
@@ -2199,7 +2199,7 @@ int vgrid::Cvgd_levels_2ref_8(int ni, int nj, int nk, int *ip1_list, double *lev
   {
     try
     {
-      this->C_compute_pressures_5100_double(ni, nj, nk, ip1_list, levels_8, sfc_field_8, sfc_field_ls_8, in_log, 0);
+      this->C_compute_pressures_5100_double(ni, nj, nk, ip1_list, levels_8, sfc_field_8, sfc_field_ls_8, in_log);
     }
     catch(vgrid_exception)
     {
@@ -2214,7 +2214,7 @@ int vgrid::Cvgd_levels_2ref(int ni, int nj, int nk, int *ip1_list, float *levels
   {
     try
     {
-      this->C_compute_pressures_5100_float(ni, nj, nk, ip1_list, levels, sfc_field, sfc_field_ls, in_log, 0);
+      this->C_compute_pressures_5100_float(ni, nj, nk, ip1_list, levels, sfc_field, sfc_field_ls, in_log);
     }
     catch(vgrid_exception)
     {

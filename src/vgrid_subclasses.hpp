@@ -263,20 +263,20 @@ public:
 				     float *levels,
 				     float *sfc_field,
 				     float *sfc_field_ls,
-				     int in_log, int dpidpis);
+				     int in_log);
   int C_compute_pressures_5100_double(int ni, int nj, int nk, int *ip1_list,
 				      double *levels,
 				      double *sfc_field,
 				      double *sfc_field_ls,
-				      int in_log, int dpidpis);
+				      int in_log);
 
 public:
   template<class FloatPrecision>
-  int C_compute_pressures_5100(int ni, int nj, int nk, int *ip1_list,
-			       FloatPrecision *levels,
-			       FloatPrecision *sfc_field,
-			       FloatPrecision *sfc_field_ls,
-			       int in_log, int dpidpis);
+  int C_compute_pressures_dpidpis_5100(int ni, int nj, int nk, int *ip1_list,
+			               FloatPrecision *levels,
+			               FloatPrecision *sfc_field,
+			               FloatPrecision *sfc_field_ls,
+			               int in_log, int dpidpis);
 private:
   void fstd_subinit();
   void set_table_nj(int nk);
@@ -356,11 +356,11 @@ private:
 // Can these go in the *.cpp, since they are private?
 
 template<class FloatPrecision>
-int vgrid_5100::C_compute_pressures_5100(int ni, int nj, int nk, int *ip1_list,
-					 FloatPrecision *levels,
-					 FloatPrecision *sfc_field,
-					 FloatPrecision *sfc_field_ls,
-					 int in_log, int dpidpis)
+int vgrid_5100::C_compute_pressures_dpidpis_5100(int ni, int nj, int nk, int *ip1_list,
+					         FloatPrecision *levels,
+					         FloatPrecision *sfc_field,
+					         FloatPrecision *sfc_field_ls,
+					         int in_log=0, int dpidpis=0)
 {
   char proc_name[] = "C_compute_pressure_5100";
   double *aa_8, *bb_8, *cc_8, *s_8, *sl_8, lvl;

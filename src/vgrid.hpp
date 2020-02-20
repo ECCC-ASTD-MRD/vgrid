@@ -248,12 +248,12 @@ public:
 				       float *levels,
 				       float *sfc_field,
 				       float *sfc_field_ls,
-				       int in_log, int dpidpis);
+				       int in_log);
   virtual int C_compute_pressures_5100_double(int ni, int nj, int nk, int *ip1_list,
 				       double *levels,
 				       double *sfc_field,
 				       double *sfc_field_ls,
-				       int in_log, int dpidpis);
+				       int in_log);
 
 protected:
   virtual void set_table_nj(int nk) = 0;

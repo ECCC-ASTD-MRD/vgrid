@@ -69,13 +69,13 @@ int Cvgd_diag_withref_2ref_8(int vgdid, int ni, int nj, int nk,
 
 int Cvgd_compute_pressures_5100(int vgdid, int ni, int nj, int nk,
 				int *ip1_list, float *levels, float *sfc_field,
-				float *sfc_field_ls, int in_log, int dpidpis)
+				float *sfc_field_ls, int in_log)
 {
   vgrid *vgd;
   vgd=grid_check.get_grid_keep_tag(vgdid);
   return vgd->C_compute_pressures_5100_float(ni, nj, nk,
                                        ip1_list, levels, sfc_field,
-                                       sfc_field_ls, in_log, dpidpis);
+                                       sfc_field_ls, in_log);
 };
 
 int Cvgd_get_char(int vgdid, char *key, char *my_char, int quiet)
