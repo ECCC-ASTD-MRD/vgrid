@@ -27,8 +27,8 @@ program tests
   
   integer, parameter :: nfile=1
 
-!!$  character(len=4), dimension(nfile) :: vcode_S=(/"5002","5004","5005","5100"/)
-  character(len=1), dimension(nfile) :: vcode_S=(/"5100"/)
+!!$character(len=4), dimension(nfile) :: vcode_S=(/"5002","5004","5005","5100"/)
+  character(len=4),  dimension(nfile) :: vcode_S=(/"5100"/)
 
   logical :: ok=.true.
 
@@ -63,7 +63,8 @@ end program tests
 
 integer function test_dpidpis(F_lu) result(stat)
 
-   use vGrid_Descriptors, only: vgd_new,vgd_get,vgd_dpidpis,VGD_ERROR,VGD_OK
+   use vGrid_Descriptors, only: vgd_new,vgd_get,VGD_ERROR,VGD_OK
+   use vgrid_5100
    
 
    implicit none
@@ -112,7 +113,7 @@ integer function test_dpidpis(F_lu) result(stat)
    !===============
    ! Real interface
    
-   stat = vgd_dpidpis(vgdid,sfc_field=p0,ip1_list=ip1_list,dpidpis=dpidpis_cube)
+   stat = vgd_dpidpis_NewIfc(vgdid,ip1_list,dpidpis_cube,p0,p0)
    if(stat.ne.VGD_OK)then
       print*,'ERROR: problem with vgd_dpidpis real'
       return
@@ -147,42 +148,42 @@ integer function test_dpidpis(F_lu) result(stat)
       endif
    enddo
    
-   !=================
-   ! Real*8 interface
-   
-   stat = vgd_dpidpis(vgdid,sfc_field=p0_8,ip1_list=ip1_list,dpidpis=dpidpis_cube_8)
-   if(stat.ne.VGD_OK)then
-      print*,'ERROR: problem with vgd_dpidpis real(kind=8)'
-      return
-   endif
-   
-   print*,'size(dpidpis_cube_8)',size(dpidpis_cube_8)
-   
-   OK=.true.
-   do k=1,size(coef_b)
-      call convip(ip1_list(k),pres,kind,-1,"",.false.)
-      if(kind.ne.5)cycle
-      stat = fstlir(px,F_lu,ni,nj,nk,-1,'',ip1_list(k),-1,-1,'','PX')
-      if(stat < 0)then
-         print*,'ERROR problem with fstlir on PX for ip1 ->',ip1_list(k)
-         return
-      endif
-      w1=coef_b(k)*px(i0,j0)*100./p0_8(i0,j0)
-      ! Note since px is a real the precision cannot be hier than real
-      if( abs(w1) < 1.E-37)then
-         if ( abs(dpidpis_cube_8(i0,j0,k)) > 1.d0*1.0E-37)then
-            print*,'vgd_dpidpis real(kind=8) do not validate, expect', w1,' got ',dpidpis_cube_8(i0,j0,k)
-            return
-         endif
-      else
-         if(abs(dpidpis_cube_8(i0,j0,k)- w1) > px(i0,j0)*100.d0*epsilon)then
-            print*,'vgd_dpidpis real(kind=8) do not validate, expect', w1,' got ',dpidpis_cube_8(i0,j0,k)
-            return
-         endif
-      endif
-   enddo
-
-   deallocate(ip1_list,dpidpis_cube,dpidpis_cube_8,p0,px,p0_8,coef_b)
+!!$   !=================
+!!$   ! Real*8 interface
+!!$   
+!!$   stat = vgd_dpidpis_NewIfc(vgdid,sfc_field=p0_8,ip1_list=ip1_list,dpidpis=dpidpis_cube_8)
+!!$   if(stat.ne.VGD_OK)then
+!!$      print*,'ERROR: problem with vgd_dpidpis real(kind=8)'
+!!$      return
+!!$   endif
+!!$   
+!!$   print*,'size(dpidpis_cube_8)',size(dpidpis_cube_8)
+!!$   
+!!$   OK=.true.
+!!$   do k=1,size(coef_b)
+!!$      call convip(ip1_list(k),pres,kind,-1,"",.false.)
+!!$      if(kind.ne.5)cycle
+!!$      stat = fstlir(px,F_lu,ni,nj,nk,-1,'',ip1_list(k),-1,-1,'','PX')
+!!$      if(stat < 0)then
+!!$         print*,'ERROR problem with fstlir on PX for ip1 ->',ip1_list(k)
+!!$         return
+!!$      endif
+!!$      w1=coef_b(k)*px(i0,j0)*100./p0_8(i0,j0)
+!!$      ! Note since px is a real the precision cannot be hier than real
+!!$      if( abs(w1) < 1.E-37)then
+!!$         if ( abs(dpidpis_cube_8(i0,j0,k)) > 1.d0*1.0E-37)then
+!!$            print*,'vgd_dpidpis real(kind=8) do not validate, expect', w1,' got ',dpidpis_cube_8(i0,j0,k)
+!!$            return
+!!$         endif
+!!$      else
+!!$         if(abs(dpidpis_cube_8(i0,j0,k)- w1) > px(i0,j0)*100.d0*epsilon)then
+!!$            print*,'vgd_dpidpis real(kind=8) do not validate, expect', w1,' got ',dpidpis_cube_8(i0,j0,k)
+!!$            return
+!!$         endif
+!!$      endif
+!!$   enddo
+!!$
+!!$   deallocate(ip1_list,dpidpis_cube,dpidpis_cube_8,p0,px,p0_8,coef_b)
    
 !   stat=vgd_free(d)
 
