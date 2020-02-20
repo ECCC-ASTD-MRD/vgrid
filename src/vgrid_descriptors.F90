@@ -79,6 +79,10 @@ module vGrid_Descriptors
    public :: vgd_write                           !write coordinates to a file
    public :: vgd_levels                          !compute physical level information
    public :: vgd_dpidpis                         !compute pressure derivative with respesct the sfc pressure
+
+   !! New Interface
+   public :: vgd_compute_pressures_5100
+
    public :: vgd_standard_atmosphere_1976   !Get standard atmosphere 1976 variable for a given coordinate
                                             ! Kept only for backward compatibility with vgrid 6.3
    public :: vgd_stda76                     !Get standard atmosphere 1976 variable for a given coordinate
@@ -127,6 +131,20 @@ module vGrid_Descriptors
          type(c_ptr), value  :: levels_CP
          integer (c_int), value :: ni, nj, nk
       end function f_diag_withref_8
+
+      integer(c_int) function f_compute_pressures_5100(vgdid, ni, nj, nk, ip1_list, &
+                                                       levels, sfc_field, sfc_field_ls, &
+                                                       in_log, dpidpis) &
+                                              bind(c, name='Cvgd_compute_pressures_5100')
+        use iso_c_binding, only: c_ptr, c_int
+        integer (c_int), value :: vgdid
+        integer (c_int), value :: ni, nj, nk
+        type(c_ptr), value :: ip1_list
+        type(c_ptr), value :: levels
+        type(c_ptr), value :: sfc_field
+        type(c_ptr), value :: sfc_field_ls
+        integer (c_int), value :: in_log, dpidpis
+      end function f_compute_pressures_5100
 
       integer(c_int) function f_get_int(vgdid, key, value_CP, quiet) bind(c, name='Cvgd_get_int')
          use iso_c_binding, only: c_ptr, c_char, c_int
@@ -2454,7 +2472,188 @@ contains
 #undef REAL_8
 #undef REAL_KIND
 #undef PROC_SUFF
-  end function levels_withref_prof_8
+   end function levels_withref_prof_8
+
+   integer function vgd_compute_pressures_5100(vgdid, ip1_list, levels, &
+                                               sfc_field, sfc_field_ls, in_log, dpidpis)&
+                                               result(status)
+#undef REAL_8
+#define REAL_KIND 4
+#define PROC_SUFF ""
+     use vgrid_utils, only: get_allocate
+     integer,                                intent(in)           :: vgdid
+     integer, dimension(:),                  intent(in),  target  :: ip1_list
+     real(kind=REAL_KIND), dimension(:,:,:), intent(out), pointer :: levels
+     real(kind=REAL_KIND), dimension(:,:),   intent(in),  target  :: sfc_field
+     real(kind=REAL_KIND), dimension(:,:),   intent(in),  target  :: sfc_field_ls
+     logical, optional,                      intent(in)           :: in_log, dpidpis
+
+     integer ni,nj,nk,error
+     real, dimension(:,:), pointer :: my_sfc_field, my_sfc_field_ls
+     real, dimension(:,:,:), pointer :: my_levels 
+     type (c_ptr) :: ip1_list_CP ,levels_CP ,sfc_field_CP, sfc_field_ls_CP
+     integer :: in_log_int, dpidpis_int
+     logical :: alloc_my_sfc_field_L, alloc_my_sfc_field_ls_L, alloc_my_levels_L
+
+     status = VGD_ERROR
+      
+     ! Set default values      
+     in_log_int = 0
+     if (present(in_log))then
+       if(in_log)then
+         in_log_int = 1
+       else
+         in_log_int = 0
+       endif
+    endif
+      
+    dpidpis_int = 0
+     if (present(dpidpis))then
+       if(dpidpis)then
+         dpidpis_int = 1
+       else
+         dpidpis_int = 0
+       endif
+    endif
+      
+    alloc_my_sfc_field_L    = .false.;
+    alloc_my_sfc_field_ls_L = .false.;
+    alloc_my_levels_L       = .false.
+
+    ni = size(sfc_field,dim=1);
+    nj = size(sfc_field,dim=2);
+    nk = size(ip1_list)
+
+#ifdef WITH_intel
+!   is_contiguous is not Fortran 2008 standard but Intel
+    if(is_contiguous(sfc_field))then
+      my_sfc_field => sfc_field
+
+    else
+#endif
+!     Copy in and out 
+      alloc_my_sfc_field_L = .true.
+      allocate(my_sfc_field(ni,nj),stat=error)
+      if (error /= 0) then
+        write(for_msg,*) 'cannot allocate space for my_sfc_field in vgd_compute_pressures_5100'//PROC_SUFF
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+      endif
+      my_sfc_field(1:ni,1:nj) = sfc_field(1:ni,1:nj)
+
+#ifdef WITH_intel
+    endif 
+#endif
+      
+    if(  ni /= size(sfc_field_ls,dim=1) .or. &
+         nj /= size(sfc_field_ls,dim=2) )then
+      write(for_msg,*) 'reference large scale field is not of same size has reference field'
+      call msg(MSG_ERROR,VGD_PRFX//for_msg)
+      return
+    endif
+
+#ifdef WITH_intel
+!   is_contiguous is not Fortran 2008 standard but Intel
+    if(is_contiguous(sfc_field_ls))then
+      my_sfc_field_ls => sfc_field_ls
+
+    else
+#endif
+!     Copy in and out instead
+      alloc_my_sfc_field_ls_L = .true.
+      allocate(my_sfc_field_ls(ni,nj),stat=error)
+      if (error /= 0) then
+        write(for_msg,*) 'cannot allocate space for my_sfc_field_ls in vgd_compute_pressures_5100'//PROC_SUFF
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+      endif
+      my_sfc_field_ls(1:ni,1:nj) = sfc_field_ls(1:ni,1:nj)
+
+#ifdef WITH_intel
+    endif
+#endif
+
+
+    if (associated(levels)) then
+      if (size(levels,dim=1) /= ni .or. size(levels,dim=2) /= nj .or. size(levels,dim=3) /= nk) then
+        if(ALLOW_RESHAPE)then
+          write(for_msg,*) 'Levels array size error - will be reallocated'
+          call msg(MSG_WARNING,VGD_PRFX//for_msg)
+          deallocate(levels)
+        else
+          write(for_msg,*) 'Levels array size error - will not reallocate since ALLOW_RESHAPE is set to false'
+          call msg(MSG_ERROR,VGD_PRFX//for_msg)
+          return
+        endif
+      endif
+    endif
+
+    if(.not. associated(levels) )then
+      allocate(levels(ni,nj,nk),stat=error)
+      if (error /= 0) then
+        write(for_msg,*) 'cannot allocate space for levels in vgd_compute_pressures_5100'//PROC_SUFF
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+      endif
+    endif
+
+#ifdef WITH_intel
+!   is_contiguous is not Fortran 2008 standard but Intel
+    if(is_contiguous(levels))then
+      my_levels => levels
+
+    else
+#endif
+!     Copy in and out instead
+      alloc_my_levels_L = .true.
+      allocate(my_levels(ni,nj,nk),stat=error)
+      if (error /= 0) then
+        write(for_msg,*) 'cannot allocate space for my_levels in vgd_compute_pressures_5100'//PROC_SUFF
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+        return
+      endif
+
+#ifdef WITH_intel
+    endif
+#endif
+      
+    ip1_list_CP  = c_loc(ip1_list)
+    levels_CP    = c_loc(my_levels(1,1,1))
+    sfc_field_CP = c_loc(my_sfc_field(1,1))
+    sfc_field_ls_CP = c_loc(my_sfc_field_ls(1,1))
+!!#if defined(REAL_8)
+!!    status = f_compute_pressures_5100_8(vgdid,ni,nj,nk,ip1_list_CP,levels_CP, &
+!!                                        sfc_field_CP,sfc_field_ls_CP,in_log_int, &
+!!                                        dpidpis_int)
+!!#else
+    status = f_compute_pressures_5100(vgdid,ni,nj,nk,ip1_list_CP,levels_CP, &
+                                      sfc_field_CP,sfc_field_ls_CP,in_log_int, &
+                                      dpidpis_int)
+!!#endif
+    if (status /= VGD_OK) then
+      if(dpidpis)then
+        write(for_msg,*) 'error computing dpidpis in vgd_compute_pressures_5100'//PROC_SUFF
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+      else
+        write(for_msg,*) 'error computing pressure in vgd_compute_pressures_5100'//PROC_SUFF
+        call msg(MSG_ERROR,VGD_PRFX//for_msg)
+      endif
+      return
+    endif
+
+    if(alloc_my_sfc_field_L)    deallocate(my_sfc_field)
+    if(alloc_my_sfc_field_ls_L) deallocate(my_sfc_field_ls)
+    if(alloc_my_levels_L)then
+      levels(1:ni,1:nj,1:nk) = my_levels(1:ni,1:nj,1:nk)
+      deallocate(my_levels)
+    end if
+      
+    ! Set status and return
+    status = VGD_OK
+    return
+#undef REAL_KIND
+#undef PROC_SUFF
+   end function vgd_compute_pressures_5100
 
   integer function dpidpis_withref_prof(vgdid,ip1_list,dpidpis,sfc_field) result(status)
 #undef REAL_8
