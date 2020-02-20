@@ -7,7 +7,15 @@ module vgrid_5100
 
   interface vgd_dpidpis_NewIfc
     module procedure vgd_compute_dpidpis_5100
-  end interface vgd_dpidpis_NewIfc
+ end interface vgd_dpidpis_NewIfc
+
+ interface vgd_create_from_ab
+    module procedure vgd_create_from_ab_5100
+ end interface vgd_create_from_ab
+
+ interface vgd_create_from_hyb
+    module procedure vgd_create_from_hyb_5100
+ end interface vgd_create_from_hyb
 end module vgrid_5100
 
 
