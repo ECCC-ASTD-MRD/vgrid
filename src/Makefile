@@ -30,7 +30,7 @@ DEFINE = -DFICHSTD98
 	s.cc -c -O $(OPTIMIZ) $(DEFINE) $(CFLAGS) $(SUPP_OPT) $(C_SUPP_OPT) $<
 
 
-OBJECTS = vgrid_utils.o vgrid.o vgrid_subclasses.o vgrid_creators.o vgrid_descriptors.o C_interface.o coat_check.o
+OBJECTS = vgrid_utils.o vgrid.o vgrid_subclasses.o vgrid_creators.o vgrid_descriptors.o C_interface.o coat_check.o vgrid_interfaces.o
 
 # default:
 libvgrid.a: $(OBJECTS)
@@ -53,6 +53,8 @@ vgrid_subclasses.o: vgrid_subclasses.cpp vgrid_subclasses.hpp
 vgrid_creators.o: vgrid_creators.cpp vgrid_creators.hpp
 
 vgrid_descriptors.o: vgrid_descriptors.F90 vgrid_utils.o vgrid_descriptors.hf
+
+vgrid_interfaces.o:  vgrid_interfaces.F90
 
 vgrid_utils.o: vgrid_utils.F90 vgrid_descriptors.hf
 

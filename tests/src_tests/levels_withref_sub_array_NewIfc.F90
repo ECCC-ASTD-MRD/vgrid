@@ -76,9 +76,10 @@ end module mod_levels_withref_sub_array
 !========================================================
 program levels_withref_sub_array_NewIfc
    use Vgrid_descriptors, only:  vgd_new, vgd_get, &
-        vgd_levels, VGD_ERROR, vgd_compute_pressures_5100
+        vgd_levels, VGD_ERROR
    use mod_levels_withref_sub_array, only : test_levels
    use Unit_Testing, only: ut_report
+   use vgrid_5100
    implicit none
    integer, parameter :: lu=10
    integer, parameter :: nmax=1000
@@ -167,7 +168,7 @@ program levels_withref_sub_array_NewIfc
    p0_p => p0(1:l_ni,1:l_nj)
    p0ls_p => p0ls(1:l_ni,1:l_nj)
    levels_p => levels(1:l_ni,1:l_nj,1:G_nk)
-   if( vgd_compute_pressures_5100(vgdid,ip1s,levels_p,p0_p,sfc_field_ls=p0ls_p) == VGD_ERROR)then
+   if( vgd_levels_NewIfc(vgdid,ip1s,levels_p,p0_p,sfc_field_ls=p0ls_p) == VGD_ERROR)then
       call exit(1)
    endif
    if( test_levels(levels_p,l_ni,l_nj,G_nk,liste,infon,lu) == VGD_ERROR)then
@@ -178,7 +179,7 @@ program levels_withref_sub_array_NewIfc
    p0_p => p0(1:1,1:1)
    p0ls_p => p0ls(1:1,1:1)
    levels_p => levels(1:1,1:1,1:G_nk)
-   if( vgd_compute_pressures_5100(vgdid,ip1s,levels_p,p0_p,sfc_field_ls=p0ls_p) == VGD_ERROR)then
+   if( vgd_levels_NewIfc(vgdid,ip1s,levels_p,p0_p,sfc_field_ls=p0ls_p) == VGD_ERROR)then
       call exit(1)
    endif
    if( test_levels(levels_p,1,1,G_nk,liste,infon,lu) == VGD_ERROR)then
@@ -192,7 +193,7 @@ program levels_withref_sub_array_NewIfc
    ! Test mix sub array and array
    deallocate(levels)
    allocate(levels(l_ni,l_nj,G_nk))
-   if( vgd_compute_pressures_5100(vgdid,ip1s,levels,p0_p,sfc_field_ls=p0ls_p) == VGD_ERROR)then
+   if( vgd_levels_NewIfc(vgdid,ip1s,levels,p0_p,sfc_field_ls=p0ls_p) == VGD_ERROR)then
       call exit(1)
    endif
    if( test_levels(levels,l_ni,l_nj,G_nk,liste,infon,lu) == VGD_ERROR)then
@@ -200,7 +201,7 @@ program levels_withref_sub_array_NewIfc
       call exit
    endif   
    wk(1:l_ni,1:l_nj)=p0(1:l_ni,1:l_nj)
-   if( vgd_compute_pressures_5100(vgdid,ip1s,levels,wk,sfc_field_ls=p0ls_p) == VGD_ERROR)then
+   if( vgd_levels_NewIfc(vgdid,ip1s,levels,wk,sfc_field_ls=p0ls_p) == VGD_ERROR)then
       call exit(1)
    endif   
    if( test_levels(levels,l_ni,l_nj,G_nk,liste,infon,lu) == VGD_ERROR)then
@@ -208,7 +209,7 @@ program levels_withref_sub_array_NewIfc
       call exit
    endif
    wk(1:l_ni,1:l_nj)=p0ls(1:l_ni,1:l_nj)
-   if( vgd_compute_pressures_5100(vgdid,ip1s,levels,p0_p,sfc_field_ls=wk) == VGD_ERROR)then
+   if( vgd_levels_NewIfc(vgdid,ip1s,levels,p0_p,sfc_field_ls=wk) == VGD_ERROR)then
       call exit(1)
    endif   
    if( test_levels(levels,l_ni,l_nj,G_nk,liste,infon,lu) == VGD_ERROR)then
