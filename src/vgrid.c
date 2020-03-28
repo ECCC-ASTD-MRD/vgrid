@@ -3598,12 +3598,12 @@ static int C_genab_1003(float *hybuser, int nk, float rcoef, double ptop_8, doub
   return(VGD_OK);
 }
   
-static int C_genab_2001(float *pres, int nk, double **a_m_8, double **b_m_8, int **ip1_m)
+static int C_genab_2001(float *pres, int nk, double **a_m_8, double **b_m_8, int **ip1_m, int old_style_ip1)
 {
 
   // Andre Plante May 2015. 
   char ok = 1;
-  int k;
+  int k, ip1;
   
   if( my_alloc_double(a_m_8, nk, "(Cvgd) ERROR in C_genab_2001, malloc error with a_m_8") == VGD_ERROR )
     return(VGD_ERROR);
@@ -3631,8 +3631,11 @@ static int C_genab_2001(float *pres, int nk, double **a_m_8, double **b_m_8, int
   for ( k = 0; k < nk; k++){
     (*a_m_8)[k] = pres[k] * 100.;
     (*b_m_8)[k] = 0.;
-    // Go back and forth to ip1 in order to make sure pres value is encodable.
-    (*ip1_m)[k] = c_convip_Level2IP(pres[k],2);
+    if(old_style_ip1){
+      (*ip1_m)[k] = c_convip_Level2IP_old_style(pres[k],2);
+    } else {
+      (*ip1_m)[k] = c_convip_Level2IP(pres[k],2);
+    }
   }
 
   return(VGD_OK);
@@ -5648,7 +5651,7 @@ int Cvgd_new_gen2(vgrid_descriptor **self, int kind, int version, float *hyb, in
     nk   = size_hyb;
     nl_m = size_hyb;
     nl_t = -1;
-    if(C_genab_2001(hyb, size_hyb, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
+    if(C_genab_2001(hyb, size_hyb, &a_m_8, &b_m_8, &ip1_m, 0) == VGD_ERROR ) {
       free(a_m_8);
       free(b_m_8);
       free(ip1_m);
@@ -5897,7 +5900,7 @@ static int C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, c
 static int C_gen_legacy_desc(vgrid_descriptor **self, int unit, int *keylist , int nb ){
   
   int *ip1 = NULL;
-  int kind, origkind, k, ni, nj, nk, hy_key, pt_key, e1_key;
+  int kind, origkind, k, ni, nj, nk, hy_key, pt_key, e1_key, old_style_ip1;
   float ptop, rcoef;
   float *hyb = NULL, *hybm = NULL;
   double ptop_8, pref_8;
@@ -5917,6 +5920,12 @@ static int C_gen_legacy_desc(vgrid_descriptor **self, int unit, int *keylist , i
   if( kind != 1 && kind != 2 && kind != 5 ){
     printf("(Cvgd) ERROR: in C_gen_legacy_desc, kind = %d, has to be 1, 2 or 5\n", kind);
     goto bomb;
+  }
+  // Convert back hyb[0] to ip1 old style to find out if var.ip1 is old style
+  old_style_ip1 = 0;
+  if( c_convip_Level2IP_old_style(hyb[0],kind) == var.ip1 ){
+    old_style_ip1 = 1;
+    printf("(Cvgd)   Old style ip1 detected\n");
   }
   origkind=kind;
 
@@ -6015,7 +6024,7 @@ static int C_gen_legacy_desc(vgrid_descriptor **self, int unit, int *keylist , i
     
   } else if ( kind == 2 ){
     printf("(Cvgd)   pressure coordinate found\n");
-    if( C_genab_2001(hyb, nb, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ){
+    if( C_genab_2001(hyb, nb, &a_m_8, &b_m_8, &ip1, old_style_ip1) == VGD_ERROR ){
       goto bomb;
     }
     if( Cvgd_new_build_vert2(self, kind, 1, nb, var.ig1, var.ig2, NULL, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR ){

@@ -40,6 +40,9 @@ program level_withref_5001
   ier=chek_levels_withref('data/2001_from_model_run','')
   if(ier==VGD_ERROR)stat=VGD_ERROR
 
+  ier=chek_levels_withref('data/2001_from_model_run_old_style','')
+  if(ier==VGD_ERROR)stat=VGD_ERROR
+
   ier=chek_levels_withref('data/dm_5001_from_model_run','')
   if(ier==VGD_ERROR)stat=VGD_ERROR
 
