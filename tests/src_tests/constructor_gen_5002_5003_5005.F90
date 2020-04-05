@@ -60,7 +60,6 @@ program constructor
 
   !Use wrong top pressure
 
-if(.false.)then
   print*,'================== EXPECTED ERROR SECTION BEGINGS================='
   print*,'================== EXPECTED ERROR SECTION BEGINGS================='
   print*,'================== EXPECTED ERROR SECTION BEGINGS================='
@@ -84,7 +83,7 @@ if(.false.)then
   print*,'================== EXPECTED ERROR SECTION ENDS  ================='
   print*,'================== EXPECTED ERROR SECTION ENDS  ================='
   call flush(6)
-endif
+
   ! Construct a new set of vertical coordinate descriptors 5002
   stat = vgd_new(vgd,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref,ip1=0)
 
@@ -122,6 +121,14 @@ endif
   stat = test_5002(vgd,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
   print*,'ptop',ptop
+
+  ! Tests option nl_f (number of flat levels at domain top)
+  ! Note that option nl_f is extensively tested in test program c_new_gen_all, here
+  ! we just tests the fortran interface that is the same for all Vcode.
+  stat = vgd_new(vgd,kind=5,version=5,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,ip1=0,nl_f=5)
+  file='data/data_constructor_gen_5005_nl_f_5.txt'
+  stat = test_5002(vgd,file,write_control_L,stat)
+  if(stat.eq.VGD_ERROR)OK=.false.
  
   call ut_report(OK,'Grid_Descriptors::vgd_new vertical generate initializer (5002) value')
 end program constructor
@@ -247,11 +254,17 @@ integer function test_5002(F_d,F_file,F_write_control_L,F_stat) result(istat)
   print*,'Reading B T'
   read(10,*)work_8(1:size(b_t_8))
   do k=1,size(b_t_8)
-     if(abs(work_8(k)-b_t_8(k))/b_t_8(k)>100.*epsilon(1.))then
-        istat=VGD_ERROR
-        print*,'Probleme avec B T, pas dans les limites tollerees'
-        print*,work_8(k),'vs'
-        print*,b_t_8(k)
+     if(b_t_8(k).eq.0.)then
+        if(work_8(k).ne.0.)then
+           print*,'Probleme avec B T, pas egal a zero'
+        endif
+     else
+        if(abs(work_8(k)-b_t_8(k))/b_t_8(k)>100.*epsilon(1.))then
+           istat=VGD_ERROR
+           print*,'Probleme avec B T, pas dans les limites tollerees'
+           print*,work_8(k),'vs'
+           print*,b_t_8(k)
+        endif
      endif
   enddo
 
