@@ -249,12 +249,12 @@ module vGrid_Descriptors
       end function f_new_from_table
 
       integer(c_int) function f_new_gen(vgd,kind,version,hyb_CP,size_hyb,rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP, &
-           ip1,ip2,dhm_CP,dht_CP,dhw_CP,avg) bind(c, name='Cvgd_new_gen2')
+           ip1,ip2,dhm_CP,dht_CP,dhw_CP,avg,nl_f_CP) bind(c, name='Cvgd_new_gen3')
          use iso_c_binding, only : c_ptr, c_int
          type(c_ptr) :: vgd
          integer (c_int), value :: kind, version, size_hyb
          type(c_ptr), value :: hyb_CP,rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP
-         type(c_ptr), value :: dhm_CP,dht_CP,dhw_CP
+         type(c_ptr), value :: dhm_CP,dht_CP,dhw_CP,nl_f_CP
          integer (c_int), value :: ip1,ip2,avg
       end function f_new_gen
       
@@ -497,7 +497,7 @@ contains
       
     end function new_from_table
 
-   integer function new_gen(self,kind,version,hyb,rcoef1,rcoef2,rcoef3,rcoef4,ptop_8,pref_8,ptop_out_8,ip1,ip2,stdout_unit,dhm,dht,dhw,avg_L) result(status)
+   integer function new_gen(self,kind,version,hyb,rcoef1,rcoef2,rcoef3,rcoef4,ptop_8,pref_8,ptop_out_8,ip1,ip2,stdout_unit,dhm,dht,dhw,avg_L,nl_f) result(status)
       implicit none
 
       ! Coordinate constructor - build vertical descriptor from hybrid coordinate entries
@@ -514,12 +514,13 @@ contains
       logical, optional :: avg_L                           !Obtain thermo A, B and C by averaging momentum ones (Temporary for Vcode 5100)
                                                            !   If this option becoms permenant, some code will have to be added
                                                            !   to check this option for vcode 5100 only.
+      integer, target, optional,intent(in) :: nl_f         ! Number of flat levels at domain top
       ! Local variables
       type(c_ptr) :: hyb_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, ptop_8_CP, ptop_out_8_CP, pref_8_CP
-      type(c_ptr) :: stdout_unit_CP, dhm_CP, dht_CP, dhw_CP
+      type(c_ptr) :: stdout_unit_CP, dhm_CP, dht_CP, dhw_CP, nl_f_CP
       integer :: my_ip1, my_ip2, my_avg
       hyb_CP = c_loc(hyb)
-
+      
       status = VGD_ERROR;
       ! Assign optional argument to C_NULL_PTR
       if(present(rcoef1))then
@@ -598,17 +599,22 @@ contains
             my_avg=0
          endif
       endif
+      if(present(nl_f))then
+         nl_f_CP = c_loc(nl_f)
+      else
+         nl_f_CP = C_NULL_PTR
+      endif
       
       if(.not.c_associated(self%cptr))then
          self%cptr = C_NULL_PTR
       endif
 
-      if(f_new_gen(self%cptr,kind,version,hyb_CP,size(hyb),rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP,my_ip1,my_ip2,dhm_CP,dht_CP,dhw_CP,my_avg) == VGD_ERROR)then
+      if(f_new_gen(self%cptr,kind,version,hyb_CP,size(hyb),rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP,my_ip1,my_ip2,dhm_CP,dht_CP,dhw_CP,my_avg,nl_f_CP) == VGD_ERROR)then
          print*,'(F_vgd) ERROR in new_gen, problem with f_new_gen'
          return
       endif
       status = VGD_OK
-   end function new_gen
+    end function new_gen
 
    integer function new_build_vert(self,kind,version,nk,ip1,ip2, &
         ptop_8,pref_8,rcoef1,rcoef2,rcoef3,rcoef4,a_m_8,b_m_8,a_t_8,b_t_8, &
