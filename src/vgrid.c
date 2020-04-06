@@ -864,198 +864,198 @@ int Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip) {
   if(! self ) {
     printf("In Cvgd_print_desc: vgrid structure not constructed\n");
     return(VGD_ERROR);
-  } else {
-    if(! self->valid) {
-      printf("In Cvgd_print_desc: vgrid structure is not valid\n");
-      return(VGD_ERROR);
-    }
-    if(sout != -1 && sout != 6){
-      printf("In Cvgd_print_desc : please implement sout option = %d\n",sout);
-      return(VGD_ERROR);
-    }
-    if(convip == -1){
-      strcpy(pres_S,"");
-    }
-    
-    // Dump general descriptor information
-    printf(" -- Vertical Grid Descriptor Information --\n");
-    printf("   ip1 = %d\n   ip2 = %d\n", self->rec.ip1, self->rec.ip2);
-    printf("-------------------------------------------------------\n");
-    printf(" Vcode = %d\n",self->vcode);
-    printf("   Descriptor Nomvar: %s\n",self->rec.nomvar);
-    printf("   level kind = %d, level version = %d\n", self->kind, self->version);
-    if( is_valid(self, ptop_8_valid) )
-      printf("   ptop=%f Pa\n",self->ptop_8);
-    if( is_valid(self, pref_8_valid) )
-      printf("   pref=%f Pa\n",self->pref_8);
-    if( is_valid(self, rcoef1_valid) )
-      printf("   rcoef1=%f\n",self->rcoef1);
-    if( is_valid(self, rcoef2_valid) )
-      printf("   rcoef2=%f\n",self->rcoef2);
-    if( is_valid(self, rcoef3_valid) && Cvgd_is_valid(self,"ref_namel_valid" ) )
-      printf("   rcoef3=%f\n",self->rcoef3);
-    if( is_valid(self, rcoef4_valid) && Cvgd_is_valid(self,"ref_namel_valid" ) )
-      printf("   rcoef4=%f\n",self->rcoef4);
-    if( Cvgd_is_valid(self,"ref_name_valid") )
-      printf("   Surface field nomvar %s\n",self->ref_name);
-    if( Cvgd_is_valid(self,"ref_namel_valid") )
-      printf("   Surface field nomvar large scale %s\n",self->ref_namel);
-    
-    switch(self->vcode) {
-    case 1:
-      printf("   Number of height levels (momentum/Vertical-Velocity) %d\n",self->nk);
-      printf("   Equation to compute heights z = A \n");
-      break;
-    case 1001:
-      printf("   Number of sigma levels %d\n",self->nk);
-      printf("   Equation to compute hydrostatic pressure (pi): pi = B * P0*100\n");
-      break;
-    case 1002:
-      printf("   Number of eta levels %d\n", self->nl_m );
-      break;
-    case 2001:
-      printf("   Number of pressure levels %d\n", self->nl_m );
-      printf("   Equation to compute hydrostatic pressure (pi): pi = A\n");
-      break;
-    case 1003:
-      printf("   Number of hybrid normalized levels %d\n", self->nl_m );
-      printf("   Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100\n");
-      break;
-    case 4001:
-      printf("   Number of heights levels %d (height with respect to ground level)\n", self->nl_m );
-      printf("   Equation to compute heights (m): h = A\n");
-      break;
-    case 5001:
-      printf("   Number of hybrid levels %d\n", self->nl_m );
-      printf("   Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100\n");
-      break;
-    case 5999: 
-      printf("   Number of hybrid unstaggered levels of unknown origin %d\n", self->nl_m );
-      printf("   Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100\n");
-      break;
-    case 5002:
-    case 5003:
-    case 5004:
-      printf("   Number of hybrid levels (momentum levels) %d\n", self->nl_m-1 );
-      printf("   Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref)\n");
-      break;
-    case 5005:
-      printf("   Number of hybrid levels (momentum/thermo levels) %d\n", self->nl_m-2 );
-      ip1=self->ip1_m[self->nl_m-1];
-      printf("   Diagnostic momentum level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
-      ip1=self->ip1_t[self->nl_t-1];
-      printf("   Diagnostic thermo   level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
-      printf("   Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref)\n");
-      break;
-    case 5100:
-      printf("   Number of hybrid levels (SLEVE momentum/thermo levels) %d\n", self->nl_m-2 );
-      ip1=self->ip1_m[self->nl_m-1];
-      printf("   Diagnostic momentum level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
-      ip1=self->ip1_t[self->nl_t-1];
-      printf("   Diagnostic thermo   level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
-      printf("   Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref) + C * ln(P0LS*100/pref)\n");
-      break;
-    case 21001:
-      if( Cvgd_is_valid(self,"ref_namel_valid") ){
-	printf("   Number of hybrid height levels (Gal-Chen) (SLEVE momentum/thermo levels) %d\n", self->nl_m-2 );
-      } else {
-	printf("   Number of hybrid height levels (Gal-Chen) (momentum/thermo levels) %d\n", self->nl_m-2 );
-      }
-      ip1=self->ip1_m[self->nl_m-1];
-      printf("   Diagnostic momentum level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
-      ip1=self->ip1_t[self->nl_t-1];
-      printf("   Diagnostic thermo   level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
-      if( Cvgd_is_valid(self,"ref_namel_valid") ){
-	printf("   Equation to compute heights z = A + B * ME + C * MELS\n");
-      } else {
-	printf("   Equation to compute heights z = A + B * ME\n");
-      }
-      break;
-    case 21002:
-      if( Cvgd_is_valid(self,"ref_namel_valid") ){
-	printf("   Number of hybrid height levels on Lorenz grid (SLEVE momentum-thermo/vertical-velocity levels) %d\n", self->nl_m-2 );
-      } else {
-	printf("   Number of hybrid height levels on Lorenz grid (momentum-thermo/vertical-velocity levels) %d\n", self->nl_m-2 );
-      }
-      ip1=self->ip1_m[self->nl_m-1];
-      printf("   Diagnostic momentum level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
-      ip1=self->ip1_t[self->nl_t-1];
-      printf("   Diagnostic thermo   level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
-      ip1=self->ip1_w[self->nl_w-1];
-      printf("   Diagnostic Vertical-Velocity level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
-      if( Cvgd_is_valid(self,"ref_namel_valid") ){
-	printf("   Equation to compute heights z = A + B * ME + C * MELS\n");
-      } else {
-	printf("   Equation to compute heights z = A + B * ME\n");
-      }
-      break;
-    default:
-      printf("(Cvgd) ERROR in Cvgd_print_desc, invalid kind or version: kind=%d, version=%d\n",self->kind,self->version);
-      return(VGD_ERROR);
-    }
-
-    if (is_valid(self, ip1_m_valid) ) {
-      printf("   Momentum levels ip1,%s A, B",pres_S);
-      if( is_valid(self, c_m_8_valid) && Cvgd_is_valid(self,"ref_namel_valid" ) ) {
-	printf(", C:\n");
-      }else{
-	printf(":\n");
-      }
-      for ( k = 0; k < self->nl_m; k++) {
-	if(convip != -1){
-	  printf("%12d %-# 25.15G %-# 25.15G %-# 25.15G",self->ip1_m[k],c_convip_IP2Level(self->ip1_m[k],&my_int),self->a_m_8[k],self->b_m_8[k]);
-	} else {
-	  printf("%12d %-# 25.15G %-# 25.15G",self->ip1_m[k],self->a_m_8[k],self->b_m_8[k]);
-	}
-	if( is_valid(self, c_m_8_valid) && Cvgd_is_valid(self,"ref_namel_valid" ) ) {
-	  printf(" %-# 25.15G\n",self->c_m_8[k]);
-	}else{
-	  printf("\n");
-	}
-      }
-    }
-    if (is_valid(self, ip1_t_valid) ) {
-      printf("   Thermodynamic levels ip1,%s A, B",pres_S);
-      if( is_valid(self, c_t_8_valid) && Cvgd_is_valid(self,"ref_namel_valid" ) ) {
-	printf(", C:\n");
-      }else{
-	printf(":\n");
-      }
-      for ( k = 0; k < self->nl_t; k++) {
-	if(convip != -1){
-	  printf("%12d %-# 25.15G %-# 25.15G %-# 25.15G",self->ip1_t[k],c_convip_IP2Level(self->ip1_t[k],&my_int),self->a_t_8[k],self->b_t_8[k]);
-	} else {
-	  printf("%12d %-# 25.15G %-# 25.15G",self->ip1_t[k],self->a_t_8[k],self->b_t_8[k]);
-	}
-	if( is_valid(self, c_t_8_valid) && Cvgd_is_valid(self,"ref_namel_valid" ) ) {
-	  printf(" %-# 25.15G\n",self->c_t_8[k]);
-	}else{
-	  printf("\n");
-	}
-      }
-    }
-    if (is_valid(self, ip1_w_valid) ) {
-      printf("   Vertical-Velocity levels ip1,%s A, B",pres_S);
-      if( is_valid(self, c_w_8_valid) && Cvgd_is_valid(self,"ref_namel_valid") ) {
-	printf(", C:\n");
-      }else{
-	printf(":\n");
-      }
-      for ( k = 0; k < self->nl_w; k++) {
-	if(convip != -1){
-	  printf("%12d %-# 25.15G %-# 25.15G %-# 25.15G",self->ip1_w[k],c_convip_IP2Level(self->ip1_w[k],&my_int),self->a_w_8[k],self->b_w_8[k]);
-	} else {
-	  printf("%12d %-# 25.15G %-# 25.15G",self->ip1_w[k],self->a_w_8[k],self->b_w_8[k]);
-	}
-	if( is_valid(self, c_w_8_valid) && Cvgd_is_valid(self,"ref_namel_valid") ) {
-	  printf(" %-# 25.15G\n",self->c_w_8[k]);
-	}else{
-	  printf("\n");
-	}
-      }
-    }
-    return(VGD_OK);
   }
+  if(! self->valid) {
+    printf("In Cvgd_print_desc: vgrid structure is not valid\n");
+    return(VGD_ERROR);
+  }
+  if(sout != -1 && sout != 6){
+    printf("In Cvgd_print_desc : please implement sout option = %d\n",sout);
+    return(VGD_ERROR);
+  }
+  if(convip == -1){
+    strcpy(pres_S,"");
+  }
+  
+  // Dump general descriptor information
+  printf(" -- Vertical Grid Descriptor Information --\n");
+  printf("   ip1 = %d\n   ip2 = %d\n", self->rec.ip1, self->rec.ip2);
+  printf("-------------------------------------------------------\n");
+  printf(" Vcode = %d\n",self->vcode);
+  printf("   Descriptor Nomvar: %s\n",self->rec.nomvar);
+  printf("   level kind = %d, level version = %d\n", self->kind, self->version);
+  if( is_valid(self, ptop_8_valid) )
+    printf("   ptop=%f Pa\n",self->ptop_8);
+  if( is_valid(self, pref_8_valid) )
+    printf("   pref=%f Pa\n",self->pref_8);
+  if( is_valid(self, rcoef1_valid) )
+    printf("   rcoef1=%f\n",self->rcoef1);
+  if( is_valid(self, rcoef2_valid) )
+    printf("   rcoef2=%f\n",self->rcoef2);
+  if( is_valid(self, rcoef3_valid) && Cvgd_is_valid(self,"ref_namel_valid" ) )
+    printf("   rcoef3=%f\n",self->rcoef3);
+  if( is_valid(self, rcoef4_valid) && Cvgd_is_valid(self,"ref_namel_valid" ) )
+    printf("   rcoef4=%f\n",self->rcoef4);
+  if( Cvgd_is_valid(self,"ref_name_valid") )
+    printf("   Surface field nomvar %s\n",self->ref_name);
+  if( Cvgd_is_valid(self,"ref_namel_valid") )
+    printf("   Surface field nomvar large scale %s\n",self->ref_namel);
+  
+  switch(self->vcode) {
+  case 1:
+    printf("   Number of height levels (momentum/Vertical-Velocity) %d\n",self->nk);
+    printf("   Equation to compute heights z = A \n");
+    break;
+  case 1001:
+    printf("   Number of sigma levels %d\n",self->nk);
+    printf("   Equation to compute hydrostatic pressure (pi): pi = B * P0*100\n");
+    break;
+  case 1002:
+    printf("   Number of eta levels %d\n", self->nl_m );
+    break;
+  case 2001:
+    printf("   Number of pressure levels %d\n", self->nl_m );
+    printf("   Equation to compute hydrostatic pressure (pi): pi = A\n");
+    break;
+  case 1003:
+    printf("   Number of hybrid normalized levels %d\n", self->nl_m );
+    printf("   Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100\n");
+    break;
+  case 4001:
+    printf("   Number of heights levels %d (height with respect to ground level)\n", self->nl_m );
+    printf("   Equation to compute heights (m): h = A\n");
+    break;
+  case 5001:
+    printf("   Number of hybrid levels %d\n", self->nl_m );
+    printf("   Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100\n");
+    break;
+  case 5999: 
+    printf("   Number of hybrid unstaggered levels of unknown origin %d\n", self->nl_m );
+    printf("   Equation to compute hydrostatic pressure (pi): pi = A + B * P0*100\n");
+    break;
+  case 5002:
+  case 5003:
+  case 5004:
+    printf("   Number of hybrid levels (momentum levels) %d\n", self->nl_m-1 );
+    printf("   Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref)\n");
+    break;
+  case 5005:
+    printf("   Number of hybrid levels (momentum/thermo levels) %d\n", self->nl_m-2 );
+    ip1=self->ip1_m[self->nl_m-1];
+    printf("   Diagnostic momentum level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
+    ip1=self->ip1_t[self->nl_t-1];
+    printf("   Diagnostic thermo   level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
+    printf("   Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref)\n");
+    break;
+  case 5100:
+    printf("   Number of hybrid levels (SLEVE momentum/thermo levels) %d\n", self->nl_m-2 );
+    ip1=self->ip1_m[self->nl_m-1];
+    printf("   Diagnostic momentum level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
+    ip1=self->ip1_t[self->nl_t-1];
+    printf("   Diagnostic thermo   level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
+    printf("   Equation to compute hydrostatic pressure (pi): ln(pi) = A + B * ln(P0*100/pref) + C * ln(P0LS*100/pref)\n");
+    break;
+  case 21001:
+    if( Cvgd_is_valid(self,"ref_namel_valid") ){
+      printf("   Number of hybrid height levels (Gal-Chen) (SLEVE momentum/thermo levels) %d\n", self->nl_m-2 );
+    } else {
+      printf("   Number of hybrid height levels (Gal-Chen) (momentum/thermo levels) %d\n", self->nl_m-2 );
+    }
+    ip1=self->ip1_m[self->nl_m-1];
+    printf("   Diagnostic momentum level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
+    ip1=self->ip1_t[self->nl_t-1];
+    printf("   Diagnostic thermo   level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
+    if( Cvgd_is_valid(self,"ref_namel_valid") ){
+      printf("   Equation to compute heights z = A + B * ME + C * MELS\n");
+    } else {
+      printf("   Equation to compute heights z = A + B * ME\n");
+    }
+    break;
+  case 21002:
+    if( Cvgd_is_valid(self,"ref_namel_valid") ){
+      printf("   Number of hybrid height levels on Lorenz grid (SLEVE momentum-thermo/vertical-velocity levels) %d\n", self->nl_m-2 );
+    } else {
+      printf("   Number of hybrid height levels on Lorenz grid (momentum-thermo/vertical-velocity levels) %d\n", self->nl_m-2 );
+    }
+    ip1=self->ip1_m[self->nl_m-1];
+    printf("   Diagnostic momentum level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
+    ip1=self->ip1_t[self->nl_t-1];
+    printf("   Diagnostic thermo   level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
+    ip1=self->ip1_w[self->nl_w-1];
+    printf("   Diagnostic Vertical-Velocity level (ip1=%d) at %f m Above Ground Level\n",ip1,c_convip_IP2Level(ip1,&kind));
+    if( Cvgd_is_valid(self,"ref_namel_valid") ){
+      printf("   Equation to compute heights z = A + B * ME + C * MELS\n");
+    } else {
+      printf("   Equation to compute heights z = A + B * ME\n");
+    }
+    break;
+  default:
+    printf("(Cvgd) ERROR in Cvgd_print_desc, invalid kind or version: kind=%d, version=%d\n",self->kind,self->version);
+    return(VGD_ERROR);
+  }
+  
+  if (is_valid(self, ip1_m_valid) ) {
+    printf("   Momentum levels ip1,%s A, B",pres_S);
+    if( is_valid(self, c_m_8_valid) && Cvgd_is_valid(self,"ref_namel_valid" ) ) {
+      printf(", C:\n");
+    }else{
+      printf(":\n");
+    }
+    for ( k = 0; k < self->nl_m; k++) {
+      if(convip != -1){
+	printf("%12d %-# 25.15G %-# 25.15G %-# 25.15G",self->ip1_m[k],c_convip_IP2Level(self->ip1_m[k],&my_int),self->a_m_8[k],self->b_m_8[k]);
+      } else {
+	printf("%12d %-# 25.15G %-# 25.15G",self->ip1_m[k],self->a_m_8[k],self->b_m_8[k]);
+      }
+      if( is_valid(self, c_m_8_valid) && Cvgd_is_valid(self,"ref_namel_valid" ) ) {
+	printf(" %-# 25.15G\n",self->c_m_8[k]);
+      }else{
+	printf("\n");
+      }
+    }
+  }
+  if (is_valid(self, ip1_t_valid) ) {
+    printf("   Thermodynamic levels ip1,%s A, B",pres_S);
+    if( is_valid(self, c_t_8_valid) && Cvgd_is_valid(self,"ref_namel_valid" ) ) {
+      printf(", C:\n");
+    }else{
+      printf(":\n");
+    }
+    for ( k = 0; k < self->nl_t; k++) {
+      if(convip != -1){
+	printf("%12d %-# 25.15G %-# 25.15G %-# 25.15G",self->ip1_t[k],c_convip_IP2Level(self->ip1_t[k],&my_int),self->a_t_8[k],self->b_t_8[k]);
+      } else {
+	printf("%12d %-# 25.15G %-# 25.15G",self->ip1_t[k],self->a_t_8[k],self->b_t_8[k]);
+      }
+      if( is_valid(self, c_t_8_valid) && Cvgd_is_valid(self,"ref_namel_valid" ) ) {
+	printf(" %-# 25.15G\n",self->c_t_8[k]);
+      }else{
+	printf("\n");
+      }
+    }
+  }
+  if (is_valid(self, ip1_w_valid) ) {
+    printf("   Vertical-Velocity levels ip1,%s A, B",pres_S);
+    if( is_valid(self, c_w_8_valid) && Cvgd_is_valid(self,"ref_namel_valid") ) {
+      printf(", C:\n");
+    }else{
+      printf(":\n");
+    }
+    for ( k = 0; k < self->nl_w; k++) {
+      if(convip != -1){
+	printf("%12d %-# 25.15G %-# 25.15G %-# 25.15G",self->ip1_w[k],c_convip_IP2Level(self->ip1_w[k],&my_int),self->a_w_8[k],self->b_w_8[k]);
+      } else {
+	printf("%12d %-# 25.15G %-# 25.15G",self->ip1_w[k],self->a_w_8[k],self->b_w_8[k]);
+      }
+      if( is_valid(self, c_w_8_valid) && Cvgd_is_valid(self,"ref_namel_valid") ) {
+	printf(" %-# 25.15G\n",self->c_w_8[k]);
+      }else{
+	printf("\n");
+      }
+    }
+  }
+  fflush(stdout);
+  return(VGD_OK);
 }
 
 int Cvgd_print_vcode_description(int vcode){
