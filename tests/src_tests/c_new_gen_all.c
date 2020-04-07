@@ -403,266 +403,9 @@ int check_gen_5002(vgrid_descriptor *vgd){
   return(VGD_OK);
 }
 //========================================================================
-int check_gen_5005(vgrid_descriptor *vgd){
-  int kind, kind2, version, nl, ier, nk, k, ok;
-  int *ip1_m = NULL, nl_f=5;
-  float rc_1, rc_2, *hyb, dhm, dht;
-  double pref_8, ptop_out_8, *b_m_8 = NULL;
-  vgrid_descriptor *vgd2 = NULL;
-
-  if( Cvgd_get_int(vgd,"KIND", &kind, 0) == VGD_ERROR ){
-    return(VGD_ERROR);
-  }
-  if( Cvgd_get_int(vgd,"VERS", &version, 0) == VGD_ERROR ){
-    return(VGD_ERROR);
-  }
-  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nl, 0) == VGD_ERROR ){
-    return(VGD_ERROR);
-  }
-  if( Cvgd_get_double(vgd,"PREF", &pref_8, 0) == VGD_ERROR ){
-    return(VGD_ERROR);
-  }
-  if( Cvgd_get_float(vgd,"RC_1", &rc_1, 0) == VGD_ERROR ){
-    return(VGD_ERROR);
-  }
-  if( Cvgd_get_float(vgd,"RC_2", &rc_2, 0) == VGD_ERROR ){
-    return(VGD_ERROR);
-  }
-  if( Cvgd_get_float(vgd,"DHM ", &dhm, 0) == VGD_ERROR ){
-    return(VGD_ERROR);
-  }
-  if( Cvgd_get_float(vgd,"DHT ", &dht, 0) == VGD_ERROR ){
-    return(VGD_ERROR);
-  }
-  nk = nl - 2;
-  hyb = malloc( nk * sizeof(float) );
-  if(! hyb ){ 
-    printf("ERROR: check_gen_5005, problem allocating hyb\n");
-    return(VGD_ERROR);
-  }
-  for( k=0; k < nk; k++){
-    hyb[k] = c_convip_IP2Level(ip1_m[k], &kind2);
-    //printf("k = %d, hyb[k] = %f\n", k, hyb[k]);
-  }
-  
-  printf("  Testing generic interface\n");
-  if( Cvgd_new_gen(&vgd2, kind, version, hyb, nk, &rc_1, &rc_2, 
-		      NULL, &pref_8, &ptop_out_8, 0, 0, &dhm, &dht, 0) == VGD_ERROR) {
-    return(VGD_ERROR);
-  }
-  // Test equality
-  ier = Cvgd_vgdcmp(vgd, vgd2);
-  if( ier != 0 ){
-    printf("     Descritors not equal, Cvgd_vgdcmp code is %d\n", ier);
-    return(VGD_ERROR);
-  } else {
-    printf("     Descritors are equal.\n");
-  }
-  Cvgd_free(&vgd2);
-
-  printf("  Testing specific interface\n");
-  if( Cvgd_new_gen_5005(&vgd2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, 0, 0, dhm, dht) == VGD_ERROR) {
-    return(VGD_ERROR);
-  }
-  //Test equality
-  ier = Cvgd_vgdcmp(vgd, vgd2);
-  if( ier != 0 ){
-    printf("     Descritors not equal, Cvgd_vgdcmp code is %d\n", ier);
-    return(VGD_ERROR);
-  } else {
-    printf("     Descritors are equal.\n");
-  }
-  Cvgd_free(&vgd2);
-
-  //=================
-  // Test option nl_f
-  //-----------------
-  //Test option nl_f for default value
-  if( Cvgd_new_gen_5005_2(&vgd2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, 0, 0, dhm, dht, 1) == VGD_ERROR) {
-    return(VGD_ERROR);
-  }
-  //Test equality
-  ier = Cvgd_vgdcmp(vgd, vgd2);
-  if( ier != 0 ){
-    printf("     Descritors not equal for option nl_f = 1 on 5005, Cvgd_vgdcmp code is %d\n", ier);
-    return(VGD_ERROR);
-  } else {
-    printf("     Descritors are equal for option nl_f = 1.\n");
-  }
-  Cvgd_free(&vgd2);
-
-  //Test option nl_f out of range
-  printf("    In test c_new_gen_all on 5005, following 4 errors lines on nl_f range are expected\n");
-  if(! Cvgd_new_gen_5005_2(&vgd2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, 0, 0, dhm, dht, 0) == VGD_ERROR) {
-    printf("   ERROR in test c_new_gen_all on 5005, nl_f = 0, out of range but did not get cut\n");   
-    return(VGD_ERROR);
-  }
-  if(! Cvgd_new_gen_5005_2(&vgd2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, 0, 0, dhm, dht, nk+1) == VGD_ERROR) {
-    printf("   ERROR in test c_new_gen_all on 5005, nl_f = nk+1, out of range but did not get cut\n");   
-    return(VGD_ERROR);
-  }
-  
-  //Test option nl_f non default value
-  // Reduce rcoefs otherwise B is zero near the top and test may not be valid.
-  if( Cvgd_new_gen_5005_2(&vgd2, hyb, nk, pref_8, &ptop_out_8, 1, 1, 0, 0, dhm, dht, nl_f) == VGD_ERROR) {
-    return(VGD_ERROR);
-  }
-  // Here we cannot test the equality since we have no control fst file for nl_f != 1.
-  // But we only really care to see if there are nl_f level with B = 0 at domain top.
-  // The code to generate Vcode 5005 is the same for all values og nl_f.
-  // The rest of vgrid functions are the same for 5005 for all value of nl_f too.
-  // Therefore further testing in Vcode 5005 and option nl_f are not riquired.
-  if( Cvgd_get_double_1d(vgd2,"CB_M", &b_m_8, &nk, 0) == VGD_ERROR ){
-    printf("   ERROR in test c_new_gen_all on 5005, getting CB_M");
-    return(VGD_ERROR);
-  }
-  Cvgd_free(&vgd2);
-  ok = 1;
-  for (k=0; k < nl_f; k++){
-    if( b_m_8[k] > epsilon_8 ){
-      printf("    ERROR in test c_new_gen_all on 5005, b_m_8 should be 0.0 for k = %d, got %-# 25.15G\n",k,b_m_8[k]);
-      ok = 0;
-    }
-  }
-  if(! ok){
-    return(VGD_ERROR);
-  }
-  
-  free(hyb);
-  free(ip1_m);
-  Cvgd_free(&vgd2);
-  return(VGD_OK);
-}
-
-//========================================================================
-int check_gen_5100(vgrid_descriptor *vgd){
-  int kind, kind2, version, nl, ier, nk, k, nl_f = 5, ok;
-  int *ip1_m = NULL, *ip1_t = NULL;
-  float rc_1, rc_2, rc_3, rc_4, *hyb, dhm, dht;
-  double pref_8, ptop_out_8, *b_m_8 = NULL;
-  vgrid_descriptor *vgd2 = NULL;
-
-  if( Cvgd_get_int(vgd,"KIND", &kind, 0) == VGD_ERROR ){
-    return(VGD_ERROR);
-  }
-  if( Cvgd_get_int(vgd,"VERS", &version, 0) == VGD_ERROR ){
-    return(VGD_ERROR);
-  }
-  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nl, 0) == VGD_ERROR ){
-    return(VGD_ERROR);
-  }
-  if( Cvgd_get_double(vgd,"PREF", &pref_8, 0) == VGD_ERROR ){
-    return(VGD_ERROR);
-  }
-  if( Cvgd_get_float(vgd,"RC_1", &rc_1, 0) == VGD_ERROR ){
-    return(VGD_ERROR);
-  }
-  if( Cvgd_get_float(vgd,"RC_2", &rc_2, 0) == VGD_ERROR ){
-    return(VGD_ERROR);
-  }
-  if( Cvgd_get_float(vgd,"RC_3", &rc_3, 0) == VGD_ERROR ){
-    return(VGD_ERROR);
-  }
-  if( Cvgd_get_float(vgd,"RC_4", &rc_4, 0) == VGD_ERROR ){
-    return(VGD_ERROR);
-  }
-  if( Cvgd_get_float(vgd,"DHM ", &dhm, 0) == VGD_ERROR ){
-    return(VGD_ERROR);
-  }
-  if( Cvgd_get_float(vgd,"DHT ", &dht, 0) == VGD_ERROR ){
-    return(VGD_ERROR);
-  }
-  nk = nl - 2;
-  hyb = malloc( nk * sizeof(float) );
-  if(! hyb ){ 
-    printf("ERROR: check_gen_5100, problem allocating hyb\n");
-    return(VGD_ERROR);
-  }
-  for( k=0; k < nk; k++){
-    hyb[k] = c_convip_IP2Level(ip1_m[k], &kind2);
-    //printf("k = %d, hyb[k] = %f\n", k, hyb[k]);
-  }
-  // No generic interface for 5100
-  Cvgd_free(&vgd2);
-  printf("  Testing specific interface\n");
-  if( Cvgd_new_gen_5100(&vgd2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, rc_3, rc_4, 0, 0, dhm, dht, 1) == VGD_ERROR) {
-    return(VGD_ERROR);
-  }
-  //Test equality
-  ier = Cvgd_vgdcmp(vgd, vgd2);
-  if( ier != 0 ){
-    printf("     Descritors not equal, Cvgd_vgdcmp code is %d\n", ier);
-    return(VGD_ERROR);
-  } else {
-    printf("     Descritors are equal.\n");
-  }
-  Cvgd_free(&vgd2);
-  
-  //=================
-  // Test nl_f option
-  //-----------------
-  
-  // Test nl_f default for option value
-  if( Cvgd_new_gen_5100_2(&vgd2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, rc_3, rc_4, 0, 0, dhm, dht, 1, 1) == VGD_ERROR) {
-    return(VGD_ERROR);
-  }
-  //Test equality
-  ier = Cvgd_vgdcmp(vgd, vgd2);
-  if( ier != 0 ){
-    printf("     Descritors not equal for option nl_f = 1 on 5100, Cvgd_vgdcmp code is %d\n", ier);
-    return(VGD_ERROR);
-  } else {
-    printf("     Descritors are equal for option nl_f = 1.\n");
-  }
-  Cvgd_free(&vgd2);
-  
-  //Test option nl_f out of range
-  printf("    In test c_new_gen_all on 5100, following 4 errors lines on nl_f range are expected\n");
-  if(! Cvgd_new_gen_5100_2(&vgd2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, rc_3, rc_4, 0, 0, dhm, dht, 1, 0) == VGD_ERROR) {
-    printf("   ERROR in test c_new_gen_all on 5100, nl_f = 0, out of range but did not get cut\n"); 
-    return(VGD_ERROR);
-  }
-  if(! Cvgd_new_gen_5100_2(&vgd2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, rc_3, rc_4, 0, 0, dhm, dht, 1, nk+1) == VGD_ERROR) {
-    printf("   ERROR in test c_new_gen_all on 5100, nl_f = nk+1, out of range but did not get cut\n");
-    return(VGD_ERROR);
-  }
-  
-  //Test option nl_f non default value
-  // Reduce rcoefs otherwise B is zero near the top and test may not be valid.
-  if( Cvgd_new_gen_5100_2(&vgd2, hyb, nk, pref_8, &ptop_out_8, 1, 1, 1, 2, 0, 0, dhm, dht, 1, nl_f) == VGD_ERROR) {
-    return(VGD_ERROR);
-  }
-  // Here we cannot test the equality since we have no control fst file for nl_f != 1.
-  // But we only really care to see if there are nl_f level with B = 0 at domain top.
-  // The code to generate Vcode 5100 is the same for all values og nl_f.
-  // The rest of vgrid functions are the same for 5100 for all value of nl_f too.
-  // Therefore further testing in Vcode 5100 and option nl_f are not riquired.
-  if( Cvgd_get_double_1d(vgd2,"CB_M", &b_m_8, &nk, 0) == VGD_ERROR ){
-    printf("   ERROR in test c_new_gen_all on 5100, getting CB_M");
-    return(VGD_ERROR);
-  }
-  Cvgd_free(&vgd2);
-  ok = 1;
-  for (k=0; k < nl_f; k++){
-    if( b_m_8[k] > epsilon_8 ){
-      ok = 0;
-      printf("    ERROR in test c_new_gen_all on 5100, b_m_8 should be 0.0 for k = %d, got %-# 25.15G\n",k,b_m_8[k]);
-    }
-  }
-  if(! ok){
-    return(VGD_ERROR);
-  }
-  
-  free(hyb);
-  free(ip1_m);
-  free(ip1_t);
-  Cvgd_free(&vgd2);
-  return(VGD_OK);
-}
-//========================================================================
 int check_gen_5005_5100_21001_21002(vgrid_descriptor *vgd, int vcode){
-  int kind, kind2, version, vcode2, nl, ier, nk, k, nl_f = 5, ok;
-  int *ip1_m = NULL, *ip1_t = NULL, high_precision;
+  int kind, kind2, version, vcode2, nl, ier, nk, k, ok;
+  int *ip1_m = NULL, *ip1_t = NULL, high_precision, test_ind=5;
   float rc_1, rc_2, rc_3, rc_4, *hyb, dhm, dht, dhw;
   double pref_8, ptop_out_8, *b_m_8 = NULL;
   vgrid_descriptor *vgd2 = NULL;
@@ -861,21 +604,21 @@ int check_gen_5005_5100_21001_21002(vgrid_descriptor *vgd, int vcode){
     Cvgd_free(&vgd2);
   }
   
-  //=================
-  // Test nl_f option
-  //-----------------    
-  // Test nl_f default for option value
-  printf("  Testing specific interface with default nl_f = 1 for Vcode %d\n", vcode);
+  //=====================
+  // Test hyb_flat option
+  //---------------------   
+  // Reproduce default vgrid but with option for option hyb_flat = hyb[0]
+  printf("  Testing specific interface to reproduce default but we hyb_flat = hyb[0] for Vcode %d\n", vcode);
   high_precision=1;
   switch(vcode) {
   case 5005:
-    if( Cvgd_new_gen_5005_2(&vgd2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, 0, 0, dhm, dht, 1) == VGD_ERROR) {
+    if( Cvgd_new_gen_5005_2(&vgd2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, 0, 0, dhm, dht,hyb[0]) == VGD_ERROR) {
       return(VGD_ERROR);
     }
     break;
     break;
   case 5100:
-    if( Cvgd_new_gen_5100_2(&vgd2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, rc_3, rc_4, 0, 0, dhm, dht, 1, 1) == VGD_ERROR) {
+    if( Cvgd_new_gen_5100_2(&vgd2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, rc_3, rc_4, 0, 0, dhm, dht, 1, hyb[0]) == VGD_ERROR) {
       return(VGD_ERROR);
     }
     break;
@@ -884,7 +627,7 @@ int check_gen_5005_5100_21001_21002(vgrid_descriptor *vgd, int vcode){
     // Small diffence in average hyb to compute thermo levels result is ip1_t
     // that are different for some levels. Therefore at the moment, Vcode 21001
     // cannot successfully be rebuilt.
-    if( Cvgd_new_gen_21001_2(&vgd2, hyb, nk, rc_1, rc_2, rc_3, rc_4, 0, 0, dhm, dht, 1) == VGD_ERROR) {
+    if( Cvgd_new_gen_21001_2(&vgd2, hyb, nk, rc_1, rc_2, rc_3, rc_4, 0, 0, dhm, dht, hyb[0]) == VGD_ERROR) {
       return(VGD_ERROR);
     }
     break;    
@@ -893,12 +636,12 @@ int check_gen_5005_5100_21001_21002(vgrid_descriptor *vgd, int vcode){
     // Small diffence in average hyb to compute vertical velocity levels result is ip1_t
     // that are different for some levels. Therefore at the moment, Vcode 21002
     // cannot successfully be rebuilt.
-    if( Cvgd_new_gen_21002_2(&vgd2, hyb, nk, rc_1, rc_2, rc_3, rc_4, 0, 0, dhm, dht, dhw, 1) == VGD_ERROR) {
+    if( Cvgd_new_gen_21002_2(&vgd2, hyb, nk, rc_1, rc_2, rc_3, rc_4, 0, 0, dhm, dht, dhw, hyb[0]) == VGD_ERROR) {
       return(VGD_ERROR);
     }
     break;        
   default:
-    printf("In test ERROR in check_gen_5005_5100_21001_21002, unsupported Vcode for Test nl_f default for option value %d\n",vcode);
+    printf("In test ERROR in check_gen_5005_5100_21001_21002, unsupported Vcode for Test default hyb_flat for option value %d\n",vcode);
     return(VGD_ERROR);
   }
     
@@ -906,10 +649,10 @@ int check_gen_5005_5100_21001_21002(vgrid_descriptor *vgd, int vcode){
   if(high_precision){
     ier = Cvgd_vgdcmp(vgd, vgd2);
     if( ier != 0 ){
-      printf("     Descritors not equal for option nl_f = 1 on 5100, Cvgd_vgdcmp code is %d\n", ier);
+      printf("     Descriptors not equal in trying to reproduce default with option hyb_float = hyb[0] on %d, Cvgd_vgdcmp code is %d\n", vcode, ier);
       return(VGD_ERROR);
     } else {
-      printf("     Descritors are equal for option nl_f = 1.\n");
+      printf("     Descriptors are equal in reproduce default with option hyb_float = hyb[0]\n");
     }
     Cvgd_free(&vgd2);
   }else{
@@ -927,103 +670,103 @@ int check_gen_5005_5100_21001_21002(vgrid_descriptor *vgd, int vcode){
     Cvgd_free(&vgd2);
   }
   
-  //Test option nl_f out of range
-  printf("  In test c_new_gen_all on Vcode %d, following 4 errors lines on nl_f range are expected\n", vcode);
+  /* //Test option hyb_flat out of range */
+  printf("  In test c_new_gen_all on Vcode %d, following 4 errors lines on hyb_flat range are expected\n", vcode);
   switch(vcode) {
   case 5005:
-    if(! Cvgd_new_gen_5005_2(&vgd2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, 0, 0, dhm, dht, 0) == VGD_ERROR) {
-      printf("   ERROR in test c_new_gen_all on vcode %d, nl_f = 0, out of range but did not get cut\n", vcode);
+    if(Cvgd_new_gen_5005_2(&vgd2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, 0, 0, dhm, dht, hyb[0]*0.99) != VGD_ERROR) {
+      printf("   ERROR in test c_new_gen_all on vcode %d, hyb_flat out of low range but did not get cut\n", vcode);
       return(VGD_ERROR);
     }
-    if(! Cvgd_new_gen_5005_2(&vgd2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, 0, 0, dhm, dht, nk+1) == VGD_ERROR) {
-      printf("   ERROR in test c_new_gen_all on Vcode %d, nl_f = nk+1, out of range but did not get cut\n", vcode);
+    if(Cvgd_new_gen_5005_2(&vgd2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, 0, 0, dhm, dht, hyb[nk-1]*1.01) != VGD_ERROR) {
+      printf("   ERROR in test c_new_gen_all on Vcode %d, hyb_flat out of high range but did not get cut\n", vcode);
       return(VGD_ERROR);
-    }    
+    }
     break;
   case 5100:
-    if(! Cvgd_new_gen_5100_2(&vgd2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, rc_3, rc_4, 0, 0, dhm, dht, 1, 0) == VGD_ERROR) {
-      printf("   ERROR in test c_new_gen_all on vcode %d, nl_f = 0, out of range but did not get cut\n", vcode);
+    if(Cvgd_new_gen_5100_2(&vgd2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, rc_3, rc_4, 0, 0, dhm, dht, 1, hyb[0]*0.99) != VGD_ERROR) {
+      printf("   ERROR in test c_new_gen_all on vcode %d, hyb_flat out of low range but did not get cut\n", vcode);
       return(VGD_ERROR);
     }
-    if(! Cvgd_new_gen_5100_2(&vgd2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, rc_3, rc_4, 0, 0, dhm, dht, 1, nk+1) == VGD_ERROR) {
-      printf("   ERROR in test c_new_gen_all on vcode %d, nl_f = nk+1, out of range but did not get cut\n", vcode);
+    if(Cvgd_new_gen_5100_2(&vgd2, hyb, nk, pref_8, &ptop_out_8, rc_1, rc_2, rc_3, rc_4, 0, 0, dhm, dht, 1, hyb[nk-1]*1.01) != VGD_ERROR) {
+      printf("   ERROR in test c_new_gen_all on vcode %d, hyb_flat out of high range but did not get cut\n", vcode);
       return(VGD_ERROR);
-    }    
+    }
     break;
   case 21001:
-    if(! Cvgd_new_gen_21001_2(&vgd2, hyb, nk, rc_1, rc_2, rc_3, rc_4, 0, 0, dhm, dht, 0) == VGD_ERROR) {
-      printf("   ERROR in test c_new_gen_all on vcode %d, nl_f = 0, out of range but did not get cut\n", vcode);
+    if(Cvgd_new_gen_21001_2(&vgd2, hyb, nk, rc_1, rc_2, rc_3, rc_4, 0, 0, dhm, dht, hyb[0]*1.01) != VGD_ERROR) {
+      printf("   ERROR in test c_new_gen_all on vcode %d, hyb_flat out of high range but did not get cut\n", vcode);
       return(VGD_ERROR);
     }
-    if(! Cvgd_new_gen_21001_2(&vgd2, hyb, nk, rc_1, rc_2, rc_3, rc_4, 0, 0, dhm, dht, nk+1) == VGD_ERROR) {
-      printf("   ERROR in test c_new_gen_all on vcode %d, nl_f = 0, out of range but did not get cut\n", vcode);
+    if(Cvgd_new_gen_21001_2(&vgd2, hyb, nk, rc_1, rc_2, rc_3, rc_4, 0, 0, dhm, dht, hyb[nk-1]*0.99) != VGD_ERROR) {
+      printf("   ERROR in test c_new_gen_all on vcode %d, hyb_flat out of low range but did not get cut\n", vcode);
       return(VGD_ERROR);
     }
     break;
   case 21002:
-    if(! Cvgd_new_gen_21002_2(&vgd2, hyb, nk, rc_1, rc_2, rc_3, rc_4, 0, 0, dhm, dht, dhw, 0) == VGD_ERROR) {
-      printf("   ERROR in test c_new_gen_all on vcode %d, nl_f = 0, out of range but did not get cut\n", vcode);
+    if(Cvgd_new_gen_21002_2(&vgd2, hyb, nk, rc_1, rc_2, rc_3, rc_4, 0, 0, dhm, dht, dhw, hyb[0]*1.01) != VGD_ERROR) {
+      printf("   ERROR in test c_new_gen_all on vcode %d, hyb_flat out of high range but did not get cut\n", vcode);
       return(VGD_ERROR);
     }
-    if(! Cvgd_new_gen_21002_2(&vgd2, hyb, nk, rc_1, rc_2, rc_3, rc_4, 0, 0, dhm, dht, dhw, nk+1) == VGD_ERROR) {
-      printf("   ERROR in test c_new_gen_all on vcode %d, nl_f = 0, out of range but did not get cut\n", vcode);
+    if(Cvgd_new_gen_21002_2(&vgd2, hyb, nk, rc_1, rc_2, rc_3, rc_4, 0, 0, dhm, dht, dhw, hyb[nk-1]*0.99) != VGD_ERROR) {
+      printf("   ERROR in test c_new_gen_all on vcode %d, hyb_flat out of low range but did not get cut\n", vcode);
       return(VGD_ERROR);
     }
-    break; 
+    break;
   default:
-    printf("ERROR in check_gen_5005_5100_21001_21002, unsupported Vcode %d, for Test nl_f out of range \n",vcode);
+    printf("ERROR in check_gen_5005_5100_21001_21002, unsupported Vcode %d, for Test hyb_flat out of range \n",vcode);
     return(VGD_ERROR);
-  }
+ }
 
-  //Test option nl_f non default value
+  //Test option hyb_flat non default value
   // Reduce rcoefs otherwise B is zero near the top and test may not be valid.
-  printf("  Testing option nl_f = %d, just checking if top %d levels have Bm = 0.\n", nl_f, nl_f);
+  printf("  Testing option hyb_flast = hyb[%d-1], just checking if top %d levels have Bm = 0.\n",test_ind,test_ind);
   switch(vcode) {
   case 5005:
-    if( Cvgd_new_gen_5005_2(&vgd2, hyb, nk, pref_8, &ptop_out_8, 1, 2, 0, 0, dhm, dht, nl_f) == VGD_ERROR) {
+    if( Cvgd_new_gen_5005_2(&vgd2, hyb, nk, pref_8, &ptop_out_8, 1, 2, 0, 0, dhm, dht, hyb[test_ind-1]) == VGD_ERROR) {
       return(VGD_ERROR);
     }
     break;
   case 5100:
-    if( Cvgd_new_gen_5100_2(&vgd2, hyb, nk, pref_8, &ptop_out_8, 1, 1, 1, 2, 0, 0, dhm, dht, 1, nl_f) == VGD_ERROR) {
+    if( Cvgd_new_gen_5100_2(&vgd2, hyb, nk, pref_8, &ptop_out_8, 1, 1, 1, 2, 0, 0, dhm, dht, 1, hyb[test_ind-1]) == VGD_ERROR) {
       return(VGD_ERROR);
     }
     break;
   case 21001:
-    if( Cvgd_new_gen_21001_2(&vgd2, hyb, nk, 1, 1, 1, 2, 0, 0, dhm, dht, nl_f) == VGD_ERROR) {
+    if( Cvgd_new_gen_21001_2(&vgd2, hyb, nk, 1, 1, 1, 2, 0, 0, dhm, dht, hyb[test_ind-1]) == VGD_ERROR) {
       return(VGD_ERROR);
     }
     break;
   case 21002:
-    if( Cvgd_new_gen_21002_2(&vgd2, hyb, nk, 1, 1, 1, 2, 0, 0, dhm, dht, dhw, nl_f) == VGD_ERROR) {
+    if( Cvgd_new_gen_21002_2(&vgd2, hyb, nk, 1, 1, 1, 2, 0, 0, dhm, dht, dhw, hyb[test_ind-1]) == VGD_ERROR) {
       return(VGD_ERROR);
     }
     break;
   default:
-    printf("In test ERROR in check_gen_5005_5100_21001_21002, unsupported Vcode %d, for Test nl_f non default value\n",vcode);
+    printf("In test ERROR in check_gen_5005_5100_21001_21002, unsupported Vcode %d, for Test hyb_flat = hyb[%d-1] non default value\n",vcode,test_ind);
     return(VGD_ERROR);
   }
-  // Here we cannot test the equality since we have no control fst file for nl_f != 1.
-  // But we only really care to see if there are nl_f level with B = 0 at domain top.
-  // The code to generate Vcode 5100 is the same for all values og nl_f.
-  // The rest of vgrid functions are the same for 5100 for all value of nl_f too.
-  // Therefore further testing in Vcode 5100 and option nl_f are not riquired.
+  // Here we cannot test the equality since we have no control fst file for hyb_flat = hyb[test_ind-1].
+  // But we only really care to see if there are test_ind level with B = 0 at domain top.
+  // The code to generate Vcode 5100 is the same for all values of hyb_flat.
+  // The rest of vgrid functions are the same for 5100 for all value of hyb_flat too.
+  // Therefore further testing in Vcode 5100 and option hyb_flat are not required.
   if( Cvgd_get_double_1d(vgd2,"CB_M", &b_m_8, &nk, 0) == VGD_ERROR ){
-    printf("   ERROR in test c_new_gen_all on 5100, getting CB_M");
+    printf("   ERROR in test c_new_gen_all on %d, getting CB_M\n", vcode);
     return(VGD_ERROR);
   }
   Cvgd_free(&vgd2);
   ok = 1;
-  for (k=0; k < nl_f; k++){
+  for (k=0; k < test_ind; k++){
     if( b_m_8[k] > epsilon_8 ){
       ok = 0;
-      printf("    ERROR in test c_new_gen_all on 5100, b_m_8 should be 0.0 for k = %d, got %-# 25.15G\n",k,b_m_8[k]);
+      printf("    ERROR in test c_new_gen_all on Vcode %d, b_m_8 should be 0.0 for k = %d, got %-# 25.15G\n",vcode,k,b_m_8[k]);
     }
   }
   if(ok){
-    printf("    Bm is zero for top %d levels\n", nl_f);
+    printf("    Bm is zero for top %d levels\n",test_ind);
   } else {
-    return(VGD_ERROR);    
+    return(VGD_ERROR);
   }
 
   free(hyb);
@@ -1044,7 +787,7 @@ int test_it(char *filename, int ind) {
     printf("ERROR with c_fnom on iun, file %s\n", filename);
     return(VGD_ERROR);
   }
-  ier = c_fstouv(iun,"RND","");  
+  ier = c_fstouv(iun,"RND","");
   if( ier < 0 ) {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
     return(VGD_ERROR);
@@ -1081,11 +824,6 @@ int test_it(char *filename, int ind) {
       return(VGD_ERROR);
     }
     break;
-  /* case 5005: */
-  /*   if( check_gen_5005(vgd) == VGD_ERROR){ */
-  /*     return(VGD_ERROR); */
-  /*   } */
-  /*   break; */
   case 5005:
   case 5100:
   case 21001:
@@ -1093,11 +831,11 @@ int test_it(char *filename, int ind) {
     if( check_gen_5005_5100_21001_21002(vgd, vcode) == VGD_ERROR){
       return(VGD_ERROR);
     }
-    break;    
+    break;
   default:
     printf("In test ERROR unsupported Vcode %d\n",vcode);
     return(VGD_ERROR);
-  }	
+  }
   Cvgd_free(&vgd);
   return(VGD_OK);
 }

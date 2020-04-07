@@ -122,10 +122,10 @@ program constructor
   if(stat.eq.VGD_ERROR)OK=.false.
   print*,'ptop',ptop
 
-  ! Tests option nl_f (number of flat levels at domain top)
-  ! Note that option nl_f is extensively tested in test program c_new_gen_all, here
+  ! Tests option hyb_flat (flat levels at domain top at or above hyb_flat)
+  ! Note that option hyb_flat is extensively tested in test program c_new_gen_all, here
   ! we just tests the fortran interface that is the same for all Vcode.
-  stat = vgd_new(vgd,kind=5,version=5,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,ip1=0,nl_f=5)
+  stat = vgd_new(vgd,kind=5,version=5,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,ip1=0,hyb_flat=hyb(5))
   file='data/data_constructor_gen_5005_nl_f_5.txt'
   stat = test_5002(vgd,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
