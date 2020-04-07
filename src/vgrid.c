@@ -4057,7 +4057,7 @@ static int C_genab_5004(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoe
 
 }
 
-static int c_vgrid_genab_5005(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double **ptop_out_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t, float dhm, float dht, int nl_f)
+static int c_vgrid_genab_5005(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, double **ptop_out_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, int **PP_ip1_t, float dhm, float dht, float hyb_flat)
 {
   // Andre Plante May 2015.
 
@@ -4111,8 +4111,12 @@ static int c_vgrid_genab_5005(float *hybuser, int nk, int *nl_m, int *nl_t, floa
   b_t_8 = *PP_b_t_8;
   ip1_t = *PP_ip1_t;
 
-  if( nl_f < 1 || nl_f > nk){
-    printf("(Cvgd) ERROR in c_vgrid_genab_5005: nl_f must be between 1 and %d, got %d\n", nk, nl_f);
+  if( hyb_flat < 0. ){
+    // Default value for hyb_flat
+    hyb_flat = hybuser[0];
+  } else if ( hyb_flat < hybuser[0] || hyb_flat > hybuser[nk-1] ){
+      printf("(Cvgd) ERROR in c_vgrid_genab_5005: hyb_flat must be between %f and %f, got %f\n",
+	     hybuser[0], hybuser[nk-1], hyb_flat);
     return(VGD_ERROR);  
   }
   // Auto compute ptop
@@ -4150,7 +4154,7 @@ static int c_vgrid_genab_5005(float *hybuser, int nk, int *nl_m, int *nl_t, floa
   }
 
   // Momentum levels
-  zetau_8 = zsrf_8 + log(hybuser[nl_f-1]);
+  zetau_8 = zsrf_8 + log(hyb_flat);
   pr1 = 1. / (zsrf_8 - zetau_8);
   for( k = 0; k < nk; k++ ) {
     zeta_8  = zsrf_8 + log(hybuser[k]);
@@ -4204,7 +4208,7 @@ static int c_vgrid_genab_5005(float *hybuser, int nk, int *nl_m, int *nl_t, floa
 
 }
 
-static int c_vgrid_genab_5100(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **ptop_out_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, float dhm, float dht, int avg, int nl_f)
+static int c_vgrid_genab_5100(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **ptop_out_8, double pref_8, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, float dhm, float dht, int avg, float hyb_flat)
 {
   // Andre Plante Sept 2017.
 
@@ -4270,15 +4274,19 @@ static int c_vgrid_genab_5100(float *hybuser, int nk, int *nl_m, int *nl_t, floa
   c_t_8 = *PP_c_t_8;
   ip1_t = *PP_ip1_t;
 
-  if( nl_f < 1 || nl_f > nk){
-    printf("(Cvgd) ERROR in c_vgrid_genab_5100: nl_f must be between 1 and %d, got %d\n", nk, nl_f);
+  if( hyb_flat < 0. ){
+    // Default value for hyb_flat
+    hyb_flat = hybuser[0];
+  } else if ( hyb_flat < hybuser[0] || hyb_flat > hybuser[nk-1] ){
+      printf("(Cvgd) ERROR in c_vgrid_genab_5100: hyb_flat must be between %f and %f, got %f\n",
+	     hybuser[0], hybuser[nk-1], hyb_flat);
     return(VGD_ERROR);  
-  }  
+  }
   
   zsrf_8  = log(pref_8);
   
   // Auto compute ptop and make B(0) = 0
-  zetau_8 = zsrf_8 + log(hybuser[nl_f-1]);
+  zetau_8 = zsrf_8 + log(hyb_flat);
   zetaN_8 = zsrf_8 + log(hybuser[nk-1]);
   ztop_8  = 0.5 * ( 3. * (zsrf_8 + log(hybuser[0])) - (zsrf_8 + log(hybuser[1])) );
   (**ptop_out_8) = exp(ztop_8);
@@ -4394,7 +4402,7 @@ static int c_vgrid_genab_5100(float *hybuser, int nk, int *nl_m, int *nl_t, floa
   return(VGD_OK);
 
 }
-static int c_vgrid_genab_21001(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, float dhm, float dht, int nl_f)
+static int c_vgrid_genab_21001(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, float dhm, float dht, float hyb_flat)
 {
   // Andre Plante Nov 2017.
   // Define local pointers pointing to "pointer to pointer" to simplify equation below
@@ -4474,8 +4482,12 @@ static int c_vgrid_genab_21001(float *hybuser, int nk, int *nl_m, int *nl_t, flo
   c_t_8 = *PP_c_t_8;
   ip1_t = *PP_ip1_t;
 
-  if( nl_f < 1 || nl_f > nk){
-    printf("(Cvgd) ERROR in c_vgrid_genab_21001: nl_f must be between 1 and %d, got %d\n", nk, nl_f);
+  if( hyb_flat < 0. ){
+    // Default value for hyb_flat
+    hyb_flat = hybuser[0];
+  } else if ( hyb_flat < hybuser[nk-1] || hyb_flat > hybuser[0] ){
+    printf("(Cvgd) ERROR in c_vgrid_genab_21001: hyb_flat must be between %f and %f, got %f\n",
+	   hybuser[nk-1], hybuser[0], hyb_flat);
     return(VGD_ERROR);  
   }
   
@@ -4500,9 +4512,9 @@ static int c_vgrid_genab_21001(float *hybuser, int nk, int *nl_m, int *nl_t, flo
   }
   //Momentum levels
   // Note: hybuser at surface in not in the list but we know it is zero
-  pr1 = 1. / hybuser[nl_f-1];
+  pr1 = 1. / hyb_flat;
   for( k = 0; k < nk; k++ ){
-    lamda_8 = ( hybuser[nl_f-1] - hybuser[k] ) * pr1;
+    lamda_8 = ( hyb_flat - hybuser[k] ) * pr1;
     if(lamda_8 < 0.){
       lamda_8 = 0;
     }
@@ -4571,7 +4583,7 @@ static int c_vgrid_genab_21001(float *hybuser, int nk, int *nl_m, int *nl_t, flo
 
 }
 
-static int c_vgrid_genab_21002(float *hybuser, int nk, int *nl_m, int *nl_t, int *nl_w, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, double **PP_a_w_8, double **PP_b_w_8, double **PP_c_w_8, int **PP_ip1_w, float dhm, float dht, float dhw, int nl_f)
+static int c_vgrid_genab_21002(float *hybuser, int nk, int *nl_m, int *nl_t, int *nl_w, float rcoef1, float rcoef2, float rcoef3, float rcoef4, double **PP_a_m_8, double **PP_b_m_8, double **PP_c_m_8, int **PP_ip1_m, double **PP_a_t_8, double **PP_b_t_8, double **PP_c_t_8, int **PP_ip1_t, double **PP_a_w_8, double **PP_b_w_8, double **PP_c_w_8, int **PP_ip1_w, float dhm, float dht, float dhw, float hyb_flat)
 {
   // Andre Plante Jan 2018.
   // Note: momentum and thermo levels are the same except for the diag level. We define a complet set for both for simplicity.
@@ -4582,7 +4594,7 @@ static int c_vgrid_genab_21002(float *hybuser, int nk, int *nl_m, int *nl_t, int
   int k;
   float rcoef, my_rcoef3, my_rcoef4, hybm[nk+2], hybw[nk+2];
   double lamda_8, pr1;
-
+  
   //Check monotonicity
   for ( k = 1; k < nk; k++){
     if(hybuser[k] >= hybuser[k-1]){
@@ -4677,8 +4689,12 @@ static int c_vgrid_genab_21002(float *hybuser, int nk, int *nl_m, int *nl_t, int
   c_w_8 = *PP_c_w_8;
   ip1_w = *PP_ip1_w;
 
-  if( nl_f < 1 || nl_f > nk){
-    printf("(Cvgd) ERROR in c_vgrid_genab_21001: nl_f must be between 1 and %d, got %d\n", nk, nl_f);
+  if( hyb_flat < 0. ){
+    // Default value for hyb_flat
+    hyb_flat = hybuser[0];
+  } else if ( hyb_flat < hybuser[nk-1] || hyb_flat > hybuser[0] ){
+      printf("(Cvgd) ERROR in c_vgrid_genab_21002: hyb_flat must be between %f and %f, got %f\n",
+	     hybuser[nk-1], hybuser[0], hyb_flat);
     return(VGD_ERROR);  
   }
 
@@ -4704,9 +4720,9 @@ static int c_vgrid_genab_21002(float *hybuser, int nk, int *nl_m, int *nl_t, int
 
   //Momentum levels
   // Note: hybuser at surface in not in the list but we know it is zero
-  pr1 = 1. / hybuser[nl_f-1];
+  pr1 = 1. / hyb_flat;
   for( k = 0; k < nk; k++ ){
-    lamda_8 = ( hybuser[nl_f-1] - hybuser[k] ) * pr1;
+    lamda_8 = ( hyb_flat - hybuser[k] ) * pr1;
     if(lamda_8 < 0.){
       lamda_8 = 0.;
     }
@@ -5568,9 +5584,9 @@ int Cvgd_new_gen_5005(vgrid_descriptor **self, float *hyb, int size_hyb, double 
   return(VGD_OK);
 }
 
-int Cvgd_new_gen_5005_2(vgrid_descriptor **self, float *hyb, int size_hyb, double pref_8, double *ptop_out_8, float rcoef1, float rcoef2, int ip1, int ip2, float dhm, float dht, int nl_f) {
+int Cvgd_new_gen_5005_2(vgrid_descriptor **self, float *hyb, int size_hyb, double pref_8, double *ptop_out_8, float rcoef1, float rcoef2, int ip1, int ip2, float dhm, float dht, float hyb_flat) {
   if( Cvgd_new_gen3(self, 5, 5, hyb, size_hyb, &rcoef1, &rcoef2, NULL, NULL,
-		    NULL, &pref_8, ptop_out_8, ip1, ip2, &dhm, &dht, NULL, 0, &nl_f) == VGD_ERROR ){
+		    NULL, &pref_8, ptop_out_8, ip1, ip2, &dhm, &dht, NULL, 0, &hyb_flat) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen_5005_2, see details above\n");
     return(VGD_ERROR);
   }
@@ -5586,9 +5602,9 @@ int Cvgd_new_gen_5100(vgrid_descriptor **self, float *hyb, int size_hyb, double 
   return(VGD_OK);
 }
 
-int Cvgd_new_gen_5100_2(vgrid_descriptor **self, float *hyb, int size_hyb, double pref_8, double *ptop_out_8, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, int avg, int nl_f) {
+int Cvgd_new_gen_5100_2(vgrid_descriptor **self, float *hyb, int size_hyb, double pref_8, double *ptop_out_8, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, int avg, float hyb_flat) {
   if( Cvgd_new_gen3(self, 5, 100, hyb, size_hyb, &rcoef1, &rcoef2,  &rcoef3, &rcoef4,
-		    NULL, &pref_8, ptop_out_8, ip1, ip2, &dhm, &dht, NULL, avg, &nl_f) == VGD_ERROR ){
+		    NULL, &pref_8, ptop_out_8, ip1, ip2, &dhm, &dht, NULL, avg, &hyb_flat) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen_5100_2, see details above\n");
     return(VGD_ERROR);
   }
@@ -5604,9 +5620,9 @@ int Cvgd_new_gen_21001(vgrid_descriptor **self, float *hyb, int size_hyb, float 
   return(VGD_OK);
 }
 
-int Cvgd_new_gen_21001_2(vgrid_descriptor **self, float *hyb, int size_hyb, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, int nl_f) {
+int Cvgd_new_gen_21001_2(vgrid_descriptor **self, float *hyb, int size_hyb, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, float hyb_flat) {
   if( Cvgd_new_gen3(self, 21, 1, hyb, size_hyb, &rcoef1, &rcoef2, &rcoef3, &rcoef4,
-		    NULL, NULL, NULL, ip1, ip2, &dhm, &dht, NULL, 0, &nl_f) == VGD_ERROR ){
+		    NULL, NULL, NULL, ip1, ip2, &dhm, &dht, NULL, 0, &hyb_flat) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen_21001_2, see details above\n");
     return(VGD_ERROR);
   }
@@ -5622,9 +5638,9 @@ int Cvgd_new_gen_21002(vgrid_descriptor **self, float *hyb, int size_hyb, float 
   return(VGD_OK);
 }
 
-int Cvgd_new_gen_21002_2(vgrid_descriptor **self, float *hyb, int size_hyb, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, float dhw, int nl_f) {
+int Cvgd_new_gen_21002_2(vgrid_descriptor **self, float *hyb, int size_hyb, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, float dhw, float hyb_flat) {
   if( Cvgd_new_gen3(self, 21, 2, hyb, size_hyb, &rcoef1, &rcoef2, &rcoef3, &rcoef4,
-		    NULL, NULL, NULL, ip1, ip2, &dhm, &dht, &dhw, 0, &nl_f) == VGD_ERROR ){
+		    NULL, NULL, NULL, ip1, ip2, &dhm, &dht, &dhw, 0, &hyb_flat) == VGD_ERROR ){
     printf("(Cvgd) ERROR in Cvgd_new_gen_21002_2, see details above\n");
     return(VGD_ERROR);
   }
@@ -5633,11 +5649,11 @@ int Cvgd_new_gen_21002_2(vgrid_descriptor **self, float *hyb, int size_hyb, floa
 
 int Cvgd_new_gen3(vgrid_descriptor **self, int kind, int version, float *hyb, int size_hyb, float *rcoef1, float *rcoef2, float *rcoef3, float *rcoef4,
 	      double *ptop_8, double *pref_8, double *ptop_out_8,
-	      int ip1, int ip2, float *dhm, float *dht, float *dhw, int avg, int *nl_f){
+	      int ip1, int ip2, float *dhm, float *dht, float *dhw, int avg, float *hyb_flat){
 
-  float *l_rcoef3 = NULL, *l_rcoef4 = NULL, minus_one = -1.;
+  float *l_rcoef3 = NULL, *l_rcoef4 = NULL, minus_one = -1., l_hyb_flat;
   double *a_m_8 = NULL, *b_m_8 = NULL, *c_m_8 = NULL, *a_t_8 = NULL, *b_t_8 = NULL, *c_t_8 = NULL, *a_w_8 = NULL, *b_w_8 = NULL, *c_w_8 = NULL;
-  int *ip1_m = NULL, *ip1_t = NULL, *ip1_w = NULL, tlift, OKInput, l_nl_f;
+  int *ip1_m = NULL, *ip1_t = NULL, *ip1_w = NULL, tlift, OKInput;
 
   if(*self){
     Cvgd_free(self);
@@ -5697,10 +5713,10 @@ int Cvgd_new_gen3(vgrid_descriptor **self, int kind, int version, float *hyb, in
     return(VGD_ERROR);
   }
   int nk = -1, nl_m = -1, nl_t = -1, nl_w = -1;
-  if(nl_f){
-    l_nl_f = *nl_f;
+  if(hyb_flat){
+    l_hyb_flat = *hyb_flat;
   } else {
-    l_nl_f = 1;
+    l_hyb_flat = -1;
   }
 
   switch((*self)->vcode) {
@@ -5807,7 +5823,7 @@ int Cvgd_new_gen3(vgrid_descriptor **self, int kind, int version, float *hyb, in
      break;
   case 5005:
     nk   = size_hyb;
-    if(c_vgrid_genab_5005(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, &ptop_out_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t, *dhm, *dht, l_nl_f) == VGD_ERROR ) {
+    if(c_vgrid_genab_5005(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, &ptop_out_8, *pref_8, &a_m_8, &b_m_8, &ip1_m, &a_t_8, &b_t_8, &ip1_t, *dhm, *dht, l_hyb_flat) == VGD_ERROR ) {
       free(a_m_8);
       free(b_m_8);
       free(ip1_m);
@@ -5820,7 +5836,7 @@ int Cvgd_new_gen3(vgrid_descriptor **self, int kind, int version, float *hyb, in
     break;
   case 5100:
     nk   = size_hyb;
-    if(c_vgrid_genab_5100(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *l_rcoef3, *l_rcoef4, &ptop_out_8, *pref_8, &a_m_8, &b_m_8, &c_m_8, &ip1_m, &a_t_8, &b_t_8, &c_t_8, &ip1_t, *dhm, *dht, avg, l_nl_f) == VGD_ERROR ) {
+    if(c_vgrid_genab_5100(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *l_rcoef3, *l_rcoef4, &ptop_out_8, *pref_8, &a_m_8, &b_m_8, &c_m_8, &ip1_m, &a_t_8, &b_t_8, &c_t_8, &ip1_t, *dhm, *dht, avg, l_hyb_flat) == VGD_ERROR ) {
       free(a_m_8);
       free(b_m_8);
       free(c_m_8);
@@ -5835,7 +5851,7 @@ int Cvgd_new_gen3(vgrid_descriptor **self, int kind, int version, float *hyb, in
     break;
   case 21001:
     nk   = size_hyb;
-    if(c_vgrid_genab_21001(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *l_rcoef3, *l_rcoef4, &a_m_8, &b_m_8, &c_m_8, &ip1_m, &a_t_8, &b_t_8, &c_t_8, &ip1_t, *dhm, *dht, l_nl_f) == VGD_ERROR ) {
+    if(c_vgrid_genab_21001(hyb, size_hyb, &nl_m, &nl_t, *rcoef1, *rcoef2, *l_rcoef3, *l_rcoef4, &a_m_8, &b_m_8, &c_m_8, &ip1_m, &a_t_8, &b_t_8, &c_t_8, &ip1_t, *dhm, *dht, l_hyb_flat) == VGD_ERROR ) {
       free(a_m_8);
       free(b_m_8);
       free(c_m_8);
@@ -5849,7 +5865,7 @@ int Cvgd_new_gen3(vgrid_descriptor **self, int kind, int version, float *hyb, in
     break;
   case 21002:
     nk   = size_hyb;    
-    if(c_vgrid_genab_21002(hyb, size_hyb, &nl_m, &nl_t, &nl_w, *rcoef1, *rcoef2, *l_rcoef3, *l_rcoef4, &a_m_8, &b_m_8, &c_m_8, &ip1_m, &a_t_8, &b_t_8, &c_t_8, &ip1_t, &a_w_8, &b_w_8, &c_w_8, &ip1_w, *dhm, *dht, *dhw, l_nl_f) == VGD_ERROR ) {
+    if(c_vgrid_genab_21002(hyb, size_hyb, &nl_m, &nl_t, &nl_w, *rcoef1, *rcoef2, *l_rcoef3, *l_rcoef4, &a_m_8, &b_m_8, &c_m_8, &ip1_m, &a_t_8, &b_t_8, &c_t_8, &ip1_t, &a_w_8, &b_w_8, &c_w_8, &ip1_w, *dhm, *dht, *dhw, l_hyb_flat) == VGD_ERROR ) {
       free(a_m_8);
       free(b_m_8);
       free(c_m_8);
@@ -6009,9 +6025,10 @@ static int C_gen_legacy_desc(vgrid_descriptor **self, int unit, int *keylist , i
   }
   // Convert back hyb[0] to ip1 old style to find out if var.ip1 is old style
   old_style_ip1 = 0;
-  if( c_convip_Level2IP_old_style(hyb[0],kind) == var.ip1 ){
-    old_style_ip1 = 1;
-    printf("(Cvgd)   Old style ip1 detected\n");
+  if( kind != 5 ){
+    if( c_convip_Level2IP_old_style(hyb[0],kind) == var.ip1 ){
+      old_style_ip1 = 1;
+    }
   }
   origkind=kind;
 
