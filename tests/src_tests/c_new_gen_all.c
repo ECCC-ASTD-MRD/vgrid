@@ -480,10 +480,18 @@ int check_gen_5005_5100_21001_21002(vgrid_descriptor *vgd, int vcode){
 		     NULL, &pref_8, &ptop_out_8, 0, 0, &dhm, &dht, 0) == VGD_ERROR) {
       return(VGD_ERROR);
     }
+    if( abs(ptop_out_8 - 5.611828)/5.611828 > 1.e-4){
+      printf("   Error with ptop_out_8 for Vcode %d\n", vcode);
+      return(VGD_ERROR);
+    }
     break;
   case 5100:
     if( Cvgd_new_gen2(&vgd2, kind, version, hyb, nk, &rc_1, &rc_2, &rc_3, &rc_4,
 		      NULL, &pref_8, &ptop_out_8, 0, 0, &dhm, &dht, NULL, 1) ){
+      return(VGD_ERROR);
+    }
+    if( abs(ptop_out_8 - 5.611828)/5.611828 > 1.e-4){
+      printf("   Error with ptop_out_8 for Vcode %d\n", vcode);
       return(VGD_ERROR);
     }
     break;
