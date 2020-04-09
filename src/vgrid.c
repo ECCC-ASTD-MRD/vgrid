@@ -4120,9 +4120,9 @@ static int c_vgrid_genab_5005(float *hybuser, int nk, int *nl_m, int *nl_t, floa
     return(VGD_ERROR);  
   }
   // Auto compute ptop
+  zsrf_8  = log(pref_8);
   ztop_8  = 0.5 * ( 3.*(zsrf_8 + log(hybuser[0])) - (zsrf_8 + log(hybuser[1])) );
   (**ptop_out_8) = exp(ztop_8);
-  zsrf_8  = log(pref_8);
   
   // Checking vertical layering
 
