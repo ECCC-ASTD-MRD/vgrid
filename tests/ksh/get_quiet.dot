@@ -1,9 +1,0 @@
-# Remove some known polluting characters string
-rm -f tempo
-grep -v 'label 1,idate2:' ${test}.out > tempo
-mv tempo ${test}.out
-
-if ! diff ${test}.out data_$(uname -s)/TXT/${test}_${COMP_ARCH}.out > /dev/null 2>&1;then
-   result_o=' notok'
-   echo "   These files should be the same: ${test}.out data_$(uname -s)/TXT/${test}_${COMP_ARCH}.out"
-fi

@@ -1,0 +1,9 @@
+module unload intel/19.0.3.199
+module load intel/19.0.5.281
+module load craype-hugepages4M
+. ./rmncodetools_vers.dot
+. r.load.dot rpn/code-tools/$CODETOOL_vers
+. r.load.dot rpn/libs/$RMNLIB_vers
+. r.load.dot rpn/utils/$RMNLIB_vers
+unset CODETOOL_vers
+unset RMNLIB_vers
