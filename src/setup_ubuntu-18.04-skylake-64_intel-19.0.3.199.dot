@@ -1,0 +1,7 @@
+. r.load.dot comm/eccc/all/opt/intelcomp/intelpsxe-cluster-19.0.3.199
+. ./rmncodetools_vers.dot
+. r.load.dot rpn/code-tools/$CODETOOL_vers
+. r.load.dot rpn/libs/$RMNLIB_vers
+. r.load.dot rpn/utils/$RMNLIB_vers
+unset CODETOOL_vers
+unset RMNLIB_vers
