@@ -1,7 +1,0 @@
-vname=$(echo ${__swname} | tr "[:lower:]" "[:upper:]")_VERSION
-if [[ -n "$(eval echo \$$vname)" && x$(eval echo \$$vname) != x${__version} ]] ; then
-   echo "You already have a version of vgrid loaded, using two versions at the same time may cause problems"
-fi
-
-export ${vname}=${__version}
-unset __version

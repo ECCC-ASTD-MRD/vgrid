@@ -1,0 +1,7 @@
+if [ -d "${VGRID_WORKDIR}" ];then
+  rm -rf ${VGRID_WORKDIR}
+fi
+
+mkdir -p ${VGRID_WORKDIR}; cd ${VGRID_WORKDIR}
+
+git clone ${VGRID_GIT_REPOSITORY} -b ${VGRID_GIT_REFERENCE}

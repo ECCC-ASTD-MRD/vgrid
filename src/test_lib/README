@@ -1,0 +1,28 @@
+To run the tests:
+
+1) Setup the environment and make sure you have created the libvgrid.a
+in src:
+. setup_{arch+compiler}.dot
+make clean
+make genlib
+
+2) cd test_lib; make clean
+
+3) Compile and run all the tests 
+./testlibvgrid.sh
+
+All tests must Succeeded
+
+All tests done in WORK
+All stdout in *.out
+data input in data
+data output in data_out
+Source test code: *.F90 or *.c
+
+4) If one or more test fails, rerun it one by one to debug it
+cd WORK
+vi write_stat.F90
+make write_stat
+write_stat 
+
+5) Run the tests on all supported platforms and for all compilers.
