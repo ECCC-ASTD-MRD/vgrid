@@ -1,0 +1,36 @@
+#NOTE, the commands will source one file that controls
+#the version of librmn, codetools. One place for all.
+
+Source the right file depending where you are.
+
+#ppp3,ppp4,EC (ubuntu 18)
+. setup_ubuntu-18.04-skylake-64_intel-19.0.3.199.dot
+#XC50
+. setup_sles-15-skylake-64-xc50_intel-19.0.3.199.dot
+or
+. setup_sles-15-skylake-64-xc50_intel-19.0.5.281.dot
+
+#gpsc or EC(ubuntu 18)
+. setup_ubuntu-18.04-amd64-64_intel-19.0.3.199.dot
+
+#Make libvgrid in ./src
+make genlib
+
+#Make vgrid utilities in ./src
+make utils
+make clean
+#use the following before commit
+make distclean
+
+#Test libvgrid in test_lib ./src/test_lib
+cd test_lib
+testlibvgrid.sh
+make clean
+#use the following before commit
+\rm -r WORK
+
+#Test vgrid utils in test_utils ./src/test_utils
+cd test_utils
+testutilvgrid.sh
+#use the following before commit
+\rm -r WORK

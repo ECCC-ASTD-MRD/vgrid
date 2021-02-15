@@ -1,57 +1,56 @@
-# User options
-#FCFLAGS='=-C -g'
-#RCOMPILE = r.compile
-DESCRIP_PATH = ../lib
-#RMN=rmn_014_rc2
-DIST=use_new_read use_new_gen topLevel_levels lowLevel_levels use_dpidpis
 
-# Override incorrect implicits
-%.o : %.mod
+ifeq ($(BASE_ARCH),$(EC_ARCH))
+   $(info ERROR: please setup the compilation environment by typing the folowing:)
+   $(info . setup.dot)
+   $(error )
+endif
 
-# Define suffix rules
-.SUFFIXES: .ftn90 .o
-.ftn90.o:
-	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -src $<
+DESCRIP_PATH = ../src
 
-OBJECTS = $(DESCRIP_PATH)/vgrid_descriptors.o $(DESCRIP_PATH)/vgrid_genab_5002.o $(DESCRIP_PATH)/vgrid_genab_1002_5001.o $(DESCRIP_PATH)/vgrid_genab_1001.o  $(DESCRIP_PATH)/vgrid_genab_2001.o $(DESCRIP_PATH)/vgrid_genab_1004.o $(DESCRIP_PATH)/utils.o $(DESCRIP_PATH)/msg.o
+DIST = levels_with_ref lowLevel_levels topLevel_levels use_dpidpis use_dpidpis_withref_prof use_new_gen use_new_read c_simple_pressure c_use_new_read c_use_build
+
+default: distclean all
 
 all: $(DIST)
 
-use_new_read: use_new_read.ftn90 $(OBJECTS)
-	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90 -o $@ -librmn $(RMN) -libappl ${MODELUTILS}
+pressure_for_all_vcode: pressure_for_all_vcode.F90 $(DESCRIP_PATH)/libdescrip.a
+	s.compile -optf ="$(MY_FFLAGS) $(FFLAGS)" -includes $(DESCRIP_PATH) -src $@.F90 -o $@ -libpath $(DESCRIP_PATH) -libappl descrip -librmn
 
-use_new_gen: use_new_gen.ftn90 $(OBJECTS)
-	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90 -o $@ -librmn $(RMN) -libappl ${MODELUTILS}
+levels_with_ref: levels_with_ref.F90 $(DESCRIP_PATH)/libdescrip.a
+	s.compile -optf ="$(MY_FFLAGS) $(FFLAGS)" -includes $(DESCRIP_PATH) -src $@.F90 -o $@ -libpath $(DESCRIP_PATH) -libappl descrip -librmn
 
-topLevel_levels: topLevel_levels.ftn90 $(OBJECTS)
-	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90 -o $@ -librmn $(RMN) -libappl ${MODELUTILS}
+lowLevel_levels: lowLevel_levels.F90 $(DESCRIP_PATH)/libdescrip.a
+	s.compile -optf ="$(MY_FFLAGS) $(FFLAGS)" -includes $(DESCRIP_PATH) -src $@.F90 -o $@ -libpath $(DESCRIP_PATH) -libappl descrip -librmn
 
-lowLevel_levels: lowLevel_levels.ftn90 $(OBJECTS)
-	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90 -o $@ -librmn $(RMN) -libappl ${MODELUTILS}
+topLevel_levels: topLevel_levels.F90 $(DESCRIP_PATH)/libdescrip.a
+	s.compile -optf ="$(MY_FFLAGS) $(FFLAGS)" -includes $(DESCRIP_PATH) -src $@.F90 -o $@ -libpath $(DESCRIP_PATH) -libappl descrip -librmn
 
-use_dpidpis:	use_dpidpis.ftn90 $(OBJECTS)
-	$(RCOMPILE) -optf $(FCFLAGS) -includes $(DESCRIP_PATH) -obj $(OBJECTS) -src $@.ftn90 -o $@ -librmn $(RMN) -libappl ${MODELUTILS}
+use_dpidpis: use_dpidpis.F90 $(DESCRIP_PATH)/libdescrip.a
+	s.compile -optf ="$(MY_FFLAGS) $(FFLAGS)" -includes $(DESCRIP_PATH) -src $@.F90 -o $@ -libpath $(DESCRIP_PATH) -libappl descrip -librmn
 
-$(DESCRIP_PATH)/vgrid_descriptors.o: $(DESCRIP_PATH)/vgrid_descriptors.ftn90
-	(cd $(DESCRIP_PATH) && $(MAKE) $(MAKEFLAGS) vgrid_descriptors.o)
+use_dpidpis_withref_prof: use_dpidpis_withref_prof.F90 $(DESCRIP_PATH)/libdescrip.a
+	s.compile -optf ="$(MY_FFLAGS) $(FFLAGS)" -includes $(DESCRIP_PATH) -src $@.F90 -o $@ -libpath $(DESCRIP_PATH) -libappl descrip -librmn
 
-$(DESCRIP_PATH)/vgrid_genab_1001.o: $(DESCRIP_PATH)/vgrid_genab_1001.ftn90
-	(cd $(DESCRIP_PATH) && $(MAKE) $(MAKEFLAGS) vgrid_genab_1001.o)
+use_new_gen: use_new_gen.F90 $(DESCRIP_PATH)/libdescrip.a
+	s.compile -optf ="$(MY_FFLAGS) $(FFLAGS)" -includes $(DESCRIP_PATH) -src $@.F90 -o $@ -libpath $(DESCRIP_PATH) -libappl descrip -librmn
 
-$(DESCRIP_PATH)/vgrid_genab_1004.o: $(DESCRIP_PATH)/vgrid_genab_1004.ftn90
-	(cd $(DESCRIP_PATH) && $(MAKE) $(MAKEFLAGS) vgrid_genab_1004.o)
+use_new_read: use_new_read.F90 $(DESCRIP_PATH)/libdescrip.a
+	s.compile -optf ="$(MY_FFLAGS) $(FFLAGS)" -includes $(DESCRIP_PATH) -src $@.F90 -o $@ -libpath $(DESCRIP_PATH) -libappl descrip -librmn
 
-$(DESCRIP_PATH)/vgrid_genab_2001.o: $(DESCRIP_PATH)/vgrid_genab_2001.ftn90
-	(cd $(DESCRIP_PATH) && $(MAKE) $(MAKEFLAGS) vgrid_genab_2001.o)
+c_simple_pressure: c_simple_pressure.c $(DESCRIP_PATH)/libdescrip.a
+	s.compile -bidon c -main $@ -optc ="$(MY_CFLAGS) $(CFLAGS)" -includes $(DESCRIP_PATH) -src $@.c -o $@ -libpath $(DESCRIP_PATH) -libappl rmn descrip
 
-$(DESCRIP_PATH)/vgrid_genab_5002.o: $(DESCRIP_PATH)/vgrid_genab_5002.ftn90
-	(cd $(DESCRIP_PATH) && $(MAKE) $(MAKEFLAGS) vgrid_genab_5002.o)
+c_use_new_read: c_use_new_read.c $(DESCRIP_PATH)/libdescrip.a
+	s.compile -bidon c -main $@ -optc ="$(MY_CFLAGS) $(CFLAGS)" -includes $(DESCRIP_PATH) -src $@.c -o $@ -libpath $(DESCRIP_PATH) -libappl rmn descrip
+c_pressure_for_all_vcode: c_pressure_for_all_vcode.c $(DESCRIP_PATH)/libdescrip.a
+	s.compile -bidon c -main $@ -optc ="$(MY_CFLAGS) $(CFLAGS)" -includes $(DESCRIP_PATH) -src $@.c -o $@ -libpath $(DESCRIP_PATH) -libappl rmn descrip
 
-$(DESCRIP_PATH)/vgrid_genab_1002_5001.o: $(DESCRIP_PATH)/vgrid_genab_1002_5001.ftn90
-	(cd $(DESCRIP_PATH) && $(MAKE) $(MAKEFLAGS) vgrid_genab_1002_5001.o)
+c_use_build: c_use_build.c $(DESCRIP_PATH)/libdescrip.a
+	s.compile -bidon c -main $@ -optc ="$(MY_CFLAGS) $(CFLAGS)" -includes $(DESCRIP_PATH) -src $@.c -o $@ -libpath $(DESCRIP_PATH) -libappl descrip -librmn
 
-$(DESCRIP_PATH)/utils.o: $(DESCRIP_PATH)/utils.ftn90
-	(cd $(DESCRIP_PATH) && $(MAKE) $(MAKEFLAGS) utils.o)
+$(DESCRIP_PATH)/libdescrip.a: $(DESCRIP_PATH)/*.c $(DESCRIP_PATH)/*.F90 $(DESCRIP_PATH)/*.h $(DESCRIP_PATH)/*.hc
+	cd $(DESCRIP_PATH) ;\
+	make;\
 
 clean:
 	rm -f *.f90 *.o *.mod test_output.fst
@@ -61,4 +60,3 @@ distclean: clean
 
 tild:
 	rm -f *~
-
