@@ -9,8 +9,6 @@ if [ "${COMP_ARCH}" = "" ];then
    exit 1
 fi
 
-#remove the diff tests for all tests except for vgrid_sample
-
 convert_toctoc_5002=oui
 
 add_toctoc=oui
@@ -21,6 +19,7 @@ print_toctoc=oui
 
 vgrid_sample=oui
 
+ignore_spaces_in_diff=oui
 
 set -e
 #set -x
@@ -180,6 +179,14 @@ if [ ${print_toctoc} = oui ];then
 
     DEBUG=non
 
+    if [ ${ignore_spaces_in_diff} = oui ];then
+	XXDIFF='xxdiff --ignore-all-space --ignore-blank-lines'
+        DIFF='diff --ignore-all-space --ignore-blank-lines'
+    else
+	XXDIFF=xxdiff
+	DIFF=diff
+    fi
+
     cat > no_ip1t.txt<<EOF
  dm_1003_from_pgsm_lam_east_ops
 EOF
@@ -206,37 +213,83 @@ EOF
 	 echo "Test print_toctoc with kind=${kind} on ${VALIDATION_DATA}/data_tests/${ITEM}"
 
           r.print_toctoc -fst ${VALIDATION_DATA}/data_tests/${ITEM} -no_box -kind ${kind} > to_erase.txt 2>&1
+	  sed -i 's/ label 1,idate2:           0//' to_erase.txt
+         FILE=${VALIDATION_DATA}/data/${EC_ARCH}/print_toctoc_${ITEM}${lable}.txt
+         #cp to_erase.txt ${FILE}
 
+         ${DIFF} ${TMPDIR}/to_erase.txt ${FILE}
          if [ $? != 0 ];then
-            echo "ERROR 1:  r.print_toctoc on ${VALIDATION_DATA}/data/${ITEM} -no_box -kind ${kind}"
+            echo "ERROR 1:  r.print_toctoc on ${VALIDATION_DATA}/data/${ITEM} do not mach with ${FILE}"
+	    echo "faire : ${XXDIFF}  ${TMPDIR}/to_erase.txt ${FILE}"
+	    if [ ${DEBUG} = oui ];then
+		${XXDIFF}  to_erase.txt ${FILE}
+	    else
 		exit 1
+	    fi
          fi
 
           r.print_toctoc -fst ${VALIDATION_DATA}/data_tests/${ITEM} -no_box -kind ${kind} -convip > to_erase.txt 2>&1
-
+	  sed -i 's/ label 1,idate2:           0//' to_erase.txt
+         FILE=${VALIDATION_DATA}/data/${EC_ARCH}/print_toctoc_convip_${ITEM}${lable}.txt
+         #cp  to_erase.txt ${FILE}
+         ${DIFF} ${TMPDIR}/to_erase.txt ${FILE}
          if [ $? != 0 ];then
-            echo "ERROR 1:  r.print_toctoc on ${VALIDATION_DATA}/data/${ITEM} -no_box -kind ${kind} -convip "
+            echo "ERROR 1:  r.print_toctoc on ${VALIDATION_DATA}/data/${ITEM} do not mach with ${FILE}"
+	    echo "faire : ${XXDIFF}  ${TMPDIR}/to_erase.txt ${FILE}"
+	    if [ ${DEBUG} = oui ];then
+		${XXDIFF}  to_erase.txt ${FILE}
+	    else
 		exit 1
+	    fi
          fi
 
           r.print_toctoc -fst ${VALIDATION_DATA}/data_tests/${ITEM} -ip1m_only -kind ${kind} > to_erase.txt 2>&1
-
+	  sed -i 's/ label 1,idate2:           0//' to_erase.txt
+         FILE=${VALIDATION_DATA}/data/${EC_ARCH}/print_toctoc_ip1m_only_${ITEM}${lable}.txt
+         #cp to_erase.txt ${FILE}
+         ${DIFF} ${TMPDIR}/to_erase.txt ${FILE}
          if [ $? != 0 ];then
-            echo "ERROR 2:  r.print_toctoc -ip1m_only on ${VALIDATION_DATA}/data_tests/${ITEM} "
-		     exit 1
+            echo "ERROR 2:  r.print_toctoc -ip1m_only on ${VALIDATION_DATA}/data_tests/${ITEM} do not mach with ${FILE}"
+            echo "faire : ${XXDIFF}  ${TMPDIR}/to_erase.txt ${FILE}"
+	    if [ ${DEBUG} = oui ];then
+		${XXDIFF}  to_erase.txt ${FILE}
+	    else
+		exit 1
+	    fi
          fi
 
-          r.print_toctoc -fst ${VALIDATION_DATA}/data_tests/${ITEM} -ip1t_only -kind ${kind} > to_erase.txt 2>&1
-         if [ $? != 0 ];then
-		 echo "ERROR 3:  r.print_toctoc -ip1t_only on ${VALIDATION_DATA}/data_tests/${ITEM} "
+	 if ! grep -q ${ITEM} no_ip1t.txt;then
+
+             r.print_toctoc -fst ${VALIDATION_DATA}/data_tests/${ITEM} -ip1t_only -kind ${kind} > to_erase.txt 2>&1
+	     sed -i 's/ label 1,idate2:           0//' to_erase.txt
+             FILE=${VALIDATION_DATA}/data/${EC_ARCH}/print_toctoc_ip1t_only_${ITEM}${lable}.txt
+             #cp to_erase.txt ${FILE}
+             ${DIFF} ${TMPDIR}/to_erase.txt ${FILE}
+             if [ $? != 0 ];then
+		 echo "ERROR 3:  r.print_toctoc -ip1t_only on ${VALIDATION_DATA}/data_tests/${ITEM} do not mach with ${FILE}"
+		 echo "faire : ${XXDIFF}  ${TMPDIR}/to_erase.txt ${FILE}"
+		 if [ ${DEBUG} = oui ];then
+		     ${XXDIFF}  to_erase.txt ${FILE}
+		 else
 		     exit 1
+		 fi
+             fi
 
 	 fi
 
           r.print_toctoc -fst ${VALIDATION_DATA}/data_tests/${ITEM} -ip1m_only -out output_file.txt -kind ${kind} > to_erase.txt 2>&1
+	  sed -i 's/ label 1,idate2:           0//' to_erase.txt
+         FILE=${VALIDATION_DATA}/data/${EC_ARCH}/print_toctoc_ip1m_only_out_${ITEM}${lable}.txt
+         #cp output_file.txt ${FILE}
+         ${DIFF} ${TMPDIR}/output_file.txt ${FILE}
          if [ $? != 0 ];then
-            echo "ERROR 4.2:  r.print_toctoc on ${VALIDATION_DATA}/data_tests/${ITEM}"
+            echo "ERROR 4.2:  r.print_toctoc on ${VALIDATION_DATA}/data_tests/${ITEM} do not mach with ${FILE}"
+	    echo "faire : ${XXDIFF}  ${TMPDIR}/output_file.txt ${FILE}"
+	    if [ ${DEBUG} = oui ];then
+		${XXDIFF}  ${TMPDIR}/to_erase.txt ${FILE}
+	    else
 		exit 1
+	    fi
          fi
 
       done

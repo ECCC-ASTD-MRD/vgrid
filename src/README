@@ -18,19 +18,20 @@ make genlib
 
 #Make vgrid utilities in ./src
 make utils
-make clean
-#use the following before commit
-make distclean
 
 #Test libvgrid in test_lib ./src/test_lib
 cd test_lib
-testlibvgrid.sh
 make clean
-#use the following before commit
-\rm -r WORK
+testlibvgrid.sh
 
 #Test vgrid utils in test_utils ./src/test_utils
 cd test_utils
 testutilvgrid.sh
-#use the following before commit
+
+#Before commit, cleanup all:
+in src
+make distclean
+in src/test_lib
+make distclean
+in src/test_utils
 \rm -r WORK

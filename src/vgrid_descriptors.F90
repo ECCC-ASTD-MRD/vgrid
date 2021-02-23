@@ -235,10 +235,11 @@ module vGrid_Descriptors
          type(c_ptr), value :: vgd1_CP, vgd2_CP
       end function f_vgdcmp
 
-      integer(c_int) function f_new_read(vgd,unit,ip1,ip2,kind,version,quiet) bind(c, name='Cvgd_new_read2')
+      integer(c_int) function f_new_read(vgd,unit,datev,etiket,ip1,ip2,ip3,kind,version,quiet) bind(c, name='Cvgd_new_read3')
          use iso_c_binding, only : c_ptr, c_int, c_char
          type(c_ptr) :: vgd
-         integer (c_int), value :: unit, ip1, ip2, kind, version, quiet
+         integer (c_int), value :: unit, datev, ip1, ip2, ip3, kind, version, quiet
+         character(kind=c_char) :: etiket(*)
       end function f_new_read
       
       integer(c_int) function f_new_from_table(vgd, table_CP, ni, nj, nk) bind(c, name='Cvgd_new_from_table')
@@ -389,20 +390,23 @@ module vGrid_Descriptors
    end interface operator (==)
    
 contains
-   
-   integer function new_read(self,unit,format,ip1,ip2,kind,version,quiet) result(status)
+    
+   integer function new_read(self,unit,format,ip1,ip2,kind,version,quiet,datev,etiket,ip3) result(status)
       use vgrid_utils, only: up
       ! Coordinate constructor - read from a file and initialize instance
       type(vgrid_descriptor), intent(inout) :: self !Vertical descriptor instance
       integer, intent(in) :: unit                 !File unit to read descriptor information from
       character(len=*), target, optional, intent(in) :: format !File format ('fst' or 'bin') default is 'fst'
-      integer, target,optional :: ip1,ip2                 !ip1,2 values of the desired descriptors
+      integer, target,optional :: datev                   ! Validite date of desired descriptors
+      integer, target,optional :: ip1,ip2,ip3             !ip1,2 values of the desired descriptors
       integer, target,optional, intent(in) :: kind        ! Level kind requested by user.
       integer, target,optional, intent(in) :: version     ! Level version requested by user.
       logical, optional, intent(in) :: quiet              !Do not print massages
+      character(len=*), target, optional, intent(in) :: etiket  ! etiket value of the desired descriptors
       
       ! Local variables
-      integer :: ni,nj,nk, istat, error, l_ip1, l_ip2, l_kind, l_version, level_msg, l_quiet
+      integer :: ni,nj,nk, istat, error, l_datev, l_ip1, l_ip2, l_ip3, l_kind, l_version, level_msg, l_quiet
+      character(len=VGD_LEN_ETIK) :: l_etiket
       character(len=100) :: myformat
       real(kind=8), dimension(:,:,:), pointer :: table_8
 
@@ -422,7 +426,17 @@ contains
       myformat='FST'
       if (present(format)) myformat = trim(up(format))
       select case (trim(up(myformat)))
-      case ('FST')      
+      case ('FST')
+         if(present(datev))then
+            l_datev = datev
+         else
+            l_datev = -1
+         endif
+         if(present(etiket))then
+            l_etiket = etiket
+         else
+            l_etiket = " "
+         endif
          if(present(ip1))then
             l_ip1 = ip1
          else
@@ -432,6 +446,11 @@ contains
             l_ip2 = ip2
          else
             l_ip2 = -1
+         endif
+         if(present(ip3))then
+            l_ip3 = ip3
+         else
+            l_ip3 = -1
          endif
          if(present(kind))then
             l_kind = kind
@@ -444,7 +463,7 @@ contains
             l_version = -1
          endif
          
-         if( f_new_read(self%cptr, unit, l_ip1, l_ip2, l_kind, l_version, l_quiet) == VGD_ERROR )then
+         if( f_new_read(self%cptr, unit, l_datev, l_etiket//C_NULL_CHAR, l_ip1, l_ip2, l_ip3, l_kind, l_version, l_quiet) == VGD_ERROR )then
             write(for_msg,*) ' in new_read, problem with f_new_read'
             call msg(level_msg,VGD_PRFX//for_msg)
             return

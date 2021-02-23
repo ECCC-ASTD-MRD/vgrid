@@ -183,6 +183,7 @@ int Cvgd_new_gen_21002_2(vgrid_descriptor **self, float *hyb, int size_hyb, floa
 
 int Cvgd_new_read(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind, int version);
 int Cvgd_new_read2(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind, int version, int quiet);
+int Cvgd_new_read3(vgrid_descriptor **self, int unit, int datev, char *etiket, int ip1, int ip2, int ip3, int kind, int version, int quiet);
 int Cvgd_write_desc (vgrid_descriptor *self, int unit);
 int Cvgd_new_from_table(vgrid_descriptor **self, double *table, int ni, int nj, int nk);
 int Cvgd_stda76_temp(vgrid_descriptor *self, int *i_val, int nl_t, float *temp);

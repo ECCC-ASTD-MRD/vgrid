@@ -7,7 +7,7 @@ make clean
 make genlib
 make utils
 
-2) cd test_utils; make clean
+2) cd test_utils
 
 3) Test all the utilities
 ./testutilvgrid.sh
@@ -22,5 +22,7 @@ Control which test to run by modifying script testutilvgrid.sh
 5) Data set for tests is on Science only: 
 /home/sidr000/ords/vgrid_validation_data/1.9.b3
 (problem with file dm_5002_from_model_run - removed from test for now)
+(problem with text comparison in test for print_toctoc with adding !! search
+with datev ip3 and etiket. - eliminate almost all tests with diff text files)
 Maybe dataset can be reproduced using:
 driver_to_prepare_tests_files.ksh
