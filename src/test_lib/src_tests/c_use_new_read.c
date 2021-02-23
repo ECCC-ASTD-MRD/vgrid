@@ -194,7 +194,7 @@ void c_use_new_read() {
     return;
   }
   if( Cvgd_vgdcmp(vgd, vgd2) != 0 ){
-    printf("ERROR, vgd and vgd2 shouldne the same after write in file, read from file\n");
+    printf("ERROR, vgd and vgd2 should be the same after write in file, read from file\n");
     return;
   }
 

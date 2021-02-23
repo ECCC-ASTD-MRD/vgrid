@@ -1063,6 +1063,10 @@ int Cvgd_print_vcode_description(int vcode){
   // Create horizontal rule
   char *hr = {"-------------------------------------------------------"};
 
+  if(vcode == 1 || vcode == -1){
+    printf("%s\nVcode 1, kind 0, version 1\n",hr);
+    printf("  Height with respect to sea level\n");
+  }
   if(vcode == 1001 || vcode == -1){
     printf("%s\nVcode 1001, kind 1, version 1\n",hr);
     printf("  Sigma levels\n");
@@ -5721,7 +5725,7 @@ int Cvgd_new_gen3(vgrid_descriptor **self, int kind, int version, float *hyb, in
 
   switch((*self)->vcode) {
   case 1:	
-    fprintf(stderr,"(Cvgd) ERROR in Cvgd_new_gen3, kind=%d, version=%d\n cannot be generated, function to di so is in Nemo\n",kind,version);
+    fprintf(stderr,"(Cvgd) ERROR in Cvgd_new_gen3, kind=%d, version=%d\n cannot be generated, function to do this is in Nemo\n",kind,version);
     return(VGD_ERROR);
     break;
   case 1001:	
@@ -6290,10 +6294,13 @@ static int c_legacy(vgrid_descriptor **self, int unit, int F_kind) {
 }
 
 int Cvgd_new_read(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind, int version) {
-  return Cvgd_new_read2(self, unit, ip1, ip2, kind, version, 0);
+  return Cvgd_new_read3(self, unit, -1, " ", ip1, ip2, -1, kind, version, 0);
+}
+int Cvgd_new_read2(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind, int version, int quiet) {
+  return Cvgd_new_read3(self, unit, -1, " ", ip1, ip2, -1 , kind, version, quiet);
 }
 
-int Cvgd_new_read2(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind, int version, int quiet) {
+int Cvgd_new_read3(vgrid_descriptor **self, int unit, int datev, char *etiket, int ip1, int ip2, int ip3, int kind, int version, int quiet) {
   
   char  match_ipig;
   int error, i, ni, nj, nk;
@@ -6307,17 +6314,17 @@ int Cvgd_new_read2(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind
   }
   *self = c_vgd_construct();
   if(! *self){
-    printf("(Cvgd) ERROR in Cvgd_new_read2, null pointer returned by c_vgd_construct\n");
+    printf("(Cvgd) ERROR in Cvgd_new_read3, null pointer returned by c_vgd_construct\n");
     return (VGD_ERROR);
   }
   
   if(ip1 >= 0 && ip2 < 0) {
-    printf("(Cvgd) ERROR in Cvgd_new_read2, expecting optional value ip2\n");      
+    printf("(Cvgd) ERROR in Cvgd_new_read3, expecting optional value ip2\n");      
     return (VGD_ERROR);
   }
   
   if(ip2 >= 0 && ip1 < 0){
-    printf("(Cvgd) ERROR in Cvgd_new_read2, expecting optional value ip1\n");      
+    printf("(Cvgd) ERROR in Cvgd_new_read3, expecting optional value ip1\n");      
     return (VGD_ERROR);
   }
   match_ipig = 0;
@@ -6325,18 +6332,18 @@ int Cvgd_new_read2(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind
     match_ipig = 1;
   }
   if(kind == -1 && version != -1) {
-    printf("(Cvgd) ERROR in Cvgd_new_read2, option kind must be used with option version\n");
+    printf("(Cvgd) ERROR in Cvgd_new_read3, option kind must be used with option version\n");
     return (VGD_ERROR);
   }
   
-  error = c_fstinl(unit, &ni, &nj, &nk, -1, " ", ip1, ip2, -1, " ", ZNAME, keyList, &count, nkeyList);
+  error = c_fstinl(unit, &ni, &nj, &nk, datev, etiket, ip1, ip2, ip3, " ", ZNAME, keyList, &count, nkeyList);
   if (error < 0) {
-    printf("(Cvgd) ERROR in Cvgd_new_read2, with fstinl on nomvar !!\n");
+    printf("(Cvgd) ERROR in Cvgd_new_read3, with fstinl on nomvar !!\n");
     return(VGD_ERROR);
   }
   if(count == 0){
     if(! quiet) {
-      printf("(Cvgd) Cannot find %s with the following ips: ip1=%d, ip2=%d\n", ZNAME, ip1, ip2);
+      printf("(Cvgd) Cannot find %s with the following datev=%d, etiket=%s, ip1=%d, ip2=%d, ip3=%d\n", ZNAME, datev, etiket, ip1, ip2, ip3);
     }
     if(match_ipig) {
       (*self)->vcode = -1;
@@ -6352,7 +6359,7 @@ int Cvgd_new_read2(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind
       return(VGD_ERROR);      
     }
     if(fstd_init(*self) == VGD_ERROR) {
-      printf("(Cvgd) ERROR in Cvgd_new_read2, problem creating record information\n");
+      printf("(Cvgd) ERROR in Cvgd_new_read3, problem creating record information\n");
     }
     toc_found = 1;
   } else {
@@ -6370,7 +6377,7 @@ int Cvgd_new_read2(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind
       if(! toc_found) {
 	toc_found = 1;
 	if( C_load_toctoc(*self,var,keyList[i]) == VGD_ERROR ) {
-	  printf("(Cvgd) ERROR in Cvgd_new_read2, cannot load !!\n");
+	  printf("(Cvgd) ERROR in Cvgd_new_read3, cannot load !!\n");
 	  return(VGD_ERROR);
 	}
 	ni=(*self)->table_ni;
@@ -6382,32 +6389,42 @@ int Cvgd_new_read2(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind
       // We load then all to check if they are the same. If not, we return with an error message.
       self2 = c_vgd_construct();
       if( my_fstprm(keyList[i], &var) == VGD_ERROR ) {
-	printf("(Cvgd) ERROR in Cvgd_new_read2, with my_fstprm on keyList[i] = %d\n",keyList[i]);
+	printf("(Cvgd) ERROR in Cvgd_new_read3, with my_fstprm on keyList[i] = %d\n",keyList[i]);
 	return(VGD_ERROR);
       }
       if( C_load_toctoc(self2,var,keyList[i]) == VGD_ERROR ) {
-	printf("(Cvgd) ERROR in Cvgd_new_read2, cannot load !!\n");
+	printf("(Cvgd) ERROR in Cvgd_new_read3, cannot load !!\n");
 	return(VGD_ERROR);
       }
       status = Cvgd_vgdcmp(*self,self2);
       if ( status != 0 ){
 	if(! quiet){
-	  printf("(Cvgd) ERROR in Cvgd_new_read2, found different entries in vertical descriptors after search on ip1 = %d, ip2 = %d, kind = %d, version = %d, status code is %d\n",ip1,ip2,kind,version,status);
+	  printf("(Cvgd) ERROR in Cvgd_new_read3, found different entries in vertical descriptors after search on datev=%d, etiket=%s, ip1=%d, ip2=%d, ip3=%d, kind=%d, version=%d, status code is %d\n",datev,etiket,ip1,ip2,ip3,kind,version,status);
 	}
 	return(VGD_ERROR);
       }
       // TODO verifier si ce Cvgd_free est correct 
       Cvgd_free(&self2);
-    } // Loop in !! 
+    } // Loop in !!
+    if(! toc_found){
+      if(c_legacy(self,unit,kind) == VGD_ERROR){
+	if(! quiet) {
+	  printf("(Cvgd) ERROR: failed to construct vgrid descriptor from legacy encoding\n");
+	}
+	return(VGD_ERROR);
+      }
+      toc_found = 1;
+    }
   } //if(count == 0)
 
   if(! toc_found) {
-    printf("(Cvgd) ERROR in Cvgd_new_read2, cannot find !! or generate from legacy encoding\n");
+    printf("(Cvgd) ERROR in Cvgd_new_read3, cannot find !! or generate from legacy encoding\n");
     return(VGD_ERROR);
   }
+
   // Fill structure from input table
   if( Cvgd_new_from_table(self, (*self)->table, (*self)->table_ni, (*self)->table_nj, (*self)->table_nk) == VGD_ERROR ) {
-    printf("(Cvgd) ERROR in Cvgd_new_read2, unable to construct from table\n");
+    printf("(Cvgd) ERROR in Cvgd_new_read3, unable to construct from table\n");
     return(VGD_ERROR);
   }
   (*self)->match_ipig = match_ipig;  
