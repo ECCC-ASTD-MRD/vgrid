@@ -19,7 +19,7 @@
 !================================================================================================
 program tests
 #include <msg.h>
-  use vGrid_Descriptors, only: vgrid_descriptor, vgd_free, vgd_new,vgd_levels
+  use vGrid_Descriptors, only: vgrid_descriptor, vgd_free, vgd_new,vgd_levels, vgd_putopt
   use Unit_Testing, only: ut_report
 
 
@@ -42,6 +42,8 @@ program tests
   !files(4)="data/dm_1001_just_p0"
   !files(5)="data/dm_1001_from_model_run"
 
+  ier = vgd_putopt("ALLOW_SIGMA",.true.)
+
   do k=1,nfiles
 
      lu=0
@@ -59,7 +61,10 @@ program tests
      endif
      
      ! Suppress (Cvgd) and (vgd) messages for vgd_new
-     
+
+     ier = vgd_new(vgd,unit=lu,format="fst",ip1=999,ip2=999, quiet=.true.)
+     ier = vgd_new(vgd,unit=lu,format="fst",ip1=999,ip2=-1, quiet=.true.)
+     ier = vgd_new(vgd,unit=lu,format="fst",ip1=-1,ip2=999, quiet=.true.)
      ier = vgd_new(vgd,unit=lu,format="fst",ip1=-1,ip2=-1, quiet=.true.)
 
      ier = vgd_free(vgd)

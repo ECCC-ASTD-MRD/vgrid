@@ -12,6 +12,8 @@
 #define VGD_LEN_TYPVAR 3
 #define VGD_LEN_GRTYP  2
 #define VGD_NO_REF_NOMVAR "    "
+#define VGD_PRES_TYPE 1
+#define VGD_HEIGHT_TYPE 2
 extern float VGD_STDA76_SFC_T;
 extern float VGD_STDA76_SFC_P;
 

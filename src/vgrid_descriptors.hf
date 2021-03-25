@@ -7,6 +7,8 @@ integer, parameter, public :: VGD_ERROR=-1    !method return value on error
 integer, parameter, public :: VGD_LEN_ETIK=12 !String length of etiket
 integer, parameter, public :: VGD_LEN_RFLD=4  !String length of reference field "RFLD"
 integer, parameter, public :: VGD_LEN_RFLS=4  !String length of reference field "RFLS"
+integer, parameter, public :: VGD_PRES_TYPE=1
+integer, parameter, public :: VGD_HEIGHT_TYPE=2
 real, parameter, public :: VGD_MISSING=-9999. !missing value returned for invalid entries
 character(len=MSG_MAXLEN), public :: for_msg  !String to write output messages     
 character(len=6), parameter, public :: VGD_PRFX="(vgd) " !String to prefix masages
