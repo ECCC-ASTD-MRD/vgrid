@@ -4899,6 +4899,31 @@ int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet)
     *value = self->match_ipig;
   } else if (strcmp(key, "LOGP") == 0){
     *value = is_valid(self,is_in_logp);
+  } else if (strcmp(key, "TYPE") == 0){
+    switch(self->vcode) {
+    case 1001:
+    case 1002:
+    case 1003:
+    case 2001:
+    case 5001:
+    case 5002:
+    case 5003:
+    case 5004:
+    case 5005:
+    case 5100:
+    case 5999:
+      *value = VGD_PRES_TYPE;
+      break;
+    case 1:
+    case 4001:
+    case 21001:
+    case 21002:
+      *value = VGD_HEIGHT_TYPE;
+      break;
+    default:
+      printf("(Cvgd) ERROR in Cvgd_get_int, unsupported Vcode for key TYPE %d\n",self->vcode);
+      return(VGD_ERROR);
+    }
   } else {
     if(! quiet) {
       printf("(Cvgd) ERROR in Cvgd_get_int, invalid key %s\n",key);
