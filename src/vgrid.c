@@ -6196,7 +6196,7 @@ static int C_gen_legacy_desc(vgrid_descriptor **self, int unit, int *keylist , i
 
 }
 
-static int c_legacy(vgrid_descriptor **self, int unit, int F_kind) {
+static int c_legacy(vgrid_descriptor **self, int unit, int F_kind, int quiet) {
   // Construct vertical structure from legacy encoding (PT,HY...)
 
   int error, ni, nj, nk, nip1, i, j, k, kind, nb_kind=100, aa, nb;
@@ -6208,8 +6208,10 @@ static int c_legacy(vgrid_descriptor **self, int unit, int F_kind) {
   for( i = 0; i < nb_kind; i++){
     num_in_kind[i] = 0;
   }
-
-  printf("(Cvgd) Looking for kind = %d\n",F_kind);
+  
+  if(! quiet) {
+    printf("(Cvgd) Looking for kind = %d\n",F_kind);
+  }
 
   error = c_fstinl(unit, &ni, &nj, &nk, -1, " ", -1, -1, -1, " ", " ", keylist, &count, nkeylist);
   if (error < 0) {
@@ -6235,6 +6237,8 @@ static int c_legacy(vgrid_descriptor **self, int unit, int F_kind) {
     if( strcmp(var.nomvar, "PT  ") == 0 )
       continue;
     if( strcmp(var.nomvar, "HY  ") == 0 )
+      continue;
+    if( strcmp(var.nomvar, "!!  ") == 0 )
       continue;
     if( kind == 2 ){
       // Pressure at 0.0 is not part of the vertical structure
@@ -6304,7 +6308,9 @@ static int c_legacy(vgrid_descriptor **self, int unit, int F_kind) {
     }
   }
   if( nb == 0){
-    printf("(Cvgd) ERROR: No record of type pressure/sigma/hyb in file\n");
+    if(! quiet) {
+      printf("(Cvgd) ERROR: No record of type pressure/sigma/hyb in file\n");
+    }
     return(VGD_ERROR);
   }
   printf("(Cvgd)   Found %d unique ip1 of kind %d among the %d records in file to construct the vertical descriptor\n", nb, valid_kind, count);
@@ -6343,15 +6349,6 @@ int Cvgd_new_read3(vgrid_descriptor **self, int unit, int datev, char *etiket, i
     return (VGD_ERROR);
   }
   
-  if(ip1 >= 0 && ip2 < 0) {
-    printf("(Cvgd) ERROR in Cvgd_new_read3, expecting optional value ip2\n");      
-    return (VGD_ERROR);
-  }
-  
-  if(ip2 >= 0 && ip1 < 0){
-    printf("(Cvgd) ERROR in Cvgd_new_read3, expecting optional value ip1\n");      
-    return (VGD_ERROR);
-  }
   match_ipig = 0;
   if(ip1 >= 0){
     match_ipig = 1;
@@ -6377,7 +6374,7 @@ int Cvgd_new_read3(vgrid_descriptor **self, int unit, int datev, char *etiket, i
     if(! quiet) {
       printf("(Cvgd) Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)\n");
     }
-    if(c_legacy(self,unit,kind) == VGD_ERROR){
+    if(c_legacy(self,unit,kind,quiet) == VGD_ERROR){
       if(! quiet) {
 	printf("(Cvgd) ERROR: failed to construct vgrid descriptor from legacy encoding\n");
       }
@@ -6432,7 +6429,7 @@ int Cvgd_new_read3(vgrid_descriptor **self, int unit, int datev, char *etiket, i
       Cvgd_free(&self2);
     } // Loop in !!
     if(! toc_found){
-      if(c_legacy(self,unit,kind) == VGD_ERROR){
+      if(c_legacy(self,unit,kind,quiet) == VGD_ERROR){
 	if(! quiet) {
 	  printf("(Cvgd) ERROR: failed to construct vgrid descriptor from legacy encoding\n");
 	}
