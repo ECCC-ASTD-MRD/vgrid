@@ -179,7 +179,25 @@
       if(alloc_my_sfc_field_L)    deallocate(my_sfc_field)
       if(alloc_my_sfc_field_ls_L) deallocate(my_sfc_field_ls)
       if(alloc_my_levels_L)then
-         levels(1:ni,1:nj,1:nk) = my_levels(1:ni,1:nj,1:nk)
+         ! NOTE : for compiler not having the "is_contiguous" function
+         ! this code do the copy in and out.
+         ! The range of array sfc_field will always be (1:ni,1:nj)
+         ! since it is decladed as a real array in this function,
+         ! even if the user calls this function with sfc_field having
+         ! a negative starting index.
+         ! The "my_levels" array will also have the same horizontal range
+	 ! (1:ni,1:nj,...) since it is based on the size of sfc_field.
+         ! However, the variable levels is a pointer. Therefore its
+         ! range is known by this functyion and may not be 1:ni. For
+	 ! example it may start at a negative index. Therefore the copy
+	 ! must not be
+         ! levels(1:ni,1:nj,1:nk) = my_levels(1:ni,1:nj,1:nk)
+         ! but rather the simpler expression
+	 ! levels = my_levels.
+         ! As long as levels and my_levels have the same size,
+         ! which is guarantied with the checks above, this copy will
+         ! be valid for any range the user may use on pointer levels.
+         levels = my_levels
          deallocate(my_levels)
       end if
       

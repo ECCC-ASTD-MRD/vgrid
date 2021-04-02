@@ -18,12 +18,15 @@
 ! * Boston, MA 02111-1307, USA.
 module mod_levels_withref_sub_array
 contains 
-   integer function test_levels(levels,l_ni,l_nj,G_nk,liste,infon,lu) result(status)
+   integer function test_levels(levels,l_ni,l_nj,G_nk,liste,infon,lu,message_S,i0,in,j0,jn) result(status)
       use vgrid_descriptors, only: VGD_ERROR, VGD_OK
       implicit none
       real, dimension(:,:,:), pointer :: levels
       integer :: l_ni,l_nj,G_nk,lu, liste(infon), datev
+      character(len=*) :: message_S
+      integer, optional :: i0,in,j0,jn
       ! Local variables
+      integer :: my_i0,my_in,my_j0,my_jn
       integer :: i, j, k, fstprm, fstluk, fstinf, infon, ier
       real, dimension(:,:), pointer :: wk
       real :: epsilon=5.0e-4
@@ -45,6 +48,12 @@ contains
          return
       endif
 
+      my_i0=1; my_in=l_ni; my_j0=1; my_jn=l_nj
+      if(present(i0))my_i0=i0
+      if(present(in))my_in=in
+      if(present(j0))my_j0=j0
+      if(present(jn))my_jn=jn
+      
       do k=1,infon
          ier = fstprm(liste(k),dateo,deet,npas,nii,njj,nkk,nbits,datyp, &
               ip1,ip2,ip3,typvar,nomvar,etiket,grtyp,ig1,ig2,ig3,ig4,swa,lng, &
@@ -58,17 +67,19 @@ contains
          if(k == 1) allocate(wk(nii,njj))
          ier = fstluk(wk,key,nii,njj,nkk)
          wk = wk*100.
-         do j=1,l_nj
-            do i=1,l_ni
+         do j=my_j0,my_jn
+            do i=my_i0,my_in
                if(abs((wk(i,j)-levels(i,j,k))/wk(i,j))>epsilon)then
                   print*,'(Test) Difference in pressure is too large at'
                   print*,'i,j,k,px(i,j),levels(i,j,k)',i,j,k,wk(i,j),levels(i,j,k)
+                  print*,trim(message_S),' NOTOK'
                   call exit(1)
                endif
             enddo
          enddo
       end do      
       deallocate(wk)
+      print*,trim(message_S),' OK'
       status = VGD_OK      
    end function test_levels
    
@@ -84,7 +95,7 @@ program levels_withref_sub_array
    integer, parameter :: nmax=1000
    integer, dimension(nmax) :: liste
    integer :: fnom, fstouv, fstinf, fstluk, fstinl, fstprm
-   integer :: ier, infon, k, l_ni, l_nj, G_nk
+   integer :: ier, infon, k, l_ni, l_nj, G_nk, i0, in, j0, jn
    integer, dimension(:), pointer :: ip1s
    real, dimension(:,:), pointer :: p0, p0ls, wk
    real, dimension(:,:), pointer :: p0_p, p0ls_p   
@@ -150,7 +161,7 @@ program levels_withref_sub_array
       print*,'(Test) Problem with fstluk on ',rfld_S
       call exit(1)
    endif
-   p0 = -99.
+   p0 = 100000.
    p0(1:l_ni,1:l_nj) = wk(1:l_ni,1:l_nj)*100.
    key = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',rfld_ls_S)
    if(key < 0)then
@@ -161,7 +172,7 @@ program levels_withref_sub_array
       print*,'(Test) Problem with fstluk on ',rfld_ls_S
       call exit(1)
    endif
-   p0ls = -99.
+   p0ls = 100000.
    p0ls(1:l_ni,1:l_nj) = wk(1:l_ni,1:l_nj)*100.
    
    p0_p => p0(1:l_ni,1:l_nj)
@@ -170,7 +181,7 @@ program levels_withref_sub_array
    if( vgd_levels(vgd,ip1s,levels_p,p0_p,sfc_field_ls=p0ls_p) == VGD_ERROR)then
       call exit(1)
    endif
-   if( test_levels(levels_p,l_ni,l_nj,G_nk,liste,infon,lu) == VGD_ERROR)then
+   if( test_levels(levels_p,l_ni,l_nj,G_nk,liste,infon,lu,' test1') == VGD_ERROR)then
       print*,'ERROR in test with vgd_levels sub array on levels, p0 and p0ls'
       call exit
    endif
@@ -181,21 +192,30 @@ program levels_withref_sub_array
    if( vgd_levels(vgd,ip1s,levels_p,p0_p,sfc_field_ls=p0ls_p) == VGD_ERROR)then
       call exit(1)
    endif
-   if( test_levels(levels_p,1,1,G_nk,liste,infon,lu) == VGD_ERROR)then
+   if( test_levels(levels_p,1,1,G_nk,liste,infon,lu,' test2') == VGD_ERROR)then
       print*,'ERROR in test with vgd_levels profile sub array on levels, p0 and p0ls'
       call exit
    endif
 
+   ! Compute pressure in halo and domain
+   if( vgd_levels(vgd,ip1s,levels,p0,sfc_field_ls=p0ls) == VGD_ERROR)then
+      call exit(1)
+   endif
+   levels_p => levels(1:l_ni,1:l_nj,1:G_nk)
+   if( test_levels(levels_p,1,1,G_nk,liste,infon,lu,' test3') == VGD_ERROR)then
+      print*,'ERROR in test with vgd_levels domain plus halo'
+      call exit
+   endif
+
+   ! Test mix sub array and array
    p0_p => p0(1:l_ni,1:l_nj)
    p0ls_p => p0ls(1:l_ni,1:l_nj)
-   levels_p => levels(1:l_ni,1:l_nj,1:G_nk)
-   ! Test mix sub array and array
    deallocate(levels)
    allocate(levels(l_ni,l_nj,G_nk))
    if( vgd_levels(vgd,ip1s,levels,p0_p,sfc_field_ls=p0ls_p) == VGD_ERROR)then
       call exit(1)
    endif
-   if( test_levels(levels,l_ni,l_nj,G_nk,liste,infon,lu) == VGD_ERROR)then
+   if( test_levels(levels,l_ni,l_nj,G_nk,liste,infon,lu,' test4') == VGD_ERROR)then
       print*,'ERROR in test with vgd_levels sub array on p0 and p0ls'
       call exit
    endif   
@@ -203,7 +223,7 @@ program levels_withref_sub_array
    if( vgd_levels(vgd,ip1s,levels,wk,sfc_field_ls=p0ls_p) == VGD_ERROR)then
       call exit(1)
    endif   
-   if( test_levels(levels,l_ni,l_nj,G_nk,liste,infon,lu) == VGD_ERROR)then
+   if( test_levels(levels,l_ni,l_nj,G_nk,liste,infon,lu,' test5') == VGD_ERROR)then
       print*,'ERROR in test with vgd_levels sub array on p0ls'
       call exit
    endif
@@ -211,11 +231,10 @@ program levels_withref_sub_array
    if( vgd_levels(vgd,ip1s,levels,p0_p,sfc_field_ls=wk) == VGD_ERROR)then
       call exit(1)
    endif   
-   if( test_levels(levels,l_ni,l_nj,G_nk,liste,infon,lu) == VGD_ERROR)then
+   if( test_levels(levels,l_ni,l_nj,G_nk,liste,infon,lu,' test6') == VGD_ERROR)then
       print*,'ERROR in test with vgd_levels sub array on p0'
       call exit
    endif
-
    call ut_report(.true.,'Grid_Descriptors, sub array')
 end program levels_withref_sub_array
 !===================================================================
