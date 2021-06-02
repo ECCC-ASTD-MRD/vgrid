@@ -10,7 +10,7 @@ before_script:
   - export ORDENV_SITE_PROFILE=20190814
   - export ORDENV_COMM_PROFILE=eccc/20191002
   - export ORDENV_GROUP_PROFILE=eccc/cmc/1.8
-  - . /fs/ssm/main/env/ordenv-boot-20200204.sh
+  - set +e ; . /fs/ssm/main/env/ordenv-boot-20200204.sh ; set -e
   - cd src
   - setup_ubuntu-18.04-amd64-64_intel-19.0.3.199.dot
 build_cmake:
