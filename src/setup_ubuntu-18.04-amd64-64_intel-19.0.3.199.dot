@@ -1,4 +1,14 @@
+if [[ "${ORDENV_SETUP}" == "" ]] ; then
+    echo "$0 : ERROR : ordenv must be loaded to work on vgrid"
+    return 1
+fi
+
 . r.load.dot comm/eccc/all/opt/intelcomp/intelpsxe-cluster-19.0.3.199
+
+export CC=icc
+export FC=ifort
+export CXX=icpc
+
 . ./rmncodetools_vers.dot
 . r.load.dot rpn/code-tools/$CODETOOL_vers
 . r.load.dot rpn/libs/$RMNLIB_vers
