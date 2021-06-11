@@ -20,9 +20,6 @@ build_cmake:
     - cd build
     - cmake .. -DCMAKE_INSTALL_PREFIX=${CI_PROJECT_DIR}/install-dir
     - make
-    - make check
-    - ./test_f_pgsm
-    - make install
   artifacts:
     paths:
       - install-dir
