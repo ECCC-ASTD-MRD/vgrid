@@ -1,0 +1,3 @@
+[submodule "src/cmake/cmake_rpn"]
+	path = src/cmake/cmake_rpn
+	url = https://gitlab.science.gc.ca/rpn-si/cmake_rpn
