@@ -13,7 +13,7 @@ build_cmake:
     - source ~/ci-admin-bundle/environments/eccc-setup-intel.sh
     - mkdir build
     - cd build
-    - cmake .. -DCMAKE_INSTALL_PREFIX=${CI_PROJECT_DIR}/install-dir
+    - cmake ../src -DCMAKE_INSTALL_PREFIX=${CI_PROJECT_DIR}/install-dir
     - make
   artifacts:
     paths:
