@@ -71,6 +71,7 @@ set_target_properties(r.vgrid_sample PROPERTIES VERSION ${PROJECT_VERSION})
 
 install(TARGETS vgrid vgridshared r.compute_pressure r.convert_toctoc_5002 r.add_toctoc r.print_toctoc r.vcode r.vgrid_sample)
 install(FILES ${PROJECT_MODULE_FILES} TYPE INCLUDE)
+  message(STATUS "FORTESetting ${CMAKE_Fortran_COMPILER_ID}")
 
 configure_file(config.in ${CMAKE_BINARY_DIR}/${PROJECT_NAME}-config @ONLY)
 install(PROGRAMS ${CMAKE_BINARY_DIR}/${PROJECT_NAME}-config DESTINATION bin)
