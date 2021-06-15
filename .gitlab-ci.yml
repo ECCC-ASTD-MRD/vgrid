@@ -2,15 +2,17 @@
 variables:
     GIT_SUBMODULE_STRATEGY: recursive
 stages:
-  - build_intel
-  - build_gnu
+  - build
+#  - test
+#  - package
+#  - deploy
 
 before_script:
   # Force color CMake output even when output is not TTY
   - export CLICOLOR_FORCE=true
 
-build:
-  stage: build_intel
+build_intel:
+  stage: build
   script:
     - source ~/ci-admin-bundle/environments/eccc-setup-intel.sh
     - mkdir build
@@ -21,7 +23,8 @@ build:
     paths:
       - install-dir
 
-  stage: build_gnu
+build_gnu:
+  stage: build
   script:
     - source ~/ci-admin-bundle/environments/eccc-setup-gnu.sh
     - mkdir build
