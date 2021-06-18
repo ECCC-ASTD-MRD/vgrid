@@ -1,6 +1,3 @@
 [submodule "cmake/cmake_rpn"]
-	url = ../cmake_rpn
-    branch = dev
-[submodule "cmake_rpn"]
-	path = cmake_rpn
+	path = cmake/cmake_rpn
 	url = ../cmake_rpn
