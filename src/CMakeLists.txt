@@ -18,12 +18,6 @@ endif()
 include(ec_compiler_presets)
 
 find_package(RMN)
-# f OBJECTS·=·vgrid_utils.o·vgrid.o·vgrid_descriptors.o
-# genlib: $(OBJECTS)
-# 	rm -f $(MYLIB)
-# 	ar rcv $(MYLIB) $(OBJECTS)
-# 	echo 'character(len=128) :: vgrid_descriptors_version = $(VGD_VERSION)' > vgrid_version.hf
-# 	echo 'char vgrid_descriptors_version[] = $(VGD_VERSION)' > vgrid_version.hc
 
 add_library(vgrid STATIC vgrid_descriptors.F90 vgrid_utils.F90 vgrid.c)
 target_link_libraries(vgrid PRIVATE ${RMN_LIBRARIES})
@@ -74,8 +68,3 @@ install(FILES ${PROJECT_MODULE_FILES} TYPE INCLUDE)
 
 configure_file(config.in ${CMAKE_BINARY_DIR}/${PROJECT_NAME}-config @ONLY)
 install(PROGRAMS ${CMAKE_BINARY_DIR}/${PROJECT_NAME}-config DESTINATION bin)
-
-
-
-
-
