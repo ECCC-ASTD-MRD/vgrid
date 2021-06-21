@@ -15,12 +15,13 @@ if(BUILD_TESTING)
       get_filename_component(test ${testfile} NAME)
       get_filename_component(test ${test}     NAME_WLE)
       message(STATUS "(EC) Adding ${ext} test ${testfile}")
-   
+
       if(${ext} MATCHES ".c")
-         add_executable(${test} ${testfile} lib/c_ut_report.c)
+          add_executable(${test} EXCLUDE_FROM_ALL ${testfile} lib/c_ut_report.c)
       else()
-         add_executable(${test} ${testfile} lib/unit_testing.F90)
+          add_executable(${test} EXCLUDE_FROM_ALL ${testfile} lib/unit_testing.F90)
       endif()
+      add_dependencies(check ${test})
 
       target_link_libraries(${test} PRIVATE vgrid)
       target_include_directories(${test} PRIVATE ${CMAKE_BINARY_DIR}/lib ${CMAKE_SOURCE_DIR}/src/lib ${CMAKE_CURRENT_SOURCE_DIR} ${RMN_INCLUDE_DIRS})

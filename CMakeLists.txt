@@ -14,6 +14,7 @@ endif()
 
 include(CTest)
 enable_testing() 
+add_custom_target(check COMMAND CTEST_OUTPUT_ON_FAILURE=true ${CMAKE_CTEST_COMMAND})
 
 enable_language(C Fortran)
 
