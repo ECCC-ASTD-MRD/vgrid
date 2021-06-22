@@ -19,8 +19,6 @@ build_intel-19.0.3:
     - cd build
     - cmake ../ -DCMAKE_INSTALL_PREFIX=${CI_PROJECT_DIR}/install-dir
     - make
-    - make check
-    - make install
   artifacts:
     paths:
       - install-dir
