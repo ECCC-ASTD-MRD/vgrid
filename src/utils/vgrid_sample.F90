@@ -1,3 +1,5 @@
+#include "vgrid_build_info.h"
+
 module mod_vgrid_sample
 
   implicit none
@@ -303,14 +305,13 @@ contains
     character(len=612), dimension(ncle) :: cle, val, def 
     namelist /cfg/ levs, levs_eta, vc_eta, vc_5001, vc_5002, vc_5005, vc_5100, &
        vc_21001_NON_SLEVE, vc_21001_SLEVE, vc_21002_NON_SLEVE, vc_21002_SLEVE
-#include "vgrid_version.hf"
     
     cle = (/'out_dir.'/)
     val = (/'undef   '/)
     def = (/'undef   '/)
     
     stat = exdb('r.vgrid_sample', version, 'NON')
-    write(6,'("   * ",a)')vgrid_descriptors_version
+    write(6,'("   * ",a)')PROJECT_VERSION_STRING
     write(6,'("   **************************************************************"&
          //"****************************************")')
     

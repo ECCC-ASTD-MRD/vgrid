@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "vgrid.h"
+#include "vgrid_build_info.h"
 #include "armnlib.h"
 
 int main () {
@@ -32,9 +33,8 @@ int main () {
   float *f_val = NULL;
   double *a_8_t = NULL, *b_8_t = NULL, *table = NULL;
   vgrid_descriptor *vgd = NULL, *vgd2 = NULL;
-#include "vgrid_version.hc"
   
-  printf("%s\n", vgrid_descriptors_version);
+  printf("%s\n", PROJECT_VERSION_STRING);
 
   printf("c_use_new_read\n");
 

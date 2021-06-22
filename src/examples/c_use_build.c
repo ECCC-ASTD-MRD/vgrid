@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "vgrid.h"
+#include "vgrid_build_info.h"
 
 int main () {
 
@@ -42,7 +43,7 @@ int main () {
   double b_m_8[3] = {     0.0,     0.0,     0.0};
   int    ip1_m[3] = {1000    , 8500   , 500    };
   
-  printf("vgrid_descriptors_version = %s\n", vgrid_descriptors_version);
+  printf("vgrid_descriptors_version = %s\n", PROJECT_VERSION_STRING);
   
   kind=1;
   version=1;

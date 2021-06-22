@@ -1,11 +1,12 @@
 cmake_minimum_required(VERSION 3.14)
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/cmake_rpn)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake_rpn)
 include(ec_init)           # Initialise compilers and ec specific functions
 ec_git_version()           # Get version from git state
 
 project(vgrid)
 set(PROJECT_VERSION ${GIT_VERSION} CACHE STRING "Define the version of VGRID that will be baked into the various artifacts of this build")
+ec_build_info()            # Generate build information
 
 if("${CMAKE_INSTALL_PREFIX}" STREQUAL "/usr/local")
   set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install-site CACHE FILEPATH "CMake Installation prefix for ${PROJECT_NAME}" FORCE)

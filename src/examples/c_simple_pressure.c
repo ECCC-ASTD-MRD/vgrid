@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "vgrid.h"
+#include "vgrid_build_info.h"
 
 int main() {
   
@@ -33,7 +34,7 @@ int main() {
 
 #include "vgrid_version.hc"
   
-  printf("%s\n", vgrid_descriptors_version);
+  printf("%s\n", PROJECT_VERSION_STRING);
 
   // Open RPN standard file on unit iun
   ier = c_fnom(&iun, filename, "RND+R/O", 0);

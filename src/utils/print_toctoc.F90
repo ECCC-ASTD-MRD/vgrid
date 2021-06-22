@@ -1,3 +1,5 @@
+#include "vgrid_build_info.h"
+
 program print_toctoc
    !
    use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_print,vgd_get,vgd_putopt,VGD_ERROR
@@ -12,7 +14,6 @@ program print_toctoc
    character(len=12), parameter :: version='v_2.1.0'
    character(len=256), dimension(ncle) :: cle,val,def
    logical :: ip1m_only_L, ip1t_only_L, box_L, convip_L
-#include "vgrid_version.hf"
    !
    !==========================================================================
    !   
@@ -34,7 +35,7 @@ program print_toctoc
    !
    if(trim(val(1)).eq.'undef')then
       stat=exdb('r.print_toctoc',version,'NON')
-   write(6,'("   * ",a)')vgrid_descriptors_version
+   write(6,'("   * ",a)')PROJECT_VERSION_STRING
    write(6,'("   ******************************************************************************************************")')
       print*,'Usage   : r.print_toctoc -fst rpn_file'
       print*,'Options : -ip1m_only get -> ip1 list on momentum levels only'
@@ -79,7 +80,7 @@ program print_toctoc
    !
    if(box_L)then
       stat=exdb('r.print_toctoc',version,'NON')
-      write(6,'("   * ",a)')vgrid_descriptors_version
+      write(6,'("   * ",a)')PROJECT_VERSION_STRING
       write(6,'("   ******************************************************************************************************")')
    endif
    !

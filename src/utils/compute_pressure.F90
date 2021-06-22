@@ -1,3 +1,5 @@
+#include "vgrid_build_info.h"
+
 module mod_comp_pres
    !
    implicit none
@@ -382,14 +384,13 @@ program compute_pressure
    character(len=256), dimension(ncle) :: cle,val,def
    character(len=10) :: my_var
    character(len=12), parameter :: version='4.2.0'
-#include "vgrid_version.hf"
    !
    cle=(/'s.         ','d.         ','samefile   ','var        ','verbose    ','kind       ','version    ','allow_sigma'/)
    val=(/'undef      ','undef      ','NO         ','undef      ','NO         ','undef      ','undef      ','NO         '/)
    def=(/'undef      ','undef      ','YES        ','undef      ','YES        ','undef      ','undef      ','YES        '/)
    !
    stat=exdb('r.compute_pressure',version,'NON')
-   write(6,'("   * ",a)')vgrid_descriptors_version
+   write(6,'("   * ",a)')PROJECT_VERSION_STRING
    write(6,'("   ******************************************************************************************************")')
    !
    npos=-111

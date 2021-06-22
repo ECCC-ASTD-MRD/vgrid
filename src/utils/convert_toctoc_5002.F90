@@ -1,3 +1,5 @@
+#include "vgrid_build_info.h"
+
 program convert_toctoc_5002
    use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_write,vgd_print,VGD_OK
    implicit none
@@ -24,7 +26,6 @@ program convert_toctoc_5002
    character(len=2) :: typvar
    character(len=4) :: nomvar
    character(len=12) :: etiket
-#include "vgrid_version.hf"
    type(vgrid_descriptor) :: gdv
    
    cle=(/'s.      ','d.      ','samefile'/)
@@ -38,7 +39,7 @@ program convert_toctoc_5002
    !==========================================================================
 
    istat=exdb('r.convert_toctoc_5002',version,'NON')
-   write(6,'("   * ",a)')vgrid_descriptors_version
+   write(6,'("   * ",a)')PROJECT_VERSION_STRING
    write(6,'("   ******************************************************************************************************")')
   
    !==========================================================================

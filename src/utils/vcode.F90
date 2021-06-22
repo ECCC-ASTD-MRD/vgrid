@@ -1,3 +1,5 @@
+#include "vgrid_build_info.h"
+
 program vcode
    !
    use vGrid_Descriptors, only: vgd_print,VGD_ERROR
@@ -8,12 +10,11 @@ program vcode
    integer :: exdb,exfin,npos,stat,code
    character(len=12), parameter :: version='v_1.1.0'
    character(len=256), dimension(ncle) :: cle,val,def
-#include "vgrid_version.hf"
    !
    !==========================================================================
    !   
    stat=exdb('r.vcode',version,'NON')
-   write(6,'("   * ",a)')vgrid_descriptors_version
+   write(6,'("   * ",a)')PROJECT_VERSION_STRING
    write(6,'("   ******************************************************************************************************")')
    !
    ! Get keys

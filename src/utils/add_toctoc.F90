@@ -1,3 +1,5 @@
+#include "vgrid_build_info.h"
+
 program add_toctoc
    use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_write,vgd_print,vgd_putopt,VGD_ERROR
    implicit none
@@ -9,7 +11,6 @@ program add_toctoc
    logical :: samefile_L, allow_sigma_L
    character(len=12), parameter :: version='v_2.2.0'
    type(vgrid_descriptor) :: vgd
-#include "vgrid_version.hf"
   
    cle=(/'s.         ','d.         ','kind       ','samefile   ','allow_sigma'/)
    val=(/'undef      ','undef      ','undef      ','NO         ','NO         '/)
@@ -20,7 +21,7 @@ program add_toctoc
    !==========================================================================
 
    istat=exdb('r.add_toctoc',version,'NON')
-   write(6,'("   * ",a)')vgrid_descriptors_version
+   write(6,'("   * ",a)')PROJECT_VERSION_STRING
    write(6,'("   ******************************************************************************************************")')
 
    !==========================================================================
