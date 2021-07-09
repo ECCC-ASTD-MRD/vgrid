@@ -37,4 +37,6 @@ make check
 make install
 #+end_src
   
+* Data set for check/test is on SCIENCE only (ECCI_DATA_DIR=/home/sici000/ci_data/vgrid)
+
 

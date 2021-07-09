@@ -1,26 +1,5 @@
-To run the tests:
+Data set for tests is on Science only (ECCI_DATA_DIR=/home/sici000/ci_data/vgrid)
 
-1) Setup the environment and make sure you have created the libvgrid.a
-in src:
-. setup_{arch+compiler}.dot
-make clean
-make genlib
-make utils
-
-2) cd test_utils
-
-3) Test all the utilities
-./testutilvgrid.sh
-
-All tests must Succeeded
-
-All tests are done in WORK
-
-4) If one or more test fails, debug and rerun it one by one:
-Control which test to run by modifying script testutilvgrid.sh 
-
-5) Data set for tests is on Science only: 
-ECCI_DATA_DIR : /home/sici000/ci_data/vgrid
 (problem with file dm_5002_from_model_run - removed from test for now)
 (problem with text comparison in test for print_toctoc with adding !! search
 with datev ip3 and etiket. - eliminate almost all tests with diff text files)
