@@ -2,9 +2,12 @@ if(BUILD_TESTING)
 
    #----- Library tests
    message(STATUS "(EC) Generating vgrid library and utilities tests")
+   set(ECCI_DATA_DIR /home/sici000/ci_data/vgrid)
+   #set(ECCI_DATA_DIR /local/drive2/afsr005/ci/vgrid)
 
    file(REMOVE_RECURSE ${CMAKE_BINARY_DIR}/Testing/data_out)
-   execute_process(COMMAND ln -s /home/sidr000/ords/vgrid_validation_data/b_6.5/data ${CMAKE_BINARY_DIR}/Testing/data)
+   execute_process(COMMAND ln -s ${ECCI_DATA_DIR}/b_6.5/data ${CMAKE_BINARY_DIR}/Testing/data)
+   execute_process(COMMAND rm -f -r ${CMAKE_BINARY_DIR}/Testing/data_out)
    execute_process(COMMAND mkdir ${CMAKE_BINARY_DIR}/Testing/data_out)
 
    file(GLOB SRC_TEST lib/src/*)
@@ -31,5 +34,5 @@ if(BUILD_TESTING)
 
    #----- Utilities tests
    find_program(BASH_COMMAND bash)
-   add_test(NAME testutils COMMAND ${BASH_COMMAND} ${CMAKE_SOURCE_DIR}/test/utils/testutilvgrid.sh ${CMAKE_BINARY_DIR}/utils /home/sidr000/ords/vgrid_validation_data/1.9.b3 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/Testing)
+   add_test(NAME testutils COMMAND ${BASH_COMMAND} ${CMAKE_SOURCE_DIR}/test/utils/testutilvgrid.sh ${CMAKE_BINARY_DIR}/utils ${ECCI_DATA_DIR}/1.9.b3 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/Testing)
 endif()

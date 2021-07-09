@@ -18,13 +18,6 @@ BIN_PATH=${1}
 VALIDATION_DATA=${2}
 TMPDIR=$(pwd)/data_out
 
-ln -s ${BIN_PATH}/r.convert_toctoc_5002 .
-ln -s ${BIN_PATH}/r.add_toctoc .
-ln -s ${BIN_PATH}/r.vcode .
-ln -s ${BIN_PATH}/r.compute_pressure .
-ln -s ${BIN_PATH}/r.print_toctoc .
-ln -s ${BIN_PATH}/r.vgrid_sample .
-
 #===========================================================================
 #===========================================================================
 #===========================================================================
@@ -41,7 +34,7 @@ EOF
    if [ oui = oui ];then
       # Test to convert !! and convert all !!SF to P0 if P0 not there
       # Write result in separate file
-      ./r.convert_toctoc_5002 -s ${TMPDIR}/dm2007050912-00-00_001_sans_p0 -d ${TMPDIR}/out_convert_toctoc_5002 
+      ${BIN_PATH}/r.convert_toctoc_5002 -s ${TMPDIR}/dm2007050912-00-00_001_sans_p0 -d ${TMPDIR}/out_convert_toctoc_5002 
       if [ ${?} -ne 0 ];then
          echo "TEST 1 FAILLED!"
          exit 1
@@ -53,7 +46,7 @@ EOF
       # Write result in same file and rm !!SF and old !!
       rm -f  ${TMPDIR}/dm2007050912-00-00_001_same_file
       cp ${TMPDIR}/dm2007050912-00-00_001_sans_p0 ${TMPDIR}/dm2007050912-00-00_001_same_file
-      ./r.convert_toctoc_5002 -samefile -s ${TMPDIR}/dm2007050912-00-00_001_same_file
+      ${BIN_PATH}/r.convert_toctoc_5002 -samefile -s ${TMPDIR}/dm2007050912-00-00_001_same_file
       if [ ${?} -ne 0 ];then
          echo "TEST 2 FAILLED!"
          exit 1
@@ -67,9 +60,9 @@ EOF
          desire(-1,['>>','^^','!!'])
         desire(-1,-1,-1,338995474)
 EOF
-      ./r.convert_toctoc_5002 -samefile -s ${TMPDIR}/tempo
+      ${BIN_PATH}/r.convert_toctoc_5002 -samefile -s ${TMPDIR}/tempo
       rm -f ${TMPDIR}/px
-      ./r.compute_pressure -s ${TMPDIR}/tempo -d ${TMPDIR}/px -var ALL_LEVELS
+      ${BIN_PATH}/r.compute_pressure -s ${TMPDIR}/tempo -d ${TMPDIR}/px -var ALL_LEVELS
       fstcomp -ne -a ${TMPDIR}/px -b ${TMPDIR}/dm2007050912-00-00_001_sans_p0 | grep PX | awk '{if($7 > 5.e-4)print "NOTOK"}' > res
 #xrec -imflds ${TMPDIR}/px 
       if grep -q NOTOK res;then
@@ -96,7 +89,7 @@ if [ ${add_toctoc} = oui ];then
      echo ${ITEM}
      echo ==============
       rm -f $TMPDIR/toctoc
-       ./r.add_toctoc -s ${VALIDATION_DATA}/data_tests/${ITEM} -d $TMPDIR/toctoc -allow_sigma
+      ${BIN_PATH}/r.add_toctoc -s ${VALIDATION_DATA}/data_tests/${ITEM} -d $TMPDIR/toctoc -allow_sigma
       if [ ${?} -ne 0 ];then
          echo "TEST add_toctoc with ${ITEM} FAILLED!"
          exit 1
@@ -110,14 +103,14 @@ fi
 
 if [ ${compute_pressure} = oui ];then
 
-    ITEM=dm_21001_from_model_run_NON_SLEVE
-    echo "TESTING ${VAR} ${VALIDATION_DATA}/data_tests/${ITEM}"
-    rm -f $TMPDIR/px
-    #r.compute_pressure -s ${VALIDATION_DATA}/data_tests/${ITEM} -d $TMPDIR/px -var MOMENTUM
-    if [ ${?} == 0 ];then
-	echo 'The previous command should have produce an error'
-	#exit 1
-    fi
+   ITEM=dm_21001_from_model_run_NON_SLEVE
+   echo "TESTING ${VAR} ${VALIDATION_DATA}/data_tests/${ITEM}"
+   rm -f $TMPDIR/px
+   #${BIN_PATH}/r.compute_pressure -s ${VALIDATION_DATA}/data_tests/${ITEM} -d $TMPDIR/px -var MOMENTUM
+   if [ ${?} == 0 ];then
+	   echo 'The previous command should have produce an error'
+	   #exit 1
+   fi
 
    #for ITEM in east.eta glbeta glbhyb regeta reghyb dm_1001_from_model_run dm_1002_from_model_run dm_1003_from_pgsm_lam_east_ops dm_5001_from_model_run dm_5001_from_model_run dm_5001_from_model_run dm_5002_from_model_run dm_5003_from_model_run dm_5004_from_model_run dm_5005_from_model_run dm_5100_from_model_run dm_5999_from_model_run;do
    #enleve mauvais fichier dm_5002_from_model_run
@@ -126,22 +119,22 @@ if [ ${compute_pressure} = oui ];then
       if [ ${ITEM} = 2001_from_model_run ];then
          VAR_LIST=TT
       elif [ ${ITEM} = dm_5002_from_model_run ];then
-	  VAR_LIST='MOMENTUM THERMO'
+	      VAR_LIST='MOMENTUM THERMO'
       elif [ ${ITEM} = dm_5003_from_model_run ];then
-	  VAR_LIST='MOMENTUM THERMO'
+	      VAR_LIST='MOMENTUM THERMO'
       elif [ ${ITEM} = dm_5004_from_model_run ];then
-	  VAR_LIST='MOMENTUM THERMO'
+	      VAR_LIST='MOMENTUM THERMO'
       elif [ ${ITEM} = dm_5005_from_model_run ];then
-	  VAR_LIST='MOMENTUM THERMO'
+	      VAR_LIST='MOMENTUM THERMO'
       elif [ ${ITEM} = dm_5100_from_model_run ];then
-	  VAR_LIST='MOMENTUM THERMO'
+	      VAR_LIST='MOMENTUM THERMO'
       fi
 
       for VAR in $VAR_LIST;do
 
          echo "TESTING ${VAR} ${VALIDATION_DATA}/data_tests/${ITEM}"
          rm -f $TMPDIR/px
-         ./r.compute_pressure -allow_sigma -s ${VALIDATION_DATA}/data_tests/${ITEM} -d $TMPDIR/px -var ${VAR}
+         ${BIN_PATH}/r.compute_pressure -allow_sigma -s ${VALIDATION_DATA}/data_tests/${ITEM} -d $TMPDIR/px -var ${VAR}
          fstcomp -ne -a $TMPDIR/px -b ${VALIDATION_DATA}/data_tests/${ITEM} | sed -e 's/</ /' -e 's/>/ /' | grep PX | awk '{if($7 > 6.e-6)print "NOTOK"}' > res
          if grep -q NOTOK res;then
             echo "TEST compute_pressure with ${ITEM} FAILED for $VAR"
@@ -159,13 +152,13 @@ fi
 #===========================================================================
 if [ ${print_toctoc} = oui ];then
     
-    echo =================
-    echo Test print_toctoc
-    echo -----------------
+   echo =================
+   echo Test print_toctoc
+   echo -----------------
 
-    DEBUG=non
+   DEBUG=non
 
-    cat > no_ip1t.txt<<EOF
+   cat > no_ip1t.txt<<EOF
  dm_1003_from_pgsm_lam_east_ops
 EOF
 
@@ -183,45 +176,41 @@ EOF
       for kind in ${kinds}
       do
 
-	 lable=_kind_${kind}
+	      lable=_kind_${kind}
          if [ ${kind} = =-1 ];then
             lable=""
          fi
 
-	 echo "Test print_toctoc with kind=${kind} on ${VALIDATION_DATA}/data_tests/${ITEM}"
+	      echo "Test print_toctoc with kind=${kind} on ${VALIDATION_DATA}/data_tests/${ITEM}"
 
-          r.print_toctoc -fst ${VALIDATION_DATA}/data_tests/${ITEM} -no_box -kind ${kind} > to_erase.txt 2>&1
-
+         ${BIN_PATH}/r.print_toctoc -fst ${VALIDATION_DATA}/data_tests/${ITEM} -no_box -kind ${kind} > to_erase.txt 2>&1
          if [ $? != 0 ];then
             echo "ERROR 1:  r.print_toctoc on ${VALIDATION_DATA}/data/${ITEM} -no_box -kind ${kind}"
-		exit 1
+		      exit 1
          fi
 
-          r.print_toctoc -fst ${VALIDATION_DATA}/data_tests/${ITEM} -no_box -kind ${kind} -convip > to_erase.txt 2>&1
-
+         ${BIN_PATH}/r.print_toctoc -fst ${VALIDATION_DATA}/data_tests/${ITEM} -no_box -kind ${kind} -convip > to_erase.txt 2>&1
          if [ $? != 0 ];then
             echo "ERROR 1:  r.print_toctoc on ${VALIDATION_DATA}/data/${ITEM} -no_box -kind ${kind} -convip "
-		exit 1
+		      exit 1
          fi
 
-          r.print_toctoc -fst ${VALIDATION_DATA}/data_tests/${ITEM} -ip1m_only -kind ${kind} > to_erase.txt 2>&1
-
+         ${BIN_PATH}/r.print_toctoc -fst ${VALIDATION_DATA}/data_tests/${ITEM} -ip1m_only -kind ${kind} > to_erase.txt 2>&1
          if [ $? != 0 ];then
             echo "ERROR 2:  r.print_toctoc -ip1m_only on ${VALIDATION_DATA}/data_tests/${ITEM} "
-		     exit 1
+		      exit 1
          fi
 
-          r.print_toctoc -fst ${VALIDATION_DATA}/data_tests/${ITEM} -ip1t_only -kind ${kind} > to_erase.txt 2>&1
+         ${BIN_PATH}/r.print_toctoc -fst ${VALIDATION_DATA}/data_tests/${ITEM} -ip1t_only -kind ${kind} > to_erase.txt 2>&1
          if [ $? != 0 ];then
-		 echo "ERROR 3:  r.print_toctoc -ip1t_only on ${VALIDATION_DATA}/data_tests/${ITEM} "
-		     exit 1
+		      echo "ERROR 3:  r.print_toctoc -ip1t_only on ${VALIDATION_DATA}/data_tests/${ITEM} "
+		      exit 1
+      	fi
 
-	 fi
-
-          r.print_toctoc -fst ${VALIDATION_DATA}/data_tests/${ITEM} -ip1m_only -out output_file.txt -kind ${kind} > to_erase.txt 2>&1
+         ${BIN_PATH}/r.print_toctoc -fst ${VALIDATION_DATA}/data_tests/${ITEM} -ip1m_only -out output_file.txt -kind ${kind} > to_erase.txt 2>&1
          if [ $? != 0 ];then
             echo "ERROR 4.2:  r.print_toctoc on ${VALIDATION_DATA}/data_tests/${ITEM}"
-		exit 1
+		      exit 1
          fi
 
       done
@@ -230,97 +219,98 @@ EOF
 
    #rm -f to_erase.txt
 fi
+
 #===========================================================================
 #===========================================================================
 #===========================================================================
 
 if [ ${vgrid_sample} = oui ];then
 
-    echo "==================="
-    echo "Test r.vgrid_sample"
-    echo "-------------------"
+   echo "==================="
+   echo "Test r.vgrid_sample"
+   echo "-------------------"
 
-    echo "Test r.vgrid_sample 1"
-    # r.vgrid_sample test 1
-    rm -rf out_dir vgrid_sample.nml
-    r.vgrid_sample -out_dir out_dir > listing_r.vgrid_sample    
-    #mkdir -p ${VALIDATION_DATA}/data_tests_res/vgrid_sample/${EC_ARCH}
-    #rm -rf ${VALIDATION_DATA}/data_tests_res/vgrid_sample/${EC_ARCH}/out_dir
-    #cp -r out_dir ${VALIDATION_DATA}/data_tests_res/vgrid_sample/${EC_ARCH}
+   echo "Test r.vgrid_sample 1"
+   # r.vgrid_sample test 1
+   rm -rf out_dir vgrid_sample.nml
+   ${BIN_PATH}/r.vgrid_sample -out_dir out_dir > listing_r.vgrid_sample    
+   #mkdir -p ${VALIDATION_DATA}/data_tests_res/vgrid_sample/${EC_ARCH}
+   #rm -rf ${VALIDATION_DATA}/data_tests_res/vgrid_sample/${EC_ARCH}/out_dir
+   #cp -r out_dir ${VALIDATION_DATA}/data_tests_res/vgrid_sample/${EC_ARCH}
 
-    # Test if all files produced by the current program
-    # are in the validation directory
-    OK=1
-    for file in out_dir/*;do
-	if [ ! -f ${VALIDATION_DATA}/data_tests_res/vgrid_sample/${EC_ARCH}/out_dir/${file##*/} ];then
-	    echo "ERROR: new file \"${file##*/}\" not in validation data ${VALIDATION_DATA}/data_tests_res/vgrid_sample/${EC_ARCH}/out_dir"
-	    OK=0
-	fi
-    done
+   # Test if all files produced by the current program
+   # are in the validation directory
+   OK=1
+   for file in out_dir/*;do
+	   if [ ! -f ${VALIDATION_DATA}/data_tests_res/vgrid_sample/${EC_ARCH}/out_dir/${file##*/} ];then
+	      echo "ERROR: new file \"${file##*/}\" not in validation data ${VALIDATION_DATA}/data_tests_res/vgrid_sample/${EC_ARCH}/out_dir"
+	      OK=0
+	   fi
+   done
     
-    n_file_checked=0
+   _file_checked=0
     for file in $(ls ${VALIDATION_DATA}/data_tests_res/vgrid_sample/${EC_ARCH}/out_dir/*);do
-	((n_file_checked=n_file_checked+1))
-        r.print_toctoc -no_box -fst out_dir/${file##*/} > ${file##*/}_tests.txt
-	r.print_toctoc -no_box -fst ${file} > ${file##*/}_ctrl.txt
-	if diff  ${file##*/}_tests.txt ${file##*/}_ctrl.txt;then
-           :
-        else
-	   OK=0
-           echo "ERROR with ${file##*/} on r.vgrid_sample test 1"
-        fi
-    done
-    if [ ${OK} = 0 ];then
-       echo "ERROR with r.vgrid_sample for r.vgrid_sample test 1 for some Vcode, see diff output above"
-       exit 1
-    fi    
-    if [ ${n_file_checked} = 0 ];then
-	echo "ERROR with r.vgrid_sample for r.vgrid_sample test 1 no file were checked"
-	exit 1
-    fi
+	   ((n_file_checked=n_file_checked+1))
+      ${BIN_PATH}/r.print_toctoc -no_box -fst out_dir/${file##*/} > ${file##*/}_tests.txt
+	   ${BIN_PATH}/r.print_toctoc -no_box -fst ${file} > ${file##*/}_ctrl.txt
+	   if diff  ${file##*/}_tests.txt ${file##*/}_ctrl.txt;then
+         :
+      else
+	      OK=0
+         echo "ERROR with ${file##*/} on r.vgrid_sample test 1"
+      fi
+   done
+   if [ ${OK} = 0 ];then
+      echo "ERROR with r.vgrid_sample for r.vgrid_sample test 1 for some Vcode, see diff output above"
+      exit 1
+   fi    
+   if [ ${n_file_checked} = 0 ];then
+	   echo "ERROR with r.vgrid_sample for r.vgrid_sample test 1 no file were checked"
+	   exit 1
+   fi
 
-    # r.vgrid_sample test 2
-    echo "Test r.vgrid_sample 2"
-    cat > vgrid_sample.nml<<EOF
-    &cfg
+   # r.vgrid_sample test 2
+   echo "Test r.vgrid_sample 2"
+   cat > vgrid_sample.nml<<EOF
+   &cfg
    vc_eta%ptop_8 = 1000.
    levs_eta = 0.0 ,0.5, 1.0
 /
 EOF
-    rm -rf out_dir_2
-    r.vgrid_sample -out_dir out_dir_2 > listing_r.vgrid_sample_2
-    #mkdir -p ${VALIDATION_DATA}/data_tests_res/vgrid_sample/${EC_ARCH}
-    #rm -rf ${VALIDATION_DATA}/data_tests_res/vgrid_sample/${EC_ARCH}/out_dir_2
-    #cp -r out_dir_2 ${VALIDATION_DATA}/data_tests_res/vgrid_sample/${EC_ARCH}
-    # Test if all files produced by the current program
-    # are in the validation directory
-    OK=1
-    for file in out_dir_2/*;do
-	if [ ! -f ${VALIDATION_DATA}/data_tests_res/vgrid_sample/${EC_ARCH}/out_dir_2/${file##*/} ];then
-	    echo "ERROR: new file \"${file##*/}\" not in validation data ${VALIDATION_DATA}/data_tests_res/vgrid_sample/${EC_ARCH}/out_dir_2"
-	    OK=0
-	fi
-    done
-    n_file_checked=0
-    for file in $(ls ${VALIDATION_DATA}/data_tests_res/vgrid_sample/${EC_ARCH}/out_dir_2/*);do
-        ((n_file_checked=n_file_checked+1))
-	r.print_toctoc -no_box -fst out_dir_2/${file##*/} > ${file##*/}_tests.txt
-	r.print_toctoc -no_box -fst ${file} > ${file##*/}_ctrl.txt
-	if diff  ${file##*/}_tests.txt ${file##*/}_ctrl.txt;then
-           :
-        else
-	   OK=0
-           echo "ERROR with ${file##*/} on r.vgrid_sample test 2"
-        fi
-    done
-    if [ ${OK} = 0 ];then
-       echo "ERROR with r.vgrid_sample for r.vgrid_sample test 2 for some Vcode, see diff output above"
-       exit 1
-    fi
-    if [ ${n_file_checked} = 0 ];then
-	echo "ERROR with r.vgrid_sample for r.vgrid_sample test 2 no file were checked"
-	exit 1
-    fi
+   rm -rf out_dir_2
+   ${BIN_PATH}/r.vgrid_sample -out_dir out_dir_2 > listing_r.vgrid_sample_2
+   #mkdir -p ${VALIDATION_DATA}/data_tests_res/vgrid_sample/${EC_ARCH}
+   #rm -rf ${VALIDATION_DATA}/data_tests_res/vgrid_sample/${EC_ARCH}/out_dir_2
+   #cp -r out_dir_2 ${VALIDATION_DATA}/data_tests_res/vgrid_sample/${EC_ARCH}
+   # Test if all files produced by the current program
+   # are in the validation directory
+   OK=1
+   for file in out_dir_2/*;do
+	   if [ ! -f ${VALIDATION_DATA}/data_tests_res/vgrid_sample/${EC_ARCH}/out_dir_2/${file##*/} ];then
+	      echo "ERROR: new file \"${file##*/}\" not in validation data ${VALIDATION_DATA}/data_tests_res/vgrid_sample/${EC_ARCH}/out_dir_2"
+	      OK=0
+	   fi
+   done
+   n_file_checked=0
+   for file in $(ls ${VALIDATION_DATA}/data_tests_res/vgrid_sample/${EC_ARCH}/out_dir_2/*);do
+      ((n_file_checked=n_file_checked+1))
+	   ${BIN_PATH}/r.print_toctoc -no_box -fst out_dir_2/${file##*/} > ${file##*/}_tests.txt
+	   ${BIN_PATH}/r.print_toctoc -no_box -fst ${file} > ${file##*/}_ctrl.txt
+	   if diff  ${file##*/}_tests.txt ${file##*/}_ctrl.txt;then
+         :
+      else
+	      OK=0
+         echo "ERROR with ${file##*/} on r.vgrid_sample test 2"
+      fi
+   done
+   if [ ${OK} = 0 ];then
+      echo "ERROR with r.vgrid_sample for r.vgrid_sample test 2 for some Vcode, see diff output above"
+      exit 1
+   fi
+   if [ ${n_file_checked} = 0 ];then
+	   echo "ERROR with r.vgrid_sample for r.vgrid_sample test 2 no file were checked"
+	   exit 1
+   fi
 
 fi
 

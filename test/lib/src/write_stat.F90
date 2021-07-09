@@ -53,6 +53,20 @@ program tests
 
   ! Print information about the instance
   stat = vgd_write(d,unit=luo,format='fst')
+  call close_fst(lui,luo)
+
   call ut_report(stat,message='Grid_Descriptors::vgd_write write descriptors')
 
 end program tests
+
+subroutine close_fst(lui,luo)
+
+   implicit none
+   integer lui,luo,fstfrm,stat
+
+   stat=fstfrm(lui)
+   stat=fstfrm(luo)
+
+   print*,'fst files closed'
+
+end subroutine close_fst

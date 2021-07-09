@@ -29,7 +29,7 @@ program test_allow_sigma
   integer :: fnom,fstouv,fstfrm
   logical :: ok=.true., my_bol_value
 
-  stat=fnom(lu,"data/dm_1001_from_model_run","RND",0)
+  stat=fnom(lu,"data/dm_1001_from_model_run","RND+R/O",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
      call abort
