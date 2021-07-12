@@ -3,7 +3,7 @@ variables:
     GIT_SUBMODULE_STRATEGY: recursive
 stages:
   - build
-#  - test
+  - test
 #  - package
 #  - deploy
 
@@ -11,7 +11,7 @@ before_script:
   # Force color CMake output even when output is not TTY
   - export CLICOLOR_FORCE=true
 
-build_intel-19.0.3:
+build:intel-19.0.3:
   stage: build
   script:
     - source ~/ci-admin-bundle/environments/latest/ubuntu-18.04-skylake-64/intel-19.0.3.199.sh
@@ -20,10 +20,11 @@ build_intel-19.0.3:
     - cmake ../ -DCMAKE_INSTALL_PREFIX=${CI_PROJECT_DIR}/install-dir
     - make
   artifacts:
+    expire_in: 2 hrs
     paths:
       - install-dir
 
-build_gnu-7.4.0:
+build:gnu-7.4.0:
   stage: build
   script:
     - source ~/ci-admin-bundle/environments/latest/ubuntu-18.04-amd-64/gnu-7.4.0.sh
@@ -32,5 +33,19 @@ build_gnu-7.4.0:
     - cmake ../ -DCMAKE_INSTALL_PREFIX=${CI_PROJECT_DIR}/install-dir
     - make
   artifacts:
+    expire_in: 2 hrs
     paths:
       - install-dir
+
+test:intel-19.0.3:
+   stage: test
+   script:
+      - source ~/ci-admin-bundle/environments/latest/ubuntu-18.04-amd-64/intel-19.0.3.199.sh
+      - make check
+
+test:gnu-7.4.0:
+   stage: test
+   script:
+      - source ~/ci-admin-bundle/environments/latest/ubuntu-18.04-amd-64/gnu-7.4.0.sh
+      - make check
+#ssm:
