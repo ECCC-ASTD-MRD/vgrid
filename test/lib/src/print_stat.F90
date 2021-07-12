@@ -29,12 +29,12 @@ program tests
   stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
-     call exit(1)
+     error stop 1
   endif
   stat=fstouv(lu,'RND')
   if(stat.lt.0)then
      print*,'No record in RPN file'
-     call exit(1)
+     error stop 1
   endif
 
   ! Construct a new set of 3D coordinate descriptors

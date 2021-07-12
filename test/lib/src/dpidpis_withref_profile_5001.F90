@@ -39,19 +39,19 @@ program tests
   stat=fnom(lu,"data/dm_5001_from_model_run","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
-     call abort
+     error stop 1
   endif
   stat=fstouv(lu,'RND')
   if(stat.lt.0)then
      print*,'No record in RPN file'
-     call abort
+     error stop 1
   endif
 
   ! Get dpidpis
   stat = vgd_new(d,unit=lu,format="fst")
   if(stat/=VGD_OK)then
      print*,'ERROR with vgd_new'
-     call exit(1)
+     error stop 1
   endif  
 
   stat = vgd_get(d,key='CB_M - vertical B coefficient (m)',value=coef_b)
@@ -64,7 +64,7 @@ program tests
   if(stat.ne.VGD_OK)then
      print*,'ERROR: problem with vgd_dpidpis'
      stat=fstfrm(lu)
-     call abort
+     error stop 1
   endif
 
   print*,'size(dpidpis_cube)',size(dpidpis_cube)
@@ -94,7 +94,7 @@ program tests
   if(stat.ne.VGD_OK)then
      print*,'ERROR: problem with vgd_dpidpis real(kind=8)'
      stat=fstfrm(lu)
-     call abort
+     error stop 1
   endif
 
   print*,'size(dpidpis_cube_8)',size(dpidpis_cube_8)

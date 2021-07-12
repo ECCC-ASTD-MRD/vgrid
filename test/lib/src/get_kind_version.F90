@@ -32,12 +32,12 @@ program constructor
   stat=fnom(lu,"data/dm_1002_from_model_run_plus_toc","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
-     call exit(1)
+     error stop 1
   endif
   stat=fstouv(lu,'RND')
   if(stat.le.0)then
      print*,'No record in RPN file'
-     call exit(1)
+     error stop 1
   endif
 
   ! Construct a new set of 3D coordinate descriptors
@@ -45,7 +45,7 @@ program constructor
   if(stat.ne.VGD_OK)then
      print*,'ERROR: problem with vgd_new'
      stat=fstfrm(lu)
-     call exit(1)
+     error stop 1
   endif
   stat = vgd_print(d)
   stat = vgd_get(d,key='KIND',value=kind)

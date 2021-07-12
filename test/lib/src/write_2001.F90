@@ -38,12 +38,12 @@ program constructor
   stat=fnom(lu,"test.fst","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
-     call abort
+     error stop 1
   endif
   stat=fstouv(lu,'RND')
   if(stat.lt.0)then
      print*,'No record in RPN file'
-     call abort
+     error stop 1
   endif
 
   ! Construct a new set of 3D coordinate descriptors
@@ -59,7 +59,7 @@ program constructor
   stat = vgd_print(d)
   if(stat==VGD_ERROR)then
      call system('rm -f test.fst')
-     call exit(1)
+     error stop 1
   endif
   stat = vgd_write(d,unit=lu,format='fst')
   stat = vgd_get(d,'IP_1 - record ip1',ip1)
@@ -67,7 +67,7 @@ program constructor
   stat = vgd_new(d_rtn,unit=lu,format='fst',ip1=ip1,ip2=ip2)
   if(stat==VGD_ERROR)then
      call system('rm -f test.fst')
-     call exit(1)
+     error stop 1
   endif
 
   stat = vgd_get(d_rtn,key='COFA - vertical A coefficient',value=pres_rtn)

@@ -44,12 +44,12 @@ program constructor
      stat=fnom(iun(i),files(i),"RND",0)
      if(stat.lt.0)then
         print*,'ERROR with fnom on ',trim(files(i))
-        call abort
+        error stop 1
      endif
      stat=fstouv(iun(i),"RND")
      if(stat.lt.0)then
         print*,'Error with fstouv on ',trim(files(i))
-        call abort
+        error stop 1
      endif
   enddo
 

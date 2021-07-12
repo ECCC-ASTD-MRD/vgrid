@@ -31,7 +31,7 @@
 #define write_control 0
 
 
-void main() {
+int main() {
 
   FILE *fp;
   int ier, nk, key, ij, nl, nl_c, in_log, k;
@@ -46,30 +46,30 @@ void main() {
   // Get any heights vertical descriptor
   if(c_fnom(&iun,filename,mode,0) < 0 ) {
     printf("ERROR with c_fnom on iun, file %s\n", filename);
-    exit(1);
+    return(1);
   }
   if(c_fstouv(iun,"RND","") < 0 ) {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
-    exit(1);
+    return(1);
   }
   if( Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read\n");
-    exit(1);
+    return(1);
   }
   if( Cvgd_get_int(vgd, "NL_M", &nl, quiet) == VGD_ERROR){
     printf("ERROR cannot Cvgd_get_int on NL_M\n");
-    exit(1);
+    return(1);
   }
   printf("Found %d heights\n", nl);
   
   i_val = malloc(nl * sizeof(int));
   if(! i_val){
     printf("Problem allocating i_val of size %d\n",nl);
-    exit(1);
+    return(1);
   }
   if(Cvgd_get_int_1d(vgd, "VIPM", &i_val, NULL, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_int for VIPM\n");
-    exit(1);
+    return(1);
   }
   //for(k=0; k<nl; k++){
   //  printf("i_val[k] = %d\n",i_val[k]);
@@ -80,11 +80,11 @@ void main() {
   hgts = malloc(nl * sizeof(float));
   if(! hgts){
     printf("Problem allocating hgts of size %d\n",nl);
-    exit(1);
+    return(1);
   }
   if(Cvgd_levels(vgd, 1, 1, nl, i_val, hgts, &me, 0) == VGD_ERROR){
     printf("Problem Computing heights");
-    exit(1);
+    return(1);
   }
   //for(k=0; k<nl; k++){
   //  printf("ghts[k]. = %f\n",hgts[k]);
@@ -92,12 +92,12 @@ void main() {
   pres = malloc(nl * sizeof(float));
   if(! pres){
     printf("Problem allocating pres of size %d\n",nl);
-    exit(1);
+    return(1);
   }
   if(Cvgd_stda76_pres_from_hgts_list(pres, hgts, nl)
      == VGD_ERROR){
     printf("Problem Computing pres from heights value");
-    exit(1);
+    return(1);
   }
   //for(k=0; k<nl; k++){
   //  printf("k = %d, pres[k] = %f, hgts[k] = %f\n", k, pres[k], hgts[k]);
@@ -117,14 +117,14 @@ void main() {
   fscanf(fp, "%s %d",buff, &nl_c);
   if( nl_c != nl){
     printf("ERROR in tests, size problem with validation file\n");
-    exit(1);
+    return(1);
   }
   for( k=0; k<nl; k++){
     fscanf(fp,"%f", &ff);
     if( fabs(ff - pres[k]) > .01f ){
       printf("ERROR differences found, expecting: %f, got %f\n", ff, pres[k]);
       printf("ERROR TEST on file %s failled\n", filename_c);
-      exit(1);
+      return(1);
     }
   }
   printf("The following error is expected\n");
@@ -132,11 +132,9 @@ void main() {
   if(Cvgd_stda76_pres_from_hgts_list(pres,hgts,nl)
      == VGD_OK){
     printf("Problem: call sould have produce a bound error by did not\n");
-    exit(1);
+    return(1);
   }
   
   printf("All tests OK");
-  ier = c_ut_report(VGD_OK,
-		    "testing Cvgd_stda76_pres_from_hgts_list");
-
+  return(c_ut_report(VGD_OK,"testing Cvgd_stda76_pres_from_hgts_list"));
 }

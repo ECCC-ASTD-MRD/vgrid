@@ -51,7 +51,7 @@ char* concat(const char *s1, const char *s2)
     char *result = malloc(strlen(s1)+strlen(s2)+1);//+1 for the null-terminator
     if(! result){
       printf("Problem in tests with concat");
-      exit(1);
+      return(1);
     }
     strcpy(result, s1);
     strcat(result, s2);
@@ -203,7 +203,7 @@ int test_it(char *filename, int ind) {
 //========================================================================
 //========================================================================
 
-void main() {
+int main() {
   
   int i, ier, status = VGD_OK;
 
@@ -214,13 +214,13 @@ void main() {
     printf("ERROR with VGD_STDA76_SFC_T, expected %f got %f\n", 273.15 +15,
 	   VGD_STDA76_SFC_T);
     status = VGD_ERROR;
-    exit(1);
+    return(1);
   }
   if(fabs(VGD_STDA76_SFC_P - 101325.)/101325. > 1.e-5){
     printf("ERROR with VGD_STDA76_SFC_P, expected %f got %f\n", 101325.,
 	   VGD_STDA76_SFC_P);
     status = VGD_ERROR;
-    exit(1);
+    return(1);
   }
   
   // Tests stda76 functions on all files
@@ -229,9 +229,8 @@ void main() {
     if(test_it(filenames[i],i) == VGD_ERROR){
       printf("ERROR with %s\n",filenames[i]);
       status = VGD_ERROR;
-      exit(1);
+      return(1);
     }
   }  
-  ier = c_ut_report(status,"testing Cvgd_stda76");  
-  
+  return(c_ut_report(status,"testing Cvgd_stda76"));  
 }

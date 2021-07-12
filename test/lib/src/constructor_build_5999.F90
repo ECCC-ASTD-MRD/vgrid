@@ -55,12 +55,12 @@ program constructor_build_5999
   ier=fnom(lui,file,"RND",0)
   if(ier.lt.0)then
      print*,'ERROR with fnom on file ',file
-     call exit(1)
+     error stop 1
   endif
   ier=fstouv(lui,'RND')
   if(ier.lt.0)then
      print*,'No record in RPN file ',file
-     call exit(1)
+     error stop 1
   endif
   if(vgd_new(vgd,unit=lui,format="fst") == VGD_ERROR)OK=.false.  
 
@@ -78,7 +78,7 @@ program constructor_build_5999
   stat=vgd_new(vgd2,kind=5,version=999,nk=size(a_m_8),ip1=1,ip2=2,&
        a_m_8=a_m_8,b_m_8=b_m_8,ip1_m=ip1_m)
   if(stat==VGD_OK)then
-     print*,'Error with test on wrong ip1 kind, vgd_new should have return error but did not'
+     print*,'Error with test on wrong ip1 kind, vgd_new should have error stop 1 error but did not'
      OK=.false.
   endif
   ! Try create with ip1 repetition
@@ -104,13 +104,13 @@ program constructor_build_5999
      ier=fnom(luo,file,"RND",0)
      if(ier.lt.0)then
         print*,'ERROR with fnom on file ',file
-        call exit(1)
+        error stop 1
      endif
      ier=vgd_print(vgd2)     
      ier=fstouv(luo,'RND')
      if(ier.lt.0)then
         print*,'No record in RPN file ',file
-        call exit(1)
+        error stop 1
      endif     
      ! Copy fields
      LOOP_ON_NOMVAR: do i=1,size(nomvars)

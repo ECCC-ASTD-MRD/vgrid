@@ -32,12 +32,12 @@ program constructor
   stat=fnom(lu,"data/dm_1001_just_p0","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
-     call abort
+     error stop 1
   endif
   stat=fstouv(lu,"RND")
   if(stat.lt.0)then
      print*,'Error with fstouv'
-     call abort
+     error stop 1
   endif
   print*,'The following should produce an error since there is no levels in file'
   stat=vgd_new(d,lu)

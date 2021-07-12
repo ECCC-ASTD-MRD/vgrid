@@ -47,16 +47,16 @@ program stda76
   stat = vgd_putopt("ALLOW_SIGMA",.true.)
 
   if(abs(VGD_STDA76_SFC_T - 288.15)/288.15 > 1.e-5)then
-     call exit(1)
+     error stop 1
   endif
   if(abs(VGD_STDA76_SFC_P - 101325.)/101325. > 1.e-5)then
-     call exit(1)
+     error stop 1
   endif
  
   do i=1,nfiles
      stat = stda_do_it(lu,files(i))
      if(stat==VGD_ERROR)then
-        call exit(1)
+        error stop 1
      endif
   enddo
   call ut_report(ok,message='Grid_Descriptors::vgd_levels level calculation status')

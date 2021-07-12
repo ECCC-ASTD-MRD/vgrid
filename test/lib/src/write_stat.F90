@@ -31,17 +31,17 @@ program tests
   stat=fnom(lui,"data/dm_5002_from_model_run","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
-     call abort()
+     error stop 1
   endif
   stat=fstouv(lui,'RND')
   if(stat.le.0)then
      print*,'No record in RPN file'
-     call abort()
+     error stop 1
   endif
   stat=fnom(luo,"data_out/dm_5002_from_model_run","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
-     call abort()
+     error stop 1
   endif
   stat=fstouv(luo,'RND')
   open(unit=lutxt,file='data/dm_5002_ips.txt',status='OLD')

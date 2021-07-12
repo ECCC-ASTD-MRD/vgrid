@@ -51,14 +51,14 @@ program constructor
   stat=fnom(lui,"data/dm_1002_from_model_run","RND+OLD",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom 1'
-     call abort
+     error stop 1
   endif
   stat=fstouv(lui,'RND')
 
   stat=fnom(luo,"data_out/dm_1002","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom 2'
-     call abort
+     error stop 1
   endif
   stat=fstouv(luo,'RND')
 
@@ -66,7 +66,7 @@ program constructor
   if(stat.lt.0)then
      print*,'ERROR with fstinl'
      call close_fst(lui,luo)
-     call abort
+     error stop 1
   endif
   
   nk=infon
@@ -74,7 +74,7 @@ program constructor
   if(nk.le.0)then
      print*,'ERROR no TT records'
      call close_fst(lui,luo)
-     call abort
+     error stop 1
   endif
 
   allocate(ip1_m(nk),a_m_8(nk),b_m_8(nk),eta(nk))
@@ -86,7 +86,7 @@ program constructor
      if(stat.lt.0)then
         print*,'ERROR with fstprm'
         call close_fst(lui,luo)
-        call abort
+        error stop 1
      endif
      call convip(ip1,eta(k),kind,-1,blk_S,.false.)
      ip1_m(k)=ip1
@@ -94,7 +94,7 @@ program constructor
      if(kind.ne.1)then
         print*,'ERROR wrong kind:',kind
         call close_fst(lui,luo)
-        call abort
+        error stop 1
      endif
   enddo
 
@@ -103,9 +103,9 @@ program constructor
      print*,'WARNING cannot find PT. Will look for HY'
      keyhy=fstinf(lui,nii,njj,nkk,-1,' ',-1,-1,-1,' ','HY')
      if(keyhy.lt.0)then
-        print*,'ERROR with fstinf on HY. Will abort'
+        print*,'ERROR with fstinf on HY. Will exit(1)'
         call close_fst(lui,luo)
-        call abort
+        error stop 1
      endif
   endif
 
@@ -125,7 +125,7 @@ program constructor
      if (ig2.ne.1000) then
         print*,'ERROR with rcoef not equal 1.0 from HY. rcoef= ',rcoef1
         call close_fst(lui,luo)
-        call abort
+        error stop 1
      endif
      call convip(ip1,pp,kind,-1,blk_S,.false.)
      ptop_8=pp*100.d0
@@ -154,7 +154,7 @@ program constructor
   if(stat.ne.VGD_OK)then
      print*,'ERROR: problem with vgd_new'
      call close_fst(lui,luo)
-     call abort
+     error stop 1
   endif
 
   ! Construct a new set of 3D coordinate descriptors
@@ -162,7 +162,7 @@ program constructor
   if(stat.ne.VGD_OK)then
      print*,'ERROR: problem with vgd_write'
      call close_fst(lui,luo)
-     call abort
+     error stop 1
   endif
 
   call ut_report(stat,'Grid_Descriptors, vgd_new, vgd_write')

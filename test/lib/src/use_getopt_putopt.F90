@@ -61,7 +61,7 @@ program tests
   stat=vgd_putopt('ALLOW_RESHAPE',.true.)
   if(stat==VGD_ERROR)then
      print*,'This should not happend please fixit'
-     call exit(1)
+     error stop 1
   endif
   stat=vgd_getopt('ALLOW_RESHAPE',key_value_L)
   if(.not.key_value_L)then
@@ -72,7 +72,7 @@ program tests
   stat=vgd_putopt('ALLOW_SIGMA',.true.)
   if(stat==VGD_ERROR)then
      print*,'This should not happend please fixit 2'
-     call exit(1)
+     error stop 1
   endif
   stat=vgd_getopt('ALLOW_SIGMA',key_value_L)
   if(.not.key_value_L)then

@@ -118,11 +118,11 @@ integer function test_2001(F_d,F_file,F_write_control_L) result(istat)
    !
    if(nl_m.ne.size(b_m_8))then
       print*,'Problem with NL_M should be',size(b_m_8),' got',nl_m
-      return
+      error stop 1
    endif
    if(nl_t.ne.size(b_m_8))then
       print*,'Problem with NL_T should be',size(b_m_8),' got',nl_t
-      return
+      error stop 1
    endif
    !
    nk=size(a_m_8)
@@ -136,24 +136,24 @@ integer function test_2001(F_d,F_file,F_write_control_L) result(istat)
       if(abs(work_8(k)-a_m_8(k))/a_m_8(k)>10.*epsilon(a_m_8(k)))then
          print*,'Probleme avec A, pas dans les limites tollerees'
          print*,work_8(k),'vs',a_m_8(k)
-         return
+         error stop 1
       endif
    enddo
    if(any(a_m_8.ne.a_t_8))then
       print*,'Probleme avec A T, dot egaler A M :'
       print*,a_t_8
       print*,a_m_8
-      return
+      error stop 1
    endif
    !
    ! Check B
    if(any(b_m_8.ne.0.d0))then
       print*,'Probleme avec B M, doit egaler 0.0d :',b_m_8
-      return
+      error stop 1
    endif
    if(any(b_t_8.ne.0.d0))then
       print*,'Probleme avec B T, doit egaler 0.0d :',b_t_8
-      return
+      error stop 1
    endif
    !
    ! Check IP
@@ -164,14 +164,14 @@ integer function test_2001(F_d,F_file,F_write_control_L) result(istat)
       if(work_i(k).ne.vipm(k))then
          print*,'Probleme avec IP :'
          print*,work_i(k),'vs',vipm(k)
-         return
+         error stop 1
       endif
    enddo
    if(any(vipm.ne.vipt))then
       print*,'Probleme avec ip1 T , doit egaler ip1 M :'
       print*,vipt
       print*,vipm
-      return
+      error stop 1
    endif
    !
    ! Check vcdm
@@ -182,14 +182,14 @@ integer function test_2001(F_d,F_file,F_write_control_L) result(istat)
       if(abs(work(k)-vcdm(k))/vcdm(k)>10.*epsilon(vcdm(k)))then
          print*,'Probleme avec vcdm, pas dans les limites tollerees'
          print*,work(k),'vs',vcdm(k)
-         return
+         error stop 1
       endif
    enddo
    if(any(vcdm.ne.vcdt))then
       print*,'Probleme avec VCDT, doit egaler VCDM'
       print*,vcdt
       print*,vcdm
-      return
+      error stop 1
    endif
    !
    close(10)

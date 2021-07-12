@@ -47,12 +47,12 @@ program get_levels_from_keys
   stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
-     call abort
+     error stop 1
   endif
   stat=fstouv(lu,'RND')
   if(stat.le.0)then
      print*,'No record in RPN file'
-     call abort
+     error stop 1
   endif
 
   ! Get vertical grid descriptor

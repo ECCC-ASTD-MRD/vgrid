@@ -38,12 +38,12 @@ program tests
   stat=fnom(lu,"data/gg_5001_from_model_run_plus_toc","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
-     call abort
+     error stop 1
   endif
   stat=fstouv(lu,'RND')
   if(stat.lt.0)then
      print*,'No record in RPN file'
-     call abort
+     error stop 1
   endif
   open(unit=lutxt,file='data/gg_5001_ips.txt',status='OLD')
   read(lutxt,*) ip1,ip2
@@ -67,7 +67,7 @@ program tests
   if(stat.ne.VGD_OK)then
      print*,'ERROR: problem with vgd_levels'
      stat=fstfrm(lu)
-     call abort
+     error stop 1
   endif
 
   pres_profil=pres_profil*.01

@@ -763,7 +763,7 @@ int test_it(char *filename, int ind) {
 }
 
 //========================================================================
-void main() {
+int main() {
   
   int i, ier, status = VGD_OK;
 
@@ -775,6 +775,6 @@ void main() {
       status = VGD_ERROR;
   }  
 
-  ier = c_ut_report(status,"testing new_build");  
+  return(c_ut_report(status,"testing new_build"));  
   
 }

@@ -24,7 +24,7 @@
 #include "rpnmacros.h"
 #include "armnlib.h"
 
-void main() {
+int main() {
 
   int ier, iun = 10, iun2 = 11;
   int quiet = 0, *i_val = NULL, in_log = 0, dpidpis = 0;
@@ -51,17 +51,17 @@ void main() {
   ier = c_fnom(&iun,filename,mode,0);
   if( ier < 0 ) {
     printf("ERROR with c_fnom on iun, file %s\n", filename);
-    exit(1);
+    return(1);
   }
   ier = c_fstouv(iun,"RND","");  
   if( ier < 0 ) {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
-    exit(1);
+    return(1);
   }
   key = c_fstinf(iun,&ni,&nj,&nk,-1," ",-1,  -1,  -1," ","!!");
   if(key < 0){
     printf("ERROR cannot find !!\n");
-    exit(1);
+    return(1);
   }
   if( c_fstprm(key,
 	       &dateo,  &deet,   &npas, 
@@ -73,29 +73,29 @@ void main() {
 	       &swa,    &lng,    &dltf,   &ubc,
 	       &extra1, &extra2, &extra3) < 0 ) {
     printf("(Cvgd) ERROR: cannot fstprm for fstkey %d\n",key);
-    exit(1);
+    return(1);
   }
   if( Cvgd_new_read(&vgd, iun, ip1, ip2, 5, 5) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
-    exit(1);
+    return(1);
   }
   if( Cvgd_new_read2(&vgd2, iun, ip1, ip2, 5, 5, 0) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read2 on iun\n");
-    exit(1);
+    return(1);
   }
   if( Cvgd_vgdcmp(vgd, vgd2) != 0 ){
     printf("ERROR, vgd and vgd2 shouldne the same with Cvgd_new_read2\n");
-    exit(1);
+    return(1);
   }
 
   // Test that we can read with all selection parameter and get equality with Cvgd_new_read
   if( Cvgd_new_read3(&vgd2, iun, 0, "STG_CP_GEMV4", ip1, ip2, 0, 5, 5, 0) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
-    exit(1);
+    return(1);
   }
   if( Cvgd_vgdcmp(vgd, vgd2) != 0 ){
     printf("ERROR, vgd and vgd2 should be the same with Cvgd_new_read3\n");
-    exit(1);
+    return(1);
   }
 
   Cvgd_free(&vgd2);
@@ -104,40 +104,40 @@ void main() {
   printf("The following error message is normal since testing wrong datev\n");
   if( Cvgd_new_read3(&vgd2, iun, 354514400, etiket, ip1, ip2, 0, 5, 5, 0) == VGD_OK ) {
     printf("ERROR with Cvgd_new_read3 should not find !! and did\n");
-    exit(1);
+    return(1);
   }
 
   // Test wrong etiket
   printf("The following error message is normal since testing wrong etiket\n");
   if( Cvgd_new_read3(&vgd2, iun, 0,"WRONG ETIKET", ip1, ip2, 0, 5, 5, 0) == VGD_OK ) {
     printf("ERROR with Cvgd_new_read3 should not find !! and did\n");
-    exit(1);
+    return(1);
   }
 
   // Test wrong ip1
   printf("The following error message is normal since testing wrong ip1\n");
   if( Cvgd_new_read3(&vgd2, iun, 0,etiket, ip1+1, ip2, 0, 5, 5, 0) == VGD_OK ) {
     printf("ERROR with Cvgd_new_read3 should not find !! and did\n");
-    exit(1);
+    return(1);
   }
 
   // Test wrong ip2
   printf("The following error message is normal since testing wrong ip2\n");
   if( Cvgd_new_read3(&vgd2, iun, 0,etiket, ip1, ip2+1, 0, 5, 5, 0) == VGD_OK ) {
     printf("ERROR with Cvgd_new_read3 should not find !! and did\n");
-    exit(1);
+    return(1);
   }
 
   // Test wrong ip3
   printf("The following error message is normal since testing wrong ip3\n");
   if( Cvgd_new_read3(&vgd2, iun, 0,etiket, ip1, ip2, 1, 5, 5, 0) == VGD_OK ) {
     printf("ERROR with Cvgd_new_read3 should not find !! and did\n");
-    exit(1);
+    return(1);
   }
 
   Cvgd_free(&vgd);
   Cvgd_free(&vgd2);
 
-  ier = c_ut_report(status,"testing Cvgd_new_read*");
+  return(c_ut_report(status,"testing Cvgd_new_read*"));
   
 }

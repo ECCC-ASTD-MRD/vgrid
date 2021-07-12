@@ -52,12 +52,12 @@ program tests
      !feeding fnom with 0 forces lu to obtain a number
      if(ier.lt.0)then
         print*,'(Test) ERROR with fnom on file ',trim(files(k))
-        call exit(1)
+        error stop 1
      endif
      ier=fstouv(lu,'RND')
      if(ier.lt.0)then
         print*,'(Test) No record in RPN file ',trim(files(k))
-        call exit(1)
+        error stop 1
      endif
      
      ! Suppress (Cvgd) and (vgd) messages for vgd_new

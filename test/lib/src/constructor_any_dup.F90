@@ -37,12 +37,12 @@ program constructor
   stat=fnom(lu,"data/dm_5002_from_model_run-interp_dup","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
-     call abort
+     error stop 1
   endif
   stat=fstouv(lu,'RND')
   if(stat.le.0)then
      print*,'No record in RPN file'
-     call abort
+     error stop 1
   endif
   
   stat = vgd_new(d,unit=lu,format="fst",ip1=-1,ip2=-1)

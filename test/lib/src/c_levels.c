@@ -22,7 +22,7 @@
 #include <math.h>
 #include "vgrid.h"
 
-void main() {
+int main() {
 
   int ier, iun = 10;
   int *quiet = NULL, *i_val = NULL, *in_log = NULL, *dpidpis = NULL;
@@ -40,22 +40,22 @@ void main() {
   ier = c_fnom(&iun,filename,mode,0);
   if( ier < 0 ) {
     printf("ERROR with c_fnom on iun, file %s\n", filename);
-    return;
+    return(1);
   }
   ier = c_fstouv(iun,"RND","");  
   if( ier < 0 ) {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
-    return;
+    return(1);
   }
   
   if( Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
-    return;
+    return(1);
   }
 
   if( Cvgd_get_int_1d(vgd, "VIPT", &i_val, NULL, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_int for VIPT\n");
-    return;
+    return(1);
   }
 
   ier = Cvgd_get_int(vgd, "NL_T", &nl_t, quiet);
@@ -68,32 +68,32 @@ void main() {
   key = c_fstinf( iun, &ni2, &nj2, &nk2, -1, " ", -1, -1, -1, " ", "P0");
   if(key < 0){
     printf("Problem getting info for P0\n");
-    return;
+    return(1);
   }
   p0 = malloc(ni2*nj2 * sizeof(float));
   if(! p0){
     printf("Problem allocating p0 of size %d\n",ni2*nj2);
-    return;
+    return(1);
   }
   p0_8 = malloc(ni2*nj2 * sizeof(double));
   if(! p0_8){
     printf("Problem allocating p0_8 of size %d\n",ni2*nj2);
-    return;
+    return(1);
   }
   levels = malloc(ni2*nj2*nl_t * sizeof(float));
   if(! levels){
     printf("Problem allocating levels of size %d\n",ni2*nj2);
-    return;
+    return(1);
   }
   levels_8 = malloc(ni2*nj2*nl_t * sizeof(double));
   if(! levels_8){
     printf("Problem allocating levels_8 of size %d\n",ni2*nj2);
-    return;
+    return(1);
   }
   ier = c_fstluk( p0, key, &ni2, &nj2, &nk2 );
   if(ier < 0){
     printf("Problem with fstluk for p0\n");
-    return;
+    return(1);
   }
   for( ij = 0; ij < ni2*nj2; ij++, ijk++){
     p0[ij] = p0[ij]*100.;
@@ -122,22 +122,22 @@ void main() {
     key = c_fstinf( iun, &ni2, &nj2, &nk2, -1, " ", i_val[k], -1, -1, " ", "PX");
     if(key < 0){
       printf("Problem getting info for PX for ip1 = %d\n",i_val[k]);
-      return;
+      return(1);
     }
     // To simplify, PX are assumed to be on the same grid as P0. but this should be check in an operational program!
     ier = c_fstluk( p0, key, &ni2, &nj2, &nk2 );
     if( ier < 0 ){
       printf("Error with c_fstluk on level = %d\n",i_val[k]);
-      return;
+      return(1);
     }
     for( ij = 0; ij < ni2*nj2; ij++, ijk++){
       if( fabs(p0[ij] - levels[ijk]/100.)/p0[ij] > 1.e-6 ) {
 	printf("Difference is too large (float), expected %f, got %f\n", p0[ij], levels[ijk]/100.);
-	return;
+	return(1);
       }
       if( fabs(p0[ij] - levels_8[ijk]/100.)/p0[ij] > 1.e-6 ) {
 	printf("Difference is too large (double), expected %f, got %f\n", p0_8[ij], levels_8[ijk]/100.);
-	return;
+	return(1);
       }
     }
   }
@@ -151,6 +151,5 @@ void main() {
   free(levels_8);
   free(i_val);
   
-  ier = c_ut_report(status,"testing Cvgd_levels");
-
+  return(c_ut_report(status,"testing Cvgd_levels"));
 }

@@ -45,12 +45,12 @@ program get_put_get_all
   
   if( vgd_putopt("ALLOW_SIGMA",.true.) == VGD_ERROR )then
      print*,'Error with vgd_putopt on ALLOW_SIGM'
-     call exit(1)
+     error stop 1
   endif
   
   do i=1, nfiles
      if( test_it(files(i),i) == VGD_ERROR )then
-        call exit(1)
+        error stop 1
      endif
   enddo
 
@@ -87,12 +87,12 @@ integer function test_it(F_file, ind) result(status)
    endif   
    if( vgd_new(vgd, lu, 'fst') == VGD_ERROR )then
       print*,'Error with vgd_new on file ', trim(F_file)
-      call exit(1)
+      error stop 1
    endif
    
    if( vgd_get(vgd,"TYPE",type) == VGD_ERROR )then
       print*,'TEST ERROR: cannot get key TYPE for file',trim(F_file)
-      call exit(1)
+      error stop 1
    endif
 
    ier = vgd_get(vgd,"VCOD",vcode)
@@ -101,16 +101,16 @@ integer function test_it(F_file, ind) result(status)
    case (1001,1002,1003,2001,5001,5002,5003,5004,5005,5100,5999)
       if(type /= VGD_PRES_TYPE)then
          print*,'TEST ERROR: vcode',vcode,' should be of type pressure and it is not'
-         call exit(1)
+         error stop 1
       endif
    case (1,4001,21001,21002)
       if(type /= VGD_HEIGHT_TYPE)then
          print*,'TEST ERROR: vcode',vcode,' should be of type height and it is not'
-         call exit(1)
+         error stop 1
       endif
    case DEFAULT
       print*,'TEST ERROR: vcode',vcode,' not supported in test get_type, please add in code'
-      call exit(1)
+      error stop 1
  end select
    
    ier = vgd_free(vgd)

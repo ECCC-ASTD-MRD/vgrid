@@ -57,24 +57,24 @@ program constructor_build_all
      stat=fnom(lu+i,files(i),"RND",0)
      if(stat.lt.0)then
         print*,'ERROR with fnom on file ',trim(files(i))
-        call exit(1)
+        error stop 1
      endif
      stat=fstouv(lu+i,'RND')
      if(stat.le.0)then
         print*,'No record in RPN file ',trim(files(i))
-        call exit(1)
+        error stop 1
      endif     
      if( vgd_new(vgd,unit=lu+i,format="fst",ip1=-1,ip2=-1) == VGD_ERROR)then
         print*,'ERROR: problem with vgd_new on file ',trim(files(i))
         stat=fstfrm(lu+i)
-        call exit(1)
+        error stop 1
      endif
      stat=fstfrm(lu+i)  
      stat=fclos(lu+i)
      if( check_build(vgd) == VGD_ERROR) ok=.false.     
      if( vgd_free(vgd) == VGD_ERROR)then
         print*,'Error with vgd_free(vgd) on file ',trim(files(i))
-        call exit(1)
+        error stop 1
      endif
 
   end do
@@ -102,38 +102,38 @@ integer function check_build(F_vgd) result(istat)
   istat = VGD_ERROR
 
   ! Get Vcode
-  if( vgd_get(F_vgd,'vcode',vcode) == VGD_ERROR )return
+  if( vgd_get(F_vgd,'vcode',vcode) == VGD_ERROR )error stop 1
   print*,'Testing build for Vcode ', vcode
 
   select case (vcode)
   case (1001,2001)
-     if(check_build_1001_2001_5999(F_vgd) == VGD_ERROR) return
+     if(check_build_1001_2001_5999(F_vgd) == VGD_ERROR) error stop 1
   case (1002)
-     if(check_build_1002(F_vgd) == VGD_ERROR) return
+     if(check_build_1002(F_vgd) == VGD_ERROR) error stop 1
   case (4001)
-     if(check_build_4001(F_vgd) == VGD_ERROR) return
+     if(check_build_4001(F_vgd) == VGD_ERROR) error stop 1
   case (5001)
-     if(check_build_5001(F_vgd) == VGD_ERROR) return
+     if(check_build_5001(F_vgd) == VGD_ERROR) error stop 1
   case (5002)
-     if(check_build_5002(F_vgd) == VGD_ERROR) return
+     if(check_build_5002(F_vgd) == VGD_ERROR) error stop 1
   case (5003)
-     if(check_build_5002(F_vgd) == VGD_ERROR) return
+     if(check_build_5002(F_vgd) == VGD_ERROR) error stop 1
   case (5004)
-     if(check_build_5002(F_vgd) == VGD_ERROR) return
+     if(check_build_5002(F_vgd) == VGD_ERROR) error stop 1
   case (5005)
-     if(check_build_5005(F_vgd) == VGD_ERROR) return
+     if(check_build_5005(F_vgd) == VGD_ERROR) error stop 1
   case (5100)
-     if(check_build_5100(F_vgd) == VGD_ERROR) return
+     if(check_build_5100(F_vgd) == VGD_ERROR) error stop 1
   case (5999)
-     if(check_build_1001_2001_5999(F_vgd) == VGD_ERROR) return
+     if(check_build_1001_2001_5999(F_vgd) == VGD_ERROR) error stop 1
   case (21001)
-     if(check_build_21001(F_vgd) == VGD_ERROR) return
+     if(check_build_21001(F_vgd) == VGD_ERROR) error stop 1
   case (21002)
-     if(check_build_21002(F_vgd) == VGD_ERROR) return
+     if(check_build_21002(F_vgd) == VGD_ERROR) error stop 1
   case DEFAULT
      print*,'ERROR, no function for checking Vcode ',vcode
      print*,'       please add this function in test'
-     return
+     error stop 1
   end select
 
   istat = VGD_OK

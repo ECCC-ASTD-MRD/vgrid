@@ -321,7 +321,7 @@ int test_it(char *filename, char *ip1_name, int ind) {
 //========================================================================
 //========================================================================
 
-void main() {
+int main() {
   
   int i, ier, status = VGD_OK;
 
@@ -332,20 +332,19 @@ void main() {
     if(test_it(filenames[i],"VIPM",i) == VGD_ERROR){
       printf("ERROR with %s\n",filenames[i]);
       status = VGD_ERROR;
-      exit(1);
+      return(1);
     }
     if(test_it(filenames[i],"VIPT",i) == VGD_ERROR){
       printf("ERROR with %s\n",filenames[i]);
       status = VGD_ERROR;
-      exit(1);
+      return(1);
     }
     if(test_it(filenames[i],"VIPW",i) == VGD_ERROR){
       printf("ERROR with %s\n",filenames[i]);
       status = VGD_ERROR;
-      exit(1);
+      return(1);
     }
   }  
   printf("status=%d, VGD_OK=%d, VGD_ERROR=%d\n",status, VGD_OK, VGD_ERROR);
-  ier = c_ut_report(status,"testing Cvgd_levels");  
-  
+  return(c_ut_report(status,"testing Cvgd_levels"));  
 }

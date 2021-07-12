@@ -22,7 +22,7 @@
 #include <math.h>
 #include "vgrid.h"
 
-void main() {
+int main() {
 
   int ier, iun = 10, iun2 = 11;
   int quiet = 0, *i_val = NULL, in_log = 0, dpidpis = 0;
@@ -40,40 +40,40 @@ void main() {
   ier = c_fnom(&iun,filename,mode,0);
   if( ier < 0 ) {
     printf("ERROR with c_fnom on iun, file %s\n", filename);
-    return;
+    return(1);
   }
   ier = c_fstouv(iun,"RND","");  
   if( ier < 0 ) {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
-    return;
+    return(1);
   }
   
   if( Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
-    return;
+    return(1);
   }
   if( Cvgd_get_int_1d(vgd, "VIPT", &i_val, NULL, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_int for VIPT\n");
-    return;
+    return(1);
   }
   if( Cvgd_get_float_1d(vgd, "VCDT", &f_val, NULL , quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_float_1d for VCDT\n");
-    return;
+    return(1);
   }
   if( Cvgd_get_double_1d(vgd, "CA_T", &a_8_t, NULL, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_double_1d for CA_T\n");
-    return;
+    return(1);
   }
   if( Cvgd_get_double_1d(vgd, "CB_T", &b_8_t, &nt, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_double_1d for CB_T\n");
-    return;
+    return(1);
   }
 
   // Size of thermo may also be obtained by this:
   ier = Cvgd_get_int(vgd, "NL_T", &nl_t, quiet);
   if(nl_t != nt ) {
     printf("ERROR: nt and nl_t should be equal, got %d, %d\n",nt, nl_t);
-    return;
+    return(1);
   }
   printf("nl_t = %d\n", nl_t);
   
@@ -86,19 +86,19 @@ void main() {
   // obtained with fstlir, but why do it if vgd already contains it!)
   if ( Cvgd_get_double_3d(vgd, "VTBL", &table, &ni, &nj, &nk, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_double_3d for VTBL\n");
-    return;
+    return(1);
   }
   
   // Constructing new vgd with this table
   if ( Cvgd_new_from_table(&vgd2, table, ni, nj, nk) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_new_from_table for VTBL\n");
-    return;
+    return(1);
   }
 
   // Comparing new table with original table, must be the same.
   if( Cvgd_vgdcmp(vgd, vgd2) != 0 ){
     printf("ERROR, vgd and vgd2 shouldne the same\n");
-    return;
+    return(1);
   }
 
   // Write descriptor in new file  
@@ -108,16 +108,16 @@ void main() {
   ier = c_fnom(&iun2,"to_erase",mode,0);
   if( ier < 0 ) {
     printf("ERROR with c_fnom on iun2\n");
-    return;
+    return(1);
   }
   ier = c_fstouv(iun2,"RND","");  
   if( ier < 0 ) {
     printf("ERROR with c_fstouv on iun2\n");
-    return;
+    return(1);
   }
   if( Cvgd_write_desc(vgd, iun2) == VGD_ERROR ){
     printf("ERROR with Cvgd_write_desc on iun2\n");
-    return;
+    return(1);
   }
 
   // Compute 3D pressure levels
@@ -125,22 +125,22 @@ void main() {
   key = c_fstinf( iun, &ni2, &nj2, &nk2, -1, " ", -1, -1, -1, " ", "P0");
   if(key < 0){
     printf("Problem getting info for P0\n");
-    return;
+    return(1);
   }
   p0 = malloc(ni2*nj2 * sizeof(float));
   if(! p0){
     printf("Problem allocating P0 of size %d\n",ni2*nj2);
-    return;
+    return(1);
   }
   p0_8 = malloc(ni2*nj2 * sizeof(double));
   if(! p0_8){
     printf("Problem allocating P0_8 of size %d\n",ni2*nj2);
-    return;
+    return(1);
   }
   levels_8 = malloc(ni2*nj2*nl_t * sizeof(double));
   if(! levels_8){
     printf("Problem allocating levels_8 of size %d\n",ni2*nj2);
-    return;
+    return(1);
   }
   ier = c_fstluk( p0, key, &ni2, &nj2, &nk2 );
   if( ier < 0 ){
@@ -159,18 +159,18 @@ void main() {
     key = c_fstinf( iun, &ni2, &nj2, &nk2, -1, " ", i_val[k], -1, -1, " ", "PX");
     if(key < 0){
       printf("Problem getting info for PX for ip1 = %d\n",i_val[k]);
-      return;
+      return(1);
     }
     // To simplify, PX are assumed to be on the same grid as P0. bur rhis should be check in an operational program!
     ier = c_fstluk( p0, key, &ni2, &nj2, &nk2 );    
     if( ier < 0 ){
       printf("Problem with fstluk on px ip1 = %d\n", i_val[k]);
-      return;
+      return(1);
     }
     for( ij = 0; ij < ni2*nj2; ij++, ijk++){
       if( fabs(p0[ij] - levels_8[ijk]/100.)/p0[ij] > 1.e-6 ) {
 	printf("Difference is too large, expected %f, got %f\n", p0[ij], levels_8[ijk]/100.);
-	return;
+	return(1);
       }
     }
   }
@@ -182,20 +182,20 @@ void main() {
   ier = c_fnom(&iun2,"to_erase",mode,0);
   if( ier < 0 ) {
     printf("ERROR with c_fnom on iun2\n");
-    return;
+    return(1);
   }
   ier = c_fstouv(iun2,"RND","");  
   if( ier < 0 ) {
     printf("ERROR with c_fstouv on iun2\n");
-    return;
+    return(1);
   }
   if( Cvgd_new_read(&vgd2, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read vgd2\n");
-    return;
+    return(1);
   }
   if( Cvgd_vgdcmp(vgd, vgd2) != 0 ){
     printf("ERROR, vgd and vgd2 should be the same after write in file, read from file\n");
-    return;
+    return(1);
   }
 
   Cvgd_free(&vgd);
@@ -206,6 +206,5 @@ void main() {
   free(a_8_t);
   free(b_8_t);
 
-  ier = c_ut_report(status,"testing Cvgd_levels");
-  
+  return(c_ut_report(status,"testing Cvgd_levels"));
 }

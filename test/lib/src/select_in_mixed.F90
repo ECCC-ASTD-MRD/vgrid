@@ -75,17 +75,17 @@ program constructor
      stat=fnom(lu(i),files(i),"RND",0)
      if(stat.lt.0)then
         print*,'ERROR with fnom in file',trim(files(i))
-        call abort
+        error stop 1
      endif
      stat=fstouv(lu(i),'RND')
      if(stat.le.0)then
         print*,'No record in RPN file',trim(files(i))
-        call abort
+        error stop 1
      endif
      key=fstinf(lu(i),ni,nj,nk,-1,' ',-1,-1,-1,' ','TT')
      if(key.lt.0)then
         print*,'No TT record in RPN file',files(i)
-        call abort
+        error stop 1
      endif
      stat=my_fstprm(key,prm)
      if(i.eq.3)then
@@ -122,7 +122,7 @@ program constructor
      stat = vgd_new(d,unit=lu(1),format="fst",ip1=ip1(i),ip2=ip2(i))
      if(stat.ne.VGD_OK)then
         print*,'ERROR: problem with vgd_new'
-        call abort
+        error stop 1
      endif
      ! Get vcode to check if whats is read is ok
      stat = vgd_get(d,'KIND - vertical coordinate ip1 kind',kind)

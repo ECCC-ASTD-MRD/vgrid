@@ -48,24 +48,24 @@ int test_it(char *filename, int ind) {
 
   if( c_fnom(&iun,filename,"RND+R/O",0) < 0 ) {
     printf("ERROR with c_fnom on iun, file %s\n", filename);
-    return;
+    return(1);
   }
   if( c_fstouv(iun,"RND","") < 0 ) {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
-    return;
+    return(1);
   }  
   if( Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
-    return;
+    return(1);
   }
   // Get table  
   if( Cvgd_get_double_3d(vgd, "VTBL", &table, &ni, &nj, &nk, 0) == VGD_ERROR ){
     printf("ERROR with Cvgd_get_double_3d on VTBL\n");
-    return;
+    return(1);
   }
   if( Cvgd_new_from_table(&vgd2, table, ni, nj, nk) == VGD_ERROR ){
     printf("ERROR with Cvgd_new_from_table\n");
-    return;
+    return(1);
   }
   // Test equality
   ier = Cvgd_vgdcmp(vgd, vgd2);
@@ -81,7 +81,7 @@ int test_it(char *filename, int ind) {
   return (VGD_OK);
 }
 
-void main() {
+int main() {
   
   int i, ier, status = VGD_OK;
 
@@ -92,10 +92,10 @@ void main() {
     if(test_it(filenames[i],i) == VGD_ERROR){
       printf("ERROR with %s\n",filenames[i]);
       status = VGD_ERROR;
-      exit(1);
+      return(1);
     }
   }  
   printf("status=%d, VGD_OK=%d, VGD_ERROR=%d\n",status, VGD_OK, VGD_ERROR);
-  ier = c_ut_report(status,"testing Cvgd_levels");  
+  return(c_ut_report(status,"testing Cvgd_levels"));  
   
 }

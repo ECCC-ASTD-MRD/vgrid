@@ -39,12 +39,12 @@ program tests
      stat=fnom(lu,"data/dm_"//vcode_S(i)//"_from_model_run","RND",0)
      if(stat.lt.0)then
         print*,'ERROR with fnom on',"data/dm_"//vcode_S(i)//"_from_model_run"
-        call abort
+        error stop 1
      endif
      stat=fstouv(lu,'RND')
      if(stat.lt.0)then
         print*,'No record in RPN file'
-        call abort
+        error stop 1
      endif
      stat=test_dpidpis(lu)
      if(stat.ne.VGD_OK)ok=.false.

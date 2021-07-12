@@ -36,12 +36,12 @@ program tests
       stat=fnom(lu,"data/dm_"//vcode_S(i)//"_from_model_run","RND",0)
       if(stat.lt.0)then
          print*,'ERROR with fnom',"data/dm_"//vcode_S(i)//"_from_model_run"
-         call abort
+         error stop 1
       endif
       stat=fstouv(lu,'RND')
       if(stat.lt.0)then
          print*,'No record in RPN file'
-         call abort
+         error stop 1
       endif
       open(unit=lutxt,file='data/dm_'//vcode_S(i)//'_ips.txt',status='OLD')
       read(lutxt,*) ip1,ip2

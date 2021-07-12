@@ -36,19 +36,19 @@ program tests
   ier=fnom(list(1),file_S(1),"RND+R/O",0)
   if(ier.lt.0)then
      print*,'(Test) ERROR with fnom on file ',trim(file_S(1))
-     call exit(1)
+     error stop 1
   endif
   ier=fstouv(list(1),'RND')
   if(ier.lt.0)then
      print*,'(Test) No record in RPN file ',trim(file_S(1))
-     call exit(1)
+     error stop 1
   endif
 
   ! First construct the Vcode 1002 (eta) !! from legacy encoding from
   ! a pure file having only P0, PT and TT, UU ... in it of Vcode 1002
   if(VGD_OK /= vgd_new(vgd1,unit=list(1),kind=1))then
      print*,"Error could not read vgrid descriptor 1002"
-     call exit(1)
+     error stop 1
   endif
   
   ! Now simulater what xrec or other applycation may be doing be joining other files
@@ -57,12 +57,12 @@ program tests
      ier=fnom(list(i),file_S(i),"RND+R/O",0)
      if(ier.lt.0)then
         print*,'(Test) ERROR with fnom on file ',trim(file_S(i))
-        call exit(1)
+        error stop 1
      endif
      ier=fstouv(list(i),'RND')
      if(ier.lt.0)then
         print*,'(Test) No record in RPN file ',trim(file_S(i))
-        call exit(1)
+        error stop 1
      endif
   end do
 
@@ -70,17 +70,17 @@ program tests
   ! Prove that we can read a kind 5 toc
   if(VGD_OK /= vgd_new(vgd2,unit=list(1),kind=5))then
      print*,"Error could not read vgrid descriptor of kind 5"
-     call exit(1)
+     error stop 1
   endif  
   ! Prove that we can still reconstruc 1002 from legacy even with other !! and records of diferent kind
    ! Prove that we can read a kind 5 toc
   if(VGD_OK /= vgd_new(vgd3,unit=list(1),kind=1))then
      print*,"Error could not read vgrid descriptor 1002 on file with other !!"
-     call exit(1)
+     error stop 1
   endif
   if (.not. vgd1 == vgd3) then
      print*,"Error vgrid from legacy constructed from file with 1002 and other vcode is not equal as pure legacy construction"
-     call exit(1)
+     error stop 1
   endif
   
   do i=1,3

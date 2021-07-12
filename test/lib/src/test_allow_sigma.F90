@@ -32,12 +32,12 @@ program test_allow_sigma
   stat=fnom(lu,"data/dm_1001_from_model_run","RND+R/O",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
-     call abort
+     error stop 1
   endif
   stat=fstouv(lu,'RND')
   if(stat.le.0)then
      print*,'No record in RPN file'
-     call abort
+     error stop 1
   endif
 
   ! Try to get the value of ALLOW_SIGMA. it should be .false. by default

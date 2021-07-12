@@ -48,13 +48,13 @@ program tests
   stat = vgd_new(vgd,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
   if(stat==VGD_ERROR)then
      print*,'This error should not happen, please fixit'
-     call exit(1)
+     error stop 1
   end if
   print*,'Second build';call flush(6)
   stat = vgd_new(vgd,kind=5,version=2,hyb=hyb2,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
   if(stat==VGD_ERROR)then
      print*,'This error should not happen, since reshaping memory pointed by structure vgrid_descriptor is always allowed'
-     call exit(1)
+     error stop 1
   end if
 
   !===================================
@@ -66,12 +66,12 @@ program tests
   stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom on lu'
-     call exit(1)
+     error stop 1
   endif
   stat=fstouv(lu,'RND')
   if(stat.lt.0)then
      print*,'No record in RPN file data/dm_5002_from_model_run'
-     call exit(1)
+     error stop 1
   endif  
   fstkey = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ','P0') 
   allocate(p0(ni,nj))
@@ -98,7 +98,7 @@ program tests
   stat=vgd_putopt('ALLOW_RESHAPE',.true.)
   if(stat==VGD_ERROR)then
      print*,'ERROR on putopt, this should not happend please fixit'
-     call exit(1)
+     error stop 1
   endif
 
   print*,'===================================================================================================='
@@ -234,7 +234,7 @@ subroutine check_status(stat,reshape_L)
          print*,'The above error is normal'
       else
          print*,'The above should produce an error and does not'
-         call exit(1)
+         error stop 1
       endif
    endif   
    call flush(6)
@@ -248,23 +248,23 @@ subroutine check_status2(stat_not_alloc,stat_alloc_correct_size,stat_alloc_wrong
 
    if(stat_not_alloc==VGD_ERROR)then
       print*,'The above should not produce an error and it does (not alloc)'
-      call exit(1)
+      error stop 1
    endif
    if(stat_alloc_correct_size==VGD_ERROR)then
       print*,'The above should not produce an error and does (alloc correct size)'
-      call exit(1)
+      error stop 1
    endif
    if(reshape_L)then
       if(stat_alloc_wrong_size==VGD_ERROR)then
          print*,'The above should not produce an error and it does (alloc wrong size)'
-         call exit(1)
+         error stop 1
       endif
    else
       if(stat_alloc_wrong_size==VGD_ERROR)then
          print*,'The above error is normal on (alloc wrong size)'
       else
          print*,'The above should produce an error and does not (alloc wrong size)'
-         call exit(1)
+         error stop 1
       endif
    endif   
    call flush(6)

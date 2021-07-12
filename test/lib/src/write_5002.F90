@@ -40,7 +40,7 @@ program constructor
   stat=fnom(luo,"data_out/dm_5002","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
-     call abort
+     error stop 1
   endif
   stat=fstouv(luo,'RND')
 

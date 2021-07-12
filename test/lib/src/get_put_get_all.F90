@@ -45,12 +45,12 @@ program get_put_get_all
   
   if( vgd_putopt("ALLOW_SIGMA",.true.) == VGD_ERROR )then
      print*,'Error with vgd_putopt on ALLOW_SIGM'
-     call exit(1)
+     error stop 1
   endif
   
   do i=1, nfiles
      if( test_it(files(i),i) == VGD_ERROR )then
-        call exit(1)
+        error stop 1
      endif
   enddo
 
@@ -93,7 +93,7 @@ integer function test_it(F_file, ind) result(status)
    endif   
    if( vgd_new(vgd, lu, 'fst') == VGD_ERROR )then
       print*,'Error with vgd_new on file ', trim(F_file)
-      call exit(1)
+      error stop 1
    endif
    
    !put_int

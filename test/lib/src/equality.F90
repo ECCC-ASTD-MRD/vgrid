@@ -56,12 +56,12 @@ program constructor
      ier=fnom(lu+i,files(i),"RND",0)     
      if(ier.lt.0)then
         print*,'ERROR with fnom on file ',files(i)
-        call abort
+        error stop 1
      endif
      ier=fstouv(lu+i,'RND')
      if(ier.le.0)then
         print*,'No record in RPN file'
-        call abort
+        error stop 1
      endif
      ! Construct a new set of 3D coordinate descriptors
      ier = vgd_new(vgrid        ,unit=lu+i,format="fst")

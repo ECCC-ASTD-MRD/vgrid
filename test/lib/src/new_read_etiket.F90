@@ -46,17 +46,17 @@ program tests
   ier=fnom(lu,file_S,"RND+R/O",0)
   if(ier.lt.0)then
      print*,'(Test) ERROR with fnom on file ',trim(file_S)
-     call exit(1)
+     error stop 1
   endif
   ier=fstouv(lu,'RND')
   if(ier.lt.0)then
      print*,'(Test) No record in RPN file ',trim(file_S)
-     call exit(1)
+     error stop 1
   endif
   key = fstinf(lu,ni,nj,nk,-1," ",-1,-1,-1,' ',"TT")
   if(key < 0 )then
      print*,'Error cannot find a record TT in file ',trim(file_S)
-     call exit(1)
+     error stop 1
   endif
   ier=fstprm(key,dateo,deet,npas,ni,nj,nk,nbits,datyp,ip1,&
        ip2,ip3,typvar,nomvar,etiket,grtyp,ig1,ig2,ig3, &
@@ -66,7 +66,7 @@ program tests
   key = fstinf(lu,ni,nj,nk,-1," ",-1,-1,-1,' ',"!!")
   if(key < 0 )then
      print*,'Error cannot find !! in file ',trim(file_S)
-     call exit(1)
+     error stop 1
   endif
   ier=fstprm(key,dateo,deet,npas,ni,nj,nk,nbits,datyp,ip1,&
        ip2,ip3,typvar,nomvar,etiket,grtyp,ig1,ig2,ig3, &
@@ -74,47 +74,47 @@ program tests
 
   if(VGD_OK /= vgd_new(vgd,unit=lu,format="fst",ip1=ip1,ip2=ip2,kind=kind))then
      print*,"Error could not read vgrid descriptor 1"
-     call exit(1)
+     error stop 1
   endif
   if(VGD_OK /= vgd_new(vgd2,unit=lu,format="fst",datev=0,etiket=etiket,ip1=ip1,ip2=ip2,ip3=0,kind=kind))then
      print*,"Error could not read vgrid descriptor 2"
-     call exit(1)
+     error stop 1
   endif
   if (.not. vgd == vgd2) then
      print*,'Error vgd and vgd2 must be equal but are not'
-     call exit(1)
+     error stop 1
   endif
 
   ! Test wrong datev
   if ( VGD_OK == vgd_new(vgd2,unit=lu,format="fst",datev=354514400,etiket=etiket,ip1=ip1,ip2=ip2,ip3=0,kind=kind,quiet=.true.))then
      print*,'Error should have return an error and did not with wrong datev'     
-     call exit(1)
+     error stop 1
   endif
   ! Test wrong etiket
   if ( VGD_OK == vgd_new(vgd2,unit=lu,format="fst",datev=0,etiket="WRONG ETIKET",ip1=ip1,ip2=ip2,ip3=0,kind=kind,quiet=.true.) )then
      print*,'Error should have return an error and did not with wrong etiket'     
-     call exit(1)
+     error stop 1
   endif
   ! Test wrong ip1
   if ( VGD_OK == vgd_new(vgd2,unit=lu,format="fst",datev=0,etiket=etiket,ip1=ip1+1,ip2=ip2,ip3=0,kind=kind,quiet=.true.) )then
      print*,'Error should have return an error and did not with wrong ip1'     
-     call exit(1)
+     error stop 1
   endif
   ! Test wrong ip2
   if ( VGD_OK == vgd_new(vgd2,unit=lu,format="fst",datev=0,etiket=etiket,ip1=ip1,ip2=ip2+1,ip3=0,kind=kind,quiet=.true.) )then
      print*,'Error should have return an error and did not with wrong ip2'     
-     call exit(1)
+     error stop 1
   endif
   ! Test wrong ip3
   if ( VGD_OK == vgd_new(vgd2,unit=lu,format="fst",datev=0,etiket=etiket,ip1=ip1,ip2=ip2,ip3=1,kind=kind,quiet=.true.) )then
      print*,'Error should have return an error and did not with wrong ip3'     
-     call exit(1)
+     error stop 1
   endif
   ! Test wrong kind
   print*,'The following error message on legacy encoding is normal for test wrong kind'
   if ( VGD_OK == vgd_new(vgd2,unit=lu,format="fst",datev=0,etiket=etiket,ip1=ip1,ip2=ip2,ip3=0,kind=1,quiet=.true.) )then
      print*,'Error should have return an error and did not with wrong kind'     
-     call exit(1)
+     error stop 1
   endif
   
   ier=fclos(lu)

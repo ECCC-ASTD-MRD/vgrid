@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include "vgrid.h"
 
-void main() {
+int main() {
 
   int ier, iun = 10, iun2 = 11, status;
   char filename[]="data/dm_5005_from_model_run";
@@ -37,45 +37,45 @@ void main() {
   ier = c_fnom(&iun,filename,mode,0);
   if( ier < 0 ) {
     printf("ERROR with c_fnom on iun, file %s\n", filename);
-    return;
+    return(1);
   }
   ier = c_fstouv(iun,"RND","");  
   if( ier < 0 ) {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
-    return;
+    return(1);
   }
   if( Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
-    return;
+    return(1);
   }
   if( Cvgd_new_read(&vgd2, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
-    return;
+    return(1);
   }
 
   ier = c_fnom(&iun2,filename2,mode,0);
   if( ier < 0 ) {
     printf("ERROR with c_fnom on iun2, file %s\n", filename2);
-    return;
+    return(1);
   }
   ier = c_fstouv(iun2,"RND","");  
   if( ier < 0 ) {
     printf("ERROR with c_fstouv on iun2, file %s\n", filename2);
-    return;
+    return(1);
   }
   if( Cvgd_new_read(&vgd3, iun2, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun2\n");
-    return;
+    return(1);
   }
   if( Cvgd_new_read(&vgd4, iun2, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun2\n");
-    return;
+    return(1);
   }
 
   // Comparing all
   if( Cvgd_vgdcmp(vgd, vgd2) != 0 ){
     printf("ERROR, vgd and vgd2 should be the same\n");
-    return;
+    return(1);
   }
 
   vgd2->vcode=0;
@@ -179,6 +179,5 @@ void main() {
   Cvgd_free(&vgd);
   Cvgd_free(&vgd2);
 
-  ier = c_ut_report(status,"testing Cvgd_levels");
-  
+  return(c_ut_report(status,"testing Cvgd_levels"));
 }

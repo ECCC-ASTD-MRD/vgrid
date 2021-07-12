@@ -75,18 +75,18 @@ program get_logp
      stat=fnom(lu+i,files(i),"RND",0)
      if(stat.lt.0)then
         print*,'ERROR with fnom on file ',trim(files(i))
-        call abort
+        error stop 1
      endif
      stat=fstouv(lu+i,'RND')
      if(stat.le.0)then
         print*,'No record in RPN file ',trim(files(i))
-        call abort
+        error stop 1
      endif     
      stat = vgd_new(d,unit=lu+i,format="fst",ip1=-1,ip2=-1)
      if(stat.ne.VGD_OK)then
         print*,'ERROR: problem with vgd_new on file ',trim(files(i))
         stat=fstfrm(lu+i)
-        call abort
+        error stop 1
      endif
      stat = vgd_get(d,key='LOGP',value=logp_L)
      if(stat /= VGD_OK )then

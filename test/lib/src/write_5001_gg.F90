@@ -50,21 +50,21 @@ program constructor
   stat=fnom(lui,"data/gg_5001_from_model_run","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom 1'
-     call abort
+     error stop 1
   endif
   stat=fstouv(lui,'RND')
 
   stat=fnom(luo,"data_out/gg_5001","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom 2'
-     call abort
+     error stop 1
   endif
   stat=fstouv(luo,'RND')
 
   stat=fstinl(lui,ni,nj,nk,-1,' ',-1,-1,-1,' ','TT',liste,infon,nmax)
   if(stat.lt.0)then
      print*,'ERROR with fstinl'
-     call abort
+     error stop 1
   endif
   
   nk=infon
@@ -72,7 +72,7 @@ program constructor
   if(nk.le.0)then
      print*,'ERROR no TT records'
      call close_fst(lui,luo)
-     call abort
+     error stop 1
   endif
 
   allocate(ip1_m(nk),a_m_8(nk),b_m_8(nk),hyb(nk))
@@ -84,7 +84,7 @@ program constructor
      if(stat.lt.0)then
         print*,'ERROR with fstprm'
         call close_fst(lui,luo)
-        call abort
+        error stop 1
      endif
      call convip(ip1,hyb(k),kind,-1,blk_S,.false.)
      ip1_m(k)=ip1
@@ -92,7 +92,7 @@ program constructor
      if(kind.ne.5)then
         print*,'ERROR wrong kind:',kind
         call close_fst(lui,luo)
-        call abort
+        error stop 1
      endif
   enddo
 
@@ -100,7 +100,7 @@ program constructor
   if(keyhy.lt.0)then
      print*,'ERROR with fstinf on HY'
      call close_fst(lui,luo)
-     call abort
+     error stop 1
   endif
   stat=fstprm(keyhy,dateo,deet,npas,nii,njj,nkk,nbits,datyp,ip1,&
        ip2,ip3,typvar,nomvar,etiket,grtyp,ig1,ig2,ig3, &
@@ -138,7 +138,7 @@ program constructor
   if(stat.ne.VGD_OK)then
      print*,'ERROR: problem with vgd_new'
      call close_fst(lui,luo)
-     call abort
+     error stop 1
   endif
 
   ! Construct a new set of 3D coordinate descriptors
@@ -146,7 +146,7 @@ program constructor
   if(stat.ne.VGD_OK)then
      print*,'ERROR: problem with vgd_write'
      call close_fst(lui,luo)
-     call abort
+     error stop 1
   endif
 
   call ut_report(stat,'Grid_Descriptors, vgd_new, vgd_write')

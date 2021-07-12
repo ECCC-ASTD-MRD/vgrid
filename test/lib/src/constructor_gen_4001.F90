@@ -83,23 +83,23 @@ program constructor
 
   hgts=(/0.,20.,25.,40.,50.,80.,100.,120.,150.,200./)
 
-  if( vgd_new(vgd,kind=4,version=1,hyb=hgts) == VGD_ERROR)call exit(1)
+  if( vgd_new(vgd,kind=4,version=1,hyb=hgts) == VGD_ERROR)error stop 1
 
-  if( vgd_get(vgd,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='CA_T - vertical A coefficient (t)'   ,value=a_t_8) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='CA_W - vertical A coefficient (w)'   ,value=a_w_8) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='CB_M - vertical B coefficient (m)'   ,value=b_m_8) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='CB_T - vertical B coefficient (t)'   ,value=b_t_8) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='CB_W - vertical B coefficient (w)'   ,value=b_w_8) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='VIPM - level ip1 list (m)'           ,value=vipm) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='VIPT - level ip1 list (t)'           ,value=vipt) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='VIPW - level ip1 list (w)'           ,value=vipw) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='VCDM - vertical coordinate (m)'      ,value=vcdm) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='VCDT - vertical coordinate (t)'      ,value=vcdt) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='VCDW - vertical coordinate (w)'      ,value=vcdw) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='NL_M - Number of vertical levels (m)',value=nl_m) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='NL_T - Number of vertical levels (t)',value=nl_t) == VGD_ERROR )call exit(1)
-  if( vgd_get(vgd,key='NL_W - Number of vertical levels (w)',value=nl_w) == VGD_ERROR )call exit(1)
+  if( vgd_get(vgd,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8) == VGD_ERROR )error stop 1
+  if( vgd_get(vgd,key='CA_T - vertical A coefficient (t)'   ,value=a_t_8) == VGD_ERROR )error stop 1
+  if( vgd_get(vgd,key='CA_W - vertical A coefficient (w)'   ,value=a_w_8) == VGD_ERROR )error stop 1
+  if( vgd_get(vgd,key='CB_M - vertical B coefficient (m)'   ,value=b_m_8) == VGD_ERROR )error stop 1
+  if( vgd_get(vgd,key='CB_T - vertical B coefficient (t)'   ,value=b_t_8) == VGD_ERROR )error stop 1
+  if( vgd_get(vgd,key='CB_W - vertical B coefficient (w)'   ,value=b_w_8) == VGD_ERROR )error stop 1
+  if( vgd_get(vgd,key='VIPM - level ip1 list (m)'           ,value=vipm) == VGD_ERROR )error stop 1
+  if( vgd_get(vgd,key='VIPT - level ip1 list (t)'           ,value=vipt) == VGD_ERROR )error stop 1
+  if( vgd_get(vgd,key='VIPW - level ip1 list (w)'           ,value=vipw) == VGD_ERROR )error stop 1
+  if( vgd_get(vgd,key='VCDM - vertical coordinate (m)'      ,value=vcdm) == VGD_ERROR )error stop 1
+  if( vgd_get(vgd,key='VCDT - vertical coordinate (t)'      ,value=vcdt) == VGD_ERROR )error stop 1
+  if( vgd_get(vgd,key='VCDW - vertical coordinate (w)'      ,value=vcdw) == VGD_ERROR )error stop 1
+  if( vgd_get(vgd,key='NL_M - Number of vertical levels (m)',value=nl_m) == VGD_ERROR )error stop 1
+  if( vgd_get(vgd,key='NL_T - Number of vertical levels (t)',value=nl_t) == VGD_ERROR )error stop 1
+  if( vgd_get(vgd,key='NL_W - Number of vertical levels (w)',value=nl_w) == VGD_ERROR )error stop 1
 
   file='data/data_constructor_gen_4001.txt'
   if(write_control_L)then
@@ -245,21 +245,21 @@ program constructor
 
   if(.true.) then
      ! Generate file to copy in data/dm_4001_from_model_run
-     if( vgd_new(vgd,kind=4,version=1,hyb=hgts) == VGD_ERROR)call exit(1)
-     if( vgd_get(vgd,key='NL_M - Number of vertical levels (m)',value=nl_m) == VGD_ERROR )call exit(1)
-     if( vgd_get(vgd,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8) == VGD_ERROR )call exit(1)
-      if( vgd_get(vgd,key='VIPM - level ip1 list (m)'           ,value=vipm) == VGD_ERROR )call exit(1)
+     if( vgd_new(vgd,kind=4,version=1,hyb=hgts) == VGD_ERROR)error stop 1
+     if( vgd_get(vgd,key='NL_M - Number of vertical levels (m)',value=nl_m) == VGD_ERROR )error stop 1
+     if( vgd_get(vgd,key='CA_M - vertical A coefficient (m)'   ,value=a_m_8) == VGD_ERROR )error stop 1
+      if( vgd_get(vgd,key='VIPM - level ip1 list (m)'           ,value=vipm) == VGD_ERROR )error stop 1
      file="data_out/to_copy_in_dm_4001_from_model_run"
      if( fnom(lu1,file,"RND",0) < 0 )then
         print*,'ERROR with fnom on file ',trim(file)
-        call exit(1)
+        error stop 1
      endif
      ier = fstouv(lu1,'RND')
      ! Use the following file only the get a record info
      file="data/dm_21002_from_model_run_NON_SLEVE"
      if( fnom(lu2,file,"RND",0) < 0 )then
         print*,'ERROR with fnom on file ',trim(file)
-        call exit(1)
+        error stop 1
      endif
      if( fstouv(lu2,'RND') <= 0 )then
         print*,'file empty',trim(file)
@@ -267,18 +267,18 @@ program constructor
      key = fstinf(lu2,ni,nj,nkk,-1,' ',-1,-1,-1,' ','GZ')
      if( key < 0 )then
         print*,'ERROR cannot find GZ at 93423264, key=',key
-        call exit(1)
+        error stop 1
      endif
      ier = my_fstprm(key,fst)
      allocate(ff(fst%ni,fst%ni))
-     if( fstluk(ff,key,ni,nj,nkk) < 0 )call exit(1)     
+     if( fstluk(ff,key,ni,nj,nkk) < 0 )error stop 1     
      do k=1,nl_m
         ff=a_m_8(k)/10.
         ier=fstecr(ff,dummy,-32,lu1,fst%dateo,fst%deet,fst%npas, &
              ni,nj,nkk,vipm(k),fst%ip2,fst%ip3,fst%typvar,fst%nomvar,fst%etiket,fst%grtyp, &
              fst%ig1,fst%ig2,fst%ig3,fst%ig4,fst%datyp,.true.)
      enddo
-     if( vgd_write(vgd,lu1,format='fst') == VGD_ERROR )call exit(1)
+     if( vgd_write(vgd,lu1,format='fst') == VGD_ERROR )error stop 1
      ier = fstfrm(lu1)
      ier = fstfrm(lu2)
   endif

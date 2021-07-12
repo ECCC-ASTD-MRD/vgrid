@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include "vgrid.h"
 
-void main() {
+int main() {
 
   int ier, iun = 10;
   int quiet = 0, *i_val = NULL, in_log = 0;
@@ -36,22 +36,22 @@ void main() {
   ier = c_fnom(&iun,filename,mode,0);
   if( ier < 0 ) {
     printf("ERROR with c_fnom on iun, file %s\n", filename);
-    return;
+    return(1);
   }
   ier = c_fstouv(iun,"RND","");  
   if( ier < 0 ) {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
-    return;
+    return(1);
   }
   
   if( Cvgd_new_read(&vgd, iun, -1, -1, -1, -1) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
-    return;
+    return(1);
   }
 
   if( Cvgd_get_int_1d(vgd, "VIPT", &i_val, NULL, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_int for VIPT\n");
-    return;
+    return(1);
   }
 
   ier = Cvgd_get_int(vgd, "NL_T", &nl_t, quiet);
@@ -62,7 +62,7 @@ void main() {
   levels = malloc(nl_t * sizeof(float));
   if(! levels){
     printf("Problem allocating levels of size %d\n",nl_t);
-    return;
+    return(1);
   }
   p0=1000*100.;
   ier = Cvgd_levels(vgd, 1, 1, nl_t, i_val, levels, &p0, in_log);
@@ -87,6 +87,5 @@ void main() {
   free(levels);
   free(i_val);
   
-  ier = c_ut_report(status,"testing Cvgd_levels");
-
+  return(c_ut_report(status,"testing Cvgd_levels"));
 }

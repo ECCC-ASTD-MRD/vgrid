@@ -38,12 +38,12 @@ program tests
   stat=fnom(lu,"data/dm_5002_from_model_run-interp","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom'
-     call abort
+     error stop 1
   endif
   stat=fstouv(lu,'RND')
   if(stat.lt.0)then
      print*,'No record in RPN file'
-     call abort
+     error stop 1
   endif
 
   ! Get physical levelling information
@@ -60,7 +60,7 @@ program tests
   stat = vgd_levels(d,unit=lu,fstkeys=fstkeys(1:count),levels=lev)
   if(stat == VGD_ERROR)then
      print*,'ERROR with vgd_levels'
-     call exit(1)
+     error stop 1
   end if
   call ut_report(abs(lev(10,5,testLev)/100.-px(10,5))<epsilon,message='Grid_Descriptors::vgd_levels level calculation status')
 

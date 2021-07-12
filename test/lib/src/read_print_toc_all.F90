@@ -50,16 +50,16 @@ program constructor
   do i=1,nfiles
      if( fnom(lu+i,files(i),"RND",0) < 0)then
         print*,'ERROR with fnom, on file',trim(files(i))
-        call exit(1)
+        error stop 1
      end if
      if( fstouv(lu+i,'RND') <= 0 )then
         print*,'No record in RPN file ',trim(files(i))
-        call exit(1)
+        error stop 1
      endif
      ! Construct a new set of 3D coordinate descriptors
      if( vgd_new(d,unit=lu+i,format="fst") == VGD_ERROR )then
         print*,'ERROR: problem with vgd_new on file ',trim(files(i))
-        call exit(1)
+        error stop 1
      endif
      if( vgd_print(d) == VGD_ERROR) ok = .false.
      stat=fstfrm(lu+i)

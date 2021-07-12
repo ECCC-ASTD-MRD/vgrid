@@ -51,14 +51,14 @@ program constructor
   stat=fnom(lui,"data/dm_1001_from_model_run","RND+OLD",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom 1'
-     call abort
+     error stop 1
   endif
   stat=fstouv(lui,'RND')
 
   stat=fnom(luo,"data_out/dm_1001","RND",0)
   if(stat.lt.0)then
      print*,'ERROR with fnom 2'
-     call abort
+     error stop 1
   endif
   stat=fstouv(luo,'RND')
 
@@ -66,7 +66,7 @@ program constructor
   if(stat.lt.0)then
      print*,'ERROR with fstinl'
      call close_fst(lui,luo)
-     call abort
+     error stop 1
   endif
   
   nk=infon
@@ -74,7 +74,7 @@ program constructor
   if(nk.le.0)then
      print*,'ERROR no TT records'
      call close_fst(lui,luo)
-     call abort
+     error stop 1
   endif
 
   allocate(ip1_m(nk),a_m_8(nk),b_m_8(nk),sig(nk))
@@ -86,7 +86,7 @@ program constructor
      if(stat.lt.0)then
         print*,'ERROR with fstprm'
         call close_fst(lui,luo)
-        call abort
+        error stop 1
      endif
      call convip(ip1,sig(k),kind,-1,blk_S,.false.)
      ip1_m(k)=ip1
@@ -94,7 +94,7 @@ program constructor
      if(kind.ne.1)then
         print*,'ERROR wrong kind:',kind
         call close_fst(lui,luo)
-        call abort
+        error stop 1
      endif
   enddo
 
@@ -121,7 +121,7 @@ program constructor
   if(stat.ne.VGD_OK)then
      print*,'ERROR: problem with vgd_new'
      call close_fst(lui,luo)
-     call abort
+     error stop 1
   endif
 
   ! Construct a new set of 3D coordinate descriptors
@@ -130,7 +130,7 @@ program constructor
   if(stat.ne.VGD_OK)then
      print*,'ERROR: problem with vgd_write'
      call close_fst(lui,luo)
-     call abort
+     error stop 1
   endif
 
   call ut_report(stat,'Grid_Descriptors, vgd_new, vgd_write')

@@ -39,29 +39,29 @@ program stda76_pres_from_hgts
   !Get any heights vertical descriptor
   if(fnom(lu,file,"RND+R/O",0) < 0)then
      print*,'(Test) ERROR with fnom on file ',file
-     call exit(1)
+     error stop 1
   endif
   if(fstouv(lu,'RND') < 0)then
      print*,'(Test) No record in RPN file ',file
-     call exit(1)
+     error stop 1
   endif
   if(vgd_new(vgd,lu) == VGD_ERROR)then
      print*,'(Test) Problem with vgd_new'
-     call exit(1)
+     error stop 1
   endif
   if( vgd_get(vgd, "VIPM", ip1s) ==  VGD_ERROR )then
      print*,"ERROR with Cvgd_get_int for VIPT"
-     call exit(1)
+     error stop 1
   end if
   me = -100.
   if(vgd_levels(vgd,sfc_field=me,ip1_list=ip1s,levels=hgts) ==&
        VGD_ERROR)then
      print*,"ERROR with vgd_levels"
-     call exit(1)
+     error stop 1
   endif
   allocate(pres(size(hgts)))
   if(vgd_stda76_pres_from_hgts_list(pres, hgts, size(hgts)) &
-       == VGD_ERROR) call exit(1)
+       == VGD_ERROR) error stop 1
   
   ! Data for control is produce by tests c_stda76_pres_from_ghts
   open(unit=11, file="data/c_stda76_pres_from_ghts.txt", &
@@ -69,13 +69,13 @@ program stda76_pres_from_hgts
   read(11,'(4x,i8)')nl
   if(nl /= size(hgts))then
      print*,'In tests, size problem'
-     call exit(1)
+     error stop 1
   end if
   do k=1, nl
      read(11,*)ff
      if(abs(ff - pres(k))/pres(k) > 100.*epsilon(ff))then
         print*,'OUPS, got ',ff,' expected ',pres(k)
-        call exit(1)
+        error stop 1
      endif
   end do
 

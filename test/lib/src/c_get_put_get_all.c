@@ -49,7 +49,7 @@ char* concat(const char *s1, const char *s2)
     char *result = malloc(strlen(s1)+strlen(s2)+1);//+1 for the null-terminator
     if(! result){
       printf("Problem in tests with concat");
-      exit(1);
+      return(1);
     }
     strcpy(result, s1);
     strcat(result, s2);
@@ -139,14 +139,14 @@ int test_it(char *filename, int ind) {
 //========================================================================
 //========================================================================
 
-void main() {
+int main() {
   
   int ier, i, status = VGD_OK;
 
   if( Cvgd_putopt_int("ALLOW_SIGMA",1) == VGD_ERROR){
     printf("ERROR with Cvgd_putopt_int on ALLOW_SIGMA)\n");
     status = VGD_ERROR;
-    exit(1);
+    return(1);
   }
   
   for (i = 0; i < (int) n_file; i++) {
@@ -154,10 +154,9 @@ void main() {
     if(test_it(filenames[i],i) == VGD_ERROR){
       printf("ERROR with %s\n",filenames[i]);
       status = VGD_ERROR;
-      exit(1);
+      return(1);
     }
   }  
 
-  ier = c_ut_report(status,"testing Cvgd_stda76");  
-  
+  return(c_ut_report(status,"testing Cvgd_stda76"));  
 }

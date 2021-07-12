@@ -83,7 +83,7 @@ integer function test_it(F_file,F_index) result(istat)
    stat=fstouv(lu1,'RND')
    if(stat.le.0)then
       print*,'No record in RPN file ',trim(F_file)
-      call abort
+      error stop 1
    endif
    
    ! Construct a new set of 3D coordinate descriptors
@@ -99,12 +99,12 @@ integer function test_it(F_file,F_index) result(istat)
    stat=fnom(lu2,my_file,"RND",0)
    if(stat.lt.0)then
       print*,'ERROR on fnom with ',my_file
-      call abort
+      error stop 1
    endif
    stat=fstouv(lu2,'RND')   
    if(stat.lt.0)then
       print*,'ERROR on fstouv with ',my_file
-      call abort
+      error stop 1
    endif
    if(vgd_write(vgd,unit=lu2,format="fst") == VGD_ERROR)return
    stat=fstfrm(lu2)
@@ -112,12 +112,12 @@ integer function test_it(F_file,F_index) result(istat)
    stat=fnom(lu3,my_file,"RND+R/O",0)
    if(stat.lt.0)then
       print*,'ERROR on fnom with reopenning ',my_file
-      call abort
+      error stop 1
    endif
    stat=fstouv(lu3,'RND')   
    if(stat.lt.0)then
       print*,'ERROR on fstouv with reopenning ',my_file
-      call abort
+      error stop 1
    endif
     
    if(vgd_new(vgd2,unit=lu3,format="fst") == VGD_ERROR)return

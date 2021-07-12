@@ -53,7 +53,7 @@ contains
          key = fstinf(lu,nii,njj,nkk,datev,' ',ip1,ip2,-1,typvar,'PX')
          if(key < 0)then
             print*,'Cannot find PX for datev,ip1,ip2,typvar',datev,ip1,ip2,typvar
-            call exit(1)
+            error stop 1
          endif
          if(k == 1) allocate(wk(nii,njj))
          ier = fstluk(wk,key,nii,njj,nkk)
@@ -63,7 +63,7 @@ contains
                if(abs((wk(i,j)-levels(i,j,k))/wk(i,j))>epsilon)then
                   print*,'(Test) Difference in pressure is too large at'
                   print*,'i,j,k,px(i,j),levels(i,j,k)',i,j,k,wk(i,j),levels(i,j,k)
-                  call exit(1)
+                  error stop 1
                endif
             enddo
          enddo
@@ -107,18 +107,18 @@ program levels_withref_sub_array
 
    if(fnom(lu,fst_S,"RND",0) < 0)then
       print*,'(Test) ERROR with fnom on ',trim(fst_S)
-      call exit(1)
+      error stop 1
    endif
    if(fstouv(lu,'RND') < 0)then
       print*,'(Test) No record in RPN file ',trim(fst_S)
-      call exit(1)
+      error stop 1
    endif
    
    ier = fstinl(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ','TT',liste,infon,nmax)
    l_ni=ni; l_nj=nj; G_nk=infon
    if(infon == 0 )then
       print*,'(Test) pas de record de TT'      
-      call exit(1)
+      error stop 1
    endif
    allocate(ip1s(infon))
    do k=1,infon
@@ -134,7 +134,7 @@ program levels_withref_sub_array
 
    if(vgd_new(vgd,unit=lu,format="fst") == VGD_ERROR )then
       print*,'(Test) Problem getting vertical grid descriptor'
-      call exit(1)
+      error stop 1
    endif        
    ier = vgd_get(vgd,'RFLD',rfld_S)
    ier = vgd_get(vgd,'RFLS',rfld_ls_S)   
@@ -144,22 +144,22 @@ program levels_withref_sub_array
    key = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',rfld_S)
    if(key < 0)then
       print*,'(Test) Problem getting ',rfld_S
-      call exit(1)
+      error stop 1
    endif
    if( fstluk(wk,key,ni,nj,nk) < 0)then
       print*,'(Test) Problem with fstluk on ',rfld_S
-      call exit(1)
+      error stop 1
    endif
    p0 = -99.
    p0(1:l_ni,1:l_nj) = wk(1:l_ni,1:l_nj)*100.
    key = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',rfld_ls_S)
    if(key < 0)then
       print*,'(Test) Problem getting ',rfld_ls_S
-      call exit(1)
+      error stop 1
    endif
    if( fstluk(wk,key,ni,nj,nk) < 0)then
       print*,'(Test) Problem with fstluk on ',rfld_ls_S
-      call exit(1)
+      error stop 1
    endif
    p0ls = -99.
    p0ls(1:l_ni,1:l_nj) = wk(1:l_ni,1:l_nj)*100.
@@ -168,7 +168,7 @@ program levels_withref_sub_array
    p0ls_p => p0ls(1:l_ni,1:l_nj)
    levels_p => levels(1:l_ni,1:l_nj,1:G_nk)
    if( vgd_levels(vgd,ip1s,levels_p,p0_p,sfc_field_ls=p0ls_p) == VGD_ERROR)then
-      call exit(1)
+      error stop 1
    endif
    if( test_levels(levels_p,l_ni,l_nj,G_nk,liste,infon,lu) == VGD_ERROR)then
       print*,'ERROR in test with vgd_levels sub array on levels, p0 and p0ls'
@@ -179,7 +179,7 @@ program levels_withref_sub_array
    p0ls_p => p0ls(1:1,1:1)
    levels_p => levels(1:1,1:1,1:G_nk)
    if( vgd_levels(vgd,ip1s,levels_p,p0_p,sfc_field_ls=p0ls_p) == VGD_ERROR)then
-      call exit(1)
+      error stop 1
    endif
    if( test_levels(levels_p,1,1,G_nk,liste,infon,lu) == VGD_ERROR)then
       print*,'ERROR in test with vgd_levels profile sub array on levels, p0 and p0ls'
@@ -193,7 +193,7 @@ program levels_withref_sub_array
    deallocate(levels)
    allocate(levels(l_ni,l_nj,G_nk))
    if( vgd_levels(vgd,ip1s,levels,p0_p,sfc_field_ls=p0ls_p) == VGD_ERROR)then
-      call exit(1)
+      error stop 1
    endif
    if( test_levels(levels,l_ni,l_nj,G_nk,liste,infon,lu) == VGD_ERROR)then
       print*,'ERROR in test with vgd_levels sub array on p0 and p0ls'
@@ -201,7 +201,7 @@ program levels_withref_sub_array
    endif   
    wk(1:l_ni,1:l_nj)=p0(1:l_ni,1:l_nj)
    if( vgd_levels(vgd,ip1s,levels,wk,sfc_field_ls=p0ls_p) == VGD_ERROR)then
-      call exit(1)
+      error stop 1
    endif   
    if( test_levels(levels,l_ni,l_nj,G_nk,liste,infon,lu) == VGD_ERROR)then
       print*,'ERROR in test with vgd_levels sub array on p0ls'
@@ -209,7 +209,7 @@ program levels_withref_sub_array
    endif
    wk(1:l_ni,1:l_nj)=p0ls(1:l_ni,1:l_nj)
    if( vgd_levels(vgd,ip1s,levels,p0_p,sfc_field_ls=wk) == VGD_ERROR)then
-      call exit(1)
+      error stop 1
    endif   
    if( test_levels(levels,l_ni,l_nj,G_nk,liste,infon,lu) == VGD_ERROR)then
       print*,'ERROR in test with vgd_levels sub array on p0'

@@ -39,6 +39,10 @@ contains
     ! Close output file
     close(REPORT_FILE_UNIT)
     
+    if (status /= 0) then
+      error stop 1
+    endif
+
     ! End of subprogram
     return
   end subroutine report_stat
@@ -68,7 +72,11 @@ contains
     ! Close output file
     close(REPORT_FILE_UNIT)
 
-    ! End of subprogram
+    if (.not. logic) then
+      error stop 1
+    endif
+
+   ! End of subprogram
     return
   end subroutine report_logical
 

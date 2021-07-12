@@ -32,13 +32,13 @@ program ref_nomvar_is_white_space
 
    if( fnom(lu,"data/dm_2001_from_editfst","RND+R/O",0) < 0 )then
       print*,'ERROR with fnom'
-      call exit(1)
+      error stop 1
    endif
    if( fstouv(lu,'RND') < 0)then 
       print*,'No record in RPN file'
-      call exit(1)
+      error stop 1
    endif
-   if( vgd_new(vgd,unit=lu,format="fst") == VGD_ERROR) call exit(1)
+   if( vgd_new(vgd,unit=lu,format="fst") == VGD_ERROR) error stop 1
 
    if( vgd_get(vgd,"RFLD", rfld, .true.) == VGD_OK )then
       print*,"RFLD='",rfls,"'"
