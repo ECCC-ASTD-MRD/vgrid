@@ -3,7 +3,7 @@ if(BUILD_TESTING)
    #----- Library tests
    message(STATUS "(EC) Generating vgrid library and utilities tests")
    set(ECCI_DATA_DIR /home/sici000/ci_data/vgrid)
-   #set(ECCI_DATA_DIR /local/drive2/afsr005/ci/vgrid)
+  # set(ECCI_DATA_DIR /local/drive2/afsr005/ci/vgrid)
 
    file(REMOVE_RECURSE ${CMAKE_BINARY_DIR}/Testing/data_out)
    execute_process(COMMAND ln -s ${ECCI_DATA_DIR}/b_6.5/data ${CMAKE_BINARY_DIR}/Testing/data)

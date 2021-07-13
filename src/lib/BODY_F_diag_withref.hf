@@ -50,7 +50,7 @@
 
          ni = size(sfc_field,dim=1); nj = size(sfc_field,dim=2); nk = size(ip1_list)
 
-#ifdef WITH_intel
+#ifdef __INTEL_COMPILER
 !        is_contiguous is not Fortran 2008 standard but Intel
          if(is_contiguous(sfc_field))then
             my_sfc_field => sfc_field
@@ -67,7 +67,7 @@
             endif
             my_sfc_field(1:ni,1:nj) = sfc_field(1:ni,1:nj)
 
-#ifdef WITH_intel
+#ifdef __INTEL_COMPILER
          endif 
 #endif
 
@@ -89,7 +89,7 @@
             return
          endif
 
-#ifdef WITH_intel
+#ifdef __INTEL_COMPILER
 !        is_contiguous is not Fortran 2008 standard but Intel
          if(is_contiguous(sfc_field_ls))then
             my_sfc_field_ls => sfc_field_ls
@@ -105,7 +105,7 @@
             endif
             my_sfc_field_ls(1:ni,1:nj) = sfc_field_ls(1:ni,1:nj)
 
-#ifdef WITH_intel
+#ifdef __INTEL_COMPILER
          endif
 #endif
       else
@@ -137,7 +137,7 @@
          endif
       endif
 
-#ifdef WITH_intel
+#ifdef __INTEL_COMPILER
 !        is_contiguous is not Fortran 2008 standard but Intel
       if(is_contiguous(levels))then
          my_levels => levels
@@ -152,7 +152,7 @@
             return
          endif
 
-#ifdef WITH_intel
+#ifdef __INTEL_COMPILER
       endif
 #endif
       ip1_list_CP  = c_loc(ip1_list)
