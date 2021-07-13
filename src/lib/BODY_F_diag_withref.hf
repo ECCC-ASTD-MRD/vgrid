@@ -179,7 +179,7 @@
       if(alloc_my_sfc_field_L)    deallocate(my_sfc_field)
       if(alloc_my_sfc_field_ls_L) deallocate(my_sfc_field_ls)
       if(alloc_my_levels_L)then
-         levels(1:ni,1:nj,1:nk) = my_levels(1:ni,1:nj,1:nk)
+         levels = my_levels
          deallocate(my_levels)
       end if
       
