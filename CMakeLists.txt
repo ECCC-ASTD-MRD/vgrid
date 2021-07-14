@@ -31,10 +31,4 @@ add_subdirectory(src/utils utils)
 #add_subdirectory(src/examples examples)
 add_subdirectory(test test)
 
-configure_file(config.in ${CMAKE_BINARY_DIR}/${PROJECT_NAME}-config @ONLY)
-install(PROGRAMS ${CMAKE_BINARY_DIR}/${PROJECT_NAME}-config DESTINATION bin)
-
-
-
-
-
+ec_build_config()
