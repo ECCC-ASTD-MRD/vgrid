@@ -41,11 +41,13 @@ test:intel-19.0.3:
    stage: test
    script:
       - source ~/ci-admin-bundle/environments/latest/ubuntu-18.04-amd-64/intel-19.0.3.199.sh
+      - cd build
       - make check
 
 test:gnu-7.4.0:
    stage: test
    script:
       - source ~/ci-admin-bundle/environments/latest/ubuntu-18.04-amd-64/gnu-7.4.0.sh
+      - cd build
       - make check
 #ssm:
