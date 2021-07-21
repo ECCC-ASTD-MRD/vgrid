@@ -26,7 +26,7 @@ program constructor
 
   type(vgrid_descriptor) :: vgd
   integer, parameter :: nk=27
-  integer :: stat,k,i,nl_m=-1,nl_t=-1
+  integer :: stat,k,nl_m=-1,nl_t=-1
   integer, dimension(:), pointer :: vipm,vipt,work_i
   real :: my_epsilon=1.e-6
   real, dimension(nk) :: sigma,sigma2
@@ -34,7 +34,6 @@ program constructor
   real(kind=8), dimension(:), pointer :: b_m_8,a_m_8,b_t_8,a_t_8,work_8
   logical :: OK=.true.
   logical, parameter :: write_control_L=.false.
-  character (len=1) :: dumc_S
   character (len=256) :: file
 
   nullify(vipm,vipt,work_i,vcdm,vcdt,work,b_m_8,a_m_8,b_t_8,a_t_8,work_8)

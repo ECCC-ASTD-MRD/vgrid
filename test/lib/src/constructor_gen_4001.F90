@@ -34,9 +34,8 @@ contains
       ! Use fstprm function to get information about the record
       integer, intent(in) :: fstkey               !Key from FST file record
       type(FSTD_ext) :: record                    !Record information
-      integer :: error,ni,nj,nk
+      integer :: error
       integer, external :: fstprm,fstinf
-      real(kind=8) :: nhours
       status = -1
       error=fstprm(fstkey,record%dateo,record%deet,record%npas, &
            record%ni,record%nj,record%nk,record%nbits,record%datyp,record%ip1,record%ip2, &
@@ -65,7 +64,7 @@ program constructor
 
   type(vgrid_descriptor) :: vgd
   integer, parameter :: nk=10
-  integer :: stat,k,i,nl_m=-1,nl_t=-1,nl_w=-1
+  integer :: stat,k,nl_m=-1,nl_t=-1,nl_w=-1
   integer :: fnom,fstouv,fstfrm,fstluk,fstecr,ier,lu1=11,lu2=12,key,fstinf,ni,nj,nkk
   integer, dimension(:), pointer :: vipm,vipt,vipw,work_i
   real :: my_epsilon=1.e-6, dummy
@@ -75,7 +74,6 @@ program constructor
   real(kind=8), dimension(:), pointer :: a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,a_w_8,b_w_8,c_w_8,work_8
   logical :: OK=.true.
   logical, parameter :: write_control_L=.false.
-  character (len=1) :: dumc_S
   character (len=256) :: file
   type(FSTD_ext) :: fst
 

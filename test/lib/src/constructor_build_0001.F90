@@ -27,7 +27,6 @@ program constructor
   type(vgrid_descriptor) :: vgd
   integer :: k
   integer, parameter :: nk = 50
-  integer :: stat
   integer, dimension(nk) :: ip1_m, ip1_w
   real :: work  
   real(kind=8), dimension(nk) :: hgt_w= (/&

@@ -26,7 +26,6 @@ program constructor
   integer, parameter :: lu=10
   integer :: stat
   integer :: fnom,fstouv,fstfrm
-  logical :: ok
 
   stat=fnom(lu,"data/dm_5002_toc_dyn_toc_phy","RND",0)
   if(stat.lt.0)then

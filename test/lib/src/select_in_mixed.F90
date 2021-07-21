@@ -31,7 +31,7 @@ contains
       ! Use fstprm function to get information about the record
       integer, intent(in) :: fstkey               !Key from FST file record
       type(FSTD_ext) :: record                    !Record information
-      integer :: error,ni,nj,nk
+      integer :: error
       integer, external :: fstprm,fstinf
       real(kind=8) :: nhours
       status = -1
@@ -64,7 +64,7 @@ program constructor
   integer,dimension(nliste) :: lu=(/10,11/), &
        ip1,ip2,vcode=(/5001,5003/)
   integer :: stat,i,vers,key,ni,nj,nk
-  integer :: fnom,fstouv,fstinf,fstfrm,fclos,kind,version,fstlnk
+  integer :: fnom,fstouv,fstinf,fstfrm,fclos,kind,fstlnk
   logical :: ok=.true.
   character(len=1000),dimension(nliste) :: files=(/ &
        "data/dm_5001_from_model_run_plus_toc    ", &

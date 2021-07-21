@@ -179,7 +179,7 @@ integer function test_1002_5001(F_d,F_file,F_write_control_L) result(istat)
    real, dimension(:), pointer :: vcdm,vcdt,work
    real(kind=8), dimension(:), pointer :: b_m_8,a_m_8,b_t_8,a_t_8,work_8
    integer, dimension(:), pointer :: vipm,vipt,work_i
-   integer :: nl_m,nl_t,k,nk,stat,kind,vers,vcode
+   integer :: nl_m,nl_t,k,nk,stat,kind,vers
    real :: my_real = 0
 
    istat=VGD_OK

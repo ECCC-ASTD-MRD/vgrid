@@ -24,7 +24,7 @@ program constructor
   implicit none
 
   type(vgrid_descriptor) :: d,d_rtn
-  integer :: stat,lu=0,fnom,fstouv,fstfrm,fclos,k
+  integer :: stat,lu=0,k
   integer, parameter :: LEVS=4
   integer, dimension(LEVS) :: ip1s
   real(kind=8), dimension(LEVS) :: pres=(/1000.,925.,850.,700./),b=(/0.,0.,0.,0./)

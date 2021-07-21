@@ -123,13 +123,13 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
    character(len=VGD_LEN_RFLD) :: rfld_S, rfls_S
    ! Variable for fstprm, sorry...
    integer ::dateo, datev, datyp, deet, dltf, extra1, extra2, extra3, ig1,&
-        ig2, ig3, ig4, ip1, ip2, ip3, iun, key, lng, nbits,&
-        ni,  nj, nk, npak, npas, swa, ubc
+        ig2, ig3, ig4, ip1, ip2, ip3, key, lng, nbits,&
+        ni,  nj, nk, npas, swa, ubc
    character(len=12) :: etiket
    character(len=4)  :: nomvar,nomvar_metric
    character(len=2)  :: typvar
-   character(len=1)  :: grtyp, ctype, dummy_S
-   logical :: rewrit, two_refs_L, ok
+   character(len=1)  :: grtyp, dummy_S
+   logical :: two_refs_L, ok
    
    nullify(pres,pres_8,p0,p0ls,px,ip1s)
 

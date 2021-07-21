@@ -25,7 +25,7 @@ program constructor
   type(vgrid_descriptor) :: d
   integer, parameter :: lu=10
   integer :: stat,ip1
-  integer :: fnom,fstouv,fstfrm,fclos,kind,version
+  integer :: fnom,fstouv,fstfrm,fclos
   logical :: ok=.true.
   real :: height
   integer, dimension(:), pointer :: ip1_list

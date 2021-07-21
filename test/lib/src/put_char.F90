@@ -23,8 +23,7 @@ program tests
   implicit none
 
   type(vgrid_descriptor) :: d
-  integer :: stat,fstkey,lu=0,fnom,fstouv,fstfrm,fclos,lutxt=69,ip1,ip2
-  real, dimension(:,:,:), allocatable :: lev
+  integer :: stat,lu=0,fnom,fstouv,fstfrm,fclos,lutxt=69,ip1,ip2
   character(len=12) :: rfld_ETIK
   logical :: ok = .true.
 

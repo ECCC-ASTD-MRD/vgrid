@@ -57,9 +57,7 @@ integer function test_it(F_file) result(istat)
    real, dimension(:,:,:), pointer :: levels,px
    real, parameter :: epsilon=6.0e-6
    real :: ff
-   
-   logical :: in_log
-   
+      
    nullify(levels,px)
 
    istat=VGD_ERROR

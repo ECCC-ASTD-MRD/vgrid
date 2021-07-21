@@ -27,21 +27,19 @@ program constructor
   type(vgrid_descriptor) :: d
   integer, parameter :: lui=10,luo=20,nmax=1000
   integer, dimension(nmax) :: liste
-  integer :: stat,k,infon,ind,kind,keyhy,nii,njj,nkk,ig1tt,ig2tt
-  integer :: fnom,fstouv,fstfrm,fstinl,fstprm,fstinf
-  logical :: ok
+  integer :: stat,k,infon,kind,keyhy,nii,njj,nkk,ig1tt,ig2tt
+  integer :: fnom,fstouv,fstinl,fstprm,fstinf
   real, dimension(:),allocatable :: hyb
   real(kind=8), dimension(:),allocatable :: a_m_8,b_m_8
-  real(kind=8), dimension(:),allocatable :: a_t_8, b_t_8
   real(kind=8) :: pref_8,ptop_8,hybtop_8
   real :: pp,rcoef1
-  integer, dimension(:),allocatable :: ip1_m,ip1_t
+  integer, dimension(:),allocatable :: ip1_m
   character(len=10) :: blk_S
 
   ! For fstprm
   integer :: ig1,ig2,ig3,ig4,dateo,deet,npas,datyp,nbits
-  integer :: ni,nj,nk,ni2,nj2,nk2,nit,njt,nkt,nkmod
-  integer :: ip1,ip2,ip3,swa,lng,dltf,ubc,extra1,extra2,extra3,datev
+  integer :: ni,nj,nk
+  integer :: ip1,ip2,ip3,swa,lng,dltf,ubc,extra1,extra2,extra3
   character(len=1) :: grtyp
   character(len=2) :: typvar
   character(len=4) :: nomvar
@@ -158,7 +156,8 @@ end program constructor
 subroutine close_fst(lui,luo)
 
    implicit none
-   integer lui,luo,fstfrm,stat
+   integer lui,luo,stat
+   integer :: fstfrm
 
    stat=fstfrm(lui)
    stat=fstfrm(luo)

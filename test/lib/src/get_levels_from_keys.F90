@@ -30,17 +30,14 @@ program get_levels_from_keys
   integer :: fnom,fstouv,fstfrm,fstinf,fstluk,fstinl,fstprm
   real, dimension(:,:,:), pointer :: pres
   real, dimension(:,:), pointer :: ff
-  logical :: ok
   ! Variable for fstprm
   integer ::dateo, datev, datyp, deet, dltf, extra1, extra2, extra3, ig1,&
-       ig2, ig3, ig4, ip1, ip2, ip3, iun, key, lng, nbits,&
-       ni,  nj, nk, npak, npas, swa, ubc
+       ig2, ig3, ig4, ip1, ip2, ip3, key, lng, nbits,&
+       ni,  nj, nk, npas, swa, ubc
   character(len=12) :: etiket
   character(len=4)  :: nomvar
   character(len=2)  :: typvar
-  character(len=1)  :: grtyp, ctype
-  logical :: rewrit
-  real :: hyb
+  character(len=1)  :: grtyp
 
   nullify(pres,ff)
 

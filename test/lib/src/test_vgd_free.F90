@@ -29,7 +29,6 @@ program tests
 
   ! Structure elements
   real, dimension(3) :: hyb=(/0.1,  0.5, 0.9/)
-  real, dimension(4) :: hyb2=(/0.1,0.33, 0.66, 0.9/)
   real :: rcoef1=0.,rcoef2=1.  
   real(kind=8) :: ptop_8=1000d0,pref_8=100000d0,value_8
   

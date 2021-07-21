@@ -28,7 +28,6 @@ program constructor
   integer, parameter :: luo=10,nk=3
   integer :: stat,ip1,k
   integer :: fnom,fstouv,fstfrm
-  logical :: ok
   real :: pp
   real(kind=8), dimension(:), pointer :: a_m_8,b_m_8
   real(kind=8), dimension(:), pointer :: a_t_8, b_t_8

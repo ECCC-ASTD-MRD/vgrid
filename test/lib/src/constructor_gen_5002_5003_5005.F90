@@ -27,8 +27,7 @@ program constructor
   implicit none
 
   type(vgrid_descriptor) :: vgd
-  integer :: stat,nl_m,nl_t
-  real :: epsilon=1.e-6
+  integer :: stat
   real, dimension(57) :: hyb= &
      (/0.0134575, 0.0203980, 0.0333528, 0.0472815, 0.0605295, 0.0720790, &
        0.0815451, 0.0889716, 0.0946203, 0.0990605, 0.1033873, 0.1081924, &
@@ -152,7 +151,7 @@ integer function test_5002(F_d,F_file,F_write_control_L,F_stat) result(istat)
    real, dimension(:), pointer :: vcdm,vcdt,work
    real(kind=8), dimension(:), pointer :: b_m_8,a_m_8,b_t_8,a_t_8,work_8
    integer, dimension(:), pointer :: vipm,vipt,work_i
-   integer :: nl_m,nl_t,k,nk,stat,kind,vers,vcode,ip1,my_ip1
+   integer :: nl_m,nl_t,k,nk,stat,kind,vers,ip1,my_ip1
 
    nullify(vcdm,vcdt,work,b_m_8,a_m_8,b_t_8,a_t_8,work_8,vipm,vipt,work_i)
 

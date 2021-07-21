@@ -24,7 +24,6 @@ program tests
 
   type(vgrid_descriptor) :: d
   integer :: stat,fnom,fstouv,lu=10
-  real, dimension(:,:,:), allocatable :: lev
   logical :: ok = .true.
 
   stat=fnom(lu,"data/dm_5002_from_model_run","RND",0)

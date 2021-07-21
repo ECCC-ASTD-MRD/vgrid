@@ -27,7 +27,6 @@ program constructor
   integer :: lu=0,lu2=0,lutxt=69
   integer :: stat,ip1,ip2
   integer :: fnom,fstouv,fstfrm,fclos
-  logical :: ok
 
   call flush(6)
  

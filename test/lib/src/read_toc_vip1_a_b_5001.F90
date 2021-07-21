@@ -28,7 +28,6 @@ program constructor
   integer :: stat,i
   integer :: fnom,fstouv,fstfrm
   integer, dimension(:), pointer :: vip1
-  logical :: ok
   real(kind=8), dimension(:), pointer :: cam,cbm
   real, dimension(:), pointer :: vcrd
 

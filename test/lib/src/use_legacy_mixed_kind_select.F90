@@ -25,7 +25,7 @@ program constructor
 
   type(vgrid_descriptor) :: d
   integer :: fnom,fstouv,fstlnk,i
-  integer :: stat,lu1=10,lu2=20
+  integer :: stat
   integer, parameter :: nfiles=2
   integer, dimension(nfiles) :: iun
   character(len=500),dimension(nfiles) :: files

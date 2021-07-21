@@ -24,7 +24,7 @@ program tests
    implicit none
 
    integer, parameter :: nfile=3
-   integer :: stat,lu=0,fnom,fstouv,fstfrm,fclos,lutxt=69,ip1,ip2,test_it,i
+   integer :: stat,lu=0,fnom,fstouv,fstfrm,lutxt=69,ip1,ip2,test_it,i
    character(len=4), dimension(nfile) :: vcode_S=(/"5002","5004","5005"/)   
    logical :: ok=.true.
       

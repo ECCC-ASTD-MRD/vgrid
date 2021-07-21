@@ -31,9 +31,8 @@ contains
       ! Use fstprm function to get information about the record
       integer, intent(in) :: fstkey               !Key from FST file record
       type(FSTD_ext) :: record                    !Record information
-      integer :: error,ni,nj,nk
+      integer :: error
       integer, external :: fstprm,fstinf
-      real(kind=8) :: nhours
       status = -1
       error=fstprm(fstkey,record%dateo,record%deet,record%npas, &
            record%ni,record%nj,record%nk,record%nbits,record%datyp,record%ip1,record%ip2, &
@@ -90,10 +89,9 @@ integer function test_it(F_file_from_model_run) result(status)
    type(vgrid_descriptor) :: vgrid,vgrid_rebuilt
    integer, parameter :: nmax = 1000
    integer, dimension(nmax) :: liste
-   integer :: lu=0,lu2=0,lutxt=69
-   integer :: ier,stat,ip1,ip2,infon,i,ni,nj,nk,key
+   integer :: lu=0,lu2=0
+   integer :: ier,stat,infon,i,ni,nj,nk,key
    integer :: fnom,fstouv,fstfrm,fstinl,fsteff,fstinf
-   logical :: ok  
    real(kind=8), dimension(:,:,:), pointer :: table
    type(FSTD_ext) :: prm_orig,prm_rebuilt
    

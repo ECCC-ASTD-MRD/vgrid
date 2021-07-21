@@ -23,13 +23,12 @@ program tests
 
   implicit none
 
-  integer :: stat,lu=0,ni,nj,nk,fnom,fstouv,fstfrm,fclos,fstlir,fstinf,k
+  integer :: stat,lu=0,fnom,fstouv,fstfrm,k
   integer, parameter :: i0=1,j0=1
   integer, dimension(:), pointer :: ip1_list
   real, dimension(:,:,:), pointer :: dpidpis_cube
   real(kind=8), dimension(:,:,:), pointer :: dpidpis_cube_8
   real :: eps=1.e-6
-  real :: w1
   type(vgrid_descriptor) :: d
   logical :: ok
   real(kind=8), dimension(:), pointer :: coef_b

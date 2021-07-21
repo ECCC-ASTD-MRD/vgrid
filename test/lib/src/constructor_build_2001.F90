@@ -25,7 +25,7 @@ program constructor
   implicit none
   !
   type(vgrid_descriptor) :: d,d2
-  integer :: stat,i,nl_m,nl_t,k,nk,test_2001
+  integer :: stat,i,test_2001
   integer, dimension(:), pointer :: ip1s
   integer, dimension(:), pointer :: vipm,vipt,work_i
   real(kind=8), dimension(4) :: pres=(/700.,850.,925.,1000./),b=(/0.,0.,0.,0./)
@@ -92,7 +92,7 @@ integer function test_2001(F_d,F_file,F_write_control_L) result(istat)
    real, dimension(:), pointer :: vcdm,vcdt,work
    real(kind=8), dimension(:), pointer :: b_m_8,a_m_8,b_t_8,a_t_8,work_8
    integer, dimension(:), pointer :: vipm,vipt,work_i
-   integer :: nl_m,nl_t,k,nk,stat,kind,vers,vcode
+   integer :: nl_m,nl_t,k,nk,stat
    !
    istat=VGD_ERROR
    !

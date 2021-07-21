@@ -26,10 +26,9 @@ program constructor
   implicit none
 
   type(vgrid_descriptor) :: d
-  integer :: lu=10,lutxt=69
-  integer :: stat,ip1,ip2
+  integer :: lu=10
+  integer :: stat
   integer :: fnom,fstouv,fstfrm
-  logical :: ok
 
   stat=fnom(lu,"data/sample_out_lewis_small.fstd","RND",0)
   if(stat.lt.0)then

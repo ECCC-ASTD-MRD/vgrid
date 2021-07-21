@@ -27,12 +27,10 @@ program constructor
   implicit none
 
   type(vgrid_descriptor) :: d
-  integer :: lu=0,ier,fstinl, ni, nj, nk
+  integer :: lu=0
   integer :: stat
-  integer :: fnom,fstouv,fstfrm,infon
+  integer :: fnom,fstouv,fstfrm
   integer, parameter :: nmax=1000
-  integer, dimension(nmax) :: liste
-  logical :: ok  
 
   stat=fnom(lu,"data/dm_5002_from_model_run-interp_dup","RND",0)
   if(stat.lt.0)then

@@ -25,7 +25,7 @@ program constructor
 
   type(vgrid_descriptor) :: d
   integer, parameter :: lu=10
-  integer :: stat,i
+  integer :: stat
   integer :: fnom,fstouv,fstfrm
   integer, dimension(:), pointer :: vip1
   real, dimension(:), pointer :: vcr

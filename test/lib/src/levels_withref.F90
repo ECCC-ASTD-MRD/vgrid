@@ -96,16 +96,15 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
    real(kind=8), dimension(:,:), pointer :: p0_8, p0ls_8
    real :: epsilon=5.0e-4,pppp, factor
    integer, dimension(:), pointer :: ip1s
-   logical :: ok
    ! Variable for fstprm, sorry...
    integer ::dateo, datev, datyp, deet, dltf, extra1, extra2, extra3, ig1,&
-        ig2, ig3, ig4, ip1, ip2, ip3, iun, key, lng, nbits,&
-        ni,  nj, nk, npak, npas, swa, ubc
+        ig2, ig3, ig4, ip1, ip2, ip3, key, lng, nbits,&
+        ni,  nj, nk, npas, swa, ubc
    character(len=12) :: etiket
    character(len=4)  :: nomvar, rfld, nomvar_metric
    character(len=2)  :: typvar
-   character(len=1)  :: grtyp, ctype, dummy_S
-   logical :: rewrit, sfc_field_ls_L
+   character(len=1)  :: grtyp, dummy_S
+   logical :: sfc_field_ls_L
 
    status=VGD_ERROR   
 

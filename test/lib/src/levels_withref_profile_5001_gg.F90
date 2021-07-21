@@ -22,7 +22,7 @@ program tests
 
   implicit none
 
-  integer :: stat,lu=0,ni,nj,fnom,fstouv,fstfrm,fclos,fstlir,fstinf,k,lutxt=69,ip1,ip2,nk
+  integer :: stat,lu=0,ni,nj,fnom,fstouv,fstfrm,fstlir,fstinf,k,lutxt=69,ip1,ip2,nk
   integer, parameter :: i0=20,j0=10
   integer, dimension(:), pointer :: ip1_list
   real, dimension(:), pointer :: pres_profil

@@ -25,7 +25,6 @@ program tests
 
   type(vgrid_descriptor) :: d
   integer :: stat,lu=10,lutxt=69,ip1,ip2
-  real(kind=8) :: ptop_8
   logical :: OK = .true.
   
   integer, external :: fnom,fstouv,fclos,fstfrm
