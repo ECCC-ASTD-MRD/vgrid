@@ -2032,6 +2032,9 @@ contains
     real, optional, target, intent(in) :: sfc_temp     !Use this surface temperature for standard atmosphere
     real, optional, target, intent(in) :: sfc_pres     !Use this surface pressure for standard atmosphere
     ! Local variables
+
+    status = VGD_OK
+
     if(present(sfc_temp) .and. present(sfc_pres))then
        status=vgd_stda76(self, ip1s, val, var, sfc_temp=sfc_temp, sfc_pres=sfc_pres)
        return

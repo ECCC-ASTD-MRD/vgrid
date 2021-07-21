@@ -313,7 +313,7 @@ contains
     stat = exdb('r.vgrid_sample', version, 'NON')
     write(6,'("   * ",a)')PROJECT_VERSION_STRING
     write(6,'("   **************************************************************" &
-         //"****************************************")')
+         &"****************************************")')
     
     npos = -111
     call ccard(cle, def, val, ncle, npos)
