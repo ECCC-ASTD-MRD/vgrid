@@ -13,7 +13,7 @@ before_script:
 build:intel-19.0.3:
   stage: build
   script:
-    - source ~/ci-admin-bundle/environments/latest/ubuntu-18.04-skylake-64/intel-19.0.3.199.sh
+    - source ci-env/latest/ubuntu-18.04-skylake-64/intel-19.0.3.199.sh
     - mkdir build_intel
     - cd build_intel
     - cmake ../ -DCMAKE_INSTALL_PREFIX=${CI_PROJECT_DIR}/install-dir
@@ -26,7 +26,7 @@ build:intel-19.0.3:
 build:gnu-7.4.0:
   stage: build
   script:
-    - source ~/ci-admin-bundle/environments/latest/ubuntu-18.04-amd-64/gnu-7.4.0.sh
+    - source ci-env/latest/ubuntu-18.04-amd-64/gnu-7.4.0.sh
     - mkdir build_gnu
     - cd build_gnu
     - cmake ../ -DCMAKE_INSTALL_PREFIX=${CI_PROJECT_DIR}/install-dir
@@ -39,14 +39,14 @@ build:gnu-7.4.0:
 test:intel-19.0.3:
    stage: test
    script:
-      - source ~/ci-admin-bundle/environments/latest/ubuntu-18.04-amd-64/intel-19.0.3.199.sh
+      - source ci-env/latest/ubuntu-18.04-amd-64/intel-19.0.3.199.sh
       - cd build_intel
       - make check
 
 test:gnu-7.4.0:
    stage: test
    script:
-      - source ~/ci-admin-bundle/environments/latest/ubuntu-18.04-amd-64/gnu-7.4.0.sh
+      - source ci-env/latest/ubuntu-18.04-amd-64/gnu-7.4.0.sh
       - cd build_gnu
       - make check
 #ssm:
