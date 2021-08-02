@@ -8,7 +8,7 @@ Vertical grids management library and tools
 - CMake 3.12+
 - librmn
 
-Note: =cmake_rpn= and =-ci-env= are included as a submodule.  Please clone with the
+Note: =cmake_rpn= and =ci-env= are included as a submodule.  Please clone with the
 =--recursive= flag or run =git submodule update --init --recursive= in the
 git repo after having cloned.
 
@@ -53,7 +53,7 @@ make install
 - CMake 3.12+
 - librmn with shared libraries (https://github.com/ECCC-ASTD-MRD/librmn/tree/dev)
 
-Note: =cmake_rpn= and =-ci-env= are included as a submodule but =ci-env= is not available externally. 
+Note: =cmake_rpn= and =ci-env= are included as a submodule but =ci-env= is not available externally. 
 Please run =git submodule update --init --recursive cmake_rpn= in the git repo after having cloned.
 
 ** Build and install
