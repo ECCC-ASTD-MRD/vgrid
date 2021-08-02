@@ -1,7 +1,9 @@
 
 Vertical grids management library and tools
 
-* Build dependencies
+* At CMC
+
+** Build dependencies
 
 - CMake 3.12+
 - librmn
@@ -10,7 +12,7 @@ Note: =cmake_rpn= and =-ci-env= are included as a submodule.  Please clone with 
 =--recursive= flag or run =git submodule update --init --recursive= in the
 git repo after having cloned.
 
-* At CMC
+** Environment
 
 Source the right file depending on the architecture you need from the env directory.
 This will load the specified compiler and define the ECCI_DATA_DIR variable for the test datasets
@@ -33,7 +35,7 @@ This will load the specified compiler and define the ECCI_DATA_DIR variable for 
 . ci-env/latest/ubuntu-18.04-amd-64/gnu-7.5.0.sh
 #+end_src
 
-* Build and install
+** Build and install
 
 #+begin_src
 mkdir build
@@ -44,4 +46,22 @@ make check
 make install
 #+end_src
 
+* Outside CMC (External users)
 
+** Build dependencies
+
+- CMake 3.12+
+- librmn with shared libraries (https://github.com/ECCC-ASTD-MRD/librmn/tree/dev)
+
+Note: =cmake_rpn= and =-ci-env= are included as a submodule but =ci-env= is not available externally. 
+Please run =git submodule update --init --recursive cmake_rpn= in the git repo after having cloned.
+
+** Build and install
+
+#+begin_src
+mkdir build
+cd build
+cmake .. -DCMAKE_INSTALL_PREFIX=${your_choice} -DRMN_ROOT=${librmn_install_path}
+make -j 4
+make install
+#+end_src
