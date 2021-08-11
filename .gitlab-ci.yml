@@ -2,13 +2,23 @@ variables:
    GIT_SUBMODULE_STRATEGY: recursive
 stages:
    - build
-   - test
-#   - package
-#   - deploy
+#   - test
+   - deploy
 
 before_script:
    # Force color CMake output even when output is not TTY
    - export CLICOLOR_FORCE=true
+
+deploy:intel-19.0.3:test:
+   stage: deploy
+   environment:
+      name: testing
+   when: manual
+      script:
+      - source ci-env/latest/ubuntu-18.04-amd-64/intel-19.0.3.199.sh
+      - cd build_intel-19.0.3
+      - make package
+      - mv package/*.tgz ~/ci_package/
 
 build:intel-19.0.3:
    stage: build
@@ -26,39 +36,39 @@ build:intel-19.0.3:
       paths:
          - build_intel-19.0.3
 
-build:gnu-7.4.0:
-   stage: build
-   only:
-      - master
-      - dev
-   script:
-      - source ci-env/latest/ubuntu-18.04-amd-64/gnu-7.4.0.sh
-      - mkdir build_gnu-7.4.0
-      - cd build_gnu-7.4.0
-      - cmake ../ -DCMAKE_INSTALL_PREFIX=${CI_PROJECT_DIR}/install-dir
-      - make
-   artifacts:
-      expire_in: 2 hrs
-      paths:
-         - build_gnu-7.4.0
+# build:gnu-7.4.0:
+#    stage: build
+#    only:
+#       - master
+#       - dev
+#    script:
+#       - source ci-env/latest/ubuntu-18.04-amd-64/gnu-7.4.0.sh
+#       - mkdir build_gnu-7.4.0
+#       - cd build_gnu-7.4.0
+#       - cmake ../ -DCMAKE_INSTALL_PREFIX=${CI_PROJECT_DIR}/install-dir
+#       - make
+#    artifacts:
+#       expire_in: 2 hrs
+#       paths:
+#          - build_gnu-7.4.0
 
-test:intel-19.0.3:
-   stage: test
-   only:
-      - master
-      - dev
-   script:
-      - source ci-env/latest/ubuntu-18.04-amd-64/intel-19.0.3.199.sh
-      - cd build_intel-19.0.3
-      - make check
+# test:intel-19.0.3:
+#    stage: test
+#    only:
+#       - master
+#       - dev
+#    script:
+#       - source ci-env/latest/ubuntu-18.04-amd-64/intel-19.0.3.199.sh
+#       - cd build_intel-19.0.3
+#       - make check
 
-test:gnu-7.4.0:
-   stage: test
-   only:
-      - master
-      - dev
-   script:
-      - source ci-env/latest/ubuntu-18.04-amd-64/gnu-7.4.0.sh
-      - cd build_gnu-7.4.0
-      - make check
+# test:gnu-7.4.0:
+#    stage: test
+#    only:
+#       - master
+#       - dev
+#    script:
+#       - source ci-env/latest/ubuntu-18.04-amd-64/gnu-7.4.0.sh
+#       - cd build_gnu-7.4.0
+#       - make check
 
