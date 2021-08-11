@@ -1,43 +1,52 @@
 variables:
-    GIT_SUBMODULE_STRATEGY: recursive
+   GIT_SUBMODULE_STRATEGY: recursive
 stages:
-  - build
-  - test
-#  - package
-#  - deploy
+   - build
+   - test
+#   - package
+#   - deploy
 
 before_script:
-  # Force color CMake output even when output is not TTY
-  - export CLICOLOR_FORCE=true
+   # Force color CMake output even when output is not TTY
+   - export CLICOLOR_FORCE=true
 
 build:intel-19.0.3:
-  stage: build
-  script:
-    - source ci-env/latest/ubuntu-18.04-skylake-64/intel-19.0.3.199.sh
-    - mkdir build_intel-19.0.3
-    - cd build_intel-19.0.3
-    - cmake ../ -DCMAKE_INSTALL_PREFIX=${CI_PROJECT_DIR}/install-dir
-    - make
-  artifacts:
-    expire_in: 2 hrs
-    paths:
-      - build_intel-19.0.3
+   stage: build
+   only:
+      - master
+      - dev
+   script:
+      - source ci-env/latest/ubuntu-18.04-skylake-64/intel-19.0.3.199.sh
+      - mkdir build_intel-19.0.3
+      - cd build_intel-19.0.3
+      - cmake ../ -DCMAKE_INSTALL_PREFIX=${CI_PROJECT_DIR}/install-dir
+      - make
+   artifacts:
+      expire_in: 2 hrs
+      paths:
+         - build_intel-19.0.3
 
 build:gnu-7.4.0:
-  stage: build
-  script:
-    - source ci-env/latest/ubuntu-18.04-amd-64/gnu-7.4.0.sh
-    - mkdir build_gnu-7.4.0
-    - cd build_gnu-7.4.0
-    - cmake ../ -DCMAKE_INSTALL_PREFIX=${CI_PROJECT_DIR}/install-dir
-    - make
-  artifacts:
-    expire_in: 2 hrs
-    paths:
-      - build_gnu-7.4.0
+   stage: build
+   only:
+      - master
+      - dev
+   script:
+      - source ci-env/latest/ubuntu-18.04-amd-64/gnu-7.4.0.sh
+      - mkdir build_gnu-7.4.0
+      - cd build_gnu-7.4.0
+      - cmake ../ -DCMAKE_INSTALL_PREFIX=${CI_PROJECT_DIR}/install-dir
+      - make
+   artifacts:
+      expire_in: 2 hrs
+      paths:
+         - build_gnu-7.4.0
 
 test:intel-19.0.3:
    stage: test
+   only:
+      - master
+      - dev
    script:
       - source ci-env/latest/ubuntu-18.04-amd-64/intel-19.0.3.199.sh
       - cd build_intel-19.0.3
@@ -45,6 +54,9 @@ test:intel-19.0.3:
 
 test:gnu-7.4.0:
    stage: test
+   only:
+      - master
+      - dev
    script:
       - source ci-env/latest/ubuntu-18.04-amd-64/gnu-7.4.0.sh
       - cd build_gnu-7.4.0
