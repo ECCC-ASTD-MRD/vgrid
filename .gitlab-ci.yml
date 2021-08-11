@@ -9,7 +9,7 @@ before_script:
    # Force color CMake output even when output is not TTY
    - export CLICOLOR_FORCE=true
 
-deploy:intel-19.0.3:test:
+deploy:intel-19.0.3:
    stage: deploy
    environment:
       name: testing
