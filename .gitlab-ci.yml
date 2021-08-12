@@ -63,7 +63,7 @@ test:gnu-7.4.0:
       - make check
 
 package:intel-19.0.3:
-   stage: deploy
+   stage: package
    only:
       - tags
    environment:
@@ -75,7 +75,7 @@ package:intel-19.0.3:
       - ~/ci-admin-bundle/bin/ci-deploy-ssm.sh package
 
 package:gnu-7.4.0:
-   stage: deploy
+   stage: package
    only:
       - tags
    environment:
