@@ -3,7 +3,8 @@ variables:
 stages:
    - build
    - test
-   - deploy
+   - package
+#   - deploy
 
 before_script:
    # Force color CMake output even when output is not TTY
@@ -61,7 +62,7 @@ test:gnu-7.4.0:
       - cd build_gnu-7.4.0
       - make check
 
-deploy:intel-19.0.3:
+package:intel-19.0.3:
    stage: deploy
    only:
       - tags
@@ -73,7 +74,7 @@ deploy:intel-19.0.3:
       - make package
       - ~/ci-admin-bundle/bin/ci-deploy-ssm.sh package
 
-deploy:gnu-7.4.0:
+package:gnu-7.4.0:
    stage: deploy
    only:
       - tags
