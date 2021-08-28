@@ -31,6 +31,9 @@ program use_legacy
    istat=test_it("data/dm_1002_from_model_run_multi_pt")
    if(istat.eq.VGD_ERROR)stop
 
+   istat=test_it("data/dm_1002_from_model_run_ip1s_new_style")
+   if(istat.eq.VGD_ERROR)stop
+   
    istat=test_it("data/dm_1003_from_pgsm_lam_east_ops")
    if(istat.eq.VGD_ERROR)stop
 

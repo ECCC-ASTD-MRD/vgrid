@@ -3474,7 +3474,7 @@ int Cvgd_new_from_table(vgrid_descriptor **self, double *table, int ni, int nj, 
   return(VGD_OK);
 }
 
-static int C_genab_1002(float *etauser, int nk, double *ptop_8, double **a_m_8, double **b_m_8, int **ip1_m)
+static int C_genab_1002(float *etauser, int nk, double *ptop_8, double **a_m_8, double **b_m_8, int **ip1_m, int old_style_ip1)
 {
   // Andre Plante May 2015.   
   char ok=1;
@@ -3520,7 +3520,11 @@ static int C_genab_1002(float *etauser, int nk, double *ptop_8, double **a_m_8, 
   int ip1, kind2;
   float eta;
   for ( k = 0; k < nk; k++){
-    ip1 = c_convip_Level2IP_old_style(etauser[k],1);
+    if(old_style_ip1){
+      ip1 = c_convip_Level2IP_old_style(etauser[k],1);
+    } else {
+      ip1 = c_convip_Level2IP(etauser[k],1);
+    }
     eta = c_convip_IP2Level(ip1,&kind2);
     (*ip1_m)[k] = ip1;
     (*a_m_8)[k] = (1. - eta) * (*ptop_8);
@@ -5768,7 +5772,7 @@ int Cvgd_new_gen3(vgrid_descriptor **self, int kind, int version, float *hyb, in
     nk   = size_hyb;
     nl_m = size_hyb;
     nl_t = size_hyb;
-    if(C_genab_1002(hyb, size_hyb, ptop_8, &a_m_8, &b_m_8, &ip1_m) == VGD_ERROR ) {
+    if(C_genab_1002(hyb, size_hyb, ptop_8, &a_m_8, &b_m_8, &ip1_m, 1) == VGD_ERROR ) {
       free(a_m_8);
       free(b_m_8);
       free(ip1_m);
@@ -6116,7 +6120,7 @@ static int C_gen_legacy_desc(vgrid_descriptor **self, int unit, int *keylist , i
       } else {
 	printf("(Cvgd)   eta coordinate found\n");
 	ptop_8 = ptop*100.;
-	if( C_genab_1002(hyb, nb, &ptop_8, &a_m_8, &b_m_8, &ip1) == VGD_ERROR ){	  
+	if( C_genab_1002(hyb, nb, &ptop_8, &a_m_8, &b_m_8, &ip1, old_style_ip1) == VGD_ERROR ){	  
 	  goto bomb;
 	}
 	if( Cvgd_new_build_vert2(self, kind, 2, nb, var.ig1, var.ig2, &ptop_8, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR ){
