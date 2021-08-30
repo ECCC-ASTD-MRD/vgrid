@@ -39,5 +39,5 @@ src/vgrid_version.hc
 src/vgrid_version.hf
 control
 dependencies.mk
-build
+build/
 

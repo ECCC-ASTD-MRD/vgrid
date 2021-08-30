@@ -61,15 +61,15 @@ program constructor
   ! Build a new set of vertical coordinate descriptors Vcode 0001
   if( vgd_new(vgd,0,1,nk,0,0,a_m_8=hgt_m,a_w_8=hgt_w,b_m_8=b_m_8,b_w_8=b_w_8,ip1_m=ip1_m,ip1_w=ip1_w) == VGD_ERROR )then
      print*,'ERROR in tests with vgd_new'
-     stop
+     error stop 1
   endif
   if( vgd_print(vgd,convip_L=.true.) == VGD_ERROR )then
      print*,'ERROR in tests with vgd_print'
-     stop
+     error stop 1
   endif
   if( vgd_print(1) == VGD_ERROR )then
      print*,'ERROR'
-     stop
+     error stop 1
   endif
   
   call ut_report(OK,'Grid_Descriptors::vgd_new vertical generate initializer ocean coordinate')

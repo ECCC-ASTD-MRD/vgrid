@@ -54,15 +54,15 @@ program constructor
 
   if(.not. vgd1 == vgd2)then
      print*,'ERROR vgd1 and vgd2 should be equal and are not'
-     stop
+     error stop 1
   endif
   if( vgd_print(vgd1,convip_L=.true.) == VGD_ERROR )then
      print*,'ERROR'
-     stop
+     error stop 1
   endif
   if( vgd_print(21001) == VGD_ERROR )then
      print*,'ERROR'
-     stop
+     error stop 1
   endif
 
   file='data/data_constructor_gen_21001_NO_SLEVE.txt'

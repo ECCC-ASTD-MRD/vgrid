@@ -48,11 +48,11 @@ program constructor
   if( vgd_new(d,kind=21,version=1,hyb=hgts,rcoef1=rcoef1,rcoef2=rcoef2,rcoef3=rcoef3,rcoef4=rcoef4,dhm=10.0,dht=1.5) == VGD_ERROR )OK=.false.
   if( vgd_print(d,convip_L=.true.) == VGD_ERROR )then
      print*,'ERROR'
-     stop
+     error stop 1
   endif
   if( vgd_print(21101) == VGD_ERROR )then
      print*,'ERROR'
-     stop
+     error stop 1
   endif
 
   file='data/data_constructor_gen_21001_SLEVE.txt'
