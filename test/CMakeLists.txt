@@ -8,7 +8,7 @@ if(BUILD_TESTING)
    execute_process(COMMAND rm -f -r ${CMAKE_BINARY_DIR}/Testing/data_out)
    execute_process(COMMAND mkdir ${CMAKE_BINARY_DIR}/Testing/data_out)
 
-   file(GLOB SRC_TEST lib/src/*)
+   file(GLOB SRC_TEST lib/src/*.c lib/src/*.F90)
 
    #----- Loop on tests
    foreach(testfile ${SRC_TEST})
