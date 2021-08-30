@@ -52,15 +52,15 @@ test:intel-19.0.3:
       - cd build_intel-19.0.3
       - make check
 
-test:gnu-7.4.0:
-   stage: test
-   only:
-      - master
-      - dev
-   script:
-      - source ci-env/latest/ubuntu-18.04-amd-64/gnu-7.4.0.sh
-      - cd build_gnu-7.4.0
-      - make check
+#test:gnu-7.4.0:
+#   stage: test
+#   only:
+#      - master
+#      - dev
+#   script:
+#      - source ci-env/latest/ubuntu-18.04-amd-64/gnu-7.4.0.sh
+#      - cd build_gnu-7.4.0
+#      - make check
 
 package:intel-19.0.3:
    stage: package
