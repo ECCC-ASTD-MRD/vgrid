@@ -67,7 +67,7 @@ program constructor
   ! Build a new set of vertical coordinate descriptors Vcode 0001
   if( vgd_new(vgd,0,1,nk,0,0,a_m_8=hgt_m,a_w_8=hgt_w,b_m_8=b_m_8,b_w_8=b_w_8,ip1_m=ip1_m,ip1_w=ip1_w) == VGD_ERROR )then
      print*,'ERROR in tests with vgd_new'
-     stop
+     error stop 1
   endif
 
   k = vgd_print(vgd)
@@ -75,11 +75,11 @@ program constructor
   print*,'Testing A M'
   if( vgd_get(vgd,key="VIPM",value=ip1_list) == VGD_ERROR )then
      print*,'ERROR in test with vgd_get on key VIPM'
-     stop
+     error stop 1
   endif  
   if( vgd_levels(vgd,ip1_list,levels) == VGD_ERROR )then
      print*,'ERROR in test with vgd_levels'
-     stop
+     error stop 1
   endif
   do k=1,nk
      if(abs(levels(1,1,k)) < epsilon(1.))then
@@ -98,11 +98,11 @@ program constructor
   print*,'Testing A W'
   if( vgd_get(vgd,key="VIPW",value=ip1_list) == VGD_ERROR )then
      print*,'ERROR in test with vgd_get on key VIPW'
-     stop
+     error stop 1
   endif  
   if( vgd_levels(vgd,ip1_list,levels) == VGD_ERROR )then
      print*,'ERROR in test with vgd_levels'
-     stop
+     error stop 1
   endif
   do k=1,nk
      if(abs(levels(1,1,k)) < epsilon(1.))then

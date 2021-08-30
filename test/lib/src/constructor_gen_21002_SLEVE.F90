@@ -45,11 +45,11 @@ program constructor
   if( vgd_new(d,kind=21,version=2,hyb=hgts,rcoef1=0.,rcoef2=1.,rcoef3=0.,rcoef4=1000.,dhm=10.0,dht=1.5,dhw=0.) == VGD_ERROR )OK=.false.
   if( vgd_print(d,convip_L=.true.) == VGD_ERROR )then
      print*,'ERROR'
-     stop
+     error stop 1
   endif
   if( vgd_print(21002) == VGD_ERROR )then
      print*,'ERROR'
-     stop
+     error stop 1
   endif
 
   file='data/data_constructor_gen_21002_SLEVE.txt'
@@ -60,11 +60,11 @@ program constructor
   if( vgd_new(d,kind=21,version=2,hyb=hgts,rcoef1=0.,rcoef2=1.,rcoef3=0.,rcoef4=1000.,dhm=10.0,dht=1.5,dhw=0.) == VGD_ERROR )OK=.false.
   if( vgd_print(d,convip_L=.true.) == VGD_ERROR )then
      print*,'ERROR'
-     stop
+     error stop 1
   endif
   if( vgd_print(21002) == VGD_ERROR )then
      print*,'ERROR'
-     stop
+     error stop 1
   endif
 
   file='data/data_constructor_gen_21002_SLEVE.txt'

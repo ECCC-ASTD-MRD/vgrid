@@ -56,20 +56,20 @@ program get_levels_from_keys
   stat = vgd_new(d,unit=lu,format="fst")
   if(stat < 0 )then
      print*,'Problem getting vertical grid descriptor'
-     stop
+     error stop 1
   endif
 
   ier = fstinl(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ','TT',liste,infon,nmax)
 
   if(infon == 0 )then
      print*,'pas de record de TT'
-     stop
+     error stop 1
   endif
 
   stat = vgd_levels(d,unit=lu,fstkeys=liste(1:infon),levels=pres)
   if(stat < 0 )then
      print*,'Problem with vgd_levels'
-     stop
+     error stop 1
   endif
   
   pres=pres/100.
@@ -83,14 +83,14 @@ program get_levels_from_keys
      dltf,ubc,extra1,extra2,extra3)
      if(ier.lt.0)then
         print*,'Problem with fstprm on TT, ip1=',ip1
-        stop
+        error stop 1
      endif
      call incdatr(datev,dateo,deet*npas/3600.d0)
      key=fstinf(lu,ni,nj,nk,datev,' ',ip1,ip2,-1,typvar,'PX')     
      ier = fstluk(ff,key,ni,nj,nk)
       if(ier.lt.0)then
         print*,'Problem with fstinf on PX, ip1=',ip1
-        stop
+        error stop 1
      endif
 
      do j=1,nj

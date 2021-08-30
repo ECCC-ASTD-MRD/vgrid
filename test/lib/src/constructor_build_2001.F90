@@ -63,7 +63,7 @@ program constructor
   !
   if(stat == VGD_ERROR)then
      print*,'Error avec vgd_new'
-     stop
+     error stop 1
   endif
   !
   file='data/data_constructor_build_2001.txt'
