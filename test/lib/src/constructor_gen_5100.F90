@@ -57,16 +57,19 @@ program constructor
 
   ! Call with missing rcoef3 and rcoef4
   print*,'Following error on rcoef3 and rcoef4 is expected'
-  if( vgd_new(vgd,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,avg_L=.true.) /= VGD_ERROR)OK=.false.
+  if( vgd_new(vgd,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,avg_L=.true.)&
+       /= VGD_ERROR)OK=.false.
 
   ! Construct a new set of vertical coordinate descriptors 5100
-  stat = vgd_new(vgd,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,rcoef3=rcoef3,rcoef4=rcoef4,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,avg_L=.true.)
+  stat = vgd_new(vgd,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,rcoef3=rcoef3,rcoef4=rcoef4,pref_8=pref,dhm=10.0,&
+       dht=2.0,ptop_out_8=ptop,avg_L=.true.)
   stat = vgd_print(vgd)
   file='data/data_constructor_gen_5100_avg.txt'
   stat = test_5100(vgd,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
 
-  stat = vgd_new(vgd,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,rcoef3=rcoef3,rcoef4=rcoef4,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,avg_L=.false.)
+  stat = vgd_new(vgd,kind=5,version=100,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,rcoef3=rcoef3,rcoef4=rcoef4,pref_8=pref,dhm=10.0,&
+       dht=2.0,ptop_out_8=ptop,avg_L=.false.)
   stat = vgd_print(vgd)
   file='data/data_constructor_gen_5100.txt'
   stat = test_5100(vgd,file,write_control_L,stat)
@@ -113,7 +116,7 @@ integer function test_5100(F_d,F_file,F_write_control_L,F_stat) result(istat)
 
    istat=VGD_OK
 
-   call flush(6)
+   flush(6)
 
    if(F_stat.eq.VGD_ERROR)then
       print*,'In test_5100: test not performed, since previous command failed'

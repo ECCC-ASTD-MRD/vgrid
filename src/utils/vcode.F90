@@ -29,7 +29,7 @@ program vcode
    !print*,'val(1),code=',val(1),code
    if(vgd_print(code).eq.VGD_ERROR)then
       print*,'ERROR with vgd_print on vcode'
-      call exit(1)
+      error stop 1
    endif
    
    stat=exfin('r.vcode',version,'NON')

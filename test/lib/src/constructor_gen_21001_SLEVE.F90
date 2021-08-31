@@ -45,7 +45,8 @@ program constructor
   character (len=256) :: file
 
   ! Construct a new set of vertical coordinate descriptors 21101 Gal-Chen
-  if( vgd_new(d,kind=21,version=1,hyb=hgts,rcoef1=rcoef1,rcoef2=rcoef2,rcoef3=rcoef3,rcoef4=rcoef4,dhm=10.0,dht=1.5) == VGD_ERROR )OK=.false.
+  if( vgd_new(d,kind=21,version=1,hyb=hgts,rcoef1=rcoef1,rcoef2=rcoef2,rcoef3=rcoef3,rcoef4=rcoef4,dhm=10.0,dht=1.5) == &
+       VGD_ERROR )OK=.false.
   if( vgd_print(d,convip_L=.true.) == VGD_ERROR )then
      print*,'ERROR'
      error stop 1
@@ -87,7 +88,7 @@ integer function test_hgts(F_d,F_file,F_write_control_L) result(istat)
 
    istat=VGD_ERROR
 
-   call flush(6)
+   flush(6)
 
    if(vgd_get(F_d,'VTBL',table) == VGD_ERROR)return
    if(vgd_new(vgrid_rebuilt,table) ==  VGD_ERROR)return

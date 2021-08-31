@@ -63,7 +63,7 @@ program constructor
   print*,'================== EXPECTED ERROR SECTION BEGINGS================='
   print*,'================== EXPECTED ERROR SECTION BEGINGS================='
   print*,'The following 3 error messages on F_ptop_8 less than zero are normal'
-  call flush(6)
+  flush(6)
   stat = vgd_new(vgd,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=0.d0,pref_8=pref)
   if(stat.ne.VGD_ERROR)OK=.false.  
   stat = vgd_new(vgd,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-1.d0,pref_8=pref)
@@ -71,7 +71,7 @@ program constructor
   stat = vgd_new(vgd,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=-2.d0,pref_8=pref)
   if(stat.ne.VGD_ERROR)OK=.false.  
   print*,'The following 3 errors on hyb values are normal'
-  call flush(6)
+  flush(6)
   stat = vgd_new(vgd,kind=5,version=2,hyb=hyb_wrong1,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
   stat = vgd_new(vgd,kind=5,version=2,hyb=hyb_wrong2,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
   stat = vgd_new(vgd,kind=5,version=2,hyb=hyb_wrong3,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
@@ -81,7 +81,7 @@ program constructor
   print*,'================== EXPECTED ERROR SECTION ENDS  ================='
   print*,'================== EXPECTED ERROR SECTION ENDS  ================='
   print*,'================== EXPECTED ERROR SECTION ENDS  ================='
-  call flush(6)
+  flush(6)
 
   ! Construct a new set of vertical coordinate descriptors 5002
   stat = vgd_new(vgd,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref,ip1=0)
@@ -124,7 +124,8 @@ program constructor
   ! Tests option hyb_flat (flat levels at domain top at or above hyb_flat)
   ! Note that option hyb_flat is extensively tested in test program c_new_gen_all, here
   ! we just tests the fortran interface that is the same for all Vcode.
-  stat = vgd_new(vgd,kind=5,version=5,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,ip1=0,hyb_flat=hyb(5))
+  stat = vgd_new(vgd,kind=5,version=5,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,pref_8=pref,dhm=10.0,dht=2.0,ptop_out_8=ptop,ip1=0,&
+       hyb_flat=hyb(5))
   file='data/data_constructor_gen_5005_nl_f_5.txt'
   stat = test_5002(vgd,file,write_control_L,stat)
   if(stat.eq.VGD_ERROR)OK=.false.
@@ -157,7 +158,7 @@ integer function test_5002(F_d,F_file,F_write_control_L,F_stat) result(istat)
 
    istat=VGD_OK
 
-   call flush(6)
+   flush(6)
 
    if(F_stat.eq.VGD_ERROR)then
       print*,'In test_5002: test not performed, since previous command failed'

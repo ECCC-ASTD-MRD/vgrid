@@ -80,8 +80,8 @@ typedef struct vgrid_descriptor {
   float    dhm;           // Diag level Height (m) for Momentum variables UU,VV
   float    dht;           // Diag level Height (t) for Thermo variables TT,HU, etc
   float    dhw;           // Diag level Height (m) for vertical-velocity variables WT1 ZZ
-  char*    ref_name;      // Reference field name
-  char*    ref_namel;     // Reference field name
+  char     ref_name[VGD_LEN_NAME]; // Reference field name
+  char     ref_namel[VGD_LEN_NAME]; // Reference field name
   float    rcoef1;        // Rectification coefficient
   float    rcoef2;        // Rectification coefficient
   float    rcoef3;        // Rectification coefficient

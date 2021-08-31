@@ -97,7 +97,8 @@ module vGrid_Descriptors
    
    interface
 
-      integer(c_int) function f_diag_withref(vgd_CP, ni, nj, nk, ip1_list_CP, levels_CP,sfc_field_CP,sfc_field_ls_CP, in_log, dpidpis) bind(c, name='Cvgd_diag_withref_2ref')
+      integer(c_int) function f_diag_withref(vgd_CP, ni, nj, nk, ip1_list_CP, levels_CP,sfc_field_CP,sfc_field_ls_CP, in_log, &
+           dpidpis) bind(c, name='Cvgd_diag_withref_2ref')
         use iso_c_binding, only: c_ptr, c_int
         type(c_ptr), value :: vgd_CP, ip1_list_CP, sfc_field_CP, sfc_field_ls_CP
         integer (c_int), value :: in_log, dpidpis
@@ -105,7 +106,8 @@ module vGrid_Descriptors
         integer (c_int), value :: ni, nj, nk
       end function f_diag_withref
       
-      integer(c_int) function f_diag_withref_8(vgd_CP, ni, nj, nk, ip1_list_CP, levels_CP,sfc_field_CP,sfc_field_ls_CP, in_log, dpidpis) bind(c, name='Cvgd_diag_withref_2ref_8')
+      integer(c_int) function f_diag_withref_8(vgd_CP, ni, nj, nk, ip1_list_CP, levels_CP,sfc_field_CP,sfc_field_ls_CP, in_log, &
+           dpidpis) bind(c, name='Cvgd_diag_withref_2ref_8')
          use iso_c_binding, only: c_ptr, c_int
          type(c_ptr), value :: vgd_CP, ip1_list_CP, sfc_field_CP, sfc_field_ls_CP
          integer (c_int), value :: in_log, dpidpis
@@ -249,8 +251,8 @@ module vGrid_Descriptors
          integer (c_int), value :: ni, nj, nk
       end function f_new_from_table
 
-      integer(c_int) function f_new_gen(vgd,kind,version,hyb_CP,size_hyb,rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP, &
-           ip1,ip2,dhm_CP,dht_CP,dhw_CP,avg,hyb_flat_CP) bind(c, name='Cvgd_new_gen3')
+      integer(c_int) function f_new_gen(vgd,kind,version,hyb_CP,size_hyb,rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP, &
+           pref_8_CP,ptop_out_8_CP, ip1,ip2,dhm_CP,dht_CP,dhw_CP,avg,hyb_flat_CP) bind(c, name='Cvgd_new_gen3')
          use iso_c_binding, only : c_ptr, c_int
          type(c_ptr) :: vgd
          integer (c_int), value :: kind, version, size_hyb
@@ -261,12 +263,14 @@ module vGrid_Descriptors
       
       integer(c_int) function f_new_build_vert(vgd,kind,version,nk,ip1,ip2, &
            ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, &
-           a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, ip1_m_CP, ip1_t_CP, ip1_w_CP, nl_m, nl_t, nl_w) bind(c, name='Cvgd_new_build_vert2')
+           a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, ip1_m_CP, ip1_t_CP, ip1_w_CP, &
+           nl_m, nl_t, nl_w) bind(c, name='Cvgd_new_build_vert2')
          use iso_c_binding, only : c_ptr, c_int
          type(c_ptr) :: vgd
          integer (c_int), value :: kind,version,nk,ip1,ip2
          type(c_ptr), value :: ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP
-         type(c_ptr), value :: a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, ip1_m_CP, ip1_t_CP, ip1_w_CP
+         type(c_ptr), value :: a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, ip1_m_CP
+         type(c_ptr), value :: ip1_t_CP, ip1_w_CP
          integer (c_int), value :: nl_m, nl_t, nl_w
       end function f_new_build_vert
 
@@ -463,7 +467,8 @@ contains
             l_version = -1
          endif
          
-         if( f_new_read(self%cptr, unit, l_datev, l_etiket//C_NULL_CHAR, l_ip1, l_ip2, l_ip3, l_kind, l_version, l_quiet) == VGD_ERROR )then
+         if( f_new_read(self%cptr, unit, l_datev, l_etiket//C_NULL_CHAR, l_ip1, l_ip2, l_ip3, l_kind, l_version, l_quiet) == &
+              VGD_ERROR )then
             write(for_msg,*) ' in new_read, problem with f_new_read'
             call msg(level_msg,VGD_PRFX//for_msg)
             return
@@ -516,7 +521,8 @@ contains
       
     end function new_from_table
 
-   integer function new_gen(self,kind,version,hyb,rcoef1,rcoef2,rcoef3,rcoef4,ptop_8,pref_8,ptop_out_8,ip1,ip2,stdout_unit,dhm,dht,dhw,avg_L,hyb_flat) result(status)
+    integer function new_gen(self,kind,version,hyb,rcoef1,rcoef2,rcoef3,rcoef4,ptop_8,pref_8,ptop_out_8,ip1,ip2,stdout_unit,dhm, &
+         dht,dhw,avg_L,hyb_flat) result(status)
       implicit none
 
       ! Coordinate constructor - build vertical descriptor from hybrid coordinate entries
@@ -530,7 +536,8 @@ contains
       integer, target, optional, intent(in) :: ip1,ip2     !IP1,2 values for FST file record [0,0]
       integer, target, optional, intent(in) :: stdout_unit !Unit number for verbose output [STDERR]
       real, target, optional, intent(in) :: dhm,dht,dhw    !Diag levels Height for Momentum/Thermo/Vertical-Velocity vaiables
-      logical, optional :: avg_L                           !Obtain thermo A, B and C by averaging momentum ones (Temporary for Vcode 5100)
+      logical, optional :: avg_L                           !Obtain thermo A, B and C by averaging momentum ones (Temporary for
+                                                           ! Vcode 5100)
                                                            !   If this option becoms permenant, some code will have to be added
                                                            !   to check this option for vcode 5100 only.
       real, target, optional,intent(in) :: hyb_flat        ! Hyb value at or above witch B momentum is flat
@@ -628,7 +635,8 @@ contains
          self%cptr = C_NULL_PTR
       endif
 
-      if(f_new_gen(self%cptr,kind,version,hyb_CP,size(hyb),rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP,ptop_out_8_CP,my_ip1,my_ip2,dhm_CP,dht_CP,dhw_CP,my_avg,hyb_flat_CP) == VGD_ERROR)then
+      if(f_new_gen(self%cptr,kind,version,hyb_CP,size(hyb),rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP, &
+           ptop_out_8_CP,my_ip1,my_ip2,dhm_CP,dht_CP,dhw_CP,my_avg,hyb_flat_CP) == VGD_ERROR)then
          print*,'(F_vgd) ERROR in new_gen, problem with f_new_gen'
          return
       endif
@@ -646,16 +654,21 @@ contains
       real,target , optional, intent(in) :: rcoef1,rcoef2,rcoef3,rcoef4 !R-coefficient values for rectification
       real(kind=8),target , optional, intent(in) :: ptop_8            !Top-level pressure (Pa)
       real(kind=8),target , optional, intent(in) :: pref_8            !Reference-level pressure (Pa)
-      real(kind=8),target , optional, dimension(:) :: a_m_8,a_t_8,a_w_8 !A-coefficients for momentum(m),thermo(t) and Vertical-Velocity levels
-      real(kind=8),target , optional, dimension(:) :: b_m_8,b_t_8,b_w_8 !B-coefficients for momentum(m),thermo(t) and Vertical-Velocity levels
-      real(kind=8),target , optional, dimension(:) :: c_m_8,c_t_8,c_w_8 !C-coefficients for momentum(m),thermo(t) and Vertical-Velocity levels
-      integer,target , optional, dimension(:) :: ip1_m,ip1_t,ip1_w !Level ID (IP1) for momentum(m),thermo(t) and Vertical-Velocity levels
+      real(kind=8),target , optional, dimension(:) :: a_m_8,a_t_8,a_w_8 !A-coefficients for momentum(m),thermo(t) and
+                                                                        ! Vertical-Velocity levels
+      real(kind=8),target , optional, dimension(:) :: b_m_8,b_t_8,b_w_8 !B-coefficients for momentum(m),thermo(t) and
+                                                                        ! Vertical-Velocity levels
+      real(kind=8),target , optional, dimension(:) :: c_m_8,c_t_8,c_w_8 !C-coefficients for momentum(m),thermo(t) and
+                                                                        ! Vertical-Velocity levels
+      integer,target , optional, dimension(:) :: ip1_m,ip1_t,ip1_w !Level ID (IP1) for momentum(m),thermo(t) and
+                                                                        ! Vertical-Velocity levels
 
       ! Assign optional argument to C_NULL_PTR    
 
       ! Local variables
       type(c_ptr) :: rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, ptop_8_CP, pref_8_CP
-      type(c_ptr) :: a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, ip1_m_CP, ip1_t_CP, ip1_w_CP
+      type(c_ptr) :: a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, ip1_m_CP, ip1_t_CP, &
+           ip1_w_CP
       integer l_ip1,l_ip2,nl_m, nl_t, nl_w
 
       status = VGD_ERROR
@@ -974,7 +987,8 @@ contains
     if (any(MATCH_GRTYP == grtyp)) then
        error = new_read(gd,unit=unit,format='fst',ip1=ig1,ip2=ig2,kind=kind)
        if(error==VGD_ERROR)then
-          write(for_msg,*) 'The above error was produce with call to new_read with specific ip1 and 1p2, trying with wild card -1, if there is no error below, disregard the above error.'
+          write(for_msg,*) 'The above error was produce with call to new_read with specific ip1 and 1p2, trying with wild card -1'&
+               //', if there is no error below, disregard the above error.'
           call msg(MSG_WARNING,VGD_PRFX//for_msg)
           error = new_read(gd,unit=unit,format='fst',                kind=kind)
        endif

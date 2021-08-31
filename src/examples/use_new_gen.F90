@@ -19,7 +19,7 @@
 program use_new_gen
 
   use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_print,VGD_OK
-
+  use, intrinsic :: iso_fortran_env
   implicit none
 
   type(vgrid_descriptor) :: vgd
@@ -37,13 +37,13 @@ program use_new_gen
        0.9735557, 0.9851275, 0.9950425/)
   real :: rcoef1=0.,rcoef2=1.
   
-  real*8 :: ptop=805d0,pref=100000d0
+  real(kind=REAL64) :: ptop=805d0,pref=100000d0
 
   stat = vgd_new(vgd,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
   
   if ( stat /= VGD_OK )then
      print*,'ERROR'
-     call exit(1)
+     error stop 1
   endif
 
   stat = vgd_print(vgd)

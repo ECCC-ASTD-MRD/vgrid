@@ -96,7 +96,8 @@ integer function check_build(F_vgd) result(istat)
   type(vgrid_descriptor), intent(in) :: F_vgd
   
   ! Local varibales
-  integer :: check_build_1001_2001_5999, check_build_1002, check_build_4001, check_build_5001, check_build_5002, check_build_5005, check_build_5100, check_build_21001, check_build_21002
+  integer :: check_build_1001_2001_5999, check_build_1002, check_build_4001, check_build_5001, check_build_5002, check_build_5005, &
+       check_build_5100, check_build_21001, check_build_21002
   integer :: vcode
 
   istat = VGD_ERROR

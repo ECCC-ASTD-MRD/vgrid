@@ -1,12 +1,12 @@
 #include "vgrid_build_info.h"
 
 module mod_vgrid_sample
-
+  use, intrinsic :: iso_fortran_env
   implicit none
   private
   public :: gen_it, sample_vgrid
   type vcode_eta
-     real*8 :: ptop_8 = -1.d0
+     real(kind=REAL64) :: ptop_8 = -1.d0
      character(len=12) :: etiket = 'ETA'
   end type vcode_eta
   type vcode_5001
@@ -76,6 +76,7 @@ contains
          vgd_stda76_hgts_from_pres_list, VGD_STDA76_SFC_P, vgd_put, &
          vgd_stda76, vgd_get
 
+    use, intrinsic :: iso_fortran_env
     implicit none
     character(len=*) :: F_dir, F_name
 
@@ -83,7 +84,7 @@ contains
     integer, save :: lu = 10
     real, dimension(nk) :: eta
     real, dimension(nk-1) :: hyb_m1, zeta, hgts, hgts_rev, pres
-    real*8 :: ptop_8, ptop_out_8, pref_8
+    real(kind=REAL64) :: ptop_8, ptop_out_8, pref_8
     real, dimension(:), pointer :: temp
     integer :: stat, fnom, fstouv, fstfrm, k
     integer, dimension(:), pointer :: ip1s
@@ -99,12 +100,12 @@ contains
     if(stat < 0)then
        print*,'ERROR with fnom on', trim(F_dir)//'/'//trim(F_name)
        print*,'      does directory '//trim(F_dir)//' exist?'
-       call exit(1)
+       error stop 1
     endif
     stat = fstouv(lu, 'RND')
     if(stat < 0)then
        print*,'ERROR with fstouv on', trim(F_dir)//'/'//trim(F_name)
-       call exit(1)
+       error stop 1
     endif
 
     pres = levs(1:nk-1) * VGD_STDA76_SFC_P
@@ -112,7 +113,7 @@ contains
     if(vgd_stda76_hgts_from_pres_list(hgts, pres, nk-1) == &
          VGD_ERROR)then
        print*,'ERROR: getting stda76 heights from pressure list'
-       call exit(1)
+       error stop 1
     endif
     do k=1,nk-1
        hgts_rev(k) = hgts(nk-k)
@@ -122,15 +123,15 @@ contains
     case('pressure')
        if( vgd_new(vgd, kind=2, version=1, hyb=levs(1:nk) * VGD_STDA76_SFC_P/100.) == VGD_ERROR)then
           print*,'ERROR: building ',trim(F_name)
-          call exit(1)
+          error stop 1
        endif
-       if( vgd_put(vgd, "ETIKET", "PRESSURE") == VGD_ERROR) call exit(1)
+       if( vgd_put(vgd, "ETIKET", "PRESSURE") == VGD_ERROR) error stop 1
     case('sigma')
        if( vgd_new(vgd, kind=1 , version=1, hyb=levs(1:nk)) == VGD_ERROR)then
           print*,'ERROR: building ',trim(F_name)
-          call exit(1)
+          error stop 1
        endif
-       if( vgd_put(vgd, "ETIKET", "SIGMA") == VGD_ERROR) call exit(1)
+       if( vgd_put(vgd, "ETIKET", "SIGMA") == VGD_ERROR) error stop 1
     case('eta')
        eta = (levs(1:nk) - levs(1)) / (levs(nk) - levs(1))
        ptop_8 = levs(1) * VGD_STDA76_SFC_P * 1.d0
@@ -141,22 +142,22 @@ contains
              print*,'ERROR: value of eta ptop inconsistant ',trim(F_name)
              print*,'       expected ',ptop_8,' got ', vc_eta%ptop_8
              print*,'       If you give levs in namelist do not set vc_eta%ptop_8 value'
-             call exit(1)
+             error stop 1
           endif
        endif
        if( vgd_new(vgd, kind=1 , version=2, ptop_8=vc_eta%ptop_8, hyb=eta) == &
             VGD_ERROR)then
           print*,'ERROR: building ',trim(F_name)
-          call exit(1)
+          error stop 1
        endif
-       if( vgd_put(vgd, "ETIKET", vc_eta%etiket) == VGD_ERROR) call exit(1)
+       if( vgd_put(vgd, "ETIKET", vc_eta%etiket) == VGD_ERROR) error stop 1
     case('4001')
        if( vgd_new(vgd, kind=4 , version=1, hyb=hgts_rev) == &
             VGD_ERROR)then
           print*,'ERROR: building ',trim(F_name)
-          call exit(1)
+          error stop 1
        endif
-       if( vgd_put(vgd, "ETIKET", "M ABV SFC") == VGD_ERROR) call exit(1)
+       if( vgd_put(vgd, "ETIKET", "M ABV SFC") == VGD_ERROR) error stop 1
     case('5001')
        ! Note : here we want hyb level to be equal to sigam level at
        !        p0 = VGD_STDA76_SFC_P. If we set pref = VGD_STDA76_SFC_P, then hyb = levs.
@@ -166,9 +167,9 @@ contains
             rcoef1=vc_5001%rcoef, hyb=levs(1:nk)) == &
             VGD_ERROR)then
           print*,'ERROR: building ',trim(F_name)
-          call exit(1)
+          error stop 1
        endif
-       if( vgd_put(vgd, "ETIKET", vc_5001%etiket) == VGD_ERROR) call exit(1)
+       if( vgd_put(vgd, "ETIKET", vc_5001%etiket) == VGD_ERROR) error stop 1
     case('5002')
        ! Note : here we want hyb level to be equal to sigma level at
        !        p0 = VGD_STDA76_SFC_P. If we set pref = VGD_STDA76_SFC_P,
@@ -182,9 +183,9 @@ contains
             rcoef1=vc_5002%rcoef1, rcoef2=vc_5002%rcoef2, hyb=hyb_m1) == &
             VGD_ERROR)then
           print*,'ERROR: building ',trim(F_name)
-          call exit(1)
+          error stop 1
        endif
-       if( vgd_put(vgd, "ETIKET", vc_5002%etiket) == VGD_ERROR) call exit(1)
+       if( vgd_put(vgd, "ETIKET", vc_5002%etiket) == VGD_ERROR) error stop 1
     case('5005')
        ! Note : here we want hyb level to be equal to sigam level at
        !        p0 = VGD_STDA76_SFC_P. If we set pref = VGD_STDA76_SFC_P,
@@ -198,9 +199,9 @@ contains
             hyb=hyb_m1, dhm=vc_5005%dhm, dht=vc_5005%dht, hyb_flat=vc_5005%hyb_flat) &
             == VGD_ERROR)then
           print*,'ERROR: building ',trim(F_name)
-          call exit(1)
+          error stop 1
        endif
-       if( vgd_put(vgd, "ETIKET", vc_5005%etiket) == VGD_ERROR) call exit(1)
+       if( vgd_put(vgd, "ETIKET", vc_5005%etiket) == VGD_ERROR) error stop 1
     case('5100')
        ! Note : here we want hyb level to be equal to sigam level at
        !        p0 = VGD_STDA76_SFC_P. If we set pref = VGD_STDA76_SFC_P,
@@ -214,29 +215,29 @@ contains
             rcoef3=vc_5100%rcoef3, rcoef4=vc_5100%rcoef4, &
             hyb=hyb_m1, dhm=vc_5100%dhm, dht=vc_5100%dht,hyb_flat=vc_5100%hyb_flat)  == VGD_ERROR)then
           print*,'ERROR: building ',trim(F_name)
-          call exit(1)
+          error stop 1
        endif
-       if( vgd_put(vgd, "ETIKET", vc_5100%etiket) == VGD_ERROR) call exit(1)
+       if( vgd_put(vgd, "ETIKET", vc_5100%etiket) == VGD_ERROR) error stop 1
     case('21001_NON_SLEVE')
        if( vgd_new(vgd, kind=21 , version=1, rcoef1=vc_21001_NON_SLEVE%rcoef1,&
             rcoef2=vc_21001_NON_SLEVE%rcoef2, rcoef3=-1., &
             rcoef4=-1., hyb=hgts, dhm=vc_21001_NON_SLEVE%dhm,&
             dht=vc_21001_NON_SLEVE%dht,hyb_flat=vc_21001_NON_SLEVE%hyb_flat) == VGD_ERROR)then
           print*,'ERROR: building ',trim(F_name)
-          call exit(1)
+          error stop 1
        endif
        if( vgd_put(vgd, "ETIKET", vc_21001_NON_SLEVE%etiket) == VGD_ERROR) &
-            call exit(1)
+            error stop 1
     case('21001_SLEVE')
        if( vgd_new(vgd, kind=21 , version=1, rcoef1=vc_21001_SLEVE%rcoef1,&
             rcoef2=vc_21001_SLEVE%rcoef2, rcoef3=vc_21001_SLEVE%rcoef3, &
             rcoef4=vc_21001_SLEVE%rcoef4, hyb=hgts, dhm=vc_21001_SLEVE%dhm,&
             dht=vc_21001_SLEVE%dht,hyb_flat=vc_21001_SLEVE%hyb_flat) == VGD_ERROR)then
           print*,'ERROR: building ',trim(F_name)
-          call exit(1)
+          error stop 1
        endif
        if( vgd_put(vgd, "ETIKET", vc_21001_SLEVE%etiket) == VGD_ERROR)&
-            call exit(1)
+            error stop 1
     case('21002_NON_SLEVE')
        if( vgd_new(vgd, kind=21 , version=2, rcoef1=vc_21002_NON_SLEVE%rcoef1,&
             rcoef2=vc_21002_NON_SLEVE%rcoef2, rcoef3=-1., &
@@ -244,10 +245,10 @@ contains
             dht=vc_21002_NON_SLEVE%dht, dhw=vc_21002_NON_SLEVE%dhw,hyb_flat=vc_21002_NON_SLEVE%hyb_flat)&
             == VGD_ERROR)then
           print*,'ERROR: building ',trim(F_name)
-          call exit(1)
+          error stop 1
        endif
        if( vgd_put(vgd, "ETIKET", vc_21002_NON_SLEVE%etiket) == VGD_ERROR)&
-            call exit(1)
+            error stop 1
     case('21002_SLEVE')
        if( vgd_new(vgd, kind=21 , version=2, rcoef1=vc_21002_SLEVE%rcoef1,&
             rcoef2=vc_21002_SLEVE%rcoef2, rcoef3=vc_21002_SLEVE%rcoef3, &
@@ -255,20 +256,20 @@ contains
             dht=vc_21002_SLEVE%dht, dhw=vc_21002_SLEVE%dhw,hyb_flat=vc_21002_SLEVE%hyb_flat) &
             == VGD_ERROR)then
           print*,'ERROR: building ',trim(F_name)
-          call exit(1)
+          error stop 1
        endif
        !if( vgd_get(vgd,'VIPM',ip1s) == VGD_ERROR)then
        !   print*,'Erreur with vgd_get on VIPM'
-       !   call exit(1)
+       !   error stop 1
        !endif
        !if( vgd_stda76(vgd,ip1s,temp,'PRESSURE',sfc_pres=100000.) == VGD_ERROR)then
        !   print*,'Erreur with vgd_stda76'
-       !   call exit(1)
+       !   error stop 1
        !endif
        !print*,'ip1s',ip1s
        !print*,'temp=',temp
        if( vgd_put(vgd, "ETIKET", vc_21002_SLEVE%etiket) == VGD_ERROR)&
-            call exit(1)
+            error stop 1
     case DEFAULT
        print*,'Please add ', trim(F_name)
        return
@@ -276,7 +277,7 @@ contains
 
     if( vgd_write(vgd, lu, 'fst') == VGD_ERROR)then
        print*,'ERROR: writing vgrid for ',trim(F_name)
-       call exit(1)
+       error stop 1
     endif
     stat = vgd_print(vgd)
     stat = vgd_free(vgd)
@@ -320,7 +321,7 @@ contains
     
     if(trim(val(1)) == 'undef')then
        print*,'Usage: r.vgrid_sample -out_dir output_directory'
-       call exit(1)
+       error stop 1
     endif
     
     if( system('mkdir -p '//trim(val(1))) /= 0 )then
@@ -328,7 +329,7 @@ contains
        print*,'Is '//trim(val(1))//' a file?'
        print*,'Do you have write permission?'
        print*,'Fix the problem and rerun program.'
-       call exit(1)
+       error stop 1
     endif
     
     
@@ -353,7 +354,7 @@ contains
              print*,'Using user defined eta levels to set all vcode levels'
              if(vc_eta%ptop_8 < 0.d0)then
                 print*,'ERROR: you must set vc_eta%ptop_8 [Pa] in namelist when setting levs_eta'
-                call exit(1)
+                error stop 1
              endif
              do k = 1, nk
                 levs(k) = levs_eta(k) *  (1.d0 - vc_eta%ptop_8/VGD_STDA76_SFC_P) + vc_eta%ptop_8/VGD_STDA76_SFC_P
@@ -370,18 +371,18 @@ contains
     
     stat = vgd_putopt("ALLOW_SIGMA",.true.)
     
-    if( gen_it(val(1), 'pressure') == VGD_ERROR )call exit(1)
-    if( gen_it(val(1), 'sigma') == VGD_ERROR )call exit(1)
-    if( gen_it(val(1), 'eta') == VGD_ERROR )call exit(1)
-    if( gen_it(val(1), '4001') == VGD_ERROR )call exit(1)
-    if( gen_it(val(1), '5001') == VGD_ERROR )call exit(1)
-    if( gen_it(val(1), '5002') == VGD_ERROR )call exit(1)
-    if( gen_it(val(1), '5005') == VGD_ERROR )call exit(1)
-    if( gen_it(val(1), '5100') == VGD_ERROR )call exit(1)
-    if( gen_it(val(1), '21001_NON_SLEVE') == VGD_ERROR )call exit(1)
-    if( gen_it(val(1), '21001_SLEVE') == VGD_ERROR )call exit(1)
-    if( gen_it(val(1), '21002_NON_SLEVE') == VGD_ERROR )call exit(1)
-    if( gen_it(val(1), '21002_SLEVE') == VGD_ERROR )call exit(1)
+    if( gen_it(val(1), 'pressure') == VGD_ERROR )error stop 1
+    if( gen_it(val(1), 'sigma') == VGD_ERROR )error stop 1
+    if( gen_it(val(1), 'eta') == VGD_ERROR )error stop 1
+    if( gen_it(val(1), '4001') == VGD_ERROR )error stop 1
+    if( gen_it(val(1), '5001') == VGD_ERROR )error stop 1
+    if( gen_it(val(1), '5002') == VGD_ERROR )error stop 1
+    if( gen_it(val(1), '5005') == VGD_ERROR )error stop 1
+    if( gen_it(val(1), '5100') == VGD_ERROR )error stop 1
+    if( gen_it(val(1), '21001_NON_SLEVE') == VGD_ERROR )error stop 1
+    if( gen_it(val(1), '21001_SLEVE') == VGD_ERROR )error stop 1
+    if( gen_it(val(1), '21002_NON_SLEVE') == VGD_ERROR )error stop 1
+    if( gen_it(val(1), '21002_SLEVE') == VGD_ERROR )error stop 1
     
     stat = exfin('r.vgrid_sample', version, 'NON')
     

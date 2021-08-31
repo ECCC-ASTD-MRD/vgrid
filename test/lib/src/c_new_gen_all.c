@@ -23,6 +23,7 @@
 #include <math.h>
 #include "vgrid.h"
 #include "armnlib.h"
+#include "c_ut_report.h"
 
 char *filenames[] = {
     "data/dm_1001_from_model_run",
@@ -48,7 +49,7 @@ static float c_convip_IP2Level(int IP,int *kind) {
    char   format;
 
    /*Convertir en niveau reel*/
-    f77name(convip)(&IP,&level,kind,&mode,&format,&flag,strglen);
+    f77name(convip_plus)(&IP,&level,kind,&mode,&format,&flag,strglen);
 
    return(level);
 }

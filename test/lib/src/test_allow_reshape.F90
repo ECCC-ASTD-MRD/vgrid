@@ -44,13 +44,13 @@ program tests
 
   print*,'===================================================================================================='
   print*,'Reshaping of structure should not be a problem since it is not subject to the ALLOW_RESHAPE flag'
-  print*,'First build';call flush(6)
+  print*,'First build';flush(6)
   stat = vgd_new(vgd,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
   if(stat==VGD_ERROR)then
      print*,'This error should not happen, please fixit'
      error stop 1
   end if
-  print*,'Second build';call flush(6)
+  print*,'Second build';flush(6)
   stat = vgd_new(vgd,kind=5,version=2,hyb=hyb2,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop,pref_8=pref)
   if(stat==VGD_ERROR)then
      print*,'This error should not happen, since reshaping memory pointed by structure vgrid_descriptor is always allowed'
@@ -143,8 +143,8 @@ integer function test_functions(lu,p0,ni,nj,reshape_L) result(status)
    ip1_list(1)=93423264
    stat = vgd_new(vgd,lu,'fst')
 
-   print*,'-----------------------------';call flush(6)
-   print*,'Testing levels_withref';call flush(6)
+   print*,'-----------------------------';flush(6)
+   print*,'Testing levels_withref';flush(6)
    deallocate(lev)
    stat_not_alloc = vgd_levels(vgd,ip1_list,lev,p0)
    stat_alloc_correct_size = vgd_levels(vgd,ip1_list,lev,p0)
@@ -152,8 +152,8 @@ integer function test_functions(lu,p0,ni,nj,reshape_L) result(status)
    stat_alloc_wrong_size = vgd_levels(vgd,ip1_list,lev,p0)
    call check_status2(stat_not_alloc,stat_alloc_correct_size,stat_alloc_wrong_size,reshape_L)
 
-   print*,'----------------------------------';call flush(6)
-   print*,'Testing levels_withref_prof';call flush(6)
+   print*,'----------------------------------';flush(6)
+   print*,'Testing levels_withref_prof';flush(6)
    deallocate(lev_1d)
    stat_not_alloc = vgd_levels(vgd,ip1_list,lev_1d,100000.)
    stat_alloc_correct_size = vgd_levels(vgd,ip1_list,lev_1d,100000.)
@@ -161,8 +161,8 @@ integer function test_functions(lu,p0,ni,nj,reshape_L) result(status)
    stat_alloc_wrong_size = vgd_levels(vgd,ip1_list,lev_1d,100000.)
    call check_status2(stat_not_alloc,stat_alloc_correct_size,stat_alloc_wrong_size,reshape_L)
 
-   print*,'-----------------------------';call flush(6)
-   print*,'Testing dpidpis_withref';call flush(6)
+   print*,'-----------------------------';flush(6)
+   print*,'Testing dpidpis_withref';flush(6)
    deallocate(lev)
    stat_not_alloc=vgd_dpidpis(vgd,ip1_list,lev,p0)
    stat_alloc_correct_size=vgd_dpidpis(vgd,ip1_list,lev,p0)
@@ -170,8 +170,8 @@ integer function test_functions(lu,p0,ni,nj,reshape_L) result(status)
    stat_alloc_wrong_size=vgd_dpidpis(vgd,ip1_list,lev,p0)
    call check_status2(stat_not_alloc,stat_alloc_correct_size,stat_alloc_wrong_size,reshape_L)
    
-   print*,'----------------------------------';call flush(6)
-   print*,'Testing dpidpis_withref_prof';call flush(6)
+   print*,'----------------------------------';flush(6)
+   print*,'Testing dpidpis_withref_prof';flush(6)
    deallocate(lev_1d)
    stat_not_alloc=vgd_dpidpis(vgd,ip1_list,lev_1d,100000.)
    stat_alloc_correct_size=vgd_dpidpis(vgd,ip1_list,lev_1d,100000.)
@@ -179,16 +179,16 @@ integer function test_functions(lu,p0,ni,nj,reshape_L) result(status)
    stat_alloc_wrong_size=vgd_dpidpis(vgd,ip1_list,lev_1d,100000.)
    call check_status2(stat_not_alloc,stat_alloc_correct_size,stat_alloc_wrong_size,reshape_L)
    
-   print*,'----------------------------------';call flush(6)
-   print*,'Testing get_allocate_i1d ip1m';call flush(6)
+   print*,'----------------------------------';flush(6)
+   print*,'Testing get_allocate_i1d ip1m';flush(6)
    stat_not_alloc=vgd_get(vgd,'VIPM - level ip1 list (m)',i1d)
    stat_alloc_correct_size=vgd_get(vgd,'VIPM - level ip1 list (m)',i1d)
    deallocate(i1d);allocate(i1d(1))
    stat_alloc_wrong_size=vgd_get(vgd,'VIPM - level ip1 list (m)',i1d)
    call check_status2(stat_not_alloc,stat_alloc_correct_size,stat_alloc_wrong_size,reshape_L)
    
-   print*,'----------------------------------';call flush(6)
-   print*,'Testing get_allocate_r1d VCDM';call flush(6)
+   print*,'----------------------------------';flush(6)
+   print*,'Testing get_allocate_r1d VCDM';flush(6)
    deallocate(r1d)
    stat_not_alloc=vgd_get(vgd,'VCDM - vertical coordinate (m)',r1d)
    stat_alloc_correct_size=vgd_get(vgd,'VCDM - vertical coordinate (m)',r1d)
@@ -196,8 +196,8 @@ integer function test_functions(lu,p0,ni,nj,reshape_L) result(status)
    stat_alloc_wrong_size=vgd_get(vgd,'VCDM - vertical coordinate (m)',r1d)
    call check_status2(stat_not_alloc,stat_alloc_correct_size,stat_alloc_wrong_size,reshape_L)
 
-   print*,'----------------------------------';call flush(6)
-   print*,'Testing get_allocate_r81d VCDM';call flush(6)
+   print*,'----------------------------------';flush(6)
+   print*,'Testing get_allocate_r81d VCDM';flush(6)
    deallocate(r81d)
    stat_not_alloc=vgd_get(vgd,'CA_M - vertical A coefficient (m)',r81d)
    stat_alloc_correct_size=vgd_get(vgd,'CA_M - vertical A coefficient (m)',r81d)
@@ -205,8 +205,8 @@ integer function test_functions(lu,p0,ni,nj,reshape_L) result(status)
    stat_alloc_wrong_size=vgd_get(vgd,'CA_M - vertical A coefficient (m)',r81d)
    call check_status2(stat_not_alloc,stat_alloc_correct_size,stat_alloc_wrong_size,reshape_L)
 
-   print*,'----------------------------------';call flush(6)
-   print*,'Testing get_allocate_r83d VTBL';call flush(6)
+   print*,'----------------------------------';flush(6)
+   print*,'Testing get_allocate_r83d VTBL';flush(6)
    deallocate(table_8)
    stat_not_alloc=vgd_get(vgd,'VTBL - vgrid_descriptor table',table_8)
    stat_alloc_correct_size=vgd_get(vgd,'VTBL - vgrid_descriptor table',table_8)
@@ -237,7 +237,7 @@ subroutine check_status(stat,reshape_L)
          error stop 1
       endif
    endif   
-   call flush(6)
+   flush(6)
    return
 end subroutine check_status
 subroutine check_status2(stat_not_alloc,stat_alloc_correct_size,stat_alloc_wrong_size,reshape_L)
@@ -267,6 +267,6 @@ subroutine check_status2(stat_not_alloc,stat_alloc_correct_size,stat_alloc_wrong
          error stop 1
       endif
    endif   
-   call flush(6)
+   flush(6)
    return
 end subroutine check_status2

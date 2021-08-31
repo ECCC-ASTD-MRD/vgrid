@@ -18,8 +18,10 @@
  * Boston, MA 02111-1307, USA.
  */
 #include <stdio.h>
+#include <stdlib.h>
 #include "vgrid.h"
 #include "armnlib.h"
+#include "c_ut_report.h"
 
 char *filenames[] = {
     "data/dm_1001_from_model_run",

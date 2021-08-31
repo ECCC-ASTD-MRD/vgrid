@@ -23,6 +23,7 @@
 #include <math.h>
 #include "vgrid.h"
 #include "armnlib.h"
+#include "c_ut_report.h"
 
 char *filenames[] = {
     "data/dm_1001_from_model_run",
@@ -49,10 +50,6 @@ char *filenames[] = {
 char* concat(const char *s1, const char *s2)
 {
     char *result = malloc(strlen(s1)+strlen(s2)+1);//+1 for the null-terminator
-    if(! result){
-      printf("Problem in tests with concat");
-      return(1);
-    }
     strcpy(result, s1);
     strcat(result, s2);
     return result;

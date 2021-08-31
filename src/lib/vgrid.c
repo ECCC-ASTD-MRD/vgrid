@@ -1358,8 +1358,8 @@ static vgrid_descriptor* c_vgd_construct() {
       vgrid->dhm           = VGD_MISSING;
       vgrid->dht           = VGD_MISSING;
       vgrid->dhw           = VGD_MISSING;
-      vgrid->ref_name      = strdup(VGD_NO_REF_NOMVAR);
-      vgrid->ref_namel     = strdup(VGD_NO_REF_NOMVAR);
+      strcpy(vgrid->ref_name, VGD_NO_REF_NOMVAR);
+      strcpy(vgrid->ref_namel,VGD_NO_REF_NOMVAR);
       vgrid->rcoef1        = VGD_MISSING;
       vgrid->rcoef2        = VGD_MISSING;
       vgrid->rcoef3        = VGD_MISSING;
@@ -1454,8 +1454,6 @@ void Cvgd_free(vgrid_descriptor **self) {
    if( *self ) {
       FREE((*self)->table);
       c_vgd_free_abci(self);
-      FREE((*self)->ref_name);      
-      FREE((*self)->ref_namel);      
       free(*self);
       *self = NULL;
    }
