@@ -4,13 +4,13 @@ set_source_files_properties(compute_pressure.F90 convert_toctoc_5002.F90 add_toc
 PROPERTIES Fortran_PREPROCESS ON)
 
 add_executable(r.compute_pressure compute_pressure.F90)
-#add_dependencies(r.compute_pressure ${PROJECT_NAME}_build_info)
+add_dependencies(r.compute_pressure ${PROJECT_NAME}_build_info)
 target_link_libraries(r.compute_pressure PRIVATE vgrid)
 target_include_directories(r.compute_pressure PRIVATE ${CMAKE_BINARY_DIR}/lib ${CMAKE_SOURCE_DIR}/src/lib ${CMAKE_CURRENT_SOURCE_DIR} ${RMN_INCLUDE_DIRS})
 set_target_properties(r.compute_pressure PROPERTIES VERSION ${PROJECT_VERSION})
 
 add_executable(r.convert_toctoc_5002 convert_toctoc_5002.F90)
-#add_dependencies(r.convert_toctoc_5002 ${PROJECT_NAME}_build_info)
+add_dependencies(r.convert_toctoc_5002 ${PROJECT_NAME}_build_info)
 target_link_libraries(r.convert_toctoc_5002 PRIVATE vgrid)
 target_include_directories(r.convert_toctoc_5002 PRIVATE ${CMAKE_BINARY_DIR}/lib ${CMAKE_SOURCE_DIR}/src/lib ${CMAKE_CURRENT_SOURCE_DIR} ${RMN_INCLUDE_DIRS})
 set_target_properties(r.convert_toctoc_5002 PROPERTIES VERSION ${PROJECT_VERSION})
