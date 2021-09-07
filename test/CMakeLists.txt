@@ -15,7 +15,7 @@ if(BUILD_TESTING)
       get_filename_component(ext  ${testfile} EXT)
       get_filename_component(test ${testfile} NAME)
       get_filename_component(test ${test}     NAME_WLE)
-      message(STATUS "(EC) Adding ${ext} test ${testfile}")
+#      message(STATUS "(EC) Adding ${ext} test ${testfile}")
 
       if(${ext} MATCHES ".c")
           add_executable(${test} EXCLUDE_FROM_ALL ${testfile} lib/c_ut_report.c)
