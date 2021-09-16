@@ -16,8 +16,9 @@ add_custom_target(check COMMAND CTEST_OUTPUT_ON_FAILURE=true ${CMAKE_CTEST_COMMA
 
 enable_language(C Fortran)
 
-#include(doxygen)          # Doxygen target
+include(ec_doxygen)          # Doxygen target (-DWITH_DOC=TRUE)
 include(ec_compiler_presets)
+include(ec_openmp)           # Enable OpenMP (-DWITH_OPENMP=TRUE)
 
 find_package(RMN ${RMN_REQ_VERSION})
 if (RMN_FOUND) 
