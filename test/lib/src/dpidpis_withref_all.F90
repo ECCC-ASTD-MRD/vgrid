@@ -141,7 +141,8 @@ integer function test_dpidpis(F_lu) result(stat)
       else
          print*,'TOTO',abs(dpidpis_cube(i0,j0,k)- w1), px(i0,j0)*100.*epsilon
          if(abs(dpidpis_cube(i0,j0,k)- w1) > px(i0,j0)*100.*epsilon)then
-            print*,'vgd_dpidpis real do not validate, expect', w1,' got ',dpidpis_cube(i0,j0,k),abs(dpidpis_cube(i0,j0,k)- w1)/w1,epsilon
+            print*,'vgd_dpidpis real do not validate, expect', w1,' got ',dpidpis_cube(i0,j0,k),abs(dpidpis_cube(i0,j0,k)- w1)/w1, &
+                 epsilon
          endif
       endif
    enddo

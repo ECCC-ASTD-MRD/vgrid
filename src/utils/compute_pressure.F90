@@ -31,6 +31,7 @@ module mod_comp_pres
    !=======================================================
    integer function my_fstprm(fstkey,record) result(status)
       !
+      use, intrinsic :: iso_fortran_env
       implicit none
       !
       integer, intent(in) :: fstkey
@@ -39,7 +40,7 @@ module mod_comp_pres
       ! Local variables
       !
       integer :: error
-      real*8 :: nhours
+      real(kind=REAL64) :: nhours
       !
       !external
       !
@@ -115,7 +116,7 @@ module mod_comp_pres
          ier=vgd_print(vgd)
          if(ier.ne.VGD_OK)then
             print*,'ERROR with vgd_print'
-            call exit(1)
+            error stop 1
          endif
       endif
       !
@@ -426,7 +427,7 @@ program compute_pressure
    endif
    if(my_kind.eq.-1.and.my_version.ne.-1)then
       print*,'ERROR; argument -kind must be used with option -version'
-      call exit(1)
+      error stop 1
    endif
    
    !read(val(7),*)my_version
@@ -441,24 +442,24 @@ program compute_pressure
    stat=fnom(lui,val(1),"RND+R/O",0)
    if(stat.lt.0)then
       print*,'ERROR with fnom on lui'
-      call exit(1)
+      error stop 1
    endif
    stat=fstouv(lui,'RND')
    if(stat.le.0)then
       print*,'No record in RPN file'
-      call exit(1)
+      error stop 1
    endif
    !
    stat=fnom(luo,val(2),'RND',0)
    if(stat.lt.0)then
       print*,'ERROR with fnom on file ',trim(val(2))
-      call exit(1)
+      error stop 1
    endif
    stat=fstouv(luo,'RND')
    if(stat.lt.0)then
       print*,'ERROR: problem with fstouv on ',trim(val(2))
       stat=fstfrm(luo)
-      call exit(1)
+      error stop 1
    endif
    !
    if(trim(val(8)).eq.'NO')then
@@ -467,7 +468,7 @@ program compute_pressure
       allow_sigma_L=.true.
    else
       print*,"ERROR: option -allow_sigma does't take any value"
-      call exit(1)
+      error stop 1
    endif
    
    stat = vgd_putopt("ALLOW_SIGMA",allow_sigma_L)
@@ -475,7 +476,7 @@ program compute_pressure
    stat=get_pres_by_group(lui,luo,my_var)      
    if(stat.eq.COMP_PRES_ERROR)then
       print*,'ERROR: with get_pres_by_group for ',trim(my_var)
-      call exit(1)
+      error stop 1
    endif
    !
    stat=fstfrm(lui)

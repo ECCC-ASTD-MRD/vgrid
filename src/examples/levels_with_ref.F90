@@ -76,7 +76,7 @@
    status = vgd_new(vgd,iun,'fst')
    if (status /= VGD_OK)then
       print*,'Error with vgd_new'
-      call exit(1)
+      error stop 1
    endif
    !
    ! Get pressure levels for TT variable
@@ -84,7 +84,7 @@
    status = vgd_levels(vgd,ip1s,pressure,p0)
    if (status /= VGD_OK)then
       print*,'Error with vgd_levels'
-      call exit(1)
+      error stop 1
    endif
    !
    print*,'pressure(1,1,1:count)=',pressure(1,1,1:count)

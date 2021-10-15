@@ -57,8 +57,10 @@ program constructor
    integer, parameter :: nversion=11
    integer stat,i,test_it
    logical :: OK=.true.
-   character(len=10), dimension(nversion) :: vcode_S=(/"4001 ","5002 ","5003 ","5004 ","5005 ","5100 ","5999 ","21001", "21001","21002","21002"/)
-   character(len=60), dimension(nversion) :: suffix_S=(/"          ","          ","          " ,"          ","          ","          ","          " ,"_SLEVE    ","_NON_SLEVE","_SLEVE    ","_NON_SLEVE"/)
+   character(len=10), dimension(nversion) :: vcode_S=(/"4001 ","5002 ","5003 ","5004 ","5005 ","5100 ","5999 ","21001", &
+        "21001","21002","21002"/)
+   character(len=60), dimension(nversion) :: suffix_S=(/"          ","          ","          " ,"          ","          ", &
+        "          ","          " ,"_SLEVE    ","_NON_SLEVE","_SLEVE    ","_NON_SLEVE"/)
 
    do i=1,nversion
       

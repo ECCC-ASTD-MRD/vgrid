@@ -23,6 +23,7 @@
 #include <math.h>
 #include "vgrid.h"
 #include "armnlib.h"
+#include "c_ut_report.h"
 
 // Do not let write_control set to 1 since this will invalidate the test.
 // Just use this to produce the validation data. To do so, run the program

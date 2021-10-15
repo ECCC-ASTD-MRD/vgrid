@@ -22,9 +22,10 @@ contains
       use vgrid_descriptors, only: VGD_ERROR, VGD_OK
       implicit none
       real, dimension(:,:,:), pointer :: levels
+      integer :: infon
       integer :: l_ni,l_nj,G_nk,lu, liste(infon), datev
       ! Local variables
-      integer :: i, j, k, fstprm, fstluk, fstinf, infon, ier
+      integer :: i, j, k, fstprm, fstluk, fstinf, ier
       real, dimension(:,:), pointer :: wk
       real :: epsilon=5.0e-4
       ! Variable for fstprm, sorry...
@@ -172,7 +173,7 @@ program levels_withref_sub_array
    endif
    if( test_levels(levels_p,l_ni,l_nj,G_nk,liste,infon,lu) == VGD_ERROR)then
       print*,'ERROR in test with vgd_levels sub array on levels, p0 and p0ls'
-      call exit
+      error stop 1
    endif
    !Test profile
    p0_p => p0(1:1,1:1)
@@ -183,7 +184,7 @@ program levels_withref_sub_array
    endif
    if( test_levels(levels_p,1,1,G_nk,liste,infon,lu) == VGD_ERROR)then
       print*,'ERROR in test with vgd_levels profile sub array on levels, p0 and p0ls'
-      call exit
+      error stop 1
    endif
 
    p0_p => p0(1:l_ni,1:l_nj)
@@ -197,7 +198,7 @@ program levels_withref_sub_array
    endif
    if( test_levels(levels,l_ni,l_nj,G_nk,liste,infon,lu) == VGD_ERROR)then
       print*,'ERROR in test with vgd_levels sub array on p0 and p0ls'
-      call exit
+      error stop 1
    endif   
    wk(1:l_ni,1:l_nj)=p0(1:l_ni,1:l_nj)
    if( vgd_levels(vgd,ip1s,levels,wk,sfc_field_ls=p0ls_p) == VGD_ERROR)then
@@ -205,7 +206,7 @@ program levels_withref_sub_array
    endif   
    if( test_levels(levels,l_ni,l_nj,G_nk,liste,infon,lu) == VGD_ERROR)then
       print*,'ERROR in test with vgd_levels sub array on p0ls'
-      call exit
+      error stop 1
    endif
    wk(1:l_ni,1:l_nj)=p0ls(1:l_ni,1:l_nj)
    if( vgd_levels(vgd,ip1s,levels,p0_p,sfc_field_ls=wk) == VGD_ERROR)then
@@ -213,7 +214,7 @@ program levels_withref_sub_array
    endif   
    if( test_levels(levels,l_ni,l_nj,G_nk,liste,infon,lu) == VGD_ERROR)then
       print*,'ERROR in test with vgd_levels sub array on p0'
-      call exit
+      error stop 1
    endif
 
    call ut_report(.true.,'Grid_Descriptors, sub array')

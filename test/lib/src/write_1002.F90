@@ -134,7 +134,7 @@ program constructor
      b_m_8(k)= eta(k)
      a_m_8(k)= ptop_8*(1.0-eta(k))
      print*,'k,b_m_8(k),a_m_8(k)=',k,b_m_8(k),a_m_8(k)
-     call flush(6)
+     flush(6)
   enddo
 
   stat=vgd_new(&

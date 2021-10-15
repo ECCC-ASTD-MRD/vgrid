@@ -20,9 +20,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 #include "vgrid.h"
 #include "rpnmacros.h"
 #include "armnlib.h"
+#include "c_ut_report.h"
 
 int main() {
 

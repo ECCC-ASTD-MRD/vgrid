@@ -116,7 +116,7 @@ program constructor
      b_m_8(k)=((hyb(k)-hybtop_8)/(1.-hybtop_8))**rcoef1
      a_m_8(k)=(hyb(k)-b_m_8(k))*pref_8
      print*,'k,b_m_8(k),a_m_8(k)=',k,b_m_8(k),a_m_8(k)
-     call flush(6)
+     flush(6)
   enddo
 
   stat=vgd_new(&

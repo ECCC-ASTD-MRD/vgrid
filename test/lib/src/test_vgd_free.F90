@@ -32,7 +32,7 @@ program tests
   real :: rcoef1=0.,rcoef2=1.  
   real(kind=8) :: ptop_8=1000d0,pref_8=100000d0,value_8
   
-  print*,'First build';call flush(6)
+  print*,'First build';flush(6)
   stat = vgd_new(vgd,kind=5,version=2,hyb=hyb,rcoef1=rcoef1,rcoef2=rcoef2,ptop_8=ptop_8,pref_8=pref_8)
   if(stat==VGD_ERROR)then
      print*,'This vgd_new error should not happen, please fixit'

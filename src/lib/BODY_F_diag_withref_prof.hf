@@ -52,9 +52,11 @@
      if (present(sfc_field_ls))then
         sfc_field_ls_2d=my_sfc_field_ls
 #if defined(REAL_8)
-        error = diag_withref_8(self,sfc_field=sfc_field_2d,sfc_field_ls=sfc_field_ls_2d,ip1_list=ip1_list,levels=levels_3d,in_log=my_in_log,dpidpis=my_dpidpis)
+        error = diag_withref_8(self,sfc_field=sfc_field_2d,sfc_field_ls=sfc_field_ls_2d,ip1_list=ip1_list,levels=levels_3d,&
+        in_log=my_in_log,dpidpis=my_dpidpis)
 #else
-        error = diag_withref(self,sfc_field=sfc_field_2d,sfc_field_ls=sfc_field_ls_2d,ip1_list=ip1_list,levels=levels_3d,in_log=my_in_log,dpidpis=my_dpidpis)
+        error = diag_withref(self,sfc_field=sfc_field_2d,sfc_field_ls=sfc_field_ls_2d,ip1_list=ip1_list,levels=levels_3d,&
+        in_log=my_in_log,dpidpis=my_dpidpis)
 #endif
      else
 #if defined(REAL_8)

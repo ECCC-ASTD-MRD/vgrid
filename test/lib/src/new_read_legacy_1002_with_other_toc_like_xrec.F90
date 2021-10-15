@@ -29,7 +29,8 @@ program tests
   logical :: ok = .false.
   integer, dimension(3) :: list=(/10,11,12/)
   type(vgrid_descriptor) :: vgd1, vgd2, vgd3
-  character(len=72), dimension(3) :: file_S=(/"data/dm_1002_from_model_run       ","data/dm_5005_from_model_run       ","data/dm_21001_from_model_run_SLEVE"/)
+  character(len=72), dimension(3) :: file_S=(/"data/dm_1002_from_model_run       ","data/dm_5005_from_model_run       ",&
+       "data/dm_21001_from_model_run_SLEVE"/)
 
   call msg_verbosity(MSG_DEBUG)
 

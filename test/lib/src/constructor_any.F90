@@ -28,7 +28,7 @@ program constructor
   integer :: stat,ip1,ip2
   integer :: fnom,fstouv,fstfrm,fclos
 
-  call flush(6)
+  flush(6)
  
   stat=fnom(lu,"data/dm_5002_from_model_run-interp","RND",0)
   if(stat.lt.0)then

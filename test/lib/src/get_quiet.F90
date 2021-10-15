@@ -55,7 +55,7 @@ program tests
 
   ! Construct a new set of 3D coordinate descriptors
   stat = vgd_new(vgd,unit=lu,format="fst")
-  call flush(6)
+  flush(6)
 
   ! Get information about the coordinate
   
@@ -64,63 +64,63 @@ program tests
   if(stat==VGD_ERROR)print*,'Error with get_int detected and message printed above'
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_int,quiet=.true.)
   if(stat==VGD_ERROR)print*,'Error with get_int detected and message not printed above'
-  call flush(6)
+  flush(6)
 
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_int_1d)
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_int_1d,quiet=.false.)
   if(stat==VGD_ERROR)print*,'Error with get_int_1d detected and message printed above'
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_int_1d,quiet=.true.)
   if(stat==VGD_ERROR)print*,'Error with get_int_1d detected and message not printed above'
-  call flush(6)
+  flush(6)
 
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real)
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real,quiet=.false.)
   if(stat==VGD_ERROR)print*,'Error with get_real detected and message printed above'
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real,quiet=.true.)
   if(stat==VGD_ERROR)print*,'Error with get_real detected and message not printed above'
-  call flush(6)
+  flush(6)
 
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real_1d)
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real_1d,quiet=.false.)
   if(stat==VGD_ERROR)print*,'Error with get_real_1d detected and message printed above'
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real_1d,quiet=.true.)
   if(stat==VGD_ERROR)print*,'Error with get_real_1d detected and message not printed above'
-  call flush(6)
+  flush(6)
 
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real8)
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real8,quiet=.false.)
   if(stat==VGD_ERROR)print*,'Error with get_real8 detected and message printed above'
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real8,quiet=.true.)
   if(stat==VGD_ERROR)print*,'Error with get_real8 detected and message not printed above'
-  call flush(6)
+  flush(6)
 
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real8_1d)
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real8_1d,quiet=.false.)
   if(stat==VGD_ERROR)print*,'Error with get_real8_1d detected and message printed above'
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real8_1d,quiet=.true.)
   if(stat==VGD_ERROR)print*,'Error with get_real8_1d detected and message not printed above'
-  call flush(6)
+  flush(6)
 
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real8_3d)
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real8_3d,quiet=.false.)
   if(stat==VGD_ERROR)print*,'Error with get_real8_3d detected and message printed above'
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real8_3d,quiet=.true.)
   if(stat==VGD_ERROR)print*,'Error with get_real8_3d detected and message not printed above'
-  call flush(6)
+  flush(6)
 
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_char)
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_char,quiet=.false.)
   if(stat==VGD_ERROR)print*,'Error with get_char detected and message printed above'
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_char,quiet=.true.)
   if(stat==VGD_ERROR)print*,'Error with get_char detected but message not printed above'
-  call flush(6)  
+  flush(6)  
   
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_logical)
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_logical,quiet=.false.)
   if(stat==VGD_ERROR)print*,'Error with get_logical detected and message printed above'
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_logical,quiet=.true.)
   if(stat==VGD_ERROR)print*,'Error with get_logical detected but message not printed above'
-  call flush(6)  
+  flush(6)  
   
   !===================================
   ! Tests get method on value returned
