@@ -6,7 +6,8 @@ ec_git_version()           # Get version from git state
 ec_parse_manifest()        # Parse MANIFEST file
 
 project(${NAME} DESCRIPTION "${DESCRIPTION}")
-set(PROJECT_VERSION ${VERSION})
+set(PROJECT_VERSION ${VERSION}${STATE})
+set(VGRID_VERSION ${VERSION} CACHE INTERNAL "VGRID version" FORCE) # Needed for cascaded version identification
 
 ec_build_info()            # Generate build information
 ec_install_prefix()        # Define install prefix  
