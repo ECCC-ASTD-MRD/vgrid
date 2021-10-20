@@ -16,6 +16,8 @@ defs="@EC_CMAKE_DEFINITIONS@"
 libs=CMAKE_LIBS
 
 version=@VERSION@@STATE@
+env=@ECCI_ENV@
+
 has_rmn=@RMN_VERSION@@RMN_STATE@
 
 usage()
@@ -33,6 +35,7 @@ Available values for OPTION include:
   --defs         Preprocessor definitions [${defs}]
   --version      library version [${version}]
   --has-rmn      which version of librmn is it compiled with [${has_rmn}]
+  --env          environment version used [${env}]
 
 EOF
 }
@@ -84,10 +87,14 @@ while test $# -gt 0; do
        	echo ${has_rmn:-no}
        	;;
 
-  --version)
+    --version)
 	    echo ${version}
 	    ;;
 
+    --env)
+       echo ${env}
+       ;;
+       
     *)
         echo "unknown option: $1"
 	    usage 1

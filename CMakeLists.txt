@@ -7,7 +7,7 @@ ec_parse_manifest()        # Parse MANIFEST file
 
 project(${NAME} DESCRIPTION "${DESCRIPTION}")
 set(PROJECT_VERSION ${VERSION}${STATE})
-set(VGRID_VERSION ${VERSION} CACHE INTERNAL "VGRID version" FORCE) # Needed for cascaded version identification
+set(VGRID_VERSION ${PROJECT_VERSION} CACHE INTERNAL "VGRID version" FORCE) # Needed for cascaded version identification
 
 ec_build_info()            # Generate build information
 ec_install_prefix()        # Define install prefix  
