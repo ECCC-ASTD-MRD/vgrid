@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.16)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake_rpn)
 include(ec_init)           # Initialise compilers and ec specific functions
@@ -22,19 +22,11 @@ include(ec_compiler_presets)
 include(ec_openmp)           # Enable OpenMP (-DWITH_OPENMP=TRUE)
 
 if (NOT RMN_FOUND)
-  find_package(RMN ${RMN_REQ_VERSION})
-  if (RMN_FOUND) 
-    add_compile_definitions(HAVE_RMN)
-    include_directories(${RMN_INCLUDE_DIR})
-  endif()
+   find_package(RMN ${RMN_REQ_VERSION} REQUIRED)
 endif()
 
-if (NOT TDPACK_FOUND)
-   find_package(tdpack ${TDPACK_REQ_VERSION})
-   if (TDPACK_FOUND) 
-#      add_compile_definitions(HAVE_RMN)
-      include_directories(${TDPACK_INCLUDE_DIR})
-    endif()
+if (NOT tdpack_FOUND)
+   find_package(tdpack ${tdpack_REQ_VERSION} CONFIG REQUIRED)
 endif()
 
 add_subdirectory(src/lib lib)

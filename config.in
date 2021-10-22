@@ -19,6 +19,7 @@ version=@PROJECT_VERSION@
 env=@EC_CI_ENV@
 
 has_rmn=@RMN_VERSION@@RMN_STATE@
+has_tdpack=@tdpack_VERSION@@tdpack_STATE@
 
 usage()
 {
@@ -35,6 +36,7 @@ Available values for OPTION include:
   --defs         Preprocessor definitions [${defs}]
   --version      library version [${version}]
   --has-rmn      which version of librmn is it compiled with [${has_rmn}]
+  --has-tdpack   which version of tdpack is it compiled with [${has_tdpack}]
   --env          environment version used [${env}]
 
 EOF
@@ -85,6 +87,10 @@ while test $# -gt 0; do
 
     --has-rmn)
        	echo ${has_rmn:-no}
+       	;;
+
+    --has-tdpack)
+       	echo ${has_tdpack:-no}
        	;;
 
     --version)
