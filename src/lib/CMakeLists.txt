@@ -25,4 +25,3 @@ target_link_libraries(vgridshared tdpack::tdpack)
 
 install(TARGETS vgrid vgridshared)
 install(FILES ${PROJECT_MODULE_FILES} TYPE INCLUDE)
-ec_build_config()      # Create build configuration script
