@@ -1,4 +1,5 @@
 if(BUILD_TESTING)
+   if (EC_INIT_DONE LESS 2)
 
    #----- Library tests
    message(STATUS "(EC) Generating vgrid library and utilities tests")
@@ -33,4 +34,5 @@ if(BUILD_TESTING)
    #----- Utilities tests
    find_program(BASH_COMMAND bash)
    add_test(NAME testutils COMMAND ${BASH_COMMAND} ${CMAKE_SOURCE_DIR}/test/utils/testutilvgrid.sh ${CMAKE_BINARY_DIR}/utils $ENV{ECCI_DATA_DIR}/vgrid/1.9.b3 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/Testing)
+endif()
 endif()
