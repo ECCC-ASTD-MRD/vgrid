@@ -3,7 +3,7 @@ if(BUILD_TESTING)
    #----- Library tests
    message(STATUS "(EC) Generating vgrid library and utilities tests")
 
-   file(REMOVE_RECURSE ${CMAKE_BINARY_DIR}/Testing/data_out)
+   file(REMOVE_RECURSE ${CMAKE_BINARY_DIR}/Testing/data_out ${CMAKE_BINARY_DIR}/Testing/data)
    execute_process(COMMAND ln -s $ENV{ECCI_DATA_DIR}/vgrid/b_6.5/data ${CMAKE_BINARY_DIR}/Testing/data)
    execute_process(COMMAND rm -f -r ${CMAKE_BINARY_DIR}/Testing/data_out)
    execute_process(COMMAND mkdir ${CMAKE_BINARY_DIR}/Testing/data_out)
