@@ -66,6 +66,8 @@ package:intel-19.0.3:
    stage: package
    only:
       - tags
+   dependencies:
+      - build:intel-19.0.3
    environment:
       name: testing
    script:
@@ -78,7 +80,9 @@ package:gnu-7.4.0:
    stage: package
    only:
       - tags
-   environment:
+   dependencies:
+      - build:gnu-7.4.0
+    environment:
       name: testing
    script:
       - source ci-env/latest/ubuntu-18.04-amd-64/gnu-7.4.0.sh
