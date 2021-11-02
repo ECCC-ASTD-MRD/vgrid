@@ -15,6 +15,7 @@ build:intel-19.0.3:
    only:
       - master
       - dev
+      - tags
    script:
       - source ci-env/latest/ubuntu-18.04-skylake-64/intel-19.0.3.199.sh
       - mkdir build_intel-19.0.3
@@ -31,6 +32,7 @@ build:gnu-7.4.0:
    only:
       - master
       - dev
+      - tags
    script:
       - source ci-env/latest/ubuntu-18.04-amd-64/gnu-7.4.0.sh
       - mkdir build_gnu-7.4.0
@@ -47,6 +49,7 @@ test:intel-19.0.3:
    only:
       - master
       - dev
+      - tags
    script:
       - source ci-env/latest/ubuntu-18.04-amd-64/intel-19.0.3.199.sh
       - cd build_intel-19.0.3
@@ -57,6 +60,7 @@ test:intel-19.0.3:
 #   only:
 #      - master
 #      - dev
+#      - tags
 #   script:
 #      - source ci-env/latest/ubuntu-18.04-amd-64/gnu-7.4.0.sh
 #      - cd build_gnu-7.4.0
