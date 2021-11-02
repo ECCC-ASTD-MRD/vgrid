@@ -34,8 +34,8 @@ add_subdirectory(src/utils utils)
 #add_subdirectory(src/examples examples)
 add_subdirectory(test test)
 
-ec_build_config()      # Create build configuration script
-ec_prepare_ssm()       # Prepare ssm packaging files
+ec_build_config()                # Create build configuration script
+ec_prepare_ssm(include lib bin)  # Prepare ssm packaging files
 
 set(CPACK_GENERATOR "TGZ")
 set(CPACK_PACKAGE_VENDOR "ECCC")
