@@ -119,5 +119,3 @@ package:XC50_intel-19.0.5:
       - cd build_XC50_intel-19.0.5
       - make package
       - ~/ci-admin-bundle/bin/ci-deploy-ssm.sh package
-
-p
