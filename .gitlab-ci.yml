@@ -1,5 +1,9 @@
 variables:
    GIT_SUBMODULE_STRATEGY: recursive
+   ORD_SOUMET_W: "10"
+   ORD_SOUMET_C: "40"
+   ORD_SOUMET_M: "100G"
+   ORD_SOUMET_TMPFS: "10G"
 stages:
    - build
    - test
