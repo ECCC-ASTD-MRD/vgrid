@@ -24,7 +24,7 @@ program constructor_build_all
 
   type(vgrid_descriptor) :: vgd
   integer, parameter :: lu=10
-  integer :: stat,i,check_build
+  integer :: stat,i,check_build,check_get_ABC
   integer :: fnom,fstouv,fstfrm,fclos
   logical :: ok
 
@@ -71,12 +71,12 @@ program constructor_build_all
      endif
      stat=fstfrm(lu+i)  
      stat=fclos(lu+i)
-     if( check_build(vgd) == VGD_ERROR) ok=.false.     
+     if( check_get_ABC(vgd) == VGD_ERROR) ok=.false.
+     if( check_build(vgd) == VGD_ERROR) ok=.false.
      if( vgd_free(vgd) == VGD_ERROR)then
         print*,'Error with vgd_free(vgd) on file ',trim(files(i))
         error stop 1
      endif
-
   end do
 
   call ut_report(ok,'Grid_Descriptors, vgd_get, LOGP 5002')  
@@ -87,7 +87,58 @@ end program constructor_build_all
 !=============================================================
 !=============================================================
 !=============================================================
-
+integer function check_get_ABC(F_vgd) result(istat)
+  ! The goal is to check if all coef A, B and C can be retreived.
+  use, intrinsic :: iso_fortran_env
+  use Vgrid_Descriptors, only: Vgrid_descriptor, vgd_get, VGD_ERROR, VGD_OK,VGD_NO_REF_NOMVAR
+  implicit none
+  type(vgrid_descriptor), intent(in) :: F_vgd
+  ! Local varibales
+  integer :: i,k, vcode, ier,nk
+  integer, parameter :: nkeys=9
+  character(len=4), dimension(9) :: keys_S = (/"CA_M","CB_M","CC_M","CA_T","CB_T","CC_T","CA_W","CB_W","CC_W"/)
+  character(len=4) :: rfls_S, key_nk
+  real(kind=REAL64), dimension(:), pointer :: value_1d_8  
+  istat = VGD_ERROR
+  nullify(value_1d_8)
+  ! Get Vcode
+  if( vgd_get(F_vgd,'vcode',vcode) == VGD_ERROR )error stop 1
+  write(6,'("=============== Testing check_get_ABC for Vcode ",i10,"=======================")')vcode
+  do i=1,nkeys
+     print*,'Checking key ',keys_S(i)
+     flush(6)
+     if(vgd_get(F_vgd,keys_S(i),value_1d_8) == VGD_ERROR)then
+        print*,'Problem in test constructor, s/r check_get_ABC, cannot get key ',keys_S(i)       
+        error stop
+        return
+     endif
+     if(.not. associated(value_1d_8))then
+        print*,'Problem in test constructor, s/r check_get_ABC, value_1d_8 is not assiciated for ',keys_S(i)
+        error stop
+        return
+     endif
+     ! Test that C coefs are zero if non SLEVE
+     ier = vgd_get(F_vgd, "RFLS", rfls_S,quiet=.true.)
+     if( rfls_S == VGD_NO_REF_NOMVAR .and. keys_S(i)(2:2) == "C")then
+        print*,'Testing ',keys_S(i),' for zero value'
+        !NL_M, NL_T or NL_W
+        key_nk="NL_"//keys_S(i)(4:4)
+        ier = vgd_get(F_vgd,key_nk,nk)
+        do k=1,nk
+           if(value_1d_8(k) /= 0.d0)then
+              print*,'Problem in test constructor, s/r check_get_ABC, some value_1d_8 are not zero and should for key ',keys_S(i)
+              print*,value_1d_8(k)
+              error stop
+              return
+           endif
+        end do
+     endif
+     deallocate(value_1d_8)
+  end do  
+  istat = VGD_OK
+  return
+end function check_get_ABC
+!=============================================================
 integer function check_build(F_vgd) result(istat)
 
   use Vgrid_Descriptors, only: Vgrid_descriptor, vgd_get, VGD_ERROR, VGD_OK

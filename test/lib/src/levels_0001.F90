@@ -17,15 +17,15 @@
 ! * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ! * Boston, MA 02111-1307, USA.
 program constructor
-
-  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_print,vgd_levels,VGD_ERROR
+  
+  use, intrinsic :: iso_fortran_env
+  use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_get,vgd_print,vgd_levels,VGD_ERROR, VGD_NO_REF_NOMVAR
   use Unit_Testing, only: ut_report
   
-
   implicit none
 
   type(vgrid_descriptor) :: vgd
-  integer :: k
+  integer :: i,k,nk_abc,ier
   integer, dimension(:), pointer :: ip1_list
   integer, parameter :: nk = 50
   integer, dimension(nk) :: ip1_m, ip1_w
@@ -45,12 +45,15 @@ program constructor
         453.9380,   541.0890,   643.5670,   763.3330,   902.3390,  1062.4400,  1245.2900,  1452.2500,  1684.2800,  1941.8900,&
        2225.0800,  2533.3400,  2865.7000,  3220.8200,  3597.0300,  3992.4800,  4405.2200,  4833.2900,  5274.7800,  5727.9200/)
   real(kind=8), dimension(nk) :: b_m_8, b_w_8
-
+  real(kind=REAL64), dimension(:), pointer :: value_1d_8
   logical, parameter :: write_control_L=.false.
   logical :: OK
   character(len=1) :: dum_S
-
-  nullify(ip1_list,levels)
+  integer, parameter :: nkeys=9
+  character(len=4), dimension(9) :: keys_S = (/"CA_M","CB_M","CC_M","CA_T","CB_T","CC_T","CA_W","CB_W","CC_W"/)
+  character(len=4) :: rfls_S, key_nk
+  
+  nullify(ip1_list,levels,value_1d_8)
   
   OK = .true.
   just_for_hor_size = 0.
@@ -117,6 +120,35 @@ program constructor
         endif
      endif
   enddo
+
+  ! Try to retreive all A, B, C
+  do i=1,nkeys
+     print*,'Checking key ',keys_S(i)
+     flush(6)
+     if(vgd_get(vgd,keys_S(i),value_1d_8) == VGD_ERROR)then
+        print*,'Problem in test constructor, s/r check_get_ABC, cannot get key ',keys_S(i)       
+        error stop
+     endif
+     if(.not. associated(value_1d_8))then
+        print*,'Problem in test constructor, s/r check_get_ABC, value_1d_8 is not assiciated for ',keys_S(i)
+        error stop
+     endif
+     ! Test that B and C coefs are zero
+     if( keys_S(i)(2:2) == "B" .or. keys_S(i)(2:2) == "C")then
+        print*,'Testing ',keys_S(i),' for zero value'
+        !NL_M, NL_T or NL_W
+        key_nk="NL_"//keys_S(i)(4:4)
+        ier = vgd_get(vgd,key_nk,nk_abc)
+        do k=1,nk_abc
+           if(value_1d_8(k) /= 0.d0)then             
+              print*,'Problem in test constructor, s/r check_get_ABC, some value_1d_8 are not zero and should for key ',keys_S(i)
+              print*,value_1d_8(k)
+              error stop
+           endif
+        end do
+     endif
+     deallocate(value_1d_8)
+  end do
 
   call ut_report(OK,'Grid_Descriptors::vgd_levels height computation for ocean coordinate')
 end program constructor
