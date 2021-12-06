@@ -1,6 +1,7 @@
 NAME       : vgrid
 VERSION    : 6.7.0
 BUILD      : Release
+STATE      :
 DESCRIPTION: ECCC-MRD Vertical reference manipulation library
 SUMMARY    : This library allows for encoding/decoding, of vertical references
 MAINTAINER : Vivian Lee - Vivian.Lee@ec.gc.ca
@@ -10,5 +11,5 @@ URL        : https://gitlab.science.gc.ca/RPN-SI/vgrid
 #    =,<,<=,>,>= : Version rules
 #    ~           : Optional
 
-RMN    >= 19.7.0
+rmn    >= 20.0.0
 tdpack >= 0.1.0
