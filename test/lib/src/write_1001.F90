@@ -99,7 +99,7 @@ program constructor
      b_m_8(k)= sig(k)
      a_m_8(k)= 0.0
      print*,'k,b_m_8(k),a_m_8(k)=',k,b_m_8(k),a_m_8(k)
-     call flush(6)
+     flush(6)
   enddo
 
   stat=vgd_new(&

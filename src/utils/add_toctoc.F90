@@ -59,13 +59,13 @@ program add_toctoc
    endif
    if(istat.lt.0)then
       print*,'ERROR with fnom on file ',trim(val(1))
-      call exit(1)
+      error stop 1
    endif
    istat=fstouv(lui,'RND')
    if(istat.le.0)then
       print*,'Error : no record in RPN file ',trim(val(1))
       istat=fstfrm(lui)
-      call exit(1)
+      error stop 1
    endif
 
    !==========================================================================
@@ -73,7 +73,7 @@ program add_toctoc
    istat=fstinl(lui,ni,nj,nk,-1,' ',-1,-1,-1,' ','!!SF',liste,infon,nmax)
    if(infon.gt.0)then
       print*,'ERROR record !!SF is present, use convert_toctoc_5002 instead'
-      call exit(1)
+      error stop 1
    endif
    !
    istat=fstinl(lui,ni,nj,nk,-1,' ',-1,-1,-1,' ','!!',liste,infon,nmax)
@@ -90,38 +90,38 @@ program add_toctoc
       istat=fnom(luo,val(2),'RND',0)
       if(istat.lt.0)then
          print*,'ERROR with fnom on file ',trim(val(2))
-         call exit(1)
+         error stop 1
       endif
       istat=fstouv(luo,'RND')
       if(istat.lt.0)then
          print*,'Error : problem with fstouv on ',trim(val(2))
          istat=fstfrm(luo)
-         call exit(1)
+         error stop 1
       endif 
    endif
 
    istat = vgd_putopt("ALLOW_SIGMA",allow_sigma_L)
    if(istat.eq.VGD_ERROR)then
       print*,'Error with vgd_putopt on ALLOW_SIGMA'
-      call exit(1)
+      error stop 1
    endif
 
    istat=vgd_new(vgd,lui,kind=kind)
    if(istat.eq.VGD_ERROR)then
       print*,'Error with vgd_new'
-      call exit(1)
+      error stop 1
    endif
 
    istat=vgd_print(vgd)
    if(istat.eq.VGD_ERROR)then
       print*,'Error with vgd_print'
-      call exit(1)
+      error stop 1
    endif
 
    istat=vgd_write(vgd,luo)
    if(istat.eq.VGD_ERROR)then
       print*,'Error with vgd_print'
-      call exit(1)
+      error stop 1
    endif
 
    !==========================================================================

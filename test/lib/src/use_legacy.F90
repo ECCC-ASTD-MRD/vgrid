@@ -26,16 +26,19 @@ program use_legacy
    istat = vgd_putopt("ALLOW_SIGMA",.true.)
 
    istat=test_it("data/dm_1001_from_model_run")
-   if(istat.eq.VGD_ERROR)stop
+   if(istat.eq.VGD_ERROR) error stop 1
 
    istat=test_it("data/dm_1002_from_model_run_multi_pt")
-   if(istat.eq.VGD_ERROR)stop
+   if(istat.eq.VGD_ERROR) error stop 1
 
+   istat=test_it("data/dm_1002_from_model_run_ip1s_new_style")
+   if(istat.eq.VGD_ERROR) error stop 1
+   
    istat=test_it("data/dm_1003_from_pgsm_lam_east_ops")
-   if(istat.eq.VGD_ERROR)stop
+   if(istat.eq.VGD_ERROR) error stop 1
 
    istat=test_it("data/dm_5001_from_model_run")
-   if(istat.eq.VGD_ERROR)stop
+   if(istat.eq.VGD_ERROR) error stop 1
 
    call ut_report(OK,'Grid_Descriptors::vgd_vintage (1001 sigma)')   
 end program use_legacy

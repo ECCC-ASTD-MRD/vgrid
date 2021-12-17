@@ -1,21 +1,22 @@
 if(BUILD_TESTING)
+   if (EC_INIT_DONE LESS 2)
 
    #----- Library tests
    message(STATUS "(EC) Generating vgrid library and utilities tests")
 
-   file(REMOVE_RECURSE ${CMAKE_BINARY_DIR}/Testing/data_out)
+   file(REMOVE_RECURSE ${CMAKE_BINARY_DIR}/Testing/data_out ${CMAKE_BINARY_DIR}/Testing/data)
    execute_process(COMMAND ln -s $ENV{ECCI_DATA_DIR}/vgrid/b_6.5/data ${CMAKE_BINARY_DIR}/Testing/data)
    execute_process(COMMAND rm -f -r ${CMAKE_BINARY_DIR}/Testing/data_out)
    execute_process(COMMAND mkdir ${CMAKE_BINARY_DIR}/Testing/data_out)
 
-   file(GLOB SRC_TEST lib/src/*)
+   file(GLOB SRC_TEST lib/src/*.c lib/src/*.F90)
 
    #----- Loop on tests
    foreach(testfile ${SRC_TEST})
       get_filename_component(ext  ${testfile} EXT)
       get_filename_component(test ${testfile} NAME)
       get_filename_component(test ${test}     NAME_WLE)
-      message(STATUS "(EC) Adding ${ext} test ${testfile}")
+#      message(STATUS "(EC) Adding ${ext} test ${testfile}")
 
       if(${ext} MATCHES ".c")
           add_executable(${test} EXCLUDE_FROM_ALL ${testfile} lib/c_ut_report.c)
@@ -33,4 +34,5 @@ if(BUILD_TESTING)
    #----- Utilities tests
    find_program(BASH_COMMAND bash)
    add_test(NAME testutils COMMAND ${BASH_COMMAND} ${CMAKE_SOURCE_DIR}/test/utils/testutilvgrid.sh ${CMAKE_BINARY_DIR}/utils $ENV{ECCI_DATA_DIR}/vgrid/1.9.b3 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/Testing)
+endif()
 endif()

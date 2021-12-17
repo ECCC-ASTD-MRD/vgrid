@@ -3,8 +3,10 @@
       type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
       integer, target, dimension(:), intent(in) :: ip1_list               !Key of prototype field
       real(kind=REAL_KIND), dimension(:,:,:), pointer :: levels                   !Physical level values
-      real(kind=REAL_KIND), dimension(:,:), optional, target, intent(in) :: sfc_field     !Surface field reference for coordinate [none]
-      real(kind=REAL_KIND), dimension(:,:), optional, target, intent(in) :: sfc_field_ls  !Surface field large scale reference for coordinate [none]
+      real(kind=REAL_KIND), dimension(:,:), optional, target, intent(in) :: sfc_field     !Surface field reference for coordinate
+                                                                                          ! [none]
+      real(kind=REAL_KIND), dimension(:,:), optional, target, intent(in) :: sfc_field_ls  !Surface field large scale reference for
+                                                                                          ! coordinate [none]
       logical, optional, intent(in) :: in_log                     !Compute levels in ln() [.false.]
       logical, optional, intent(in) :: dpidpis                    !Compute partial derivative of hydrostatic pressure (pi) with
       !   respect to surface hydrostatic pressure(pis) [.false.]

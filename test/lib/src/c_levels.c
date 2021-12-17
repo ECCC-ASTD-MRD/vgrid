@@ -21,11 +21,13 @@
 #include <stdlib.h>
 #include <math.h>
 #include "vgrid.h"
+#include "armnlib.h"
+#include "c_ut_report.h"
 
 int main() {
 
-  int ier, iun = 10;
-  int *quiet = NULL, *i_val = NULL, *in_log = NULL, *dpidpis = NULL;
+  int ier, iun = 10, quiet = 0, in_log = 0;
+  int *i_val = NULL, *dpidpis = NULL;
   int nl_t, ni, nj, nk, ni2, nj2, nk2, k, key, ij, ijk, status;
   char filename[]="data/dm_5001_from_model_run";
   char mode[]="RND";

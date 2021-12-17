@@ -45,12 +45,12 @@ program test_allow_sigma
   print*,'==========================================================================='
   if(stat == VGD_ERROR)then
      print*, "ERROR in test, cannot get ALLOW_RESHAPE value"
-     stop
+     error stop 1
   endif
   print*,'my_bol_value=',my_bol_value
   if(my_bol_value)then
       print*, "ERROR in test, ALLOW_SIGMA should be .false."
-     stop
+     error stop 1
   endif
 
   ! Construct a new set of 3D coordinate descriptors
@@ -65,7 +65,7 @@ program test_allow_sigma
   stat = vgd_putopt("ALLOW_SIGMA",.true.)
   if(stat == VGD_ERROR)then
      print*, "ERROR in test, cannot put option ALLOW_SIGMA"
-     stop
+     error stop 1
   endif
   stat = vgd_new(d,unit=lu,format="fst")
   if(stat==VGD_ERROR)then

@@ -30,7 +30,7 @@ program constructor
   stat = vgd_new(d,kind=2,version=1,nk=size(pres),ip1_m=int(pres),a_m_8=pres,b_m_8=pres)
   if(stat.eq.VGD_ERROR)then    
      print*,'UNEXPECTED problem with vgd_new'
-     stop
+     error stop 1
   endif
 
   call ut_report(stat,'Grid_Descriptors::vgd_new vertical build initializer (2001)')

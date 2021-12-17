@@ -39,12 +39,12 @@ program pressure_for_all_vcode
    
    if( vgd_putopt("ALLOW_SIGMA",.true.) == VGD_ERROR )then
       print*,'Error with vgd_putopt on ALLOW_SIGM'
-      call exit(1)
+      error stop 1
    endif
 
    do i=1, nfiles
       if( comp_pres(files(i),i) == VGD_ERROR )then
-         call exit(1)
+         error stop 1
       endif
    enddo
 
@@ -85,7 +85,7 @@ integer function comp_pres(F_file, ind) result(status)
    endif   
    if( vgd_new(vgd, lu, 'fst') == VGD_ERROR )then
       print*,'Error with vgd_new on file ', trim(F_file)
-      call exit(1)
+      error stop 1
    endif
 
    ! Read RFLD ?
@@ -150,7 +150,7 @@ integer function comp_pres(F_file, ind) result(status)
    allocate(levels(ni,nj,nk))
    if( vgd_levels(vgd, sfc_field=rfld_2d, sfc_field_ls=rfls_2d, ip1_list=ip1_list, levels=levels) == VGD_ERROR) then
       print*,'Error with vgd_levels'
-      call exit(1)
+      error stop 1
    endif
 
    ! Compare computed pressure with PX in file

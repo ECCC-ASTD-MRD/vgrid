@@ -42,14 +42,15 @@ program constructor
   character (len=256) :: file
 
   ! Construct a new set of vertical coordinate descriptors 21002 hyb heights on Lorenz grid
-  if( vgd_new(d,kind=21,version=2,hyb=hgts,rcoef1=0.,rcoef2=1.,rcoef3=0.,rcoef4=1000.,dhm=10.0,dht=1.5,dhw=0.) == VGD_ERROR )OK=.false.
+  if( vgd_new(d,kind=21,version=2,hyb=hgts,rcoef1=0.,rcoef2=1.,rcoef3=0.,rcoef4=1000.,dhm=10.0,dht=1.5,dhw=0.) == VGD_ERROR )&
+       OK=.false.
   if( vgd_print(d,convip_L=.true.) == VGD_ERROR )then
      print*,'ERROR'
-     stop
+     error stop 1
   endif
   if( vgd_print(21002) == VGD_ERROR )then
      print*,'ERROR'
-     stop
+     error stop 1
   endif
 
   file='data/data_constructor_gen_21002_SLEVE.txt'
@@ -57,14 +58,15 @@ program constructor
   if(stat.eq.VGD_ERROR)OK=.false.
 
   ! Construct a new set of vertical coordinate descriptors 21002 hyb heights on Lorenz grid with SLEVE
-  if( vgd_new(d,kind=21,version=2,hyb=hgts,rcoef1=0.,rcoef2=1.,rcoef3=0.,rcoef4=1000.,dhm=10.0,dht=1.5,dhw=0.) == VGD_ERROR )OK=.false.
+  if( vgd_new(d,kind=21,version=2,hyb=hgts,rcoef1=0.,rcoef2=1.,rcoef3=0.,rcoef4=1000.,dhm=10.0,dht=1.5,dhw=0.) == VGD_ERROR )&
+       OK=.false.
   if( vgd_print(d,convip_L=.true.) == VGD_ERROR )then
      print*,'ERROR'
-     stop
+     error stop 1
   endif
   if( vgd_print(21002) == VGD_ERROR )then
      print*,'ERROR'
-     stop
+     error stop 1
   endif
 
   file='data/data_constructor_gen_21002_SLEVE.txt'
@@ -100,7 +102,7 @@ integer function test_hgts(F_d,F_file,F_write_control_L) result(istat)
 
    istat=VGD_ERROR
 
-   call flush(6)
+   flush(6)
 
    if(vgd_get(F_d,'VTBL',table) == VGD_ERROR)return
    if(vgd_new(vgrid_rebuilt,table) ==  VGD_ERROR)return

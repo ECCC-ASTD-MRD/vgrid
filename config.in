@@ -10,13 +10,16 @@
 
 cc="@CMAKE_C_COMPILER_ID@ @CMAKE_C_COMPILER_VERSION@"
 fc="@CMAKE_Fortran_COMPILER_ID@ @CMAKE_Fortran_COMPILER_VERSION@"
-cflags="@CMAKE_C_FLAGS@"
-fflags="@CMAKE_Fortran_FLAGS@"
+cflags="@EC_C_FLAGS@"
+fflags="@EC_Fortran_FLAGS@"
 defs="@EC_CMAKE_DEFINITIONS@"
 libs=CMAKE_LIBS
 
-version=@VERSION@@STATE@
+version=@PROJECT_VERSION@
+env=@EC_CI_ENV@
+
 has_rmn=@RMN_VERSION@@RMN_STATE@
+has_tdpack=@tdpack_VERSION@@tdpack_STATE@
 
 usage()
 {
@@ -33,6 +36,8 @@ Available values for OPTION include:
   --defs         Preprocessor definitions [${defs}]
   --version      library version [${version}]
   --has-rmn      which version of librmn is it compiled with [${has_rmn}]
+  --has-tdpack   which version of tdpack is it compiled with [${has_tdpack}]
+  --env          environment version used [${env}]
 
 EOF
 }
@@ -84,10 +89,18 @@ while test $# -gt 0; do
        	echo ${has_rmn:-no}
        	;;
 
-  --version)
+    --has-tdpack)
+       	echo ${has_tdpack:-no}
+       	;;
+
+    --version)
 	    echo ${version}
 	    ;;
 
+    --env)
+       echo ${env}
+       ;;
+       
     *)
         echo "unknown option: $1"
 	    usage 1

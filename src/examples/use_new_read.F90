@@ -31,7 +31,7 @@ program use_new_read
    
    if (status /= VGD_OK)then
       print*,'ERROR'
-      call exit(1)
+      error stop 1
    endif
 
    status = vgd_print(vgd)

@@ -44,7 +44,7 @@ program print_toctoc
       print*,'          -no_box        -> do not print top and bottum boxes'
       print*,'          -out file_out  -> print in file file_out (works only with options -ip1m_only or -ip1T_only)'
       print*,'          -convip        -> also print real value (p) associated to ip1'
-      call exit(1)
+      error stop 1
    endif
    !
    if(trim(val(2)).eq.'YES')then
@@ -66,7 +66,7 @@ program print_toctoc
    if(noptions.gt.1)then
       print*,'Only one of the following options can be set:'
       print*,'-ip1m_only -ip1t_only -nml'
-      call exit(1)
+      error stop 1
    endif
    !
    if(trim(val(6)).ne.'undef')then
@@ -89,25 +89,25 @@ program print_toctoc
    stat=fnom(lu,val(1),"RND+R/O",0)
    if(stat.lt.0)then
       print*,'ERROR with fnom on',val(1)
-      call exit(1)
+      error stop 1
    endif
    stat=fstouv(lu,'RND')
    if(stat.lt.0)then
       print*,'ERROR with fstouv on',val(1)
-      call exit(1)
+      error stop 1
    endif
    !
    stat = vgd_putopt("ALLOW_SIGMA",.true.)
    stat = vgd_new(vgd,lu,'fst',kind=kind)
    if(stat.eq.VGD_ERROR)then
       print*,'ERROR with vgd_new on',val(1)
-      call exit(1)
+      error stop 1
    endif
    if(ip1m_only_L)then
       stat=vgd_get(vgd,'VIPM - level ip1 list (m)',ip1s)
       if(stat.eq.VGD_ERROR)then
          print*,'ERROR with vgd_get on','VIPM'
-         call exit(1)
+         error stop 1
       endif
       do i=1,size(ip1s)
          write(lu_out,'(i10)')ip1s(i)
@@ -116,7 +116,7 @@ program print_toctoc
       stat=vgd_get(vgd,'VIPT - level ip1 list (t)',ip1s)
       if(stat.eq.VGD_ERROR)then
          print*,'ERROR with vgd_get on','VIPT'
-         call exit(1)
+         error stop 1
       endif
       do i=1,size(ip1s)
          write(lu_out,'(i10)')ip1s(i)
@@ -125,7 +125,7 @@ program print_toctoc
       stat = vgd_print(vgd,6,convip_L)
       if(stat.eq.VGD_ERROR)then
          print*,'ERROR with vgd_print'
-         call exit(1)
+         error stop 1
       endif
       if(box_L)stat=exfin('r.print_toctoc',version,'NON')
    endif

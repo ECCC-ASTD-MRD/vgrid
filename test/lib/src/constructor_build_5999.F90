@@ -142,7 +142,7 @@ program constructor_build_5999
      if(vgd_write(vgd2,luo) == VGD_ERROR)OK=.false.
      ier=fstfrm(luo)
      
-     stop
+     error stop 1
      
   endif
 

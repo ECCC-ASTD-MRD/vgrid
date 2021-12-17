@@ -2,6 +2,7 @@
 
 program convert_toctoc_5002
    use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_write,vgd_print,VGD_OK
+   use, intrinsic :: iso_fortran_env
    implicit none
    integer, parameter :: ncle=3,lui=10,nmax=1000
    integer, dimension(nmax) :: liste
@@ -11,9 +12,9 @@ program convert_toctoc_5002
    character(len=256), dimension(ncle) :: cle,val,def
    logical :: info_L
    real, allocatable, dimension(:,:) :: tocsf,p0
-   real*8, allocatable, dimension(:,:) :: toctoc
+   real(kind=REAL64), allocatable, dimension(:,:) :: toctoc
    real :: dummy
-   real*8 :: nhours
+   real(kind=REAL64) :: nhours
    logical :: samefile_L
    character(len=12), parameter :: version='v_1.1.0'
 
@@ -21,7 +22,7 @@ program convert_toctoc_5002
    integer :: ig1,ig2,ig3,ig4,dateo,deet,npas,datyp,nbits
    integer :: ni,nj,nk,ni2,nj2,nk2,nkmod
    integer :: ip1,ip2,ip3,swa,lng,dltf,ubc,extra1,extra2,extra3,datev
-   real*8, dimension(:), pointer :: a_m_8, b_m_8, a_t_8, b_t_8
+   real(kind=REAL64), dimension(:), pointer :: a_m_8, b_m_8, a_t_8, b_t_8
    character(len=1) :: grtyp
    character(len=2) :: typvar
    character(len=4) :: nomvar
@@ -70,13 +71,13 @@ program convert_toctoc_5002
    endif
    if(istat.lt.0)then
       print*,'ERROR with fnom on file ',trim(val(1))
-      call exit(1)
+      error stop 1
    endif
    istat=fstouv(lui,'RND')
    if(istat.le.0)then
       print*,'Error : no record in RPN file ',trim(val(1))
       istat=fstfrm(lui)
-      call exit(1)
+      error stop 1
    endif
 
    !==========================================================================
@@ -84,7 +85,7 @@ program convert_toctoc_5002
    istat=fstinl(lui,ni,nj,nk,-1,' ',-1,-1,-1,' ','!!SF',liste,infon,nmax)
    if(istat.lt.0)then
       print*,'ERROR with fstinl !!SF'
-      call exit(1)
+      error stop 1
    endif
    if(infon.eq.0)then
       print*,'Noting to convert'
@@ -100,13 +101,13 @@ program convert_toctoc_5002
       istat=fnom(luo,val(2),'RND',0)
       if(istat.lt.0)then
          print*,'ERROR with fnom on file ',trim(val(2))
-         call exit(1)
+         error stop 1
       endif
       istat=fstouv(luo,'RND')
       if(istat.lt.0)then
          print*,'Error : problem with fstouv on ',trim(val(2))
          istat=fstfrm(luo)
-         call exit(1)
+         error stop 1
       endif 
    endif
    ! Loop on !!SF found
@@ -121,7 +122,7 @@ program convert_toctoc_5002
          print*,'ERROR with fstluk on !!SF'
          istat=fstfrm(lui)
          if(samefile_L)istat=fstfrm(luo)
-         call exit(1)
+         error stop 1
       endif
       ! Look for matching P0, if not there write it
       nhours=deet*npas/3600.d0     
@@ -147,11 +148,11 @@ program convert_toctoc_5002
    istat=fstinl(lui,ni,nj,nk,-1,' ',-1,-1,-1,' ','!!',liste,infon,nmax)
    if(istat.lt.0)then
       print*,'ERROR with fstinl !!'
-      call exit(1)
+      error stop 1
    endif
    if(infon.lt.1)then
       print*,'ERROR: cannot find !! in file ',val(1)
-      call exit(1)
+      error stop 1
    endif
    ! Loop on !! found
    do i=1,infon
@@ -166,7 +167,7 @@ program convert_toctoc_5002
          print*,'ERROR with fstluk on !!'
          istat=fstfrm(lui)
          if(.not.samefile_L)istat=fstfrm(luo)
-         call exit(1)
+         error stop 1
       endif
       nkmod=(nj-3)/2
       print*,'njmod',nkmod
@@ -202,7 +203,7 @@ program convert_toctoc_5002
          print*,'ERROR problem with vgd_new'
          istat=fstfrm(lui)
          if(.not.samefile_L)istat=fstfrm(luo)
-         call exit(1)
+         error stop 1
       endif
       istat = vgd_print(gdv)
       print*,'Writing converted !!'
@@ -211,7 +212,7 @@ program convert_toctoc_5002
          print*,'ERROR problem with vgd_write'
          istat=fstfrm(lui)
          if(.not.samefile_L)istat=fstfrm(luo)
-         call exit(1)
+         error stop 1
       endif
       if(samefile_L)then
          ind_to_erase=ind_to_erase+1

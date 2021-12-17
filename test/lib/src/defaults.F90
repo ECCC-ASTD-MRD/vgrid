@@ -45,7 +45,7 @@ program defaults
   stat = vgd_new(vgrid,unit=lu,format="fst")
   if(stat.eq.VGD_ERROR)then
      print*,'In test error with vgd_new'
-     stop
+     error stop 1
   endif
 
   stat = vgd_get(vgrid,'PTOP',ptop)
