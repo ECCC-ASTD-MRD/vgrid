@@ -40,5 +40,5 @@ target_include_directories(r.vgrid_sample PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/..
 set_target_properties(r.vgrid_sample PROPERTIES VERSION ${PROJECT_VERSION})
 
 install(TARGETS r.compute_pressure_gz r.convert_toctoc_5002 r.add_toctoc r.print_toctoc r.vcode r.vgrid_sample
-    RUNTIME  DESTINATION bin/$ENV{EC_ARCH})
+    RUNTIME  DESTINATION bin)
  

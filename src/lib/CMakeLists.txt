@@ -23,10 +23,10 @@ set_target_properties(vgridshared PROPERTIES
   POSITION_INDEPENDENT_CODE ON)
  
 install(TARGETS vgrid vgridshared
-   PUBLIC_HEADER DESTINATION include/$ENV{EC_ARCH}
-   LIBRARY       DESTINATION lib/$ENV{EC_ARCH}
-   ARCHIVE       DESTINATION lib/$ENV{EC_ARCH})
-install(FILES ${PROJECT_MODULE_FILES} DESTINATION include/$ENV{EC_ARCH})
+   PUBLIC_HEADER DESTINATION include
+   LIBRARY       DESTINATION lib
+   ARCHIVE       DESTINATION lib)
+install(FILES ${PROJECT_MODULE_FILES} DESTINATION include)
 
 target_link_libraries(vgrid RMN::RMN)
 if (tdpack_FOUND)
