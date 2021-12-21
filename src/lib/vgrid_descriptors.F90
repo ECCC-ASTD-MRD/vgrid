@@ -1625,38 +1625,23 @@ contains
 
       select case (my_key)
       case ('CA_M','COFA')
-         if (is_valid(self,"a_m_8_valid")) then
-            istat = get_int(self,'NL_M',nl_)
-            istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CA_M in get_real8_1d)')         
-            if (istat /= 0) return
-            value_CP = c_loc(value(1))
-            status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
-         else
-            error = int(get_error(key,my_quiet))
-            return
-         endif
+         istat = get_int(self,'NL_M',nl_)
+         istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CA_M in get_real8_1d)')         
+         if (istat /= 0) return
+         value_CP = c_loc(value(1))
+         status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
       case ('CB_M','COFB')
-         if (is_valid(self,"b_m_8_valid")) then
-            istat = get_int(self,'NL_M',nl_)
-            istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CB_M in get_real8_1d)')         
-            if (istat /= 0) return
-            value_CP = c_loc(value(1))
-            status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
-         else
-            error = int(get_error(key,my_quiet))
-            return
-         endif
+         istat = get_int(self,'NL_M',nl_)
+         istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CB_M in get_real8_1d)')         
+         if (istat /= 0) return
+         value_CP = c_loc(value(1))
+         status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
       case ('CC_M')
-         if (is_valid(self,"c_m_8_valid")) then
-            istat = get_int(self,'NL_M',nl_)
-            istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CC_M in get_real8_1d)')         
-            if (istat /= 0) return
-            value_CP = c_loc(value(1))
-            status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
-         else
-            error = int(get_error(key,my_quiet))
-            return
-         endif
+         istat = get_int(self,'NL_M',nl_)
+         istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CC_M in get_real8_1d)')         
+         if (istat /= 0) return
+         value_CP = c_loc(value(1))
+         status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
       case ('CA_T')
          istat = get_int(self,'NL_T',nl_)
          istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CA_T in get_real8_1d)')         
@@ -1664,16 +1649,11 @@ contains
          value_CP = c_loc(value(1))
          status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)            
       case ('CC_T')
-         if (is_valid(self,"c_t_8_valid")) then
-            istat = get_int(self,'NL_T',nl_)
-            istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CC_T in get_real8_1d)')         
-            if (istat /= 0) return
-            value_CP = c_loc(value(1))
-            status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
-         else
-            error = int(get_error(key,my_quiet))
-            return
-         endif
+         istat = get_int(self,'NL_T',nl_)
+         istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CC_T in get_real8_1d)')         
+         if (istat /= 0) return
+         value_CP = c_loc(value(1))
+         status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
       case ('CB_T')
          istat = get_int(self,'NL_T',nl_)
          istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CB_T in get_real8_1d)')         
