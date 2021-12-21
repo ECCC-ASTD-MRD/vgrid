@@ -22,7 +22,7 @@
 #include <string.h>
 #include <math.h>
 #include "vgrid.h"
-#include "armnlib.h"
+#include "rmn.h"
 #include "c_ut_report.h"
 
 char *filenames[] = {

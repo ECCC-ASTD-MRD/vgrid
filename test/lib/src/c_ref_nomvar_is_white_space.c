@@ -19,7 +19,7 @@
  */
 #include <stdio.h>
 #include "vgrid.h"
-#include "armnlib.h"
+#include "rmn.h"
 #include "c_ut_report.h"
 
 int main() {

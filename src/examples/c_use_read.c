@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include "vgrid.h"
 #include "vgrid_build_info.h"
-#include "armnlib.h"
+#include "rmn.h"
 
 int main () {
 

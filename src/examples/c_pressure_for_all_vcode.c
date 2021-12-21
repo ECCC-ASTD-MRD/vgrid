@@ -22,7 +22,7 @@
 #include <string.h>
 #include <math.h>
 #include "vgrid.h"
-#include "armnlib.h"
+#include "rmn.h"
 
 char *filenames[] = {
     "../tests/data/dm_1001_from_model_run",

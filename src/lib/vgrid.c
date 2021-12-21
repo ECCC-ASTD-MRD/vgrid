@@ -24,7 +24,7 @@
 #include <string.h>
 #include <math.h>
 #include "rpnmacros.h"
-#include "armnlib.h"
+#include "rmn.h"
 
 #define STR_INIT(str,len) if(len>1) memset(str,' ',len-1); if(len>0) str[len-1] = '\0'
 
@@ -740,7 +740,7 @@ static int C_load_toctoc(vgrid_descriptor *self, VGD_TFSTD_ext var, int key) {
     printf("(Cvgd) ERROR in C_load_toctoc, cannot allocate table of bouble of size %d\n",table_size );
     return(VGD_ERROR);
   }
-  istat = c_fstluk(self->table, key, &ni, &nj, &nk);
+  istat = c_fstluk((uint32_t*)self->table, key, &ni, &nj, &nk);
   if(istat < 0) {
     printf("(Cvgd) ERROR in C_load_toctoc, problem with fstluk\n");
     free(self->table);
@@ -6064,7 +6064,7 @@ static int C_get_consistent_pt_e1(int iun, float *val, char *nomvar ){
 	printf("(Cvgd) ERROR: in C_get_consistent_pt_e1, dim misatch for %s, expected (%d,%d,%d), got (%d,%d,%d)\n", nomvar, ni, nj, nk, var.ni, var.nj, var.nk);
       goto bomb;
     }
-    if( c_fstluk(work,liste[k],&ni,&nj,&nk) < 0 ){
+    if( c_fstluk((uint32_t*)work,liste[k],&ni,&nj,&nk) < 0 ){
       printf("(Cvgd) ERROR: in C_get_consistent_pt_e1, with c_fstluk");
     }
     if( k == 0 ){
@@ -6577,7 +6577,7 @@ int Cvgd_write_desc (vgrid_descriptor *self, int unit) {
   ip2=self->rec.ip2;
   if(self->rec.ip2 < 0) ip2=0;
   
-  if( c_fstecr( self->table,      work,            -self->rec.nbits, unit, 
+  if( c_fstecr((uint32_t*)self->table,      work,            -self->rec.nbits, unit, 
 		self->rec.dateo,  self->rec.deet,   self->rec.npas, 
 		self->table_ni,   self->table_nj,   self->table_nk, 
 		ip1,              ip2,              self->rec.ip3,

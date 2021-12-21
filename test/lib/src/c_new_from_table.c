@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "vgrid.h"
-#include "armnlib.h"
+#include "rmn.h"
 #include "c_ut_report.h"
 
 char *filenames[] = {

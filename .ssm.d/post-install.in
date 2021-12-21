@@ -23,8 +23,3 @@ cat > ${loginPath} << EOF
 #----- Add the <PackageName>_DIR variable for cmake builds
 export ${packageName%%_*}_DIR="$packageHome"
 EOF
-
-cat > ${loginPath} << EOF
-#----- Add the <PackageName>_DIR variable for cmake builds
-export ${packageName%%_*}_DIR="$packageHome"
-EOF
