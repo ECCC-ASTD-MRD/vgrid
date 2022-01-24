@@ -19,11 +19,11 @@ set_target_properties(vgridshared PROPERTIES
   POSITION_INDEPENDENT_CODE ON
   OUTPUT_NAME vgrid)
  
-target_link_libraries(vgrid rmn::rmn)
-target_link_libraries(vgridshared rmn::rmn)
+target_link_libraries(vgrid rmn)
+target_link_libraries(vgridshared rmn)
 if (tdpack_FOUND)
-   target_link_libraries(vgrid tdpack::tdpack)
-   target_link_libraries(vgridshared tdpack::tdpack)
+   target_link_libraries(vgrid tdpack)
+   target_link_libraries(vgridshared tdpack)
 endif()
 
 install(TARGETS vgrid vgridshared
