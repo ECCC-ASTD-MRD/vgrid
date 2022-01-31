@@ -6,7 +6,7 @@ PROPERTIES Fortran_PREPROCESS ON)
 add_executable(r.compute_pressure_gz compute_pressure_gz.F90)
 add_dependencies(r.compute_pressure_gz ${PROJECT_NAME}_build_info)
 target_link_libraries(r.compute_pressure_gz PRIVATE vgrid rmn)
-target_include_directories(r.compute_pressure_gz PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/../lib ${CMAKE_CURRENT_SOURCE_DIR}/../lib ${CMAKE_CURRENT_SOURCE_DIR} ${RMN_INCLUDE_DIRS})
+target_include_directories(r.compute_pressure_gz PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/../lib ${CMAKE_CURRENT_SOURCE_DIR}/../lib ${CMAKE_CURRENT_SOURCE_DIR} ${RMN_INCLUDE_DIRS} ${tdpack_INCLUDE_DIRS})
 set_target_properties(r.compute_pressure_gz PROPERTIES VERSION ${PROJECT_VERSION})
 
 add_executable(r.convert_toctoc_5002 convert_toctoc_5002.F90)
