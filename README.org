@@ -61,7 +61,7 @@ Please run =git -c submodule."ci-env".update=none submodule update --init --recu
 #+begin_src
 mkdir build
 cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=${your_choice} -DRMN_ROOT=${librmn_install_path}
+cmake .. -DCMAKE_INSTALL_PREFIX=${your_choice} -Drmn_ROOT=${librmn_install_path}
 make -j 4
 make install
 #+end_src

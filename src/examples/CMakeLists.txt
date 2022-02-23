@@ -9,5 +9,5 @@ foreach(exfile ${SRC_EXAMPLES})
 
    add_executable(${ex} ${exfile})
    target_link_libraries(${ex} PRIVATE vgrid)
-   target_include_directories(${ex} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}  ${CMAKE_SOURCE_DIR}/src/lib  ${RMN_INCLUDE_DIRS})
+   target_include_directories(${ex} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}  ${CMAKE_SOURCE_DIR}/src/lib  ${rmn_INCLUDE_DIRS})
 endforeach()
