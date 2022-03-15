@@ -13,6 +13,7 @@ set_target_properties(vgrid PROPERTIES
 
 set(PROJECT_MODULE_FILES ${CMAKE_CURRENT_BINARY_DIR}/vgrid_descriptors.mod ${CMAKE_CURRENT_BINARY_DIR}/vgrid_utils.mod)
 add_library(vgridshared SHARED vgrid_descriptors.F90 vgrid_utils.F90 vgrid.c)
+add_dependencies(vgridshared vgrid ${PROJECT_NAME}_build_info)
 set_target_properties(vgridshared PROPERTIES
   VERSION ${PROJECT_VERSION}
   PUBLIC_HEADER "${PROJECT_INCLUDE_FILES}"
