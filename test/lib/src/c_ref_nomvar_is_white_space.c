@@ -34,7 +34,7 @@ int main() {
     printf("ERROR with c_fnom on iun, file %s\n", filename);
     return(1);
   }
-  if( c_fstouv(iun,mode,"") < 0 ) {
+  if( c_fstouv(iun,mode) < 0 ) {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
     return(1);
   }

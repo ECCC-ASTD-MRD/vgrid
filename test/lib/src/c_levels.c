@@ -44,7 +44,7 @@ int main() {
     printf("ERROR with c_fnom on iun, file %s\n", filename);
     return(1);
   }
-  ier = c_fstouv(iun,"RND","");  
+  ier = c_fstouv(iun,"RND");  
   if( ier < 0 ) {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
     return(1);
@@ -92,7 +92,7 @@ int main() {
     printf("Problem allocating levels_8 of size %d\n",ni2*nj2);
     return(1);
   }
-  ier = c_fstluk( p0, key, &ni2, &nj2, &nk2 );
+  ier = c_fstluk((uint32_t*)p0, key, &ni2, &nj2, &nk2 );
   if(ier < 0){
     printf("Problem with fstluk for p0\n");
     return(1);
@@ -127,7 +127,7 @@ int main() {
       return(1);
     }
     // To simplify, PX are assumed to be on the same grid as P0. but this should be check in an operational program!
-    ier = c_fstluk( p0, key, &ni2, &nj2, &nk2 );
+    ier = c_fstluk((uint32_t*)p0, key, &ni2, &nj2, &nk2 );
     if( ier < 0 ){
       printf("Error with c_fstluk on level = %d\n",i_val[k]);
       return(1);

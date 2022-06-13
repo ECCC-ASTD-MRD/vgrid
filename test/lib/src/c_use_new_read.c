@@ -31,7 +31,7 @@ int main() {
   int quiet = 0, *i_val = NULL, in_log = 0, dpidpis = 0;
   int nl_t, nt, ni, nj, nk, ni2, nj2, nk2, k, key, ij, ijk, status;
   char filename[]="data/dm_5005_from_model_run";
-  char mode[]="RND";
+  char mode[]="STD+RND";
   char format[] = "FST";
   char name[5];
   float *f_val = NULL, *p0 = NULL, *px = NULL;
@@ -45,7 +45,7 @@ int main() {
     printf("ERROR with c_fnom on iun, file %s\n", filename);
     return(1);
   }
-  ier = c_fstouv(iun,"RND","");  
+  ier = c_fstouv(iun,"RND");  
   if( ier < 0 ) {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
     return(1);
@@ -113,7 +113,7 @@ int main() {
     printf("ERROR with c_fnom on iun2\n");
     return(1);
   }
-  ier = c_fstouv(iun2,"RND","");  
+  ier = c_fstouv(iun2,"RND");  
   if( ier < 0 ) {
     printf("ERROR with c_fstouv on iun2\n");
     return(1);
@@ -145,7 +145,7 @@ int main() {
     printf("Problem allocating levels_8 of size %d\n",ni2*nj2);
     return(1);
   }
-  ier = c_fstluk( p0, key, &ni2, &nj2, &nk2 );
+  ier = c_fstluk((uint32_t*)p0, key, &ni2, &nj2, &nk2 );
   if( ier < 0 ){
     printf("Problem with fstluk on p0\n");
   }
@@ -165,7 +165,7 @@ int main() {
       return(1);
     }
     // To simplify, PX are assumed to be on the same grid as P0. bur rhis should be check in an operational program!
-    ier = c_fstluk( p0, key, &ni2, &nj2, &nk2 );    
+    ier = c_fstluk((uint32_t*)p0, key, &ni2, &nj2, &nk2 );    
     if( ier < 0 ){
       printf("Problem with fstluk on px ip1 = %d\n", i_val[k]);
       return(1);
@@ -187,7 +187,7 @@ int main() {
     printf("ERROR with c_fnom on iun2\n");
     return(1);
   }
-  ier = c_fstouv(iun2,"RND","");  
+  ier = c_fstouv(iun2,"RND");  
   if( ier < 0 ) {
     printf("ERROR with c_fstouv on iun2\n");
     return(1);

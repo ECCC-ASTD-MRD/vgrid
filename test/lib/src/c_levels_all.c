@@ -72,7 +72,7 @@ int compare_values(int iun, int vcode, float *levels, double *levels_8, float *p
       return(VGD_ERROR);
     }
     // To simplify, PX are assumed to be on the same grid as P0. but this should be check in an operational program!
-    ier = c_fstluk( p0, key, &ni2, &nj2, &nk2 );
+    ier = c_fstluk((uint32_t*)p0, key, &ni2, &nj2, &nk2 );
     if( ier < 0 ){
       printf("Error with c_fstluk on level = %d\n",i_val[k]);
       return(VGD_ERROR);
@@ -121,7 +121,7 @@ int test_it(char *filename, char *ip1_name, int ind) {
     printf("ERROR with c_fnom on iun, file %s\n", filename);
     return(VGD_ERROR);
   }
-  ier = c_fstouv(iun,"RND","");  
+  ier = c_fstouv(iun,"RND");  
   if( ier < 0 ) {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
     return(VGD_ERROR);
@@ -199,7 +199,7 @@ int test_it(char *filename, char *ip1_name, int ind) {
     printf("Problem allocating double surface reference field of size %d\n",ni2*nj2);
     return(VGD_ERROR);
   }
-  ier = c_fstluk( p0, key, &ni2, &nj2, &nk2 );
+  ier = c_fstluk((uint32_t*)p0, key, &ni2, &nj2, &nk2 );
   if(ier < 0){
     printf("Problem with fstluk for reference field\n");
     return(VGD_ERROR);
@@ -233,7 +233,7 @@ int test_it(char *filename, char *ip1_name, int ind) {
       printf("Problem allocating p0ls_8 of size %d\n",ni2*nj2);
       return(VGD_ERROR);
     }
-    ier = c_fstluk( p0ls, key, &ni2, &nj2, &nk2 );
+    ier = c_fstluk((uint32_t*)p0ls, key, &ni2, &nj2, &nk2 );
     if(ier < 0){
       printf("Problem with fstluk for p0\n");
       return(VGD_ERROR);

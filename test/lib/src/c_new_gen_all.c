@@ -796,7 +796,7 @@ int test_it(char *filename, int ind) {
     printf("ERROR with c_fnom on iun, file %s\n", filename);
     return(VGD_ERROR);
   }
-  ier = c_fstouv(iun,"RND","");
+  ier = c_fstouv(iun,"RND");
   if( ier < 0 ) {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
     return(VGD_ERROR);

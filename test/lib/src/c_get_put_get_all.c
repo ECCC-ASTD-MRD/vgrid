@@ -67,7 +67,7 @@ int test_it(char *filename, int ind) {
     printf("ERROR in test with c_fnom on iun, file %s\n", filename);
     return(VGD_ERROR);
   }
-  if( c_fstouv(iun,"RND","") < 0 ) {
+  if( c_fstouv(iun,"RND") < 0 ) {
     printf("ERROR in test with c_fstouv on iun, file %s\n", filename);
     return(VGD_ERROR);
   }

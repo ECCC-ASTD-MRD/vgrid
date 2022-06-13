@@ -49,7 +49,7 @@ int main() {
     printf("ERROR with c_fnom on iun, file %s\n", filename);
     return(1);
   }
-  if(c_fstouv(iun,"RND","") < 0 ) {
+  if(c_fstouv(iun,"RND") < 0 ) {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
     return(1);
   }

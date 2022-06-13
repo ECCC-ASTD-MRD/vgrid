@@ -42,7 +42,7 @@ int main() {
     printf("ERROR with c_fnom on iun, file %s\n", filename);
     return(1);
   }
-  ier = c_fstouv(iun,"RND","");  
+  ier = c_fstouv(iun,"RND");  
   if( ier < 0 ) {
     printf("ERROR with c_fstouv on iun, file %s\n", filename);
     return(1);
@@ -61,7 +61,7 @@ int main() {
     printf("ERROR with c_fnom on iun2, file %s\n", filename2);
     return(1);
   }
-  ier = c_fstouv(iun2,"RND","");  
+  ier = c_fstouv(iun2,"RND");  
   if( ier < 0 ) {
     printf("ERROR with c_fstouv on iun2, file %s\n", filename2);
     return(1);
