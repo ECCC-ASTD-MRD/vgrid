@@ -20,7 +20,6 @@ include(ec_doxygen)          # Doxygen target (-DWITH_DOC=TRUE)
 include(ec_compiler_presets)
 include(ec_openmp)           # Enable OpenMP (-DWITH_OPENMP=TRUE)
 
-set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 if (NOT rmn_FOUND)
    find_package(rmn ${rmn_REQ_VERSION} REQUIRED)
 endif()
