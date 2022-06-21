@@ -44,7 +44,7 @@ build:amd64-inteloneapi-2022.1.2:
    script:
       - set +e
       - source ci-env/latest/rhel-8-amd-64/inteloneapi-2022.1.2.sh
-      - . r.load.dot ${SSM}/${ECCI_PROCESS}/libs
+      - . r.load.dot ${SSM}/libs
       - set -e
       - mkdir build_amd64-inteloneapi-2022.1.2
       - cd build_amd64-inteloneapi-2022.1.2
@@ -64,7 +64,7 @@ build:amd64-gnu-9.3.0:
    script:
       - set +e
       - source ci-env/latest/rhel-8-amd-64/gnu-9.3.0.sh 
-      - . r.load.dot ${SSM}/${ECCI_PROCESS}/libs
+      - . r.load.dot ${SSM}/libs
       - set -e
       - mkdir build_amd64-gnu-9.3.0
       - cd build_amd64-gnu-9.3.0
