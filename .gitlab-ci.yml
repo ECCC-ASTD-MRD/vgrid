@@ -13,7 +13,7 @@ stages:
 before_script:
    - export CLICOLOR_FORCE=true
    - if [[ ${CI_COMMIT_REF_NAME} == "dev" && ${ECCI_PROCESS:0:3} != "dev" && ${ECCI_PROCESS} != "nightly" ]]; then ECCI_PROCESS="dev_${CI_PIPELINE_ID}"; fi
-   - SSM=${ECCI_SSM}/`[[ -d ${ECCI_SSM}/${ECCI_PROCESS} ]] && echo ${ECCI_PROCESS} || echo staging`
+   - SSM=${ECCI_SSM}/`[[ ${ECCI_PROCESS:0:3} != "dev" ]] && echo ${ECCI_PROCESS} || echo staging`
 
 build:icelake-inteloneapi-2022.1.2:
    stage: build
