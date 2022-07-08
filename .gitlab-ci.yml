@@ -85,7 +85,7 @@ test:icelake-inteloneapi-2022.1.2:
       - build:icelake-inteloneapi-2022.1.2
    script:
       - source ci-env/latest/rhel-8-icelake-64/inteloneapi-2022.1.2.sh
-      - . r.load.dot ${SSM}/libs
+      - . r.load.dot ${SSM}/libs ${SSM}/utils
       - cd build_icelake-inteloneapi-2022.1.2
       - make check
 
@@ -99,7 +99,7 @@ test:amd64-inteloneapi-2022.1.2:
       - build:amd64-inteloneapi-2022.1.2
    script:
       - source ci-env/latest/rhel-8-amd-64/inteloneapi-2022.1.2.sh
-      - . r.load.dot ${SSM}/libs
+      - . r.load.dot ${SSM}/libs ${SSM}/utils
       - cd build_amd64-inteloneapi-2022.1.2
       - make check
 
@@ -113,7 +113,7 @@ test:amd64-gnu-9.3.0:
       - build:amd64-gnu-9.3.0
    script:
       - source ci-env/latest/rhel-8-amd-64/gnu-9.3.0.sh 
-      - . r.load.dot ${SSM}/libs
+      - . r.load.dot ${SSM}/libs ${SSM}/utils
       - cd build_amd64-gnu-9.3.0
       - make check
 
