@@ -215,7 +215,7 @@ package:ubuntu-18.04_amd64_inteloneapi-2022.1.2:
       - tags
       - schedules
    dependencies:
-      - build:ubuntu-18.04_amd64_inteloneapi-2022.1.2
+      - build:ubuntu-18.04-amd64_inteloneapi-2022.1.2
    environment:
       name: testing
    script:
