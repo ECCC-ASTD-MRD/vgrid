@@ -228,7 +228,7 @@ test:ubuntu-18.04-amd64_inteloneapi-2022.1.2:
       - build:ubuntu-18.04-amd64_inteloneapi-2022.1.2
    script:
       - set +e
-      - build:ubuntu-18.04-amd64_inteloneapi-2022.1.2
+      - source ci-env/latest/ubuntu-18.04-amd-64/inteloneapi-2022.1.2.sh
       - . r.load.dot ${SSM}/libs ${SSM}/utils
       - set -e
       - cd build_ubuntu-18.04-amd64_inteloneapi-2022.1.2
