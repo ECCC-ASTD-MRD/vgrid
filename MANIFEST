@@ -1,5 +1,5 @@
 NAME       : vgrid
-VERSION    : 6.8.1
+VERSION    : 6.8.0
 BUILD      : Release
 STATE      :
 DESCRIPTION: ECCC-MRD Vertical reference manipulation library
