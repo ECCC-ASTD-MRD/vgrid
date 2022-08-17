@@ -1,6 +1,6 @@
 NAME       : vgrid
-VERSION    : 6.8.0
-BUILD      : Release
+VERSION    : 
+BUILD      : 
 STATE      :
 DESCRIPTION: ECCC-MRD Vertical reference manipulation library
 SUMMARY    : This library allows for encoding/decoding, of vertical references
