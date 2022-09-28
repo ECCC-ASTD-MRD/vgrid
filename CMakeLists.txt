@@ -23,11 +23,11 @@ include(ec_compiler_presets)
 include(ec_openmp)           # Enable OpenMP (-DWITH_OPENMP=TRUE)
 
 if (NOT rmn_FOUND)
-   find_package(rmn ${rmn_REQ_VERSION} REQUIRED)
+   find_package(rmn ${rmn_REQ_VERSION} COMPONENTS shared REQUIRED)
 endif()
 
 if (NOT tdpack_FOUND)
-   find_package(tdpack ${tdpack_REQ_VERSION} CONFIG)
+   find_package(tdpack ${tdpack_REQ_VERSION} COMPONENTS shared)
 endif()
 
 add_subdirectory(src/lib lib)
