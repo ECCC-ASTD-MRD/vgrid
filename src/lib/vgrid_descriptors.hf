@@ -1,4 +1,4 @@
-#include "msg.h"
+#include "rmn/msg.h"
 
 ! Public class constants
 integer, parameter, public :: VGD_LEN_NAME=4  !maximum length of a variable name in the data file

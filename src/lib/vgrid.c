@@ -23,8 +23,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include "rpnmacros.h"
 #include "rmn.h"
+#include "rmn/rpnmacros.h"
 
 #define STR_INIT(str,len) if(len>1) memset(str,' ',len-1); if(len>0) str[len-1] = '\0'
 
