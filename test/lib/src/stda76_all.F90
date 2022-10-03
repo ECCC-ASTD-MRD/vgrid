@@ -21,7 +21,7 @@
 ! NOTE : the control files for comparison can be produce by the test c_standard_atmophere_all.c
 
 program stda76
-#include <msg.h>
+#include <rmn/msg.h>
   use Unit_Testing, only: ut_report
   use vGrid_Descriptors, only: vgd_putopt, VGD_STDA76_SFC_T, VGD_STDA76_SFC_P, &
        VGD_ERROR
