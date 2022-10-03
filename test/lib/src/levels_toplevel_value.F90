@@ -52,7 +52,7 @@ contains
 end module mod_constructor_table
 !================================================================================================
 program tests
-#include <msg.h>
+#include <rmn/msg.h>
   use vGrid_Descriptors, only: vgd_levels,vgd_putopt,VGD_ERROR
   use Unit_Testing, only: ut_report
 

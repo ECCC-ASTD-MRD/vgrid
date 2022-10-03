@@ -19,7 +19,7 @@
 !===============================================================================
 
 program stda76_hgts_from_pres
-#include <msg.h>
+#include <rmn/msg.h>
   use Unit_Testing, only: ut_report
   use vGrid_Descriptors, only: vgrid_descriptor, vgd_new, vgd_get, vgd_levels, &
        vgd_stda76_hgts_from_pres_list, VGD_ERROR

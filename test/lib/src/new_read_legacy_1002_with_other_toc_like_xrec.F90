@@ -18,7 +18,7 @@
 ! * Boston, MA 02111-1307, USA.
 !================================================================================================
 program tests
-#include <msg.h>
+#include <rmn/msg.h>
   use vGrid_Descriptors, only: vgrid_descriptor, vgd_free, vgd_new,vgd_levels,operator(==), VGD_OK
   use Unit_Testing, only: ut_report
 
