@@ -9,7 +9,7 @@ ec_parse_manifest()        # Parse MANIFEST file
 
 project(${NAME} DESCRIPTION "${DESCRIPTION}")
 set(PROJECT_VERSION ${VERSION}${STATE})
-set(VGRID_VERSION ${PROJECT_VERSION} CACHE INTERNAL "VGRID version" FORCE) # Needed for cascaded version identification
+set(vgrid_VERSION ${PROJECT_VERSION} CACHE INTERNAL "vgrid version" FORCE) # Needed for cascaded version identification
 
 ec_build_info()            # Generate build information
 
