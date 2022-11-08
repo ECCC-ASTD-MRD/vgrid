@@ -1,3 +1,4 @@
+      use app
       use vgrid_utils, only: get_allocate
       ! Given referent, compute physical levelling information from the vertical description
       type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
@@ -16,7 +17,7 @@
       
       if(.not.is_valid(self,'SELF'))then
          write(for_msg,*) 'vgrid structure is not valid in dpidpis_withref'//PROC_SUFF
-         call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+         call app_log(APP_ERROR,VGD_PRFX//for_msg)       
          return
       endif
       
@@ -30,7 +31,7 @@
       if (error /= 0) then
          nullify(my_sfc_field)
          write(for_msg,*) 'cannot allocate space for sfc_field in dpidpis_withref'//PROC_SUFF
-         call msg(MSG_ERROR,VGD_PRFX//for_msg)
+         call app_log(APP_ERROR,VGD_PRFX//for_msg)       
          return
       endif
       if (present(sfc_field)) then

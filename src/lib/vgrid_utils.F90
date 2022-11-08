@@ -19,6 +19,7 @@
 
 module vgrid_utils
    
+   use app
    implicit none
    private
 
@@ -54,7 +55,7 @@ module vgrid_utils
 contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! Allocate space for pointer returns
-
+   
    integer function get_allocate_i1d(key_S,value,len,allow_reshape_L,msg_S) result(istat)
       ! Allocate space for the result value and report error
       implicit none
@@ -74,12 +75,13 @@ contains
          if(size(value)/=len)then
             if(allow_reshape_L)then
                write(for_msg,*) 'reshaping 1D integer vector '//trim(msg_S)
-               call msg(MSG_INFO,VGD_PRFX//for_msg)
+               call app_log(APP_INFO,VGD_PRFX//for_msg)       
+
                deallocate(value)
                alloc_lev_L=.true.
             else
                write(for_msg,*) '1D pointer already allocated with a different length, will not reallocate '//trim(msg_S)
-               call msg(MSG_ERROR,VGD_PRFX//for_msg)
+               call app_log(APP_ERROR,VGD_PRFX//for_msg)       
                return
             endif
          endif
@@ -88,7 +90,7 @@ contains
          allocate(value(len),stat=istat)
          if (istat /= 0) then
             write(for_msg,*) 'unable to allocate space for '//trim(key_S)//' request '//trim(msg_S)
-            call msg(MSG_CRITICAL,for_msg)
+            call app_log(APP_ERROR,VGD_PRFX//for_msg)       
          endif
       else
          istat=0
@@ -114,12 +116,13 @@ contains
          if(size(value)/=len)then
             if(allow_reshape_L)then
                write(for_msg,*) 'reshaping 1D real vector '//trim(msg_S)
-               call msg(MSG_INFO,VGD_PRFX//for_msg)
+               call app_log(APP_INFO,VGD_PRFX//for_msg)       
+
                deallocate(value)
                alloc_lev_L=.true.
             else
                write(for_msg,*) '1D pointer already allocated with a different length, will not reallocate '//trim(msg_S)
-               call msg(MSG_ERROR,VGD_PRFX//for_msg)
+               call app_log(APP_ERROR,VGD_PRFX//for_msg)       
                return
             endif
          endif
@@ -128,7 +131,7 @@ contains
          allocate(value(len),stat=istat)
          if (istat /= 0) then
             write(for_msg,*) 'unable to allocate space for '//trim(key_S)//' request '//trim(msg_S)
-            call msg(MSG_CRITICAL,for_msg)
+            call app_log(APP_ERROR,VGD_PRFX//for_msg)       
          endif
       else
          istat=0
@@ -154,12 +157,13 @@ contains
          if(size(value)/=len)then
             if(allow_reshape_L)then
                write(for_msg,*) 'reshaping 1D real(kind=8) vector '//trim(msg_S)
-               call msg(MSG_INFO,VGD_PRFX//for_msg)
+               call app_log(APP_INFO,VGD_PRFX//for_msg)       
+
                deallocate(value)
                alloc_lev_L=.true.
             else
                write(for_msg,*) '1D pointer already allocated with a different length, will not reallocate '//trim(msg_S)
-               call msg(MSG_ERROR,VGD_PRFX//for_msg)
+               call app_log(APP_ERROR,VGD_PRFX//for_msg)       
                return
             endif
          endif
@@ -168,7 +172,7 @@ contains
          allocate(value(len),stat=istat)
          if (istat /= 0) then
             write(for_msg,*) 'unable to allocate space for '//trim(key_S)//' request '//trim(msg_S)
-            call msg(MSG_CRITICAL,for_msg)
+            call app_log(APP_ERROR,VGD_PRFX//for_msg)       
          endif
       else
        istat=0
@@ -283,8 +287,8 @@ contains
     external msg
     if (len_trim(string) > len(upper_string)) then
        write(for_msg,*) 'Long string truncated in up() ',trim(string)
-       call msg(MSG_WARNING,for_msg)
-    endif
+       call app_log(APP_WARNING,VGD_PRFX//for_msg)       
+      endif
     upper_string = string
     do i = 1,len_trim(string)
        if (string(i:i) >= 'a' .and. string(i:i) <= 'z') then
@@ -308,7 +312,7 @@ contains
     istat=-1
     if (size(len) < 3) then
        write(for_msg,*) 'wrong array shape specified for '//trim(key_S)
-       call msg(MSG_CRITICAL,for_msg)
+       call app_log(APP_ERROR,VGD_PRFX//for_msg)       
        return
     endif
     alloc_lev_L=.false.
@@ -320,12 +324,13 @@ contains
             size(value,3)/=len(3))then
           if(allow_reshape_L)then
              write(for_msg,*) 'reshaping 3D real table'//trim(msg_S)
-             call msg(MSG_INFO,VGD_PRFX//for_msg)
+             call app_log(APP_INFO,VGD_PRFX//for_msg)       
+
              deallocate(value)
              alloc_lev_L=.true.
           else
              write(for_msg,*) '3D pointer already allocated with a different length, will not reallocate '//trim(msg_S)
-             call msg(MSG_ERROR,VGD_PRFX//for_msg)
+             call app_log(APP_ERROR,VGD_PRFX//for_msg)       
              return
           endif
        endif
@@ -334,8 +339,8 @@ contains
        allocate(value(len(1),len(2),len(3)),stat=istat)
        if (istat /= 0) then
           write(for_msg,*) 'unable to allocate space for '//trim(key_S)//' request '//trim(msg_S)
-          call msg(MSG_CRITICAL,for_msg)
-       endif
+          call app_log(APP_ERROR,VGD_PRFX//for_msg)       
+         endif
     else
        istat=0
     endif
@@ -355,7 +360,7 @@ contains
     istat=-1
     if (size(len) < 3) then
        write(for_msg,*) 'wrong array shape specified for '//trim(key_S)
-       call msg(MSG_CRITICAL,for_msg)
+       call app_log(APP_ERROR,VGD_PRFX//for_msg)       
        return
     endif
     alloc_lev_L=.false.
@@ -367,12 +372,13 @@ contains
             size(value,3)/=len(3))then
           if(allow_reshape_L)then
              write(for_msg,*) 'reshaping 3D real(kind=8) table'//trim(msg_S)
-             call msg(MSG_INFO,VGD_PRFX//for_msg)
+             call app_log(APP_INFO,VGD_PRFX//for_msg)       
+
              deallocate(value)
              alloc_lev_L=.true.
           else
              write(for_msg,*) '3D pointer already allocated with a different length, will not reallocate '//trim(msg_S)
-             call msg(MSG_ERROR,VGD_PRFX//for_msg)
+             call app_log(APP_ERROR,VGD_PRFX//for_msg)       
              return
           endif
        endif
@@ -381,8 +387,8 @@ contains
        allocate(value(len(1),len(2),len(3)),stat=istat)
        if (istat /= 0) then
           write(for_msg,*) 'unable to allocate space for '//trim(key_S)//' request '//trim(msg_S)
-          call msg(MSG_CRITICAL,for_msg)
-       endif
+          call app_log(APP_ERROR,VGD_PRFX//for_msg)       
+         endif
     else
        istat=0
     endif
@@ -399,12 +405,12 @@ contains
     ! Local variables
     integer :: level_msg
     external msg
-    level_msg=MSG_CRITICAL
+    level_msg=APP_ERROR
     if (present(quiet)) then
-       if(quiet)level_msg=MSG_QUIET    
+       if(quiet)level_msg=APP_QUIET    
     endif
     write(for_msg,*) 'Attempt to retrieve invalid key '//trim(key)//' returns VGD_MISSING'
-    call msg(level_msg,for_msg)
+    call app_log(level_msg,VGD_PRFX//for_msg)       
     value = dble(VGD_MISSING)
     return
   end function get_error
@@ -413,7 +419,7 @@ contains
     character(len=*), intent(in) :: key
     external msg
     write(for_msg,*) 'WARNING: attempt to set useless value for '//trim(key)
-    call msg(MSG_CRITICAL,for_msg)
+    call app_log(APP_ERROR,VGD_PRFX//for_msg)       
     error = VGD_ERROR
     return
   end function put_error

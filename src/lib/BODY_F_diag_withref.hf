@@ -1,3 +1,4 @@
+      use app
       use vgrid_utils, only: get_allocate
       ! Given referent, compute physical levelling information from the vertical description
       type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
@@ -24,7 +25,7 @@
       
       if(.not.is_valid(self,'SELF'))then
          write(for_msg,*) 'vgrid structure is not valid in diag_withref'//PROC_SUFF
-         call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+         call app_log(APP_ERROR,VGD_PRFX//for_msg)       
          return
       endif
       
@@ -64,7 +65,7 @@
             allocate(my_sfc_field(ni,nj),stat=error)
             if (error /= 0) then
                write(for_msg,*) 'cannot allocate space for my_sfc_field in diag_withref'//PROC_SUFF
-               call msg(MSG_ERROR,VGD_PRFX//for_msg)
+               call app_log(APP_ERROR,VGD_PRFX//for_msg)       
                return
             endif
             my_sfc_field(1:ni,1:nj) = sfc_field(1:ni,1:nj)
@@ -76,7 +77,7 @@
       else
          if (is_valid(self,"ref_name_valid")) then
             write(for_msg,*) 'reference field must be provided to diag_withref'//PROC_SUFF
-            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            call app_log(APP_ERROR,VGD_PRFX//for_msg)       
             return
          else
             ni = 1; nj = 1; nk = size(ip1_list)
@@ -87,7 +88,7 @@
          if(  ni /= size(sfc_field_ls,dim=1) .or. &
               nj /= size(sfc_field_ls,dim=2) )then
             write(for_msg,*) 'reference large scale field is not of same size has reference field'
-            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            call app_log(APP_ERROR,VGD_PRFX//for_msg)       
             return
          endif
 
@@ -102,7 +103,7 @@
             allocate(my_sfc_field_ls(ni,nj),stat=error)
             if (error /= 0) then
                write(for_msg,*) 'cannot allocate space for my_sfc_field_ls in diag_withref'//PROC_SUFF
-               call msg(MSG_ERROR,VGD_PRFX//for_msg)
+               call app_log(APP_ERROR,VGD_PRFX//for_msg)       
                return
             endif
             my_sfc_field_ls(1:ni,1:nj) = sfc_field_ls(1:ni,1:nj)
@@ -113,7 +114,7 @@
       else
          if (is_valid(self,"ref_namel_valid") .and. .not. my_dpidpis) then
             write(for_msg,*) 'reference large scale field must be provided to diag_withref'//PROC_SUFF
-            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            call app_log(APP_ERROR,VGD_PRFX//for_msg)       
             return
          endif
       endif
@@ -121,11 +122,11 @@
          if (size(levels,dim=1) /= ni .or. size(levels,dim=2) /= nj .or. size(levels,dim=3) /= nk) then
             if(ALLOW_RESHAPE)then
                write(for_msg,*) 'Levels array size error - will be reallocated'
-               call msg(MSG_WARNING,VGD_PRFX//for_msg)
+               call app_log(APP_ERROR,VGD_PRFX//for_msg)       
                deallocate(levels)
             else
                write(for_msg,*) 'Levels array size error - will not reallocate since ALLOW_RESHAPE is set to false'
-               call msg(MSG_ERROR,VGD_PRFX//for_msg)
+               call app_log(APP_ERROR,VGD_PRFX//for_msg)       
                return
             endif
          endif
@@ -134,7 +135,7 @@
          allocate(levels(ni,nj,nk),stat=error)
          if (error /= 0) then
             write(for_msg,*) 'cannot allocate space for levels in diag_withref'//PROC_SUFF
-            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            call app_log(APP_ERROR,VGD_PRFX//for_msg)       
             return
          endif
       endif
@@ -150,7 +151,7 @@
          allocate(my_levels(ni,nj,nk),stat=error)
          if (error /= 0) then
             write(for_msg,*) 'cannot allocate space for my_levels in diag_withref'//PROC_SUFF
-            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            call app_log(APP_ERROR,VGD_PRFX//for_msg)       
             return
          endif
 
@@ -171,10 +172,10 @@
       if (istat /= VGD_OK) then
          if(my_dpidpis)then
             write(for_msg,*) 'error computing dpidpis in diag_withref'//PROC_SUFF
-            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            call app_log(APP_ERROR,VGD_PRFX//for_msg)       
          else
             write(for_msg,*) 'error computing pressure in diag_withref'//PROC_SUFF
-            call msg(MSG_ERROR,VGD_PRFX//for_msg)
+            call app_log(APP_ERROR,VGD_PRFX//for_msg)       
          endif
          return
       endif
