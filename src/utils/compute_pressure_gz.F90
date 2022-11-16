@@ -11,7 +11,7 @@ module mod_comp_pres_gz
   integer, public :: cpg_luo=11,cpg_kind,cpg_version
   character(len=12), public :: cpg_etiket_S
   character(len=20), public :: cpg_levels_S
-  logical, public :: cpg_samefile_L,cpg_verbose_L,cpg_allow_sigma_L,cpg_zap_etiket_L,&
+  logical, public :: cpg_samefile_L,cpg_allow_sigma_L,cpg_zap_etiket_L,&
        cpg_is_pressure_L,cpg_compute_gz_L
   type(vgrid_descriptor), public :: cpg_vgd
   type cpg_rpn
@@ -80,21 +80,14 @@ contains
     status=VGD_ERROR
     cle=(/'s.         ','d.         ','samefile   ','levels     ','verbose    ','kind       ','version    ',&
          'allow_sigma','etiket     ','compute    '/)
-    val=(/'undef      ','undef      ','undef      ','ALL_LEVELS ','NO         ','undef      ','undef      ',&
+    val=(/'undef      ','undef      ','undef      ','ALL_LEVELS ','undef      ','undef      ','undef      ',&
          'NO         ','undef      ','undef      '/)
-    def=(/'undef      ','undef      ','YES        ','ALL_LEVELS ','YES        ','undef      ','undef      ',&
+    def=(/'undef      ','undef      ','YES        ','ALL_LEVELS ','INFO       ','undef      ','undef      ',&
          'YES        ','undef      ','undef      '/)
     npos=-111
-    call ccard(cle,def,val,ncle,npos) 
-    if(trim(val(5)).eq.'NO')then
-       cpg_verbose_L=.false.
-    else if (trim(val(5)).eq.'YES')then
-       cpg_verbose_L=.true.
-    else
-       write(app_msg,*) "option -verbose does't take any value, got ",trim(val(5))
-       call app_log(APP_ERROR,app_msg)
-         return
-    endif
+    call ccard(cle,def,val,ncle,npos)
+    stat=app_loglevel(trim(val(5))) 
+
     if(trim(val(10)).eq.'undef')then
        write(app_msg,*) 'Argument -compute (pressure,gz) is mandatory'
        call app_log(APP_ERROR,app_msg)
@@ -114,7 +107,7 @@ contains
        return
     endif
     cpg_samefile_L = trim(val(3)) == 'YES'
-    if(cpg_verbose_L .and.  cpg_samefile_L)then
+    if(cpg_samefile_L)then
        write(app_msg,*) 'Results will be written in input file '//trim(val(1))
        call app_log(APP_INFO,app_msg)
       endif
@@ -194,10 +187,8 @@ contains
     else
        cpg_zap_etiket_L=.true.
        cpg_etiket_S=trim(val(9))
-       if(cpg_verbose_L) then
-         write(app_msg,*) 'Etiket of output records will be zap to ',cpg_etiket_S
-         call app_log(APP_ERROR,app_msg)
-       endif
+       write(app_msg,*) 'Etiket of output records will be zap to ',cpg_etiket_S
+       call app_log(APP_ERROR,app_msg)
     endif
     status=VGD_OK
   end function cpg_process_arguments
@@ -339,12 +330,12 @@ contains
   end function cpg_fstecr
   !===================================================================================
   integer function cpg_sort_key_by_levels(sorted_keys,unsorted_keys,&
-       sorted_levels,remove_duplicate_L,verbose_L,&
+       sorted_levels,remove_duplicate_L,&
        sort_as_kind,only_kind,sorted_ip1s) result(status)
     implicit none
     integer, optional,intent(inout), pointer, dimension(:) :: sorted_keys, sorted_ip1s
     integer, optional,intent(in) , dimension(:) :: unsorted_keys      
-    logical, optional,intent(in) :: verbose_L,remove_duplicate_L
+    logical, optional,intent(in) :: remove_duplicate_L
     real, optional, pointer, dimension(:) ::sorted_levels
     integer, optional,intent(in) :: sort_as_kind,only_kind
     ! Local variables
@@ -353,7 +344,7 @@ contains
     real, pointer, dimension(:) :: hyb
     real :: tempo
     character (len=1) :: dummy_S
-    logical :: l_verbose_L,l_remove_duplicate_L,reverse_L
+    logical :: l_remove_duplicate_L,reverse_L
     type (cpg_rpn) :: prm
     external :: convip
     nullify(prm%data,keys,hyb,ip1s)
@@ -368,8 +359,6 @@ contains
        call app_log(APP_ERROR,app_msg)
         return
     endif
-    l_verbose_L=.false.
-    if(present(verbose_L))l_verbose_L=verbose_L
     l_remove_duplicate_L=.false.
     if(present(remove_duplicate_L))l_remove_duplicate_L=remove_duplicate_L
     l_sort_as_kind=-1
@@ -381,7 +370,8 @@ contains
        call app_log(APP_ERROR,'cpg_sort_key_by_levels: unsorted_keys list is empty')
          return
     endif
-    if(l_verbose_L)write(6,'("There are ",i8," unsorted levels")')nkns
+    write(app_msg,*) 'There are ',nkns,' unsorted levels'
+    call app_log(APP_INFO,app_msg)
     allocate(keys(nkns),hyb(nkns),ip1s(nkns),stat=ier)
     if (ier /= 0)then
       call app_log(APP_ERROR,'cpg_sort_key_by_levels: allocation problem 1 in cpg_sort_key_by_levels')
@@ -531,7 +521,7 @@ contains
          return    
     end select
     !
-    if(l_verbose_L)then
+    if(app_loglevel('').gt.1)then
        write(app_msg,*) 'There are ',nks,' sorted levels'
        call app_log(APP_INFO,app_msg)
        if(l_sort_as_kind.ne.-1) then
@@ -663,17 +653,15 @@ contains
     endif
     ier = vgd_get(cpg_vgd,"KIND",kind)
     if(cpg_sort_key_by_levels(sorted_keys,unsorted_keys(1:infon),&
-         remove_duplicate_L=.true.,verbose_L=cpg_verbose_L,&
+         remove_duplicate_L=.true.,&
          only_kind=kind,sorted_ip1s=ip1s_m) == VGD_ERROR)return
-    if(cpg_verbose_L) then
-      write(app_msg,*) 'List of momentum ip1s',ip1s_m
-      call app_log(APP_INFO,app_msg)
-    endif
+    write(app_msg,*) 'List of momentum ip1s',ip1s_m
+    call app_log(APP_INFO,app_msg)
+
     nk = size(ip1s_m)
-    if(cpg_verbose_l) then
-      write(app_msg,*) 'computing 3d pressure'
-      call app_log(APP_INFO,app_msg)
-    endif
+    write(app_msg,*) 'computing 3d pressure'
+    call app_log(APP_INFO,app_msg)
+
     gz%nomvar="gz"
     ier = cpg_cp_params(prm,p0)
     prm%ip1=12000
@@ -784,17 +772,14 @@ contains
 
     ! get all momentum ip1s
     if( vgd_get(cpg_vgd,"vipm - level ip1 list (m)", ip1s_m) == vgd_error)return
-    if(cpg_verbose_L) then
-      write(app_msg,*) 'List of momentum ip1s',ip1s_m
-      call app_log(APP_INFO,app_msg)
-    endif
+    write(app_msg,*) 'List of momentum ip1s',ip1s_m
+    call app_log(APP_INFO,app_msg)
 
     ! get all thermo ip1s
     if( vgd_get(cpg_vgd,"vipt - level ip1 list (t)", ip1s_t) == vgd_error)return
-    if(cpg_verbose_L) then
-      write(app_msg,*) 'List of thermo ip1s_t',ip1s_t
-      call app_log(APP_INFO,app_msg)
-    endif
+    write(app_msg,*) 'List of thermo ip1s_t',ip1s_t
+    call app_log(APP_INFO,app_msg)
+
     ! For vcode 5002, there are nk+t dynamic temperature, there are nk+2 ip1s_t counting 
     !                 the diag level. This last level is not
     !                 used for computing gz.
@@ -830,10 +815,8 @@ contains
       write(app_msg,*) 'error in get_gz_5002_5005_5100, cannot allocate wa, wb and gztof size ->',prm%ni,' x',prm%nj
       call app_log(APP_ERROR,app_msg)
     end if
-    if(cpg_verbose_L) then
-      write(app_msg,*) 'computing 3d pressure'
-      call app_log(APP_INFO,app_msg)
-    endif
+    write(app_msg,*) 'computing 3d pressure'
+    call app_log(APP_INFO,app_msg)
 
     gz%nomvar="gz"
     ier = cpg_cp_params(prm,p0)    
@@ -1271,16 +1254,14 @@ contains
     endif
     ! get all momentum ip1s
     if( vgd_get(cpg_vgd,"vipm - level ip1 list (m)", ip1s_m) == vgd_error)return
-    if(cpg_verbose_L) then
-      write(app_msg,*) 'List of momentum ip1s',ip1s_m
-      call app_log(APP_INFO,app_msg)
-    endif
+    write(app_msg,*) 'List of momentum ip1s',ip1s_m
+    call app_log(APP_INFO,app_msg)
+    
     ! get all thermo ip1s
     if( vgd_get(cpg_vgd,"vipt - level ip1 list (t)", ip1s_t) == vgd_error)return
-    if(cpg_verbose_L) then
-      write(app_msg,*) 'List of thermo ip1s_t',ip1s_t
-      call app_log(APP_INFO,app_msg)
-    endif
+    write(app_msg,*) 'List of thermo ip1s_t',ip1s_t
+    call app_log(APP_INFO,app_msg)
+
     ! For vcode 21001, there are nk dynamic temperature, 
     !                  there are nk+2 ip1s_t counting hyb=1.0 and diag levels, these 
     !                  last 2 levels are not used for computing gz.
@@ -1297,10 +1278,10 @@ contains
       write(app_msg,*) 'cpg_get_px_21001: cannot allocate wa, wb, vt%data, pxtsize ->',prm%ni,' x',prm%nj, 'x 1'
       call app_log(APP_ERROR,app_msg)
     endif
-    if(cpg_verbose_L) then 
-      write(app_msg,*) 'Computing 3d pressure for Vcode ',vcode
-      call app_log(APP_INFO,app_msg)
-    endif
+
+    write(app_msg,*) 'Computing 3d pressure for Vcode ',vcode
+    call app_log(APP_INFO,app_msg)
+
     gz%nomvar="gz"
     prm%ip1=ip1_sfc
     !ier=cpg_print_prm(prm)
@@ -1402,7 +1383,7 @@ program compute_pressure_gz
    use app
    use vGrid_Descriptors, only: vgd_new,vgd_print,vgd_get,VGD_PRES_TYPE,VGD_HEIGHT_TYPE,VGD_OK,VGD_ERROR
   use mod_comp_pres_gz, only: cpg_process_arguments,cpg_lui,cpg_luo,cpg_samefile_L,cpg_compute_gz_L,&
-       cpg_get_vgd_levels,cpg_vgd,cpg_kind,cpg_version,cpg_verbose_L,cpg_levels_S,cpg_is_pressure_L,&
+       cpg_get_vgd_levels,cpg_vgd,cpg_kind,cpg_version,cpg_levels_S,cpg_is_pressure_L,&
        cpg_get_px_gz
   implicit none
   integer :: stat,coor_type, fstfrm
@@ -1411,6 +1392,7 @@ program compute_pressure_gz
 !==========================================================================
 app_ptr=app_init(0,'r.compute_pressure_gz',version,'',BUILD_TIMESTAMP)
 call app_liblist('vgrid',VERSION)
+call app_liblist('tdpack',HAVE_TDPACK)
 call app_start()
 !==========================================================================
 
@@ -1427,7 +1409,7 @@ call app_start()
      stat=app_end(-1)
      error stop
   endif
-  if(cpg_verbose_L)then
+  if(app_loglevel('').gt.1)then
      if(vgd_print(cpg_vgd) == VGD_ERROR)then
         stat=app_end(-1)
         error stop
