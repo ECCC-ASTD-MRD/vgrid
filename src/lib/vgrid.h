@@ -17,7 +17,6 @@
 extern float VGD_STDA76_SFC_T;
 extern float VGD_STDA76_SFC_P;
 
-
 typedef struct VGD_TFSTD {
    int   dateo;                 // date d'origine du champs
    int   deet;                  // duree d'un pas de temps
