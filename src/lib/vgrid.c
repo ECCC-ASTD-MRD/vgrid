@@ -116,6 +116,11 @@ static int is_option(vgrid_descriptor *self, int *table_option)
   return 0;
 }
 
+static char *vgrid_version=VERSION;
+char *vgrid_GetVersion(void) {
+     return(vgrid_version);
+}
+
 int Cvgd_is_valid(vgrid_descriptor *self, char *valid_table_name)
 {
   if(! self){
