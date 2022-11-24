@@ -32,3 +32,4 @@ install(TARGETS vgrid vgridshared
   LIBRARY       DESTINATION lib
   ARCHIVE       DESTINATION lib)
 install(FILES ${PROJECT_MODULE_FILES} DESTINATION include)
+ec_install_symlink(./lib${NAME}a ${CMAKE_INSTALL_PREFIX}/lib/lib${NAME}_${PROJECT_VERSION}.a)
