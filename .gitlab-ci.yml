@@ -429,6 +429,7 @@ build:ubuntu-20.04-amd64_gnu-9.3.0:
       - set +e
       - source ~/ci-env/latest/ubuntu-20.04-amd-64/gnu-9.3.0.sh
       - export ORDENV_PLAT=ubuntu-20.04-amd64-64
+      - . r.load.dot ${ECCI_PROCESS_SSM}/libs
       - set -e
       - mkdir build_ubuntu-20.04-amd64_gnu-9.3.0
       - cd build_ubuntu-20.04-amd64_gnu-9.3.0
@@ -454,6 +455,7 @@ test:ubuntu-20.04-amd64_gnu-9.3.0:
    script:
       - set +e
       - source ~/ci-env/latest/ubuntu-20.04-amd-64/gnu-9.3.0.sh
+      - . r.load.dot ${ECCI_PROCESS_SSM}/libs ${ECCI_PROCESS_SSM}/utils
       - export ORDENV_PLAT=ubuntu-20.04-amd64-64
       - set -e
       - cd build_ubuntu-20.04-amd64_gnu-9.3.0
@@ -477,6 +479,7 @@ package:ubuntu-20.04-amd64_gnu-9.3.0:
    script:
       - set +e
       - source ~/ci-env/latest/ubuntu-20.04-amd-64/gnu-9.3.0.sh
+      - . r.load.dot ${ECCI_PROCESS_SSM}/libs
       - set -e
       - cd build_ubuntu-20.04-amd64_gnu-9.3.0
       - make package
