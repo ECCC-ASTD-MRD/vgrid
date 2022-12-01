@@ -25,7 +25,6 @@ module vgrid_utils
 
    ! Public utilities
    public :: get_allocate                        !allocation of array values
-   public :: get_error,put_error                 !get/put error messaging 
    public :: same_vec                            !check for equivalence of arrays
    public :: up                                  !convert string to upper-case
 
@@ -66,7 +65,6 @@ contains
       character(len=*) :: msg_S
       !Local variables
       logical :: alloc_lev_L   
-      external msg
       istat=-1
       alloc_lev_L=.false.
       if(.not.associated(value))then
@@ -107,7 +105,6 @@ contains
       character(len=*) :: msg_S
       !Local variables
       logical :: alloc_lev_L
-      external msg
       istat=-1
       alloc_lev_L=.false.
       if(.not.associated(value))then
@@ -148,7 +145,6 @@ contains
       character(len=*) :: msg_S
       !Local variables
       logical :: alloc_lev_L
-      external msg
       istat=-1
       alloc_lev_L=.false.
       if(.not.associated(value))then
@@ -284,7 +280,6 @@ contains
     character(len=*), intent(in) :: string      !Input string to upper-case
     character(len=LONG_STRING) :: upper_string  !Upper-cased result
     integer :: i
-    external msg
     if (len_trim(string) > len(upper_string)) then
        write(app_msg,*) 'Long string truncated in up() ',trim(string)
        call Lib_Log(APP_WARNING,APP_LIBVGRID,app_msg)       
@@ -308,7 +303,6 @@ contains
     character(len=*) :: msg_S
     !Local variables
     logical :: alloc_lev_L
-    external msg
     istat=-1
     if (size(len) < 3) then
        write(app_msg,*) 'wrong array shape specified for '//trim(key_S)
@@ -356,7 +350,7 @@ contains
     character(len=*) :: msg_S
     !Local variables
     logical :: alloc_lev_L
-    external msg
+
     istat=-1
     if (size(len) < 3) then
        write(app_msg,*) 'wrong array shape specified for '//trim(key_S)
@@ -393,35 +387,5 @@ contains
        istat=0
     endif
  end function get_allocate_r83d
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!! Get/Put support functions
-  
-  real function get_error(key,quiet) result(value)
-    ! Write error message and return a missing value     
-    implicit none
-    character(len=*), intent(in) :: key
-    logical, optional, intent(in) :: quiet      !Do not print massages
-    ! Local variables
-    integer :: level_msg
-    external msg
-    level_msg=APP_ERROR
-    if (present(quiet)) then
-       if(quiet)level_msg=APP_QUIET    
-    endif
-    write(app_msg,*) 'Attempt to retrieve invalid key '//trim(key)//' returns VGD_MISSING'
-    call Lib_Log(level_msg,APP_LIBVGRID,app_msg)       
-    value = dble(VGD_MISSING)
-    return
-  end function get_error
-
-  integer function put_error(key) result(error)
-    character(len=*), intent(in) :: key
-    external msg
-    write(app_msg,*) 'WARNING: attempt to set useless value for '//trim(key)
-    call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
-    error = VGD_ERROR
-    return
-  end function put_error
 
 end module vgrid_utils

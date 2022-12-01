@@ -240,19 +240,15 @@ contains
     status = VGD_OK
   end function cpg_cp_params
   !===================================================================================
-  integer function cpg_get_rec(F_f, F_lui, match_prm, quiet) result(status)
+  integer function cpg_get_rec(F_f, F_lui, match_prm) result(status)
     type(cpg_rpn) :: F_f
     integer, intent(in) :: F_lui
     type(cpg_rpn), optional :: match_prm
-    logical, optional :: quiet
     ! Local variables      
     integer, dimension(1000) :: keyList
     integer :: fstinl, ni, nj, nk, count, ier, fstluk
     type(cpg_rpn) :: prm
-    logical :: my_quiet
     status = VGD_ERROR
-    my_quiet=.false.
-    if(present(quiet))my_quiet=quiet
     if( present(match_prm) )then
        ier = cpg_cp_params(prm,match_prm)
     else
@@ -264,10 +260,8 @@ contains
        return
     endif
     if( count .eq. 0 )then
-       if(.not.my_quiet)then
-          write(app_msg,*) 'cpg_get_rec, no ', F_f%nomvar,' in input file with the following research key: datev = ',prm%datev,', etiket = ',prm%etiket,',ip1 2 3 = ', prm%ip1, prm%ip2, prm%ip3
-          call app_log(APP_ERROR,app_msg)
-      endif
+       write(app_msg,*) 'cpg_get_rec, no ', F_f%nomvar,' in input file with the following research key: datev = ',prm%datev,', etiket = ',prm%etiket,',ip1 2 3 = ', prm%ip1, prm%ip2, prm%ip3
+       call app_log(APP_ERROR,app_msg)
        return
     endif
     if( count > 1 )then
@@ -839,7 +833,7 @@ contains
     vt_L = .true.
     ier = cpg_cp_params(prm,p0)
     prm%ip1=ip1s_t(1+kp);
-    if( cpg_get_rec(vt, cpg_lui, match_prm=prm, quiet=.true.) == VGD_ERROR )then
+    if( cpg_get_rec(vt, cpg_lui, match_prm=prm) == VGD_ERROR )then
        vt_L = .false.
     endif
     
@@ -1107,7 +1101,7 @@ contains
        endif
        work=record%data
        if(trim(nomvar) == "P0")record%data=record%data*100.       
-       ier=vgd_get(cpg_vgd,'RFLS - large scale reference field name',value=nomvar_ls,quiet=.true.)         
+       ier=vgd_get(cpg_vgd,'RFLS - large scale reference field name',value=nomvar_ls)         
        if(nomvar_ls == VGD_NO_REF_NOMVAR)then
           if(associated(p0ls))deallocate(p0ls)
        else
@@ -1228,7 +1222,7 @@ contains
       call app_log(APP_ERROR,app_msg)
        return
     endif
-    ier=vgd_get(cpg_vgd,"RFLS",refls_name,quiet=.true.)
+    ier=vgd_get(cpg_vgd,"RFLS",refls_name)
     sleve_L = .not. (trim(refls_name) == trim(VGD_NO_REF_NOMVAR))
     me%nomvar="ME"
     if( cpg_get_rec(me, cpg_lui) == VGD_ERROR ) return

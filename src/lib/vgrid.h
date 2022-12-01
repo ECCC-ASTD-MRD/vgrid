@@ -144,16 +144,16 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
 int Cvgd_vgdcmp(vgrid_descriptor *vgd1, vgrid_descriptor *vgd2);
 int Cvgd_vgdcmp_no_ip1_check(vgrid_descriptor *vgd1, vgrid_descriptor *vgd2);
 void Cvgd_free(vgrid_descriptor **self);
-int Cvgd_getopt_int(char *key, int *value, int quiet);
-int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet);
-int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk, int quiet);
-int Cvgd_get_float(vgrid_descriptor *self, char *key, float *value, int quiet);
-int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk, int quiet);
+int Cvgd_getopt_int(char *key, int *value);
+int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value);
+int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk);
+int Cvgd_get_float(vgrid_descriptor *self, char *key, float *value);
+int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk);
 int Cvgd_put_double(vgrid_descriptor **self, char *key, double value_put);
-int Cvgd_get_double(vgrid_descriptor *self, char *key, double *value_get, int quiet);
-int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *nk, int quiet);
-int Cvgd_get_double_3d(vgrid_descriptor *self, char *key, double **value, int *ni, int *nj, int *nk, int quiet);
-int Cvgd_get_char(vgrid_descriptor *self, char *key, char out[], int quiet);
+int Cvgd_get_double(vgrid_descriptor *self, char *key, double *value_get);
+int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *nk);
+int Cvgd_get_double_3d(vgrid_descriptor *self, char *key, double **value, int *ni, int *nj, int *nk);
+int Cvgd_get_char(vgrid_descriptor *self, char *key, char out[]);
 int Cvgd_put_char(vgrid_descriptor **self, char *key, char *value);
 int Cvgd_putopt_int(char *key, int value);
 int Cvgd_put_int(vgrid_descriptor **self, char *key, int value);
@@ -183,8 +183,8 @@ int Cvgd_new_gen_21002(vgrid_descriptor **self, float *hyb, int size_hyb, float 
 int Cvgd_new_gen_21002_2(vgrid_descriptor **self, float *hyb, int size_hyb, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, float dhw, float hyb_flat);
 
 int Cvgd_new_read(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind, int version);
-int Cvgd_new_read2(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind, int version, int quiet);
-int Cvgd_new_read3(vgrid_descriptor **self, int unit, int datev, char *etiket, int ip1, int ip2, int ip3, int kind, int version, int quiet);
+int Cvgd_new_read2(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind, int version);
+int Cvgd_new_read3(vgrid_descriptor **self, int unit, int datev, char *etiket, int ip1, int ip2, int ip3, int kind, int version);
 int Cvgd_write_desc (vgrid_descriptor *self, int unit);
 int Cvgd_new_from_table(vgrid_descriptor **self, double *table, int ni, int nj, int nk);
 int Cvgd_stda76_temp(vgrid_descriptor *self, int *i_val, int nl_t, float *temp);

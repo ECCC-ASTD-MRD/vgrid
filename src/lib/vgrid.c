@@ -290,13 +290,6 @@ static int max_int(int *vec, int ni) {
   return(vec[ind]);
 }
 
-static double c_get_error(char *key, int quiet) {
-  if (! quiet) {
-    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: attempt to retrieve invalid key %s\n",__func__,key);
-  }
-  return(VGD_MISSING);
-}
-
 void c_hypsometric (float *pkp, float pk, float Tk, float gammaT, float zk, float zkp){
   // Compute pressure pkp which is at top of the following atmopheric layer
   //
@@ -4903,25 +4896,23 @@ static int c_vgrid_genab_21002(float *hybuser, int nk, int *nl_m, int *nl_t, int
 
 }
 
-int Cvgd_getopt_int(char *key, int *value, int quiet)
+int Cvgd_getopt_int(char *key, int *value)
 {
-  if(! value){
+  if (!value){
     Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: value is a NULL pointer\n",__func__);
     return(VGD_ERROR);
   }
   if (strcmp(key, "ALLOW_SIGMA") == 0){
       *value = ALLOW_SIGMA;
   } else {
-    if(! quiet) {
-      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key %s\n",__func__,key);
-    }
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key %s\n",__func__,key);
     return(VGD_ERROR);
   }  
   
   return(VGD_OK);
 }
 
-int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet)
+int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value)
 {  
   if(! Cvgd_is_valid(self,"SELF")){
     Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid vgrid\n",__func__);
@@ -4962,28 +4953,19 @@ int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet)
     *value = self->rec.ip3;
   } else if (strcmp(key, "DIPM") == 0){
     if( ! Cvgd_is_valid(self,"dhm_valid") ){      
-      if(! quiet) {
-	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot get key %s\n",__func__,key);
-	fflush(stdout);
-      }
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot get key %s\n",__func__,key);
       return(VGD_ERROR);
     }
     *value = self->ip1_m[self->nl_m -1];
   } else if (strcmp(key, "DIPT") == 0){
     if( ! Cvgd_is_valid(self,"dht_valid") ){      
-      if(! quiet) {
-	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot get key %s\n",__func__,key);
-	fflush(stdout);
-      }
+	    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot get key %s\n",__func__,key);
       return(VGD_ERROR);
     }
     *value = self->ip1_t[self->nl_t -1];
   } else if (strcmp(key, "DIPW") == 0){
     if( ! Cvgd_is_valid(self,"dhw_valid") ){      
-      if(! quiet) {
-	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot get key %s\n",__func__,key);
-	fflush(stdout);
-      }
+	    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot get key %s\n",__func__,key);
       return(VGD_ERROR);
     }
     *value = self->ip1_w[self->nl_w -1];
@@ -5017,9 +4999,7 @@ int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet)
       return(VGD_ERROR);
     }
   } else {
-    if(! quiet) {
-      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key %s\n",__func__,key);
-    }
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key %s\n",__func__,key);
     return(VGD_ERROR);
   }
   
@@ -5027,7 +5007,7 @@ int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet)
 
 }
 
-int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk, int quiet)
+int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk)
 {
   int OK = 1;
   if(nk) *nk = -1;
@@ -5093,17 +5073,14 @@ int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk, int
     OK = 0;
   }
   if(! OK) {
-    if(! quiet) {
-      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key '%s' for Vcode %d\n",__func__,key,self->vcode);
-      fflush(stdout);
-    }
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key '%s' for Vcode %d\n",__func__,key,self->vcode);
     return(VGD_ERROR);    
   }
   return(VGD_OK);
 
 }
 
-int Cvgd_get_float(vgrid_descriptor *self, char *key, float *value, int quiet) {
+int Cvgd_get_float(vgrid_descriptor *self, char *key, float *value) {
 
   if(! Cvgd_is_valid(self,"SELF")){
     Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid vgrid\n",__func__);
@@ -5114,59 +5091,58 @@ int Cvgd_get_float(vgrid_descriptor *self, char *key, float *value, int quiet) {
     return(VGD_ERROR);
   }  
 
+  *value = (float)VGD_MISSING;
   if( strcmp(key, "RC_1" ) == 0 ){    
     if( is_valid(self,rcoef1_valid) ){
       *value = self->rcoef1;
     } else {
-      *value = (float) c_get_error(key,quiet);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: attempt to retrieve invalid key %s\n",__func__,key);
     }
   } else  if( strcmp(key, "RC_2" ) == 0 ){
     if( is_valid(self,rcoef2_valid) ){
       *value = self->rcoef2;
     } else {
-      *value = (float) c_get_error(key,quiet);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: attempt to retrieve invalid key %s\n",__func__,key);
     }
   } else  if( strcmp(key, "RC_3" ) == 0 ){
     if( is_valid(self,rcoef3_valid) ){
       *value = self->rcoef3;
     } else {
-      *value = (float) c_get_error(key,quiet);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: attempt to retrieve invalid key %s\n",__func__,key);
     }
   } else  if( strcmp(key, "RC_4" ) == 0 ){
     if( is_valid(self,rcoef4_valid) ){
       *value = self->rcoef4;
     } else {
-      *value = (float) c_get_error(key,quiet);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: attempt to retrieve invalid key %s\n",__func__,key);
     }
   } else  if( strcmp(key, "DHM " ) == 0 ){
     if( is_valid(self,dhm_valid) ){
       *value = self->dhm;
     } else {
-      *value = (float) c_get_error(key,quiet);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: attempt to retrieve invalid key %s\n",__func__,key);
     }
   } else  if( strcmp(key, "DHT " ) == 0 ){
     if( is_valid(self,dht_valid) ){
       *value = self->dht;
     } else {
-      *value = (float) c_get_error(key,quiet);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: attempt to retrieve invalid key %s\n",__func__,key);
     }
   } else  if( strcmp(key, "DHW " ) == 0 ){
     if( is_valid(self,dhw_valid) ){
       *value = self->dhw;
     } else {
-      *value = (float) c_get_error(key,quiet);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: attempt to retrieve invalid key %s\n",__func__,key);
     }
   } else {
-    if(! quiet) {
-      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key '%s'\n",__func__,key);
-    }
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key '%s'\n",__func__,key);
     return(VGD_ERROR);
   }
   return(VGD_OK);
 
 }
 
-int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk, int quiet)
+int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk)
 {
   char key2[5];
   int *vip1=NULL, kind, k, OK = 1;
@@ -5185,7 +5161,7 @@ int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk,
 	}
       }    
       strcpy(key2,"VIPM");
-      Cvgd_get_int_1d(self, key2, &vip1, NULL, quiet);
+      Cvgd_get_int_1d(self, key2, &vip1, NULL);
       for(k = 0; k < self->nl_m; k++){
 	(*value)[k] = c_convip_IP2Level(vip1[k], &kind);
       }
@@ -5203,7 +5179,7 @@ int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk,
       }
     }  
     strcpy(key2,"VIPT");
-    Cvgd_get_int_1d(self, key2, &vip1, NULL, quiet);
+    Cvgd_get_int_1d(self, key2, &vip1, NULL);
     for(k = 0; k < self->nl_t; k++){
       (*value)[k] = c_convip_IP2Level(vip1[k], &kind);
     }    
@@ -5218,7 +5194,7 @@ int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk,
       }
     }  
     strcpy(key2,"VIPW");
-    Cvgd_get_int_1d(self, key2, &vip1, NULL, quiet);
+    Cvgd_get_int_1d(self, key2, &vip1, NULL);
     for(k = 0; k < self->nl_w; k++){
       (*value)[k] = c_convip_IP2Level(vip1[k], &kind);
     }    
@@ -5228,15 +5204,13 @@ int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk,
     OK = 0;
   }
   if(! OK){
-    if(! quiet) {
-      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key '%s' for vcode %d\n",__func__,key, self->vcode);
-    }
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key '%s' for vcode %d\n",__func__,key, self->vcode);
     return(VGD_ERROR);    
   }
   return(VGD_OK);
 }
 
-int Cvgd_get_double(vgrid_descriptor *self, char *key, double *value_get, int quiet) {
+int Cvgd_get_double(vgrid_descriptor *self, char *key, double *value_get) {
   int OK = 1;
   if(! Cvgd_is_valid(self,"SELF")){
     Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid vgrid\n",__func__);
@@ -5261,24 +5235,19 @@ int Cvgd_get_double(vgrid_descriptor *self, char *key, double *value_get, int qu
     if(! is_valid(self, rcoef4_valid)) OK = 0;
     *value_get = (self)->rcoef4;
   } else {
-    if(! quiet) {
-      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key '%s'\n",__func__,key);
-      fflush(stdout);
-    }
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key '%s'\n",__func__,key);
     return(VGD_ERROR);
   }
   
   if(! OK) {
-    if(! quiet) {
-      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: %s cannot get for Vcode %d\n",__func__,key,(self)->vcode);
-    }
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: %s cannot get for Vcode %d\n",__func__,key,(self)->vcode);
     return(VGD_ERROR);
   }    
   
   return(VGD_OK);
 }
 
-int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *nk, int quiet)
+int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *nk)
 {
   int OK = 1;
   if(nk) *nk = -1;
@@ -5410,10 +5379,7 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     OK = 0;
   }    
   if( ! OK) {
-    if(! quiet) {
-      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key '%s' for vcode %d\n",__func__,key,self->vcode);
-      fflush(stdout);
-    }
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key '%s' for vcode %d\n",__func__,key,self->vcode);
     return(VGD_ERROR);
   }
 
@@ -5421,7 +5387,7 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
 
 }
 
-int Cvgd_get_double_3d(vgrid_descriptor *self, char *key, double **value, int *ni, int *nj, int *nk, int quiet)
+int Cvgd_get_double_3d(vgrid_descriptor *self, char *key, double **value, int *ni, int *nj, int *nk)
 {
   if(ni) *ni = -1;
   if(nj) *nj = -1;
@@ -5444,17 +5410,14 @@ int Cvgd_get_double_3d(vgrid_descriptor *self, char *key, double **value, int *n
     if(nj) *nj = self->table_nj;
     if(nk) *nk = self->table_nk;
   } else {
-    if(! quiet) {
-      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key '%s'\n",__func__,key);
-      fflush(stdout);
-    }
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key '%s'\n",__func__,key);
     return(VGD_ERROR);
   }
 
   return(VGD_OK);
 }
 
-int Cvgd_get_char(vgrid_descriptor *self, char *key, char out[], int quiet) {
+int Cvgd_get_char(vgrid_descriptor *self, char *key, char out[]) {
   char ok = 1;
   if(! Cvgd_is_valid(self,"SELF")){
     Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid vgrid structure\n",__func__);
@@ -5482,9 +5445,7 @@ int Cvgd_get_char(vgrid_descriptor *self, char *key, char out[], int quiet) {
     ok = 0;
   }
   if(! ok ){
-    if(! quiet){
-      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key -> '%s'\n",__func__,key);
-    }
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key -> '%s'\n",__func__,key);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -6271,7 +6232,7 @@ static int C_gen_legacy_desc(vgrid_descriptor **self, int unit, int *keylist , i
 
 }
 
-static int c_legacy(vgrid_descriptor **self, int unit, int F_kind, int quiet) {
+static int c_legacy(vgrid_descriptor **self, int unit, int F_kind) {
   // Construct vertical structure from legacy encoding (PT,HY...)
 
   int error, ni, nj, nk, nip1, i, j, k, kind, nb_kind=100, aa, nb;
@@ -6284,9 +6245,7 @@ static int c_legacy(vgrid_descriptor **self, int unit, int F_kind, int quiet) {
     num_in_kind[i] = 0;
   }
   
-  if(! quiet) {
-    App_Log(APP_INFO,"%s: Looking for kind = %d\n",__func__,F_kind);
-  }
+  App_Log(APP_INFO,"%s: Looking for kind = %d\n",__func__,F_kind);
 
   error = c_fstinl(unit, &ni, &nj, &nk, -1, " ", -1, -1, -1, " ", " ", keylist, &count, nkeylist);
   if (error < 0) {
@@ -6383,9 +6342,7 @@ static int c_legacy(vgrid_descriptor **self, int unit, int F_kind, int quiet) {
     }
   }
   if( nb == 0){
-    if(! quiet) {
-      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: No record of type pressure/sigma/hyb in file\n",__func__);
-    }
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: No record of type pressure/sigma/hyb in file\n",__func__);
     return(VGD_ERROR);
   }
   App_Log(APP_INFO,"%s: Found %d unique ip1 of kind %d among the %d records in file to construct the vertical descriptor\n",__func__,nb,valid_kind,count);
@@ -6400,13 +6357,13 @@ static int c_legacy(vgrid_descriptor **self, int unit, int F_kind, int quiet) {
 }
 
 int Cvgd_new_read(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind, int version) {
-  return Cvgd_new_read3(self, unit, -1, " ", ip1, ip2, -1, kind, version, 0);
+  return Cvgd_new_read3(self, unit, -1, " ", ip1, ip2, -1, kind, version);
 }
-int Cvgd_new_read2(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind, int version, int quiet) {
-  return Cvgd_new_read3(self, unit, -1, " ", ip1, ip2, -1 , kind, version, quiet);
+int Cvgd_new_read2(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind, int version) {
+  return Cvgd_new_read3(self, unit, -1, " ", ip1, ip2, -1 , kind, version);
 }
 
-int Cvgd_new_read3(vgrid_descriptor **self, int unit, int datev, char *etiket, int ip1, int ip2, int ip3, int kind, int version, int quiet) {
+int Cvgd_new_read3(vgrid_descriptor **self, int unit, int datev, char *etiket, int ip1, int ip2, int ip3, int kind, int version) {
   
   char  match_ipig;
   int error, i, ni, nj, nk;
@@ -6439,20 +6396,14 @@ int Cvgd_new_read3(vgrid_descriptor **self, int unit, int datev, char *etiket, i
     return(VGD_ERROR);
   }
   if(count == 0){
-    if(! quiet) {
-      Lib_Log(APP_WARNING,APP_LIBVGRID,"%s: Cannot find %s with the following datev=%d, etiket=%s, ip1=%d, ip2=%d, ip3=%d\n",__func__,ZNAME,datev,etiket,ip1,ip2,ip3);
-    }
+    Lib_Log(APP_WARNING,APP_LIBVGRID,"%s: Cannot find %s with the following datev=%d, etiket=%s, ip1=%d, ip2=%d, ip3=%d\n",__func__,ZNAME,datev,etiket,ip1,ip2,ip3);
     if(match_ipig) {
       (*self)->vcode = -1;
       return(VGD_ERROR);
     }
-    if(! quiet) {
-      Lib_Log(APP_WARNING,APP_LIBVGRID,"%s: Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)\n",__func__);
-    }
-    if(c_legacy(self,unit,kind,quiet) == VGD_ERROR){
-      if(! quiet) {
-	       Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: failed to construct vgrid descriptor from legacy encoding\n",__func__);
-      }
+    Lib_Log(APP_WARNING,APP_LIBVGRID,"%s: Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)\n",__func__);
+    if(c_legacy(self,unit,kind) == VGD_ERROR){
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: failed to construct vgrid descriptor from legacy encoding\n",__func__);
       return(VGD_ERROR);      
     }
     if(fstd_init(*self) == VGD_ERROR) {
@@ -6495,20 +6446,16 @@ int Cvgd_new_read3(vgrid_descriptor **self, int unit, int datev, char *etiket, i
       }
       status = Cvgd_vgdcmp(*self,self2);
       if ( status != 0 ){
-	if(! quiet){
-	  Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: found different entries in vertical descriptors after search on datev=%d, etiket=%s, ip1=%d, ip2=%d, ip3=%d, kind=%d, version=%d, status code is %d\n",__func__,datev,etiket,ip1,ip2,ip3,kind,version,status);
-	}
-	return(VGD_ERROR);
+	      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: found different entries in vertical descriptors after search on datev=%d, etiket=%s, ip1=%d, ip2=%d, ip3=%d, kind=%d, version=%d, status code is %d\n",__func__,datev,etiket,ip1,ip2,ip3,kind,version,status);
+  	    return(VGD_ERROR);
       }
       // TODO verifier si ce Cvgd_free est correct 
       Cvgd_free(&self2);
     } // Loop in !!
     if(! toc_found){
-      if(c_legacy(self,unit,kind,quiet) == VGD_ERROR){
-	if(! quiet) {
-	  Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: failed to construct vgrid descriptor from legacy encoding\n",__func__);
-	}
-	return(VGD_ERROR);
+      if(c_legacy(self,unit,kind) == VGD_ERROR){
+	      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: failed to construct vgrid descriptor from legacy encoding\n",__func__);
+	      return(VGD_ERROR);
       }
       toc_found = 1;
     }
@@ -6574,7 +6521,7 @@ int Cvgd_stda76_temp(vgrid_descriptor *self, int *i_val, int nl, float *temp){
     return(VGD_ERROR);
   }
   
-  if( Cvgd_get_int(self, "VCOD", &vcode, 1) == VGD_ERROR ){
+  if( Cvgd_get_int(self, "VCOD", &vcode) == VGD_ERROR ){
     return(VGD_ERROR);
   };
   if(! strcmp((*self).ref_name,"ME  ") || vcode == 4001 ){
