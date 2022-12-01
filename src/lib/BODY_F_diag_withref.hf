@@ -24,8 +24,8 @@
       status = VGD_ERROR
       
       if(.not.is_valid(self,'SELF'))then
-         write(for_app,*) 'vgrid structure is not valid in diag_withref'//PROC_SUFF
-         call app_log(APP_ERROR,VGD_PRFX//for_app)       
+         write(app_msg,*) 'vgrid structure is not valid in diag_withref'//PROC_SUFF
+         call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
          return
       endif
       
@@ -64,8 +64,8 @@
             alloc_my_sfc_field_L = .true.
             allocate(my_sfc_field(ni,nj),stat=error)
             if (error /= 0) then
-               write(for_app,*) 'cannot allocate space for my_sfc_field in diag_withref'//PROC_SUFF
-               call app_log(APP_ERROR,VGD_PRFX//for_app)       
+               write(app_msg,*) 'cannot allocate space for my_sfc_field in diag_withref'//PROC_SUFF
+               call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
                return
             endif
             my_sfc_field(1:ni,1:nj) = sfc_field(1:ni,1:nj)
@@ -76,8 +76,8 @@
 
       else
          if (is_valid(self,"ref_name_valid")) then
-            write(for_app,*) 'reference field must be provided to diag_withref'//PROC_SUFF
-            call app_log(APP_ERROR,VGD_PRFX//for_app)       
+            write(app_msg,*) 'reference field must be provided to diag_withref'//PROC_SUFF
+            call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
             return
          else
             ni = 1; nj = 1; nk = size(ip1_list)
@@ -87,8 +87,8 @@
       if (present(sfc_field_ls)) then
          if(  ni /= size(sfc_field_ls,dim=1) .or. &
               nj /= size(sfc_field_ls,dim=2) )then
-            write(for_app,*) 'reference large scale field is not of same size has reference field'
-            call app_log(APP_ERROR,VGD_PRFX//for_app)       
+            write(app_msg,*) 'reference large scale field is not of same size has reference field'
+            call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
             return
          endif
 
@@ -102,8 +102,8 @@
             alloc_my_sfc_field_ls_L = .true.
             allocate(my_sfc_field_ls(ni,nj),stat=error)
             if (error /= 0) then
-               write(for_app,*) 'cannot allocate space for my_sfc_field_ls in diag_withref'//PROC_SUFF
-               call app_log(APP_ERROR,VGD_PRFX//for_app)       
+               write(app_msg,*) 'cannot allocate space for my_sfc_field_ls in diag_withref'//PROC_SUFF
+               call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
                return
             endif
             my_sfc_field_ls(1:ni,1:nj) = sfc_field_ls(1:ni,1:nj)
@@ -113,20 +113,20 @@
 #endif
       else
          if (is_valid(self,"ref_namel_valid") .and. .not. my_dpidpis) then
-            write(for_app,*) 'reference large scale field must be provided to diag_withref'//PROC_SUFF
-            call app_log(APP_ERROR,VGD_PRFX//for_app)       
+            write(app_msg,*) 'reference large scale field must be provided to diag_withref'//PROC_SUFF
+            call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
             return
          endif
       endif
       if (associated(levels)) then
          if (size(levels,dim=1) /= ni .or. size(levels,dim=2) /= nj .or. size(levels,dim=3) /= nk) then
             if(ALLOW_RESHAPE)then
-               write(for_app,*) 'Levels array size error - will be reallocated'
-               call app_log(APP_ERROR,VGD_PRFX//for_app)       
+               write(app_msg,*) 'Levels array size error - will be reallocated'
+               call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
                deallocate(levels)
             else
-               write(for_app,*) 'Levels array size error - will not reallocate since ALLOW_RESHAPE is set to false'
-               call app_log(APP_ERROR,VGD_PRFX//for_app)       
+               write(app_msg,*) 'Levels array size error - will not reallocate since ALLOW_RESHAPE is set to false'
+               call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
                return
             endif
          endif
@@ -134,8 +134,8 @@
       if(.not. associated(levels) )then
          allocate(levels(ni,nj,nk),stat=error)
          if (error /= 0) then
-            write(for_app,*) 'cannot allocate space for levels in diag_withref'//PROC_SUFF
-            call app_log(APP_ERROR,VGD_PRFX//for_app)       
+            write(app_msg,*) 'cannot allocate space for levels in diag_withref'//PROC_SUFF
+            call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
             return
          endif
       endif
@@ -150,8 +150,8 @@
          alloc_my_levels_L = .true.
          allocate(my_levels(ni,nj,nk),stat=error)
          if (error /= 0) then
-            write(for_app,*) 'cannot allocate space for my_levels in diag_withref'//PROC_SUFF
-            call app_log(APP_ERROR,VGD_PRFX//for_app)       
+            write(app_msg,*) 'cannot allocate space for my_levels in diag_withref'//PROC_SUFF
+            call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
             return
          endif
 
@@ -171,11 +171,11 @@
 #endif
       if (istat /= VGD_OK) then
          if(my_dpidpis)then
-            write(for_app,*) 'error computing dpidpis in diag_withref'//PROC_SUFF
-            call app_log(APP_ERROR,VGD_PRFX//for_app)       
+            write(app_msg,*) 'error computing dpidpis in diag_withref'//PROC_SUFF
+            call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
          else
-            write(for_app,*) 'error computing pressure in diag_withref'//PROC_SUFF
-            call app_log(APP_ERROR,VGD_PRFX//for_app)       
+            write(app_msg,*) 'error computing pressure in diag_withref'//PROC_SUFF
+            call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
          endif
          return
       endif

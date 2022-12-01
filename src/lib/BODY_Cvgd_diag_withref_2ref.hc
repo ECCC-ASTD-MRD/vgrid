@@ -1,13 +1,13 @@
 
   if(! Cvgd_is_valid(self,"SELF")){
-    App_Log(APP_ERROR,"%s: invalid vgrid.\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid vgrid.\n",__func__);
     return(VGD_ERROR);
   }
   
   switch(self->vcode) {
   case 1:
     if( dpidpis ){
-      App_Log(APP_ERROR,"%s: dpidpis not supported for vertical coordinate 1\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: dpidpis not supported for vertical coordinate 1\n",__func__);
       return(VGD_ERROR);
     }
     if(double_interface){
@@ -42,7 +42,7 @@
     break;
   case 2001:
     if( dpidpis ){
-      App_Log(APP_ERROR,"%s: dpidpis not implemented for vertical coordinate 2001\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: dpidpis not implemented for vertical coordinate 2001\n",__func__);
       return(VGD_ERROR);
     }
     if(double_interface){
@@ -55,11 +55,11 @@
     break;
   case 4001:
     if( dpidpis ){
-      App_Log(APP_ERROR,"%s: dpidpis not implemented for vertical coordinate 4001\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: dpidpis not implemented for vertical coordinate 4001\n",__func__);
       return(VGD_ERROR);
     }
     if( in_log ){
-      App_Log(APP_ERROR,"%s: option in_log not supported for vertical coordinate 4001\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: option in_log not supported for vertical coordinate 4001\n",__func__);
       return(VGD_ERROR);
     }
     if(double_interface){
@@ -121,7 +121,7 @@
     }
     break;
   default:
-    App_Log(APP_ERROR,"%s: invalid kind or version: kind = %d, version = %d\n",__func__,self->kind,self->version);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid kind or version: kind = %d, version = %d\n",__func__,self->kind,self->version);
     return(VGD_ERROR);
   }
   

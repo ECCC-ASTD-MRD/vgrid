@@ -124,7 +124,7 @@ char *vgrid_GetVersion(void) {
 int Cvgd_is_valid(vgrid_descriptor *self, char *valid_table_name)
 {
   if(! self){
-    App_Log(APP_ERROR,"%s: vgrid descriptor not constructed\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: vgrid descriptor not constructed\n",__func__);
     return(0);
   }
   if( strcmp(valid_table_name, "SELF") == 0 ){
@@ -180,7 +180,7 @@ int Cvgd_is_valid(vgrid_descriptor *self, char *valid_table_name)
   } else if( strcmp(valid_table_name, "is_in_logp")       == 0 ){
     return(is_valid(self,              is_in_logp));
   } else {
-    App_Log(APP_WARNING,"%s: valid_table_name '%s' does not exist\n",__func__,valid_table_name);
+    Lib_Log(APP_WARNING,APP_LIBVGRID,"%s: valid_table_name '%s' does not exist\n",__func__,valid_table_name);
     return(0);
   }
 }
@@ -188,12 +188,12 @@ int Cvgd_is_valid(vgrid_descriptor *self, char *valid_table_name)
 static int is_required_double(vgrid_descriptor *self, double *ptr, int *table_valid, char *message) {
   if( is_valid(self,table_valid)) {
     if (! ptr) {
-      App_Log(APP_ERROR,"%s: %s is a required constructor entry\n",__func__,message);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: %s is a required constructor entry\n",__func__,message);
       return(0);
     }
   } else {
     if (ptr) {
-      App_Log(APP_ERROR,"%s: %s is not a required constructor entry\n",__func__,message);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: %s is not a required constructor entry\n",__func__,message);
       return(0);
     }
   }
@@ -202,12 +202,12 @@ static int is_required_double(vgrid_descriptor *self, double *ptr, int *table_va
 static int is_required_float(vgrid_descriptor *self, float *ptr, int *table_valid, char *message) {
   if( is_valid(self,table_valid)) {
     if (! ptr) {
-      App_Log(APP_ERROR,"%s: %s is a required constructor entry\n",__func__,message);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: %s is a required constructor entry\n",__func__,message);
       return(0);
     }
   } else {
     if (ptr) {
-      App_Log(APP_ERROR,"%s: %s is not a required constructor entry\n",__func__,message);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: %s is not a required constructor entry\n",__func__,message);
       return(0);
     }
   }
@@ -217,7 +217,7 @@ static int is_required_float(vgrid_descriptor *self, float *ptr, int *table_vali
 static int my_alloc_int(int **vec, int size, char *message){
   *vec = malloc ( size * sizeof(int) );
   if(! *vec){    
-    App_Log(APP_ERROR," %s %d\n",message,size);
+    Lib_Log(APP_ERROR,APP_LIBVGRID," %s %d\n",message,size);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -226,7 +226,7 @@ static int my_alloc_int(int **vec, int size, char *message){
 static int my_alloc_float(float **vec, int size, char *message){
   *vec = malloc ( size * sizeof(float) );
   if(! *vec){    
-    App_Log(APP_ERROR," %s %d\n",message, size);
+    Lib_Log(APP_ERROR,APP_LIBVGRID," %s %d\n",message, size);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -235,7 +235,7 @@ static int my_alloc_float(float **vec, int size, char *message){
 static int my_alloc_double(double **vec, int size, char *message){
   *vec = malloc ( size * sizeof(double) );
   if(! *vec){    
-    App_Log(APP_ERROR," %s %d\n",message, size);
+    Lib_Log(APP_ERROR,APP_LIBVGRID," %s %d\n",message, size);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -292,7 +292,7 @@ static int max_int(int *vec, int ni) {
 
 static double c_get_error(char *key, int quiet) {
   if (! quiet) {
-    App_Log(APP_ERROR,"%s: attempt to retrieve invalid key %s\n",__func__,key);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: attempt to retrieve invalid key %s\n",__func__,key);
   }
   return(VGD_MISSING);
 }
@@ -338,7 +338,7 @@ static int c_set_stda_layer(int ind, float Tk, float pk, float *zk, float *zkp, 
   static float epsilon = 1.e-6;
 
   if( ind >=  STDA76_N_LAYER ){
-    App_Log(APP_ERROR,"%s: maximum layer excedded\n",__func__);    
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: maximum layer excedded\n",__func__);    
     return(VGD_ERROR);
   }
   *zero_lapse_rate = 0;
@@ -399,19 +399,19 @@ int c_stda76_temp_from_press(vgrid_descriptor *self, int *i_val, int nl, float *
   
   levs = malloc( nl * sizeof(float) );
   if(! levs){
-    App_Log(APP_ERROR,"%s: problem allocating levs\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating levs\n",__func__);
     free(levs);
     return(VGD_ERROR);
   }
   
   if(! Cvgd_is_valid(self,"ref_namel_valid") ){    
     if( Cvgd_levels(self, 1, 1, nl, i_val, levs, &VGD_STDA76_SFC_P, 0) == VGD_ERROR){
-      App_Log(APP_ERROR,"%s: problem with Cvgd_levels (computing pressure profile with one ref)\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem with Cvgd_levels (computing pressure profile with one ref)\n",__func__);
       return(VGD_ERROR);
     }
   } else {
     if( Cvgd_levels_2ref(self, 1, 1, nl, i_val, levs, &VGD_STDA76_SFC_P, &VGD_STDA76_SFC_P, 0) == VGD_ERROR){
-      App_Log(APP_ERROR,"%s: problem with Cvgd_levels (computing pressure profile with two refs)\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem with Cvgd_levels (computing pressure profile with two refs)\n",__func__);
       return(VGD_ERROR);
     }
   }
@@ -452,19 +452,19 @@ int c_stda76_temp_pres_from_heights(vgrid_descriptor *self, int *i_val, int nl, 
 
   levs = malloc( nl * sizeof(float) );
   if(! levs){
-    App_Log(APP_ERROR,"%s: problem allocating levs\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating levs\n",__func__);
     free(levs);
     return(VGD_ERROR);
   }
   
   if(! Cvgd_is_valid(self,"ref_namel_valid") ){    
     if( Cvgd_levels(self, 1, 1, nl, i_val, levs, &zero, 0) == VGD_ERROR){
-      App_Log(APP_ERROR,"%s: problem with Cvgd_levels (computing heights profile with one ref)\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem with Cvgd_levels (computing heights profile with one ref)\n",__func__);
       return(VGD_ERROR);
     }
   } else {
     if( Cvgd_levels_2ref(self, 1, 1, nl, i_val, levs, &zero, &zero, 0) == VGD_ERROR){
-      App_Log(APP_ERROR,"%s: problem with Cvgd_levels (computing heights profile with two refs)\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem with Cvgd_levels (computing heights profile with two refs)\n",__func__);
       return(VGD_ERROR);
     }
   }
@@ -480,7 +480,7 @@ int c_stda76_temp_pres_from_heights(vgrid_descriptor *self, int *i_val, int nl, 
     pk = VGD_STDA76_SFC_P;
   }
   if( c_set_stda_layer( ind, Tk, pk, &zk, &zkp, &gammaT, &pkp, &zero_lapse_rate) == VGD_ERROR ){
-    App_Log(APP_ERROR,"%s: error in c_set_stda_layer\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: error in c_set_stda_layer\n",__func__);
     return(VGD_ERROR);
   }
   for( k = nl-1; k >= 0; k--){
@@ -518,30 +518,30 @@ static int c_table_update(vgrid_descriptor **self) {
   case 5004:
   case 5005:
     if( c_encode_vert_5002_5003_5004_5005(self, 1) == VGD_ERROR ) {
-      App_Log(APP_ERROR,"%s: cannot encode Vcode %d\n",__func__,(*self)->vcode);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot encode Vcode %d\n",__func__,(*self)->vcode);
       return(VGD_ERROR);
     }
     break;
   case 5100:
     if( c_encode_vert_5100(self, 1) == VGD_ERROR ) {
-      App_Log(APP_ERROR,"%s: cannot encode Vcode %d\n",__func__,(*self)->vcode);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot encode Vcode %d\n",__func__,(*self)->vcode);
       return(VGD_ERROR);
     }
     break;
   case 21001:
     if( c_encode_vert_21001(self, 1) == VGD_ERROR ) {
-      App_Log(APP_ERROR,"%s: cannot encode Vcode %d\n",__func__,(*self)->vcode);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot encode Vcode %d\n",__func__,(*self)->vcode);
       return(VGD_ERROR);
     }
     break;
   case 21002:
     if( c_encode_vert_21002(self, 1) == VGD_ERROR ) {
-      App_Log(APP_ERROR,"%s: cannot encode Vcode %d\n",__func__,(*self)->vcode);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot encode Vcode %d\n",__func__,(*self)->vcode);
       return(VGD_ERROR);
     }
     break;
   default:
-    App_Log(APP_ERROR,"%s: unsupported Vcode %d\n",__func__,(*self)->vcode);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: unsupported Vcode %d\n",__func__,(*self)->vcode);
     return(VGD_ERROR);
   }	
   return(VGD_OK);  
@@ -692,7 +692,7 @@ static int my_fstprm(int key,VGD_TFSTD_ext *ff) {
 	        ff->grtyp,  &ff->ig1,    &ff->ig2,    &ff->ig3, &ff->ig4,
 	       &ff->swa,    &ff->lng,    &ff->dltf,   &ff->ubc,
 	       &ff->extra1, &ff->extra2, &ff->extra3) < 0 ) {
-    App_Log(APP_ERROR,"%s: cannot fstprm for fstkey %d\n",__func__,key);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot fstprm for fstkey %d\n",__func__,key);
     return(VGD_ERROR);
   }
   nhours = ff->deet * ff->npas / 3600.;
@@ -705,7 +705,7 @@ static int correct_kind_and_version(int key, int kind, int version, VGD_TFSTD_ex
   int kind_from_ig1;
   *status=0;
   if( my_fstprm(key, var) == VGD_ERROR ) {
-    App_Log(APP_ERROR,"%s: problem with my_fstprm on key %d\n",__func__,key);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem with my_fstprm on key %d\n",__func__,key);
     return(VGD_ERROR);
   }
   if(kind != -1 && version != -1) {
@@ -744,19 +744,19 @@ static int C_load_toctoc(vgrid_descriptor *self, VGD_TFSTD_ext var, int key) {
   table_size = self->table_ni * self->table_nj * self->table_nk;
   self->table = malloc ( table_size * sizeof(double) );
   if(! self->table ) {
-    App_Log(APP_ERROR,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
     return(VGD_ERROR);
   }
   istat = c_fstluk((uint32_t*)self->table, key, &ni, &nj, &nk);
   if(istat < 0) {
-    App_Log(APP_ERROR,"%s: problem with fstluk\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem with fstluk\n",__func__);
     free(self->table);
     return(VGD_ERROR);
   }
   self->kind             = (int) self->table[0];
   self->version          = (int) self->table[1];
   if(fstd_init(self) == VGD_ERROR) {
-    App_Log(APP_ERROR,"%s: problem creating record information\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem creating record information\n",__func__);
     return(VGD_ERROR);
   }
   self->rec.dateo        = var.dateo;
@@ -869,15 +869,15 @@ int Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip) {
   int k, ip1, kind, my_int;
   char pres_S[] = " p,";
   if(! self ) {
-    App_Log(APP_ERROR,"%s: vgrid structure not constructed\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: vgrid structure not constructed\n",__func__);
     return(VGD_ERROR);
   }
   if(! self->valid) {
-    App_Log(APP_ERROR,"%s: vgrid structure is not valid\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: vgrid structure is not valid\n",__func__);
     return(VGD_ERROR);
   }
   if(sout != -1 && sout != 6){
-    App_Log(APP_ERROR,"%s: please implement sout option = %d\n",__func__,sout);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: please implement sout option = %d\n",__func__,sout);
     return(VGD_ERROR);
   }
   if(convip == -1){
@@ -997,7 +997,7 @@ int Cvgd_print_desc(vgrid_descriptor *self, int sout, int convip) {
     }
     break;
   default:
-    App_Log(APP_ERROR,"%s: invalid kind or version: kind=%d, version=%d\n",__func__,self->kind,self->version);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid kind or version: kind=%d, version=%d\n",__func__,self->kind,self->version);
     return(VGD_ERROR);
   }
   
@@ -1320,7 +1320,7 @@ static vgrid_descriptor* c_vgd_construct() {
 
    vgrid_descriptor *vgrid = malloc(sizeof(vgrid_descriptor));
    if( !vgrid ){
-     App_Log(APP_ERROR,"%s: cannot allocate vgrid\n",__func__);
+     Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate vgrid\n",__func__);
      return NULL;
    }
 
@@ -1527,7 +1527,7 @@ void Cvgd_free(vgrid_descriptor **self) {
 int Cvgd_set_vcode_i(vgrid_descriptor *VGrid,int Kind,int Version) {
 
    if( Kind>MAX_VKIND || Kind<0 || Version>999 || Version<0 ) {
-      App_Log(APP_ERROR,"%s: invalid kind or version kind=%d, version=%d\n",__func__,Kind,Version);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid kind or version kind=%d, version=%d\n",__func__,Kind,Version);
       return(VGD_ERROR);
    }
    VGrid->vcode = Kind*1000 + Version;
@@ -1552,7 +1552,7 @@ int Cvgd_set_vcode_i(vgrid_descriptor *VGrid,int Kind,int Version) {
 int Cvgd_set_vcode(vgrid_descriptor *VGrid) {
 
    if( !VGrid->table ) {
-      App_Log(APP_ERROR,"%s: Cvgd_set_vcode called before constructor\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: Cvgd_set_vcode called before constructor\n",__func__);
       return(VGD_ERROR);
    }
 
@@ -1657,7 +1657,7 @@ static int fstd_init(vgrid_descriptor *VGrid) {
          h->ig4=0;
          break;
        default:
-         App_Log(APP_ERROR,"%s: invalid kind or version: kind=%d, version=%d\n",__func__,VGrid->kind,VGrid->version);
+         Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid kind or version: kind=%d, version=%d\n",__func__,VGrid->kind,VGrid->version);
          return(VGD_ERROR);
    }
 
@@ -1796,7 +1796,7 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
   }
   *self = c_vgd_construct();
   if(! *self){
-    App_Log(APP_ERROR,"%s: null pointer returned by c_vgd_construct\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: null pointer returned by c_vgd_construct\n",__func__);
     return (VGD_ERROR);
   }
 
@@ -1815,7 +1815,7 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
   (*self)->rec.ip2    = (int) fmax(0,ip2);
   strcpy((*self)->rec.nomvar,"!!  ");
   if(Cvgd_set_vcode_i(*self, kind, version) == VGD_ERROR)  {
-    App_Log(APP_ERROR,"%s: problem with Cvgd_set_vcode_i",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem with Cvgd_set_vcode_i",__func__);
     return (VGD_ERROR);
   }
   (*self)->rec.ig1   = (*self)->vcode;
@@ -1825,7 +1825,7 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
     if(ptop_8) {
       (*self)->ptop_8 = *ptop_8;
     } else {
-      App_Log(APP_ERROR,"%s: ptop_8 is a required constructor entry\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: ptop_8 is a required constructor entry\n",__func__);
       errorInput = 1;
     }
   }
@@ -1833,7 +1833,7 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
     if(pref_8){
       (*self)->pref_8 = *pref_8;
     } else {
-      App_Log(APP_ERROR,"%s: pref_8 is a required constructor entry\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: pref_8 is a required constructor entry\n",__func__);
       errorInput = 1;
     }
   }
@@ -1841,7 +1841,7 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
     if(rcoef1){
       (*self)->rcoef1 = *rcoef1;
     } else {
-      App_Log(APP_ERROR,"%s: rcoef1 is a required constructor entry\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: rcoef1 is a required constructor entry\n",__func__);
       errorInput = 1;
     }
   }
@@ -1849,7 +1849,7 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
     if(rcoef2){
       (*self)->rcoef2 = *rcoef2;
     } else {
-      App_Log(APP_ERROR,"%s: rcoef2 is a required constructor entry\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: rcoef2 is a required constructor entry\n",__func__);
       errorInput = 1;
     }
   }
@@ -1857,7 +1857,7 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
     if(rcoef3){
       (*self)->rcoef3 = *rcoef3;
     } else {
-      App_Log(APP_ERROR,"%s: rcoef3 is a required constructor entry\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: rcoef3 is a required constructor entry\n",__func__);
       errorInput = 1;
     }
   }
@@ -1865,7 +1865,7 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
     if(rcoef4){
       (*self)->rcoef4 = *rcoef4;
     } else {
-      App_Log(APP_ERROR,"%s: rcoef4 is a required constructor entry\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: rcoef4 is a required constructor entry\n",__func__);
       errorInput = 1;
     }
   }
@@ -1873,14 +1873,14 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
   free((*self)->a_m_8);
   (*self)->a_m_8 = malloc( nl_m * sizeof(double) );
   if(! (*self)->a_m_8){ 
-    App_Log(APP_ERROR,"%s: problem allocating a_m_8 of size = %d\n",__func__,nl_m);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating a_m_8 of size = %d\n",__func__,nl_m);
     return(VGD_ERROR);
   }  
   if(is_valid( *self, a_m_8_valid)) {
     if(a_m_8){
       my_copy_double(a_m_8, &((*self)->a_m_8), nl_m);
     } else {
-      App_Log(APP_ERROR,"%s: a_m_8 is a required constructor entry\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: a_m_8 is a required constructor entry\n",__func__);
       errorInput = 1;
     }
   }
@@ -1888,14 +1888,14 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
   free((*self)->b_m_8);
   (*self)->b_m_8 = malloc( nl_m * sizeof(double) );
   if(! (*self)->b_m_8) {
-    App_Log(APP_ERROR,"%s: problem allocating b_m_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating b_m_8\n",__func__);
     return(VGD_ERROR);
   }
   if(is_valid( *self, b_m_8_valid)) {
     if(b_m_8){
       my_copy_double(b_m_8, &((*self)->b_m_8), nl_m);
     } else {
-      App_Log(APP_ERROR,"%s: b_m_8 is a required constructor entry\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: b_m_8 is a required constructor entry\n",__func__);
       errorInput = 1;
     }
   }
@@ -1903,14 +1903,14 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
   free((*self)->c_m_8);
   (*self)->c_m_8 = malloc( nl_m * sizeof(double) );
   if(! (*self)->c_m_8) {
-    App_Log(APP_ERROR,"%s: problem allocating c_m_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating c_m_8\n",__func__);
     return(VGD_ERROR);
   }
   if(is_valid( *self, c_m_8_valid)) {
     if(c_m_8){
       my_copy_double(c_m_8, &((*self)->c_m_8), nl_m);
     } else {
-      App_Log(APP_ERROR,"%s: c_m_8 is a required constructor entry\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: c_m_8 is a required constructor entry\n",__func__);
       errorInput = 1;
     }
   }
@@ -1919,12 +1919,12 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
       free((*self)->a_t_8);
       (*self)->a_t_8 = malloc( nl_t * sizeof(double) );
       if(! (*self)->a_t_8) {
-       	App_Log(APP_ERROR,"%s: problem allocating a_t_8\n",__func__);
+       	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating a_t_8\n",__func__);
 	      return(VGD_ERROR);
       }
       my_copy_double(a_t_8, &((*self)->a_t_8), nl_t);
     } else {
-      App_Log(APP_ERROR,"%s: a_t_8 is a required constructor entry\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: a_t_8 is a required constructor entry\n",__func__);
       errorInput = 1;
     }
   }
@@ -1933,12 +1933,12 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
       free((*self)->b_t_8);
       (*self)->b_t_8 = malloc( nl_t * sizeof(double) );
       if(! (*self)->b_t_8) {
-	App_Log(APP_ERROR,"%s: problem allocating b_t_8\n",__func__);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating b_t_8\n",__func__);
 	return(VGD_ERROR);
       }
       my_copy_double(b_t_8, &((*self)->b_t_8), nl_t);
     } else {
-      App_Log(APP_ERROR,"%s: b_t_8 is a required constructor entry\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: b_t_8 is a required constructor entry\n",__func__);
       errorInput = 1;
     }
   }
@@ -1947,12 +1947,12 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
       free((*self)->c_t_8);
       (*self)->c_t_8 = malloc( nl_t * sizeof(double) );
       if(! (*self)->c_t_8) {
-	App_Log(APP_ERROR,"%s: problem allocating c_t_8\n",__func__);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating c_t_8\n",__func__);
 	return(VGD_ERROR);
       }
       my_copy_double(c_t_8, &((*self)->c_t_8), nl_t);
     } else {
-      App_Log(APP_ERROR,"%s: c_t_8 is a required constructor entry\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: c_t_8 is a required constructor entry\n",__func__);
       errorInput = 1;
     }
   }
@@ -1961,12 +1961,12 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
       free((*self)->a_w_8);
       (*self)->a_w_8 = malloc( nl_w * sizeof(double) );
       if(! (*self)->a_w_8) {
-	App_Log(APP_ERROR,"%s: problem allocating a_w_8\n",__func__);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating a_w_8\n",__func__);
 	return(VGD_ERROR);
       }
       my_copy_double(a_w_8, &((*self)->a_w_8), nl_w);
     } else {
-      App_Log(APP_ERROR,"%s: a_w_8 is a required constructor entry\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: a_w_8 is a required constructor entry\n",__func__);
       errorInput = 1;
     }
   }
@@ -1975,12 +1975,12 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
       free((*self)->b_w_8);
       (*self)->b_w_8 = malloc( nl_w * sizeof(double) );
       if(! (*self)->b_w_8) {
-	App_Log(APP_ERROR,"%s: problem allocating b_w_8\n",__func__);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating b_w_8\n",__func__);
 	return(VGD_ERROR);
       }
       my_copy_double(b_w_8, &((*self)->b_w_8), nl_w);
     } else {
-      App_Log(APP_ERROR,"%s: b_w_8 is a required constructor entry\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: b_w_8 is a required constructor entry\n",__func__);
       errorInput = 1;
     }
   }
@@ -1989,12 +1989,12 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
       free((*self)->c_w_8);
       (*self)->c_w_8 = malloc( nl_w * sizeof(double) );
       if(! (*self)->c_w_8) {
-	App_Log(APP_ERROR,"%s: problem allocating c_w_8\n",__func__);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating c_w_8\n",__func__);
 	return(VGD_ERROR);
       }
       my_copy_double(c_w_8, &((*self)->c_w_8), nl_w);
     } else {
-      App_Log(APP_ERROR,"%s: c_w_8 is a required constructor entry\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: c_w_8 is a required constructor entry\n",__func__);
       errorInput = 1;
     }
   }
@@ -2004,12 +2004,12 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
       free((*self)->ip1_m);
       (*self)->ip1_m = malloc( nl_m * sizeof(int) );
       if(! (*self)->ip1_m) {
-	App_Log(APP_ERROR,"%s: problem allocating ip1_m in Cvgd_new_build_vert2\n",__func__);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating ip1_m in Cvgd_new_build_vert2\n",__func__);
 	return(VGD_ERROR);
       }
       my_copy_int(ip1_m, &((*self)->ip1_m), nl_m);
     } else {
-      App_Log(APP_ERROR,"%s: ip1_m is a required constructor entry\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: ip1_m is a required constructor entry\n",__func__);
       errorInput = 1;
     }
   }
@@ -2018,12 +2018,12 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
       free((*self)->ip1_t);
       (*self)->ip1_t = malloc( nl_t * sizeof(int) );
       if(! (*self)->ip1_t) {
-	App_Log(APP_ERROR,"%s: problem allocating ip1_t\n",__func__);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating ip1_t\n",__func__);
 	return(VGD_ERROR);
       }
       my_copy_int(ip1_t, &((*self)->ip1_t), nl_t);
     } else {
-      App_Log(APP_ERROR,"%s: ip1_t is a required constructor entry\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: ip1_t is a required constructor entry\n",__func__);
       errorInput = 1;
     }
   }
@@ -2032,12 +2032,12 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
       free((*self)->ip1_w);
       (*self)->ip1_w = malloc( nl_w * sizeof(int) );
       if(! (*self)->ip1_w) {
-	App_Log(APP_ERROR,"%s: problem allocating ip1_w\n",__func__);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating ip1_w\n",__func__);
 	return(VGD_ERROR);
       }
       my_copy_int(ip1_w, &((*self)->ip1_w), nl_w);
     } else {
-      App_Log(APP_ERROR,"%s: ip1_w is a required constructor entry\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: ip1_w is a required constructor entry\n",__func__);
       errorInput = 1;
     }
   }
@@ -2103,18 +2103,18 @@ int Cvgd_new_build_vert2(vgrid_descriptor **self, int kind, int version, int nk,
     ier = c_encode_vert_21002(self, 0);
     break;
   default:
-    App_Log(APP_ERROR,"%s: invalid kind or version : kind=%d, version=%d\n",__func__,kind,version);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid kind or version : kind=%d, version=%d\n",__func__,kind,version);
     return(VGD_ERROR);
   }
 
   if(ier == VGD_ERROR) {
-    App_Log(APP_ERROR,"%s: problem with encode_vert_%s\n",__func__,cvcode);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem with encode_vert_%s\n",__func__,cvcode);
     return(VGD_ERROR);
   }
 
   (*self)->valid = 1;
   if(fstd_init(*self) == VGD_ERROR) {
-    App_Log(APP_ERROR,"%s: problem with fstd_init\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem with fstd_init\n",__func__);
   }
 
   return(VGD_OK);
@@ -2133,7 +2133,7 @@ static int c_encode_vert_0001(vgrid_descriptor **self,int nk){
   table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
   (*self)->table = malloc ( table_size * sizeof(double) );
   if(! (*self)->table ) {
-    App_Log(APP_ERROR,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
     return(VGD_ERROR);
   }
   strcpy((*self)->ref_name,VGD_NO_REF_NOMVAR);
@@ -2184,7 +2184,7 @@ static int c_encode_vert_1001(vgrid_descriptor **self,int nk){
   table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
   (*self)->table = malloc ( table_size * sizeof(double) );
   if(! (*self)->table ) {
-    App_Log(APP_ERROR,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
     return(VGD_ERROR);
   }
 
@@ -2237,7 +2237,7 @@ static int c_encode_vert_1002(vgrid_descriptor **self,int nk){
   table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
   (*self)->table = malloc ( table_size * sizeof(double) );
   if(! (*self)->table ) {
-    App_Log(APP_ERROR,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
     return(VGD_ERROR);
   }
   strcpy((*self)->ref_name,"P0  ");
@@ -2286,7 +2286,7 @@ static int c_encode_vert_2001(vgrid_descriptor **self,int nk){
   table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
   (*self)->table = malloc ( table_size * sizeof(double) );
   if(! (*self)->table ) {
-    App_Log(APP_ERROR,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
     return(VGD_ERROR);
   }
   strcpy((*self)->ref_name,VGD_NO_REF_NOMVAR);
@@ -2333,7 +2333,7 @@ static int c_encode_vert_4001(vgrid_descriptor **self,int nk){
   table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
   (*self)->table = malloc ( table_size * sizeof(double) );
   if(! (*self)->table ) {
-    App_Log(APP_ERROR,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
     return(VGD_ERROR);
   }
   strcpy((*self)->ref_name,VGD_NO_REF_NOMVAR);
@@ -2380,7 +2380,7 @@ static int c_encode_vert_5001(vgrid_descriptor **self,int nk){
   table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
   (*self)->table = malloc ( table_size * sizeof(double) );
   if(! (*self)->table ) {
-    App_Log(APP_ERROR,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
     return(VGD_ERROR);
   }
   strcpy((*self)->ref_name,"P0  ");
@@ -2426,7 +2426,7 @@ static int c_encode_vert_5001(vgrid_descriptor **self,int nk){
 static int c_encode_vert_5002_5003_5004_5005(vgrid_descriptor **self, char update){
   int skip = 3, table_size;
   if(! *self ) {
-    App_Log(APP_ERROR,"%s: vgrid descriptor not constructed\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: vgrid descriptor not constructed\n",__func__);
     return(VGD_ERROR);
   }
   if(! update) {    
@@ -2438,7 +2438,7 @@ static int c_encode_vert_5002_5003_5004_5005(vgrid_descriptor **self, char updat
     table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
     (*self)->table = malloc ( table_size * sizeof(double) );
     if(! (*self)->table ) {
-      App_Log(APP_ERROR,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
       return(VGD_ERROR);
     }
     strcpy((*self)->ref_name,"P0  ");
@@ -2484,7 +2484,7 @@ static int c_encode_vert_5002_5003_5004_5005(vgrid_descriptor **self, char updat
 static int c_encode_vert_5100(vgrid_descriptor **self, char update){
   int skip = 3, table_size;
   if(! *self ) {
-    App_Log(APP_ERROR,"%s: vgrid descriptor not constructed\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: vgrid descriptor not constructed\n",__func__);
     return(VGD_ERROR);
   }
   if(! update) {    
@@ -2496,7 +2496,7 @@ static int c_encode_vert_5100(vgrid_descriptor **self, char update){
     table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
     (*self)->table = malloc ( table_size * sizeof(double) );
     if(! (*self)->table ) {
-      App_Log(APP_ERROR,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
       return(VGD_ERROR);
     }
     strcpy((*self)->ref_name,"P0  ");
@@ -2555,12 +2555,12 @@ static int c_encode_vert_5999(vgrid_descriptor **self,int nk){
     hyb = hyb*2.f; // To silence the compiler warning
     // Even if hyb is kind 5, kind 4 may be present due to diag level in m AGL
     if( kind != 5 && kind != 4 ) {
-      App_Log(APP_ERROR,"%s: ip1 kind must be 5 or 4 but got %d, for ip1 = %d\n",__func__,kind,(*self)->ip1_m[k]);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: ip1 kind must be 5 or 4 but got %d, for ip1 = %d\n",__func__,kind,(*self)->ip1_m[k]);
       return(VGD_ERROR);
     }
     for( i=k+1; i < nk; i++) {
       if( (*self)->ip1_m[i] == (*self)->ip1_m[k]) {
-	App_Log(APP_ERROR,"%s: repetition present in ip1 list for at least ip1 = %d\n",__func__,(*self)->ip1_m[i]);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: repetition present in ip1 list for at least ip1 = %d\n",__func__,(*self)->ip1_m[i]);
 	return(VGD_ERROR);
       }
     }
@@ -2574,13 +2574,13 @@ static int c_encode_vert_5999(vgrid_descriptor **self,int nk){
   table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
   (*self)->table = malloc ( table_size * sizeof(double) );
   if(! (*self)->table ) {
-    App_Log(APP_ERROR,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
     return(VGD_ERROR);
   }
   free((*self)->c_m_8);
   (*self)->c_m_8 = malloc ( nk * sizeof(double) );
   if(! (*self)->c_m_8 ) {    
-    App_Log(APP_ERROR,"%s: cannot allocate c_m_8 of bouble of size %d\n",__func__,nk);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate c_m_8 of bouble of size %d\n",__func__,nk);
     return(VGD_ERROR);
   }
   strcpy((*self)->ref_name,"P0  ");
@@ -2621,7 +2621,7 @@ static int c_encode_vert_5999(vgrid_descriptor **self,int nk){
 static int c_encode_vert_21001(vgrid_descriptor **self, char update){
   int skip = 3, table_size;
   if(! *self ) {
-    App_Log(APP_ERROR,"%s: vgrid descriptor not constructed\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: vgrid descriptor not constructed\n",__func__);
     return(VGD_ERROR);
   }
   if(! update) {    
@@ -2633,7 +2633,7 @@ static int c_encode_vert_21001(vgrid_descriptor **self, char update){
     table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
     (*self)->table = malloc ( table_size * sizeof(double) );
     if(! (*self)->table ) {
-      App_Log(APP_ERROR,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
       return(VGD_ERROR);
     }
     strcpy((*self)->ref_name,"ME  ");
@@ -2688,7 +2688,7 @@ static int c_encode_vert_21001(vgrid_descriptor **self, char update){
 static int c_encode_vert_21002(vgrid_descriptor **self, char update){
   int skip = 3, table_size;
   if(! *self ) {
-    App_Log(APP_ERROR,"%s: vgrid descriptor not constructed\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: vgrid descriptor not constructed\n",__func__);
     return(VGD_ERROR);
   }
   if(! update) {    
@@ -2703,7 +2703,7 @@ static int c_encode_vert_21002(vgrid_descriptor **self, char update){
     table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
     (*self)->table = malloc ( table_size * sizeof(double) );
     if(! (*self)->table ) {
-      App_Log(APP_ERROR,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
       return(VGD_ERROR);
     }
     strcpy((*self)->ref_name,"ME  ");
@@ -2775,7 +2775,7 @@ static int c_decode_vert_0001(vgrid_descriptor **self) {
   (*self)->b_m_8 = malloc( nk * sizeof(double) );
   (*self)->c_m_8 = malloc( nk * sizeof(double) );
   if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 || !(*self)->c_m_8 ){
-    App_Log(APP_ERROR,"%s: c_decode_vert_0001, cannot allocate,  ip1_m, a_m_8, b_m_8 and c_m_8 of size %d\n",__func__,nk);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: c_decode_vert_0001, cannot allocate,  ip1_m, a_m_8, b_m_8 and c_m_8 of size %d\n",__func__,nk);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nk; k++){      
@@ -2789,7 +2789,7 @@ static int c_decode_vert_0001(vgrid_descriptor **self) {
   (*self)->a_w_8 = malloc( nk * sizeof(double) );
   (*self)->b_w_8 = malloc( nk * sizeof(double) );
   if( !(*self)->ip1_w || !(*self)->a_w_8 || !(*self)->b_w_8 ){
-    App_Log(APP_ERROR,"%s: cannot allocate,  ip1_w, a_w_8 and b_w_8 of size %d\n",__func__,nk);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate,  ip1_w, a_w_8 and b_w_8 of size %d\n",__func__,nk);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nk; k++){      
@@ -2827,7 +2827,7 @@ static int c_decode_vert_1001(vgrid_descriptor **self) {
   (*self)->b_m_8 = malloc( nk * sizeof(double) );
   (*self)->c_m_8 = malloc( nk * sizeof(double) );
   if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 ){
-    App_Log(APP_ERROR,"%s: cannot allocate,  ip1_m, a_m_8 and c_m_8 of size %d\n",__func__,nk);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate,  ip1_m, a_m_8 and c_m_8 of size %d\n",__func__,nk);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nk; k++){      
@@ -2871,7 +2871,7 @@ static int c_decode_vert_1002(vgrid_descriptor **self) {
   (*self)->b_m_8 = malloc( nk * sizeof(double) );
   (*self)->c_m_8 = malloc( nk * sizeof(double) );
   if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 || !(*self)->c_m_8 ){
-    App_Log(APP_ERROR,"%s: cannot allocate,  ip1_m, a_m_8, b_m_8 and c_m_8 of size %d\n",__func__,nk);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate,  ip1_m, a_m_8, b_m_8 and c_m_8 of size %d\n",__func__,nk);
     return(VGD_ERROR);
   }
    for ( k = 0; k < nk; k++){      
@@ -2913,7 +2913,7 @@ static int c_decode_vert_2001(vgrid_descriptor **self) {
   (*self)->b_m_8 = malloc( nk * sizeof(double) );
   (*self)->c_m_8 = malloc( nk * sizeof(double) );
   if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 || !(*self)->c_m_8 ){
-    App_Log(APP_ERROR,"%s: cannot allocate,  ip1_m, a_m_8, b_m_8 and c_m_8 of size %d\n",__func__,nk);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate,  ip1_m, a_m_8, b_m_8 and c_m_8 of size %d\n",__func__,nk);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nk; k++){      
@@ -2955,7 +2955,7 @@ static int c_decode_vert_4001(vgrid_descriptor **self) {
   (*self)->b_m_8 = malloc( nk * sizeof(double) );
   (*self)->c_m_8 = malloc( nk * sizeof(double) );
   if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 || !(*self)->c_m_8 ){
-    App_Log(APP_ERROR,"%s: cannot allocate,  ip1_m, a_m_8, b_m_8 and c_m_8 of size %d\n",__func__,nk);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate,  ip1_m, a_m_8, b_m_8 and c_m_8 of size %d\n",__func__,nk);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nk; k++){      
@@ -3003,7 +3003,7 @@ static int c_decode_vert_1003_5001(vgrid_descriptor **self) {
   (*self)->b_m_8 = malloc( nk * sizeof(double) );
   (*self)->c_m_8 = malloc( nk * sizeof(double) );
   if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 || !(*self)->c_m_8 ){
-    App_Log(APP_ERROR,"%s: cannot allocate,  ip1_m, a_m_8, b_m_8 and c_m_8 of size %d\n",__func__,nk);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate,  ip1_m, a_m_8, b_m_8 and c_m_8 of size %d\n",__func__,nk);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nk; k++){    
@@ -3042,7 +3042,7 @@ static int c_decode_vert_5100(vgrid_descriptor **self) {
   flip_transfer_d2c((*self)->ref_namel,(*self)->table[10]);
 
   if( Cvgd_set_vcode_i(*self, (*self)->kind, (*self)->version) == VGD_ERROR ) {
-    App_Log(APP_ERROR,"%s: cannot set vcode\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot set vcode\n",__func__);
     return(VGD_ERROR);
   }
 
@@ -3060,7 +3060,7 @@ static int c_decode_vert_5100(vgrid_descriptor **self) {
   (*self)->b_m_8 = malloc( nb * sizeof(double) );
   (*self)->c_m_8 = malloc( nb * sizeof(double) );
   if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 || !(*self)->c_m_8){
-    App_Log(APP_ERROR,"%s: cannot allocate,  ip1_m, a_m_8, b_m_8 and c_m_8 of size %d\n",__func__,nb);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate,  ip1_m, a_m_8, b_m_8 and c_m_8 of size %d\n",__func__,nb);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nb; k++){
@@ -3080,7 +3080,7 @@ static int c_decode_vert_5100(vgrid_descriptor **self) {
   (*self)->b_t_8 = malloc( nb * sizeof(double) );
   (*self)->c_t_8 = malloc( nb * sizeof(double) );
   if( !(*self)->ip1_t || !(*self)->a_t_8 || !(*self)->b_t_8 || !(*self)->c_t_8 ){
-    App_Log(APP_ERROR,"%s: cannot allocate,  ip1_t, a_t_8, b_t_8 and c_t_8 of size %d\n",__func__,nb);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate,  ip1_t, a_t_8, b_t_8 and c_t_8 of size %d\n",__func__,nb);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nb; k++){
@@ -3113,7 +3113,7 @@ static int c_decode_vert_5002_5003_5004_5005(vgrid_descriptor **self) {
   (*self)->rcoef2  = (float) (*self)->table[6];
   flip_transfer_d2c((*self)->ref_name,(*self)->table[7]);
   if( Cvgd_set_vcode_i(*self, (*self)->kind, (*self)->version) == VGD_ERROR ) {
-    App_Log(APP_ERROR,"%s: cannot set vcode\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot set vcode\n",__func__);
     return(VGD_ERROR);
   }
   switch((*self)->vcode) {
@@ -3126,7 +3126,7 @@ static int c_decode_vert_5002_5003_5004_5005(vgrid_descriptor **self) {
     k_plus_top=0;
     break;
   default:
-    App_Log(APP_ERROR,"%s: Vcode %d not supported\n",__func__,(*self)->vcode);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: Vcode %d not supported\n",__func__,(*self)->vcode);
     return(VGD_ERROR);
   }
 
@@ -3151,7 +3151,7 @@ static int c_decode_vert_5002_5003_5004_5005(vgrid_descriptor **self) {
   (*self)->b_m_8 = malloc( nb * sizeof(double) );
   (*self)->c_m_8 = malloc( nb * sizeof(double) );
   if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 || !(*self)->c_m_8 ){
-    App_Log(APP_ERROR,"%s: cannot allocate,  ip1_m, a_m_8, b_m_8 and c_m_8 of size %d\n",__func__,nb);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate,  ip1_m, a_m_8, b_m_8 and c_m_8 of size %d\n",__func__,nb);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nb; k++){
@@ -3172,7 +3172,7 @@ static int c_decode_vert_5002_5003_5004_5005(vgrid_descriptor **self) {
   (*self)->b_t_8 = malloc( nb * sizeof(double) );
   (*self)->c_t_8 = malloc( nb * sizeof(double) );
   if( !(*self)->ip1_t || !(*self)->a_t_8 || !(*self)->b_t_8 || !(*self)->c_t_8 ){
-    App_Log(APP_ERROR,"%s: cannot allocate,  ip1_t, a_t_8, b_t_8 and c_t_8 of size %d\n",__func__,nb);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate,  ip1_t, a_t_8, b_t_8 and c_t_8 of size %d\n",__func__,nb);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nb; k++){
@@ -3216,7 +3216,7 @@ static int c_decode_vert_5999(vgrid_descriptor **self) {
   (*self)->b_m_8 = malloc( nk * sizeof(double) );
   (*self)->c_m_8 = malloc( nk * sizeof(double) );
   if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 || !(*self)->c_m_8  ){
-    App_Log(APP_ERROR,"%s: cannot allocate,  ip1_m, a_m_8, b_m_8 and c_m_8 of size %d\n",__func__,nk);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate,  ip1_m, a_m_8, b_m_8 and c_m_8 of size %d\n",__func__,nk);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nk; k++){    
@@ -3250,7 +3250,7 @@ static int c_decode_vert_21001(vgrid_descriptor **self) {
   flip_transfer_d2c((*self)->ref_name, (*self)->table[7]);
   flip_transfer_d2c((*self)->ref_namel,(*self)->table[8]);
   if( Cvgd_set_vcode_i(*self, (*self)->kind, (*self)->version) == VGD_ERROR ) {
-    App_Log(APP_ERROR,"%s: cannot set vcode\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot set vcode\n",__func__);
     return(VGD_ERROR);
   }
   // Free A, B, C and Ip1 vectors for momentum and thermo.
@@ -3264,7 +3264,7 @@ static int c_decode_vert_21001(vgrid_descriptor **self) {
   (*self)->b_m_8 = malloc( nb * sizeof(double) );
   (*self)->c_m_8 = malloc( nb * sizeof(double) );
   if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 || !(*self)->c_m_8 ){
-    App_Log(APP_ERROR,"%s: cannot allocate,  ip1_m, a_m_8, b_m_8 and c_m_8 of size %d\n",__func__,nb);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate,  ip1_m, a_m_8, b_m_8 and c_m_8 of size %d\n",__func__,nb);
     return(VGD_ERROR);
   }
   ind = 12;
@@ -3285,7 +3285,7 @@ static int c_decode_vert_21001(vgrid_descriptor **self) {
   (*self)->b_t_8 = malloc( nb * sizeof(double) );
   (*self)->c_t_8 = malloc( nb * sizeof(double) );
   if( !(*self)->ip1_t || !(*self)->a_t_8 || !(*self)->b_t_8 || !(*self)->c_t_8 ){
-    App_Log(APP_ERROR,"%s: cannot allocate,  ip1_t, a_t_8, b_t_8 and c_t_8 of size %d\n",__func__,nb);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate,  ip1_t, a_t_8, b_t_8 and c_t_8 of size %d\n",__func__,nb);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nb; k++){
@@ -3318,7 +3318,7 @@ static int c_decode_vert_21002(vgrid_descriptor **self) {
   flip_transfer_d2c((*self)->ref_name,(*self)->table[7]);
   flip_transfer_d2c((*self)->ref_namel,(*self)->table[8]);
   if( Cvgd_set_vcode_i(*self, (*self)->kind, (*self)->version) == VGD_ERROR ) {
-    App_Log(APP_ERROR,"%s: cannot set vcode\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot set vcode\n",__func__);
     return(VGD_ERROR);
   }
   // Free A, B, C and Ip1 vectors for momentum and thermo.
@@ -3333,7 +3333,7 @@ static int c_decode_vert_21002(vgrid_descriptor **self) {
   (*self)->b_m_8 = malloc( nb * sizeof(double) );
   (*self)->c_m_8 = malloc( nb * sizeof(double) );
   if( !(*self)->ip1_m || !(*self)->a_m_8 || !(*self)->b_m_8 || !(*self)->c_m_8 ){
-    App_Log(APP_ERROR,"%s: cannot allocate,  ip1_m, a_m_8, b_m_8 and c_m_8 of size %d\n",__func__,nb);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate,  ip1_m, a_m_8, b_m_8 and c_m_8 of size %d\n",__func__,nb);
     return(VGD_ERROR);
   }
   ind = 12;
@@ -3353,7 +3353,7 @@ static int c_decode_vert_21002(vgrid_descriptor **self) {
   (*self)->b_w_8 = malloc( nb * sizeof(double) );
   (*self)->c_w_8 = malloc( nb * sizeof(double) );
   if( !(*self)->ip1_w || !(*self)->a_w_8 || !(*self)->b_w_8 || !(*self)->c_w_8 ){
-    App_Log(APP_ERROR,"%s: ip1_w, a_w_8, b_w_8 and c_w_8 of size %d\n",__func__,nb);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: ip1_w, a_w_8, b_w_8 and c_w_8 of size %d\n",__func__,nb);
     return(VGD_ERROR);
   }
   for ( k = 0; k < nb; k++){
@@ -3372,7 +3372,7 @@ static int c_decode_vert_21002(vgrid_descriptor **self) {
   (*self)->b_t_8 = malloc( nb * sizeof(double) );
   (*self)->c_t_8 = malloc( nb * sizeof(double) );
   if( !(*self)->ip1_t || !(*self)->a_t_8 || !(*self)->b_t_8 || !(*self)->c_t_8 ){
-    App_Log(APP_ERROR,"%s: cannot allocate,  ip1_t, a_t_8, b_t_8 and c_t_8 of size %d\n",__func__,nb);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate,  ip1_t, a_t_8, b_t_8 and c_t_8 of size %d\n",__func__,nb);
     return(VGD_ERROR);
   }
   // For Lorenz, thermo is momentum, except for diag level (see below)
@@ -3409,13 +3409,13 @@ static int C_genab_1001(float *hyb, int nk, double **a_m_8, double **b_m_8, int 
     return(VGD_ERROR);
   
   if( memcmp( &(hyb[nk-1]), &f_one, sizeof(float)/sizeof(char)) ){
-    App_Log(APP_ERROR,"%s: WRONG SPECIFICATION OF SIGMA VERTICAL LEVELS: SIGMA(NK) MUST BE 1.0\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: WRONG SPECIFICATION OF SIGMA VERTICAL LEVELS: SIGMA(NK) MUST BE 1.0\n",__func__);
     ok=0;
   }
   //Check monotonicity
   for ( k = 1; k < nk; k++){
     if(hyb[k] <= hyb[k-1]){
-      App_Log(APP_ERROR,"%s: WRONG SPECIFICATION OF SIGMA VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: WRONG SPECIFICATION OF SIGMA VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n",__func__);
       ok=0;
       break;
     }
@@ -3450,7 +3450,7 @@ int Cvgd_new_from_table(vgrid_descriptor **self, double *table, int ni, int nj, 
   if(! *self){
     *self = c_vgd_construct();
     if(! *self){
-      App_Log(APP_ERROR,"%s: null pointer returned by c_vgd_construct\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: null pointer returned by c_vgd_construct\n",__func__);
       return (VGD_ERROR);
     }
   }
@@ -3459,7 +3459,7 @@ int Cvgd_new_from_table(vgrid_descriptor **self, double *table, int ni, int nj, 
   table_size = ni * nj * nk;
   ltable = malloc ( table_size * sizeof(double) );
   if(! ltable ) {
-    App_Log(APP_ERROR,"%s: cannot allocate ltable of bouble of size %d\n",__func__,table_size);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate ltable of bouble of size %d\n",__func__,table_size);
     return(VGD_ERROR);
   }
   my_copy_double(table, &ltable, table_size);  
@@ -3469,7 +3469,7 @@ int Cvgd_new_from_table(vgrid_descriptor **self, double *table, int ni, int nj, 
   (*self)->table_nk = nk;
   (*self)->table = malloc ( ni * nj * nk * sizeof(double) );
   if(! (*self)->table ) {
-    App_Log(APP_ERROR,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
     return(VGD_ERROR);
   }
   for(i = 0; i < table_size; i++) {
@@ -3480,45 +3480,45 @@ int Cvgd_new_from_table(vgrid_descriptor **self, double *table, int ni, int nj, 
   (*self)->version = (int) (*self)->table[1];
   // Fill remainder of structure
   if( Cvgd_set_vcode(*self) == VGD_ERROR ) {
-    App_Log(APP_ERROR,"%s: cannot set vcode\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot set vcode\n",__func__);
     return(VGD_ERROR);
   }
 
   switch((*self)->vcode) {
   case 1:
     if( c_decode_vert_0001(self) == VGD_ERROR ) {
-      App_Log(APP_ERROR,"%s: problem decoding table with vcode -0001\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem decoding table with vcode -0001\n",__func__);
       return(VGD_ERROR);
     }
     break;
   case 1001:
     if( c_decode_vert_1001(self) == VGD_ERROR ) {
-      App_Log(APP_ERROR,"%s: problem decoding table with vcode 1001\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem decoding table with vcode 1001\n",__func__);
       return(VGD_ERROR);
     }
     break;
   case 1002:
     if( c_decode_vert_1002(self) == VGD_ERROR ) {
-      App_Log(APP_ERROR,"%s: problem decoding table with vcode 1002\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem decoding table with vcode 1002\n",__func__);
       return(VGD_ERROR);
     }
     break;
   case 2001:
     if( c_decode_vert_2001(self) == VGD_ERROR ) {
-      App_Log(APP_ERROR,"%s: problem decoding table with vcode 2001\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem decoding table with vcode 2001\n",__func__);
       return(VGD_ERROR);
     }
     break;
   case 1003:
   case 5001:
     if( c_decode_vert_1003_5001(self) == VGD_ERROR ) {
-      App_Log(APP_ERROR,"%s: problem decoding table with vcode 1003 or 5001\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem decoding table with vcode 1003 or 5001\n",__func__);
       return(VGD_ERROR);
     }
     break;
   case 4001:
     if( c_decode_vert_4001(self) == VGD_ERROR ) {
-      App_Log(APP_ERROR,"%s: problem decoding table with vcode 4001\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem decoding table with vcode 4001\n",__func__);
       return(VGD_ERROR);
     }
     break;
@@ -3527,41 +3527,41 @@ int Cvgd_new_from_table(vgrid_descriptor **self, double *table, int ni, int nj, 
   case 5004:
   case 5005:
     if( c_decode_vert_5002_5003_5004_5005(self) == VGD_ERROR ) {
-      App_Log(APP_ERROR,"%s: problem decoding table with vcode 5002,5003,5004 or 5005\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem decoding table with vcode 5002,5003,5004 or 5005\n",__func__);
       return(VGD_ERROR);
     }
     break;
   case 5100:
     if( c_decode_vert_5100(self) == VGD_ERROR ) {
-      App_Log(APP_ERROR,"%s: problem decoding table with vcode 5100\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem decoding table with vcode 5100\n",__func__);
       return(VGD_ERROR);
     }
     break;    
   case 5999:
     if( c_decode_vert_5999(self) == VGD_ERROR ) {
-      App_Log(APP_ERROR,"%s: problem decoding table with vcode 5999\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem decoding table with vcode 5999\n",__func__);
       return(VGD_ERROR);
     }
     break;    
   case 21001:
     if( c_decode_vert_21001(self) == VGD_ERROR ) {
-      App_Log(APP_ERROR,"%s: problem decoding table with vcode 21001\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem decoding table with vcode 21001\n",__func__);
       return(VGD_ERROR);
     }
     break;    
   case 21002:
     if( c_decode_vert_21002(self) == VGD_ERROR ) {
-      App_Log(APP_ERROR,"%s: problem decoding table with vcode 21002\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem decoding table with vcode 21002\n",__func__);
       return(VGD_ERROR);
     }
     break;    
   default:
-    App_Log(APP_ERROR,"%s: invalid Vcode %d\n",__func__,(*self)->vcode);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid Vcode %d\n",__func__,(*self)->vcode);
     return(VGD_ERROR);
   }
   (*self)->valid = 1;
   if(fstd_init(*self) == VGD_ERROR) {
-    App_Log(APP_ERROR,"%s: problem creating record information\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem creating record information\n",__func__);
   }
 
   return(VGD_OK);
@@ -3586,13 +3586,13 @@ static int C_genab_1002(float *etauser, int nk, double *ptop_8, double **a_m_8, 
   // using eta this is safe.
 
   if(etauser[nk-1] > 1.){
-    App_Log(APP_ERROR,"%s: WRONG SPECIFICATION OF ETA VERTICAL LEVELS: ETA(NK-1) MUST BE LESS OR EQUAL TO 1.0\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: WRONG SPECIFICATION OF ETA VERTICAL LEVELS: ETA(NK-1) MUST BE LESS OR EQUAL TO 1.0\n",__func__);
     ok=0;
   }
   //Check monotonicity
   for ( k = 1; k < nk; k++){
     if(etauser[k] <= etauser[k-1]){
-      App_Log(APP_ERROR,"%s: WRONG SPECIFICATION OF ETA VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: WRONG SPECIFICATION OF ETA VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n",__func__);
       ok=0;
       break;
     }
@@ -3606,7 +3606,7 @@ static int C_genab_1002(float *etauser, int nk, double *ptop_8, double **a_m_8, 
   }
 
   if( *ptop_8 <= 0.) {
-    App_Log(APP_ERROR,"%s: ptop = %f must be greater than zero\n",__func__,*ptop_8);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: ptop = %f must be greater than zero\n",__func__,*ptop_8);
     return(VGD_ERROR);
   }
 
@@ -3639,17 +3639,17 @@ static int C_genab_1003(float *hybuser, int nk, float rcoef, double ptop_8, doub
    
   ok = 1;
   if( ptop_8 <= 0.) {
-    App_Log(APP_ERROR,"%s: ptop must be greater than zero, got %f\n",__func__,ptop_8);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: ptop must be greater than zero, got %f\n",__func__,ptop_8);
     return(VGD_ERROR);
   }
   if( memcmp( &(hybuser[nk-1]), &f_one, sizeof(float)/sizeof(char)) ){
-    App_Log(APP_ERROR,"%s: WRONG SPECIFICATION OF HYB VERTICAL LEVELS: HYB(NK) MUST BE 1.0, got %f\n",__func__,hybuser[nk-1]);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: WRONG SPECIFICATION OF HYB VERTICAL LEVELS: HYB(NK) MUST BE 1.0, got %f\n",__func__,hybuser[nk-1]);
     return(VGD_ERROR);
   }
   //Check monotonicity
   for ( k = 1; k < nk; k++){
     if(hybuser[k] <= hybuser[k-1]){
-      App_Log(APP_ERROR,"%s: WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n",__func__);
       ok = 0;
       break;
     }
@@ -3716,7 +3716,7 @@ static int C_genab_2001(float *pres, int nk, double **a_m_8, double **b_m_8, int
   //Check monotonicity
   for ( k = 1; k < nk; k++){
     if(pres[k] <= pres[k-1]){
-      App_Log(APP_ERROR,"%s: WRONG SPECIFICATION OF PRESSURE VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: WRONG SPECIFICATION OF PRESSURE VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n",__func__);
       ok=0;
       break;
     }
@@ -3760,13 +3760,13 @@ static int C_genab_4001(float *hgts, int nk, double **a_m_8, double **b_m_8, int
   //Check monotonicity
   for ( k = 1; k < nk; k++){
     if(hgts[k] <= hgts[k-1]){
-      App_Log(APP_ERROR,"%s: WRONG SPECIFICATION OF HEIGHTS VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: WRONG SPECIFICATION OF HEIGHTS VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n",__func__);
       ok=0;
       break;
     }
   }
   if ( hgts[0] < 0. ){
-    App_Log(APP_ERROR,"%s: WRONG SPECIFICATION OF HEIGHTS VERTICAL LEVELS: LEVELS must be positive\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: WRONG SPECIFICATION OF HEIGHTS VERTICAL LEVELS: LEVELS must be positive\n",__func__);
     ok=0;
   }
   if(! ok){
@@ -3805,13 +3805,13 @@ static int C_genab_5001(float *hybuser, int nk, float rcoef, double ptop_8, doub
     return(VGD_ERROR);
 
   if( memcmp( &(hybuser[nk-1]), &f_one, sizeof(float)/sizeof(char)) ){
-    App_Log(APP_ERROR,"%s: WRONG SPECIFICATION OF HYB VERTICAL LEVELS: HYB(NK) MUST BE 1.0\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: WRONG SPECIFICATION OF HYB VERTICAL LEVELS: HYB(NK) MUST BE 1.0\n",__func__);
     ok=0;
   }
   //Check monotonicity
   for ( k = 1; k < nk; k++){
     if(hybuser[k] <= hybuser[k-1]){
-      App_Log(APP_ERROR,"%s: WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n",__func__);
       ok=0;
       break;
     }
@@ -3825,12 +3825,12 @@ static int C_genab_5001(float *hybuser, int nk, float rcoef, double ptop_8, doub
   }
 
   if( ptop_8 <= 0.) {
-    App_Log(APP_ERROR,"%s: ptop = %f must be greater than zero\n",__func__,ptop_8);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: ptop = %f must be greater than zero\n",__func__,ptop_8);
     return(VGD_ERROR);
   }
 
   if( ( ptop_8 - hybuser[0] * pref_8 ) / ptop_8 > epsilon ) {
-    App_Log(APP_ERROR,"%s: ptop = %f is lower than first hyb level = %f\n",__func__,ptop_8,hybuser[0]*pref_8);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: ptop = %f is lower than first hyb level = %f\n",__func__,ptop_8,hybuser[0]*pref_8);
     return(VGD_ERROR);
   }
 
@@ -3868,7 +3868,7 @@ static int C_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float
   
   // Processing option
   if( ! ( tlift == 0 || tlift == 1 ) ){
-    App_Log(APP_ERROR,"%s: wrong value given to tlift, expecting 0 (for false) or 1 (for true), got %d\n",__func__,tlift);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: wrong value given to tlift, expecting 0 (for false) or 1 (for true), got %d\n",__func__,tlift);
     fflush(stdout);
     return(VGD_ERROR);
   }
@@ -3887,32 +3887,32 @@ static int C_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float
 
   *PP_a_m_8 = malloc( (*nl_m)*sizeof(double) );
   if(! *PP_a_m_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_a_m_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_a_m_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_b_m_8 = malloc( (*nl_m)*sizeof(double) );
   if(! *PP_b_m_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_b_m_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_b_m_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_ip1_m = malloc( (*nl_m)*sizeof(int) );
   if(! *PP_ip1_m){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_ip1_m\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_ip1_m\n",__func__);
     return(VGD_ERROR);
   }
   *PP_a_t_8 = malloc( (*nl_t)*sizeof(double) );
   if(! *PP_a_t_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_a_t_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_a_t_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_b_t_8 = malloc( (*nl_t)*sizeof(double) );
   if(! *PP_b_t_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_b_t_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_b_t_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_ip1_t = malloc( (*nl_t)*sizeof(int) );
   if(! *PP_ip1_t){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_ip1_t\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_ip1_t\n",__func__);
     return(VGD_ERROR);
   }
 
@@ -3925,7 +3925,7 @@ static int C_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float
 
   zsrf_8  = log(pref_8);
   if ( ptop_8 <= 0. ) {
-    App_Log(APP_ERROR,"%s: ptop_8 must be > 0, got %f\n",__func__,ptop_8);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: ptop_8 must be > 0, got %f\n",__func__,ptop_8);
     fflush(stdout);
     return(VGD_ERROR);
   }
@@ -3936,12 +3936,12 @@ static int C_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float
   //    Check range
   hybtop = (float) (ptop_8 / pref_8);
   if( hybuser[nk-1] >= 1. ) {
-    App_Log(APP_ERROR,"%s: hyb must be < 1.0, got %f\n",__func__,hybuser[nk-1]);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: hyb must be < 1.0, got %f\n",__func__,hybuser[nk-1]);
     fflush(stdout);
     return(VGD_ERROR);
   }
   if( hybuser[0] <= hybtop ) {
-    App_Log(APP_ERROR,"%s: hyb must be > %f, got %f\n",__func__,hybtop,hybuser[0]);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: hyb must be > %f, got %f\n",__func__,hybtop,hybuser[0]);
     fflush(stdout);
     return(VGD_ERROR);
   }
@@ -3949,7 +3949,7 @@ static int C_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float
   //Check monotonicity
   for ( k = 1; k < nk; k++){
     if(hybuser[k] <= hybuser[k-1]){
-      App_Log(APP_ERROR,"%s: WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n",__func__);
       ok=0;
       break;
     }
@@ -4034,32 +4034,32 @@ static int C_genab_5004(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoe
 
   *PP_a_m_8 = malloc( (*nl_m)*sizeof(double) );
   if(! *PP_a_m_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_a_m_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_a_m_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_b_m_8 = malloc( (*nl_m)*sizeof(double) );
   if(! *PP_b_m_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_b_m_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_b_m_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_ip1_m = malloc( (*nl_m)*sizeof(int) );
   if(! *PP_ip1_m){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_ip1_m\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_ip1_m\n",__func__);
     return(VGD_ERROR);
   }
   *PP_a_t_8 = malloc( (*nl_t)*sizeof(double) );
   if(! *PP_a_t_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_a_t_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_a_t_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_b_t_8 = malloc( (*nl_t)*sizeof(double) );
   if(! *PP_b_t_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_b_t_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_b_t_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_ip1_t = malloc( (*nl_t)*sizeof(int) );
   if(! *PP_ip1_t){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_ip1_t\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_ip1_t\n",__func__);
     return(VGD_ERROR);
   }
 
@@ -4083,7 +4083,7 @@ static int C_genab_5004(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoe
       zetau_8 = ztop_8;
     }
   } else if (ptop_8 <= 0.) {
-    App_Log(APP_ERROR,"%s: ptop_8 must be > 0, got %f\n",__func__,ptop_8);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: ptop_8 must be > 0, got %f\n",__func__,ptop_8);
     return(VGD_ERROR);
   } else {
     // Take B(1) from user's ztop
@@ -4097,18 +4097,18 @@ static int C_genab_5004(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoe
   //    Check range
   hybtop = (float) (l_ptop_8 / pref_8);
   if( hybuser[nk-1] >= 1. ) {
-    App_Log(APP_ERROR,"%s: hyb must be < 1.0, got %f\n",__func__,hybuser[nk-1]);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: hyb must be < 1.0, got %f\n",__func__,hybuser[nk-1]);
     return(VGD_ERROR);
   }
   if( hybuser[0] <= hybtop ) {
-    App_Log(APP_ERROR,"%s: hyb must be > %f, got %f\n",__func__,hybtop,hybuser[0]);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: hyb must be > %f, got %f\n",__func__,hybtop,hybuser[0]);
     return(VGD_ERROR);
   }
 
   //Check monotonicity
   for ( k = 1; k < nk; k++){
     if(hybuser[k] <= hybuser[k-1]){
-      App_Log(APP_ERROR,"%s: WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n",__func__);
       ok=0;
       break;
     }
@@ -4176,32 +4176,32 @@ static int c_vgrid_genab_5005(float *hybuser, int nk, int *nl_m, int *nl_t, floa
 
   *PP_a_m_8 = malloc( (*nl_m)*sizeof(double) );
   if(! *PP_a_m_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_a_m_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_a_m_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_b_m_8 = malloc( (*nl_m)*sizeof(double) );
   if(! *PP_b_m_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_b_m_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_b_m_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_ip1_m = malloc( (*nl_m)*sizeof(int) );
   if(! *PP_ip1_m){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_ip1_m\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_ip1_m\n",__func__);
     return(VGD_ERROR);
   }
   *PP_a_t_8 = malloc( (*nl_t)*sizeof(double) );
   if(! *PP_a_t_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_a_t_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_a_t_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_b_t_8 = malloc( (*nl_t)*sizeof(double) );
   if(! *PP_b_t_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_b_t_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_b_t_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_ip1_t = malloc( (*nl_t)*sizeof(int) );
   if(! *PP_ip1_t){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_ip1_t\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_ip1_t\n",__func__);
     return(VGD_ERROR);
   }
 
@@ -4216,7 +4216,7 @@ static int c_vgrid_genab_5005(float *hybuser, int nk, int *nl_m, int *nl_t, floa
     // Default value for hyb_flat
     hyb_flat = hybuser[0];
   } else if ( hyb_flat < hybuser[0] || hyb_flat > hybuser[nk-1] ){
-      App_Log(APP_ERROR,"%s: hyb_flat must be between %f and %f, got %f\n",__func__,hybuser[0],hybuser[nk-1],hyb_flat);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: hyb_flat must be between %f and %f, got %f\n",__func__,hybuser[0],hybuser[nk-1],hyb_flat);
     return(VGD_ERROR);  
   }
   // Auto compute ptop
@@ -4229,18 +4229,18 @@ static int c_vgrid_genab_5005(float *hybuser, int nk, int *nl_m, int *nl_t, floa
   //    Check range
   hybtop = (float) ( (**ptop_out_8) / pref_8 );
   if( hybuser[nk-1] >= 1. ) {
-    App_Log(APP_ERROR,"%s: hyb must be < 1.0, got %f\n",__func__,hybuser[nk-1]);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: hyb must be < 1.0, got %f\n",__func__,hybuser[nk-1]);
     return(VGD_ERROR);
   }
   if( hybuser[0] <= hybtop ) {
-    App_Log(APP_ERROR,"%s: hyb must be > %f, got %f\n",__func__,hybtop,hybuser[0]);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: hyb must be > %f, got %f\n",__func__,hybtop,hybuser[0]);
     return(VGD_ERROR);
   }
 
   //Check monotonicity
   for ( k = 1; k < nk; k++){
     if(hybuser[k] <= hybuser[k-1]){
-      App_Log(APP_ERROR,"%s: WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n",__func__);
       ok=0;
       break;
     }
@@ -4326,42 +4326,42 @@ static int c_vgrid_genab_5100(float *hybuser, int nk, int *nl_m, int *nl_t, floa
 
   *PP_a_m_8 = malloc( (*nl_m)*sizeof(double) );
   if(! *PP_a_m_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_a_m_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_a_m_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_b_m_8 = malloc( (*nl_m)*sizeof(double) );
   if(! *PP_b_m_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_b_m_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_b_m_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_c_m_8 = malloc( (*nl_m)*sizeof(double) );
   if(! *PP_c_m_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_c_m_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_c_m_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_ip1_m = malloc( (*nl_m)*sizeof(int) );
   if(! *PP_ip1_m){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_ip1_m\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_ip1_m\n",__func__);
     return(VGD_ERROR);
   }
   *PP_a_t_8 = malloc( (*nl_t)*sizeof(double) );
   if(! *PP_a_t_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_a_t_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_a_t_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_b_t_8 = malloc( (*nl_t)*sizeof(double) );
   if(! *PP_b_t_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_b_t_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_b_t_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_c_t_8 = malloc( (*nl_t)*sizeof(double) );
   if(! *PP_c_t_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_c_t_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_c_t_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_ip1_t = malloc( (*nl_t)*sizeof(int) );
   if(! *PP_ip1_t){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_ip1_t\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_ip1_t\n",__func__);
     return(VGD_ERROR);
   }
 
@@ -4378,7 +4378,7 @@ static int c_vgrid_genab_5100(float *hybuser, int nk, int *nl_m, int *nl_t, floa
     // Default value for hyb_flat
     hyb_flat = hybuser[0];
   } else if ( hyb_flat < hybuser[0] || hyb_flat > hybuser[nk-1] ){
-      App_Log(APP_ERROR,"%s: hyb_flat must be between %f and %f, got %f\n",__func__,hybuser[0],hybuser[nk-1],hyb_flat);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: hyb_flat must be between %f and %f, got %f\n",__func__,hybuser[0],hybuser[nk-1],hyb_flat);
     return(VGD_ERROR);  
   }
   
@@ -4395,18 +4395,18 @@ static int c_vgrid_genab_5100(float *hybuser, int nk, int *nl_m, int *nl_t, floa
   //    Check range
   hybtop = (float) ( (**ptop_out_8) / pref_8 );
   if( hybuser[nk-1] >= 1. ) {
-    App_Log(APP_ERROR,"%s: hyb must be < 1.0, got %f\n",__func__,hybuser[nk-1]);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: hyb must be < 1.0, got %f\n",__func__,hybuser[nk-1]);
     return(VGD_ERROR);
   }
   if( hybuser[0] <= hybtop ) {
-    App_Log(APP_ERROR,"%s: hyb must be > %f, got %f\n",__func__,hybtop,hybuser[0]);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: hyb must be > %f, got %f\n",__func__,hybtop,hybuser[0]);
     return(VGD_ERROR);
   }
 
   //Check monotonicity
   for ( k = 1; k < nk; k++){
     if(hybuser[k] <= hybuser[k-1]){
-      App_Log(APP_ERROR,"%s: WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY INCREASING\n",__func__);
       ok=0;
       break;
     }
@@ -4515,7 +4515,7 @@ static int c_vgrid_genab_21001(float *hybuser, int nk, int *nl_m, int *nl_t, flo
   //Check monotonicity
   for ( k = 1; k < nk; k++){
     if(hybuser[k] >= hybuser[k-1]){
-      App_Log(APP_ERROR,"%s: WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY DECREASING\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY DECREASING\n",__func__);
       ok=0;
       break;
     }
@@ -4533,42 +4533,42 @@ static int c_vgrid_genab_21001(float *hybuser, int nk, int *nl_m, int *nl_t, flo
   
   *PP_a_m_8 = malloc( (*nl_m)*sizeof(double) );
   if(! *PP_a_m_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_a_m_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_a_m_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_b_m_8 = malloc( (*nl_m)*sizeof(double) );
   if(! *PP_b_m_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_b_m_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_b_m_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_c_m_8 = malloc( (*nl_m)*sizeof(double) );
   if(! *PP_c_m_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_c_m_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_c_m_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_ip1_m = malloc( (*nl_m)*sizeof(int) );
   if(! *PP_ip1_m){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_ip1_m\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_ip1_m\n",__func__);
     return(VGD_ERROR);
   }
   *PP_a_t_8 = malloc( (*nl_t)*sizeof(double) );
   if(! *PP_a_t_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_a_t_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_a_t_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_b_t_8 = malloc( (*nl_t)*sizeof(double) );
   if(! *PP_b_t_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_b_t_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_b_t_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_c_t_8 = malloc( (*nl_t)*sizeof(double) );
   if(! *PP_c_t_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_c_t_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_c_t_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_ip1_t = malloc( (*nl_t)*sizeof(int) );
   if(! *PP_ip1_t){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_ip1_t\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_ip1_t\n",__func__);
     return(VGD_ERROR);
   }
 
@@ -4585,19 +4585,19 @@ static int c_vgrid_genab_21001(float *hybuser, int nk, int *nl_m, int *nl_t, flo
     // Default value for hyb_flat
     hyb_flat = hybuser[0];
   } else if ( hyb_flat < hybuser[nk-1] || hyb_flat > hybuser[0] ){
-    App_Log(APP_ERROR,"%s: hyb_flat must be between %f and %f, got %f\n",__func__,hybuser[nk-1],hybuser[0],hyb_flat);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: hyb_flat must be between %f and %f, got %f\n",__func__,hybuser[nk-1],hybuser[0],hyb_flat);
     return(VGD_ERROR);  
   }
   
   if ( rcoef3 < 0. ){
     if( rcoef4 >= 0. ){
-      App_Log(APP_ERROR,"%s: rcoef4 should not bet set since rcoef3 is not set\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: rcoef4 should not bet set since rcoef3 is not set\n",__func__);
       return(VGD_ERROR);
     }
   }
   if ( rcoef4 < 0. ){
     if( rcoef3 >= 0. ){
-      App_Log(APP_ERROR,"%s: rcoef3 should not bet set since rcoef4 is not set\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: rcoef3 should not bet set since rcoef4 is not set\n",__func__);
       return(VGD_ERROR);
     }
   }
@@ -4696,7 +4696,7 @@ static int c_vgrid_genab_21002(float *hybuser, int nk, int *nl_m, int *nl_t, int
   //Check monotonicity
   for ( k = 1; k < nk; k++){
     if(hybuser[k] >= hybuser[k-1]){
-      App_Log(APP_ERROR,"%s: WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY DECREASING\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: WRONG SPECIFICATION OF HYB VERTICAL LEVELS: LEVELS MUST BE MONOTONICALLY DECREASING\n",__func__);
       ok=0;
       break;
     }
@@ -4715,62 +4715,62 @@ static int c_vgrid_genab_21002(float *hybuser, int nk, int *nl_m, int *nl_t, int
   
   *PP_a_m_8 = malloc( (*nl_m)*sizeof(double) );
   if(! *PP_a_m_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_a_m_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_a_m_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_b_m_8 = malloc( (*nl_m)*sizeof(double) );
   if(! *PP_b_m_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_b_m_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_b_m_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_c_m_8 = malloc( (*nl_m)*sizeof(double) );
   if(! *PP_c_m_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_c_m_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_c_m_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_ip1_m = malloc( (*nl_m)*sizeof(int) );
   if(! *PP_ip1_m){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_ip1_m\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_ip1_m\n",__func__);
     return(VGD_ERROR);
   }
   *PP_a_t_8 = malloc( (*nl_t)*sizeof(double) );
   if(! *PP_a_t_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_a_t_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_a_t_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_b_t_8 = malloc( (*nl_t)*sizeof(double) );
   if(! *PP_b_t_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_b_t_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_b_t_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_c_t_8 = malloc( (*nl_t)*sizeof(double) );
   if(! *PP_c_t_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_c_t_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_c_t_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_ip1_t = malloc( (*nl_t)*sizeof(int) );
   if(! *PP_ip1_t){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_ip1_t\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_ip1_t\n",__func__);
     return(VGD_ERROR);
   }
   *PP_a_w_8 = malloc( (*nl_w)*sizeof(double) );
   if(! *PP_a_w_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_a_w_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_a_w_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_b_w_8 = malloc( (*nl_w)*sizeof(double) );
   if(! *PP_b_w_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_b_w_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_b_w_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_c_w_8 = malloc( (*nl_w)*sizeof(double) );
   if(! *PP_c_w_8){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_c_w_8\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_c_w_8\n",__func__);
     return(VGD_ERROR);
   }
   *PP_ip1_w = malloc( (*nl_w)*sizeof(int) );
   if(! *PP_ip1_w){
-    App_Log(APP_ERROR,"%s: malloc error with *PP_ip1_w\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: malloc error with *PP_ip1_w\n",__func__);
     return(VGD_ERROR);
   }
 
@@ -4791,19 +4791,19 @@ static int c_vgrid_genab_21002(float *hybuser, int nk, int *nl_m, int *nl_t, int
     // Default value for hyb_flat
     hyb_flat = hybuser[0];
   } else if ( hyb_flat < hybuser[nk-1] || hyb_flat > hybuser[0] ){
-      App_Log(APP_ERROR,"%s: hyb_flat must be between %f and %f, got %f\n",__func__,hybuser[nk-1],hybuser[0],hyb_flat);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: hyb_flat must be between %f and %f, got %f\n",__func__,hybuser[nk-1],hybuser[0],hyb_flat);
     return(VGD_ERROR);  
   }
 
   if ( rcoef3 < 0. ){
     if( rcoef4 >= 0. ){
-      App_Log(APP_ERROR,"%s: rcoef4 should not bet set since rcoef3 is not set\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: rcoef4 should not bet set since rcoef3 is not set\n",__func__);
       return(VGD_ERROR);
     }
   }
   if ( rcoef4 < 0. ){
     if( rcoef3 >= 0. ){
-      App_Log(APP_ERROR,"%s: fcoef3 should not bet set since rcoef4 is not set\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: fcoef3 should not bet set since rcoef4 is not set\n",__func__);
       return(VGD_ERROR);
     }
   }
@@ -4906,14 +4906,14 @@ static int c_vgrid_genab_21002(float *hybuser, int nk, int *nl_m, int *nl_t, int
 int Cvgd_getopt_int(char *key, int *value, int quiet)
 {
   if(! value){
-    App_Log(APP_ERROR,"%s: value is a NULL pointer\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: value is a NULL pointer\n",__func__);
     return(VGD_ERROR);
   }
   if (strcmp(key, "ALLOW_SIGMA") == 0){
       *value = ALLOW_SIGMA;
   } else {
     if(! quiet) {
-      App_Log(APP_ERROR,"%s: invalid key %s\n",__func__,key);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key %s\n",__func__,key);
     }
     return(VGD_ERROR);
   }  
@@ -4924,11 +4924,11 @@ int Cvgd_getopt_int(char *key, int *value, int quiet)
 int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet)
 {  
   if(! Cvgd_is_valid(self,"SELF")){
-    App_Log(APP_ERROR,"%s: invalid vgrid\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid vgrid\n",__func__);
     return(VGD_ERROR);
   }
   if(! value){
-    App_Log(APP_ERROR,"%s: value is a NULL pointer\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: value is a NULL pointer\n",__func__);
     return(VGD_ERROR);
   }
   *value = VGD_MISSING;
@@ -4963,7 +4963,7 @@ int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet)
   } else if (strcmp(key, "DIPM") == 0){
     if( ! Cvgd_is_valid(self,"dhm_valid") ){      
       if(! quiet) {
-	App_Log(APP_ERROR,"%s: cannot get key %s\n",__func__,key);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot get key %s\n",__func__,key);
 	fflush(stdout);
       }
       return(VGD_ERROR);
@@ -4972,7 +4972,7 @@ int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet)
   } else if (strcmp(key, "DIPT") == 0){
     if( ! Cvgd_is_valid(self,"dht_valid") ){      
       if(! quiet) {
-	App_Log(APP_ERROR,"%s: cannot get key %s\n",__func__,key);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot get key %s\n",__func__,key);
 	fflush(stdout);
       }
       return(VGD_ERROR);
@@ -4981,7 +4981,7 @@ int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet)
   } else if (strcmp(key, "DIPW") == 0){
     if( ! Cvgd_is_valid(self,"dhw_valid") ){      
       if(! quiet) {
-	App_Log(APP_ERROR,"%s: cannot get key %s\n",__func__,key);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot get key %s\n",__func__,key);
 	fflush(stdout);
       }
       return(VGD_ERROR);
@@ -5013,12 +5013,12 @@ int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet)
       *value = VGD_HEIGHT_TYPE;
       break;
     default:
-      App_Log(APP_ERROR,"%s: unsupported Vcode for key TYPE %d\n",__func__,self->vcode);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: unsupported Vcode for key TYPE %d\n",__func__,self->vcode);
       return(VGD_ERROR);
     }
   } else {
     if(! quiet) {
-      App_Log(APP_ERROR,"%s: invalid key %s\n",__func__,key);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key %s\n",__func__,key);
     }
     return(VGD_ERROR);
   }
@@ -5032,7 +5032,7 @@ int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk, int
   int OK = 1;
   if(nk) *nk = -1;
   if(! Cvgd_is_valid(self,"SELF")){
-    App_Log(APP_ERROR,"%s: invalid vgrid\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid vgrid\n",__func__);
     return(VGD_ERROR);
   }
   // ====
@@ -5040,7 +5040,7 @@ int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk, int
   // ----
   if(strcmp(key, "VIP1") == 0 ){
     if( is_valid(self,ip1_m_valid) ){
-      App_Log(APP_ERROR,"%s: depricated key '%s' use VIPM instead.\n",__func__,key);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: depricated key '%s' use VIPM instead.\n",__func__,key);
       return(VGD_ERROR);
     } else {
       OK = 0;
@@ -5054,7 +5054,7 @@ int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk, int
       if(! *value){
 	(*value) = malloc(self->nl_m * sizeof(int));
 	if(! *value){
-	  App_Log(APP_ERROR,"%s: problem allocating %d int\n",__func__,self->nl_m);
+	  Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating %d int\n",__func__,self->nl_m);
 	  return(VGD_ERROR);
 	}
       }
@@ -5070,7 +5070,7 @@ int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk, int
     if(! *value){
       (*value) = malloc(self->nl_t * sizeof(int));
       if(! *value){
-	App_Log(APP_ERROR,"%s: problem allocating %d int\n",__func__,self->nl_t);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating %d int\n",__func__,self->nl_t);
 	return(VGD_ERROR);
       }
     }
@@ -5083,7 +5083,7 @@ int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk, int
     if(! *value){
       (*value) = malloc(self->nl_w * sizeof(int));
       if(! *value){
-	App_Log(APP_ERROR,"%s: problem allocating %d int\n",__func__,self->nl_w);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating %d int\n",__func__,self->nl_w);
 	return(VGD_ERROR);
       }
     }
@@ -5094,7 +5094,7 @@ int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk, int
   }
   if(! OK) {
     if(! quiet) {
-      App_Log(APP_ERROR,"%s: invalid key '%s' for Vcode %d\n",__func__,key,self->vcode);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key '%s' for Vcode %d\n",__func__,key,self->vcode);
       fflush(stdout);
     }
     return(VGD_ERROR);    
@@ -5106,11 +5106,11 @@ int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk, int
 int Cvgd_get_float(vgrid_descriptor *self, char *key, float *value, int quiet) {
 
   if(! Cvgd_is_valid(self,"SELF")){
-    App_Log(APP_ERROR,"%s: invalid vgrid\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid vgrid\n",__func__);
     return(VGD_ERROR);
   }
   if(! value){
-    App_Log(APP_ERROR,"%s: value is a NULL pointer\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: value is a NULL pointer\n",__func__);
     return(VGD_ERROR);
   }  
 
@@ -5158,7 +5158,7 @@ int Cvgd_get_float(vgrid_descriptor *self, char *key, float *value, int quiet) {
     }
   } else {
     if(! quiet) {
-      App_Log(APP_ERROR,"%s: invalid key '%s'\n",__func__,key);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key '%s'\n",__func__,key);
     }
     return(VGD_ERROR);
   }
@@ -5172,7 +5172,7 @@ int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk,
   int *vip1=NULL, kind, k, OK = 1;
   if(nk) *nk = -1;
   if(! Cvgd_is_valid(self,"SELF")){
-    App_Log(APP_ERROR,"%s: invalid vgrid\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid vgrid\n",__func__);
     return(VGD_ERROR);
   }
   if( strcmp(key, "VCDM") == 0 ){
@@ -5180,7 +5180,7 @@ int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk,
       if(! *value){
 	(*value) = malloc(self->nl_m * sizeof(float));
 	if(! *value){
-	  App_Log(APP_ERROR,"%s: problem allocating %d double\n",__func__,self->nl_m);
+	  Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating %d double\n",__func__,self->nl_m);
 	  return(VGD_ERROR);
 	}
       }    
@@ -5198,7 +5198,7 @@ int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk,
     if(! *value){
       (*value) = malloc(self->nl_t * sizeof(float));
       if(! *value){
-	App_Log(APP_ERROR,"%s: problem allocating %d double\n",__func__,self->nl_t);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating %d double\n",__func__,self->nl_t);
 	return(VGD_ERROR);
       }
     }  
@@ -5213,7 +5213,7 @@ int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk,
     if(! *value){
       (*value) = malloc(self->nl_w * sizeof(float));
       if(! *value){
-	App_Log(APP_ERROR,"%s: problem allocating %d double\n",__func__,self->nl_w);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating %d double\n",__func__,self->nl_w);
 	return(VGD_ERROR);
       }
     }  
@@ -5229,7 +5229,7 @@ int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk,
   }
   if(! OK){
     if(! quiet) {
-      App_Log(APP_ERROR,"%s: invalid key '%s' for vcode %d\n",__func__,key, self->vcode);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key '%s' for vcode %d\n",__func__,key, self->vcode);
     }
     return(VGD_ERROR);    
   }
@@ -5239,7 +5239,7 @@ int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk,
 int Cvgd_get_double(vgrid_descriptor *self, char *key, double *value_get, int quiet) {
   int OK = 1;
   if(! Cvgd_is_valid(self,"SELF")){
-    App_Log(APP_ERROR,"%s: invalid vgrid\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid vgrid\n",__func__);
     return(VGD_ERROR);
   }
   if( strcmp(key, "PTOP") == 0 ) {
@@ -5262,7 +5262,7 @@ int Cvgd_get_double(vgrid_descriptor *self, char *key, double *value_get, int qu
     *value_get = (self)->rcoef4;
   } else {
     if(! quiet) {
-      App_Log(APP_ERROR,"%s: invalid key '%s'\n",__func__,key);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key '%s'\n",__func__,key);
       fflush(stdout);
     }
     return(VGD_ERROR);
@@ -5270,7 +5270,7 @@ int Cvgd_get_double(vgrid_descriptor *self, char *key, double *value_get, int qu
   
   if(! OK) {
     if(! quiet) {
-      App_Log(APP_ERROR,"%s: %s cannot get for Vcode %d\n",__func__,key,(self)->vcode);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: %s cannot get for Vcode %d\n",__func__,key,(self)->vcode);
     }
     return(VGD_ERROR);
   }    
@@ -5283,7 +5283,7 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
   int OK = 1;
   if(nk) *nk = -1;
   if(! Cvgd_is_valid(self,"SELF")){
-    App_Log(APP_ERROR,"%s: invalid vgrid\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid vgrid\n",__func__);
     return(VGD_ERROR);
   }
   if( strcmp(key, "CA_M") == 0 || strcmp(key, "COFA") == 0 ){
@@ -5293,7 +5293,7 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     if(! *value){
       (*value) = malloc(self->nl_m * sizeof(double));
       if(! *value){
-	App_Log(APP_ERROR,"%s: problem allocating %d double for CA_M\n",__func__,self->nl_m);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating %d double for CA_M\n",__func__,self->nl_m);
 	return(VGD_ERROR);
       }
     }
@@ -5306,7 +5306,7 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     if(! *value){
       (*value) = malloc(self->nl_m * sizeof(double));
       if(! *value){
-	App_Log(APP_ERROR,"%s: problem allocating %d double for CB_M\n",__func__,self->nl_m);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating %d double for CB_M\n",__func__,self->nl_m);
 	return(VGD_ERROR);
       }
     }
@@ -5319,7 +5319,7 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     if(! *value){
       (*value) = malloc(self->nl_m * sizeof(double));
       if(! *value){
-	App_Log(APP_ERROR,"%s: problem allocating %d double for CC_M\n",__func__,self->nl_m);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating %d double for CC_M\n",__func__,self->nl_m);
 	return(VGD_ERROR);
       }
     }
@@ -5332,7 +5332,7 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     if(! *value){
       (*value) = malloc(self->nl_t * sizeof(double));
       if(! *value){
-	App_Log(APP_ERROR,"%s: problem allocating %d double for CA_T\n",__func__,self->nl_t);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating %d double for CA_T\n",__func__,self->nl_t);
 	return(VGD_ERROR);
       }
     }
@@ -5345,7 +5345,7 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     if(! *value){
       (*value) = malloc(self->nl_t * sizeof(double));
       if(! *value){
-	App_Log(APP_ERROR,"%s: problem allocating %d double for CB_T\n",__func__,self->nl_t);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating %d double for CB_T\n",__func__,self->nl_t);
 	return(VGD_ERROR);
       }
     }
@@ -5358,7 +5358,7 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     if(! *value){
       (*value) = malloc(self->nl_t * sizeof(double));
       if(! *value){
-	App_Log(APP_ERROR,"%s: problem allocating %d double for CC_T\n",__func__,self->nl_t);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating %d double for CC_T\n",__func__,self->nl_t);
 	return(VGD_ERROR);
       }
     }
@@ -5371,7 +5371,7 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     if(! *value){
       (*value) = malloc(self->nl_w * sizeof(double));
       if(! *value){
-	App_Log(APP_ERROR,"%s: problem allocating %d double for CA_W\n",__func__,self->nl_w);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating %d double for CA_W\n",__func__,self->nl_w);
 	return(VGD_ERROR);
       }
     }
@@ -5384,7 +5384,7 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     if(! *value){
       (*value) = malloc(self->nl_w * sizeof(double));
       if(! *value){
-	App_Log(APP_ERROR,"%s: problem allocating %d double for CB_W\n",__func__,self->nl_w);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating %d double for CB_W\n",__func__,self->nl_w);
 	return(VGD_ERROR);
       }
     }
@@ -5397,7 +5397,7 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     if(! *value){
       (*value) = malloc(self->nl_w * sizeof(double));
       if(! *value){
-	App_Log(APP_ERROR,"%s: problem allocating %d double for CC_W\n",__func__,self->nl_w);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating %d double for CC_W\n",__func__,self->nl_w);
 	return(VGD_ERROR);
       }
     }
@@ -5411,7 +5411,7 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
   }    
   if( ! OK) {
     if(! quiet) {
-      App_Log(APP_ERROR,"%s: invalid key '%s' for vcode %d\n",__func__,key,self->vcode);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key '%s' for vcode %d\n",__func__,key,self->vcode);
       fflush(stdout);
     }
     return(VGD_ERROR);
@@ -5427,7 +5427,7 @@ int Cvgd_get_double_3d(vgrid_descriptor *self, char *key, double **value, int *n
   if(nj) *nj = -1;
   if(nk) *nk = -1;    
   if(! Cvgd_is_valid(self,"SELF")){
-    App_Log(APP_ERROR,"%s: invalid vgrid\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid vgrid\n",__func__);
     return(VGD_ERROR);
   }
   int table_size = self->table_ni * self->table_nj * self->table_nk;
@@ -5435,7 +5435,7 @@ int Cvgd_get_double_3d(vgrid_descriptor *self, char *key, double **value, int *n
     if(! *value){
       (*value) = malloc( table_size * sizeof(double));
       if(! *value){
-	App_Log(APP_ERROR,"%s: problem allocating %d double\n",__func__,table_size);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating %d double\n",__func__,table_size);
 	return(VGD_ERROR);
       }
     }
@@ -5445,7 +5445,7 @@ int Cvgd_get_double_3d(vgrid_descriptor *self, char *key, double **value, int *n
     if(nk) *nk = self->table_nk;
   } else {
     if(! quiet) {
-      App_Log(APP_ERROR,"%s: invalid key '%s'\n",__func__,key);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key '%s'\n",__func__,key);
       fflush(stdout);
     }
     return(VGD_ERROR);
@@ -5457,7 +5457,7 @@ int Cvgd_get_double_3d(vgrid_descriptor *self, char *key, double **value, int *n
 int Cvgd_get_char(vgrid_descriptor *self, char *key, char out[], int quiet) {
   char ok = 1;
   if(! Cvgd_is_valid(self,"SELF")){
-    App_Log(APP_ERROR,"%s: invalid vgrid structure\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid vgrid structure\n",__func__);
     return(VGD_ERROR);
   }
   if( strcmp(key, "ETIK") == 0 ){
@@ -5483,7 +5483,7 @@ int Cvgd_get_char(vgrid_descriptor *self, char *key, char out[], int quiet) {
   }
   if(! ok ){
     if(! quiet){
-      App_Log(APP_ERROR,"%s: invalid key -> '%s'\n",__func__,key);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key -> '%s'\n",__func__,key);
     }
     return(VGD_ERROR);
   }
@@ -5492,13 +5492,13 @@ int Cvgd_get_char(vgrid_descriptor *self, char *key, char out[], int quiet) {
 
 int Cvgd_put_char(vgrid_descriptor **self, char *key, char *value) {
   if(! Cvgd_is_valid(*self,"SELF")){
-    App_Log(APP_ERROR,"%s: invalid vgrid\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid vgrid\n",__func__);
     return(VGD_ERROR);
   }
   if( strcmp(key, "ETIK") == 0 ){
     strcpy((*self)->rec.etiket,value);
   } else {
-    App_Log(APP_ERROR,"%s: invalid key -> '%s'\n",__func__,key);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key -> '%s'\n",__func__,key);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -5508,7 +5508,7 @@ int Cvgd_putopt_int(char *key, int value) {
   if( strcmp(key, "ALLOW_SIGMA") == 0 ) {
     ALLOW_SIGMA = value;
   } else {
-    App_Log(APP_ERROR,"%s: invalid key %s\n",__func__,key);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key %s\n",__func__,key);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -5517,12 +5517,12 @@ int Cvgd_putopt_int(char *key, int value) {
 int Cvgd_put_int(vgrid_descriptor **self, char *key, int value) {
   int kind;
   if(! self) {
-    App_Log(APP_ERROR,"%s: vgrid is a null pointer\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: vgrid is a null pointer\n",__func__);
     return(VGD_ERROR);
   }
   
   if(! Cvgd_is_valid((*self),"SELF")){
-    App_Log(APP_ERROR,"%s: invalid vgrid\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid vgrid\n",__func__);
     return(VGD_ERROR);
   }
   if( strcmp(key, "DATE") == 0 ) {
@@ -5551,11 +5551,11 @@ int Cvgd_put_int(vgrid_descriptor **self, char *key, int value) {
 	(*self)->a_m_8[(*self)->nl_m -1 ] = c_convip_IP2Level(value, &kind);
       }
       if( c_table_update(self) == VGD_ERROR) {
-	App_Log(APP_ERROR,"%s: problem with c_table_update for key %s\n",__func__,key);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem with c_table_update for key %s\n",__func__,key);
 	return(VGD_ERROR);
       }
     } else {
-      App_Log(APP_ERROR,"%s: DIPM cannot be put for Vcode %d\n",__func__,(*self)->vcode);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: DIPM cannot be put for Vcode %d\n",__func__,(*self)->vcode);
       return(VGD_ERROR);
     }
   } else if( strcmp(key, "DIPT") == 0 ) {
@@ -5568,11 +5568,11 @@ int Cvgd_put_int(vgrid_descriptor **self, char *key, int value) {
 	(*self)->a_t_8[(*self)->nl_t -1 ] =  c_convip_IP2Level(value, &kind);
       }
       if( c_table_update(self) == VGD_ERROR) {
-	App_Log(APP_ERROR,"%s: problem with c_table_update for key %s\n",__func__,key);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem with c_table_update for key %s\n",__func__,key);
 	return(VGD_ERROR);
       }
     } else {
-      App_Log(APP_ERROR,"%s: DIPT cannot be put for Vcode %d\n",__func__,(*self)->vcode);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: DIPT cannot be put for Vcode %d\n",__func__,(*self)->vcode);
       return(VGD_ERROR);
     }
   } else if( strcmp(key, "DIPW") == 0 ) {
@@ -5585,15 +5585,15 @@ int Cvgd_put_int(vgrid_descriptor **self, char *key, int value) {
 	(*self)->a_w_8[(*self)->nl_w -1 ] =  c_convip_IP2Level(value, &kind);
       }
       if( c_table_update(self) == VGD_ERROR) {
-	App_Log(APP_ERROR,"%s: problem with c_table_update for key %s\n",__func__,key);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem with c_table_update for key %s\n",__func__,key);
 	return(VGD_ERROR);
       }
     } else {
-      App_Log(APP_ERROR,"%s: DIPW cannot be put for Vcode %d\n",__func__,(*self)->vcode);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: DIPW cannot be put for Vcode %d\n",__func__,(*self)->vcode);
       return(VGD_ERROR);
     }
   } else {
-    App_Log(APP_ERROR,"%s: invalid key %s\n",__func__,key);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid key %s\n",__func__,key);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -5605,7 +5605,7 @@ int Cvgd_new_gen2(vgrid_descriptor **self, int kind, int version, float *hyb, in
   if( Cvgd_new_gen3(self, kind, version, hyb, size_hyb, rcoef1, rcoef2, rcoef3, rcoef4,
 		   ptop_8, pref_8, ptop_out_8,
 		    ip1, ip2, dhm, dht, dhw, avg, NULL) == VGD_ERROR ){
-    App_Log(APP_ERROR,"%s: see details above\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: see details above\n",__func__);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -5617,7 +5617,7 @@ int Cvgd_new_gen(vgrid_descriptor **self, int kind, int version, float *hyb, int
   if( Cvgd_new_gen3(self, kind, version, hyb, size_hyb, rcoef1, rcoef2, NULL, NULL,
 		   ptop_8, pref_8, ptop_out_8,
 		    ip1, ip2, dhm, dht, NULL, avg, NULL) == VGD_ERROR ){
-    App_Log(APP_ERROR,"%s: see details above\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: see details above\n",__func__);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -5625,7 +5625,7 @@ int Cvgd_new_gen(vgrid_descriptor **self, int kind, int version, float *hyb, int
 int Cvgd_new_gen_1001(vgrid_descriptor **self, float *hyb, int size_hyb, int ip1, int ip2) {
   if( Cvgd_new_gen3(self, 1, 1, hyb, size_hyb, NULL, NULL, NULL, NULL,
 		    NULL, NULL, NULL, ip1, ip2, NULL, NULL, NULL, 0, NULL) == VGD_ERROR ){
-    App_Log(APP_ERROR,"%s: see details above\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: see details above\n",__func__);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -5633,7 +5633,7 @@ int Cvgd_new_gen_1001(vgrid_descriptor **self, float *hyb, int size_hyb, int ip1
 int Cvgd_new_gen_2001(vgrid_descriptor **self, float *hyb, int size_hyb, int ip1, int ip2) {
   if( Cvgd_new_gen3(self, 2, 1, hyb, size_hyb, NULL, NULL, NULL, NULL,
 		    NULL, NULL, NULL, ip1, ip2, NULL, NULL, NULL, 0, NULL) == VGD_ERROR ){
-    App_Log(APP_ERROR,"%s: see details above\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: see details above\n",__func__);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -5641,7 +5641,7 @@ int Cvgd_new_gen_2001(vgrid_descriptor **self, float *hyb, int size_hyb, int ip1
 int Cvgd_new_gen_5999(vgrid_descriptor **self, float *hyb, int size_hyb, int ip1, int ip2) {
   if( Cvgd_new_gen3(self, 5, 999, hyb, size_hyb, NULL, NULL, NULL, NULL,
 		    NULL, NULL, NULL, ip1, ip2, NULL, NULL, NULL, 0, NULL) == VGD_ERROR ){
-    App_Log(APP_ERROR,"%s: see details above\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: see details above\n",__func__);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -5649,7 +5649,7 @@ int Cvgd_new_gen_5999(vgrid_descriptor **self, float *hyb, int size_hyb, int ip1
 int Cvgd_new_gen_1002(vgrid_descriptor **self, float *hyb, int size_hyb, double ptop_8, int ip1, int ip2) {
   if( Cvgd_new_gen3(self, 1, 2, hyb, size_hyb, NULL, NULL, NULL, NULL,
 		    &ptop_8, NULL, NULL, ip1, ip2, NULL, NULL, NULL, 0, NULL) == VGD_ERROR ){
-    App_Log(APP_ERROR,"%s: see details above\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: see details above\n",__func__);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -5657,7 +5657,7 @@ int Cvgd_new_gen_1002(vgrid_descriptor **self, float *hyb, int size_hyb, double 
 int Cvgd_new_gen_4001(vgrid_descriptor **self, float *hyb, int size_hyb, int ip1, int ip2) {  
   if( Cvgd_new_gen3(self, 4, 1, hyb, size_hyb, NULL, NULL, NULL, NULL,
 		    NULL, NULL, NULL, ip1, ip2, NULL, NULL, NULL, 0, NULL) == VGD_ERROR ){
-    App_Log(APP_ERROR,"%s: see details above\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: see details above\n",__func__);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -5665,7 +5665,7 @@ int Cvgd_new_gen_4001(vgrid_descriptor **self, float *hyb, int size_hyb, int ip1
 int Cvgd_new_gen_5001(vgrid_descriptor **self, float *hyb, int size_hyb, double ptop_8, double pref_8, float rcoef1, int ip1, int ip2) {
   if( Cvgd_new_gen3(self, 5, 1, hyb, size_hyb, &rcoef1, NULL, NULL, NULL,
 		    &ptop_8, &pref_8, NULL, ip1, ip2, NULL, NULL, NULL, 0, NULL) == VGD_ERROR ){
-    App_Log(APP_ERROR,"%s: see details above\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: see details above\n",__func__);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -5673,7 +5673,7 @@ int Cvgd_new_gen_5001(vgrid_descriptor **self, float *hyb, int size_hyb, double 
 int Cvgd_new_gen_5002(vgrid_descriptor **self, float *hyb, int size_hyb, double ptop_8, double pref_8, float rcoef1, float rcoef2, int ip1, int ip2) {
   if( Cvgd_new_gen3(self, 5, 2, hyb, size_hyb, &rcoef1, &rcoef2, NULL, NULL,
 		    &ptop_8, &pref_8, NULL, ip1, ip2, NULL, NULL, NULL, 0, NULL) == VGD_ERROR ){
-    App_Log(APP_ERROR,"%s: see details above\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: see details above\n",__func__);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -5682,7 +5682,7 @@ int Cvgd_new_gen_5002(vgrid_descriptor **self, float *hyb, int size_hyb, double 
 int Cvgd_new_gen_5005(vgrid_descriptor **self, float *hyb, int size_hyb, double pref_8, double *ptop_out_8, float rcoef1, float rcoef2, int ip1, int ip2, float dhm, float dht) {
   if( Cvgd_new_gen3(self, 5, 5, hyb, size_hyb, &rcoef1, &rcoef2, NULL, NULL,
 		    NULL, &pref_8, ptop_out_8, ip1, ip2, &dhm, &dht, NULL, 0, NULL) == VGD_ERROR ){
-    App_Log(APP_ERROR,"%s: see details above\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: see details above\n",__func__);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -5691,7 +5691,7 @@ int Cvgd_new_gen_5005(vgrid_descriptor **self, float *hyb, int size_hyb, double 
 int Cvgd_new_gen_5005_2(vgrid_descriptor **self, float *hyb, int size_hyb, double pref_8, double *ptop_out_8, float rcoef1, float rcoef2, int ip1, int ip2, float dhm, float dht, float hyb_flat) {
   if( Cvgd_new_gen3(self, 5, 5, hyb, size_hyb, &rcoef1, &rcoef2, NULL, NULL,
 		    NULL, &pref_8, ptop_out_8, ip1, ip2, &dhm, &dht, NULL, 0, &hyb_flat) == VGD_ERROR ){
-    App_Log(APP_ERROR,"%s: see details above\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: see details above\n",__func__);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -5700,7 +5700,7 @@ int Cvgd_new_gen_5005_2(vgrid_descriptor **self, float *hyb, int size_hyb, doubl
 int Cvgd_new_gen_5100(vgrid_descriptor **self, float *hyb, int size_hyb, double pref_8, double *ptop_out_8, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, int avg) {
   if( Cvgd_new_gen3(self, 5, 100, hyb, size_hyb, &rcoef1, &rcoef2,  &rcoef3, &rcoef4,
 		    NULL, &pref_8, ptop_out_8, ip1, ip2, &dhm, &dht, NULL, avg, NULL) == VGD_ERROR ){
-    App_Log(APP_ERROR,"%s: see details above\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: see details above\n",__func__);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -5709,7 +5709,7 @@ int Cvgd_new_gen_5100(vgrid_descriptor **self, float *hyb, int size_hyb, double 
 int Cvgd_new_gen_5100_2(vgrid_descriptor **self, float *hyb, int size_hyb, double pref_8, double *ptop_out_8, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, int avg, float hyb_flat) {
   if( Cvgd_new_gen3(self, 5, 100, hyb, size_hyb, &rcoef1, &rcoef2,  &rcoef3, &rcoef4,
 		    NULL, &pref_8, ptop_out_8, ip1, ip2, &dhm, &dht, NULL, avg, &hyb_flat) == VGD_ERROR ){
-    App_Log(APP_ERROR,"%s: see details above\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: see details above\n",__func__);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -5718,7 +5718,7 @@ int Cvgd_new_gen_5100_2(vgrid_descriptor **self, float *hyb, int size_hyb, doubl
 int Cvgd_new_gen_21001(vgrid_descriptor **self, float *hyb, int size_hyb, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht) {
   if( Cvgd_new_gen3(self, 21, 1, hyb, size_hyb, &rcoef1, &rcoef2, &rcoef3, &rcoef4,
 		    NULL, NULL, NULL, ip1, ip2, &dhm, &dht, NULL, 0, NULL) == VGD_ERROR ){
-    App_Log(APP_ERROR,"%s: see details above\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: see details above\n",__func__);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -5727,7 +5727,7 @@ int Cvgd_new_gen_21001(vgrid_descriptor **self, float *hyb, int size_hyb, float 
 int Cvgd_new_gen_21001_2(vgrid_descriptor **self, float *hyb, int size_hyb, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, float hyb_flat) {
   if( Cvgd_new_gen3(self, 21, 1, hyb, size_hyb, &rcoef1, &rcoef2, &rcoef3, &rcoef4,
 		    NULL, NULL, NULL, ip1, ip2, &dhm, &dht, NULL, 0, &hyb_flat) == VGD_ERROR ){
-    App_Log(APP_ERROR,"%s: see details above\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: see details above\n",__func__);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -5736,7 +5736,7 @@ int Cvgd_new_gen_21001_2(vgrid_descriptor **self, float *hyb, int size_hyb, floa
 int Cvgd_new_gen_21002(vgrid_descriptor **self, float *hyb, int size_hyb, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, float dhw) {
   if( Cvgd_new_gen3(self, 21, 2, hyb, size_hyb, &rcoef1, &rcoef2, &rcoef3, &rcoef4,
 		    NULL, NULL, NULL, ip1, ip2, &dhm, &dht, &dhw, 0, NULL) == VGD_ERROR ){
-    App_Log(APP_ERROR,"%s: see details above\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: see details above\n",__func__);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -5745,7 +5745,7 @@ int Cvgd_new_gen_21002(vgrid_descriptor **self, float *hyb, int size_hyb, float 
 int Cvgd_new_gen_21002_2(vgrid_descriptor **self, float *hyb, int size_hyb, float rcoef1, float rcoef2, float rcoef3, float rcoef4, int ip1, int ip2, float dhm, float dht, float dhw, float hyb_flat) {
   if( Cvgd_new_gen3(self, 21, 2, hyb, size_hyb, &rcoef1, &rcoef2, &rcoef3, &rcoef4,
 		    NULL, NULL, NULL, ip1, ip2, &dhm, &dht, &dhw, 0, &hyb_flat) == VGD_ERROR ){
-    App_Log(APP_ERROR,"%s: see details above\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: see details above\n",__func__);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -5765,16 +5765,16 @@ int Cvgd_new_gen3(vgrid_descriptor **self, int kind, int version, float *hyb, in
 
   *self = c_vgd_construct();
   if(! *self){
-    App_Log(APP_ERROR,"%s: null pointer returned by c_vgd_construct\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: null pointer returned by c_vgd_construct\n",__func__);
     return (VGD_ERROR);
   }
 
   if(Cvgd_set_vcode_i(*self, kind, version) == VGD_ERROR)  {
-    App_Log(APP_ERROR,"%s: ERROR with Cvgd_set_vcode_i",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: Cvgd_set_vcode_i",__func__);
     return (VGD_ERROR);
   }
   if( ! is_valid(*self, vcode_valid) ){
-    App_Log(APP_ERROR,"%s: vcode %d is not valid.\n",__func__,(*self)->vcode);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: vcode %d is not valid.\n",__func__,(*self)->vcode);
     return (VGD_ERROR);
   }
   
@@ -5825,7 +5825,7 @@ int Cvgd_new_gen3(vgrid_descriptor **self, int kind, int version, float *hyb, in
 
   switch((*self)->vcode) {
   case 1:	
-    App_Log(APP_ERROR,"%s: kind=%d, version=%d\n cannot be generated, function to do this is in Nemo\n",__func__,kind,version);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: kind=%d, version=%d\n cannot be generated, function to do this is in Nemo\n",__func__,kind,version);
     return(VGD_ERROR);
     break;
   case 1001:	
@@ -5851,7 +5851,7 @@ int Cvgd_new_gen3(vgrid_descriptor **self, int kind, int version, float *hyb, in
     }
     break;
   case 1003:
-    App_Log(APP_ERROR,"%s:  kind=%d, version=%d\n cannot be generated, please use kind 1 of version 2\n",__func__,kind,version);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s:  kind=%d, version=%d\n cannot be generated, please use kind 1 of version 2\n",__func__,kind,version);
     return(VGD_ERROR);
     break;
   case 2001:
@@ -5987,11 +5987,11 @@ int Cvgd_new_gen3(vgrid_descriptor **self, int kind, int version, float *hyb, in
     }
     break;
   default:
-    App_Log(APP_ERROR,"%s: invalid kind or version, kind = %d, version = %d\n",__func__,kind,version);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: invalid kind or version, kind = %d, version = %d\n",__func__,kind,version);
     return(VGD_ERROR);
   }
   if( VGD_ERROR == Cvgd_new_build_vert2(self,kind,version,nk,ip1,ip2,ptop_8,pref_8,rcoef1,rcoef2,l_rcoef3,l_rcoef4,a_m_8,b_m_8,c_m_8,a_t_8,b_t_8,c_t_8,a_w_8,b_w_8,c_w_8,ip1_m,ip1_t,ip1_w,nl_m,nl_t,nl_w) ) {
-    App_Log(APP_ERROR,"%s: problem with new_build_vert for kind = %d, version = %d\n",__func__,kind,version);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem with new_build_vert for kind = %d, version = %d\n",__func__,kind,version);
     return(VGD_ERROR);
   }
   free(a_m_8);
@@ -6014,12 +6014,12 @@ static int C_get_consistent_pt_e1(int iun, float *val, char *nomvar ){
 
   error = c_fstinl(iun, &ni, &nj, &nk, -1, " ", -1, -1, -1, " ", nomvar, liste, &infon, nmax);
   if (error < 0) {
-    App_Log(APP_ERROR,"%s: problem with fstinl\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem with fstinl\n",__func__);
     return(VGD_ERROR);
   }
   
   if( infon > 1 ){
-    App_Log(APP_ERROR,"%s: More than one %s checking consistency ...\n",__func__,nomvar);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: More than one %s checking consistency ...\n",__func__,nomvar);
   }
 
   if( my_alloc_float(&work, ni*nj, "C_get_consistent_pt_e1: unable to allocate work") == VGD_ERROR )
@@ -6030,17 +6030,17 @@ static int C_get_consistent_pt_e1(int iun, float *val, char *nomvar ){
       goto bomb;
     }
     if ( var.ni != ni && var.nj != nj && var.nk != nk ){
-	    App_Log(APP_ERROR,"%s: dim misatch for %s, expected (%d,%d,%d), got (%d,%d,%d)\n",__func__,nomvar,ni,nj,nk,var.ni,var.nj,var.nk);
+	    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: dim misatch for %s, expected (%d,%d,%d), got (%d,%d,%d)\n",__func__,nomvar,ni,nj,nk,var.ni,var.nj,var.nk);
       goto bomb;
     }
     if( c_fstluk((uint32_t*)work,liste[k],&ni,&nj,&nk) < 0 ){
-      App_Log(APP_ERROR,"%s: problem with c_fstluk",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem with c_fstluk",__func__);
     }
     if( k == 0 ){
       *val = work[0];
     } else {
       if( memcmp( &(work[0]), val, sizeof(float)/sizeof(char)) ){
-	App_Log(APP_ERROR,"%s: inconsistent %s, %f v %f\n",__func__,nomvar,work[0],*val);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: inconsistent %s, %f v %f\n",__func__,nomvar,work[0],*val);
 	goto bomb;
       }
     }
@@ -6062,18 +6062,18 @@ static int C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, c
   // Try dateo first
   error = c_fstinl(iun, &ni, &nj, &nk, var.dateo, var.etiket, -1, -1, -1, " ", nomvar, liste, &infon, nmax);
   if (error < 0) {
-    App_Log(APP_ERROR,"%s: problem with fstinl on dateo\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem with fstinl on dateo\n",__func__);
     return(VGD_ERROR);
   }  
   if( infon == 0 ){
     // No dateo, check datev
     error = c_fstinl(iun, &ni, &nj, &nk, var.datev, var.etiket, -1, -1, -1, " ", nomvar, liste, &infon, nmax);
     if (error < 0) {
-      App_Log(APP_ERROR,"%s: problem with fstinl on datev\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem with fstinl on datev\n",__func__);
       return(VGD_ERROR);
     }
     if( infon == 0 ){
-      App_Log(APP_ERROR,"%s: no record of nomvar = %s, (dateo = %d or datev = %d), etiket = %s found\n",__func__,nomvar,var.dateo,var.datev,var.etiket);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: no record of nomvar = %s, (dateo = %d or datev = %d), etiket = %s found\n",__func__,nomvar,var.dateo,var.datev,var.etiket);
       return(VGD_ERROR);
     }
   }
@@ -6089,11 +6089,11 @@ static int C_get_consistent_hy(int iun, VGD_TFSTD_ext var, VGD_TFSTD_ext *va2, c
 	return(VGD_ERROR);
       }
       if ( va3.ni != ni && va3.nj != nj && va3.nk != nk ){
-	App_Log(APP_ERROR,"%s: dim misatch for %s, expected (%d,%d,%d), got (%d,%d,%d)\n",__func__,nomvar,ni,nj,nk,va3.ni,va3.nj,va3.nk);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: dim misatch for %s, expected (%d,%d,%d), got (%d,%d,%d)\n",__func__,nomvar,ni,nj,nk,va3.ni,va3.nj,va3.nk);
 	return(VGD_ERROR);
       }
       if ( va3.ig1 != va2->ig1 && va3.ig2 != va2->ig2 && va3.ig3 != va2->ig3 && va3.ig4 != va2->ig4 ){
-	App_Log(APP_ERROR,"%s: igs misatch for %s, expected (%d,%d,%d,%d), got (%d,%d,%d,%d)\n",__func__,nomvar,va2->ig1,va2->ig2,va2->ig3,va2->ig4,va3.ig1,va3.ig2,va3.ig3,va3.ig4);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: igs misatch for %s, expected (%d,%d,%d,%d), got (%d,%d,%d,%d)\n",__func__,nomvar,va2->ig1,va2->ig2,va2->ig3,va2->ig4,va3.ig1,va3.ig2,va3.ig3,va3.ig4);
 	return(VGD_ERROR);
       } 
     }
@@ -6119,12 +6119,12 @@ static int C_gen_legacy_desc(vgrid_descriptor **self, int unit, int *keylist , i
     return(VGD_ERROR);
 
   if( my_fstprm(keylist[0], &var) == VGD_ERROR ){
-    App_Log(APP_ERROR,"%s: fstprm 1 on key %d\n",__func__,keylist[0]);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: fstprm 1 on key %d\n",__func__,keylist[0]);
     goto bomb;
   }
   hyb[0] = c_convip_IP2Level(var.ip1,&kind);
   if( kind != 1 && kind != 2 && kind != 5 ){
-    App_Log(APP_ERROR,"%s: kind = %d, has to be 1, 2 or 5\n",__func__,kind);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: kind = %d, has to be 1, 2 or 5\n",__func__,kind);
     goto bomb;
   }
   // Convert back hyb[0] to ip1 old style to find out if var.ip1 is old style
@@ -6138,16 +6138,16 @@ static int C_gen_legacy_desc(vgrid_descriptor **self, int unit, int *keylist , i
 
   for( k = 1; k < nb; k++ ){
     if( my_fstprm(keylist[k], &va2) == VGD_ERROR ){
-      App_Log(APP_ERROR,"%s: fstprm 2 on key %d\n",__func__,keylist[k]);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: fstprm 2 on key %d\n",__func__,keylist[k]);
       goto bomb;
     }
     if ( va2.ni != var.ni && va2.nj != var.nj && va2.nk != var.nk ){
-      App_Log(APP_ERROR,"%s: dim misatch expected (%d,%d,%d), got (%d,%d,%d)\n",__func__,var.ni,var.nj,var.nk,va2.ni,va2.nj,va2.nk);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: dim misatch expected (%d,%d,%d), got (%d,%d,%d)\n",__func__,var.ni,var.nj,var.nk,va2.ni,va2.nj,va2.nk);
       goto bomb;
     }
     hyb[k] = c_convip_IP2Level(va2.ip1,&kind);
     if( kind != origkind ){
-      App_Log(APP_ERROR,"%s: expecting kind = %d, got kind = %d\n",__func__,origkind, kind);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: expecting kind = %d, got kind = %d\n",__func__,origkind, kind);
       goto bomb;
     }
   }
@@ -6165,28 +6165,28 @@ static int C_gen_legacy_desc(vgrid_descriptor **self, int unit, int *keylist , i
       // PT PT PT PT PT PT PT PT PT PT PT PT PT PT PT
       //---------------------------------------------
       if( C_get_consistent_pt_e1(unit, &ptop,"PT  ") == VGD_ERROR ){
-	      App_Log(APP_ERROR,"%s: consistency check on PT failed\n",__func__);
+	      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: consistency check on PT failed\n",__func__);
 	      goto bomb;
       }
       if(hy_key >= 0){
         // Verify if HY constistant with PT
         if( C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR ){
-          App_Log(APP_ERROR,"%s: consistency check on HY failed (1)\n",__func__);
+          Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: consistency check on HY failed (1)\n",__func__);
           goto bomb;
         }
         decode_HY(va2, &ptop_8, &pref_8, &rcoef);
         if( fabs(rcoef - 1.0) > 1.e-5){
-          App_Log(APP_ERROR,"%s: HY rcoef should by 1.0 since PT record is present in file\n",__func__);
+          Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: HY rcoef should by 1.0 since PT record is present in file\n",__func__);
           goto bomb;
         }
         if( fabs( ptop - ptop_8/100.) > 1.e-5 ){
-          App_Log(APP_ERROR,"%s: ptop from HY is %f while it is %f in PT record\n",__func__,ptop_8/100.,ptop);
+          Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: ptop from HY is %f while it is %f in PT record\n",__func__,ptop_8/100.,ptop);
           goto bomb;
         }
-	      App_Log(APP_ERROR,"%s: HY record consistent with PT\n",__func__);
+	      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: HY record consistent with PT\n",__func__);
       }
       if( e1_key >= 0){
-        App_Log(APP_ERROR,"%s: add support to 1004 etasef coordinate",__func__);
+        Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: add support to 1004 etasef coordinate",__func__);
         goto bomb;
       } else {
 	      App_Log(APP_INFO,"%s: eta coordinate found\n",__func__);
@@ -6204,7 +6204,7 @@ static int C_gen_legacy_desc(vgrid_descriptor **self, int unit, int *keylist , i
       //------------------------------------------------
       App_Log(APP_INFO,"%s: hybrid (normalized) coordinate found\n",__func__);
       if( C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR ){
-	App_Log(APP_ERROR,"%s: consistency check on HY failed (2)\n",__func__);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: consistency check on HY failed (2)\n",__func__);
 	goto bomb;
       }
       decode_HY(va2, &ptop_8, &pref_8, &rcoef);
@@ -6217,7 +6217,7 @@ static int C_gen_legacy_desc(vgrid_descriptor **self, int unit, int *keylist , i
     } else {
       // SIGMA SIGMA SIGMA SIGMA SIGMA SIGMA SIGMA SIGMA
       if( ! ALLOW_SIGMA ){
-	App_Log(APP_ERROR,"%s: sigma coordinate construction is not ALLOWED.\n(Cvgd)       If your are certain that you want this sigma coordinate, set ALLOW_SIGMA to true e.g.\n(Cvgd)          in fortran stat =  vgd_putopt(\"ALLOW_SIGMA\",.true.)\n(Cvgd)          in C       stat = Cvgd_putopt_int(\"ALLOW_SIGMA\",1)\n",__func__);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: sigma coordinate construction is not ALLOWED.\n(Cvgd)       If your are certain that you want this sigma coordinate, set ALLOW_SIGMA to true e.g.\n(Cvgd)          in fortran stat =  vgd_putopt(\"ALLOW_SIGMA\",.true.)\n(Cvgd)          in C       stat = Cvgd_putopt_int(\"ALLOW_SIGMA\",1)\n",__func__);
 	goto bomb;
       }
       App_Log(APP_INFO,"%s: sigma coordinate found\n",__func__);
@@ -6240,7 +6240,7 @@ static int C_gen_legacy_desc(vgrid_descriptor **self, int unit, int *keylist , i
   } else if ( kind == 5 ){
     App_Log(APP_INFO,"%s: Hybrid coordinate found\n",__func__);
     if( C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR ){
-      App_Log(APP_ERROR,"%s: consistency check on HY failed\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: consistency check on HY failed\n",__func__);
       goto bomb;
     }
     decode_HY(va2, &ptop_8, &pref_8, &rcoef);
@@ -6251,7 +6251,7 @@ static int C_gen_legacy_desc(vgrid_descriptor **self, int unit, int *keylist , i
       goto bomb;
     }	
   } else {
-    App_Log(APP_ERROR,"%s: kind %d is not supported\n",__func__,kind);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: kind %d is not supported\n",__func__,kind);
     return(VGD_ERROR);
   }
   free(ip1);
@@ -6290,14 +6290,14 @@ static int c_legacy(vgrid_descriptor **self, int unit, int F_kind, int quiet) {
 
   error = c_fstinl(unit, &ni, &nj, &nk, -1, " ", -1, -1, -1, " ", " ", keylist, &count, nkeylist);
   if (error < 0) {
-    App_Log(APP_ERROR,"%s: problem with fstinl\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem with fstinl\n",__func__);
     return(VGD_ERROR);
   }
   nip1 = 0;
   for( i = 0; i < count; i++){
     error = my_fstprm(keylist[i], &var);
     if (error == VGD_ERROR) {
-      App_Log(APP_ERROR,"%s: return from fstprm wrapper for fst key = %d",__func__,keylist[i]);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: return from fstprm wrapper for fst key = %d",__func__,keylist[i]);
       return(VGD_ERROR);
     }
     preslist[i] = c_convip_IP2Level(var.ip1,&kind);
@@ -6332,7 +6332,7 @@ static int c_legacy(vgrid_descriptor **self, int unit, int F_kind, int quiet) {
     }
   }
   if(max_int(num_in_kind,nb_kind) != nip1){
-    App_Log(APP_ERROR,"%s: more than one pressure/sigma/hyb coordinate in file\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: more than one pressure/sigma/hyb coordinate in file\n",__func__);
     for(i = 0; i < nb_kind; i++){
       if(num_in_kind[i] > 0) {
 	       App_Log(APP_INFO,"%s: There are %d records of kind %d\n",__func__,num_in_kind[i],i);
@@ -6384,7 +6384,7 @@ static int c_legacy(vgrid_descriptor **self, int unit, int F_kind, int quiet) {
   }
   if( nb == 0){
     if(! quiet) {
-      App_Log(APP_ERROR,"%s: No record of type pressure/sigma/hyb in file\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: No record of type pressure/sigma/hyb in file\n",__func__);
     }
     return(VGD_ERROR);
   }
@@ -6392,7 +6392,7 @@ static int c_legacy(vgrid_descriptor **self, int unit, int F_kind, int quiet) {
   error = C_gen_legacy_desc(self, unit, keylist , nb);
 
   if( error == VGD_ERROR ){
-    App_Log(APP_ERROR,"%s: problem with C_gen_legacy_desc\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem with C_gen_legacy_desc\n",__func__);
     return(VGD_ERROR);
   }  
   App_Log(APP_INFO,"%s: Vertical descriptor successfully reconstructed\n",__func__);
@@ -6420,7 +6420,7 @@ int Cvgd_new_read3(vgrid_descriptor **self, int unit, int datev, char *etiket, i
   }
   *self = c_vgd_construct();
   if(! *self){
-    App_Log(APP_ERROR,"%s: null pointer returned by c_vgd_construct\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: null pointer returned by c_vgd_construct\n",__func__);
     return (VGD_ERROR);
   }
   
@@ -6429,34 +6429,34 @@ int Cvgd_new_read3(vgrid_descriptor **self, int unit, int datev, char *etiket, i
     match_ipig = 1;
   }
   if(kind == -1 && version != -1) {
-    App_Log(APP_ERROR,"%s: option kind must be used with option version\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: option kind must be used with option version\n",__func__);
     return (VGD_ERROR);
   }
   
   error = c_fstinl(unit, &ni, &nj, &nk, datev, etiket, ip1, ip2, ip3, " ", ZNAME, keyList, &count, nkeyList);
   if (error < 0) {
-    App_Log(APP_ERROR,"%s: with fstinl on nomvar !!\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: with fstinl on nomvar !!\n",__func__);
     return(VGD_ERROR);
   }
   if(count == 0){
     if(! quiet) {
-      App_Log(APP_WARNING,"%s: Cannot find %s with the following datev=%d, etiket=%s, ip1=%d, ip2=%d, ip3=%d\n",__func__,ZNAME,datev,etiket,ip1,ip2,ip3);
+      Lib_Log(APP_WARNING,APP_LIBVGRID,"%s: Cannot find %s with the following datev=%d, etiket=%s, ip1=%d, ip2=%d, ip3=%d\n",__func__,ZNAME,datev,etiket,ip1,ip2,ip3);
     }
     if(match_ipig) {
       (*self)->vcode = -1;
       return(VGD_ERROR);
     }
     if(! quiet) {
-      App_Log(APP_WARNING,"%s: Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)\n",__func__);
+      Lib_Log(APP_WARNING,APP_LIBVGRID,"%s: Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)\n",__func__);
     }
     if(c_legacy(self,unit,kind,quiet) == VGD_ERROR){
       if(! quiet) {
-	       App_Log(APP_ERROR,"%s: failed to construct vgrid descriptor from legacy encoding\n",__func__);
+	       Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: failed to construct vgrid descriptor from legacy encoding\n",__func__);
       }
       return(VGD_ERROR);      
     }
     if(fstd_init(*self) == VGD_ERROR) {
-      App_Log(APP_ERROR,"%s: problem creating record information\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem creating record information\n",__func__);
     }
     toc_found = 1;
   } else {
@@ -6474,7 +6474,7 @@ int Cvgd_new_read3(vgrid_descriptor **self, int unit, int datev, char *etiket, i
       if(! toc_found) {
 	toc_found = 1;
 	if( C_load_toctoc(*self,var,keyList[i]) == VGD_ERROR ) {
-	  App_Log(APP_ERROR,"%s: cannot load !!\n",__func__);
+	  Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot load !!\n",__func__);
 	  return(VGD_ERROR);
 	}
 	ni=(*self)->table_ni;
@@ -6486,17 +6486,17 @@ int Cvgd_new_read3(vgrid_descriptor **self, int unit, int datev, char *etiket, i
       // We load then all to check if they are the same. If not, we return with an error message.
       self2 = c_vgd_construct();
       if( my_fstprm(keyList[i], &var) == VGD_ERROR ) {
-	App_Log(APP_ERROR,"%s: problem with my_fstprm on keyList[i] = %d\n",__func__,keyList[i]);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem with my_fstprm on keyList[i] = %d\n",__func__,keyList[i]);
 	return(VGD_ERROR);
       }
       if( C_load_toctoc(self2,var,keyList[i]) == VGD_ERROR ) {
-	App_Log(APP_ERROR,"%s: cannot load !!\n",__func__);
+	Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot load !!\n",__func__);
 	return(VGD_ERROR);
       }
       status = Cvgd_vgdcmp(*self,self2);
       if ( status != 0 ){
 	if(! quiet){
-	  App_Log(APP_ERROR,"%s: found different entries in vertical descriptors after search on datev=%d, etiket=%s, ip1=%d, ip2=%d, ip3=%d, kind=%d, version=%d, status code is %d\n",__func__,datev,etiket,ip1,ip2,ip3,kind,version,status);
+	  Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: found different entries in vertical descriptors after search on datev=%d, etiket=%s, ip1=%d, ip2=%d, ip3=%d, kind=%d, version=%d, status code is %d\n",__func__,datev,etiket,ip1,ip2,ip3,kind,version,status);
 	}
 	return(VGD_ERROR);
       }
@@ -6506,7 +6506,7 @@ int Cvgd_new_read3(vgrid_descriptor **self, int unit, int datev, char *etiket, i
     if(! toc_found){
       if(c_legacy(self,unit,kind,quiet) == VGD_ERROR){
 	if(! quiet) {
-	  App_Log(APP_ERROR,"%s: failed to construct vgrid descriptor from legacy encoding\n",__func__);
+	  Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: failed to construct vgrid descriptor from legacy encoding\n",__func__);
 	}
 	return(VGD_ERROR);
       }
@@ -6515,13 +6515,13 @@ int Cvgd_new_read3(vgrid_descriptor **self, int unit, int datev, char *etiket, i
   } //if(count == 0)
 
   if(! toc_found) {
-    App_Log(APP_ERROR,"%s: cannot find !! or generate from legacy encoding\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot find !! or generate from legacy encoding\n",__func__);
     return(VGD_ERROR);
   }
 
   // Fill structure from input table
   if( Cvgd_new_from_table(self, (*self)->table, (*self)->table_ni, (*self)->table_nj, (*self)->table_nk) == VGD_ERROR ) {
-    App_Log(APP_ERROR,"%s: unable to construct from table\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: unable to construct from table\n",__func__);
     return(VGD_ERROR);
   }
   (*self)->match_ipig = match_ipig;  
@@ -6534,11 +6534,11 @@ int Cvgd_write_desc (vgrid_descriptor *self, int unit) {
   float work[1];
 
   if(! self){
-    App_Log(APP_ERROR,"%s: vgrid descriptor not constructed\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: vgrid descriptor not constructed\n",__func__);
     return(VGD_ERROR);
   }  
   if(! self->valid) {
-    App_Log(APP_ERROR,"%s: vgrid structure is not valid %d\n",__func__,self->valid);    
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: vgrid structure is not valid %d\n",__func__,self->valid);    
     return(VGD_ERROR);
   }
   ip1=self->rec.ip1;
@@ -6553,7 +6553,7 @@ int Cvgd_write_desc (vgrid_descriptor *self, int unit) {
 		self->rec.typvar, self->rec.nomvar, self->rec.etiket, 
 		self->rec.grtyp,  self->rec.ig1,    self->rec.ig2,    self->rec.ig3, self->rec.ig4,
 		self->rec.datyp, 1) , 0 ) {
-    App_Log(APP_ERROR,"%s: problem with fstecr\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem with fstecr\n",__func__);
     return(VGD_ERROR);
   }
 
@@ -6566,11 +6566,11 @@ int Cvgd_stda76_temp(vgrid_descriptor *self, int *i_val, int nl, float *temp){
   float *pres;
   pres = malloc( nl * sizeof(float) );
   if(! pres){
-    App_Log(APP_ERROR,"%s: problem allocating pres\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating pres\n",__func__);
     return(VGD_ERROR);
   }  
   if(! temp){
-    App_Log(APP_ERROR,"%s: temp not allocated\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: temp not allocated\n",__func__);
     return(VGD_ERROR);
   }
   
@@ -6595,11 +6595,11 @@ int Cvgd_stda76_pres(vgrid_descriptor *self, int *i_val, int nl, float *pres, fl
   float *temp;
   temp = malloc( nl * sizeof(float) );
   if(! temp){
-    App_Log(APP_ERROR,"%s: problem allocating temp of size %d \n",__func__,nl);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: problem allocating temp of size %d \n",__func__,nl);
     return(VGD_ERROR);
   }
   if(! pres){
-    App_Log(APP_ERROR,"%s: pres not allocated\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: pres not allocated\n",__func__);
     return(VGD_ERROR);
   }
   if(! strcmp((*self).ref_name,"ME  ")){
@@ -6607,7 +6607,7 @@ int Cvgd_stda76_pres(vgrid_descriptor *self, int *i_val, int nl, float *pres, fl
       return(VGD_ERROR);
     }
   } else {
-    App_Log(APP_ERROR,"%s: please contact the vgrid developpers to add c_stda76_pres_from_pres\n",__func__);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: please contact the vgrid developpers to add c_stda76_pres_from_pres\n",__func__);
     return(VGD_ERROR);
     //if( c_stda76_pres_from_press(self, i_val, nl, pres) == VGD_ERROR ){
     //  return(VGD_ERROR);
@@ -6629,7 +6629,7 @@ int Cvgd_stda76_hgts_from_pres_list(float *hgts, float *pres,
   }
   for(i=0; i<nb; i++){
     if( pres[i] <= pk[STDA76_N_LAYER]){
-      App_Log(APP_ERROR,"%s: Pressure %f Pa in list is out of the standard atmophere pressure upper bound which is %f Pa\n",__func__,pres[i],pk[STDA76_N_LAYER]);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: Pressure %f Pa in list is out of the standard atmophere pressure upper bound which is %f Pa\n",__func__,pres[i],pk[STDA76_N_LAYER]);
       return(VGD_ERROR);
     }
     if(pres[i] >= pk[0]){
@@ -6669,7 +6669,7 @@ int Cvgd_stda76_pres_from_hgts_list(float *pres, float *hgts,
   }
   for(i=0; i<nb; i++){
     if( hgts[i] > zk[STDA76_N_LAYER]){
-      App_Log(APP_ERROR,"%s: Height %f m in list is out of the standard atmophere height upper bound which is %f m\n",__func__,hgts[i],zk[STDA76_N_LAYER]);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: Height %f m in list is out of the standard atmophere height upper bound which is %f m\n",__func__,hgts[i],zk[STDA76_N_LAYER]);
       return(VGD_ERROR);
     }
     if(hgts[i] <= zk[0]){

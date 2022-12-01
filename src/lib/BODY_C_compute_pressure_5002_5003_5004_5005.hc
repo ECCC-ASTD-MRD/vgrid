@@ -5,12 +5,12 @@
 
   aa_8 = malloc(nk*sizeof(double));
   if(! aa_8 ) {
-    App_Log(APP_ERROR,"%s: cannot allocate aa_8 of double size %d\n",__func__,nk);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate aa_8 of double size %d\n",__func__,nk);
     return(VGD_ERROR);
   }  
   bb_8 = malloc(nk*sizeof(double));
   if(! bb_8 ) {
-    App_Log(APP_ERROR,"%s: cannot allocate bb_8 of double size %d\n",__func__,nk);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate bb_8 of double size %d\n",__func__,nk);
     free(aa_8);
     return(VGD_ERROR);
   }
@@ -24,7 +24,7 @@
 	aa_8[k] = self->a_t_8[ind];
 	bb_8[k] = self->b_t_8[ind];
       } else {
-        App_Log(APP_ERROR,"%s: cannot find ip1 %d in vgrid descriptor\n",__func__,ip1_list[k]);
+        Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot find ip1 %d in vgrid descriptor\n",__func__,ip1_list[k]);
 	free(aa_8);
 	free(bb_8);  	
 	return(VGD_ERROR);	
@@ -33,7 +33,7 @@
   }
   s_8 = malloc(ni*nj*sizeof(double));
   if(! s_8 ) {
-    App_Log(APP_ERROR,"%s: cannot allocate s_8 of double size %dx%d\n",__func__,ni,nj);
+    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate s_8 of double size %dx%d\n",__func__,ni,nj);
     free(aa_8);
     free(bb_8);
     return(VGD_ERROR);
@@ -68,7 +68,7 @@
 
   if( dpidpis ){
     if( in_log ){
-      App_Log(APP_ERROR,"%s: cannot get dpidpis in log\n",__func__);
+      Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot get dpidpis in log\n",__func__);
       free(s_8);
       free(aa_8);
       free(bb_8);

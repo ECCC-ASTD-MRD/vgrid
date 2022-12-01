@@ -14,8 +14,8 @@
      status = VGD_ERROR
 
      if(.not.is_valid(self,'SELF'))then
-        write(for_app,*) 'vgrid structure is not valid in levels_withref_prof'//PROC_SUFF
-        call app_log(APP_ERROR,VGD_PRFX//for_app)       
+        write(app_msg,*) 'vgrid structure is not valid in levels_withref_prof'//PROC_SUFF
+        call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
         return
      endif
      

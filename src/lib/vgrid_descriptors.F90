@@ -468,30 +468,30 @@ contains
          
          if( f_new_read(self%cptr, unit, l_datev, l_etiket//C_NULL_CHAR, l_ip1, l_ip2, l_ip3, l_kind, l_version, l_quiet) == &
               VGD_ERROR )then
-!            write(for_app,*) 'in new_read, problem with f_new_read'
-            call app_log(APP_ERROR,VGD_PRFX//' in new_read, problem with f_new_read')       
+!            write(app_msg,*) 'in new_read, problem with f_new_read'
+            call Lib_Log(APP_ERROR,APP_LIBVGRID,' in new_read, problem with f_new_read')       
             return
          endif
       case ('BIN')
          read(unit) ni,nj,nk
          allocate(table_8(ni,nj,nk),stat=istat)
          if (istat /= 0) then
-            write(for_app,*) ' in new_read unable to allocate table_8'
-            call app_log(APP_ERROR,VGD_PRFX//for_app)       
+            write(app_msg,*) ' in new_read unable to allocate table_8'
+            call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
             return
          endif
          read(unit) table_8
          
          error = new_from_table(self,table_8)
          if (error < 0) then
-            write(for_app,*) ' in new_read, problem creating record information'
-            call app_log(APP_ERROR,VGD_PRFX//for_app)       
+            write(app_msg,*) ' in new_read, problem creating record information'
+            call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
             return
          endif
          ! Warn user on invalid input format specification
       case DEFAULT
-         write(for_app,*) ' in new_read invalid constructor format request ',trim(myformat)
-         call app_log(APP_ERROR,VGD_PRFX//for_app)       
+         write(app_msg,*) ' in new_read invalid constructor format request ',trim(myformat)
+         call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
          return
       end select
 
@@ -512,7 +512,7 @@ contains
        status = VGD_ERROR
        
        if ( f_new_from_table(self%cptr, table_CP, size(table,dim=1), size(table,dim=2), size(table,dim=3)) == VGD_ERROR )then
-         call app_log(APP_ERROR,'new_from_table: problem with f_new_from_table')
+         call Lib_Log(APP_ERROR,APP_LIBVGRID,'new_from_table: problem with f_new_from_table')
          return
       endif      
       
@@ -594,8 +594,8 @@ contains
          my_ip2 = -1
       endif
       if(present(stdout_unit))then
-         write(for_app,*) 'ERROR: in new_gen, implement option stdout_unit'         
-         call app_log(APP_ERROR,VGD_PRFX//for_app)       
+         write(app_msg,*) 'ERROR: in new_gen, implement option stdout_unit'         
+         call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
          return
          stdout_unit_CP = c_loc(stdout_unit)
       else
@@ -636,7 +636,7 @@ contains
 
       if(f_new_gen(self%cptr,kind,version,hyb_CP,size(hyb),rcoef1_CP,rcoef2_CP,rcoef3_CP,rcoef4_CP,ptop_8_CP,pref_8_CP, &
            ptop_out_8_CP,my_ip1,my_ip2,dhm_CP,dht_CP,dhw_CP,my_avg,hyb_flat_CP) == VGD_ERROR)then
-         call app_log(APP_INFO,'new_gen: problem with f_new_gen')
+         call Lib_Log(APP_INFO,APP_LIBVGRID,'new_gen: problem with f_new_gen')
          return
       endif
       status = VGD_OK
@@ -783,7 +783,7 @@ contains
            ptop_8_CP, pref_8_CP, rcoef1_CP, rcoef2_CP, rcoef3_CP, rcoef4_CP, &
            a_m_8_CP, b_m_8_CP, c_m_8_CP, a_t_8_CP, b_t_8_CP, c_t_8_CP, a_w_8_CP, b_w_8_CP, c_w_8_CP, &
            ip1_m_CP, ip1_t_CP, ip1_w_CP, nl_m, nl_t, nl_w) == VGD_ERROR )then
-         call app_log(APP_ERROR,'(F_vgd) new_build_vert: problem with c_new_build_vert')
+         call Lib_Log(APP_ERROR,APP_LIBVGRID,'new_build_vert: problem with c_new_build_vert')
          return
       endif
 
@@ -830,8 +830,8 @@ contains
          if (status == VGD_ERROR) return
          value = l_value /= 0
       case DEFAULT
-         write(for_app,*) 'invalid key in call to getopt_logical: ',trim(key)
-         call app_log(APP_ERROR,VGD_PRFX//for_app)       
+         write(app_msg,*) 'invalid key in call to getopt_logical: ',trim(key)
+         call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
          return
       end select
       ! Set status and return
@@ -860,13 +860,13 @@ contains
          endif
          status = f_putopt_int(key//C_NULL_CHAR,l_value)
          if(status==VGD_ERROR)then
-            write(for_app,*) 'problem with f_putopt_int in putopt_logical for key ',trim(key)
-            call app_log(APP_ERROR,VGD_PRFX//for_app)       
+            write(app_msg,*) 'problem with f_putopt_int in putopt_logical for key ',trim(key)
+            call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
             return
          endif
       case DEFAULT
-         write(for_app,*) 'invalid key in call to putopt_logical: ',trim(key)
-         call app_log(APP_ERROR,VGD_PRFX//for_app)       
+         write(app_msg,*) 'invalid key in call to putopt_logical: ',trim(key)
+         call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
          return
       end select
       ! Set status and return
@@ -903,7 +903,7 @@ contains
 
       istat = VGD_ERROR
       if(.not.c_associated(self%cptr))then
-         call app_log(APP_ERROR,'(F_vgd) print_descript: self%cptr not associated')
+         call Lib_Log(APP_ERROR,APP_LIBVGRID,'(F_vgd) print_descript: self%cptr not associated')
          return
       endif
 
@@ -960,8 +960,8 @@ contains
     grids: do i=1,size(fstkeys)
        error = my_fstprm(fstkeys(i),var)
        if (error /= VGD_OK) then
-          write(for_app,*) 'return from fstprm wrapper for fst key ',fstkeys(i)
-          call app_log(APP_ERROR,VGD_PRFX//for_app)       
+          write(app_msg,*) 'return from fstprm wrapper for fst key ',fstkeys(i)
+          call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
           return
        endif
        if (i==1) then
@@ -972,8 +972,8 @@ contains
           ip1 = var%ip1
        endif
        if (var%ig1 /= ig1 .or. var%ig2 /= ig2 .or. var%ig3 /= ig3 .or. trim(var%grtyp(1:1)) /= trim(grtyp)) then
-          write(for_app,*) 'multiple grids defined in fstkeys vector'
-          call app_log(APP_ERROR,VGD_PRFX//for_app)       
+          write(app_msg,*) 'multiple grids defined in fstkeys vector'
+          call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
           return
        endif
     enddo grids
@@ -983,9 +983,9 @@ contains
     if (any(MATCH_GRTYP == grtyp)) then
        error = new_read(gd,unit=unit,format='fst',ip1=ig1,ip2=ig2,kind=kind)
        if(error==VGD_ERROR)then
-          write(for_app,*) 'The above error was produce with call to new_read with specific ip1 and 1p2, trying with wild card -1'&
+          write(app_msg,*) 'The above error was produce with call to new_read with specific ip1 and 1p2, trying with wild card -1'&
                //', if there is no error below, disregard the above error.'
-               call app_log(APP_ERROR,VGD_PRFX//for_app)       
+               call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
                error = new_read(gd,unit=unit,format='fst',                kind=kind)
        endif
     else
@@ -993,15 +993,15 @@ contains
     endif
 
     if (error /= VGD_OK) then
-       write(for_app,*) 'cannot build grid descriptor instance for fst key ',fstkeys(1)
-       call app_log(APP_ERROR,VGD_PRFX//for_app)       
+       write(app_msg,*) 'cannot build grid descriptor instance for fst key ',fstkeys(1)
+       call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
        return
     endif
 
     error = levels_readref(gd,unit=unit,fstkeys=fstkeys,levels=levels,in_log=my_in_log)
     if (error /= VGD_OK) then
-       write(for_app,*) 'problem computing level information for fst key ',fstkeys(1)
-       call app_log(APP_ERROR,VGD_PRFX//for_app)       
+       write(app_msg,*) 'problem computing level information for fst key ',fstkeys(1)
+       call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
        return
     endif
 
@@ -1035,8 +1035,8 @@ contains
     status = VGD_ERROR
 
     if(.not.is_valid(self,'SELF'))then
-       write(for_app,*) 'vgrid structure is not valid in levels_readref'
-       call app_log(APP_ERROR,VGD_PRFX//for_app)       
+       write(app_msg,*) 'vgrid structure is not valid in levels_readref'
+       call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
        return
     endif
 
@@ -1046,54 +1046,54 @@ contains
 
     ! Check input keys
     if(size(fstkeys)<1)then
-       write(for_app,*) 'fstkeys vector passed to vgd_levels is null'                             
-       call app_log(APP_ERROR,VGD_PRFX//for_app)       
+       write(app_msg,*) 'fstkeys vector passed to vgd_levels is null'                             
+       call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
        return                                                                
     endif
     istat=my_fstprm(fstkeys(1),prmk)
     if(istat < 0)then
-       write(for_app,*) 'problem with my_fstprm in levels_readref'
-       call app_log(APP_ERROR,VGD_PRFX//for_app)       
+       write(app_msg,*) 'problem with my_fstprm in levels_readref'
+       call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
       endif
     check_times: do i=1,size(fstkeys)
        istat=my_fstprm(fstkeys(i),prm_check)
        ip1_list(i) = prm_check%ip1
        if (prm_check%datev /= prmk%datev) then
-         call app_log(APP_ERROR,VGD_PRFX//for_app)       
-         call app_log(APP_ERROR,VGD_PRFX//for_app)       
+         call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
+         call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
 
           return
        endif
        if (prm_check%ig1 /= prmk%ig1 .or. prm_check%ig2 /= prmk%ig2) then
-         call app_log(APP_ERROR,VGD_PRFX//for_app)       
-         call app_log(APP_ERROR,VGD_PRFX//for_app)       
+         call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
+         call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
 
           return
        endif
     enddo check_times
     if ( vgd_get(self,"MIPG match !! IPs and IGs with records",match_ipig) == VGD_ERROR )then
-       write(for_app,*) 'ERROR in levels_readref with vgd_get on MIPG'
-       call app_log(APP_ERROR,VGD_PRFX//for_app)       
+       write(app_msg,*) 'ERROR in levels_readref with vgd_get on MIPG'
+       call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
        return
     endif
 
     if ( vgd_get(self,"IP_1",ip1) == VGD_ERROR )then
-       write(for_app,*) 'ERROR in levels_readref with vgd_get on IP_1'
-       call app_log(APP_ERROR,VGD_PRFX//for_app)       
+       write(app_msg,*) 'ERROR in levels_readref with vgd_get on IP_1'
+       call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
        return
     endif
     if ( vgd_get(self,"IP_2",ip2) == VGD_ERROR )then
-       write(for_app,*) 'ERROR in levels_readref with vgd_get on IP_2'
-       call app_log(APP_ERROR,VGD_PRFX//for_app)       
+       write(app_msg,*) 'ERROR in levels_readref with vgd_get on IP_2'
+       call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
        return
     endif
     if (match_ipig == 1) then
        if (prmk%ig1 /= ip1 .or. prmk%ig2 /= ip2) then
-          write(for_app,*) 'fstkeys do not correspond to the correct grid descriptor'
-          call app_log(APP_ERROR,VGD_PRFX//for_app)       
-          write(for_app,'("   expecting (ip1,ip2)->(",i8,",",i8,"), got (ig1,ig2)->(",i8,",",i8,")")')&
+          write(app_msg,*) 'fstkeys do not correspond to the correct grid descriptor'
+          call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
+          write(app_msg,'("   expecting (ip1,ip2)->(",i8,",",i8,"), got (ig1,ig2)->(",i8,",",i8,")")')&
           prmk%ig1,prmk%ig2,ip1,ip2
-          call app_log(APP_ERROR,VGD_PRFX//for_app)       
+          call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
           return
        endif
     endif
@@ -1101,36 +1101,36 @@ contains
     ! Check surface field if needed
     sfc_large_scale_valid: if ( is_valid(self,"ref_namel_valid") ) then
        if ( vgd_get(self,"RFLS",ref_name) == VGD_ERROR )then
-          write(for_app,*) 'ERROR in levels_readref with vgd_get on RFLS'
-          call app_log(APP_ERROR,VGD_PRFX//for_app)       
+          write(app_msg,*) 'ERROR in levels_readref with vgd_get on RFLS'
+          call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
           return
        endif
        istat=get_ref( p0ls, self, ref_name, unit, prmk)
        if(istat == VGD_ERROR)then
-          write(for_app,*) 'Problem getting reference field ',trim(ref_name)
-          call app_log(APP_ERROR,VGD_PRFX//for_app)       
+          write(app_msg,*) 'Problem getting reference field ',trim(ref_name)
+          call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
           return
        endif
     end if sfc_large_scale_valid
 
     sfc_valid: if( is_valid(self,"ref_name_valid")) then
        if ( vgd_get(self,"RFLD",ref_name) == VGD_ERROR )then
-          write(for_app,*) 'ERROR in levels_readref with vgd_get on RFLD'
-          call app_log(APP_ERROR,VGD_PRFX//for_app)       
+          write(app_msg,*) 'ERROR in levels_readref with vgd_get on RFLD'
+          call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
           return
        endif
        istat=get_ref(p0,self,ref_name,unit,prmk)
        if(istat == VGD_ERROR)then
-          write(for_app,*) 'Problem getting reference field ',trim(ref_name)
-          call app_log(APP_ERROR,VGD_PRFX//for_app)       
+          write(app_msg,*) 'Problem getting reference field ',trim(ref_name)
+          call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
           return
        endif
     else
        allocate(p0(1,1),stat=error)
        if (error /= 0) then
           nullify(p0)
-          write(for_app,*) 'cannot allocate space for p0 in levels_readref'
-          call app_log(APP_ERROR,VGD_PRFX//for_app)       
+          write(app_msg,*) 'cannot allocate space for p0 in levels_readref'
+          call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
           return
        endif
        p0 = VGD_MISSING
@@ -1145,8 +1145,8 @@ contains
     deallocate(p0)
     if(associated(p0ls))deallocate(p0ls)
     if (error /= VGD_OK) then
-       write(for_app,*) 'got error return from levels_withref in levels_readref'
-       call app_log(APP_ERROR,VGD_PRFX//for_app)       
+       write(app_msg,*) 'got error return from levels_withref in levels_readref'
+       call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
        return
     endif
 
@@ -1300,7 +1300,7 @@ contains
          ! Write to an RPN Standard file
       case ('FST')         
          if( f_write_desc(self%cptr,unit)  == VGD_ERROR )then
-            call app_log(APP_ERROR,'(F_vgd) write_desc: problem with f_write_desc')
+            call Lib_Log(APP_ERROR,APP_LIBVGRID,'write_desc: problem with f_write_desc')
             return
          endif
       ! Write to a Fortran binary file
@@ -1313,15 +1313,15 @@ contains
             return
          endif
          if( get_real8_3d(self,'VTBL',table_8) == VGD_ERROR)then
-            call app_log(APP_ERROR,'(F_vgd) write_desc: problem with get_real8_3d')
+            call Lib_Log(APP_ERROR,APP_LIBVGRID,'(F_vgd) write_desc: problem with get_real8_3d')
             return
          endif
          write(unit) tshape
          write(unit) table_8
       ! Warn user afor unknown format
       case DEFAULT
-         write(for_app,*) 'No write done for unknown format ',trim(myformat)
-         call app_log(APP_ERROR,VGD_PRFX//for_app)       
+         write(app_msg,*) 'No write done for unknown format ',trim(myformat)
+         call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
       end select      
      ! Set status and return
       status = VGD_OK
@@ -1377,8 +1377,8 @@ contains
       status = VGD_ERROR
       
       if(.not. is_valid(self,'SELF')) then
-         write(for_app,*) 'vgrid structure is not valid in get_int_1d'
-         call app_log(APP_ERROR,VGD_PRFX//for_app)       
+         write(app_msg,*) 'vgrid structure is not valid in get_int_1d'
+         call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
          return
       endif
 
@@ -1421,8 +1421,8 @@ contains
          value_CP = c_loc(value(1))
          status = f_get_int_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,nk_CP,l_quiet)
       case DEFAULT
-         write(for_app,*) 'invalid key '//trim(key)//' given to vgd_get (int 1D)'
-         call app_log(APP_ERROR,VGD_PRFX//for_app)       
+         write(app_msg,*) 'invalid key '//trim(key)//' given to vgd_get (int 1D)'
+         call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
          return
       end select
       
@@ -1484,8 +1484,8 @@ contains
       nullify(vipt)
       
       if(.not. is_valid(self,'SELF')) then
-         write(for_app,*) 'vgrid structure is not valid in get_real_1d'
-         call app_log(APP_ERROR,VGD_PRFX//for_app)       
+         write(app_msg,*) 'vgrid structure is not valid in get_real_1d'
+         call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
 
          return
       endif
@@ -1532,16 +1532,16 @@ contains
          if (istat == VGD_ERROR) return
       case ('VCRD')
          if (is_valid(self,"ip1_m_valid")) then
-            write(for_app,*) 'depricated key '//trim(key)//', use VCDM instead'
-            call app_log(APP_ERROR,VGD_PRFX//for_app)       
+            write(app_msg,*) 'depricated key '//trim(key)//', use VCDM instead'
+            call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
             return
          else
             error = int(get_error(key,my_quiet))
             return
          endif
       case DEFAULT
-         write(for_app,*) 'invalid key '//trim(key)//' given to vgd_get (real 1D)'
-         call app_log(APP_ERROR,VGD_PRFX//for_app)       
+         write(app_msg,*) 'invalid key '//trim(key)//' given to vgd_get (real 1D)'
+         call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
          return
       end select
       
@@ -1599,8 +1599,8 @@ contains
       status = VGD_ERROR
 
       if(.not. is_valid(self,'SELF')) then
-         write(for_app,*) 'vgrid structure is not valid in get_real8_1d'
-         call app_log(APP_ERROR,VGD_PRFX//for_app)       
+         write(app_msg,*) 'vgrid structure is not valid in get_real8_1d'
+         call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
        
          return
       endif
@@ -1673,8 +1673,8 @@ contains
          value_CP = c_loc(value(1))
          status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
       case DEFAULT
-         write(for_app,*) 'invalid key '//trim(key)//' given to vgd_get (real8 1D)'
-         call app_log(APP_ERROR,VGD_PRFX//for_app)       
+         write(app_msg,*) 'invalid key '//trim(key)//' given to vgd_get (real8 1D)'
+         call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
          return
       end select
       return      
@@ -1700,8 +1700,8 @@ contains
       status = VGD_ERROR
       
       if(.not. is_valid(self,'SELF'))then
-         write(for_app,*) 'vgrid structure is not valid in get_real8_3d'
-         call app_log(APP_ERROR,VGD_PRFX//for_app)       
+         write(app_msg,*) 'vgrid structure is not valid in get_real8_3d'
+         call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
        
          return
       endif
@@ -1726,8 +1726,8 @@ contains
          value_CP = c_loc(value(1,1,1))
          status = f_get_real8_3d(self%cptr,"VTBL"//C_NULL_CHAR,value_CP,C_NULL_PTR,C_NULL_PTR,C_NULL_PTR,l_quiet)         
       case DEFAULT
-         write(for_app,*) 'invalid key '//trim(key)//' given to vgd_get (real8 3D)'
-         call app_log(APP_ERROR,VGD_PRFX//for_app)       
+         write(app_msg,*) 'invalid key '//trim(key)//' given to vgd_get (real8 3D)'
+         call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
          return
       end select
       
@@ -1779,8 +1779,8 @@ contains
          nchar=VGD_LEN_RFLS
       case DEFAULT
          if( .not. my_quiet)then
-            write(for_app,*) 'invalid key in call to get_char: ',trim(key)
-            call app_log(APP_ERROR,VGD_PRFX//for_app)       
+            write(app_msg,*) 'invalid key in call to get_char: ',trim(key)
+            call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
 
          end if
          return
@@ -1853,10 +1853,10 @@ contains
       real(kind=8), dimension(:,:,:), pointer :: value !Value to set
       type(c_ptr) :: my_value_CP
       status = VGD_ERROR
-      call app_log(APP_ERROR,'(F_vgd) put_real8_3d: putint real8 3D array is not implemented in this library')
-      call app_log(APP_ERROR,'(F_vgd)        if you want to put the VGTB, you may do it by reconstructing a new vgrid_descriptor')
-      call app_log(APP_ERROR,'(F_vgd)        e.g. vgd_new(self,table_8)')
-      call app_log(APP_ERROR,'(F_vgd)        If you think you really need to vgd_put VGTB contact dev team')
+      call Lib_Log(APP_ERROR,APP_LIBVGRID,'put_real8_3d: putint real8 3D array is not implemented in this library')
+      call Lib_Log(APP_ERROR,APP_LIBVGRID,'       if you want to put the VGTB, you may do it by reconstructing a new vgrid_descriptor')
+      call Lib_Log(APP_ERROR,APP_LIBVGRID,'       e.g. vgd_new(self,table_8)')
+      call Lib_Log(APP_ERROR,APP_LIBVGRID,'       If you think you really need to vgd_put VGTB contact dev team')
       ! To silence the compiler warning
       if(associated(value))then
       endif
@@ -1882,8 +1882,8 @@ contains
       status = VGD_ERROR
       
       if(.not.is_valid(self,'SELF'))then
-         write(for_app,*) 'vgrid structure is not valid in put_char'
-         call app_log(APP_ERROR,VGD_PRFX//for_app)       
+         write(app_msg,*) 'vgrid structure is not valid in put_char'
+         call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
        
          return
       endif
@@ -1952,47 +1952,47 @@ contains
     
     sfc_key = fstinf(F_unit,ni,nj,nk,prm%datev,prm%etiket,-1,prm%ip2,prm%ip3,' ',F_name_S)
     if(sfc_key < 0)then
-       write(for_app,*) 'cannot find ',F_name_S,' for :'
-       call app_log(APP_ERROR,VGD_PRFX//for_app)       
+       write(app_msg,*) 'cannot find ',F_name_S,' for :'
+       call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
 
-       write(for_app,*) 'datev=',prm%datev,' etiket=',prm%etiket,' ip2=',prm%ip2,' ip3=',prm%ip3
-       call app_log(APP_ERROR,VGD_PRFX//for_app)       
+       write(app_msg,*) 'datev=',prm%datev,' etiket=',prm%etiket,' ip2=',prm%ip2,' ip3=',prm%ip3
+       call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
 
        return
     endif
     istat=my_fstprm(sfc_key,prm_p0)
     if(prm_p0%ni.ne.prm%ni.or.prm_p0%nj.ne.prm%nj)then
-       write(for_app,*) 'horizontal grid mismatch for '//trim(F_name_S),ni,nj,' vs',prm%ni,prm%nj
-       call app_log(APP_ERROR,VGD_PRFX//for_app)       
+       write(app_msg,*) 'horizontal grid mismatch for '//trim(F_name_S),ni,nj,' vs',prm%ni,prm%nj
+       call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
 
        return
     endif
     if ( vgd_get(self,"MIPG match !! IPs and IGs with records",match_ipig) == VGD_ERROR )then
-       write(for_app,*) 'ERROR in get_ref with vgd_get on MIPG'
-       call app_log(APP_ERROR,VGD_PRFX//for_app)       
+       write(app_msg,*) 'ERROR in get_ref with vgd_get on MIPG'
+       call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
 
        return
     endif
     if (match_ipig == 1) then
        if ( vgd_get(self,"IP_1",ip1) == VGD_ERROR )then
-          write(for_app,*) 'ERROR in get_ref with vgd_get on IP_1'
-          call app_log(APP_ERROR,VGD_PRFX//for_app)       
+          write(app_msg,*) 'ERROR in get_ref with vgd_get on IP_1'
+          call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
 
           return
        endif
        if ( vgd_get(self,"IP_2",ip2) == VGD_ERROR )then
-          write(for_app,*) 'ERROR in get_ref with vgd_get on IP_2'
-          call app_log(APP_ERROR,VGD_PRFX//for_app)       
+          write(app_msg,*) 'ERROR in get_ref with vgd_get on IP_2'
+          call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
 
           return
        endif
        if (prm_p0%ig1 /= ip1 .or. prm_p0%ig2 /= ip2) then
-          write(for_app,*) 'sfc_field ig1 ig2 do not correspond to the correct grid descriptor'
-          call app_log(APP_ERROR,VGD_PRFX//for_app)       
+          write(app_msg,*) 'sfc_field ig1 ig2 do not correspond to the correct grid descriptor'
+          call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
 
-          write(for_app,'("   expecting (ip1,ip2)->(",i8,",",i8,"), got (ig1,ig2)->(",i8,",",i8,")")')&
+          write(app_msg,'("   expecting (ip1,ip2)->(",i8,",",i8,"), got (ig1,ig2)->(",i8,",",i8,")")')&
                ip1,ip2,prm_p0%ig1,prm_p0%ig2
-          call app_log(APP_ERROR,VGD_PRFX//for_app)       
+          call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
                             
           return
        endif
@@ -2001,15 +2001,15 @@ contains
     allocate(F_f(ni,nj),stat=istat)
     if (istat /= 0) then
        nullify(F_f)
-       write(for_app,*) 'cannot allocate space in get_ref for ',trim(F_name_S) 
-       call app_log(APP_ERROR,VGD_PRFX//for_app)       
+       write(app_msg,*) 'cannot allocate space in get_ref for ',trim(F_name_S) 
+       call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
 
        return
     endif
     istat = fstluk(F_f,sfc_key,ni,nj,nk)
     if(istat < 0 )then
-       write(for_app,*) 'problem with fstluk '//trim(F_name_S)//' in get_ref'
-       call app_log(APP_ERROR,VGD_PRFX//for_app)       
+       write(app_msg,*) 'problem with fstluk '//trim(F_name_S)//' in get_ref'
+       call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
 
        deallocate(F_f)
        return
@@ -2060,8 +2060,8 @@ contains
    type (c_ptr) :: ip1s_CP, val_CP, sfc_pres_CP, sfc_temp_CP
    status = VGD_ERROR
    if(.not.is_valid(self,'SELF'))then
-      write(for_app,*) 'vgrid structure is not valid in stda76'
-      call app_log(APP_ERROR,VGD_PRFX//for_app)       
+      write(app_msg,*) 'vgrid structure is not valid in stda76'
+      call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
        
       return
    endif
@@ -2084,28 +2084,28 @@ contains
    select case (trim(up(var)))
    case ('TEMPERATURE')
       if (present(sfc_temp) .or. present(sfc_pres) )then
-          write(for_app,*) 'ERROR with vgd_stda76_temp, option sfc_temp and/or sfc_pres not implemented for TEMPERATURE.'&
+          write(app_msg,*) 'ERROR with vgd_stda76_temp, option sfc_temp and/or sfc_pres not implemented for TEMPERATURE.'&
                //'Please contact the vgrid dev team.'
-          call app_log(APP_ERROR,VGD_PRFX//for_app)       
+          call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
  
           return
       endif
       if( f_stda76_temp(self%cptr, ip1s_CP, size(val), val_CP) /= VGD_OK) then
-         write(for_app,*) 'ERROR with vgd_stda76_temp'
-         call app_log(APP_ERROR,VGD_PRFX//for_app)       
+         write(app_msg,*) 'ERROR with vgd_stda76_temp'
+         call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
        
          return
       endif
    case ('PRESSURE')
       if( f_stda76_pres(self%cptr, ip1s_CP, size(val), val_CP, sfc_temp_CP, sfc_pres_CP ) /= VGD_OK) then
-         write(for_app,*) 'ERROR with vgd_stda76_pres'
-         call app_log(APP_ERROR,VGD_PRFX//for_app)       
+         write(app_msg,*) 'ERROR with vgd_stda76_pres'
+         call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
        
          return
       endif
    case DEFAULT
-      write(for_app,*) 'invalid variable name given to vgd_stda76',trim(var)
-      call app_log(APP_ERROR,VGD_PRFX//for_app)       
+      write(app_msg,*) 'invalid variable name given to vgd_stda76',trim(var)
+      call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
 
       return
    end select

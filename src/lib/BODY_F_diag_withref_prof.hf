@@ -22,8 +22,8 @@
      nullify(sfc_field_2d,sfc_field_ls_2d,levels_3d)
 
      if(.not.is_valid(self,'SELF'))then
-        write(for_app,*) 'vgrid structure is not valid in diag_withref_prof'//PROC_SUFF
-        call app_log(APP_ERROR,VGD_PRFX//for_app)       
+        write(app_msg,*) 'vgrid structure is not valid in diag_withref_prof'//PROC_SUFF
+        call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
         return
      endif
 
@@ -44,8 +44,8 @@
         if(associated(sfc_field_2d))deallocate(sfc_field_2d)
         if(associated(sfc_field_ls_2d))deallocate(sfc_field_ls_2d)
         if(associated(levels_3d))deallocate(levels_3d)
-        write(for_app,*) 'cannot allocate space for p0/levels in diag_withref_prof'//PROC_SUFF
-        call app_log(APP_ERROR,VGD_PRFX//for_app)       
+        write(app_msg,*) 'cannot allocate space for p0/levels in diag_withref_prof'//PROC_SUFF
+        call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
         return
      endif
      sfc_field_2d=my_sfc_field
@@ -68,8 +68,8 @@
      endif
      if (error /= 0) then
         deallocate(sfc_field_2d,levels_3d)
-        write(for_app,*) 'problem with diag_withref in diag_withref_prof'//PROC_SUFF
-        call app_log(APP_ERROR,VGD_PRFX//for_app)       
+        write(app_msg,*) 'problem with diag_withref in diag_withref_prof'//PROC_SUFF
+        call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
         return
      endif
      error = get_allocate('levels',levels,nk,ALLOW_RESHAPE,'(in diag_withref_prof'//PROC_SUFF//')')

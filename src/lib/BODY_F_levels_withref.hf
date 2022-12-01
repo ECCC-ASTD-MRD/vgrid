@@ -19,8 +19,8 @@
       status = VGD_ERROR
       
       if(.not.is_valid(self,'SELF'))then
-         write(for_app,*) 'vgrid structure is not valid in levels_withref'//PROC_SUFF
-         call app_log(APP_ERROR,VGD_PRFX//for_app)       
+         write(app_msg,*) 'vgrid structure is not valid in levels_withref'//PROC_SUFF
+         call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
          return
       endif
       
@@ -32,8 +32,8 @@
       endif
       allocate(my_sfc_field(ni,nj),stat=error)
       if (error /= 0) then
-         write(for_app,*) 'cannot allocate space for sfc_field in levels_withref'//PROC_SUFF
-         call app_log(APP_ERROR,VGD_PRFX//for_app)       
+         write(app_msg,*) 'cannot allocate space for sfc_field in levels_withref'//PROC_SUFF
+         call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
          return
       endif
       if (present(sfc_field)) then
@@ -43,8 +43,8 @@
       endif
       if (present(sfc_field_ls)) then
          if( size(sfc_field_ls,dim=1) /= ni .or. size(sfc_field_ls,dim=2) /= nj )then
-            write(for_app,*) 'size of sfc_field_ls not the same as sfc_field in levels_withref'//PROC_SUFF
-            call app_log(APP_ERROR,VGD_PRFX//for_app)       
+            write(app_msg,*) 'size of sfc_field_ls not the same as sfc_field in levels_withref'//PROC_SUFF
+            call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
             return
          endif
       endif
