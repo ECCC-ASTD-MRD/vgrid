@@ -403,16 +403,6 @@ package:ubuntu-20.04-amd64_inteloneapi-2022.1.2:
       - make package
       - ~/ci-admin-bundle/bin/ci-package-ssm.sh package ${ECCI_PROCESS}
 
-deploy:staging:
-   stage: deploy
-   only:
-      - master
-      - tags
-      - dev
-      - schedules
-   script:
-      - ~/ci-admin-bundle/bin/ci-stage-ssm.sh libs  ${CI_PROJECT_NAME} "${CI_COMMIT_TAG}" "${ECCI_PROCESS}"
-
 #----- ubuntu-20.04-amd64_gnu-9.3.0
 
 build:ubuntu-20.04-amd64_gnu-9.3.0:
