@@ -2,7 +2,7 @@
 
 program vcode
    !
-   use app
+   use rmn_app
    use vGrid_Descriptors, only: vgd_print,VGD_ERROR
    !
    implicit none
@@ -14,7 +14,6 @@ program vcode
   
    !==========================================================================
    app_ptr=app_init(0,'r.vcode',version,'Display vertical coordinate information',BUILD_TIMESTAMP)
-   call app_liblist('vgrid',VERSION)
    call app_start()
    !==========================================================================
    

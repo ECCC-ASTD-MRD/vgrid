@@ -1,7 +1,7 @@
 #include "vgrid_build_info.h"
 
 program add_toctoc
-   use app
+   use rmn_app
    use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_write,vgd_print,vgd_putopt,VGD_ERROR
    implicit none
    integer, parameter :: ncle=5,lui=10,nmax=1000
@@ -21,7 +21,6 @@ program add_toctoc
 
    !==========================================================================
    app_ptr=app_init(0,'r.add_toctoc',version,'Add vertical descriptor (!!)',BUILD_TIMESTAMP)
-   call app_liblist('vgrid',VERSION)
    call app_start()
    !==========================================================================
    
@@ -145,7 +144,7 @@ program add_toctoc
 end program add_toctoc
 
 subroutine help (version)
-   use app
+   use rmn_app
    implicit none
    character(len=*) :: version
    integer :: istat

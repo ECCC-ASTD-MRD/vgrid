@@ -1,7 +1,7 @@
 #include "vgrid_build_info.h"
 
 program convert_toctoc_5002
-   use app
+   use rmn_app
    use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_write,vgd_print,VGD_OK
    use, intrinsic :: iso_fortran_env
    implicit none
@@ -40,7 +40,6 @@ program convert_toctoc_5002
 
    !==========================================================================
    app_ptr=app_init(0,'r.convert_toc_toc_5002',version,'Display verticalcoordinate information',BUILD_TIMESTAMP)
-   call app_liblist('vgrid',VERSION)
    call app_start()
    !==========================================================================
 

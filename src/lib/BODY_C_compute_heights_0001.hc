@@ -4,7 +4,7 @@
 
   aa_8 = malloc(nk*sizeof(double));
   if(! aa_8 ) {
-    Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot allocate aa_8 of double size %d\n",__func__,nk);
+    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate aa_8 of double size %d\n",__func__,nk);
     return(VGD_ERROR);
   }  
 
@@ -15,7 +15,7 @@
       if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_w, self->nl_w) ) != -1 ) {
 	       aa_8[k] = self->a_w_8[ind];
       } else {
-         Lib_Log(APP_ERROR,APP_LIBVGRID,"%s: cannot find ip1 %d in vgrid descriptor\n",__func__,ip1_list[k]);
+         Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot find ip1 %d in vgrid descriptor\n",__func__,ip1_list[k]);
 	       free(aa_8);
 	       return(VGD_ERROR);	
       }

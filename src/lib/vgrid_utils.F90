@@ -19,7 +19,7 @@
 
 module vgrid_utils
    
-   use app
+   use rmn_app
    implicit none
    private
 
@@ -73,13 +73,13 @@ contains
          if(size(value)/=len)then
             if(allow_reshape_L)then
                write(app_msg,*) 'reshaping 1D integer vector '//trim(msg_S)
-               call Lib_Log(APP_INFO,APP_LIBVGRID,app_msg)       
+               call Lib_Log(APP_LIBVGRID,APP_INFO,app_msg)       
 
                deallocate(value)
                alloc_lev_L=.true.
             else
                write(app_msg,*) '1D pointer already allocated with a different length, will not reallocate '//trim(msg_S)
-               call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
+               call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
                return
             endif
          endif
@@ -88,7 +88,7 @@ contains
          allocate(value(len),stat=istat)
          if (istat /= 0) then
             write(app_msg,*) 'unable to allocate space for '//trim(key_S)//' request '//trim(msg_S)
-            call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
+            call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
          endif
       else
          istat=0
@@ -113,13 +113,13 @@ contains
          if(size(value)/=len)then
             if(allow_reshape_L)then
                write(app_msg,*) 'reshaping 1D real vector '//trim(msg_S)
-               call Lib_Log(APP_INFO,APP_LIBVGRID,app_msg)       
+               call Lib_Log(APP_LIBVGRID,APP_INFO,app_msg)       
 
                deallocate(value)
                alloc_lev_L=.true.
             else
                write(app_msg,*) '1D pointer already allocated with a different length, will not reallocate '//trim(msg_S)
-               call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
+               call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
                return
             endif
          endif
@@ -128,7 +128,7 @@ contains
          allocate(value(len),stat=istat)
          if (istat /= 0) then
             write(app_msg,*) 'unable to allocate space for '//trim(key_S)//' request '//trim(msg_S)
-            call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
+            call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
          endif
       else
          istat=0
@@ -153,13 +153,13 @@ contains
          if(size(value)/=len)then
             if(allow_reshape_L)then
                write(app_msg,*) 'reshaping 1D real(kind=8) vector '//trim(msg_S)
-               call Lib_Log(APP_INFO,APP_LIBVGRID,app_msg)       
+               call Lib_Log(APP_LIBVGRID,APP_INFO,app_msg)       
 
                deallocate(value)
                alloc_lev_L=.true.
             else
                write(app_msg,*) '1D pointer already allocated with a different length, will not reallocate '//trim(msg_S)
-               call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
+               call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
                return
             endif
          endif
@@ -168,7 +168,7 @@ contains
          allocate(value(len),stat=istat)
          if (istat /= 0) then
             write(app_msg,*) 'unable to allocate space for '//trim(key_S)//' request '//trim(msg_S)
-            call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
+            call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
          endif
       else
        istat=0
@@ -282,7 +282,7 @@ contains
     integer :: i
     if (len_trim(string) > len(upper_string)) then
        write(app_msg,*) 'Long string truncated in up() ',trim(string)
-       call Lib_Log(APP_WARNING,APP_LIBVGRID,app_msg)       
+       call Lib_Log(APP_LIBVGRID,APP_WARNING,app_msg)       
       endif
     upper_string = string
     do i = 1,len_trim(string)
@@ -306,7 +306,7 @@ contains
     istat=-1
     if (size(len) < 3) then
        write(app_msg,*) 'wrong array shape specified for '//trim(key_S)
-       call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
+       call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
        return
     endif
     alloc_lev_L=.false.
@@ -318,13 +318,13 @@ contains
             size(value,3)/=len(3))then
           if(allow_reshape_L)then
              write(app_msg,*) 'reshaping 3D real table'//trim(msg_S)
-             call Lib_Log(APP_INFO,APP_LIBVGRID,app_msg)       
+             call Lib_Log(APP_LIBVGRID,APP_INFO,app_msg)       
 
              deallocate(value)
              alloc_lev_L=.true.
           else
              write(app_msg,*) '3D pointer already allocated with a different length, will not reallocate '//trim(msg_S)
-             call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
+             call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
              return
           endif
        endif
@@ -333,7 +333,7 @@ contains
        allocate(value(len(1),len(2),len(3)),stat=istat)
        if (istat /= 0) then
           write(app_msg,*) 'unable to allocate space for '//trim(key_S)//' request '//trim(msg_S)
-          call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
+          call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
          endif
     else
        istat=0
@@ -354,7 +354,7 @@ contains
     istat=-1
     if (size(len) < 3) then
        write(app_msg,*) 'wrong array shape specified for '//trim(key_S)
-       call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
+       call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
        return
     endif
     alloc_lev_L=.false.
@@ -366,13 +366,13 @@ contains
             size(value,3)/=len(3))then
           if(allow_reshape_L)then
              write(app_msg,*) 'reshaping 3D real(kind=8) table'//trim(msg_S)
-             call Lib_Log(APP_INFO,APP_LIBVGRID,app_msg)       
+             call Lib_Log(APP_LIBVGRID,APP_INFO,app_msg)       
 
              deallocate(value)
              alloc_lev_L=.true.
           else
              write(app_msg,*) '3D pointer already allocated with a different length, will not reallocate '//trim(msg_S)
-             call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
+             call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
              return
           endif
        endif
@@ -381,7 +381,7 @@ contains
        allocate(value(len(1),len(2),len(3)),stat=istat)
        if (istat /= 0) then
           write(app_msg,*) 'unable to allocate space for '//trim(key_S)//' request '//trim(msg_S)
-          call Lib_Log(APP_ERROR,APP_LIBVGRID,app_msg)       
+          call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
          endif
     else
        istat=0

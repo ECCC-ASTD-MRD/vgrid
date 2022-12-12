@@ -1,7 +1,7 @@
 #include "vgrid_build_info.h"
 
 module mod_comp_pres_gz
-  use app
+  use rmn_app
   use vGrid_Descriptors, only: vgrid_descriptor, VGD_ERROR, VGD_OK
   implicit none
   private
@@ -541,7 +541,7 @@ contains
   end function cpg_sort_key_by_levels
   !===================================================================================
   integer function cpg_get_px_gz() result(stat)
-    use app
+    use rmn_app
     use vgrid_descriptors, only: vgd_get
     implicit none
     ! Local variables
@@ -1374,7 +1374,7 @@ end module mod_comp_pres_gz
 !========================================================================
 
 program compute_pressure_gz
-   use app
+   use rmn_app
    use vGrid_Descriptors, only: vgd_new,vgd_print,vgd_get,VGD_PRES_TYPE,VGD_HEIGHT_TYPE,VGD_OK,VGD_ERROR
   use mod_comp_pres_gz, only: cpg_process_arguments,cpg_lui,cpg_luo,cpg_samefile_L,cpg_compute_gz_L,&
        cpg_get_vgd_levels,cpg_vgd,cpg_kind,cpg_version,cpg_levels_S,cpg_is_pressure_L,&
@@ -1385,8 +1385,6 @@ program compute_pressure_gz
 
 !==========================================================================
 app_ptr=app_init(0,'r.compute_pressure_gz',version,'',BUILD_TIMESTAMP)
-call app_liblist('vgrid',VERSION)
-call app_liblist('tdpack',HAVE_TDPACK)
 call app_start()
 !==========================================================================
 

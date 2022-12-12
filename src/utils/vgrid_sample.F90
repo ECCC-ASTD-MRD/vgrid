@@ -1,7 +1,7 @@
 #include "vgrid_build_info.h"
 
 module mod_vgrid_sample
-  use app
+  use rmn_app
   use, intrinsic :: iso_fortran_env
   implicit none
   private
@@ -382,7 +382,6 @@ contains
     
     !==========================================================================
     app_ptr=app_init(0,'r.vgrid_sample',version,'',BUILD_TIMESTAMP)
-    call app_liblist('vgrid',VERSION)
     call app_start()
     !==========================================================================
     
