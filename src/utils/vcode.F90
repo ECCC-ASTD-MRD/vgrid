@@ -2,7 +2,7 @@
 
 program vcode
    !
-   use rmn_app
+   use app
    use vGrid_Descriptors, only: vgd_print,VGD_ERROR
    !
    implicit none

@@ -1,4 +1,4 @@
-     use rmn_app
+     use app
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
      real(kind=REAL_KIND), dimension(:), pointer :: levels                     !Physical level values

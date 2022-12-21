@@ -19,7 +19,7 @@
 
 module vgrid_utils
    
-   use rmn_app
+   use app
    implicit none
    private
 

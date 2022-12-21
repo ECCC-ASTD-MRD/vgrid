@@ -1,7 +1,7 @@
 #include "vgrid_build_info.h"
 
 module mod_vgrid_sample
-  use rmn_app
+  use app
   use, intrinsic :: iso_fortran_env
   implicit none
   private
@@ -389,7 +389,7 @@ contains
     call ccard(cle, def, val, ncle, npos)
     
     if(trim(val(1)) == 'undef')then
-      call app_log(APP_MUST,'Usage: r.vgrid_sample -out_dir output_directory')
+      call app_log(APP_VERBATIM,'Usage: r.vgrid_sample -out_dir output_directory')
       stat=app_end(-1)
       stop
     endif

@@ -24,7 +24,7 @@
 #include <math.h>
 #include <rmn.h>
 #include <rmn/rpnmacros.h>
-#include <rmn/App.h>
+#include <App.h>
 #include "vgrid.h"
 #include "vgrid_build_info.h"
 
@@ -3419,9 +3419,9 @@ static int C_genab_1001(float *hyb, int nk, double **a_m_8, double **b_m_8, int 
     }
   }
   if(! ok){
-    App_Log(APP_MUST,"   Current choice:\n");
+    App_Log(APP_VERBATIM,"   Current choice:\n");
     for ( k = 0; k < nk; k++){
-      App_Log(APP_MUST,"   %f\n", hyb[k]);
+      App_Log(APP_VERBATIM,"   %f\n", hyb[k]);
     }
     return(VGD_ERROR);
   }
@@ -3596,9 +3596,9 @@ static int C_genab_1002(float *etauser, int nk, double *ptop_8, double **a_m_8, 
     }
   }
   if(! ok){
-    App_Log(APP_MUST,"   Current choice:\n");
+    App_Log(APP_VERBATIM,"   Current choice:\n");
     for ( k = 0; k < nk; k++){
-      App_Log(APP_MUST,"   %f\n", etauser[k]);
+      App_Log(APP_VERBATIM,"   %f\n", etauser[k]);
     }
     return(VGD_ERROR);
   }
@@ -3653,9 +3653,9 @@ static int C_genab_1003(float *hybuser, int nk, float rcoef, double ptop_8, doub
     }
   }
   if(! ok){
-    App_Log(APP_MUST,"   Current choice:\n");
+    App_Log(APP_VERBATIM,"   Current choice:\n");
     for ( k = 0; k < nk; k++){
-      App_Log(APP_MUST,"   %f\n", hybuser[k]);
+      App_Log(APP_VERBATIM,"   %f\n", hybuser[k]);
     }
     return(VGD_ERROR);
   }
@@ -3720,9 +3720,9 @@ static int C_genab_2001(float *pres, int nk, double **a_m_8, double **b_m_8, int
     }
   }
   if(! ok){
-    App_Log(APP_MUST,"%   Current choice:\n");
+    App_Log(APP_VERBATIM,"%   Current choice:\n");
     for ( k = 0; k < nk; k++){
-      App_Log(APP_MUST,"   %f\n", pres[k]);
+      App_Log(APP_VERBATIM,"   %f\n", pres[k]);
     }
     return(VGD_ERROR);
   }
@@ -3768,9 +3768,9 @@ static int C_genab_4001(float *hgts, int nk, double **a_m_8, double **b_m_8, int
     ok=0;
   }
   if(! ok){
-    App_Log(APP_MUST,"   Current choice:\n");
+    App_Log(APP_VERBATIM,"   Current choice:\n");
     for ( k = 0; k < nk; k++){
-      App_Log(APP_MUST,"   %f\n", hgts[k]);
+      App_Log(APP_VERBATIM,"   %f\n", hgts[k]);
     }
     return(VGD_ERROR);
   }
@@ -3815,9 +3815,9 @@ static int C_genab_5001(float *hybuser, int nk, float rcoef, double ptop_8, doub
     }
   }
   if(! ok){
-    App_Log(APP_MUST,"   Current choice:\n");
+    App_Log(APP_VERBATIM,"   Current choice:\n");
     for ( k = 0; k < nk; k++){
-      App_Log(APP_MUST,"   %f\n", hybuser[k]);
+      App_Log(APP_VERBATIM,"   %f\n", hybuser[k]);
     }
     return(VGD_ERROR);
   }
@@ -3953,9 +3953,9 @@ static int C_genab_5002_5003(float *hybuser, int nk, int *nl_m, int *nl_t, float
     }
   }
   if(! ok){
-    App_Log(APP_MUST,"   Current choice:\n");
+    App_Log(APP_VERBATIM,"   Current choice:\n");
     for ( k = 0; k < nk; k++){
-      App_Log(APP_MUST,"   %f\n", hybuser[k]);
+      App_Log(APP_VERBATIM,"   %f\n", hybuser[k]);
     }
     fflush(stdout);
     return(VGD_ERROR);
@@ -4112,9 +4112,9 @@ static int C_genab_5004(float *hybuser, int nk, int *nl_m, int *nl_t, float rcoe
     }
   }
   if(! ok){
-    App_Log(APP_MUST,"   Current choice:\n");
+    App_Log(APP_VERBATIM,"   Current choice:\n");
     for ( k = 0; k < nk; k++){
-      App_Log(APP_MUST,"   %f\n", hybuser[k]);
+      App_Log(APP_VERBATIM,"   %f\n", hybuser[k]);
     }
     return(VGD_ERROR);
   }
@@ -4244,9 +4244,9 @@ static int c_vgrid_genab_5005(float *hybuser, int nk, int *nl_m, int *nl_t, floa
     }
   }
   if(! ok){
-    App_Log(APP_MUST,"   Current choice:\n");
+    App_Log(APP_VERBATIM,"   Current choice:\n");
     for ( k = 0; k < nk; k++){
-      App_Log(APP_MUST,"   %f\n", hybuser[k]);
+      App_Log(APP_VERBATIM,"   %f\n", hybuser[k]);
     }
     return(VGD_ERROR);
   }
@@ -4410,9 +4410,9 @@ static int c_vgrid_genab_5100(float *hybuser, int nk, int *nl_m, int *nl_t, floa
     }
   }
   if(! ok){
-    App_Log(APP_MUST,"   Current choice:\n");
+    App_Log(APP_VERBATIM,"   Current choice:\n");
     for ( k = 0; k < nk; k++){
-      App_Log(APP_MUST,"   %f\n", hybuser[k]);
+      App_Log(APP_VERBATIM,"   %f\n", hybuser[k]);
     }
     return(VGD_ERROR);
   }
@@ -4519,9 +4519,9 @@ static int c_vgrid_genab_21001(float *hybuser, int nk, int *nl_m, int *nl_t, flo
     }
   }
   if(! ok){
-    App_Log(APP_MUST,"   Current choice:\n");
+    App_Log(APP_VERBATIM,"   Current choice:\n");
     for ( k = 0; k < nk; k++){
-      App_Log(APP_MUST,"   %f\n", hybuser[k]);
+      App_Log(APP_VERBATIM,"   %f\n", hybuser[k]);
     }
     return(VGD_ERROR);
   }
@@ -4700,9 +4700,9 @@ static int c_vgrid_genab_21002(float *hybuser, int nk, int *nl_m, int *nl_t, int
     }
   }
   if(! ok){
-    App_Log(APP_MUST,"   Current choice:\n");
+    App_Log(APP_VERBATIM,"   Current choice:\n");
     for ( k = 0; k < nk; k++){
-      App_Log(APP_MUST,"   %f\n", hybuser[k]);
+      App_Log(APP_VERBATIM,"   %f\n", hybuser[k]);
     }
     return(VGD_ERROR);
   }

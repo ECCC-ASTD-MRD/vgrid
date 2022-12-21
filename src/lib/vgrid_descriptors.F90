@@ -31,7 +31,7 @@ module vGrid_Descriptors
    ! var_CP is of type type(c_prt) from iso_c_binging
 
    use iso_c_binding, only : c_ptr, C_NULL_PTR, C_CHAR, C_NULL_CHAR, c_int, C_FLOAT, c_associated, c_loc
-   use rmn_app
+   use app
 
    implicit none
    private

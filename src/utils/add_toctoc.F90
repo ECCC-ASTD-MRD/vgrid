@@ -1,7 +1,7 @@
 #include "vgrid_build_info.h"
 
 program add_toctoc
-   use rmn_app
+   use app
    use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_write,vgd_print,vgd_putopt,VGD_ERROR
    implicit none
    integer, parameter :: ncle=5,lui=10,nmax=1000
@@ -144,7 +144,7 @@ program add_toctoc
 end program add_toctoc
 
 subroutine help (version)
-   use rmn_app
+   use app
    implicit none
    character(len=*) :: version
    integer :: istat
@@ -157,6 +157,6 @@ subroutine help (version)
       '   -samefile     put constructed !! in input file (-s input_file),'//EOL//&
       '                 do not supply argument -d with this option'//EOL//&
       '   -allow_sigma  allow construction of sigma levels, default to false'
-   call app_log(APP_MUST,app_msg)
+   call app_log(APP_VERBATIM,app_msg)
 
    end subroutine help

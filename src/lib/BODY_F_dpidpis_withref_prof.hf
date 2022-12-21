@@ -1,4 +1,4 @@
-     use rmn_app
+     use app
      use vgrid_utils, only: up
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field

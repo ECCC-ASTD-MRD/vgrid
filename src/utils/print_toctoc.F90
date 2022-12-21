@@ -2,7 +2,7 @@
 
 program print_toctoc
    !
-   use rmn_app
+   use app
    use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_print,vgd_get,vgd_putopt,VGD_ERROR
    !
    implicit none

@@ -1,7 +1,7 @@
 #include "vgrid_build_info.h"
 
 module mod_comp_pres_gz
-  use rmn_app
+  use app
   use vGrid_Descriptors, only: vgrid_descriptor, VGD_ERROR, VGD_OK
   implicit none
   private
@@ -268,9 +268,9 @@ contains
       write(app_msg,*) 'cpg_get_rec: more than one nomvar "'//F_f%nomvar//'" in inout file with the following research key:'
       call app_log(APP_ERROR,app_msg)
       write(app_msg,*) '      datev = ',prm%datev,', etiket = ',prm%etiket,',ip1 2 3 = ', prm%ip1, prm%ip2, prm%ip3
-      call app_log(APP_MUST,app_msg)
+      call app_log(APP_VERBATIM,app_msg)
       write(app_msg,*) 'Use option -datev to select only one ', F_f%nomvar,' (Not implemented Yet, ask developer)'
-      call app_log(APP_MUST,app_msg)
+      call app_log(APP_VERBATIM,app_msg)
        return
     endif
     if( associated(F_f%data) .and. &
@@ -541,7 +541,7 @@ contains
   end function cpg_sort_key_by_levels
   !===================================================================================
   integer function cpg_get_px_gz() result(stat)
-    use rmn_app
+    use app
     use vgrid_descriptors, only: vgd_get
     implicit none
     ! Local variables
@@ -760,7 +760,7 @@ contains
       write(app_msg,*) 'ERROR with option -levels expected THERMO, MOMENTUM or ALL_LEVELS but got ',trim(cpg_levels_S)
       call app_log(APP_ERROR,app_msg)
       write(app_msg,*) 'NOTE: passing a nomvar to option -levels is not implemented for vcode ',vcode
-      call app_log(APP_MUST,app_msg)
+      call app_log(APP_VERBATIM,app_msg)
        return
     endif
 
@@ -1243,7 +1243,7 @@ contains
       write(app_msg,*) 'option -levels expected THERMO, MOMENTUM or ALL_LEVELS but got ',trim(cpg_levels_S)
       call app_log(APP_ERROR,app_msg)
        write(app_msg,*) 'NOTE: passing a nomvar to option -levels is not implemented for vcode ',vcode
-       call app_log(APP_MUST,app_msg)
+       call app_log(APP_VERBATIM,app_msg)
      return
     endif
     ! get all momentum ip1s
@@ -1374,7 +1374,7 @@ end module mod_comp_pres_gz
 !========================================================================
 
 program compute_pressure_gz
-   use rmn_app
+   use app
    use vGrid_Descriptors, only: vgd_new,vgd_print,vgd_get,VGD_PRES_TYPE,VGD_HEIGHT_TYPE,VGD_OK,VGD_ERROR
   use mod_comp_pres_gz, only: cpg_process_arguments,cpg_lui,cpg_luo,cpg_samefile_L,cpg_compute_gz_L,&
        cpg_get_vgd_levels,cpg_vgd,cpg_kind,cpg_version,cpg_levels_S,cpg_is_pressure_L,&

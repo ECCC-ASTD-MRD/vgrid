@@ -1,7 +1,7 @@
 #include "vgrid_build_info.h"
 
 program convert_toctoc_5002
-   use rmn_app
+   use app
    use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_write,vgd_print,VGD_OK
    use, intrinsic :: iso_fortran_env
    implicit none
@@ -52,7 +52,7 @@ program convert_toctoc_5002
       write(app_msg,*) 'usage :'//EOL//&
          '      r.convert_toctoc_5002 -s source_file -d destination_file'//EOL//&
          '   or r.convert_toctoc_5002 -s source_file -samefile'
-      call app_log(APP_MUST,app_msg)
+      call app_log(APP_VERBATIM,app_msg)
       istat=app_end(-1)
       stop
    endif
@@ -60,7 +60,7 @@ program convert_toctoc_5002
    if(val(2).eq.'undef'.and.val(3).eq.'NO')then
       write(app_msg,*) 'usage :'//EOL//&
          '      r.convert_toctoc_5002 -s source_file -d destination_file'
-      call app_log(APP_MUST,app_msg)
+      call app_log(APP_VERBATIM,app_msg)
       istat=app_end(-1)
       stop
    endif
