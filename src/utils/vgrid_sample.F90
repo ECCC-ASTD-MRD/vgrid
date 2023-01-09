@@ -1,6 +1,7 @@
 #include "vgrid_build_info.h"
 
 module mod_vgrid_sample
+  use app
   use, intrinsic :: iso_fortran_env
   implicit none
   private
@@ -94,17 +95,17 @@ contains
     nullify(temp,ip1s)
 
     lu = lu + 1
-    print*,'lu =',lu
+    write(app_msg,*) 'lu =',lu
+    call app_log(APP_DEBUG,app_msg)
 
     stat = fnom(lu, trim(F_dir)//'/'//trim(F_name), "RND", 0)
     if(stat < 0)then
-       print*,'ERROR with fnom on', trim(F_dir)//'/'//trim(F_name)
-       print*,'      does directory '//trim(F_dir)//' exist?'
+      stat=app_end(-1)
        error stop 1
     endif
     stat = fstouv(lu, 'RND')
     if(stat < 0)then
-       print*,'ERROR with fstouv on', trim(F_dir)//'/'//trim(F_name)
+      stat=app_end(-1)
        error stop 1
     endif
 
@@ -112,8 +113,8 @@ contains
     ! Compute stda 1976 heights from pres pressure profile
     if(vgd_stda76_hgts_from_pres_list(hgts, pres, nk-1) == &
          VGD_ERROR)then
-       print*,'ERROR: getting stda76 heights from pressure list'
-       error stop 1
+            stat=app_end(-1)
+            error stop 1
     endif
     do k=1,nk-1
        hgts_rev(k) = hgts(nk-k)
@@ -122,16 +123,26 @@ contains
     select case(trim(F_name))
     case('pressure')
        if( vgd_new(vgd, kind=2, version=1, hyb=levs(1:nk) * VGD_STDA76_SFC_P/100.) == VGD_ERROR)then
-          print*,'ERROR: building ',trim(F_name)
-          error stop 1
+         write(app_msg,*) 'building ',trim(F_name)
+         call app_log(APP_ERROR,app_msg)
+         stat=app_end(-1)
+         error stop 1
        endif
-       if( vgd_put(vgd, "ETIKET", "PRESSURE") == VGD_ERROR) error stop 1
+       if( vgd_put(vgd, "ETIKET", "PRESSURE") == VGD_ERROR) then
+         stat=app_end(-1)
+         error stop 1
+       endif
     case('sigma')
        if( vgd_new(vgd, kind=1 , version=1, hyb=levs(1:nk)) == VGD_ERROR)then
-          print*,'ERROR: building ',trim(F_name)
-          error stop 1
+         write(app_msg,*) 'building ',trim(F_name)
+         call app_log(APP_ERROR,app_msg)
+         stat=app_end(-1)
+         error stop 1
        endif
-       if( vgd_put(vgd, "ETIKET", "SIGMA") == VGD_ERROR) error stop 1
+       if( vgd_put(vgd, "ETIKET", "SIGMA") == VGD_ERROR) then
+         stat=app_end(-1)
+         error stop 1
+       endif
     case('eta')
        eta = (levs(1:nk) - levs(1)) / (levs(nk) - levs(1))
        ptop_8 = levs(1) * VGD_STDA76_SFC_P * 1.d0
@@ -139,25 +150,36 @@ contains
           vc_eta%ptop_8 = levs(1) * VGD_STDA76_SFC_P * 1.d0
        else
           if( abs(vc_eta%ptop_8 - ptop_8) > 1.e-5)then
-             print*,'ERROR: value of eta ptop inconsistant ',trim(F_name)
-             print*,'       expected ',ptop_8,' got ', vc_eta%ptop_8
-             print*,'       If you give levs in namelist do not set vc_eta%ptop_8 value'
-             error stop 1
+            write(app_msg,*) 'value of eta ptop inconsistant ',trim(F_name),', expected ',ptop_8,' got ', vc_eta%ptop_8,&
+             '. If you give levs in namelist do not set vc_eta%ptop_8 value'
+            call app_log(APP_ERROR,app_msg)
+            stat=app_end(-1)
+            error stop 1
           endif
        endif
        if( vgd_new(vgd, kind=1 , version=2, ptop_8=vc_eta%ptop_8, hyb=eta) == &
             VGD_ERROR)then
-          print*,'ERROR: building ',trim(F_name)
-          error stop 1
+               write(app_msg,*) 'building ',trim(F_name)
+               call app_log(APP_ERROR,app_msg)
+               stat=app_end(-1)
+               error stop 1
        endif
-       if( vgd_put(vgd, "ETIKET", vc_eta%etiket) == VGD_ERROR) error stop 1
+       if( vgd_put(vgd, "ETIKET", vc_eta%etiket) == VGD_ERROR) then
+         stat=app_end(-1)
+         error stop 1
+       endif
     case('4001')
        if( vgd_new(vgd, kind=4 , version=1, hyb=hgts_rev) == &
             VGD_ERROR)then
-          print*,'ERROR: building ',trim(F_name)
-          error stop 1
+               write(app_msg,*) 'building ',trim(F_name)
+               call app_log(APP_ERROR,app_msg)
+               stat=app_end(-1)
+               error stop 1
        endif
-       if( vgd_put(vgd, "ETIKET", "M ABV SFC") == VGD_ERROR) error stop 1
+       if( vgd_put(vgd, "ETIKET", "M ABV SFC") == VGD_ERROR) then
+         stat=app_end(-1)
+         error stop 1
+       endif
     case('5001')
        ! Note : here we want hyb level to be equal to sigam level at
        !        p0 = VGD_STDA76_SFC_P. If we set pref = VGD_STDA76_SFC_P, then hyb = levs.
@@ -166,11 +188,17 @@ contains
        if( vgd_new(vgd, kind=5 , version=1, ptop_8=ptop_8, pref_8=pref_8, &
             rcoef1=vc_5001%rcoef, hyb=levs(1:nk)) == &
             VGD_ERROR)then
-          print*,'ERROR: building ',trim(F_name)
-          error stop 1
+               write(app_msg,*) 'building ',trim(F_name)
+               call app_log(APP_ERROR,app_msg)
+               stat=app_end(-1)
+               error stop 1
        endif
-       if( vgd_put(vgd, "ETIKET", vc_5001%etiket) == VGD_ERROR) error stop 1
-    case('5002')
+       if( vgd_put(vgd, "ETIKET", vc_5001%etiket) == VGD_ERROR) then
+         stat=app_end(-1)
+         error stop 1
+       endif
+
+      case('5002')
        ! Note : here we want hyb level to be equal to sigma level at
        !        p0 = VGD_STDA76_SFC_P. If we set pref = VGD_STDA76_SFC_P,
        !        then zeta = ln(pres)
@@ -182,10 +210,16 @@ contains
        if( vgd_new(vgd, kind=5 , version=2, ptop_8=ptop_8, pref_8=pref_8, &
             rcoef1=vc_5002%rcoef1, rcoef2=vc_5002%rcoef2, hyb=hyb_m1) == &
             VGD_ERROR)then
-          print*,'ERROR: building ',trim(F_name)
-          error stop 1
+               write(app_msg,*) 'building ',trim(F_name)
+               call app_log(APP_ERROR,app_msg)
+               stat=app_end(-1)
+               error stop 1
        endif
-       if( vgd_put(vgd, "ETIKET", vc_5002%etiket) == VGD_ERROR) error stop 1
+       if( vgd_put(vgd, "ETIKET", vc_5002%etiket) == VGD_ERROR) then
+         stat=app_end(-1)
+         error stop 1
+       endif
+
     case('5005')
        ! Note : here we want hyb level to be equal to sigam level at
        !        p0 = VGD_STDA76_SFC_P. If we set pref = VGD_STDA76_SFC_P,
@@ -198,10 +232,16 @@ contains
             pref_8=pref_8, rcoef1=vc_5005%rcoef1, rcoef2=vc_5005%rcoef2, &
             hyb=hyb_m1, dhm=vc_5005%dhm, dht=vc_5005%dht, hyb_flat=vc_5005%hyb_flat) &
             == VGD_ERROR)then
-          print*,'ERROR: building ',trim(F_name)
-          error stop 1
+               write(app_msg,*) 'building ',trim(F_name)
+               call app_log(APP_ERROR,app_msg)
+               stat=app_end(-1)
+               error stop 1
        endif
-       if( vgd_put(vgd, "ETIKET", vc_5005%etiket) == VGD_ERROR) error stop 1
+       if( vgd_put(vgd, "ETIKET", vc_5005%etiket) == VGD_ERROR) then
+         stat=app_end(-1)
+         error stop 1
+       endif
+
     case('5100')
        ! Note : here we want hyb level to be equal to sigam level at
        !        p0 = VGD_STDA76_SFC_P. If we set pref = VGD_STDA76_SFC_P,
@@ -214,49 +254,72 @@ contains
             pref_8=pref_8, rcoef1=vc_5100%rcoef1, rcoef2=vc_5100%rcoef2, &
             rcoef3=vc_5100%rcoef3, rcoef4=vc_5100%rcoef4, &
             hyb=hyb_m1, dhm=vc_5100%dhm, dht=vc_5100%dht,hyb_flat=vc_5100%hyb_flat)  == VGD_ERROR)then
-          print*,'ERROR: building ',trim(F_name)
-          error stop 1
+               write(app_msg,*) 'building ',trim(F_name)
+               call app_log(APP_ERROR,app_msg)
+               stat=app_end(-1)
+               error stop 1
        endif
-       if( vgd_put(vgd, "ETIKET", vc_5100%etiket) == VGD_ERROR) error stop 1
+       if( vgd_put(vgd, "ETIKET", vc_5100%etiket) == VGD_ERROR) then
+         stat=app_end(-1)
+         error stop 1
+       endif
+
     case('21001_NON_SLEVE')
        if( vgd_new(vgd, kind=21 , version=1, rcoef1=vc_21001_NON_SLEVE%rcoef1,&
             rcoef2=vc_21001_NON_SLEVE%rcoef2, rcoef3=-1., &
             rcoef4=-1., hyb=hgts, dhm=vc_21001_NON_SLEVE%dhm,&
             dht=vc_21001_NON_SLEVE%dht,hyb_flat=vc_21001_NON_SLEVE%hyb_flat) == VGD_ERROR)then
-          print*,'ERROR: building ',trim(F_name)
-          error stop 1
+               write(app_msg,*) 'building ',trim(F_name)
+               call app_log(APP_ERROR,app_msg)
+               stat=app_end(-1)
+                error stop 1
        endif
-       if( vgd_put(vgd, "ETIKET", vc_21001_NON_SLEVE%etiket) == VGD_ERROR) &
-            error stop 1
+       if( vgd_put(vgd, "ETIKET", vc_21001_NON_SLEVE%etiket) == VGD_ERROR) then
+         stat=app_end(-1)
+         error stop 1
+       endif
+
     case('21001_SLEVE')
        if( vgd_new(vgd, kind=21 , version=1, rcoef1=vc_21001_SLEVE%rcoef1,&
             rcoef2=vc_21001_SLEVE%rcoef2, rcoef3=vc_21001_SLEVE%rcoef3, &
             rcoef4=vc_21001_SLEVE%rcoef4, hyb=hgts, dhm=vc_21001_SLEVE%dhm,&
             dht=vc_21001_SLEVE%dht,hyb_flat=vc_21001_SLEVE%hyb_flat) == VGD_ERROR)then
-          print*,'ERROR: building ',trim(F_name)
-          error stop 1
+               write(app_msg,*) 'building ',trim(F_name)
+               call app_log(APP_ERROR,app_msg)
+                stat=app_end(-1)
+                error stop 1
        endif
-       if( vgd_put(vgd, "ETIKET", vc_21001_SLEVE%etiket) == VGD_ERROR)&
-            error stop 1
+       if( vgd_put(vgd, "ETIKET", vc_21001_SLEVE%etiket) == VGD_ERROR) then
+         stat=app_end(-1)
+         error stop 1
+       endif
+
     case('21002_NON_SLEVE')
        if( vgd_new(vgd, kind=21 , version=2, rcoef1=vc_21002_NON_SLEVE%rcoef1,&
             rcoef2=vc_21002_NON_SLEVE%rcoef2, rcoef3=-1., &
             rcoef4=-1., hyb=hgts, dhm=vc_21002_NON_SLEVE%dhm,&
             dht=vc_21002_NON_SLEVE%dht, dhw=vc_21002_NON_SLEVE%dhw,hyb_flat=vc_21002_NON_SLEVE%hyb_flat)&
             == VGD_ERROR)then
-          print*,'ERROR: building ',trim(F_name)
-          error stop 1
+               write(app_msg,*) 'building ',trim(F_name)
+               call app_log(APP_ERROR,app_msg)
+               stat=app_end(-1)
+               error stop 1
        endif
-       if( vgd_put(vgd, "ETIKET", vc_21002_NON_SLEVE%etiket) == VGD_ERROR)&
-            error stop 1
+       if( vgd_put(vgd, "ETIKET", vc_21002_NON_SLEVE%etiket) == VGD_ERROR) then
+         stat=app_end(-1)
+         error stop 1
+       endif
+
     case('21002_SLEVE')
        if( vgd_new(vgd, kind=21 , version=2, rcoef1=vc_21002_SLEVE%rcoef1,&
             rcoef2=vc_21002_SLEVE%rcoef2, rcoef3=vc_21002_SLEVE%rcoef3, &
             rcoef4=vc_21002_SLEVE%rcoef4, hyb=hgts, dhm=vc_21002_SLEVE%dhm,&
             dht=vc_21002_SLEVE%dht, dhw=vc_21002_SLEVE%dhw,hyb_flat=vc_21002_SLEVE%hyb_flat) &
             == VGD_ERROR)then
-          print*,'ERROR: building ',trim(F_name)
-          error stop 1
+               write(app_msg,*) 'building ',trim(F_name)
+               call app_log(APP_ERROR,app_msg)
+       stat=app_end(-1)
+               error stop 1
        endif
        !if( vgd_get(vgd,'VIPM',ip1s) == VGD_ERROR)then
        !   print*,'Erreur with vgd_get on VIPM'
@@ -268,16 +331,22 @@ contains
        !endif
        !print*,'ip1s',ip1s
        !print*,'temp=',temp
-       if( vgd_put(vgd, "ETIKET", vc_21002_SLEVE%etiket) == VGD_ERROR)&
-            error stop 1
+       if( vgd_put(vgd, "ETIKET", vc_21002_SLEVE%etiket) == VGD_ERROR) then
+         stat=app_end(-1)
+         error stop 1
+       endif
+
     case DEFAULT
-       print*,'Please add ', trim(F_name)
+      write(app_msg,*) 'Please add ', trim(F_name)
+      call app_log(APP_INFO,app_msg)
        return
     end select
 
     if( vgd_write(vgd, lu, 'fst') == VGD_ERROR)then
-       print*,'ERROR: writing vgrid for ',trim(F_name)
-       error stop 1
+       write(app_msg,*) 'writing vgrid for ',trim(F_name)
+       call app_log(APP_ERROR,app_msg)
+       stat=app_end(-1)
+        error stop 1
     endif
     stat = vgd_print(vgd)
     stat = vgd_free(vgd)
@@ -298,7 +367,7 @@ contains
     implicit none
     
     integer, parameter :: ncle=1, lunml = 9
-    integer :: stat, npos, istat
+    integer :: stat, npos
     integer :: exdb, exfin, system, k
     integer, dimension(1) :: dummy
     character(len=12), parameter :: version='1.1.0'
@@ -311,56 +380,57 @@ contains
     val = (/'undef   '/)
     def = (/'undef   '/)
     
-    stat = exdb('r.vgrid_sample', version, 'NON')
-    write(6,'("   * ",a)')PROJECT_VERSION_STRING
-    write(6,'("   **************************************************************" &
-         &"****************************************")')
+    !==========================================================================
+    app_ptr=app_init(0,'r.vgrid_sample',version,'',BUILD_TIMESTAMP)
+    call app_start()
+    !==========================================================================
     
     npos = -111
     call ccard(cle, def, val, ncle, npos)
     
     if(trim(val(1)) == 'undef')then
-       print*,'Usage: r.vgrid_sample -out_dir output_directory'
-       error stop 1
+      call app_log(APP_VERBATIM,'Usage: r.vgrid_sample -out_dir output_directory')
+      stat=app_end(-1)
+      stop
     endif
     
     if( system('mkdir -p '//trim(val(1))) /= 0 )then
-       print*,'Problem with directory ',trim(val(1)),', see system message above.'
-       print*,'Is '//trim(val(1))//' a file?'
-       print*,'Do you have write permission?'
-       print*,'Fix the problem and rerun program.'
-       error stop 1
+      write(app_msg,*) 'Problem with directory ',trim(val(1)),' Is it a file, do you have write permission?'
+      call app_log(APP_ERROR,app_msg)
+      stat=app_end(-1)
+      error stop 1
     endif
     
     
     levs = -1
     levs_eta = -1
     open (lunml, file=nml_file, delim='APOSTROPHE', STATUS='OLD', &
-         iostat=istat)
+         iostat=stat)
     nk = 0
-    if(istat /= 0)then
-       print*,'Warning, cannot open namlist file ', trim(nml_file)
-       print*,'         Using default vertical grid parameteres'
+    if(stat /= 0)then
+      write(app_msg,*) 'cannot open namlist file ',trim(nml_file),'. Using default vertical grid parameters'
     else
        read(lunml, nml=cfg)
        dummy=minloc(levs)
        nk = dummy(1) - 1
        if( nk /= 0)then
-           print*,'Using user defined sigma levels to set all vcode levels'
+         call app_log(APP_INFO,'Using user defined sigma levels to set all vcode levels')
        else
           dummy=minloc(levs_eta)
           nk = dummy(1) - 1
           if( nk /= 0 )then
-             print*,'Using user defined eta levels to set all vcode levels'
+             call app_log(APP_INFO,'Using user defined eta levels to set all vcode levels')
              if(vc_eta%ptop_8 < 0.d0)then
-                print*,'ERROR: you must set vc_eta%ptop_8 [Pa] in namelist when setting levs_eta'
-                error stop 1
+               write(app_msg,*) 'you must set vc_eta%ptop_8 [Pa] in namelist when setting levs_eta'
+               call app_log(APP_ERROR,app_msg)
+               stat=app_end(-1)
+               error stop 1
              endif
              do k = 1, nk
                 levs(k) = levs_eta(k) *  (1.d0 - vc_eta%ptop_8/VGD_STDA76_SFC_P) + vc_eta%ptop_8/VGD_STDA76_SFC_P
              end do
           else
-             print*,'Using default sigma levels to set all vcode levels'
+            call app_log(APP_INFO,'Using default sigma levels to set all vcode levels')
           endif
        endif
     end if
@@ -371,20 +441,20 @@ contains
     
     stat = vgd_putopt("ALLOW_SIGMA",.true.)
     
-    if( gen_it(val(1), 'pressure') == VGD_ERROR )error stop 1
-    if( gen_it(val(1), 'sigma') == VGD_ERROR )error stop 1
-    if( gen_it(val(1), 'eta') == VGD_ERROR )error stop 1
-    if( gen_it(val(1), '4001') == VGD_ERROR )error stop 1
-    if( gen_it(val(1), '5001') == VGD_ERROR )error stop 1
-    if( gen_it(val(1), '5002') == VGD_ERROR )error stop 1
-    if( gen_it(val(1), '5005') == VGD_ERROR )error stop 1
-    if( gen_it(val(1), '5100') == VGD_ERROR )error stop 1
-    if( gen_it(val(1), '21001_NON_SLEVE') == VGD_ERROR )error stop 1
-    if( gen_it(val(1), '21001_SLEVE') == VGD_ERROR )error stop 1
-    if( gen_it(val(1), '21002_NON_SLEVE') == VGD_ERROR )error stop 1
-    if( gen_it(val(1), '21002_SLEVE') == VGD_ERROR )error stop 1
+    stat = gen_it(val(1), 'pressure')
+    stat = gen_it(val(1), 'sigma')
+    stat = gen_it(val(1), 'eta') 
+    stat = gen_it(val(1), '4001') 
+    stat = gen_it(val(1), '5001')
+    stat = gen_it(val(1), '5002') 
+    stat = gen_it(val(1), '5005') 
+    stat = gen_it(val(1), '5100')
+    stat = gen_it(val(1), '21001_NON_SLEVE') 
+    stat = gen_it(val(1), '21001_SLEVE') 
+    stat = gen_it(val(1), '21002_NON_SLEVE')
+    stat = gen_it(val(1), '21002_SLEVE') 
     
-    stat = exfin('r.vgrid_sample', version, 'NON')
+    stat=app_end(-1)
     
   end subroutine sample_vgrid
 end module mod_vgrid_sample

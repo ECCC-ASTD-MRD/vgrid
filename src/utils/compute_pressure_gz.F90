@@ -1,6 +1,7 @@
 #include "vgrid_build_info.h"
 
 module mod_comp_pres_gz
+  use app
   use vGrid_Descriptors, only: vgrid_descriptor, VGD_ERROR, VGD_OK
   implicit none
   private
@@ -10,7 +11,7 @@ module mod_comp_pres_gz
   integer, public :: cpg_luo=11,cpg_kind,cpg_version
   character(len=12), public :: cpg_etiket_S
   character(len=20), public :: cpg_levels_S
-  logical, public :: cpg_samefile_L,cpg_verbose_L,cpg_allow_sigma_L,cpg_zap_etiket_L,&
+  logical, public :: cpg_samefile_L,cpg_allow_sigma_L,cpg_zap_etiket_L,&
        cpg_is_pressure_L,cpg_compute_gz_L
   type(vgrid_descriptor), public :: cpg_vgd
   type cpg_rpn
@@ -73,28 +74,23 @@ contains
     use vGrid_Descriptors, only: vgd_putopt
     implicit none
     integer, parameter :: ncle=10, nmax=1000
-    integer :: stat,npos,exdb,exfin
+    integer :: stat,npos
     integer :: fnom,fstouv,fstfrm
     character(len=256), dimension(ncle) :: cle,val,def
     status=VGD_ERROR
     cle=(/'s.         ','d.         ','samefile   ','levels     ','verbose    ','kind       ','version    ',&
          'allow_sigma','etiket     ','compute    '/)
-    val=(/'undef      ','undef      ','undef      ','ALL_LEVELS ','NO         ','undef      ','undef      ',&
+    val=(/'undef      ','undef      ','undef      ','ALL_LEVELS ','undef      ','undef      ','undef      ',&
          'NO         ','undef      ','undef      '/)
-    def=(/'undef      ','undef      ','YES        ','ALL_LEVELS ','YES        ','undef      ','undef      ',&
+    def=(/'undef      ','undef      ','YES        ','ALL_LEVELS ','INFO       ','undef      ','undef      ',&
          'YES        ','undef      ','undef      '/)
     npos=-111
-    call ccard(cle,def,val,ncle,npos) 
-    if(trim(val(5)).eq.'NO')then
-       cpg_verbose_L=.false.
-    else if (trim(val(5)).eq.'YES')then
-       cpg_verbose_L=.true.
-    else
-       print*,"ERROR: option -verbose does't take any value, got ",trim(val(5))
-       return
-    endif
+    call ccard(cle,def,val,ncle,npos)
+    stat=app_loglevel(trim(val(5))) 
+
     if(trim(val(10)).eq.'undef')then
-       write(6,'("Argument -compute (pressure,gz) is mendatory")')
+       write(app_msg,*) 'Argument -compute (pressure,gz) is mandatory'
+       call app_log(APP_ERROR,app_msg)
        call cpg_print_doc
        return
     endif
@@ -111,49 +107,56 @@ contains
        return
     endif
     cpg_samefile_L = trim(val(3)) == 'YES'
-    if(cpg_verbose_L .and.  cpg_samefile_L)then
-       print*,'Results will be written in input file '//trim(val(1))
-    endif
+    if(cpg_samefile_L)then
+       write(app_msg,*) 'Results will be written in input file '//trim(val(1))
+       call app_log(APP_INFO,app_msg)
+      endif
     if(trim(val(2)).eq.'undef' .and. .not. cpg_samefile_L)then
-       print*,'ERROR: argument -d (destination_file) is mandatory'
+       write(app_msg,*) 'rgument -d (destination_file) is mandatory'
+       call app_log(APP_ERROR,app_msg)
        call cpg_print_doc
        return
     endif
     cpg_levels_S=trim(val(4))
     if(trim(cpg_levels_S) == "ALL_LEVELS")then
-       print*,'Results will be computed on all levels'
+      call app_log(APP_INFO,'Results will be computed on all levels')
     else
-       print*,'Results will be computed on '//trim(cpg_levels_S)//' levels'
-    endif
+       write(app_msg,*) 'Results will be computed on '//trim(cpg_levels_S)//' levels'
+       call app_log(APP_INFO,app_msg)
+      endif
     if(trim(val(6)).eq.'undef')then
        cpg_kind=-1
     else
        read(val(6),*)cpg_kind
-       print*,'Looking for vertical descriptor of kind ',cpg_kind
-    endif
+       write(app_msg,*) 'Looking for vertical descriptor of kind ',cpg_kind
+       call app_log(APP_INFO,app_msg)
+      endif
     if(trim(val(7)).eq.'undef')then
        cpg_version=-1
     else
        read(val(7),*)cpg_version
     endif
     if(cpg_kind.eq.-1.and.cpg_version.ne.-1)then
-       print*,'ERROR; argument -kind must be used with option -version'
-       return
+       call app_log(APP_ERROR,'argument -kind must be used with option -version')
+         return
     endif
     if(cpg_version.ne.-1)then
-       print*,'Looking for vertical descriptor of version ',cpg_version
-    endif
+       write(app_msg,*) 'Looking for vertical descriptor of version ',cpg_version
+       call app_log(APP_INFO,app_msg)
+      endif
     if(.not.cpg_samefile_L)then
        stat=fnom(cpg_lui,val(1),"RND+R/O",0)
        stat=fnom(cpg_luo,val(2),'RND',0)
        if(stat.lt.0)then
-          print*,'ERROR with fnom on file ',trim(val(2))
+          write(app_msg,*) 'Problem with fnom on file ',trim(val(2))
+          call app_log(APP_ERROR,app_msg)
           return
        endif
        stat=fstouv(cpg_luo,'RND')
        if(stat.lt.0)then
-          print*,'ERROR: problem with fstouv on ',trim(val(2))
-          stat=fstfrm(cpg_luo)
+          write(app_msg,*) 'problem with fstouv on ',trim(val(2))
+          call app_log(APP_ERROR,app_msg)
+               stat=fstfrm(cpg_luo)
           return
        endif
     else
@@ -161,21 +164,22 @@ contains
        cpg_luo=cpg_lui
     endif
     if(stat.lt.0)then
-       print*,'ERROR with fnom on cpg_lui'
-       return
+       call app_log(APP_ERROR,'ERROR with fnom on cpg_lui')
+         return
     endif
     stat=fstouv(cpg_lui,'RND')
     if(stat.le.0)then
-       print*,'No record in RPN file'
-       return
+       call app_log(APP_WARNING,'No record in RPN file')
+         return
     endif
     if(trim(val(8)).eq.'NO')then
        cpg_allow_sigma_L=.false.
     else if (trim(val(8)).eq.'YES')then
        cpg_allow_sigma_L=.true.
     else
-       print*,"ERROR: option -allow_sigma does't take any value, got ",trim(val(8))
-       return
+       write(app_msg,*) "option -allow_sigma does't take any value, got ",trim(val(8))
+       call app_log(APP_ERROR,app_msg)
+         return
     endif
     stat = vgd_putopt("ALLOW_SIGMA",cpg_allow_sigma_L)
     if(val(9) == 'undef      ')then
@@ -183,7 +187,8 @@ contains
     else
        cpg_zap_etiket_L=.true.
        cpg_etiket_S=trim(val(9))
-       if(cpg_verbose_L)print*,'Etiket of output records will be zap to ',cpg_etiket_S
+       write(app_msg,*) 'Etiket of output records will be zap to ',cpg_etiket_S
+       call app_log(APP_ERROR,app_msg)
     endif
     status=VGD_OK
   end function cpg_process_arguments
@@ -235,19 +240,15 @@ contains
     status = VGD_OK
   end function cpg_cp_params
   !===================================================================================
-  integer function cpg_get_rec(F_f, F_lui, match_prm, quiet) result(status)
+  integer function cpg_get_rec(F_f, F_lui, match_prm) result(status)
     type(cpg_rpn) :: F_f
     integer, intent(in) :: F_lui
     type(cpg_rpn), optional :: match_prm
-    logical, optional :: quiet
     ! Local variables      
     integer, dimension(1000) :: keyList
     integer :: fstinl, ni, nj, nk, count, ier, fstluk
     type(cpg_rpn) :: prm
-    logical :: my_quiet
     status = VGD_ERROR
-    my_quiet=.false.
-    if(present(quiet))my_quiet=quiet
     if( present(match_prm) )then
        ier = cpg_cp_params(prm,match_prm)
     else
@@ -255,20 +256,21 @@ contains
     endif
     if( fstinl(F_lui, ni, nj, nk, prm%datev, prm%etiket, prm%ip1, prm%ip2, prm%ip3, ' ',F_f%nomvar,&
          keyList,count,size(keyList)) < 0 )then
-       print*,'ERROR in cpg_get_rec with fstinl'
+            call app_log(APP_ERROR,'ERROR in cpg_get_rec with fstinl')
        return
     endif
     if( count .eq. 0 )then
-       if(.not.my_quiet)then
-          print*,'ERROR in cpg_get_rec, no ', F_f%nomvar,' in input file with the following research key:'
-          print*,'      datev = ',prm%datev,', etiket = ',prm%etiket,',ip1 2 3 = ', prm%ip1, prm%ip2, prm%ip3
-       endif
+       write(app_msg,*) 'cpg_get_rec, no ', F_f%nomvar,' in input file with the following research key: datev = ',prm%datev,', etiket = ',prm%etiket,',ip1 2 3 = ', prm%ip1, prm%ip2, prm%ip3
+       call app_log(APP_ERROR,app_msg)
        return
     endif
     if( count > 1 )then
-       print*,'ERROR in cpg_get_rec, more than one nomvar "'//F_f%nomvar//'" in inout file with the following research key:'
-       print*,'      datev = ',prm%datev,', etiket = ',prm%etiket,',ip1 2 3 = ', prm%ip1, prm%ip2, prm%ip3
-       print*,'      Use option -datev to select only one ', F_f%nomvar,' (Not implemented Yet, ask developer)'
+      write(app_msg,*) 'cpg_get_rec: more than one nomvar "'//F_f%nomvar//'" in inout file with the following research key:'
+      call app_log(APP_ERROR,app_msg)
+      write(app_msg,*) '      datev = ',prm%datev,', etiket = ',prm%etiket,',ip1 2 3 = ', prm%ip1, prm%ip2, prm%ip3
+      call app_log(APP_VERBATIM,app_msg)
+      write(app_msg,*) 'Use option -datev to select only one ', F_f%nomvar,' (Not implemented Yet, ask developer)'
+      call app_log(APP_VERBATIM,app_msg)
        return
     endif
     if( associated(F_f%data) .and. &
@@ -278,17 +280,19 @@ contains
     if( .not. associated(F_f%data) )then
        allocate(F_f%data(ni,nj),stat=ier)
        if(ier /= 0)then
-          print*,'ERROR in cpg_get_rec, cannot alloacte F_f%data of size ->',ni,' x',nj
-          return
+          write(app_msg,*) 'cpg_get_rec, cannot alloacte F_f%data of size ->',ni,' x',nj
+          call app_log(APP_ERROR,app_msg)
+              return
        endif
     endif
     if( cpg_fstprm(keyList(1),F_f) == VGD_ERROR )then
-       print*,'ERROR in cpg_get_rec, with cpg_fstprm'
-       return
+       call app_log(APP_ERROR,'cpg_get_rec, with cpg_fstprm')
+        return
     endif
     if( fstluk(F_f%data,keyList(1),ni,nj,nk) < 0 )then         
-       print*,'ERROR in cpg_get_rec, with fstluk on ', F_f%nomvar
-       return
+       write(app_msg,*) 'cpg_get_rec, with fstluk on ', F_f%nomvar
+       call app_log(APP_ERROR,app_msg)
+         return
     endif
     status = VGD_OK
   end function cpg_get_rec
@@ -320,12 +324,12 @@ contains
   end function cpg_fstecr
   !===================================================================================
   integer function cpg_sort_key_by_levels(sorted_keys,unsorted_keys,&
-       sorted_levels,remove_duplicate_L,verbose_L,&
+       sorted_levels,remove_duplicate_L,&
        sort_as_kind,only_kind,sorted_ip1s) result(status)
     implicit none
     integer, optional,intent(inout), pointer, dimension(:) :: sorted_keys, sorted_ip1s
     integer, optional,intent(in) , dimension(:) :: unsorted_keys      
-    logical, optional,intent(in) :: verbose_L,remove_duplicate_L
+    logical, optional,intent(in) :: remove_duplicate_L
     real, optional, pointer, dimension(:) ::sorted_levels
     integer, optional,intent(in) :: sort_as_kind,only_kind
     ! Local variables
@@ -334,21 +338,21 @@ contains
     real, pointer, dimension(:) :: hyb
     real :: tempo
     character (len=1) :: dummy_S
-    logical :: l_verbose_L,l_remove_duplicate_L,reverse_L
+    logical :: l_remove_duplicate_L,reverse_L
     type (cpg_rpn) :: prm
     external :: convip
     nullify(prm%data,keys,hyb,ip1s)
     status=VGD_ERROR
     if(.not.present(sorted_keys))then
-       print*,'ERROR in cpg_sort_key_by_levels: argument sorted_keys must be passed'
-       return
+       write(app_msg,*) 'cpg_sort_key_by_levels: argument sorted_keys must be passed'
+       call app_log(APP_ERROR,app_msg)
+         return
     endif
     if(.not.present(unsorted_keys))then
-       print*,'ERROR in cpg_sort_key_by_levels: argument unsorted_keys must be passed'
-       return
+       write(app_msg,*) 'cpg_sort_key_by_levels: argument unsorted_keys must be passed'
+       call app_log(APP_ERROR,app_msg)
+        return
     endif
-    l_verbose_L=.false.
-    if(present(verbose_L))l_verbose_L=verbose_L
     l_remove_duplicate_L=.false.
     if(present(remove_duplicate_L))l_remove_duplicate_L=remove_duplicate_L
     l_sort_as_kind=-1
@@ -357,13 +361,14 @@ contains
     if(present(only_kind))l_only_kind=only_kind
     nkns=size(unsorted_keys)
     if(nkns == 0)then
-       print*,'ERROR in cpg_sort_key_by_levels: unsorted_keys list is empty'
-       return
+       call app_log(APP_ERROR,'cpg_sort_key_by_levels: unsorted_keys list is empty')
+         return
     endif
-    if(l_verbose_L)write(6,'("There are ",i8," unsorted levels")')nkns
+    write(app_msg,*) 'There are ',nkns,' unsorted levels'
+    call app_log(APP_INFO,app_msg)
     allocate(keys(nkns),hyb(nkns),ip1s(nkns),stat=ier)
     if (ier /= 0)then
-       print*,'ERROR in cpg_sort_key_by_levels: allocation problem 1 in cpg_sort_key_by_levels'
+      call app_log(APP_ERROR,'cpg_sort_key_by_levels: allocation problem 1 in cpg_sort_key_by_levels')
        return         
     endif
     keys=unsorted_keys
@@ -371,14 +376,17 @@ contains
     get_hyb: do k=1,nkns
        ier=cpg_fstprm(unsorted_keys(k),prm)
        if (ier /= 0)then
-          print*,'ERROR in cpg_sort_key_by_levels: with cpg_fstprm on unsorted_keys k=',k
-          return         
+          write(app_msg,*) 'cpg_sort_key_by_levels: with cpg_fstprm on unsorted_keys k=',k
+          call app_log(APP_ERROR,app_msg)
+               return         
        endif
        call convip(prm%ip1,hyb(k),kind,-1,dummy_S,.false.)
        ip1s(k)=prm%ip1
-       if(l_verbose_L)print*,'Unsorted levels, k=',k,hyb(k),ip1s(k)
+       write(app_msg,*) 'Unsorted levels, k=',k,hyb(k),ip1s(k)
+       call app_log(APP_DEBUG,app_msg)
        if(l_only_kind.ne.-1 .and. kind.ne.l_only_kind)then
-          if(l_verbose_L)write(6,'("Level",i10,f15.7," is not of kind ",i2," removing from list")')ip1s(k),hyb(k),l_only_kind
+         write(app_msg,*) '("Level",i10,f15.7," is not of kind ",i2," removing from list")',ip1s(k),hyb(k),l_only_kind
+         call app_log(APP_DEBUG,app_msg)
           if(kind.ne.l_only_kind)then
              hyb(k)=-1
              ip1s(k)=-1
@@ -405,8 +413,9 @@ contains
              count=count+1
           end if
           if(count.eq.0.and.k.eq.1)then
-             print*,'Warning in cpg_sort_key_by_levels: no level of kind ',l_only_kind,' found'
-             if (associated(sorted_keys))deallocate(sorted_keys)
+             write(app_msg,*) 'cpg_sort_key_by_levels: no level of kind ',l_only_kind,' found'
+             call app_log(APP_WARNING,app_msg)
+                     if (associated(sorted_keys))deallocate(sorted_keys)
              if(present(sorted_levels).and.associated(sorted_levels))deallocate(sorted_levels)
              if(present(sorted_ip1s).and.associated(sorted_ip1s))deallocate(sorted_ip1s)
              return
@@ -452,14 +461,15 @@ contains
     if (associated(sorted_keys))deallocate(sorted_keys)
     allocate(sorted_keys(nks),stat=ier)
     if (ier /= 0)then
-       print*,'ERROR in cpg_sort_key_by_levels: allocation problem 2 in cpg_sort_key_by_levels'
-       return         
+       write(app_msg,*) 'cpg_sort_key_by_levels: allocation problem 2 in cpg_sort_key_by_levels'
+       call app_log(APP_ERROR,app_msg)
+         return         
     endif
     if(present(sorted_levels))then
        if (associated(sorted_levels))deallocate(sorted_levels)
        allocate(sorted_levels(nks),stat=ier)
        if (ier /= 0)then
-          print*,'ERROR in cpg_sort_key_by_levels: allocation problem 3 in cpg_sort_key_by_levels'
+          call app_log(APP_ERROR,'ERROR in cpg_sort_key_by_levels: allocation problem 3 in cpg_sort_key_by_levels')
           return         
        endif
     endif
@@ -467,8 +477,8 @@ contains
        if (associated(sorted_ip1s))deallocate(sorted_ip1s)
        allocate(sorted_ip1s(nks),stat=ier)
        if (ier /= 0)then
-          print*,'ERROR in cpg_sort_key_by_levels: allocation problem 4 in cpg_sort_key_by_levels'
-          return         
+          call app_log(APP_ERROR,'ERROR in cpg_sort_key_by_levels: allocation problem 4 in cpg_sort_key_by_levels')
+               return         
        endif
     endif
     i=1
@@ -500,22 +510,30 @@ contains
        if(present(sorted_levels))sorted_levels(1:size(sorted_keys))=hyb(size(sorted_keys):1:-1)         
        if(present(sorted_ip1s))sorted_ip1s(1:size(sorted_keys))=ip1s(size(sorted_keys):1:-1)   
     case DEFAULT
-       print*,'ERROR in cpg_sort_key_by_levels: unsupported kind=',kind
-       return    
+       write(app_msg,*) 'cpg_sort_key_by_levels: unsupported kind=',kind
+       call app_log(APP_ERROR,app_msg)
+         return    
     end select
     !
-    if(l_verbose_L)then
-       print*,'There are ',nks,' sorted levels'
-       if(l_sort_as_kind.ne.-1)print*,'Levels were sorted as kind =',l_sort_as_kind
-       if(l_remove_duplicate_L)print*,'There was',nkns-nks,' duplicated levels'
+    if(app_loglevel('').gt.1)then
+       write(app_msg,*) 'There are ',nks,' sorted levels'
+       call app_log(APP_INFO,app_msg)
+       if(l_sort_as_kind.ne.-1) then
+         write(app_msg,*) 'Levels were sorted as kind =',l_sort_as_kind
+         call app_log(APP_INFO,app_msg)
+       endif
+       if(l_remove_duplicate_L) then
+         write(app_msg,*) 'There was',nkns-nks,' duplicated levels'
+         call app_log(APP_ERROR,app_msg)
+       endif
        do k=1,nks
           ier=cpg_fstprm(sorted_keys(k),prm)
           if (ier /= 0)then
-             print*,'ERROR in cpg_sort_key_by_levels: with cpg_fstprm on sorted_keys k=',k
              return         
           endif
           call convip(prm%ip1,hyb(k),kind,-1,dummy_S,.false.)      
-          print*,'Sorted levels, k=',k,hyb(k),ip1s(k)
+          write(app_msg,*) 'Sorted levels, k=',k,hyb(k),ip1s(k)
+          call app_log(APP_INFO,app_msg)
        enddo
     endif
     deallocate(keys,hyb,ip1s)
@@ -523,13 +541,13 @@ contains
   end function cpg_sort_key_by_levels
   !===================================================================================
   integer function cpg_get_px_gz() result(stat)
+    use app
     use vgrid_descriptors, only: vgd_get
     implicit none
     ! Local variables
     integer :: vcode
     stat=VGD_ERROR
     if(vgd_get(cpg_vgd,"VCOD",vcode) == VGD_ERROR)then
-       print*,'ERROR: problem with vgd_get on key "VCOD"'
        return
     endif
     select case ( vcode )
@@ -537,31 +555,33 @@ contains
        ! Computation of gz like it was done in GEM 3.3.3 with p0vt2gz_hyb
        ! It doesn't give better results than simple average below.
        if( cpg_get_gz_1002_5001_simple_avg(vcode) == VGD_ERROR )then
-          print*,'ERROR: with cpg_get_gz_1002_5001_simple_avg'
+          stat=app_end(-1)
           error stop
        endif
     case (5002)
        if( cpg_get_gz_5002_5005_5100(vcode) == VGD_ERROR )then
-          print*,'ERROR: with cpg_get_gz_5002_5005 with vcode ',vcode
+          stat=app_end(-1)
           error stop
        endif
     case (5005)     
        if( cpg_get_gz_5002_5005_5100(vcode) == VGD_ERROR )then
-          print*,'ERROR: with cpg_get_gz_5002_5005 with vcode ',vcode
+          stat=app_end(-1)
           error stop
        endif
     case (5100)     
        if( cpg_get_gz_5002_5005_5100(vcode) == VGD_ERROR )then
-          print*,'ERROR: with cpg_get_gz_5100 with vcode ',vcode
+          stat=app_end(-1)
           error stop
        endif
     case (21001)
        if( cpg_get_px_21001() == VGD_ERROR )then
-          print*,'ERROR: with cpg_get_px_21001'
+          stat=app_end(-1)
           error stop
        endif
     case DEFAULT
-       print*,'Vcode ',vcode,' not supported, please contact developer to add this'
+      write(app_msg,*) 'Vcode ',vcode,' not supported, please contact developer to add this'
+      call app_log(APP_ERROR,app_msg)
+       stat=app_end(-1)
        error stop
     end select
     stat=VGD_OK
@@ -596,13 +616,16 @@ contains
     allocate(w3a(p0%ni,p0%nj,1),w3b(p0%ni,p0%nj,1),&
          w2a(p0%ni,p0%nj),w2b(p0%ni,p0%nj),prm%data(p0%ni,p0%nj),stat=ier)
     if( ier /= 0 )then
-       print*,'error in cpg_get_gz_1002_5001_simple_avg, cannot allocate w* of size ->',prm%ni,' x',prm%nj, 'x 1'
+      write(app_msg,*) 'cpg_get_gz_1002_5001_simple_avg: cannot allocate w* of size ->',prm%ni,' x',prm%nj, 'x 1'
+      call app_log(APP_ERROR,app_msg)
+      return
     end if
     ! get all VT, or TT ip1s
     ier = fstinl(cpg_lui,tt%ni,tt%ni,tt%nk,p0%datev,p0%etiket,-1,p0%ip2,-1,'','VT',&
          unsorted_keys, infon, nmax)
     if(ier < 0 )then
-       print*,'ERROR in cpg_get_gz_1002_5001_simple_avg with fstinl on VT'
+      write(app_msg,*) 'cpg_get_gz_1002_5001_simple_avg: fstinl on VT'
+      call app_log(APP_ERROR,app_msg)
        return
     endif
     vt_L = .false.
@@ -612,21 +635,27 @@ contains
        ier = fstinl(cpg_lui,tt%ni,tt%ni,tt%nk,p0%datev,p0%etiket,-1,p0%ip2,-1,'','TT',&
             unsorted_keys, infon, nmax)
        if(ier < 0 )then
-          print*,'ERROR in cpg_get_gz_1002_5001_simple_avg with fstinl on TT'
+         write(app_msg,*) 'cpg_get_gz_1002_5001_simple_avg: fstinl on TT'
+         call app_log(APP_ERROR,app_msg)
           return
        endif
        if( infon == 0 )then
-          print*,'There is no VT or TT record in the input file'
+         write(app_msg,*) 'There is no VT or TT record in the input file'
+         call app_log(APP_ERROR,app_msg)
           return
        endif
     endif
     ier = vgd_get(cpg_vgd,"KIND",kind)
     if(cpg_sort_key_by_levels(sorted_keys,unsorted_keys(1:infon),&
-         remove_duplicate_L=.true.,verbose_L=cpg_verbose_L,&
+         remove_duplicate_L=.true.,&
          only_kind=kind,sorted_ip1s=ip1s_m) == VGD_ERROR)return
-    if(cpg_verbose_L) print*,'List of momentum ip1s',ip1s_m
+    write(app_msg,*) 'List of momentum ip1s',ip1s_m
+    call app_log(APP_INFO,app_msg)
+
     nk = size(ip1s_m)
-    if(cpg_verbose_l) print*,'computing 3d pressure'
+    write(app_msg,*) 'computing 3d pressure'
+    call app_log(APP_INFO,app_msg)
+
     gz%nomvar="gz"
     ier = cpg_cp_params(prm,p0)
     prm%ip1=12000
@@ -716,7 +745,6 @@ contains
     nullify(gzt, wa, wb, ptr_p1, ptr_p2, ptr_tempo, ip1s_m, ip1s_t, p0%data, p0ls%data, gz%data, prm%data, tt%data, hu%data, vt%data)
     status = VGD_ERROR
     if(vgd_get(cpg_vgd,"VCOD",vcode) == VGD_ERROR)then
-       print*,'ERROR: problem with vgd_get on key "VCOD"'
        return
     endif
     thermo_L=.false.
@@ -729,17 +757,23 @@ contains
        thermo_L=.true.
        momentum_L=.true.
     else
-       print*,'ERROR with option -levels expected THERMO, MOMENTUM or ALL_LEVELS but got ',trim(cpg_levels_S)
-       print*,'NOTE: passing a nomvar to option -levels is not implemented for vcode ',vcode
+      write(app_msg,*) 'ERROR with option -levels expected THERMO, MOMENTUM or ALL_LEVELS but got ',trim(cpg_levels_S)
+      call app_log(APP_ERROR,app_msg)
+      write(app_msg,*) 'NOTE: passing a nomvar to option -levels is not implemented for vcode ',vcode
+      call app_log(APP_VERBATIM,app_msg)
        return
     endif
 
     ! get all momentum ip1s
     if( vgd_get(cpg_vgd,"vipm - level ip1 list (m)", ip1s_m) == vgd_error)return
-    if(cpg_verbose_L) print*,'List of momentum ip1s',ip1s_m
+    write(app_msg,*) 'List of momentum ip1s',ip1s_m
+    call app_log(APP_INFO,app_msg)
+
     ! get all thermo ip1s
     if( vgd_get(cpg_vgd,"vipt - level ip1 list (t)", ip1s_t) == vgd_error)return
-    if(cpg_verbose_L) print*,'List of thermo ip1s_t',ip1s_t
+    write(app_msg,*) 'List of thermo ip1s_t',ip1s_t
+    call app_log(APP_INFO,app_msg)
+
     ! For vcode 5002, there are nk+t dynamic temperature, there are nk+2 ip1s_t counting 
     !                 the diag level. This last level is not
     !                 used for computing gz.
@@ -756,7 +790,8 @@ contains
        nk = size(ip1s_m)-2
        kp = 0
     else
-       print*,'INTERNAL ERROR: invalid Vcode in call to get_gz_5002_5005_5100, got ',F_vcode
+      write(app_msg,*) 'invalid Vcode in call to get_gz_5002_5005_5100, got ',F_vcode
+      call app_log(APP_ERROR,app_msg)
        return
     endif
     p0%nomvar="p0"
@@ -771,10 +806,12 @@ contains
     nij =  p0%ni*p0%nj    
     allocate(wa(p0%ni,p0%nj,1),wb(p0%ni,p0%nj,1),gzt(p0%ni,p0%nj),stat=ier)
     if( ier /= 0 )then
-       print*,'error in get_gz_5002_5005_5100, cannot allocate wa, wb of size ->',prm%ni,' x',prm%nj, 'x 1'
-       print*,'                      cannot allocate gzt of size ->',prm%ni,' x',prm%nj
+      write(app_msg,*) 'error in get_gz_5002_5005_5100, cannot allocate wa, wb and gztof size ->',prm%ni,' x',prm%nj
+      call app_log(APP_ERROR,app_msg)
     end if
-    if(cpg_verbose_L) print*,'computing 3d pressure'
+    write(app_msg,*) 'computing 3d pressure'
+    call app_log(APP_INFO,app_msg)
+
     gz%nomvar="gz"
     ier = cpg_cp_params(prm,p0)    
     prm%ip1=93423264
@@ -796,7 +833,7 @@ contains
     vt_L = .true.
     ier = cpg_cp_params(prm,p0)
     prm%ip1=ip1s_t(1+kp);
-    if( cpg_get_rec(vt, cpg_lui, match_prm=prm, quiet=.true.) == VGD_ERROR )then
+    if( cpg_get_rec(vt, cpg_lui, match_prm=prm) == VGD_ERROR )then
        vt_L = .false.
     endif
     
@@ -814,7 +851,9 @@ contains
           if(.not.associated(vt%data))then
              allocate(vt%data(prm%ni,prm%nj),stat=ier)
              if( ier /= 0 )then
-                print*,'error in get_gz_5002_5005, cannot allocate vt%data of size ->',prm%ni,' x',prm%nj
+               write(app_msg,*) 'get_gz_5002_5005: cannot allocate vt%data of size ->',prm%ni,' x',prm%nj
+               call app_log(APP_ERROR,app_msg)
+               return
              end if
           endif
           call mfotvt(vt%data,tt%data,hu%data,nij,1,nij)
@@ -903,7 +942,6 @@ contains
 
     nullify(ip1_list,ip1_list2,ip1_list3,ip1_single,pres,work,p0ls,record%data)
     if(vgd_get(cpg_vgd,'KIND - vertical coordinate ip1 kind', kind) == VGD_ERROR)then
-       print*,'ERROR with vgd_get on KIND'
        return
     endif
     allocate(ip1_single(1))
@@ -912,30 +950,35 @@ contains
     if(trim(cpg_levels_S).eq.'THERMO')then
        ier=vgd_get(cpg_vgd,'VIPT - level ip1 list (t)',value=ip1_list)
        if(ier.ne.VGD_OK)then
-          print*,'ERROR with vgd_get on VIPT for var (group) ',cpg_levels_S
+         write(app_msg,*) 'vgd_get on VIPT for var (group) ',cpg_levels_S
+         call app_log(APP_ERROR,app_msg)
           return
        endif
     else if(trim(cpg_levels_S).eq.'MOMENTUM')then
        ier=vgd_get(cpg_vgd,'VIPM - level ip1 list (m)',value=ip1_list)
        if(ier.ne.VGD_OK)then
-          print*,'ERROR with vgd_get on VIPM for var (group) ',cpg_levels_S
+         write(app_msg,*) 'vgd_get on VIPM for var (group) ',cpg_levels_S
+         call app_log(APP_ERROR,app_msg)
           return
        endif
     else if(trim(cpg_levels_S).eq.'VERTICAL_VELOCITY')then
        ier=vgd_get(cpg_vgd,'VIPW - level ip1 list (w)',value=ip1_list)
        if(ier.ne.VGD_OK)then
-          print*,'ERROR with vgd_get on VIPW for var (group) ',cpg_levels_S
+         write(app_msg,*) 'vgd_get on VIPW for var (group) ',cpg_levels_S
+         call app_log(APP_ERROR,app_msg)
           return
        endif
     else if (trim(cpg_levels_S).eq.'ALL_LEVELS')then
        ier=vgd_get(cpg_vgd,'VIPT - level ip1 list (t)',value=ip1_list2)
        if(ier.ne.VGD_OK)then
-          print*,'ERROR with vgd_get on VIPT for var (group) ',cpg_levels_S
+         write(app_msg,*) 'vgd_get on VIPT for var (group) ',cpg_levels_S
+         call app_log(APP_ERROR,app_msg)
           return
        endif
        ier=vgd_get(cpg_vgd,'VIPM - level ip1 list (m)',value=ip1_list3)
        if(ier.ne.VGD_OK)then
-          print*,'ERROR with vgd_get on VIPM for var (group) ',cpg_levels_S
+         write(app_msg,*) 'vgd_get on VIPM for var (group) ',cpg_levels_S
+         call app_log(APP_ERROR,app_msg)
           return
        endif
        !print*,"TODO vgd_get(cpg_vgd,'VIPW ..."
@@ -953,22 +996,22 @@ contains
        !    The ip1_list will have to be rebuild once the datev of P0 is known in P0 loop below.
        ier=fstinl(cpg_lui,ni,nj,nk,-1,' ',-1,-1,-1,' ',cpg_levels_S,liste,n_ip1,nmax)           
        if(ier.lt.0)then
-          print*,'ERROR with fstinl on ',cpg_levels_S
           return
        endif
        if(n_ip1.eq.0)then
-          print*,'No record of nombav '//trim(cpg_levels_S)//' in input file'
+         write(app_msg,*) 'No record of nombav '//trim(cpg_levels_S)//' in input file'
+         call app_log(APP_ERROR,app_msg)
           return
        endif
        allocate(ip1_list(n_ip1),stat=ier)
        if(ier.ne.0)then
-          print*,'Problem in allocate ip1_list(n_ip1)'
+         write(app_msg,*) 'Problem in allocate ip1_list(n_ip1)'
+         call app_log(APP_ERROR,app_msg)
           return
        endif
        do i=1,n_ip1
           if(cpg_fstprm(liste(i),record) == VGD_ERROR)then
-             print*,'ERROR with cpg_fstprm on ',nomvar
-             return
+                return
           endif
           ip1_list(i)=record%ip1
        enddo
@@ -984,18 +1027,16 @@ contains
     n_ip1=size(ip1_list)
     ier=vgd_get(cpg_vgd,'KIND - vertical coordinate ip1 kind', kind)
     if(ier.ne.VGD_OK)then
-       print*,'ERROR with vgd_get on KIND'
        return
     endif
     ier=vgd_get(cpg_vgd,'VERS - vertical coordinate version' , version)
     if(ier.ne.VGD_OK)then
-       print*,'ERROR with vgd_get on VERS'
        return
     endif
     if(kind*1000+version == 2001) then
        if(.not. OK_2001_L)then
-          print*,'ERROR -levels trim(cpg_levels_S) not allowed with pressure level file.'
-          print*,'       Use a nomvar present in the input file and rerun the program e.g. -levels TT'
+         write(app_msg,*) 'levels trim(cpg_levels_S) not allowed with pressure level file. Use a nomvar present in the input file e.g. -levels TT'
+         call app_log(APP_ERROR,app_msg)
           return
        endif
        ! Get the list of field at different time, this will be use has P0 but 
@@ -1003,14 +1044,14 @@ contains
          
        key=fstinf(cpg_lui,ni,nj,nk,-1,' ',record%ip1,-1,-1,' ',cpg_levels_S)
        if(key.lt.0)then
-          print*,'ERROR : cannot find variable ',nomvar,' in input file'
+         write(app_msg,*) 'cannot find variable ',nomvar,' in input file'
+         call app_log(APP_ERROR,app_msg)
           return
        endif
        nomvar=cpg_levels_S
     else
        ier=vgd_get(cpg_vgd,'RFLD - reference field name',value=nomvar)
        if(ier.ne.VGD_OK)then
-          print*,'ERROR with vgd_get on RFLD'
           return
        endif
        ! Use wild card to find RFLD
@@ -1018,55 +1059,56 @@ contains
     endif
     ier=fstinl(cpg_lui,ni,nj,nk,-1,' ',record%ip1,-1,-1,' ',nomvar,liste,infon,nmax)
     if(ier.lt.0)then
-       print*,'ERROR with fstinl on ',nomvar
+      write(app_msg,*) 'fstinl on ',nomvar
+      call app_log(APP_ERROR,app_msg)
        return
     endif
     if(infon.eq.0)then
-       print*,'No record ',nomvar,' in input file'
+      write(app_msg,*) 'No record ',nomvar,' in input file'
+      call app_log(APP_ERROR,app_msg)
        return
     endif
     ! Loop on all p0
     LOOP_ON_P0: do i=1,infon
        if(cpg_fstprm(liste(i),record) == VGD_ERROR)then
-          print*,'ERROR with cpg_fstprm on ',nomvar
           return
        endif       
        ier=vgd_write(cpg_vgd,cpg_luo,'fst')
        if(record%ni.ne.ni.or. &
             record%nj.ne.nj.or. &
             record%nk.ne.nk)then
-          print*,'Size of record ',nomvar,' inconsistant with previous one:'
-          print*,'ni',record%ni,'vs',ni
-          print*,'nj',record%nj,'vs',nj
-          print*,'nk',record%nk,'vd',nk
+         write(app_msg,*) 'Size of record ',nomvar,' inconsistant with previous one (ni:',record%ni,'vs',ni,'nj:',record%nj,'vs',nj,'nk:',record%nk,'vs',nk,')'
+         call app_log(APP_ERROR,app_msg)
           return
        endif
        if(associated(record%data))deallocate(record%data)
        allocate(record%data(ni,nj),stat=ier)
        if(ier.ne.0)then
-          print*,'Problem in allocate record%data'
+         write(app_msg,*) 'Problem in allocate record%data'
+         call app_log(APP_ERROR,app_msg)
           return
        endif
        if(associated(work))deallocate(work)
        allocate(work(ni,nj),stat=ier)
        if(ier.ne.0)then
-          print*,'Problem in allocate work'
+         write(app_msg,*) 'Problem in allocate work'
+         call app_log(APP_ERROR,app_msg)
           return
        endif
        ier=fstluk(record%data,liste(i),ni,nj,nk)
        if(ier.lt.0)then
-          print*,'ERROR with fstluk on ',nomvar
           return
        endif
        work=record%data
        if(trim(nomvar) == "P0")record%data=record%data*100.       
-       ier=vgd_get(cpg_vgd,'RFLS - large scale reference field name',value=nomvar_ls,quiet=.true.)         
+       ier=vgd_get(cpg_vgd,'RFLS - large scale reference field name',value=nomvar_ls)         
        if(nomvar_ls == VGD_NO_REF_NOMVAR)then
           if(associated(p0ls))deallocate(p0ls)
        else
           key = fstinf(cpg_lui,ni,nj,nk,record%datev,record%etiket,record%ip1,record%ip2,-1,' ',nomvar_ls)
           if(key < 0)then
-             print*,'ERROR : cannot find large scale reference field ',nomvar_ls,' with the following parameters'
+            write(app_msg,*) 'cannot find large scale reference field ',nomvar_ls,' with the following parameters'
+            call app_log(APP_ERROR,app_msg)
              write(6,'("datev: ",i12,", Etiket: ",a,", ip1: ",i4,", ip2: ",i4)') &
                   record%datev,record%etiket,record%ip1,record%ip2
              return
@@ -1074,12 +1116,14 @@ contains
           if(associated(p0ls))deallocate(p0ls)
           allocate(p0ls(ni,nj),stat=ier)
           if(ier.ne.0)then
-             print*,'Problem in allocate p0ls'
+            write(app_msg,*) 'Problem in allocate p0ls'
+            call app_log(APP_ERROR,app_msg)
              return
           endif
           ier=fstluk(p0ls,key,ni,nj,nk)
           if(ier.lt.0)then
-             print*,'ERROR with fstluk on ',nomvar_ls
+            write(app_msg,*) 'Problem with fstluk on ',nomvar_ls
+            call app_log(APP_ERROR,app_msg)
              return
           endif
           if(trim(nomvar_ls) == "P0LS")p0ls=p0ls*100.
@@ -1090,17 +1134,18 @@ contains
           ! Get ip1_list for current P0 datev
           ier=fstinl(cpg_lui,ni,nj,nk,record%datev,' ',-1,-1,-1,' ',cpg_levels_S,liste2,n_ip1,nmax)           
           if(ier.lt.0)then
-             print*,'ERROR with fstinl 2 on ',cpg_levels_S,' datev = ',record%datev
+            write(app_msg,*) 'Problem with fstinl 2 on ',cpg_levels_S,' datev = ',record%datev
+            call app_log(APP_ERROR,app_msg)
              return
           endif
           if(n_ip1.eq.0)then
-             print*,'No record of nomvar ',trim(cpg_levels_S),' datev = ',record%datev,' in input file'
+            write(app_msg,*) 'No record of nomvar ',trim(cpg_levels_S),' datev = ',record%datev,' in input file'
+            call app_log(APP_ERROR,app_msg)
              return
           endif
           ! Note we got a subset of ip1s, therefore ip1_list is long enough.
           do j=1,n_ip1
              if(cpg_fstprm(liste2(j),record2) == VGD_ERROR)then
-                print*,'ERROR with cpg_fstprm 2 on ',nomvar
                 return
              endif
              ip1_list(j)=record2%ip1
@@ -1114,7 +1159,6 @@ contains
              ier=vgd_levels(cpg_vgd,sfc_field=record%data,ip1_list=ip1_single,levels=pres)            
           endif
           if(ier.ne.VGD_OK)then
-             print*,'ERROR with vgd_levels for var (group) ',cpg_levels_S
              return
           endif
           if(cpg_is_pressure_L)then
@@ -1130,7 +1174,8 @@ contains
                record%typvar,record%nomvar,record%etiket,record%grtyp, &
                record%ig1,record%ig2,record%ig3,record%ig4,record%datyp,.true.)
           if(ier.lt.0)then
-             print*,'ERROR with fstecr for var (group) ',cpg_levels_S
+            write(app_msg,*) 'Problem with fstecr for var (group) ',cpg_levels_S
+            call app_log(APP_ERROR,app_msg)
              return
           endif
        enddo LOOP_ON_IP1_LIST
@@ -1170,14 +1215,14 @@ contains
          gz%data, prm%data,tt%data, hu%data, vt%data)
     status = VGD_ERROR
     if(vgd_get(cpg_vgd,"VCOD",vcode) == VGD_ERROR)then
-       print*,'ERROR: problem with vgd_get on key "VCOD"'
        return
     endif
     if(vcode /= 21001)then
-       print*,'ERROR, in cpg_get_px_21001 called with wrong Vcode, expected 21001 got',vcode
+      write(app_msg,*) 'cpg_get_px_21001 called with wrong Vcode, expected 21001 got',vcode
+      call app_log(APP_ERROR,app_msg)
        return
     endif
-    ier=vgd_get(cpg_vgd,"RFLS",refls_name,quiet=.true.)
+    ier=vgd_get(cpg_vgd,"RFLS",refls_name)
     sleve_L = .not. (trim(refls_name) == trim(VGD_NO_REF_NOMVAR))
     me%nomvar="ME"
     if( cpg_get_rec(me, cpg_lui) == VGD_ERROR ) return
@@ -1195,16 +1240,22 @@ contains
        thermo_L=.true.
        momentum_L=.true.
     else
-       print*,'ERROR with option -levels expected THERMO, MOMENTUM or ALL_LEVELS but got ',trim(cpg_levels_S)
-       print*,'NOTE: passing a nomvar to option -levels is not implemented for vcode ',vcode
-       return
+      write(app_msg,*) 'option -levels expected THERMO, MOMENTUM or ALL_LEVELS but got ',trim(cpg_levels_S)
+      call app_log(APP_ERROR,app_msg)
+       write(app_msg,*) 'NOTE: passing a nomvar to option -levels is not implemented for vcode ',vcode
+       call app_log(APP_VERBATIM,app_msg)
+     return
     endif
     ! get all momentum ip1s
     if( vgd_get(cpg_vgd,"vipm - level ip1 list (m)", ip1s_m) == vgd_error)return
-    if(cpg_verbose_L) print*,'List of momentum ip1s',ip1s_m
+    write(app_msg,*) 'List of momentum ip1s',ip1s_m
+    call app_log(APP_INFO,app_msg)
+    
     ! get all thermo ip1s
     if( vgd_get(cpg_vgd,"vipt - level ip1 list (t)", ip1s_t) == vgd_error)return
-    if(cpg_verbose_L) print*,'List of thermo ip1s_t',ip1s_t
+    write(app_msg,*) 'List of thermo ip1s_t',ip1s_t
+    call app_log(APP_INFO,app_msg)
+
     ! For vcode 21001, there are nk dynamic temperature, 
     !                  there are nk+2 ip1s_t counting hyb=1.0 and diag levels, these 
     !                  last 2 levels are not used for computing gz.
@@ -1218,10 +1269,13 @@ contains
     nij = px%ni*px%nj
     allocate(wa(px%ni,px%nj,1),wb(px%ni,px%nj,1),vt%data(px%ni,px%nj),pxt(px%ni,px%nj),stat=ier)
     if( ier /= 0 )then
-       print*,'error in cpg_get_px_21001, cannot allocate wa, wb, size ->',prm%ni,' x',prm%nj, 'x 1'
-       print*,'                           cannot allocate vt%data, pxt of size ->',prm%ni,' x',prm%nj
-    end if
-    if(cpg_verbose_L) print*,'Computing 3d pressure for Vcode ',vcode
+      write(app_msg,*) 'cpg_get_px_21001: cannot allocate wa, wb, vt%data, pxtsize ->',prm%ni,' x',prm%nj, 'x 1'
+      call app_log(APP_ERROR,app_msg)
+    endif
+
+    write(app_msg,*) 'Computing 3d pressure for Vcode ',vcode
+    call app_log(APP_INFO,app_msg)
+
     gz%nomvar="gz"
     prm%ip1=ip1_sfc
     !ier=cpg_print_prm(prm)
@@ -1320,59 +1374,81 @@ end module mod_comp_pres_gz
 !========================================================================
 
 program compute_pressure_gz
-  use vGrid_Descriptors, only: vgd_new,vgd_print,vgd_get,VGD_PRES_TYPE,VGD_HEIGHT_TYPE,VGD_OK,VGD_ERROR
+   use app
+   use vGrid_Descriptors, only: vgd_new,vgd_print,vgd_get,VGD_PRES_TYPE,VGD_HEIGHT_TYPE,VGD_OK,VGD_ERROR
   use mod_comp_pres_gz, only: cpg_process_arguments,cpg_lui,cpg_luo,cpg_samefile_L,cpg_compute_gz_L,&
-       cpg_get_vgd_levels,cpg_vgd,cpg_kind,cpg_version,cpg_verbose_L,cpg_levels_S,cpg_is_pressure_L,&
+       cpg_get_vgd_levels,cpg_vgd,cpg_kind,cpg_version,cpg_levels_S,cpg_is_pressure_L,&
        cpg_get_px_gz
   implicit none
-  integer :: stat,exdb,exfin,fstfrm,coor_type
+  integer :: stat,coor_type, fstfrm
   character(len=12), parameter :: version='1.0.0'
-  stat=exdb('r.compute_pressure_gz',version,'NON')
-  write(6,'("   * ",a)')PROJECT_VERSION_STRING
-  write(6,'("   ******************************************************************************************************")')
+
+!==========================================================================
+app_ptr=app_init(0,'r.compute_pressure_gz',version,'',BUILD_TIMESTAMP)
+call app_start()
+!==========================================================================
 
   if(cpg_process_arguments() == VGD_ERROR)then
-     error stop
+   stat=app_end(-1)
+   error stop
   endif
 
   ! Determine the vertical coordinate type (pressure or height) in order
   ! to call the appropriate computation function
   if(vgd_new(cpg_vgd,cpg_lui,'fst',kind=cpg_kind,version=cpg_version) == VGD_ERROR)then
-     print*,'ERROR with vgd_new for levels ',cpg_levels_S
+     write(app_msg,*) 'vgd_new for levels',cpg_levels_S
+     call app_log(APP_ERROR,app_msg)
+     stat=app_end(-1)
      error stop
   endif
-  if(cpg_verbose_L)then
+  if(app_loglevel('').gt.1)then
      if(vgd_print(cpg_vgd) == VGD_ERROR)then
-        print*,'ERROR with vgd_print'
+        stat=app_end(-1)
         error stop
      endif
   endif
   if(vgd_get(cpg_vgd,"TYPE",coor_type) == VGD_ERROR)then
-     print*,'ERROR with vgd_get on key "TYPE"'
+     write(app_msg,*) 'vgd_get on key "TYPE"'
+     call app_log(APP_ERROR,app_msg)
+     stat=app_end(-1)
      error stop
   endif
   if(coor_type == VGD_PRES_TYPE)then
      cpg_is_pressure_L=.true.
      if(cpg_compute_gz_L)then
-        if(cpg_get_px_gz() == VGD_ERROR)error stop
+        if(cpg_get_px_gz() == VGD_ERROR)then
+           stat=app_end(-1)
+           error stop
+        endif
      else
-        if(cpg_get_vgd_levels() == VGD_ERROR)error stop
+        if(cpg_get_vgd_levels() == VGD_ERROR)then
+         stat=app_end(-1)
+         error stop
+        endif
      endif
   elseif(coor_type == VGD_HEIGHT_TYPE)then
      cpg_is_pressure_L=.false.
      if(cpg_compute_gz_L)then
-        if(cpg_get_vgd_levels() == VGD_ERROR)error stop        
+        if(cpg_get_vgd_levels() == VGD_ERROR) then
+         stat=app_end(-1)
+         error stop  
+        endif      
      else
-        if(cpg_get_px_gz() == VGD_ERROR)error stop
+        if(cpg_get_px_gz() == VGD_ERROR)then
+         stat=app_end(-1)
+         error stop
+        endif
      endif
   else
-     print*,'ERROR, unsuported vertical coordinate type: ',coor_type
+     write(app_msg,*) 'unsuported vertical coordinate type: ',coor_type
+     call app_log(APP_ERROR,app_msg)
+     stat=app_end(-1)
      error stop
   endif
   
   stat=fstfrm(cpg_lui)
   if(.not.cpg_samefile_L)stat=fstfrm(cpg_luo)
   !
-  stat=exfin('r.compute_pressure_gz',version,'NON')
+  stat=app_end(-1)
   !
 end program compute_pressure_gz

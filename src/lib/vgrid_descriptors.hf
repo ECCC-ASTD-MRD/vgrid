@@ -1,5 +1,3 @@
-#include "rmn/msg.h"
-
 ! Public class constants
 integer, parameter, public :: VGD_LEN_NAME=4  !maximum length of a variable name in the data file
 integer, parameter, public :: VGD_OK=0        !method return value on success
@@ -10,6 +8,4 @@ integer, parameter, public :: VGD_LEN_RFLS=4  !String length of reference field 
 integer, parameter, public :: VGD_PRES_TYPE=1
 integer, parameter, public :: VGD_HEIGHT_TYPE=2
 real, parameter, public :: VGD_MISSING=-9999. !missing value returned for invalid entries
-character(len=MSG_MAXLEN), public :: for_msg  !String to write output messages     
-character(len=6), parameter, public :: VGD_PRFX="(vgd) " !String to prefix masages
 character(len=VGD_LEN_RFLD), parameter, public :: VGD_NO_REF_NOMVAR="    " !String to prefix masages

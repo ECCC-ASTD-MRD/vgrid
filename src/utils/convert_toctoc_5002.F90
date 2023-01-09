@@ -1,6 +1,7 @@
 #include "vgrid_build_info.h"
 
 program convert_toctoc_5002
+   use app
    use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_write,vgd_print,VGD_OK
    use, intrinsic :: iso_fortran_env
    implicit none
@@ -8,7 +9,7 @@ program convert_toctoc_5002
    integer, dimension(nmax) :: liste
    integer, dimension(2*nmax) :: key_to_erase
    integer :: npos,istat,fnom,fstouv,fstfrm,infon,fstprm,fstinl,fstluk,fstinf,fstecr,fsteff,ind_to_erase
-   integer :: i,key,luo,exdb,exfin
+   integer :: i,key,luo
    character(len=256), dimension(ncle) :: cle,val,def
    logical :: info_L
    real, allocatable, dimension(:,:) :: tocsf,p0
@@ -16,7 +17,7 @@ program convert_toctoc_5002
    real :: dummy
    real(kind=REAL64) :: nhours
    logical :: samefile_L
-   character(len=12), parameter :: version='v_1.1.0'
+   character(len=12), parameter :: version='1.1.0'
 
    ! For fstprm
    integer :: ig1,ig2,ig3,ig4,dateo,deet,npas,datyp,nbits
@@ -38,25 +39,29 @@ program convert_toctoc_5002
    ind_to_erase=0
 
    !==========================================================================
-
-   istat=exdb('r.convert_toctoc_5002',version,'NON')
-   write(6,'("   * ",a)')PROJECT_VERSION_STRING
-   write(6,'("   ******************************************************************************************************")')
-  
+   app_ptr=app_init(0,'r.convert_toc_toc_5002',version,'Display verticalcoordinate information',BUILD_TIMESTAMP)
+   call app_start()
    !==========================================================================
+
    ! Get keys
    npos=-111
    call ccard(cle,def,val,ncle,npos) 
    
    info_L=.false.
    if(val(1).eq.'undef')then
-      print*,'usage :    r.convert_toctoc_5002 -s source_file -d destination_file'
-      print*,'        or r.convert_toctoc_5002 -s source_file -samefile'
+      write(app_msg,*) 'usage :'//EOL//&
+         '      r.convert_toctoc_5002 -s source_file -d destination_file'//EOL//&
+         '   or r.convert_toctoc_5002 -s source_file -samefile'
+      call app_log(APP_VERBATIM,app_msg)
+      istat=app_end(-1)
       stop
    endif
    
    if(val(2).eq.'undef'.and.val(3).eq.'NO')then
-      print*,'usage :    r.convert_toctoc_5002 -s source_file -d destination_file'
+      write(app_msg,*) 'usage :'//EOL//&
+         '      r.convert_toctoc_5002 -s source_file -d destination_file'
+      call app_log(APP_VERBATIM,app_msg)
+      istat=app_end(-1)
       stop
    endif
    
@@ -70,13 +75,13 @@ program convert_toctoc_5002
       istat=fnom(lui,val(1),'RND+R/O',0)
    endif
    if(istat.lt.0)then
-      print*,'ERROR with fnom on file ',trim(val(1))
+      istat=app_end(-1)
       error stop 1
    endif
    istat=fstouv(lui,'RND')
    if(istat.le.0)then
-      print*,'Error : no record in RPN file ',trim(val(1))
       istat=fstfrm(lui)
+      istat=app_end(-1)
       error stop 1
    endif
 
@@ -84,12 +89,13 @@ program convert_toctoc_5002
    ! Look for !!SF if not present then no convertion is needed
    istat=fstinl(lui,ni,nj,nk,-1,' ',-1,-1,-1,' ','!!SF',liste,infon,nmax)
    if(istat.lt.0)then
-      print*,'ERROR with fstinl !!SF'
+      istat=app_end(-1)
       error stop 1
    endif
    if(infon.eq.0)then
-      print*,'Noting to convert'
+      call app_log(APP_WARNING,'Noting to convert')
       istat=fstfrm(lui)
+      istat=app_end(-1)
       stop
    endif
    !
@@ -100,13 +106,13 @@ program convert_toctoc_5002
       luo=lui+1
       istat=fnom(luo,val(2),'RND',0)
       if(istat.lt.0)then
-         print*,'ERROR with fnom on file ',trim(val(2))
+         istat=app_end(-1)
          error stop 1
       endif
       istat=fstouv(luo,'RND')
       if(istat.lt.0)then
-         print*,'Error : problem with fstouv on ',trim(val(2))
          istat=fstfrm(luo)
+         istat=app_end(-1)
          error stop 1
       endif 
    endif
@@ -119,9 +125,9 @@ program convert_toctoc_5002
       allocate(tocsf(ni,nj))
       istat=fstluk(tocsf,liste(i),ni,nj,nk)
       if(istat.lt.0)then
-         print*,'ERROR with fstluk on !!SF'
          istat=fstfrm(lui)
          if(samefile_L)istat=fstfrm(luo)
+         istat=app_end(-1)
          error stop 1
       endif
       ! Look for matching P0, if not there write it
@@ -130,7 +136,8 @@ program convert_toctoc_5002
       key=fstinf(lui,ni2,nj2,nk2,datev,' ',ip1,ip2,ip3,' ','P0')
       if(key.le.0)then
          ! Compute P0 form !!SF
-         print*,'Computing P0 from !!SF for hour ',nhours
+         write(app_msg,*) 'Computing P0 from !!SF for hour ',nhours
+         call app_log(APP_INFO,app_msg)
          if(allocated(p0))deallocate(p0)
          allocate(p0(ni,nj))
          p0=exp(tocsf)*1000.
@@ -147,11 +154,13 @@ program convert_toctoc_5002
    ! Find all !! and convert them
    istat=fstinl(lui,ni,nj,nk,-1,' ',-1,-1,-1,' ','!!',liste,infon,nmax)
    if(istat.lt.0)then
-      print*,'ERROR with fstinl !!'
+      istat=app_end(-1)
       error stop 1
    endif
    if(infon.lt.1)then
-      print*,'ERROR: cannot find !! in file ',val(1)
+      write(app_msg,*) 'ERROR: cannot find !! in file ',val(1)
+      call app_log(APP_ERROR,app_msg)
+      istat=app_end(-1)
       error stop 1
    endif
    ! Loop on !! found
@@ -164,13 +173,14 @@ program convert_toctoc_5002
       allocate(toctoc(ni,nj))
       istat=fstluk(toctoc,liste(i),ni,nj,nk)
       if(istat.lt.0)then
-         print*,'ERROR with fstluk on !!'
          istat=fstfrm(lui)
          if(.not.samefile_L)istat=fstfrm(luo)
+         istat=app_end(-1)
          error stop 1
       endif
       nkmod=(nj-3)/2
-      print*,'njmod',nkmod
+      write(app_msg,*) 'njmod',nkmod
+      call app_log(APP_DEBUG,app_msg)
 
       ! Looks like last momentum level is badly described in !! !!sf format
       toctoc(1,nkmod+1)=toctoc(1,nj)
@@ -200,20 +210,20 @@ program convert_toctoc_5002
            ip1_m    = nint(toctoc(1,1:nkmod+1)),&
            ip1_t    = nint(toctoc(1,nkmod+2:nj)))
       if(istat.ne.VGD_OK)then
-         print*,'ERROR problem with vgd_new'
          istat=fstfrm(lui)
          if(.not.samefile_L)istat=fstfrm(luo)
+         istat=app_end(-1)
          error stop 1
       endif
       istat = vgd_print(gdv)
-      print*,'Writing converted !!'
+      call app_log(APP_INFO,'Writing converted !!')
       istat = vgd_write(gdv,luo,'fst')
       if(istat.ne.VGD_OK)then
-         print*,'ERROR problem with vgd_write'
          istat=fstfrm(lui)
          if(.not.samefile_L)istat=fstfrm(luo)
+         istat=app_end(-1)
          error stop 1
-      endif
+         endif
       if(samefile_L)then
          ind_to_erase=ind_to_erase+1
          key_to_erase(ind_to_erase)=liste(i)
@@ -223,7 +233,7 @@ program convert_toctoc_5002
    do i=1,ind_to_erase
       istat=fsteff(key_to_erase(i))
       if(istat.lt.0)then
-         print*,'Wraning, cannot erase record'
+         call app_log(APP_WARNING,'cannot erase record')
       endif
    enddo
 
@@ -231,5 +241,5 @@ program convert_toctoc_5002
    ! close file(s)
    istat=fstfrm(lui)
    if(.not.samefile_L)istat=fstfrm(luo)
-   istat=exfin('r.convert_toctoc_5002',version,'NON')
+   istat=app_end(-1)
 end program convert_toctoc_5002

@@ -4,7 +4,7 @@
 
   aa_8 = malloc(nk*sizeof(double));
   if(! aa_8 ) {
-    printf("(Cvgd) ERROR in %s, cannot allocate aa_8 of bouble of size %d\n", proc_name, nk);
+    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate aa_8 of double size %d\n",__func__,nk);
     return(VGD_ERROR);
   }  
 
@@ -13,11 +13,11 @@
       aa_8[k] = self->a_m_8[ind];
     } else {
       if( (ind = VGD_FindIp1Idx( ip1_list[k], self->ip1_w, self->nl_w) ) != -1 ) {
-	aa_8[k] = self->a_w_8[ind];
+	       aa_8[k] = self->a_w_8[ind];
       } else {
-	printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n", proc_name,ip1_list[k]);
-	free(aa_8);
-	return(VGD_ERROR);	
+         Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot find ip1 %d in vgrid descriptor\n",__func__,ip1_list[k]);
+	       free(aa_8);
+	       return(VGD_ERROR);	
       }
     }
   }
