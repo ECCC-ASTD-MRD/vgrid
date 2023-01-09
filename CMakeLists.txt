@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
+message(STATUS "(EC) Generating vgrid Makefile")
+
 #----- Append EC specific module path
 list(APPEND CMAKE_MODULE_PATH $ENV{EC_CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake_rpn/modules)
 
@@ -10,6 +12,7 @@ ec_parse_manifest()        # Parse MANIFEST file
 project(${NAME} DESCRIPTION "${DESCRIPTION}")
 set(PROJECT_VERSION ${VERSION}${STATE})
 set(vgrid_VERSION ${PROJECT_VERSION} CACHE INTERNAL "vgrid version" FORCE) # Needed for cascaded version identification
+message(STATUS "(EC) ${PROJECT_NAME} version = ${PROJECT_VERSION}")
 
 ec_build_info()            # Generate build information
 
