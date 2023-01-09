@@ -60,23 +60,23 @@ program tests
   ! Get information about the coordinate
   
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_int)
-  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_int,quiet=.false.)
+  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_int)
   if(stat==VGD_ERROR)print*,'Error with get_int detected and message printed above'
-  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_int,quiet=.true.)
+  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_int)
   if(stat==VGD_ERROR)print*,'Error with get_int detected and message not printed above'
   flush(6)
 
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_int_1d)
-  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_int_1d,quiet=.false.)
+  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_int_1d)
   if(stat==VGD_ERROR)print*,'Error with get_int_1d detected and message printed above'
-  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_int_1d,quiet=.true.)
+  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_int_1d)
   if(stat==VGD_ERROR)print*,'Error with get_int_1d detected and message not printed above'
   flush(6)
 
   stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real)
-  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real,quiet=.false.)
+  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real)
   if(stat==VGD_ERROR)print*,'Error with get_real detected and message printed above'
-  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real,quiet=.true.)
+  stat = vgd_get(vgd,key='UNDEFINED KEY',value=my_real)
   if(stat==VGD_ERROR)print*,'Error with get_real detected and message not printed above'
   flush(6)
 

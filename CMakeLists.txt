@@ -27,6 +27,9 @@ include(ec_doxygen)          # Doxygen target (-DWITH_DOC=TRUE)
 include(ec_compiler_presets)
 include(ec_openmp)           # Enable OpenMP (-DWITH_OPENMP=TRUE)
 
+# Needed since ubunut 20.04
+set(CMAKE_EXE_LINKER_FLAGS "-Wl,--no-as-needed -ldl")
+
 if (NOT rmn_FOUND)
    find_package(rmn ${rmn_REQ_VERSION} COMPONENTS shared REQUIRED)
 endif()

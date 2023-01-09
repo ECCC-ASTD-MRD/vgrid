@@ -106,7 +106,7 @@ int compare_values(int iun, int vcode, float *levels, double *levels_8, float *p
 int test_it(char *filename, char *ip1_name, int ind) {
 
   int ier, iun, vcode;
-  int quiet=0, *i_val = NULL, in_log = 0, dpidpis = 0;
+  int *i_val = NULL, in_log = 0, dpidpis = 0;
   int nl, ni, nj, nk, ni2, nj2, nk2, key, ij, ijk, kind, ref1, ref2;
   char mode[]="RND", key_name[]="1234";
   char nomvar1[5], nomvar2[5];
@@ -144,12 +144,12 @@ int test_it(char *filename, char *ip1_name, int ind) {
   }
   //ier = Cvgd_print_desc(vgd, -1, -1);
 
-  if( Cvgd_get_int_1d(vgd, ip1_name, &i_val, NULL, quiet) ==  VGD_ERROR ) {
+  if( Cvgd_get_int_1d(vgd, ip1_name, &i_val, NULL) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_int for %s\n",ip1_name);
     return(VGD_ERROR);
   }
   
-  ier = Cvgd_get_int(vgd, key_name, &nl, quiet);
+  ier = Cvgd_get_int(vgd, key_name, &nl);
   if(ier == VGD_ERROR){
     printf("ERROR cannot Cvgd_get_int on %s\n",key_name);
     return(VGD_ERROR);
@@ -159,15 +159,15 @@ int test_it(char *filename, char *ip1_name, int ind) {
   //}
 
   // Compute 3D pressure levels or heights
-  ier = Cvgd_get_char(vgd, "RFLD", nomvar1, 1);
+  ier = Cvgd_get_char(vgd, "RFLD", nomvar1);
   ref1 = strcmp(nomvar1,VGD_NO_REF_NOMVAR) ? 1 : 0;
-  ier = Cvgd_get_char(vgd, "RFLS", nomvar2, 1);
+  ier = Cvgd_get_char(vgd, "RFLS", nomvar2);
   ref2 = strcmp(nomvar2,VGD_NO_REF_NOMVAR) ? 1 : 0;
 
   if(! ref1){
     // if no ref1 test if it kind == 2 (pressure level)
     // If is is then put nomvar1 to TT to get problem size. but the actual TT value will not be used
-    ier = Cvgd_get_int(vgd, "KIND", &kind, 0);
+    ier = Cvgd_get_int(vgd, "KIND", &kind);
     if(ier == VGD_ERROR){
       printf("ERROR cannot Cvgd_get_int on KIND\n");
       return(VGD_ERROR);
@@ -299,7 +299,7 @@ int test_it(char *filename, char *ip1_name, int ind) {
     return(VGD_ERROR);
   }
   strcpy(key_name,"VCOD");
-  ier = Cvgd_get_int(vgd, key_name, &vcode, quiet);
+  ier = Cvgd_get_int(vgd, key_name, &vcode);
   if( compare_values(iun, vcode, levels, levels_8, p0, i_val, nl,nomvar1) == VGD_ERROR){
     printf("ERROR comparison failed\n");
     return(VGD_ERROR);

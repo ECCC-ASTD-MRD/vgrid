@@ -122,16 +122,16 @@ int check_gen_1001_2001_4001(vgrid_descriptor *vgd, int vcode){
   float *hyb;
   vgrid_descriptor *vgd2 = NULL;
 
-  if( Cvgd_get_int(vgd,"KIND", &kind, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"KIND", &kind) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int(vgd,"VERS", &version, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"VERS", &version) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int(vgd,"NL_M", &nk, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"NL_M", &nk) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nk, 0) == VGD_ERROR ){
+  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nk) == VGD_ERROR ){
     return(VGD_ERROR);
   }
   hyb = malloc( nk * sizeof(float) );
@@ -200,19 +200,19 @@ int check_gen_1002(vgrid_descriptor *vgd){
   double ptop_8;
   vgrid_descriptor *vgd2 = NULL;
 
-  if( Cvgd_get_int(vgd,"KIND", &kind, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"KIND", &kind) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int(vgd,"VERS", &version, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"VERS", &version) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int(vgd,"NL_M", &nk, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"NL_M", &nk) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nk, 0) == VGD_ERROR ){
+  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nk) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double(vgd,"PTOP", &ptop_8, 0) == VGD_ERROR ){
+  if( Cvgd_get_double(vgd,"PTOP", &ptop_8) == VGD_ERROR ){
     return(VGD_ERROR);
   }
   hyb = malloc( nk * sizeof(float) );
@@ -264,25 +264,25 @@ int check_gen_5001(vgrid_descriptor *vgd){
   double ptop_8, pref_8;
   vgrid_descriptor *vgd2 = NULL;
 
-  if( Cvgd_get_int(vgd,"KIND", &kind, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"KIND", &kind) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int(vgd,"VERS", &version, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"VERS", &version) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int(vgd,"NL_M", &nk, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"NL_M", &nk) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nk, 0) == VGD_ERROR ){
+  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nk) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double(vgd,"PTOP", &ptop_8, 0) == VGD_ERROR ){
+  if( Cvgd_get_double(vgd,"PTOP", &ptop_8) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double(vgd,"PREF", &pref_8, 0) == VGD_ERROR ){
+  if( Cvgd_get_double(vgd,"PREF", &pref_8) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_float(vgd,"RC_1", &rc_1, 0) == VGD_ERROR ){
+  if( Cvgd_get_float(vgd,"RC_1", &rc_1) == VGD_ERROR ){
     return(VGD_ERROR);
   }
   hyb = malloc( nk * sizeof(float) );
@@ -337,25 +337,25 @@ int check_gen_5002(vgrid_descriptor *vgd){
   double ptop_8, pref_8;
   vgrid_descriptor *vgd2 = NULL;
 
-  if( Cvgd_get_int(vgd,"KIND", &kind, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"KIND", &kind) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int(vgd,"VERS", &version, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"VERS", &version) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nl_m, 0) == VGD_ERROR ){
+  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nl_m) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double(vgd,"PTOP", &ptop_8, 0) == VGD_ERROR ){
+  if( Cvgd_get_double(vgd,"PTOP", &ptop_8) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double(vgd,"PREF", &pref_8, 0) == VGD_ERROR ){
+  if( Cvgd_get_double(vgd,"PREF", &pref_8) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_float(vgd,"RC_1", &rc_1, 0) == VGD_ERROR ){
+  if( Cvgd_get_float(vgd,"RC_1", &rc_1) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_float(vgd,"RC_2", &rc_2, 0) == VGD_ERROR ){
+  if( Cvgd_get_float(vgd,"RC_2", &rc_2) == VGD_ERROR ){
     return(VGD_ERROR);
   }
   nk = nl_m - 1;
@@ -413,48 +413,48 @@ int check_gen_5005_5100_21001_21002(vgrid_descriptor *vgd, int vcode){
 
   printf("\n\n=== TESTING Vcode %d ======================================\n", vcode);
 
-  if( Cvgd_get_int(vgd,"KIND", &kind, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"KIND", &kind) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int(vgd,"VERS", &version, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"VERS", &version) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int(vgd, "VCOD", &vcode2, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd, "VCOD", &vcode2) == VGD_ERROR ){
     return(VGD_ERROR);
   }
   if(vcode2 != vcode){
     printf("In test check_gen_5005_5100_21001_21002 Vcode don't matck %d, vs %d", vcode, vcode2);
   }
   if(Cvgd_is_valid(vgd,"pref_8_valid")){
-    if( Cvgd_get_double(vgd,"PREF", &pref_8, 0) == VGD_ERROR ){
+    if( Cvgd_get_double(vgd,"PREF", &pref_8) == VGD_ERROR ){
       return(VGD_ERROR);
     } 
   }
-  if( Cvgd_get_float(vgd,"RC_1", &rc_1, 0) == VGD_ERROR ){
+  if( Cvgd_get_float(vgd,"RC_1", &rc_1) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_float(vgd,"RC_2", &rc_2, 0) == VGD_ERROR ){
+  if( Cvgd_get_float(vgd,"RC_2", &rc_2) == VGD_ERROR ){
     return(VGD_ERROR);
   }
   if(Cvgd_is_valid(vgd,"rcoef3_valid")){
-    if( Cvgd_get_float(vgd,"RC_3", &rc_3, 0) == VGD_ERROR ){
+    if( Cvgd_get_float(vgd,"RC_3", &rc_3) == VGD_ERROR ){
       return(VGD_ERROR);
     }      
-    if( Cvgd_get_float(vgd,"RC_4", &rc_4, 0) == VGD_ERROR ){
+    if( Cvgd_get_float(vgd,"RC_4", &rc_4) == VGD_ERROR ){
       return(VGD_ERROR);
     }
   }
-  if( Cvgd_get_float(vgd,"DHM ", &dhm, 0) == VGD_ERROR ){
+  if( Cvgd_get_float(vgd,"DHM ", &dhm) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_float(vgd,"DHT ", &dht, 0) == VGD_ERROR ){
+  if( Cvgd_get_float(vgd,"DHT ", &dht) == VGD_ERROR ){
     return(VGD_ERROR);
   }  
   if(Cvgd_is_valid(vgd,"dhw_valid")){
-    if( Cvgd_get_float(vgd,"DHW ", &dhw, 0) == VGD_ERROR ){
+    if( Cvgd_get_float(vgd,"DHW ", &dhw) == VGD_ERROR ){
       return(VGD_ERROR);
     }
   }
@@ -760,7 +760,7 @@ int check_gen_5005_5100_21001_21002(vgrid_descriptor *vgd, int vcode){
   // The code to generate Vcode 5100 is the same for all values of hyb_flat.
   // The rest of vgrid functions are the same for 5100 for all value of hyb_flat too.
   // Therefore further testing in Vcode 5100 and option hyb_flat are not required.
-  if( Cvgd_get_double_1d(vgd2,"CB_M", &b_m_8, &nk, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd2,"CB_M", &b_m_8, &nk) == VGD_ERROR ){
     printf("   ERROR in test c_new_gen_all on %d, getting CB_M\n", vcode);
     return(VGD_ERROR);
   }
@@ -806,7 +806,7 @@ int test_it(char *filename, int ind) {
     printf("ERROR with Cvgd_new_read on iun\n");
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int(vgd, "VCOD", &vcode, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd, "VCOD", &vcode) == VGD_ERROR ){
     printf("ERROR with  Cvgd_get_int on VCOD\n");
     return(VGD_ERROR);
   }
