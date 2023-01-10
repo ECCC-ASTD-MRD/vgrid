@@ -187,7 +187,7 @@ integer function chek_levels_withref(F_fst,F_ips) result(status)
          nomvar_metric = "GZ"
          factor = 10.
       endif
-      ier = vgd_get(vgd,'RFLS',rfld,quiet=.true.)
+      ier = vgd_get(vgd,'RFLS',rfld)
       if(rfld /= VGD_NO_REF_NOMVAR)sfc_field_ls_L=.true.
       if(sfc_field_ls_L)then
          key = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',rfld)

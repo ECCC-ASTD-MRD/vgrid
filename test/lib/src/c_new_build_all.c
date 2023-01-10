@@ -49,22 +49,22 @@ int check_build_1001_2001_5999_4001(vgrid_descriptor *vgd, int vcode){
   int *ip1_m = NULL;
   double *a_m_8 = NULL, *b_m_8 = NULL;
   vgrid_descriptor *vgd2 = NULL;
-  if( Cvgd_get_int(vgd,"KIND", &kind, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"KIND", &kind) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int(vgd,"VERS", &version, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"VERS", &version) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int(vgd,"NL_M", &nk, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"NL_M", &nk) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CA_M", &a_m_8, &nk, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CA_M", &a_m_8, &nk) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CB_M", &b_m_8, &nk, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CB_M", &b_m_8, &nk) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nk, 0) == VGD_ERROR ){
+  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nk) == VGD_ERROR ){
     return(VGD_ERROR);
   }
   printf("  Testing generic interface\n");
@@ -134,25 +134,25 @@ int check_build_1002(vgrid_descriptor *vgd){
   double *a_m_8 = NULL, *b_m_8 = NULL, ptop_8;
   vgrid_descriptor *vgd2 = NULL;
 
-  if( Cvgd_get_int(vgd,"KIND", &kind, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"KIND", &kind) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int(vgd,"VERS", &version, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"VERS", &version) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int(vgd,"NL_M", &nk, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"NL_M", &nk) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CA_M", &a_m_8, &nk, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CA_M", &a_m_8, &nk) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CB_M", &b_m_8, &nk, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CB_M", &b_m_8, &nk) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nk, 0) == VGD_ERROR ){
+  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nk) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double(vgd,"PTOP", &ptop_8, 0) == VGD_ERROR ){
+  if( Cvgd_get_double(vgd,"PTOP", &ptop_8) == VGD_ERROR ){
     return(VGD_ERROR);
   }
   
@@ -196,31 +196,31 @@ int check_build_5001(vgrid_descriptor *vgd){
   double *a_m_8 = NULL, *b_m_8 = NULL, ptop_8, pref_8;
   vgrid_descriptor *vgd2 = NULL;
 
-  if( Cvgd_get_int(vgd,"KIND", &kind, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"KIND", &kind) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int(vgd,"VERS", &version, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"VERS", &version) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int(vgd,"NL_M", &nk, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"NL_M", &nk) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CA_M", &a_m_8, &nk, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CA_M", &a_m_8, &nk) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CB_M", &b_m_8, &nk, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CB_M", &b_m_8, &nk) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nk, 0) == VGD_ERROR ){
+  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nk) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double(vgd,"PTOP", &ptop_8, 0) == VGD_ERROR ){
+  if( Cvgd_get_double(vgd,"PTOP", &ptop_8) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double(vgd,"PREF", &pref_8, 0) == VGD_ERROR ){
+  if( Cvgd_get_double(vgd,"PREF", &pref_8) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_float(vgd,"RC_1", &rc_1, 0) == VGD_ERROR ){
+  if( Cvgd_get_float(vgd,"RC_1", &rc_1) == VGD_ERROR ){
     return(VGD_ERROR);
   }
   
@@ -267,40 +267,40 @@ int check_build_5002(vgrid_descriptor *vgd){
   double *a_m_8 = NULL, *b_m_8 = NULL, *a_t_8 = NULL, *b_t_8 = NULL, ptop_8, pref_8;
   vgrid_descriptor *vgd2 = NULL;
 
-  if( Cvgd_get_int(vgd,"KIND", &kind, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"KIND", &kind) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int(vgd,"VERS", &version, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"VERS", &version) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CA_M", &a_m_8, &nl_m, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CA_M", &a_m_8, &nl_m) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CB_M", &b_m_8, &nl_m, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CB_M", &b_m_8, &nl_m) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nl_m, 0) == VGD_ERROR ){
+  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nl_m) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CA_T", &a_t_8, &nl_t, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CA_T", &a_t_8, &nl_t) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CB_T", &b_t_8, &nl_t, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CB_T", &b_t_8, &nl_t) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int_1d(vgd,"VIPT", &ip1_t, &nl_t, 0) == VGD_ERROR ){
+  if( Cvgd_get_int_1d(vgd,"VIPT", &ip1_t, &nl_t) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double(vgd,"PTOP", &ptop_8, 0) == VGD_ERROR ){
+  if( Cvgd_get_double(vgd,"PTOP", &ptop_8) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double(vgd,"PREF", &pref_8, 0) == VGD_ERROR ){
+  if( Cvgd_get_double(vgd,"PREF", &pref_8) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_float(vgd,"RC_1", &rc_1, 0) == VGD_ERROR ){
+  if( Cvgd_get_float(vgd,"RC_1", &rc_1) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_float(vgd,"RC_2", &rc_2, 0) == VGD_ERROR ){
+  if( Cvgd_get_float(vgd,"RC_2", &rc_2) == VGD_ERROR ){
     return(VGD_ERROR);
   }
   
@@ -350,37 +350,37 @@ int check_build_5005(vgrid_descriptor *vgd){
   double *a_m_8 = NULL, *b_m_8 = NULL, *a_t_8 = NULL, *b_t_8 = NULL, pref_8;
   vgrid_descriptor *vgd2 = NULL;
 
-  if( Cvgd_get_int(vgd,"KIND", &kind, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"KIND", &kind) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int(vgd,"VERS", &version, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"VERS", &version) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CA_M", &a_m_8, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CA_M", &a_m_8, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CB_M", &b_m_8, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CB_M", &b_m_8, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CA_T", &a_t_8, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CA_T", &a_t_8, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CB_T", &b_t_8, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CB_T", &b_t_8, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int_1d(vgd,"VIPT", &ip1_t, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_int_1d(vgd,"VIPT", &ip1_t, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double(vgd,"PREF", &pref_8, 0) == VGD_ERROR ){
+  if( Cvgd_get_double(vgd,"PREF", &pref_8) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_float(vgd,"RC_1", &rc_1, 0) == VGD_ERROR ){
+  if( Cvgd_get_float(vgd,"RC_1", &rc_1) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_float(vgd,"RC_2", &rc_2, 0) == VGD_ERROR ){
+  if( Cvgd_get_float(vgd,"RC_2", &rc_2) == VGD_ERROR ){
     return(VGD_ERROR);
   }
   
@@ -431,49 +431,49 @@ int check_build_5100(vgrid_descriptor *vgd){
     *b_t_8 = NULL, *c_t_8 = NULL, pref_8;
   vgrid_descriptor *vgd2 = NULL;
 
-  if( Cvgd_get_int(vgd,"KIND", &kind, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"KIND", &kind) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int(vgd,"VERS", &version, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"VERS", &version) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CA_M", &a_m_8, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CA_M", &a_m_8, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CB_M", &b_m_8, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CB_M", &b_m_8, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CC_M", &c_m_8, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CC_M", &c_m_8, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CA_T", &a_t_8, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CA_T", &a_t_8, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CB_T", &b_t_8, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CB_T", &b_t_8, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CC_T", &c_t_8, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CC_T", &c_t_8, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int_1d(vgd,"VIPT", &ip1_t, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_int_1d(vgd,"VIPT", &ip1_t, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double(vgd,"PREF", &pref_8, 0) == VGD_ERROR ){
+  if( Cvgd_get_double(vgd,"PREF", &pref_8) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_float(vgd,"RC_1", &rc_1, 0) == VGD_ERROR ){
+  if( Cvgd_get_float(vgd,"RC_1", &rc_1) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_float(vgd,"RC_2", &rc_2, 0) == VGD_ERROR ){
+  if( Cvgd_get_float(vgd,"RC_2", &rc_2) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_float(vgd,"RC_3", &rc_3, 0) == VGD_ERROR ){
+  if( Cvgd_get_float(vgd,"RC_3", &rc_3) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_float(vgd,"RC_4", &rc_4, 0) == VGD_ERROR ){
+  if( Cvgd_get_float(vgd,"RC_4", &rc_4) == VGD_ERROR ){
     return(VGD_ERROR);
   }
   
@@ -514,46 +514,46 @@ int check_build_21001(vgrid_descriptor *vgd){
     *b_t_8 = NULL, *c_t_8 = NULL, pref_8;
   vgrid_descriptor *vgd2 = NULL;
 
-  if( Cvgd_get_int(vgd,"KIND", &kind, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"KIND", &kind) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int(vgd,"VERS", &version, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"VERS", &version) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CA_M", &a_m_8, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CA_M", &a_m_8, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CB_M", &b_m_8, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CB_M", &b_m_8, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CC_M", &c_m_8, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CC_M", &c_m_8, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CA_T", &a_t_8, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CA_T", &a_t_8, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CB_T", &b_t_8, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CB_T", &b_t_8, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CC_T", &c_t_8, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CC_T", &c_t_8, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int_1d(vgd,"VIPT", &ip1_t, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_int_1d(vgd,"VIPT", &ip1_t, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_float(vgd,"RC_1", &rc_1, 0) == VGD_ERROR ){
+  if( Cvgd_get_float(vgd,"RC_1", &rc_1) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_float(vgd,"RC_2", &rc_2, 0) == VGD_ERROR ){
+  if( Cvgd_get_float(vgd,"RC_2", &rc_2) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_float(vgd,"RC_3", &rc_3, 0) == VGD_ERROR ){
+  if( Cvgd_get_float(vgd,"RC_3", &rc_3) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_float(vgd,"RC_4", &rc_4, 0) == VGD_ERROR ){
+  if( Cvgd_get_float(vgd,"RC_4", &rc_4) == VGD_ERROR ){
     return(VGD_ERROR);
   }
   
@@ -596,58 +596,58 @@ int check_build_21002(vgrid_descriptor *vgd){
     *a_w_8 = NULL, *b_w_8 = NULL, *c_w_8 = NULL;
   vgrid_descriptor *vgd2 = NULL;
   
-  if( Cvgd_get_int(vgd,"KIND", &kind, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"KIND", &kind) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int(vgd,"VERS", &version, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd,"VERS", &version) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CA_M", &a_m_8, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CA_M", &a_m_8, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CB_M", &b_m_8, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CB_M", &b_m_8, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CC_M", &c_m_8, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CC_M", &c_m_8, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_int_1d(vgd,"VIPM", &ip1_m, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CA_T", &a_t_8, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CA_T", &a_t_8, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CB_T", &b_t_8, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CB_T", &b_t_8, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CC_T", &c_t_8, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CC_T", &c_t_8, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int_1d(vgd,"VIPT", &ip1_t, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_int_1d(vgd,"VIPT", &ip1_t, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CA_W", &a_w_8, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CA_W", &a_w_8, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CB_W", &b_w_8, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CB_W", &b_w_8, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_double_1d(vgd,"CC_W", &c_w_8, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_double_1d(vgd,"CC_W", &c_w_8, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int_1d(vgd,"VIPW", &ip1_w, &nl, 0) == VGD_ERROR ){
+  if( Cvgd_get_int_1d(vgd,"VIPW", &ip1_w, &nl) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_float(vgd,"RC_1", &rc_1, 0) == VGD_ERROR ){
+  if( Cvgd_get_float(vgd,"RC_1", &rc_1) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_float(vgd,"RC_2", &rc_2, 0) == VGD_ERROR ){
+  if( Cvgd_get_float(vgd,"RC_2", &rc_2) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_float(vgd,"RC_3", &rc_3, 0) == VGD_ERROR ){
+  if( Cvgd_get_float(vgd,"RC_3", &rc_3) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  if( Cvgd_get_float(vgd,"RC_4", &rc_4, 0) == VGD_ERROR ){
+  if( Cvgd_get_float(vgd,"RC_4", &rc_4) == VGD_ERROR ){
     return(VGD_ERROR);
   }
   
@@ -705,7 +705,7 @@ int test_it(char *filename, int ind) {
     printf("ERROR with Cvgd_new_read on iun\n");
     return(VGD_ERROR);
   }
-  if( Cvgd_get_int(vgd, "VCOD", &vcode, 0) == VGD_ERROR ){
+  if( Cvgd_get_int(vgd, "VCOD", &vcode) == VGD_ERROR ){
     printf("ERROR with  Cvgd_get_int on VCOD\n");
     return(VGD_ERROR);
   }

@@ -1,5 +1,5 @@
-if(BUILD_TESTING)
-   if (EC_INIT_DONE LESS 2)
+if (EC_INIT_DONE LESS 2)
+   if(BUILD_TESTING)
 
       #----- Library tests
       message(STATUS "(EC) Generating vgrid library and utilities tests")

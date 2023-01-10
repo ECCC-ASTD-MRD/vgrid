@@ -29,7 +29,7 @@
 int main() {
 
   int ier, iun = 10, iun2 = 11;
-  int quiet = 0, *i_val = NULL, in_log = 0, dpidpis = 0;
+  int *i_val = NULL, in_log = 0, dpidpis = 0;
   int nl_t, nt, ni, nj, nk, ni2, nj2, nk2, k, key, ij, ijk, status;
   char filename[]="data/dm_5005_from_model_run";
   char mode[]="RND";
@@ -81,7 +81,7 @@ int main() {
     printf("ERROR with Cvgd_new_read on iun\n");
     return(1);
   }
-  if( Cvgd_new_read2(&vgd2, iun, ip1, ip2, 5, 5, 0) == VGD_ERROR ) {
+  if( Cvgd_new_read2(&vgd2, iun, ip1, ip2, 5, 5) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read2 on iun\n");
     return(1);
   }
@@ -91,7 +91,7 @@ int main() {
   }
 
   // Test that we can read with all selection parameter and get equality with Cvgd_new_read
-  if( Cvgd_new_read3(&vgd2, iun, 0, "STG_CP_GEMV4", ip1, ip2, 0, 5, 5, 0) == VGD_ERROR ) {
+  if( Cvgd_new_read3(&vgd2, iun, 0, "STG_CP_GEMV4", ip1, ip2, 0, 5, 5) == VGD_ERROR ) {
     printf("ERROR with Cvgd_new_read on iun\n");
     return(1);
   }
@@ -104,35 +104,35 @@ int main() {
 
   // Test wrong datev
   printf("The following error message is normal since testing wrong datev\n");
-  if( Cvgd_new_read3(&vgd2, iun, 354514400, etiket, ip1, ip2, 0, 5, 5, 0) == VGD_OK ) {
+  if( Cvgd_new_read3(&vgd2, iun, 354514400, etiket, ip1, ip2, 0, 5, 5) == VGD_OK ) {
     printf("ERROR with Cvgd_new_read3 should not find !! and did\n");
     return(1);
   }
 
   // Test wrong etiket
   printf("The following error message is normal since testing wrong etiket\n");
-  if( Cvgd_new_read3(&vgd2, iun, 0,"WRONG ETIKET", ip1, ip2, 0, 5, 5, 0) == VGD_OK ) {
+  if( Cvgd_new_read3(&vgd2, iun, 0,"WRONG ETIKET", ip1, ip2, 0, 5, 5) == VGD_OK ) {
     printf("ERROR with Cvgd_new_read3 should not find !! and did\n");
     return(1);
   }
 
   // Test wrong ip1
   printf("The following error message is normal since testing wrong ip1\n");
-  if( Cvgd_new_read3(&vgd2, iun, 0,etiket, ip1+1, ip2, 0, 5, 5, 0) == VGD_OK ) {
+  if( Cvgd_new_read3(&vgd2, iun, 0,etiket, ip1+1, ip2, 0, 5, 5) == VGD_OK ) {
     printf("ERROR with Cvgd_new_read3 should not find !! and did\n");
     return(1);
   }
 
   // Test wrong ip2
   printf("The following error message is normal since testing wrong ip2\n");
-  if( Cvgd_new_read3(&vgd2, iun, 0,etiket, ip1, ip2+1, 0, 5, 5, 0) == VGD_OK ) {
+  if( Cvgd_new_read3(&vgd2, iun, 0,etiket, ip1, ip2+1, 0, 5, 5) == VGD_OK ) {
     printf("ERROR with Cvgd_new_read3 should not find !! and did\n");
     return(1);
   }
 
   // Test wrong ip3
   printf("The following error message is normal since testing wrong ip3\n");
-  if( Cvgd_new_read3(&vgd2, iun, 0,etiket, ip1, ip2, 1, 5, 5, 0) == VGD_OK ) {
+  if( Cvgd_new_read3(&vgd2, iun, 0,etiket, ip1, ip2, 1, 5, 5) == VGD_OK ) {
     printf("ERROR with Cvgd_new_read3 should not find !! and did\n");
     return(1);
   }

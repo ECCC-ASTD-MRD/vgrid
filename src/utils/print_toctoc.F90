@@ -2,6 +2,7 @@
 
 program print_toctoc
    !
+   use app
    use vGrid_Descriptors, only: vgrid_descriptor,vgd_new,vgd_print,vgd_get,vgd_putopt,VGD_ERROR
    !
    implicit none
@@ -11,9 +12,9 @@ program print_toctoc
    integer :: stat,npos,i,noptions
    integer :: fnom,fstouv,fstfrm,exdb,exfin,kind,lu_out
    integer, dimension(:), pointer :: ip1s
-   character(len=12), parameter :: version='v_2.1.0'
+   character(len=12), parameter :: version='2.1.0'
    character(len=256), dimension(ncle) :: cle,val,def
-   logical :: ip1m_only_L, ip1t_only_L, box_L, convip_L
+   logical :: ip1m_only_L, ip1t_only_L, convip_L
    !
    !==========================================================================
    !   
@@ -29,43 +30,47 @@ program print_toctoc
    noptions=0
    ip1m_only_L=.false.
    ip1t_only_L=.false.
-   box_L=.true.
    lu_out=6
-   if(val(5).eq.'YES')box_L=.false.
    !
+   
+   !==========================================================================
+   app_ptr=app_init(0,'r.print_toctoc',version,'Display verticalcoordinate information',BUILD_TIMESTAMP)
+
+   if(trim(val(5)).eq.'YES') then
+      stat=app_loglevel('QUIET')
+   endif
+ 
+   call app_start()
+   !==========================================================================
+
    if(trim(val(1)).eq.'undef')then
-      stat=exdb('r.print_toctoc',version,'NON')
-   write(6,'("   * ",a)')PROJECT_VERSION_STRING
-   write(6,'("   ******************************************************************************************************")')
       print*,'Usage   : r.print_toctoc -fst rpn_file'
       print*,'Options : -ip1m_only get -> ip1 list on momentum levels only'
       print*,'          -ip1T_only get -> ip1 list on thermo   levels only'
       print*,'          -kind kind     -> print !! for level kind=kind only' 
-      print*,'          -no_box        -> do not print top and bottum boxes'
+      print*,'          -no_box        -> do not print top and bottom boxes'
       print*,'          -out file_out  -> print in file file_out (works only with options -ip1m_only or -ip1T_only)'
       print*,'          -convip        -> also print real value (p) associated to ip1'
       error stop 1
    endif
-   !
+
    if(trim(val(2)).eq.'YES')then
       noptions=noptions+1
       ip1m_only_L=.true.
-      box_L=.false.
    endif
    if(trim(val(3)).eq.'YES')then
       noptions=noptions+1
       ip1t_only_L=.true.
-      box_L=.false.
    endif
    kind=-1
    if(trim(val(4)).ne.'undef')then
       read(val(4),*)kind
-      print*,'Note : printing only level information for kind',kind
+      write(app_msg,*) 'printing only level information for kind',kind
+      call app_log(APP_INFO,app_msg)
    endif
    !
    if(noptions.gt.1)then
-      print*,'Only one of the following options can be set:'
-      print*,'-ip1m_only -ip1t_only -nml'
+      call app_log(APP_ERROR,'Only one of the following options can be set: -ip1m_only -ip1t_only -nml')
       error stop 1
    endif
    !
@@ -78,35 +83,28 @@ program print_toctoc
       convip_L=.true.
    endif
    !
-   if(box_L)then
-      stat=exdb('r.print_toctoc',version,'NON')
-      write(6,'("   * ",a)')PROJECT_VERSION_STRING
-      write(6,'("   ******************************************************************************************************")')
-   endif
-   !
-   !==========================================================================
-   !
+   
    stat=fnom(lu,val(1),"RND+R/O",0)
    if(stat.lt.0)then
-      print*,'ERROR with fnom on',val(1)
+      stat=app_end(-1)
       error stop 1
    endif
    stat=fstouv(lu,'RND')
    if(stat.lt.0)then
-      print*,'ERROR with fstouv on',val(1)
+      stat=app_end(-1)
       error stop 1
    endif
    !
    stat = vgd_putopt("ALLOW_SIGMA",.true.)
    stat = vgd_new(vgd,lu,'fst',kind=kind)
    if(stat.eq.VGD_ERROR)then
-      print*,'ERROR with vgd_new on',val(1)
+      stat=app_end(-1)
       error stop 1
    endif
    if(ip1m_only_L)then
       stat=vgd_get(vgd,'VIPM - level ip1 list (m)',ip1s)
       if(stat.eq.VGD_ERROR)then
-         print*,'ERROR with vgd_get on','VIPM'
+         stat=app_end(-1)
          error stop 1
       endif
       do i=1,size(ip1s)
@@ -115,7 +113,7 @@ program print_toctoc
    elseif(ip1t_only_L)then      
       stat=vgd_get(vgd,'VIPT - level ip1 list (t)',ip1s)
       if(stat.eq.VGD_ERROR)then
-         print*,'ERROR with vgd_get on','VIPT'
+         stat=app_end(-1)
          error stop 1
       endif
       do i=1,size(ip1s)
@@ -124,13 +122,14 @@ program print_toctoc
    else
       stat = vgd_print(vgd,6,convip_L)
       if(stat.eq.VGD_ERROR)then
-         print*,'ERROR with vgd_print'
+         stat=app_end(-1)
          error stop 1
       endif
-      if(box_L)stat=exfin('r.print_toctoc',version,'NON')
    endif
    !
    stat=fstfrm(lu)
    close(lu_out)
    !
+   stat=app_end(-1)
+
 end program print_toctoc

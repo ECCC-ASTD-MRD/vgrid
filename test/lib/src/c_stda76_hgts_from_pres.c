@@ -36,7 +36,7 @@ int main() {
 
   FILE *fp;
   int ier, nk, key, ij, nl, nl_c, in_log, k;
-  int iun = 10, quiet=0, *i_val = NULL;
+  int iun = 10, *i_val = NULL;
   float p0, *pres, *hgts, ff;
   char mode[]="RND";
   char *filename = "data/dm_5001_from_model_run";
@@ -57,7 +57,7 @@ int main() {
     printf("ERROR with Cvgd_new_read\n");
     return(1);
   }
-  if( Cvgd_get_int(vgd, "NL_M", &nl, quiet) == VGD_ERROR){
+  if( Cvgd_get_int(vgd, "NL_M", &nl) == VGD_ERROR){
     printf("ERROR cannot Cvgd_get_int on NL_M\n");
     return(1);
   }
@@ -67,7 +67,7 @@ int main() {
     printf("Problem allocating i_val of size %d\n",nl);
     return(1);
   }
-  if(Cvgd_get_int_1d(vgd, "VIPM", &i_val, NULL, quiet) ==  VGD_ERROR ) {
+  if(Cvgd_get_int_1d(vgd, "VIPM", &i_val, NULL) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_int for VIPM\n");
     return(1);
   }

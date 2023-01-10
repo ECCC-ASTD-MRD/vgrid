@@ -2,6 +2,8 @@ message(STATUS "(EC) Generating targets for vgrid utilities")
 
 set_source_files_properties(compute_pressure_gz.F90 convert_toctoc_5002.F90 add_toctoc.F90 print_toctoc.F90 vcode.F90  vgrid_sample.F90
 PROPERTIES Fortran_PREPROCESS ON)
+add_compile_definitions(HAVE_VGRID)
+set(CMAKE_EXE_LINKER_FLAGS "-Wl,--no-as-needed -ldl")
 
 if (tdpack_FOUND)
    add_executable(r.compute_pressure_gz compute_pressure_gz.F90)

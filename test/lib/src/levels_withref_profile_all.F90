@@ -185,7 +185,7 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
       ip1s(k)=ip1
    end do
    
-   ier = vgd_get(vgd, "RFLD", rfld_S, .true.);
+   ier = vgd_get(vgd, "RFLD", rfld_S);
    if( rfld_S == VGD_NO_REF_NOMVAR )then
       ier = vgd_get(vgd, "VCOD", vcode);
       if(vcode == 4001)then         
@@ -236,7 +236,7 @@ integer function check_levels_withref(F_fst,F_ips,F_var) result(status)
    endif
    
    two_refs_L = .false.
-   ier = vgd_get(vgd, "RFLS", rfls_S, .true.);
+   ier = vgd_get(vgd, "RFLS", rfls_S);
    if( rfls_S /= VGD_NO_REF_NOMVAR )then      
       two_refs_L = .true.
       key = fstinf(lu,ni,nj,nk,-1,' ',-1,-1,-1,' ',rfls_S)

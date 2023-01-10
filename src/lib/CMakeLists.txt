@@ -32,4 +32,8 @@ install(TARGETS vgrid vgridshared
   LIBRARY       DESTINATION lib
   ARCHIVE       DESTINATION lib)
 install(FILES ${PROJECT_MODULE_FILES} DESTINATION include)
-ec_install_symlink(./lib${NAME}a ${CMAKE_INSTALL_PREFIX}/lib/lib${NAME}_${PROJECT_VERSION}.a)
+
+# Symbolic link for archive numbered version
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ln -sfv lib${PROJECT_NAME}.a lib${PROJECT_NAME}_${PROJECT_VERSION}.a)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib${PROJECT_NAME}_${PROJECT_VERSION}.a DESTINATION lib)

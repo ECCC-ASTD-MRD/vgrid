@@ -1,3 +1,4 @@
+     use app
      type(vgrid_descriptor), intent(in) :: self                  !Vertical descriptor instance
      integer, dimension(:), intent(in) :: ip1_list               !Key of prototype field
      real(kind=REAL_KIND), dimension(:), pointer :: levels                     !Physical level values
@@ -13,8 +14,8 @@
      status = VGD_ERROR
 
      if(.not.is_valid(self,'SELF'))then
-        write(for_msg,*) 'vgrid structure is not valid in levels_withref_prof'//PROC_SUFF
-        call msg(MSG_ERROR,VGD_PRFX//for_msg)       
+        write(app_msg,*) 'vgrid structure is not valid in levels_withref_prof'//PROC_SUFF
+        call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
         return
      endif
      

@@ -1,19 +1,14 @@
 
   int k,*ind,ij,ijk;
   double lvl;
-  char message[128];
-
-  strcpy(message,"(Cvgd) ERROR in ");
-  strcat(message,proc_name);
-  strcat(message,", cannot allocate ind of int of size\n");
-
-  if( my_alloc_int(&ind, nk, message) == VGD_ERROR )
+  
+  if( my_alloc_int(&ind, nk, ", cannot allocate ind of int of size\n") == VGD_ERROR )
     return(VGD_ERROR);
   
   // Find ip1 indexes  
   for( k = 0; k < nk; ++k ){
     if( ( ind[k] = VGD_FindIp1Idx(ip1_list[k],self->ip1_m,self->nl_m)) == -1 ) {
-      printf("(Cvgd) ERROR in %s, cannot find ip1 %d in vgrid descriptor.\n", proc_name, ip1_list[k]);
+       Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot find ip1 %d in vgrid descriptor\n",__func__,ip1_list[k]);
       free(ind);
       return(VGD_ERROR);
     }    

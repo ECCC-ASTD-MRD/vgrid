@@ -1,3 +1,4 @@
+set(vgrid_VERSION @PROJECT_VERSION@ CACHE INTERNAL "vgrid version")
 @PACKAGE_INIT@
 
 # [[DOC]] for find_package (lists variables that are set automatically by CMake)
@@ -30,7 +31,8 @@ string(TOUPPER ${CMAKE_FIND_PACKAGE_NAME} up)
 set_target_properties(${CMAKE_FIND_PACKAGE_NAME} PROPERTIES
    IMPORTED_LOCATION             ${${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES}
    INTERFACE_INCLUDE_DIRECTORIES ${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS}
-   INTERFACE_COMPILE_DEFINITIONS HAVE_${up}
+   INTERFACE_COMPILE_DEFINITIONS HAVE_${up}="${${CMAKE_FIND_PACKAGE_NAME}_VERSION}"
+   IMPORTED_LINK_INTERFACE_LANGUAGES "C;Fortran"
 )
 
 #----- Check that everything is there and undefines ${PACKAGE_NAME}_FOUND if it's not the case
