@@ -4910,7 +4910,7 @@ int Cvgd_getopt_int(char *key, int *value)
   if (strcmp(key, "ALLOW_SIGMA") == 0){
       *value = ALLOW_SIGMA;
   } else {
-    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: invalid key %s\n",__func__,key);
+    Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: invalid key %s\n",__func__,key);
     return(VGD_ERROR);
   }  
   
@@ -4958,19 +4958,19 @@ int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value)
     *value = self->rec.ip3;
   } else if (strcmp(key, "DIPM") == 0){
     if( ! Cvgd_is_valid(self,"dhm_valid") ){      
-      Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot get key %s\n",__func__,key);
+      Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: cannot get key %s\n",__func__,key);
       return(VGD_ERROR);
     }
     *value = self->ip1_m[self->nl_m -1];
   } else if (strcmp(key, "DIPT") == 0){
     if( ! Cvgd_is_valid(self,"dht_valid") ){      
-	    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot get key %s\n",__func__,key);
+	    Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: cannot get key %s\n",__func__,key);
       return(VGD_ERROR);
     }
     *value = self->ip1_t[self->nl_t -1];
   } else if (strcmp(key, "DIPW") == 0){
     if( ! Cvgd_is_valid(self,"dhw_valid") ){      
-	    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot get key %s\n",__func__,key);
+	    Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: cannot get key %s\n",__func__,key);
       return(VGD_ERROR);
     }
     *value = self->ip1_w[self->nl_w -1];
@@ -5004,7 +5004,7 @@ int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value)
       return(VGD_ERROR);
     }
   } else {
-    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: invalid key %s\n",__func__,key);
+    Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: invalid key %s\n",__func__,key);
     return(VGD_ERROR);
   }
   
@@ -5025,7 +5025,7 @@ int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk)
   // ----
   if(strcmp(key, "VIP1") == 0 ){
     if( is_valid(self,ip1_m_valid) ){
-      Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: depricated key '%s' use VIPM instead.\n",__func__,key);
+      Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: deprecated key '%s' use VIPM instead.\n",__func__,key);
       return(VGD_ERROR);
     } else {
       OK = 0;
@@ -5078,7 +5078,7 @@ int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk)
     OK = 0;
   }
   if(! OK) {
-    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: invalid key '%s' for Vcode %d\n",__func__,key,self->vcode);
+    Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: invalid key '%s' for Vcode %d\n",__func__,key,self->vcode);
     return(VGD_ERROR);    
   }
   return(VGD_OK);
@@ -5101,46 +5101,46 @@ int Cvgd_get_float(vgrid_descriptor *self, char *key, float *value) {
     if( is_valid(self,rcoef1_valid) ){
       *value = self->rcoef1;
     } else {
-      Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: attempt to retrieve invalid key %s\n",__func__,key);
+      Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: attempt to retrieve invalid key %s\n",__func__,key);
     }
   } else  if( strcmp(key, "RC_2" ) == 0 ){
     if( is_valid(self,rcoef2_valid) ){
       *value = self->rcoef2;
     } else {
-      Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: attempt to retrieve invalid key %s\n",__func__,key);
+      Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: attempt to retrieve invalid key %s\n",__func__,key);
     }
   } else  if( strcmp(key, "RC_3" ) == 0 ){
     if( is_valid(self,rcoef3_valid) ){
       *value = self->rcoef3;
     } else {
-      Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: attempt to retrieve invalid key %s\n",__func__,key);
+      Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: attempt to retrieve invalid key %s\n",__func__,key);
     }
   } else  if( strcmp(key, "RC_4" ) == 0 ){
     if( is_valid(self,rcoef4_valid) ){
       *value = self->rcoef4;
     } else {
-      Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: attempt to retrieve invalid key %s\n",__func__,key);
+      Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: attempt to retrieve invalid key %s\n",__func__,key);
     }
   } else  if( strcmp(key, "DHM " ) == 0 ){
     if( is_valid(self,dhm_valid) ){
       *value = self->dhm;
     } else {
-      Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: attempt to retrieve invalid key %s\n",__func__,key);
+      Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: attempt to retrieve invalid key %s\n",__func__,key);
     }
   } else  if( strcmp(key, "DHT " ) == 0 ){
     if( is_valid(self,dht_valid) ){
       *value = self->dht;
     } else {
-      Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: attempt to retrieve invalid key %s\n",__func__,key);
+      Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: attempt to retrieve invalid key %s\n",__func__,key);
     }
   } else  if( strcmp(key, "DHW " ) == 0 ){
     if( is_valid(self,dhw_valid) ){
       *value = self->dhw;
     } else {
-      Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: attempt to retrieve invalid key %s\n",__func__,key);
+      Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: attempt to retrieve invalid key %s\n",__func__,key);
     }
   } else {
-    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: invalid key '%s'\n",__func__,key);
+    Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: invalid key '%s'\n",__func__,key);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -5159,16 +5159,16 @@ int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk)
   if( strcmp(key, "VCDM") == 0 ){
     if (is_valid(self,ip1_m_valid)) {
       if(! *value){
-	(*value) = malloc(self->nl_m * sizeof(float));
-	if(! *value){
-	  Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d double\n",__func__,self->nl_m);
-	  return(VGD_ERROR);
-	}
+        (*value) = malloc(self->nl_m * sizeof(float));
+        if(! *value){
+          Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d double\n",__func__,self->nl_m);
+          return(VGD_ERROR);
+        }
       }    
       strcpy(key2,"VIPM");
       Cvgd_get_int_1d(self, key2, &vip1, NULL);
       for(k = 0; k < self->nl_m; k++){
-	(*value)[k] = c_convip_IP2Level(vip1[k], &kind);
+	      (*value)[k] = c_convip_IP2Level(vip1[k], &kind);
       }
       free(vip1);
       if(nk) *nk = self->nl_m;
@@ -5179,8 +5179,8 @@ int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk)
     if(! *value){
       (*value) = malloc(self->nl_t * sizeof(float));
       if(! *value){
-	Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d double\n",__func__,self->nl_t);
-	return(VGD_ERROR);
+        Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d double\n",__func__,self->nl_t);
+        return(VGD_ERROR);
       }
     }  
     strcpy(key2,"VIPT");
@@ -5209,7 +5209,7 @@ int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk)
     OK = 0;
   }
   if(! OK){
-    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: invalid key '%s' for vcode %d\n",__func__,key, self->vcode);
+    Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: invalid key '%s' for vcode %d\n",__func__,key, self->vcode);
     return(VGD_ERROR);    
   }
   return(VGD_OK);
@@ -5240,12 +5240,12 @@ int Cvgd_get_double(vgrid_descriptor *self, char *key, double *value_get) {
     if(! is_valid(self, rcoef4_valid)) OK = 0;
     *value_get = (self)->rcoef4;
   } else {
-    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: invalid key '%s'\n",__func__,key);
+    Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: invalid key '%s'\n",__func__,key);
     return(VGD_ERROR);
   }
   
   if(! OK) {
-    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: %s cannot get for Vcode %d\n",__func__,key,(self)->vcode);
+    Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: %s cannot get for Vcode %d\n",__func__,key,(self)->vcode);
     return(VGD_ERROR);
   }    
   
@@ -5267,8 +5267,8 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     if(! *value){
       (*value) = malloc(self->nl_m * sizeof(double));
       if(! *value){
-	Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d double for CA_M\n",__func__,self->nl_m);
-	return(VGD_ERROR);
+        Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d double for CA_M\n",__func__,self->nl_m);
+        return(VGD_ERROR);
       }
     }
     my_copy_double(self->a_m_8, value, self->nl_m);
@@ -5280,8 +5280,8 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     if(! *value){
       (*value) = malloc(self->nl_m * sizeof(double));
       if(! *value){
-	Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d double for CB_M\n",__func__,self->nl_m);
-	return(VGD_ERROR);
+        Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d double for CB_M\n",__func__,self->nl_m);
+        return(VGD_ERROR);
       }
     }
     my_copy_double(self->b_m_8, value, self->nl_m);
@@ -5293,8 +5293,8 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     if(! *value){
       (*value) = malloc(self->nl_m * sizeof(double));
       if(! *value){
-	Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d double for CC_M\n",__func__,self->nl_m);
-	return(VGD_ERROR);
+        Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d double for CC_M\n",__func__,self->nl_m);
+        return(VGD_ERROR);
       }
     }
     my_copy_double(self->c_m_8, value, self->nl_m);
@@ -5306,8 +5306,8 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     if(! *value){
       (*value) = malloc(self->nl_t * sizeof(double));
       if(! *value){
-	Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d double for CA_T\n",__func__,self->nl_t);
-	return(VGD_ERROR);
+        Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d double for CA_T\n",__func__,self->nl_t);
+        return(VGD_ERROR);
       }
     }
     my_copy_double(self->a_t_8, value, self->nl_t);
@@ -5319,8 +5319,8 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     if(! *value){
       (*value) = malloc(self->nl_t * sizeof(double));
       if(! *value){
-	Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d double for CB_T\n",__func__,self->nl_t);
-	return(VGD_ERROR);
+        Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d double for CB_T\n",__func__,self->nl_t);
+        return(VGD_ERROR);
       }
     }
     my_copy_double(self->b_t_8, value, self->nl_t);
@@ -5332,8 +5332,8 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     if(! *value){
       (*value) = malloc(self->nl_t * sizeof(double));
       if(! *value){
-	Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d double for CC_T\n",__func__,self->nl_t);
-	return(VGD_ERROR);
+        Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d double for CC_T\n",__func__,self->nl_t);
+        return(VGD_ERROR);
       }
     }
     my_copy_double(self->c_t_8, value, self->nl_t);
@@ -5345,8 +5345,8 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     if(! *value){
       (*value) = malloc(self->nl_w * sizeof(double));
       if(! *value){
-	Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d double for CA_W\n",__func__,self->nl_w);
-	return(VGD_ERROR);
+        Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d double for CA_W\n",__func__,self->nl_w);
+        return(VGD_ERROR);
       }
     }
     my_copy_double(self->a_w_8, value, self->nl_w);
@@ -5358,8 +5358,8 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     if(! *value){
       (*value) = malloc(self->nl_w * sizeof(double));
       if(! *value){
-	Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d double for CB_W\n",__func__,self->nl_w);
-	return(VGD_ERROR);
+        Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d double for CB_W\n",__func__,self->nl_w);
+        return(VGD_ERROR);
       }
     }
     my_copy_double(self->b_w_8, value, self->nl_w);
@@ -5371,8 +5371,8 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     if(! *value){
       (*value) = malloc(self->nl_w * sizeof(double));
       if(! *value){
-	Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d double for CC_W\n",__func__,self->nl_w);
-	return(VGD_ERROR);
+        Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d double for CC_W\n",__func__,self->nl_w);
+        return(VGD_ERROR);
       }
     }
     my_copy_double(self->c_w_8, value, self->nl_w);
@@ -5384,7 +5384,7 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     OK = 0;
   }    
   if( ! OK) {
-    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: invalid key '%s' for vcode %d\n",__func__,key,self->vcode);
+    Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: invalid key '%s' for vcode %d\n",__func__,key,self->vcode);
     return(VGD_ERROR);
   }
 
@@ -5406,8 +5406,8 @@ int Cvgd_get_double_3d(vgrid_descriptor *self, char *key, double **value, int *n
     if(! *value){
       (*value) = malloc( table_size * sizeof(double));
       if(! *value){
-	Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d double\n",__func__,table_size);
-	return(VGD_ERROR);
+        Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d double\n",__func__,table_size);
+        return(VGD_ERROR);
       }
     }
     my_copy_double(self->table, value, table_size);
@@ -5415,7 +5415,7 @@ int Cvgd_get_double_3d(vgrid_descriptor *self, char *key, double **value, int *n
     if(nj) *nj = self->table_nj;
     if(nk) *nk = self->table_nk;
   } else {
-    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: invalid key '%s'\n",__func__,key);
+    Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: invalid key '%s'\n",__func__,key);
     return(VGD_ERROR);
   }
 
@@ -5450,7 +5450,7 @@ int Cvgd_get_char(vgrid_descriptor *self, char *key, char out[]) {
     ok = 0;
   }
   if(! ok ){
-    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: invalid key -> '%s'\n",__func__,key);
+    Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: invalid key -> '%s'\n",__func__,key);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -6406,7 +6406,7 @@ int Cvgd_new_read3(vgrid_descriptor **self, int unit, int datev, char *etiket, i
       (*self)->vcode = -1;
       return(VGD_ERROR);
     }
-    Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)\n",__func__);
+    Lib_Log(APP_LIBVGRID,APP_INFO,"%s: Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)\n",__func__);
     if(c_legacy(self,unit,kind) == VGD_ERROR){
       Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: failed to construct vgrid descriptor from legacy encoding\n",__func__);
       return(VGD_ERROR);      
@@ -6442,12 +6442,12 @@ int Cvgd_new_read3(vgrid_descriptor **self, int unit, int datev, char *etiket, i
       // We load then all to check if they are the same. If not, we return with an error message.
       self2 = c_vgd_construct();
       if( my_fstprm(keyList[i], &var) == VGD_ERROR ) {
-	Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem with my_fstprm on keyList[i] = %d\n",__func__,keyList[i]);
-	return(VGD_ERROR);
+	      Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem with my_fstprm on keyList[i] = %d\n",__func__,keyList[i]);
+	      return(VGD_ERROR);
       }
       if( C_load_toctoc(self2,var,keyList[i]) == VGD_ERROR ) {
-	Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot load !!\n",__func__);
-	return(VGD_ERROR);
+	      Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot load !!\n",__func__);
+	      return(VGD_ERROR);
       }
       status = Cvgd_vgdcmp(*self,self2);
       if ( status != 0 ){
