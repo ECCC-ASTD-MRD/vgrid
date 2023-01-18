@@ -26,7 +26,7 @@
 int main() {
 
   int ier, iun = 10;
-  int *i_val = NULL, in_log = 0;
+  int quiet = 0, *i_val = NULL, in_log = 0;
   int ind, k, nl_t, status;
   char filename[]="data/dm_5005_from_model_run";
   char mode[]="RND";
@@ -51,12 +51,12 @@ int main() {
     return(1);
   }
 
-  if( Cvgd_get_int_1d(vgd, "VIPT", &i_val, NULL) ==  VGD_ERROR ) {
+  if( Cvgd_get_int_1d(vgd, "VIPT", &i_val, NULL, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_int for VIPT\n");
     return(1);
   }
 
-  ier = Cvgd_get_int(vgd, "NL_T", &nl_t);
+  ier = Cvgd_get_int(vgd, "NL_T", &nl_t, quiet);
   if(ier == VGD_ERROR){
     status = VGD_ERROR;
   }

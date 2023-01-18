@@ -47,9 +47,9 @@ program tests
   ! Get information about the coordinate
   stat = vgd_get(d,key='RFLD - reference field name',value=rfld)
   if(rfld/='P0')ok=.false.
-  stat = vgd_get(d,key='RFLD - reference field name',value=rfld)
+  stat = vgd_get(d,key='RFLD - reference field name',value=rfld,quiet=.true.)
   if(rfld/='P0')ok=.false.
-  stat = vgd_get(d,key='RFLD - reference field name',value=rfld)
+  stat = vgd_get(d,key='RFLD - reference field name',value=rfld,quiet=.false.)
   if(rfld/='P0')ok=.false.
 
   call ut_report(ok,message='Grid_Descriptors::vgd_get get character value')

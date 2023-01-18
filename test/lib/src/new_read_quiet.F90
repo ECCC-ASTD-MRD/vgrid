@@ -62,10 +62,10 @@ program tests
      
      ! Suppress (Cvgd) and (vgd) messages for vgd_new
 
-     ier = vgd_new(vgd,unit=lu,format="fst",ip1=999,ip2=999)
-     ier = vgd_new(vgd,unit=lu,format="fst",ip1=999,ip2=-1)
-     ier = vgd_new(vgd,unit=lu,format="fst",ip1=-1,ip2=999)
-     ier = vgd_new(vgd,unit=lu,format="fst",ip1=-1,ip2=-1)
+     ier = vgd_new(vgd,unit=lu,format="fst",ip1=999,ip2=999, quiet=.true.)
+     ier = vgd_new(vgd,unit=lu,format="fst",ip1=999,ip2=-1, quiet=.true.)
+     ier = vgd_new(vgd,unit=lu,format="fst",ip1=-1,ip2=999, quiet=.true.)
+     ier = vgd_new(vgd,unit=lu,format="fst",ip1=-1,ip2=-1, quiet=.true.)
 
      ier = vgd_free(vgd)
 

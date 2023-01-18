@@ -55,6 +55,7 @@ char* concat(const char *s1, const char *s2)
 
 int test_it(char *filename, int ind) {
   int i, iun, ier;
+  int quiet=0;
   int value=0, value2=0;
   char mode[]="RND";
   vgrid_descriptor *vgd = NULL;
@@ -80,7 +81,7 @@ int test_it(char *filename, int ind) {
     printf("   %s\n", key[i]);
     if (strcmp(key[i], "DIPM") == 0){
       if(Cvgd_is_valid(vgd,"dhm_valid")){
-	if( Cvgd_get_int(vgd, key[i], &value) == VGD_ERROR ) {
+	if( Cvgd_get_int(vgd, key[i], &value, quiet) == VGD_ERROR ) {
 	  printf("ERROR in test with Cvgd_get_int on key %s\n", key[i]);
 	  return(VGD_ERROR);
 	}
@@ -90,7 +91,7 @@ int test_it(char *filename, int ind) {
     }
     if (strcmp(key[i], "DIPT") == 0){
       if(Cvgd_is_valid(vgd,"dht_valid")){
-	if( Cvgd_get_int(vgd, key[i], &value) == VGD_ERROR ) {
+	if( Cvgd_get_int(vgd, key[i], &value, quiet) == VGD_ERROR ) {
 	  printf("ERROR in test with Cvgd_get_int on key %s\n", key[i]);
 	  return(VGD_ERROR);
 	}
@@ -100,7 +101,7 @@ int test_it(char *filename, int ind) {
     }
     if (strcmp(key[i], "DIPW") == 0){
       if(Cvgd_is_valid(vgd,"dhw_valid")){
-	if( Cvgd_get_int(vgd, key[i], &value) == VGD_ERROR ) {
+	if( Cvgd_get_int(vgd, key[i], &value, quiet) == VGD_ERROR ) {
 	  printf("ERROR in test with Cvgd_get_int on key %s\n", key[i]);
 	  return(VGD_ERROR);
 	}
@@ -113,7 +114,7 @@ int test_it(char *filename, int ind) {
     if( Cvgd_put_int(&vgd, key[i] , value) == VGD_ERROR ){
       return(VGD_ERROR);
     }
-    if( Cvgd_get_int(vgd, key[i] , &value2) == VGD_ERROR ){
+    if( Cvgd_get_int(vgd, key[i] , &value2, quiet) == VGD_ERROR ){
       return(VGD_ERROR);
     }
     if ( value2 != value ){

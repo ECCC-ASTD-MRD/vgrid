@@ -118,7 +118,7 @@ integer function check_get_ABC(F_vgd) result(istat)
         return
      endif
      ! Test that C coefs are zero if non SLEVE
-     ier = vgd_get(F_vgd, "RFLS", rfls_S)
+     ier = vgd_get(F_vgd, "RFLS", rfls_S,quiet=.true.)
      if( rfls_S == VGD_NO_REF_NOMVAR .and. keys_S(i)(2:2) == "C")then
         print*,'Testing ',keys_S(i),' for zero value'
         !NL_M, NL_T or NL_W

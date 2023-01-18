@@ -260,7 +260,8 @@ contains
        return
     endif
     if( count .eq. 0 )then
-       write(app_msg,*) 'cpg_get_rec, no ', F_f%nomvar,' in input file with the following research key: datev = ',prm%datev,', etiket = ',prm%etiket,',ip1 2 3 = ', prm%ip1, prm%ip2, prm%ip3
+       write(app_msg,*) 'cpg_get_rec, no ', F_f%nomvar,' in input file with the following research key: datev = ', &
+          prm%datev,', etiket = ',prm%etiket,',ip1 2 3 = ', prm%ip1, prm%ip2, prm%ip3
        call app_log(APP_ERROR,app_msg)
        return
     endif
@@ -1035,7 +1036,8 @@ contains
     endif
     if(kind*1000+version == 2001) then
        if(.not. OK_2001_L)then
-         write(app_msg,*) 'levels trim(cpg_levels_S) not allowed with pressure level file. Use a nomvar present in the input file e.g. -levels TT'
+         write(app_msg,*) 'levels trim(cpg_levels_S) not allowed with pressure level file. &
+      & Use a nomvar present in the input file e.g. -levels TT'
          call app_log(APP_ERROR,app_msg)
           return
        endif
@@ -1077,7 +1079,8 @@ contains
        if(record%ni.ne.ni.or. &
             record%nj.ne.nj.or. &
             record%nk.ne.nk)then
-         write(app_msg,*) 'Size of record ',nomvar,' inconsistant with previous one (ni:',record%ni,'vs',ni,'nj:',record%nj,'vs',nj,'nk:',record%nk,'vs',nk,')'
+         write(app_msg,*) 'Size of record ',nomvar,' inconsistant with previous one (ni:',record%ni, &
+            'vs',ni,'nj:',record%nj,'vs',nj,'nk:',record%nk,'vs',nk,')'
          call app_log(APP_ERROR,app_msg)
           return
        endif

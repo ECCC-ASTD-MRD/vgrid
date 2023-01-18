@@ -40,13 +40,13 @@ program ref_nomvar_is_white_space
    endif
    if( vgd_new(vgd,unit=lu,format="fst") == VGD_ERROR) error stop 1
 
-   if( vgd_get(vgd,"RFLD", rfld) == VGD_OK )then
+   if( vgd_get(vgd,"RFLD", rfld, .true.) == VGD_OK )then
       print*,"RFLD='",rfls,"'"
       print*,'In test, problem with vgd_get on "RFLD", should have returned an error but returned VGD_OK'
       ok = .false.
    endif
 
-   if( vgd_get(vgd,"RFLS", rfls) == VGD_OK )then
+   if( vgd_get(vgd,"RFLS", rfls, .true.) == VGD_OK )then
       print*,"RFLS='",rfls,"'"
       print*,'In test, problem with vgd_get on "RFLS", should have returned an error but returned VGD_OK'
       ok = .false.

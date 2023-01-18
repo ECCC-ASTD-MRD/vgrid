@@ -86,33 +86,33 @@ program tests
   endif
 
   ! Test wrong datev
-  if ( VGD_OK == vgd_new(vgd2,unit=lu,format="fst",datev=354514400,etiket=etiket,ip1=ip1,ip2=ip2,ip3=0,kind=kind))then
+  if ( VGD_OK == vgd_new(vgd2,unit=lu,format="fst",datev=354514400,etiket=etiket,ip1=ip1,ip2=ip2,ip3=0,kind=kind,quiet=.true.))then
      print*,'Error should have return an error and did not with wrong datev'     
      error stop 1
   endif
   ! Test wrong etiket
-  if ( VGD_OK == vgd_new(vgd2,unit=lu,format="fst",datev=0,etiket="WRONG ETIKET",ip1=ip1,ip2=ip2,ip3=0,kind=kind) )then
+  if ( VGD_OK == vgd_new(vgd2,unit=lu,format="fst",datev=0,etiket="WRONG ETIKET",ip1=ip1,ip2=ip2,ip3=0,kind=kind,quiet=.true.) )then
      print*,'Error should have return an error and did not with wrong etiket'     
      error stop 1
   endif
   ! Test wrong ip1
-  if ( VGD_OK == vgd_new(vgd2,unit=lu,format="fst",datev=0,etiket=etiket,ip1=ip1+1,ip2=ip2,ip3=0,kind=kind) )then
+  if ( VGD_OK == vgd_new(vgd2,unit=lu,format="fst",datev=0,etiket=etiket,ip1=ip1+1,ip2=ip2,ip3=0,kind=kind,quiet=.true.) )then
      print*,'Error should have return an error and did not with wrong ip1'     
      error stop 1
   endif
   ! Test wrong ip2
-  if ( VGD_OK == vgd_new(vgd2,unit=lu,format="fst",datev=0,etiket=etiket,ip1=ip1,ip2=ip2+1,ip3=0,kind=kind) )then
+  if ( VGD_OK == vgd_new(vgd2,unit=lu,format="fst",datev=0,etiket=etiket,ip1=ip1,ip2=ip2+1,ip3=0,kind=kind,quiet=.true.) )then
      print*,'Error should have return an error and did not with wrong ip2'     
      error stop 1
   endif
   ! Test wrong ip3
-  if ( VGD_OK == vgd_new(vgd2,unit=lu,format="fst",datev=0,etiket=etiket,ip1=ip1,ip2=ip2,ip3=1,kind=kind) )then
+  if ( VGD_OK == vgd_new(vgd2,unit=lu,format="fst",datev=0,etiket=etiket,ip1=ip1,ip2=ip2,ip3=1,kind=kind,quiet=.true.) )then
      print*,'Error should have return an error and did not with wrong ip3'     
      error stop 1
   endif
   ! Test wrong kind
   print*,'The following error message on legacy encoding is normal for test wrong kind'
-  if ( VGD_OK == vgd_new(vgd2,unit=lu,format="fst",datev=0,etiket=etiket,ip1=ip1,ip2=ip2,ip3=0,kind=1) )then
+  if ( VGD_OK == vgd_new(vgd2,unit=lu,format="fst",datev=0,etiket=etiket,ip1=ip1,ip2=ip2,ip3=0,kind=1,quiet=.true.) )then
      print*,'Error should have return an error and did not with wrong kind'     
      error stop 1
   endif

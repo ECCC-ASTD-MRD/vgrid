@@ -61,7 +61,7 @@ int test_it(char *filename, int ind) {
     return(1);
   }
   // Get table  
-  if( Cvgd_get_double_3d(vgd, "VTBL", &table, &ni, &nj, &nk) == VGD_ERROR ){
+  if( Cvgd_get_double_3d(vgd, "VTBL", &table, &ni, &nj, &nk, 0) == VGD_ERROR ){
     printf("ERROR with Cvgd_get_double_3d on VTBL\n");
     return(1);
   }

@@ -336,7 +336,7 @@ static int c_set_stda_layer(int ind, float Tk, float pk, float *zk, float *zkp, 
   static float epsilon = 1.e-6;
 
   if( ind >=  STDA76_N_LAYER ){
-    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: maximum layer excedded\n",__func__);    
+    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: maximum layer exceeded\n",__func__);    
     return(VGD_ERROR);
   }
   *zero_lapse_rate = 0;
@@ -742,7 +742,7 @@ static int C_load_toctoc(vgrid_descriptor *self, VGD_TFSTD_ext var, int key) {
   table_size = self->table_ni * self->table_nj * self->table_nk;
   self->table = malloc ( table_size * sizeof(double) );
   if(! self->table ) {
-    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
+    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate table of double of size %d\n",__func__,table_size);
     return(VGD_ERROR);
   }
   istat = c_fstluk((uint32_t*)self->table, key, &ni, &nj, &nk);
@@ -2131,7 +2131,7 @@ static int c_encode_vert_0001(vgrid_descriptor **self,int nk){
   table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
   (*self)->table = malloc ( table_size * sizeof(double) );
   if(! (*self)->table ) {
-    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
+    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate table of double of size %d\n",__func__,table_size);
     return(VGD_ERROR);
   }
   strcpy((*self)->ref_name,VGD_NO_REF_NOMVAR);
@@ -2182,7 +2182,7 @@ static int c_encode_vert_1001(vgrid_descriptor **self,int nk){
   table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
   (*self)->table = malloc ( table_size * sizeof(double) );
   if(! (*self)->table ) {
-    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
+    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate table of double of size %d\n",__func__,table_size);
     return(VGD_ERROR);
   }
 
@@ -2235,7 +2235,7 @@ static int c_encode_vert_1002(vgrid_descriptor **self,int nk){
   table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
   (*self)->table = malloc ( table_size * sizeof(double) );
   if(! (*self)->table ) {
-    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
+    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate table of double of size %d\n",__func__,table_size);
     return(VGD_ERROR);
   }
   strcpy((*self)->ref_name,"P0  ");
@@ -2284,7 +2284,7 @@ static int c_encode_vert_2001(vgrid_descriptor **self,int nk){
   table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
   (*self)->table = malloc ( table_size * sizeof(double) );
   if(! (*self)->table ) {
-    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
+    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate table of double of size %d\n",__func__,table_size);
     return(VGD_ERROR);
   }
   strcpy((*self)->ref_name,VGD_NO_REF_NOMVAR);
@@ -2331,7 +2331,7 @@ static int c_encode_vert_4001(vgrid_descriptor **self,int nk){
   table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
   (*self)->table = malloc ( table_size * sizeof(double) );
   if(! (*self)->table ) {
-    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
+    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate table of double of size %d\n",__func__,table_size);
     return(VGD_ERROR);
   }
   strcpy((*self)->ref_name,VGD_NO_REF_NOMVAR);
@@ -2378,7 +2378,7 @@ static int c_encode_vert_5001(vgrid_descriptor **self,int nk){
   table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
   (*self)->table = malloc ( table_size * sizeof(double) );
   if(! (*self)->table ) {
-    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
+    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate table of double of size %d\n",__func__,table_size);
     return(VGD_ERROR);
   }
   strcpy((*self)->ref_name,"P0  ");
@@ -2436,7 +2436,7 @@ static int c_encode_vert_5002_5003_5004_5005(vgrid_descriptor **self, char updat
     table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
     (*self)->table = malloc ( table_size * sizeof(double) );
     if(! (*self)->table ) {
-      Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
+      Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate table of double of size %d\n",__func__,table_size);
       return(VGD_ERROR);
     }
     strcpy((*self)->ref_name,"P0  ");
@@ -2494,7 +2494,7 @@ static int c_encode_vert_5100(vgrid_descriptor **self, char update){
     table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
     (*self)->table = malloc ( table_size * sizeof(double) );
     if(! (*self)->table ) {
-      Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
+      Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate table of double of size %d\n",__func__,table_size);
       return(VGD_ERROR);
     }
     strcpy((*self)->ref_name,"P0  ");
@@ -2572,13 +2572,13 @@ static int c_encode_vert_5999(vgrid_descriptor **self,int nk){
   table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
   (*self)->table = malloc ( table_size * sizeof(double) );
   if(! (*self)->table ) {
-    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
+    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate table of double of size %d\n",__func__,table_size);
     return(VGD_ERROR);
   }
   free((*self)->c_m_8);
   (*self)->c_m_8 = malloc ( nk * sizeof(double) );
   if(! (*self)->c_m_8 ) {    
-    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate c_m_8 of bouble of size %d\n",__func__,nk);
+    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate c_m_8 of double of size %d\n",__func__,nk);
     return(VGD_ERROR);
   }
   strcpy((*self)->ref_name,"P0  ");
@@ -2631,7 +2631,7 @@ static int c_encode_vert_21001(vgrid_descriptor **self, char update){
     table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
     (*self)->table = malloc ( table_size * sizeof(double) );
     if(! (*self)->table ) {
-      Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
+      Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate table of double of size %d\n",__func__,table_size);
       return(VGD_ERROR);
     }
     strcpy((*self)->ref_name,"ME  ");
@@ -2701,7 +2701,7 @@ static int c_encode_vert_21002(vgrid_descriptor **self, char update){
     table_size = (*self)->table_ni * (*self)->table_nj * (*self)->table_nk;
     (*self)->table = malloc ( table_size * sizeof(double) );
     if(! (*self)->table ) {
-      Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
+      Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate table of double of size %d\n",__func__,table_size);
       return(VGD_ERROR);
     }
     strcpy((*self)->ref_name,"ME  ");
@@ -3457,7 +3457,7 @@ int Cvgd_new_from_table(vgrid_descriptor **self, double *table, int ni, int nj, 
   table_size = ni * nj * nk;
   ltable = malloc ( table_size * sizeof(double) );
   if(! ltable ) {
-    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate ltable of bouble of size %d\n",__func__,table_size);
+    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate ltable of double of size %d\n",__func__,table_size);
     return(VGD_ERROR);
   }
   my_copy_double(table, &ltable, table_size);  
@@ -3467,7 +3467,7 @@ int Cvgd_new_from_table(vgrid_descriptor **self, double *table, int ni, int nj, 
   (*self)->table_nk = nk;
   (*self)->table = malloc ( ni * nj * nk * sizeof(double) );
   if(! (*self)->table ) {
-    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate table of bouble of size %d\n",__func__,table_size);
+    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot allocate table of double of size %d\n",__func__,table_size);
     return(VGD_ERROR);
   }
   for(i = 0; i < table_size; i++) {
@@ -4901,7 +4901,7 @@ static int c_vgrid_genab_21002(float *hybuser, int nk, int *nl_m, int *nl_t, int
 
 }
 
-int Cvgd_getopt_int(char *key, int *value)
+int Cvgd_getopt_int(char *key, int *value, int quiet)
 {
   if (!value){
     Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: value is a NULL pointer\n",__func__);
@@ -4910,14 +4910,14 @@ int Cvgd_getopt_int(char *key, int *value)
   if (strcmp(key, "ALLOW_SIGMA") == 0){
       *value = ALLOW_SIGMA;
   } else {
-    Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: invalid key %s\n",__func__,key);
+    if (!quiet) Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: invalid key %s\n",__func__,key);
     return(VGD_ERROR);
   }  
   
   return(VGD_OK);
 }
 
-int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value)
+int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value, int quiet)
 {  
   if(! Cvgd_is_valid(self,"SELF")){
     Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: invalid vgrid\n",__func__);
@@ -4958,19 +4958,19 @@ int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value)
     *value = self->rec.ip3;
   } else if (strcmp(key, "DIPM") == 0){
     if( ! Cvgd_is_valid(self,"dhm_valid") ){      
-      Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: cannot get key %s\n",__func__,key);
+      if (!quiet) Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: cannot get key %s\n",__func__,key);
       return(VGD_ERROR);
     }
     *value = self->ip1_m[self->nl_m -1];
   } else if (strcmp(key, "DIPT") == 0){
     if( ! Cvgd_is_valid(self,"dht_valid") ){      
-	    Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: cannot get key %s\n",__func__,key);
+	    if (!quiet) Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: cannot get key %s\n",__func__,key);
       return(VGD_ERROR);
     }
     *value = self->ip1_t[self->nl_t -1];
   } else if (strcmp(key, "DIPW") == 0){
     if( ! Cvgd_is_valid(self,"dhw_valid") ){      
-	    Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: cannot get key %s\n",__func__,key);
+	    if (!quiet) Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: cannot get key %s\n",__func__,key);
       return(VGD_ERROR);
     }
     *value = self->ip1_w[self->nl_w -1];
@@ -5004,7 +5004,7 @@ int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value)
       return(VGD_ERROR);
     }
   } else {
-    Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: invalid key %s\n",__func__,key);
+    if (!quiet) Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: invalid key %s\n",__func__,key);
     return(VGD_ERROR);
   }
   
@@ -5012,7 +5012,7 @@ int Cvgd_get_int(vgrid_descriptor *self, char *key, int *value)
 
 }
 
-int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk)
+int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk, int quiet)
 {
   int OK = 1;
   if(nk) *nk = -1;
@@ -5055,8 +5055,8 @@ int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk)
     if(! *value){
       (*value) = malloc(self->nl_t * sizeof(int));
       if(! *value){
-	Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d int\n",__func__,self->nl_t);
-	return(VGD_ERROR);
+        Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d int\n",__func__,self->nl_t);
+        return(VGD_ERROR);
       }
     }
     my_copy_int(self->ip1_t, value, self->nl_t);
@@ -5068,8 +5068,8 @@ int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk)
     if(! *value){
       (*value) = malloc(self->nl_w * sizeof(int));
       if(! *value){
-	Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d int\n",__func__,self->nl_w);
-	return(VGD_ERROR);
+        Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: problem allocating %d int\n",__func__,self->nl_w);
+        return(VGD_ERROR);
       }
     }
     my_copy_int(self->ip1_w, value, self->nl_w);
@@ -5078,14 +5078,14 @@ int Cvgd_get_int_1d(vgrid_descriptor *self, char *key, int **value, int *nk)
     OK = 0;
   }
   if(! OK) {
-    Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: invalid key '%s' for Vcode %d\n",__func__,key,self->vcode);
+    if (!quiet) Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: invalid key '%s' for Vcode %d\n",__func__,key,self->vcode);
     return(VGD_ERROR);    
   }
   return(VGD_OK);
 
 }
 
-int Cvgd_get_float(vgrid_descriptor *self, char *key, float *value) {
+int Cvgd_get_float(vgrid_descriptor *self, char *key, float *value, int quiet) {
 
   if(! Cvgd_is_valid(self,"SELF")){
     Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: invalid vgrid\n",__func__);
@@ -5140,14 +5140,14 @@ int Cvgd_get_float(vgrid_descriptor *self, char *key, float *value) {
       Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: attempt to retrieve invalid key %s\n",__func__,key);
     }
   } else {
-    Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: invalid key '%s'\n",__func__,key);
+    if (!quiet) Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: invalid key '%s'\n",__func__,key);
     return(VGD_ERROR);
   }
   return(VGD_OK);
 
 }
 
-int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk)
+int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk, int quiet)
 {
   char key2[5];
   int *vip1=NULL, kind, k, OK = 1;
@@ -5166,7 +5166,7 @@ int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk)
         }
       }    
       strcpy(key2,"VIPM");
-      Cvgd_get_int_1d(self, key2, &vip1, NULL);
+      Cvgd_get_int_1d(self, key2, &vip1, NULL, quiet);
       for(k = 0; k < self->nl_m; k++){
 	      (*value)[k] = c_convip_IP2Level(vip1[k], &kind);
       }
@@ -5184,7 +5184,7 @@ int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk)
       }
     }  
     strcpy(key2,"VIPT");
-    Cvgd_get_int_1d(self, key2, &vip1, NULL);
+    Cvgd_get_int_1d(self, key2, &vip1, NULL, quiet);
     for(k = 0; k < self->nl_t; k++){
       (*value)[k] = c_convip_IP2Level(vip1[k], &kind);
     }    
@@ -5199,7 +5199,7 @@ int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk)
       }
     }  
     strcpy(key2,"VIPW");
-    Cvgd_get_int_1d(self, key2, &vip1, NULL);
+    Cvgd_get_int_1d(self, key2, &vip1, NULL, quiet);
     for(k = 0; k < self->nl_w; k++){
       (*value)[k] = c_convip_IP2Level(vip1[k], &kind);
     }    
@@ -5209,13 +5209,13 @@ int Cvgd_get_float_1d(vgrid_descriptor *self, char *key, float **value, int *nk)
     OK = 0;
   }
   if(! OK){
-    Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: invalid key '%s' for vcode %d\n",__func__,key, self->vcode);
+    if (!quiet) Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: invalid key '%s' for vcode %d\n",__func__,key, self->vcode);
     return(VGD_ERROR);    
   }
   return(VGD_OK);
 }
 
-int Cvgd_get_double(vgrid_descriptor *self, char *key, double *value_get) {
+int Cvgd_get_double(vgrid_descriptor *self, char *key, double *value_get, int quiet) {
   int OK = 1;
   if(! Cvgd_is_valid(self,"SELF")){
     Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: invalid vgrid\n",__func__);
@@ -5240,19 +5240,19 @@ int Cvgd_get_double(vgrid_descriptor *self, char *key, double *value_get) {
     if(! is_valid(self, rcoef4_valid)) OK = 0;
     *value_get = (self)->rcoef4;
   } else {
-    Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: invalid key '%s'\n",__func__,key);
+    if (!quiet) Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: invalid key '%s'\n",__func__,key);
     return(VGD_ERROR);
   }
   
   if(! OK) {
-    Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: %s cannot get for Vcode %d\n",__func__,key,(self)->vcode);
+    if (!quiet) Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: %s cannot get for Vcode %d\n",__func__,key,(self)->vcode);
     return(VGD_ERROR);
   }    
   
   return(VGD_OK);
 }
 
-int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *nk)
+int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *nk, int quiet)
 {
   int OK = 1;
   if(nk) *nk = -1;
@@ -5384,7 +5384,7 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
     OK = 0;
   }    
   if( ! OK) {
-    Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: invalid key '%s' for vcode %d\n",__func__,key,self->vcode);
+    if (!quiet) Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: invalid key '%s' for vcode %d\n",__func__,key,self->vcode);
     return(VGD_ERROR);
   }
 
@@ -5392,7 +5392,7 @@ int Cvgd_get_double_1d(vgrid_descriptor *self, char *key, double **value, int *n
 
 }
 
-int Cvgd_get_double_3d(vgrid_descriptor *self, char *key, double **value, int *ni, int *nj, int *nk)
+int Cvgd_get_double_3d(vgrid_descriptor *self, char *key, double **value, int *ni, int *nj, int *nk, int quiet)
 {
   if(ni) *ni = -1;
   if(nj) *nj = -1;
@@ -5415,14 +5415,14 @@ int Cvgd_get_double_3d(vgrid_descriptor *self, char *key, double **value, int *n
     if(nj) *nj = self->table_nj;
     if(nk) *nk = self->table_nk;
   } else {
-    Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: invalid key '%s'\n",__func__,key);
+    if (!quiet) Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: invalid key '%s'\n",__func__,key);
     return(VGD_ERROR);
   }
 
   return(VGD_OK);
 }
 
-int Cvgd_get_char(vgrid_descriptor *self, char *key, char out[]) {
+int Cvgd_get_char(vgrid_descriptor *self, char *key, char out[], int quiet) {
   char ok = 1;
   if(! Cvgd_is_valid(self,"SELF")){
     Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: invalid vgrid structure\n",__func__);
@@ -5450,7 +5450,7 @@ int Cvgd_get_char(vgrid_descriptor *self, char *key, char out[]) {
     ok = 0;
   }
   if(! ok ){
-    Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: invalid key -> '%s'\n",__func__,key);
+    if (!quiet) Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: invalid key -> '%s'\n",__func__,key);
     return(VGD_ERROR);
   }
   return(VGD_OK);
@@ -6237,7 +6237,7 @@ static int C_gen_legacy_desc(vgrid_descriptor **self, int unit, int *keylist , i
 
 }
 
-static int c_legacy(vgrid_descriptor **self, int unit, int F_kind) {
+static int c_legacy(vgrid_descriptor **self, int unit, int F_kind, int quiet) {
   // Construct vertical structure from legacy encoding (PT,HY...)
 
   int error, ni, nj, nk, nip1, i, j, k, kind, nb_kind=100, aa, nb;
@@ -6347,7 +6347,7 @@ static int c_legacy(vgrid_descriptor **self, int unit, int F_kind) {
     }
   }
   if( nb == 0){
-    Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: No record of type pressure/sigma/hyb in file\n",__func__);
+    if (!quiet) Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: No record of type pressure/sigma/hyb in file\n",__func__);
     return(VGD_ERROR);
   }
   App_Log(APP_INFO,"%s: Found %d unique ip1 of kind %d among the %d records in file to construct the vertical descriptor\n",__func__,nb,valid_kind,count);
@@ -6362,13 +6362,13 @@ static int c_legacy(vgrid_descriptor **self, int unit, int F_kind) {
 }
 
 int Cvgd_new_read(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind, int version) {
-  return Cvgd_new_read3(self, unit, -1, " ", ip1, ip2, -1, kind, version);
+  return Cvgd_new_read3(self, unit, -1, " ", ip1, ip2, -1, kind, version, 0);
 }
-int Cvgd_new_read2(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind, int version) {
-  return Cvgd_new_read3(self, unit, -1, " ", ip1, ip2, -1 , kind, version);
+int Cvgd_new_read2(vgrid_descriptor **self, int unit, int ip1, int ip2, int kind, int version, int quiet) {
+  return Cvgd_new_read3(self, unit, -1, " ", ip1, ip2, -1 , kind, version, 0);
 }
 
-int Cvgd_new_read3(vgrid_descriptor **self, int unit, int datev, char *etiket, int ip1, int ip2, int ip3, int kind, int version) {
+int Cvgd_new_read3(vgrid_descriptor **self, int unit, int datev, char *etiket, int ip1, int ip2, int ip3, int kind, int version, int quiet) {
   
   char  match_ipig;
   int error, i, ni, nj, nk;
@@ -6401,14 +6401,14 @@ int Cvgd_new_read3(vgrid_descriptor **self, int unit, int datev, char *etiket, i
     return(VGD_ERROR);
   }
   if(count == 0){
-    Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: Cannot find %s with the following datev=%d, etiket=%s, ip1=%d, ip2=%d, ip3=%d\n",__func__,ZNAME,datev,etiket,ip1,ip2,ip3);
+    if (!quiet) Lib_Log(APP_LIBVGRID,APP_WARNING,"%s: Cannot find %s with the following datev=%d, etiket=%s, ip1=%d, ip2=%d, ip3=%d\n",__func__,ZNAME,datev,etiket,ip1,ip2,ip3);
     if(match_ipig) {
       (*self)->vcode = -1;
       return(VGD_ERROR);
     }
-    Lib_Log(APP_LIBVGRID,APP_INFO,"%s: Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)\n",__func__);
-    if(c_legacy(self,unit,kind) == VGD_ERROR){
-      Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: failed to construct vgrid descriptor from legacy encoding\n",__func__);
+    if (!quiet) Lib_Log(APP_LIBVGRID,APP_INFO,"%s: Trying to construct vgrid descriptor from legacy encoding (PT,HY ...)\n",__func__);
+    if(c_legacy(self,unit,kind,quiet) == VGD_ERROR){
+      if (!quiet) Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: failed to construct vgrid descriptor from legacy encoding\n",__func__);
       return(VGD_ERROR);      
     }
     if(fstd_init(*self) == VGD_ERROR) {
@@ -6420,23 +6420,23 @@ int Cvgd_new_read3(vgrid_descriptor **self, int unit, int datev, char *etiket, i
     for( i=0; i < count; i++) {     
       // Check if kind and version match, skip the !! if not.
       if( correct_kind_and_version(keyList[i], kind, version, &var, &status) == VGD_ERROR) {
-	(*self)->valid = 0;
-	return(VGD_ERROR);
-      }
-      if( status != 1) {
-	continue;
+        (*self)->valid = 0;
+        return(VGD_ERROR);
+            }
+            if( status != 1) {
+        continue;
       }
       // If we reached this stage then the toc satisfy the selection criteria but it may not be the only one.
       if(! toc_found) {
-	toc_found = 1;
-	if( C_load_toctoc(*self,var,keyList[i]) == VGD_ERROR ) {
-	  Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot load !!\n",__func__);
-	  return(VGD_ERROR);
-	}
-	ni=(*self)->table_ni;
-	nj=(*self)->table_nj;
-	nk=(*self)->table_nk;
-	continue;
+        toc_found = 1;
+        if( C_load_toctoc(*self,var,keyList[i]) == VGD_ERROR ) {
+          Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: cannot load !!\n",__func__);
+          return(VGD_ERROR);
+        }
+        ni=(*self)->table_ni;
+        nj=(*self)->table_nj;
+        nk=(*self)->table_nk;
+        continue;
       }
       // If we get at this point this means that there are more than one toc satisfying the selection criteria.
       // We load then all to check if they are the same. If not, we return with an error message.
@@ -6451,15 +6451,15 @@ int Cvgd_new_read3(vgrid_descriptor **self, int unit, int datev, char *etiket, i
       }
       status = Cvgd_vgdcmp(*self,self2);
       if ( status != 0 ){
-	      Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: found different entries in vertical descriptors after search on datev=%d, etiket=%s, ip1=%d, ip2=%d, ip3=%d, kind=%d, version=%d, status code is %d\n",__func__,datev,etiket,ip1,ip2,ip3,kind,version,status);
+	      if (!quiet) Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: found different entries in vertical descriptors after search on datev=%d, etiket=%s, ip1=%d, ip2=%d, ip3=%d, kind=%d, version=%d, status code is %d\n",__func__,datev,etiket,ip1,ip2,ip3,kind,version,status);
   	    return(VGD_ERROR);
       }
       // TODO verifier si ce Cvgd_free est correct 
       Cvgd_free(&self2);
     } // Loop in !!
     if(! toc_found){
-      if(c_legacy(self,unit,kind) == VGD_ERROR){
-	      Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: failed to construct vgrid descriptor from legacy encoding\n",__func__);
+      if(c_legacy(self,unit,kind,quiet) == VGD_ERROR){
+	      if (!quiet) Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: failed to construct vgrid descriptor from legacy encoding\n",__func__);
 	      return(VGD_ERROR);
       }
       toc_found = 1;
@@ -6526,7 +6526,7 @@ int Cvgd_stda76_temp(vgrid_descriptor *self, int *i_val, int nl, float *temp){
     return(VGD_ERROR);
   }
   
-  if( Cvgd_get_int(self, "VCOD", &vcode) == VGD_ERROR ){
+  if( Cvgd_get_int(self, "VCOD", &vcode, 0) == VGD_ERROR ){
     return(VGD_ERROR);
   };
   if(! strcmp((*self).ref_name,"ME  ") || vcode == 4001 ){

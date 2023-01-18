@@ -100,7 +100,7 @@ int test_it(char *filename, int ind) {
   FILE *fp;
   char buff[255],  buff2[255];
   int ier, iun, k;
-  int *i_val = NULL, i_val_c;
+  int quiet=0, *i_val = NULL, i_val_c;
   int nl_t, nl_t_c;
   char mode[]="RND";
   char nomvar[] = "1234";
@@ -126,12 +126,12 @@ int test_it(char *filename, int ind) {
   }
   //ier = Cvgd_print_desc(vgd, -1, -1);
 
-  if( Cvgd_get_int_1d(vgd, "VIPT", &i_val, NULL) ==  VGD_ERROR ) {
+  if( Cvgd_get_int_1d(vgd, "VIPT", &i_val, NULL, quiet) ==  VGD_ERROR ) {
     printf("ERROR with Cvgd_get_int for VIPT\n");
     return(VGD_ERROR);
   }
 
-  if( Cvgd_get_int(vgd, "NL_T", &nl_t) == VGD_ERROR){
+  if( Cvgd_get_int(vgd, "NL_T", &nl_t, quiet) == VGD_ERROR){
     printf("ERROR cannot Cvgd_get_int on NL_T\n");
     return(VGD_ERROR);
   }
@@ -149,7 +149,7 @@ int test_it(char *filename, int ind) {
   if( compare(filename, "_stda76_temp.txt", i_val, temp, nl_t) == VGD_ERROR ){
     return(VGD_ERROR);
   }
-  ier = Cvgd_get_char(vgd, "RFLD", nomvar);
+  ier = Cvgd_get_char(vgd, "RFLD", nomvar, 1);
   if(! strcmp(nomvar,"ME  ")){
     printf("   Testing pressure\n");
     pres = malloc( nl_t * sizeof(float) );

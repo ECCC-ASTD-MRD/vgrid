@@ -43,13 +43,13 @@ int main() {
     return(1);
   }
 
-  if( Cvgd_get_char(vgd, "RFLD", value) == VGD_OK ){
+  if( Cvgd_get_char(vgd, "RFLD", value, 1) == VGD_OK ){
     printf("RFLD='%s'\n",value);
     printf("In test, problem with vgd_get on 'RFLD', should have returned an error but returned VGD_OK\n");
     ok = VGD_ERROR;
   }
 
-  if( Cvgd_get_char(vgd, "RFLS", value) == VGD_OK ){
+  if( Cvgd_get_char(vgd, "RFLS", value, 1) == VGD_OK ){
     printf("RFLS='%s'\n",value);
     printf("In test, problem with vgd_get on 'RFLS', should have returned an error but returned VGD_OK\n");
     ok = VGD_ERROR;

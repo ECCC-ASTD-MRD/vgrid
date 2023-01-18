@@ -116,68 +116,77 @@ module vGrid_Descriptors
          integer (c_int), value :: ni, nj, nk
        end function f_diag_withref_8
 
-      integer(c_int) function f_get_int(vgd_CP, key, value_CP) bind(c, name='Cvgd_get_int')
+      integer(c_int) function f_get_int(vgd_CP, key, value_CP, quiet) bind(c, name='Cvgd_get_int')
          use iso_c_binding, only: c_ptr, c_char, c_int
          type(c_ptr), value :: vgd_CP
+         integer (c_int), value :: quiet
          type(c_ptr), value :: value_CP
          character(kind=c_char) :: key(*)
       end function f_get_int
      
-      integer(c_int) function f_get_int_1d(vgd_CP, key, value_CP, nk_CP) bind(c, name='Cvgd_get_int_1d')
+      integer(c_int) function f_get_int_1d(vgd_CP, key, value_CP, nk_CP, quiet) bind(c, name='Cvgd_get_int_1d')
          use iso_c_binding, only: c_ptr, c_char, c_int
          type(c_ptr), value :: vgd_CP
+         integer (c_int), value :: quiet
          type(c_ptr) :: value_CP
          type(c_ptr), value :: nk_CP
          character(kind=c_char) :: key(*)
       end function f_get_int_1d
    
-      integer(c_int) function f_getopt_int(key,value_CP) bind(c, name='Cvgd_getopt_int')
+      integer(c_int) function f_getopt_int(key,value_CP,quiet) bind(c, name='Cvgd_getopt_int')
          use iso_c_binding, only: c_char, c_ptr, c_int
          character(kind=c_char) :: key(*)
          type(c_ptr), value :: value_CP
+         integer (c_int), value :: quiet
       end function f_getopt_int
 
-      integer(c_int) function f_get_real(vgd_CP, key, value_CP) bind(c, name='Cvgd_get_float')
+      integer(c_int) function f_get_real(vgd_CP, key, value_CP, quiet) bind(c, name='Cvgd_get_float')
          use iso_c_binding, only: c_ptr, c_char, c_int
          type(c_ptr), value :: vgd_CP
+         integer (c_int), value :: quiet
          type(c_ptr), value :: value_CP
          character(kind=c_char) :: key(*)
       end function f_get_real
       
-      integer(c_int) function f_get_real_1d(vgd_CP, key, value_CP, nk_CP) bind(c, name='Cvgd_get_float_1d')
+      integer(c_int) function f_get_real_1d(vgd_CP, key, value_CP, nk_CP, quiet) bind(c, name='Cvgd_get_float_1d')
          use iso_c_binding, only: c_ptr, c_char, c_int
          type(c_ptr), value :: vgd_CP
+         integer (c_int), value :: quiet
          type(c_ptr) :: value_CP
          type(c_ptr), value :: nk_CP
          character(kind=c_char) :: key(*)
       end function f_get_real_1d
 
-      integer(c_int) function f_get_real8(vgd_CP, key, value_CP) bind(c, name='Cvgd_get_double')
+      integer(c_int) function f_get_real8(vgd_CP, key, value_CP, quiet) bind(c, name='Cvgd_get_double')
          use iso_c_binding, only: c_ptr, c_char, c_int
          type(c_ptr), value :: vgd_CP
+         integer (c_int), value :: quiet
          type(c_ptr), value :: value_CP
          character(kind=c_char) :: key(*)
       end function f_get_real8
 
-      integer(c_int) function f_get_real8_1d(vgd_CP, key, value_CP, nk_CP) bind(c, name='Cvgd_get_double_1d')
+      integer(c_int) function f_get_real8_1d(vgd_CP, key, value_CP, nk_CP, quiet) bind(c, name='Cvgd_get_double_1d')
          use iso_c_binding, only: c_ptr, c_char, c_int
          type(c_ptr), value :: vgd_CP
+         integer (c_int), value :: quiet
          type(c_ptr) :: value_CP
          type(c_ptr), value :: nk_CP
          character(kind=c_char) :: key(*)
       end function f_get_real8_1d
 
-      integer(c_int) function f_get_real8_3d(vgd_CP, key, value_CP, ni_CP, nj_CP, nk_CP) bind(c, name='Cvgd_get_double_3d')
+      integer(c_int) function f_get_real8_3d(vgd_CP, key, value_CP, ni_CP, nj_CP, nk_CP, quiet) bind(c, name='Cvgd_get_double_3d')
          use iso_c_binding, only: c_ptr, c_char, c_int
          type(c_ptr), value :: vgd_CP
+         integer (c_int), value :: quiet
          type(c_ptr) :: value_CP
          type(c_ptr), value :: ni_CP, nj_CP, nk_CP
          character(kind=c_char) :: key(*)
       end function f_get_real8_3d
 
-      integer(c_int) function f_get_char(vgd_CP, key, my_char) bind(c, name='Cvgd_get_char')
+      integer(c_int) function f_get_char(vgd_CP, key, my_char, quiet) bind(c, name='Cvgd_get_char')
          use iso_c_binding, only: c_ptr, c_char, c_int
          type(c_ptr), value :: vgd_CP
+         integer (c_int), value :: quiet
          character(kind=c_char) :: key(*)
          character(kind=c_char) :: my_char(*)
       end function f_get_char
@@ -229,10 +238,10 @@ module vGrid_Descriptors
          type(c_ptr), value :: vgd1_CP, vgd2_CP
       end function f_vgdcmp
 
-      integer(c_int) function f_new_read(vgd,unit,datev,etiket,ip1,ip2,ip3,kind,version) bind(c, name='Cvgd_new_read3')
+      integer(c_int) function f_new_read(vgd,unit,datev,etiket,ip1,ip2,ip3,kind,version,quiet) bind(c, name='Cvgd_new_read3')
          use iso_c_binding, only : c_ptr, c_int, c_char
          type(c_ptr) :: vgd
-         integer (c_int), value :: unit, datev, ip1, ip2, ip3, kind, version
+         integer (c_int), value :: unit, datev, ip1, ip2, ip3, kind, version, quiet
          character(kind=c_char) :: etiket(*)
       end function f_new_read
       
@@ -387,7 +396,7 @@ module vGrid_Descriptors
    
 contains
     
-   integer function new_read(self,unit,format,ip1,ip2,kind,version,datev,etiket,ip3) result(status)
+   integer function new_read(self,unit,format,ip1,ip2,kind,version,quiet,datev,etiket,ip3) result(status)
       use vgrid_utils, only: up
       ! Coordinate constructor - read from a file and initialize instance
       type(vgrid_descriptor), intent(inout) :: self !Vertical descriptor instance
@@ -397,10 +406,11 @@ contains
       integer, target,optional :: ip1,ip2,ip3             !ip1,2 values of the desired descriptors
       integer, target,optional, intent(in) :: kind        ! Level kind requested by user.
       integer, target,optional, intent(in) :: version     ! Level version requested by user.
+      logical, optional, intent(in) :: quiet              !Do not print massages
       character(len=*), target, optional, intent(in) :: etiket  ! etiket value of the desired descriptors
       
       ! Local variables
-      integer :: ni,nj,nk, istat, error, l_datev, l_ip1, l_ip2, l_ip3, l_kind, l_version
+      integer :: ni,nj,nk, istat, error, l_datev, l_ip1, l_ip2, l_ip3, l_kind, l_version, l_quiet
       character(len=VGD_LEN_ETIK) :: l_etiket
       character(len=100) :: myformat
       real(kind=8), dimension(:,:,:), pointer :: table_8
@@ -408,6 +418,13 @@ contains
       nullify(table_8)
 
       status = VGD_ERROR
+
+      l_quiet=0
+      if (present(quiet))then
+         if(quiet) then
+            l_quiet = 1
+         endif
+      endif
 
       myformat='FST'
       if (present(format)) myformat = trim(up(format))
@@ -449,7 +466,7 @@ contains
             l_version = -1
          endif
          
-         if( f_new_read(self%cptr, unit, l_datev, l_etiket//C_NULL_CHAR, l_ip1, l_ip2, l_ip3, l_kind, l_version) == &
+         if( f_new_read(self%cptr, unit, l_datev, l_etiket//C_NULL_CHAR, l_ip1, l_ip2, l_ip3, l_kind, l_version, l_quiet) == &
               VGD_ERROR )then
 !            write(app_msg,*) 'in new_read, problem with f_new_read'
             call Lib_Log(APP_LIBVGRID,APP_ERROR,' in new_read, problem with f_new_read')       
@@ -780,17 +797,26 @@ contains
       status = VGD_OK
    end function garbage_collection
 
-   integer function getopt_logical(key,value) result(status)
+   integer function getopt_logical(key,value,quiet) result(status)
       use vgrid_utils, only: up
       character(len=*), intent(in) :: key           !Descriptor key to retrieve
       logical, intent(out) :: value                 !Retrieved value
+      logical, intent(in), optional :: quiet        !Do not generate messages
 
       ! Local variables
+      integer :: l_quiet
       integer, target :: l_value
       type(c_ptr) :: l_value_CP
 
       ! Set error status
       status=VGD_ERROR
+      
+      l_quiet=0
+      if (present(quiet))then
+         if(quiet) then
+            l_quiet = 1
+         endif
+      endif
       
       value=.false.
       l_value_CP = c_loc(l_value)
@@ -799,7 +825,7 @@ contains
       case ('ALLOW_RESHAPE')
          value=ALLOW_RESHAPE
       case ('ALLOW_SIGMA')
-         status = f_getopt_int(key//C_NULL_CHAR,l_value_CP)
+         status = f_getopt_int(key//C_NULL_CHAR,l_value_CP,l_quiet)
          if (status == VGD_ERROR) return
          value = l_value /= 0
       case DEFAULT
@@ -1301,32 +1327,41 @@ contains
       return
    end function write_desc   
 
-   integer function get_int(self,key,value) result(status)
+   integer function get_int(self,key,value,quiet) result(status)
        use vgrid_utils, only: up
       ! Retrieve the value of the requested instance variable
       type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
       character(len=*), intent(in) :: key                 !Descriptor key to retrieve
       integer,target, intent(out) :: value                !Retrieved value
+      logical, optional, intent(in) :: quiet              !Do not print massages
       
       ! Internal variables      
       type(c_ptr) :: value_CP
+      integer :: l_quiet
       character(len=KEY_LENGTH) :: my_key
       
-      value_CP = c_loc(value)
+      l_quiet=0
+      if (present(quiet))then
+         if(quiet) then
+            l_quiet = 1
+         endif
+      endif
+            value_CP = c_loc(value)
       my_key=up(key(1:KEY_LENGTH))
-      status = f_get_int(self%cptr,my_key//C_NULL_CHAR, value_CP)
+      status = f_get_int(self%cptr,my_key//C_NULL_CHAR, value_CP, l_quiet)
       
    end function get_int
  
-   integer function get_int_1d(self,key,value) result(status)
+   integer function get_int_1d(self,key,value,quiet) result(status)
       use vgrid_utils, only: get_allocate,up
       ! Retrieve the value of the requested instance variable
       type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
       character(len=*), intent(in) :: key                 !Descriptor key to retrieve
       integer, dimension(:), pointer :: value             !Retrieved value
+      logical, optional, intent(in) :: quiet              !Do not print massages
       
       ! Internal variables
-      integer :: nl_, istat, error
+      integer :: nl_, istat, error, l_quiet
       type(c_ptr) :: value_CP, nk_CP
       character(len=KEY_LENGTH) :: my_key
       integer, target :: nk
@@ -1335,6 +1370,13 @@ contains
 
       ! Set error status
       status = VGD_ERROR
+      
+      l_quiet=0
+      if (present(quiet))then
+         if(quiet) then
+            l_quiet = 1
+         endif
+      endif
       
       if(.not. is_valid(self,'SELF')) then
          write(app_msg,*) 'vgrid structure is not valid in get_int_1d'
@@ -1352,7 +1394,7 @@ contains
             istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(VIPM in get_int_1d)')
             if (istat /= 0) return
             value_CP = c_loc(value(1))            
-            status = f_get_int_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,nk_CP)
+            status = f_get_int_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,nk_CP,l_quiet)
          else
             write(app_msg,*) 'Attempt to retrieve invalid key '//trim(key)//' returns VGD_MISSING'
             call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
@@ -1364,13 +1406,13 @@ contains
          istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(VIPT in get_int_1d)')
          if (istat /= 0) return
          value_CP = c_loc(value(1))
-         status = f_get_int_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,nk_CP)
+         status = f_get_int_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,nk_CP,l_quiet)
       case ('VIPW')
          istat = get_int(self,'NL_W',nl_)
          istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(VIPT in get_int_1d)')
          if (istat /= 0) return
          value_CP = c_loc(value(1))
-         status = f_get_int_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,nk_CP)
+         status = f_get_int_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,nk_CP,l_quiet)
       case DEFAULT
          write(app_msg,*) 'invalid key '//trim(key)//' given to vgd_get (int 1D)'
          call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
@@ -1381,43 +1423,61 @@ contains
       
    end function get_int_1d
    
-   integer function get_real(self,key,value) result(status)
+   integer function get_real(self,key,value,quiet) result(status)
       use vgrid_utils, only: up
       ! Retrieve the value of the requested instance variable
       type(vgrid_descriptor), intent(in) :: self     !Vertical descriptor instance
       character(len=*), intent(in) :: key            !Descriptor key to retrieve
       real, target, intent(out) :: value             !Retrieved value
+      logical, target, optional, intent(in) :: quiet !Do not print massages
       
       ! Internal variables
       type(c_ptr) :: value_CP
+      integer :: l_quiet
       character(len=KEY_LENGTH) :: my_key
 
       value = VGD_MISSING      
    
+      l_quiet=0
+      if (present(quiet))then
+         if(quiet) then
+            l_quiet = 1
+         endif
+      endif
+
       value_CP = c_loc(value)
       my_key=up(key(1:KEY_LENGTH))
-      status = f_get_real(self%cptr,my_key//C_NULL_CHAR,value_CP)
+      status = f_get_real(self%cptr,my_key//C_NULL_CHAR,value_CP,l_quiet)
       
       return
    end function get_real
   
 
-   integer function get_real_1d(self,key,value) result(status)
+   integer function get_real_1d(self,key,value,quiet) result(status)
       use vgrid_utils, only: get_allocate,up
       ! Retrieve the value of the requested instance variable
       type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
       character(len=*), intent(in) :: key         !Descriptor key to retrieve
       real, dimension(:), pointer :: value        !Retrieved value
+      logical, optional, intent(in) :: quiet      !Do not print massages
 
       ! Internal variables
       integer :: error,istat,nl_
       integer, dimension(:), pointer :: vipt
+      integer :: l_quiet
       type(c_ptr) :: value_CP
       character(len=KEY_LENGTH) :: my_key
 
       ! Set error status
       status = VGD_ERROR
       
+      l_quiet=0
+      if (present(quiet))then
+         if(quiet) then
+            l_quiet = 1
+         endif
+      endif
+
       nullify(vipt)
       
       if(.not. is_valid(self,'SELF')) then
@@ -1437,7 +1497,7 @@ contains
             istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(VCDM in get_real_1d)')
             if (istat /= 0) return
             value_CP = c_loc(value(1))
-            istat = f_get_real_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR)
+            istat = f_get_real_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
             if (istat == VGD_ERROR) return
          else
             write(app_msg,*) 'Attempt to retrieve invalid key '//trim(key)//' returns VGD_MISSING'
@@ -1450,14 +1510,14 @@ contains
          istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(VCDT in get_real_1d)')
          if (istat /= 0) return
          value_CP = c_loc(value(1))
-         istat = f_get_real_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR)
+         istat = f_get_real_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
          if (istat == VGD_ERROR) return
       case ('VCDW')
          istat = get_int(self,'NL_W',nl_)
          istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(VCDW in get_real_1d)')
          if (istat /= 0) return
          value_CP = c_loc(value(1))
-         istat = f_get_real_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR)
+         istat = f_get_real_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
          if (istat == VGD_ERROR) return
       case ('VCRD')
          if (is_valid(self,"ip1_m_valid")) then
@@ -1481,14 +1541,16 @@ contains
       return
    end function get_real_1d
    
-   integer function get_real8(self,key,value) result(status)
+   integer function get_real8(self,key,value,quiet) result(status)
       use vgrid_utils, only: up
       type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
       character(len=*), intent(in) :: key         !Descriptor key to retrieve
       real(kind=8), target, intent(out) :: value  !Retrieved value
+      logical, optional, intent(in) :: quiet      !Do not print massages
 
       ! Internal variables
       type(c_ptr) :: value_CP
+      integer :: l_quiet
       character(len=KEY_LENGTH) :: my_key
 
       ! Set error status
@@ -1496,25 +1558,40 @@ contains
       
       value = VGD_MISSING
             
+      l_quiet=0
+      if (present(quiet))then
+         if(quiet) then
+            l_quiet = 1
+         endif
+      endif
+
       value_CP = c_loc(value)
       my_key=up(key(1:KEY_LENGTH))
-      status = f_get_real8(self%cptr,my_key//C_NULL_CHAR,value_CP)
+      status = f_get_real8(self%cptr,my_key//C_NULL_CHAR,value_CP,l_quiet)
       
    end function get_real8
 
-   integer function get_real8_1d(self,key,value) result(status)
+   integer function get_real8_1d(self,key,value,quiet) result(status)
       use vgrid_utils, only: get_allocate,up
       ! Wrapper function to C f_get_real8_1d
       type(vgrid_descriptor), intent(in) :: self     !Vertical descriptor instance
       character(len=*), intent(in) :: key            !Descriptor key to retrieve
       real(kind=8), dimension(:), pointer :: value   !Retrieved value
+      logical, optional, intent(in) :: quiet      !Do not print massages
       
       ! Internal variables
-      integer :: nl_, istat, error
+      integer :: nl_, istat, error, l_quiet
       type(c_ptr) :: value_CP
       character(len=KEY_LENGTH) :: my_key
 
       status = VGD_ERROR
+
+      l_quiet=0
+      if (present(quiet))then
+         if(quiet) then
+            l_quiet = 1
+         endif
+      endif
 
       if(.not. is_valid(self,'SELF')) then
          write(app_msg,*) 'vgrid structure is not valid in get_real8_1d'
@@ -1531,55 +1608,55 @@ contains
          istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CA_M in get_real8_1d)')         
          if (istat /= 0) return
          value_CP = c_loc(value(1))
-         status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR)
+         status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
       case ('CB_M','COFB')
          istat = get_int(self,'NL_M',nl_)
          istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CB_M in get_real8_1d)')         
          if (istat /= 0) return
          value_CP = c_loc(value(1))
-         status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR)
+         status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
       case ('CC_M')
          istat = get_int(self,'NL_M',nl_)
          istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CC_M in get_real8_1d)')         
          if (istat /= 0) return
          value_CP = c_loc(value(1))
-         status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR)
+         status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
       case ('CA_T')
          istat = get_int(self,'NL_T',nl_)
          istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CA_T in get_real8_1d)')         
          if (istat /= 0) return
          value_CP = c_loc(value(1))
-         status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR)            
+         status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)            
       case ('CC_T')
          istat = get_int(self,'NL_T',nl_)
          istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CC_T in get_real8_1d)')         
          if (istat /= 0) return
          value_CP = c_loc(value(1))
-         status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR)
+         status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
       case ('CB_T')
          istat = get_int(self,'NL_T',nl_)
          istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CB_T in get_real8_1d)')         
          if (istat /= 0) return
          value_CP = c_loc(value(1))
-         status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR)
+         status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
       case ('CA_W')
          istat = get_int(self,'NL_W',nl_)
          istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CA_W in get_real8_1d)')         
          if (istat /= 0) return
          value_CP = c_loc(value(1))
-         status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR)
+         status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
       case ('CB_W')
          istat = get_int(self,'NL_W',nl_)
          istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CB_W in get_real8_1d)')         
          if (istat /= 0) return
          value_CP = c_loc(value(1))
-         status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR)
+         status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
       case ('CC_W')
          istat = get_int(self,'NL_W',nl_)
          istat = get_allocate(key,value,nl_,ALLOW_RESHAPE,'(CC_W in get_real8_1d)')         
          if (istat /= 0) return
          value_CP = c_loc(value(1))
-         status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR)
+         status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
       case DEFAULT
          write(app_msg,*) 'invalid key '//trim(key)//' given to vgd_get (real8 1D)'
          call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
@@ -1588,19 +1665,27 @@ contains
       return      
    end function get_real8_1d
 
-   integer function get_real8_3d(self,key,value) result(status)
+   integer function get_real8_3d(self,key,value,quiet) result(status)
       use vgrid_utils, only: get_allocate,up
       ! Retrieve the value of the requested instance variable
       type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
       character(len=*), intent(in) :: key         !Descriptor key to retrieve
       real(kind=8), dimension(:,:,:), pointer :: value !Retrieved value
+      logical, optional, intent(in) :: quiet      !Do not print massages
 
       ! Internal variables
       integer :: istat
       integer, target, dimension(3) :: tshape
+      integer :: l_quiet
       type(c_ptr) :: value_CP, tshape_CP
       character(len=KEY_LENGTH) :: my_key
 
+      l_quiet=0
+      if (present(quiet))then
+         if(quiet) then
+            l_quiet = 1
+         endif
+      endif
 
       ! Set error status
       status = VGD_ERROR
@@ -1622,7 +1707,7 @@ contains
          istat = get_allocate(key,value,tshape,ALLOW_RESHAPE,'(VTBL) in get_real8_3d)')         
          if (istat /= 0) return
          value_CP = c_loc(value(1,1,1))
-         status = f_get_real8_3d(self%cptr,"VTBL"//C_NULL_CHAR,value_CP,C_NULL_PTR,C_NULL_PTR,C_NULL_PTR)         
+         status = f_get_real8_3d(self%cptr,"VTBL"//C_NULL_CHAR,value_CP,C_NULL_PTR,C_NULL_PTR,C_NULL_PTR,l_quiet)         
       case DEFAULT
          write(app_msg,*) 'invalid key '//trim(key)//' given to vgd_get (real8 3D)'
          call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
@@ -1634,17 +1719,25 @@ contains
       return
    end function get_real8_3d
    
-   integer function get_char(self,key,value) result(status)
+   integer function get_char(self,key,value,quiet) result(status)
       use vgrid_utils, only: up
       type(vgrid_descriptor), intent(in) :: self  !Vertical descriptor instance
       character(len=*), intent(in) :: key         !Descriptor key to retrieve
       character(len=*), intent(out) :: value      !Retrieved value
+      logical, optional, intent(in) :: quiet      !Do not print massages
       
       ! Internal variables
       character(len=KEY_LENGTH) :: my_key
       character(kind=c_char) :: my_char(100)
-      integer :: i, nchar
+      integer :: i, nchar, l_quiet
       logical :: end_L
+
+      l_quiet=0
+      if (present(quiet))then
+         if(quiet) then
+            l_quiet = 1
+         endif
+      endif
 
       ! Set error status
       status = VGD_ERROR
@@ -1654,7 +1747,7 @@ contains
       end do
 
       my_key=up(key(1:KEY_LENGTH))
-      status = f_get_char(self%cptr, my_key//C_NULL_CHAR, my_char)
+      status = f_get_char(self%cptr, my_key//C_NULL_CHAR, my_char, l_quiet )
       select case(trim(my_key))
       case ('ETIK')
          nchar=VGD_LEN_ETIK
@@ -1665,8 +1758,10 @@ contains
       case ('RFLS')
          nchar=VGD_LEN_RFLS
       case DEFAULT
-         write(app_msg,*) 'invalid key in call to get_char: ',trim(key)
-         call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
+         if (l_quiet.eq.1) then
+            write(app_msg,*) 'invalid key in call to get_char: ',trim(key)
+            call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
+         endif
          return
       end select
       end_L=.false.
@@ -1680,25 +1775,34 @@ contains
       enddo
    end function get_char
     
-   integer function get_logical(self,key,value) result(status)
+   integer function get_logical(self,key,value,quiet) result(status)
       use vgrid_utils, only: up
       ! Retrieve the value of the requested instance variable
       type(vgrid_descriptor), intent(in) :: self          !Vertical descriptor instance
       character(len=*), intent(in) :: key                 !Descriptor key to retrieve
       logical, intent(out) :: value                       !Retrieved value
+      logical, optional, intent(in) :: quiet              !Do not print massages    
       
       ! Local variables
+      integer :: l_quiet
       type(c_ptr) :: my_value_CP
       integer, target :: my_value
       character(len=KEY_LENGTH) :: my_key
       
+      l_quiet=0
+      if (present(quiet))then
+         if(quiet) then
+            l_quiet = 1
+         endif
+      endif
+
       ! Set error status
       status = VGD_ERROR
       value = .false.
       
       my_value_CP = c_loc(my_value)
       my_key=up(key(1:KEY_LENGTH))
-      if(f_get_int(self%cptr,my_key//C_NULL_CHAR, my_value_CP) == VGD_ERROR)return         
+      if(f_get_int(self%cptr,my_key//C_NULL_CHAR, my_value_CP,l_quiet) == VGD_ERROR)return         
       if(my_value.eq.1)value = .true.
 
       status = VGD_OK
@@ -1728,9 +1832,9 @@ contains
       type(c_ptr) :: my_value_CP
       status = VGD_ERROR
       call Lib_Log(APP_LIBVGRID,APP_ERROR,'put_real8_3d: putint real8 3D array is not implemented in this library')
-      call Lib_Log(APP_LIBVGRID,APP_ERROR,'       if you want to put the VGTB, you may do it by reconstructing a new vgrid_descriptor')
-      call Lib_Log(APP_LIBVGRID,APP_ERROR,'       e.g. vgd_new(self,table_8)')
-      call Lib_Log(APP_LIBVGRID,APP_ERROR,'       If you think you really need to vgd_put VGTB contact dev team')
+      call Lib_Log(APP_LIBVGRID,APP_ERROR,'   if you want to put the VGTB, you may do it by reconstructing a new vgrid_descriptor')
+      call Lib_Log(APP_LIBVGRID,APP_ERROR,'   e.g. vgd_new(self,table_8)')
+      call Lib_Log(APP_LIBVGRID,APP_ERROR,'   If you think you really need to vgd_put VGTB contact dev team')
       ! To silence the compiler warning
       if(associated(value))then
       endif

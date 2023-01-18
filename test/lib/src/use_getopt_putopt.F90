@@ -32,7 +32,7 @@ program tests
   ! Call with wrong key
   stat=vgd_getopt('THIS_KEY_WILL_NEVER_EXIS',key_value_L)
   print*,'The above error message is nornal'
-  stat=vgd_getopt('THIS_KEY_WILL_NEVER_EXIS',key_value_L)
+  stat=vgd_getopt('THIS_KEY_WILL_NEVER_EXIS',key_value_L,quiet=.true.)
   ! The above produces no output
 
   stat=vgd_getopt('ALLOW_RESHAPE',key_value_L)
