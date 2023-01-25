@@ -468,7 +468,7 @@ contains
          
          if( f_new_read(self%cptr, unit, l_datev, l_etiket//C_NULL_CHAR, l_ip1, l_ip2, l_ip3, l_kind, l_version, l_quiet) == &
               VGD_ERROR )then
-            if(.not. quiet) call Lib_Log(APP_LIBVGRID,APP_ERROR,'new_read: problem with f_new_read')       
+            if(l_quiet .eq. 1) call Lib_Log(APP_LIBVGRID,APP_ERROR,'new_read: problem with f_new_read')       
             return
          endif
       case ('BIN')
@@ -829,7 +829,7 @@ contains
          value = l_value /= 0
       case DEFAULT
          write(app_msg,*) 'invalid key in call to getopt_logical: ',trim(key)
-         if (.not. quiet) call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
+         if (l_quiet .eq. 1) call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
          return
       end select
       ! Set status and return
@@ -1414,7 +1414,7 @@ contains
          status = f_get_int_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,nk_CP,l_quiet)
       case DEFAULT
          write(app_msg,*) 'invalid key '//trim(key)//' given to vgd_get (int 1D)'
-         if (.not. quiet) call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
+         if (l_quiet .eq. 1) call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
          return
       end select
       
@@ -1521,7 +1521,7 @@ contains
       case ('VCRD')
          if (is_valid(self,"ip1_m_valid")) then
             write(app_msg,*) 'depricated key '//trim(key)//', use VCDM instead'
-            if (.not. quiet) call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
+            if (l_quiet .eq. 1) call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
             return
          else
             write(app_msg,*) 'Attempt to retrieve invalid key '//trim(key)//' returns VGD_MISSING'
@@ -1531,7 +1531,7 @@ contains
          endif
       case DEFAULT
          write(app_msg,*) 'invalid key '//trim(key)//' given to vgd_get (real 1D)'
-         if (.not. quiet) call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
+         if (l_quiet .eq. 1) call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
          return
       end select
       
@@ -1658,7 +1658,7 @@ contains
          status = f_get_real8_1d(self%cptr,my_key//C_NULL_CHAR,value_CP,C_NULL_PTR,l_quiet)
       case DEFAULT
          write(app_msg,*) 'invalid key '//trim(key)//' given to vgd_get (real8 1D)'
-         if (.not. quiet) call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
+         if (l_quiet .eq. 1) call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
          return
       end select
       return      
@@ -1709,7 +1709,7 @@ contains
          status = f_get_real8_3d(self%cptr,"VTBL"//C_NULL_CHAR,value_CP,C_NULL_PTR,C_NULL_PTR,C_NULL_PTR,l_quiet)         
       case DEFAULT
          write(app_msg,*) 'invalid key '//trim(key)//' given to vgd_get (real8 3D)'
-         if (.not. quiet) call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
+         if (l_quiet .eq. 1) call Lib_Log(APP_LIBVGRID,APP_ERROR,app_msg)       
          return
       end select
       
