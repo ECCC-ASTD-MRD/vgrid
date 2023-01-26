@@ -38,6 +38,7 @@ if (NOT tdpack_FOUND)
    find_package(tdpack ${tdpack_REQ_VERSION} COMPONENTS shared)
 endif()
 
+link_libraries("-Wl,--disable-new-dtags")
 add_subdirectory(src/lib lib)
 add_subdirectory(src/utils utils)
 #add_subdirectory(src/examples examples)
