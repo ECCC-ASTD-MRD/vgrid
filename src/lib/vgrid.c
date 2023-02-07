@@ -6183,7 +6183,7 @@ static int C_gen_legacy_desc(vgrid_descriptor **self, int unit, int *keylist , i
     } else {
       // SIGMA SIGMA SIGMA SIGMA SIGMA SIGMA SIGMA SIGMA
       if( ! ALLOW_SIGMA ){
-	Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: sigma coordinate construction is not ALLOWED.\n(Cvgd)       If your are certain that you want this sigma coordinate, set ALLOW_SIGMA to true e.g.\n(Cvgd)          in fortran stat =  vgd_putopt(\"ALLOW_SIGMA\",.true.)\n(Cvgd)          in C       stat = Cvgd_putopt_int(\"ALLOW_SIGMA\",1)\n",__func__);
+	Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: sigma coordinate construction is not ALLOWED.\n       If your are certain that you want this sigma coordinate, set ALLOW_SIGMA to true e.g.\n          in fortran stat =  vgd_putopt(\"ALLOW_SIGMA\",.true.)\n         in C       stat = Cvgd_putopt_int(\"ALLOW_SIGMA\",1)\n",__func__);
 	goto bomb;
       }
       App_Log(APP_INFO,"%s: sigma coordinate found\n",__func__);
