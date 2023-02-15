@@ -417,7 +417,7 @@ build:ubuntu-22.04-amd64_gnu-11.3.0:
      - tags
    script:
       - set +e
-      - source ~/ci-env/latest/ubuntu-22.04-amd-64/gnu-11.3.0.sh
+      - source ~/ci-env/latest/ubuntu-22.04-amd-64/gnu.sh
       - export ORDENV_PLAT=ubuntu-22.04-amd64-64
       - . r.load.dot ${ECCI_PROCESS_SSM}/libs
       - set -e
@@ -444,7 +444,7 @@ test:ubuntu-22.04-amd64_gnu-11.3.0:
       - build:ubuntu-22.04-amd64_gnu-11.3.0
    script:
       - set +e
-      - source ~/ci-env/latest/ubuntu-22.04-amd-64/gnu-11.3.0.sh
+      - source ~/ci-env/latest/ubuntu-22.04-amd-64/gnu.sh
       - . r.load.dot ${ECCI_PROCESS_SSM}/libs ${ECCI_PROCESS_SSM}/utils
       - export ORDENV_PLAT=ubuntu-22.04-amd64-64
       - set -e
@@ -468,7 +468,7 @@ package:ubuntu-22.04-amd64_gnu-11.3.0:
       name: testing
    script:
       - set +e
-      - source ~/ci-env/latest/ubuntu-22.04-amd-64/gnu-11.3.0.sh
+      - source ~/ci-env/latest/ubuntu-22.04-amd-64/gnu.sh
       - . r.load.dot ${ECCI_PROCESS_SSM}/libs
       - set -e
       - cd build_ubuntu-22.04-amd64_gnu-11.3.0
