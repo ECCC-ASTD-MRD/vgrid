@@ -31,11 +31,11 @@ include(ec_openmp)           # Enable OpenMP (-DWITH_OPENMP=TRUE)
 set(CMAKE_EXE_LINKER_FLAGS "-Wl,--no-as-needed -ldl")
 
 if (NOT rmn_FOUND)
-   find_package(rmn ${rmn_REQ_VERSION} COMPONENTS ompi shared REQUIRED)
+   find_package(rmn ${rmn_REQ_VERSION} COMPONENTS REQUIRED)
 endif()
 
 if (NOT tdpack_FOUND)
-   find_package(tdpack ${tdpack_REQ_VERSION} COMPONENTS shared)
+   find_package(tdpack ${tdpack_REQ_VERSION})
 endif()
 
 link_libraries("-Wl,--disable-new-dtags")
@@ -49,7 +49,14 @@ set(INCLUDE_INSTALL_DIR include)
 set(LIB_INSTALL_DIR     lib)
 set(CONFIG_INSTALL_DIR  "${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME}-${PROJECT_VERSION}")
 
-include(CMakePackageConfigHelpers)
+install(EXPORT ${PROJECT_NAME}-shared-targets
+    NAMESPACE ${PROJECT_NAME}::
+    DESTINATION ${CONFIG_INSTALL_DIR})
+install(EXPORT ${PROJECT_NAME}-static-targets
+    NAMESPACE ${PROJECT_NAME}::
+    DESTINATION ${CONFIG_INSTALL_DIR})
+
+    include(CMakePackageConfigHelpers)
 configure_package_config_file(
     "Config.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
