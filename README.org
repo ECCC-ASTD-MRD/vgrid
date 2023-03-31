@@ -35,12 +35,13 @@ This will load the specified compiler and define the ECCI_DATA_DIR variable for 
 . $ECCI_ENV/latest/ubuntu-18.04-amd-64/gnu-7.5.0.sh
 #+end_src
 
+You will also need a version of librmn and optionally tdpack, either load them from ssm, both are in rpn/libs domain (. r.load.dot rpn/libs/...) or provide the path to cmake
 ** Build and install
 
 #+begin_src
 mkdir build
 cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=${your_choice}
+cmake .. -DCMAKE_INSTALL_PREFIX=[your  install path] -Drmn_ROOT=[path to librmn] -Dtdpack_ROOT=[path to tdpack]
 make -j 4
 make check
 make package
