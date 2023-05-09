@@ -31,7 +31,7 @@ include(ec_openmp)           # Enable OpenMP (-DWITH_OPENMP=TRUE)
 set(CMAKE_EXE_LINKER_FLAGS "-Wl,--no-as-needed -ldl")
 
 if (NOT rmn_FOUND)
-   find_package(rmn ${rmn_REQ_VERSION} COMPONENTS REQUIRED)
+   find_package(rmn ${rmn_REQ_VERSION} COMPONENTS shared REQUIRED)
 endif()
 
 if (NOT tdpack_FOUND)
