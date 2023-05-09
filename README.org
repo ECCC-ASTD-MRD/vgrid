@@ -36,6 +36,7 @@ This will load the specified compiler and define the ECCI_DATA_DIR variable for 
 #+end_src
 
 You will also need a version of librmn and optionally tdpack, either load them from ssm, both are in rpn/libs domain (. r.load.dot rpn/libs/...) or provide the path to cmake
+
 ** Build and install
 
 #+begin_src
