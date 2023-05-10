@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.16)
 message(STATUS "(EC) Generating vgrid Makefile")
 
 #----- Append EC specific module path
-list(APPEND CMAKE_MODULE_PATH $ENV{EC_CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake_rpn/modules)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake_rpn/modules $ENV{EC_CMAKE_MODULE_PATH})
 
 include(ec_init)           # Initialise compilers and ec specific functions
 ec_git_version()           # Get version from git state
@@ -31,7 +31,7 @@ include(ec_openmp)           # Enable OpenMP (-DWITH_OPENMP=TRUE)
 set(CMAKE_EXE_LINKER_FLAGS "-Wl,--no-as-needed -ldl")
 
 if (NOT rmn_FOUND)
-   find_package(rmn ${rmn_REQ_VERSION} COMPONENTS shared REQUIRED)
+   find_package(rmn ${rmn_REQ_VERSION} REQUIRED)
 endif()
 
 if (NOT tdpack_FOUND)
