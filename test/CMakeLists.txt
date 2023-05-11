@@ -25,7 +25,7 @@ if (EC_INIT_DONE LESS 2)
          endif()
          add_dependencies(check ${test})
 
-         target_link_libraries(${test} PRIVATE vgrid)
+         target_link_libraries(${test} PRIVATE vgrid::vgrid)
          target_include_directories(${test} PRIVATE ${CMAKE_BINARY_DIR}/lib ${CMAKE_SOURCE_DIR}/src/lib ${CMAKE_CURRENT_SOURCE_DIR} ${RMN_INCLUDE_DIRS})
 
          add_test(NAME ${test} COMMAND ${test} WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/Testing)
