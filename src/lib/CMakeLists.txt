@@ -4,12 +4,12 @@ set(PROJECT_INCLUDE_FILES vgrid.h)
 set(MODULE_DIR ${CMAKE_CURRENT_BINARY_DIR}/include)
 set(PROJECT_MODULE_FILES ${MODULE_DIR}/vgrid_descriptors.mod ${MODULE_DIR}/vgrid_utils.mod)
 
-add_library(vgrid-static STATIC vgrid_descriptors.F90 vgrid_utils.F90 vgrid.c)
-add_dependencies(vgrid-static ${PROJECT_NAME}_build_info)
-add_library(vgrid-shared SHARED $<TARGET_OBJECTS:vgrid-static>)
-add_dependencies(vgrid-shared vgrid-static ${PROJECT_NAME}_build_info)
+add_library(${PROJECT_NAME}-static STATIC vgrid_descriptors.F90 vgrid_utils.F90 vgrid.c)
+add_dependencies(${PROJECT_NAME}-static ${PROJECT_NAME}_build_info)
+add_library(${PROJECT_NAME}-shared SHARED $<TARGET_OBJECTS:${PROJECT_NAME}-static>)
+add_dependencies(${PROJECT_NAME}-shared ${PROJECT_NAME}-static ${PROJECT_NAME}_build_info)
 
-set_target_properties(vgrid-static vgrid-shared PROPERTIES
+set_target_properties(${PROJECT_NAME}-static ${PROJECT_NAME}-shared PROPERTIES
   VERSION ${PROJECT_VERSION}
   PUBLIC_HEADER "${PROJECT_INCLUDE_FILES}"
   Fortran_MODULE_DIRECTORY ${MODULE_DIR}
@@ -18,17 +18,17 @@ set_target_properties(vgrid-static vgrid-shared PROPERTIES
   POSITION_INDEPENDENT_CODE ON
   OUTPUT_NAME vgrid)
  
-target_link_libraries(vgrid-static rmn::rmn-static)
-target_link_libraries(vgrid-shared rmn::rmn-shared)
+target_link_libraries(${PROJECT_NAME}-static rmn::rmn-static)
+target_link_libraries(${PROJECT_NAME}-shared rmn::rmn-shared)
 
-install(TARGETS vgrid-static
-  EXPORT vgrid-static-targets
+install(TARGETS ${PROJECT_NAME}-static
+  EXPORT ${PROJECT_NAME}-static-targets
   INCLUDES      DESTINATION include
   PUBLIC_HEADER DESTINATION include
   LIBRARY       DESTINATION lib
   ARCHIVE       DESTINATION lib)
-install(TARGETS vgrid-shared
-  EXPORT vgrid-shared-targets
+install(TARGETS ${PROJECT_NAME}-shared
+  EXPORT ${PROJECT_NAME}-shared-targets
   INCLUDES      DESTINATION include
   PUBLIC_HEADER DESTINATION include
   LIBRARY       DESTINATION lib
