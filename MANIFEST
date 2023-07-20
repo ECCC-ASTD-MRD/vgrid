@@ -13,4 +13,4 @@ URL        : https://gitlab.science.gc.ca/RPN-SI/vgrid
 
 rmn    >= 20.0.0
 tdpack >= 1.6.1
-App     = 0.1.0
+App    >= 1.0.6
