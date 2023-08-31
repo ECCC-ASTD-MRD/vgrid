@@ -13,7 +13,6 @@ stages:
    - trigger
 
 before_script:
-   - export CLICOLOR_FORCE=true
    - source ~/ci-admin/env/init.sh
 
 #----- rhel-8-amd64_gnu-9.3
@@ -253,7 +252,7 @@ package:rhel-8-icelake-64_inteloneapi-2021.4.0:
 build:ubuntu-18.04-amd64_gnu-9.3.0:
    variables:
       ORD_SOUMET_MACH    : gpsc5
-      ORD_SOUMET_IMAGE   : eccc/eccc_all_default_ubuntu-18.04-amd64_latest
+      ORD_SOUMET_IMAGE   : registry.maze.science.gc.ca/ssc-hpcs/generic-job:ubuntu18.04
       ORD_SOUMET_PROJECT : eccc_mrd
    stage: build
    only:
@@ -277,7 +276,7 @@ build:ubuntu-18.04-amd64_gnu-9.3.0:
 test:ubuntu-18.04-amd64_gnu-9.3.0:
    variables:
       ORD_SOUMET_MACH    : gpsc5
-      ORD_SOUMET_IMAGE   : eccc/eccc_all_default_ubuntu-18.04-amd64_latest
+      ORD_SOUMET_IMAGE   : registry.maze.science.gc.ca/ssc-hpcs/generic-job:ubuntu18.04
       ORD_SOUMET_PROJECT : eccc_mrd
    stage: test
    only:
@@ -297,7 +296,7 @@ test:ubuntu-18.04-amd64_gnu-9.3.0:
 package:ubuntu-18.04-amd64_gnu-9.3.0:
    variables:
       ORD_SOUMET_MACH    : gpsc5
-      ORD_SOUMET_IMAGE   : eccc/eccc_all_default_ubuntu-18.04-amd64_latest
+      ORD_SOUMET_IMAGE   : registry.maze.science.gc.ca/ssc-hpcs/generic-job:ubuntu18.04
       ORD_SOUMET_PROJECT : eccc_mrd
    stage: package
    only:
@@ -323,7 +322,7 @@ package:ubuntu-18.04-amd64_gnu-9.3.0:
 build:ubuntu-18.04-amd64_inteloneapi-2022.1.2:
    variables:
       ORD_SOUMET_MACH    : gpsc5
-      ORD_SOUMET_IMAGE   : eccc/eccc_all_default_ubuntu-18.04-amd64_latest
+      ORD_SOUMET_IMAGE   : registry.maze.science.gc.ca/ssc-hpcs/generic-job:ubuntu18.04
       ORD_SOUMET_PROJECT : eccc_mrd
    stage: build
    only:
@@ -347,7 +346,7 @@ build:ubuntu-18.04-amd64_inteloneapi-2022.1.2:
 test:ubuntu-18.04-amd64_inteloneapi-2022.1.2:
    variables:
       ORD_SOUMET_MACH    : gpsc5
-      ORD_SOUMET_IMAGE   : eccc/eccc_all_default_ubuntu-18.04-amd64_latest
+      ORD_SOUMET_IMAGE   : registry.maze.science.gc.ca/ssc-hpcs/generic-job:ubuntu18.04
       ORD_SOUMET_PROJECT : eccc_mrd
    stage: test
    only:
@@ -367,7 +366,7 @@ test:ubuntu-18.04-amd64_inteloneapi-2022.1.2:
 package:ubuntu-18.04-amd64_inteloneapi-2022.1.2:
    variables:
       ORD_SOUMET_MACH    : gpsc5
-      ORD_SOUMET_IMAGE   : eccc/eccc_all_default_ubuntu-18.04-amd64_latest
+      ORD_SOUMET_IMAGE   : registry.maze.science.gc.ca/ssc-hpcs/generic-job:ubuntu18.04
       ORD_SOUMET_PROJECT : eccc_mrd
    stage: package
    only:
@@ -393,7 +392,7 @@ package:ubuntu-18.04-amd64_inteloneapi-2022.1.2:
 build:ubuntu-18.04-amd64_inteloneapi-2021.4.0:
    variables:
       ORD_SOUMET_MACH    : gpsc5
-      ORD_SOUMET_IMAGE   : eccc/eccc_all_default_ubuntu-18.04-amd64_latest
+      ORD_SOUMET_IMAGE   : registry.maze.science.gc.ca/ssc-hpcs/generic-job:ubuntu18.04
       ORD_SOUMET_PROJECT : eccc_mrd
    stage: build
    only:
@@ -417,7 +416,7 @@ build:ubuntu-18.04-amd64_inteloneapi-2021.4.0:
 test:ubuntu-18.04-amd64_inteloneapi-2021.4.0:
    variables:
       ORD_SOUMET_MACH    : gpsc5
-      ORD_SOUMET_IMAGE   : eccc/eccc_all_default_ubuntu-18.04-amd64_latest
+      ORD_SOUMET_IMAGE   : registry.maze.science.gc.ca/ssc-hpcs/generic-job:ubuntu18.04
       ORD_SOUMET_PROJECT : eccc_mrd
    stage: test
    only:
@@ -437,7 +436,7 @@ test:ubuntu-18.04-amd64_inteloneapi-2021.4.0:
 package:ubuntu-18.04-amd64_inteloneapi-2021.4.0:
    variables:
       ORD_SOUMET_MACH    : gpsc5
-      ORD_SOUMET_IMAGE   : eccc/eccc_all_default_ubuntu-18.04-amd64_latest
+      ORD_SOUMET_IMAGE   : registry.maze.science.gc.ca/ssc-hpcs/generic-job:ubuntu18.04
       ORD_SOUMET_PROJECT : eccc_mrd
    stage: package
    only:
@@ -463,7 +462,7 @@ package:ubuntu-18.04-amd64_inteloneapi-2021.4.0:
 build:ubuntu-22.04-amd64_inteloneapi-2022.1.2:
    variables:
       ORD_SOUMET_MACH    : gpsc5
-      ORD_SOUMET_IMAGE   : eccc/eccc_all_default_ubuntu-22.04-amd64_latest
+      ORD_SOUMET_IMAGE   : registry.maze.science.gc.ca/ssc-hpcs/generic-job:ubuntu22.04
       ORD_SOUMET_PROJECT : eccc_mrd
    stage: build
    only:
@@ -488,7 +487,7 @@ build:ubuntu-22.04-amd64_inteloneapi-2022.1.2:
 test:ubuntu-22.04-amd64_inteloneapi-2022.1.2:
    variables:
       ORD_SOUMET_MACH    : gpsc5
-      ORD_SOUMET_IMAGE   : eccc/eccc_all_default_ubuntu-22.04-amd64_latest
+      ORD_SOUMET_IMAGE   : registry.maze.science.gc.ca/ssc-hpcs/generic-job:ubuntu22.04
       ORD_SOUMET_PROJECT : eccc_mrd
    stage: test
    only:
@@ -509,7 +508,7 @@ test:ubuntu-22.04-amd64_inteloneapi-2022.1.2:
 package:ubuntu-22.04-amd64_inteloneapi-2022.1.2:
    variables:
       ORD_SOUMET_MACH    : gpsc5
-      ORD_SOUMET_IMAGE   : eccc/eccc_all_default_ubuntu-22.04-amd64_latest
+      ORD_SOUMET_IMAGE   : registry.maze.science.gc.ca/ssc-hpcs/generic-job:ubuntu22.04
       ORD_SOUMET_PROJECT : eccc_mrd
    stage: package
    only:
@@ -536,7 +535,7 @@ package:ubuntu-22.04-amd64_inteloneapi-2022.1.2:
 build:ubuntu-22.04-amd64_inteloneapi-2023.0.0:
    variables:
       ORD_SOUMET_MACH    : gpsc5
-      ORD_SOUMET_IMAGE   : eccc/eccc_all_default_ubuntu-22.04-amd64_latest
+      ORD_SOUMET_IMAGE   : registry.maze.science.gc.ca/ssc-hpcs/generic-job:ubuntu22.04
       ORD_SOUMET_PROJECT : eccc_mrd
    stage: build
    only:
@@ -561,7 +560,7 @@ build:ubuntu-22.04-amd64_inteloneapi-2023.0.0:
 test:ubuntu-22.04-amd64_inteloneapi-2023.0.0:
    variables:
       ORD_SOUMET_MACH    : gpsc5
-      ORD_SOUMET_IMAGE   : eccc/eccc_all_default_ubuntu-22.04-amd64_latest
+      ORD_SOUMET_IMAGE   : registry.maze.science.gc.ca/ssc-hpcs/generic-job:ubuntu22.04
       ORD_SOUMET_PROJECT : eccc_mrd
    stage: test
    only:
@@ -582,7 +581,7 @@ test:ubuntu-22.04-amd64_inteloneapi-2023.0.0:
 package:ubuntu-22.04-amd64_inteloneapi-2023.0.0:
    variables:
       ORD_SOUMET_MACH    : gpsc5
-      ORD_SOUMET_IMAGE   : eccc/eccc_all_default_ubuntu-22.04-amd64_latest
+      ORD_SOUMET_IMAGE   : registry.maze.science.gc.ca/ssc-hpcs/generic-job:ubuntu22.04
       ORD_SOUMET_PROJECT : eccc_mrd
    stage: package
    only:
@@ -609,7 +608,7 @@ package:ubuntu-22.04-amd64_inteloneapi-2023.0.0:
 build:ubuntu-22.04-amd64_gnu-11.3.0:
    variables:
       ORD_SOUMET_MACH    : gpsc5
-      ORD_SOUMET_IMAGE   : eccc/eccc_all_default_ubuntu-22.04-amd64_latest
+      ORD_SOUMET_IMAGE   : registry.maze.science.gc.ca/ssc-hpcs/generic-job:ubuntu22.04
       ORD_SOUMET_PROJECT : eccc_mrd
    stage: build
    only:
@@ -634,7 +633,7 @@ build:ubuntu-22.04-amd64_gnu-11.3.0:
 test:ubuntu-22.04-amd64_gnu-11.3.0:
    variables:
       ORD_SOUMET_MACH    : gpsc5
-      ORD_SOUMET_IMAGE   : eccc/eccc_all_default_ubuntu-22.04-amd64_latest
+      ORD_SOUMET_IMAGE   : registry.maze.science.gc.ca/ssc-hpcs/generic-job:ubuntu22.04
       ORD_SOUMET_PROJECT : eccc_mrd
    stage: test
    only:
@@ -655,7 +654,7 @@ test:ubuntu-22.04-amd64_gnu-11.3.0:
 package:ubuntu-22.04-amd64_gnu-11.3.0:
    variables:
       ORD_SOUMET_MACH    : gpsc5
-      ORD_SOUMET_IMAGE   : eccc/eccc_all_default_ubuntu-22.04-amd64_latest
+      ORD_SOUMET_IMAGE   : registry.maze.science.gc.ca/ssc-hpcs/generic-job:ubuntu22.04
       ORD_SOUMET_PROJECT : eccc_mrd
    stage: package
    only:
