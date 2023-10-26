@@ -9,7 +9,7 @@ include(ec_init)           # Initialise compilers and ec specific functions
 ec_git_version()           # Get version from git state
 ec_parse_manifest()        # Parse MANIFEST file
 
-project(${NAME} DESCRIPTION "${DESCRIPTION}")
+project(${NAME} DESCRIPTION "${DESCRIPTION}" LANGUAGES C Fortran)
 set(PROJECT_VERSION ${VERSION}${STATE})
 set(vgrid_VERSION ${PROJECT_VERSION} CACHE INTERNAL "vgrid version" FORCE) # Needed for cascaded version identification
 message(STATUS "(EC) ${PROJECT_NAME} version = ${PROJECT_VERSION}")
@@ -20,8 +20,6 @@ if (EC_INIT_DONE LESS 2)
    include(CTest)
    add_custom_target(check COMMAND CTEST_OUTPUT_ON_FAILURE=true ${CMAKE_CTEST_COMMAND})
 endif()
-
-enable_language(C Fortran)
 
 include(ec_doxygen)          # Doxygen target (-DWITH_DOC=TRUE)
 include(ec_compiler_presets)
