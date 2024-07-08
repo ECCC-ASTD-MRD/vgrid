@@ -3674,7 +3674,7 @@ static int C_genab_1003(float *hybuser, int nk, float rcoef, double ptop_8, doub
     (*ip1_m)[k] = ip1;
     hyb = pres + ( 1. - pres ) * ptop_8/pref_8;
     if( k == 0){
-      if( memcmp( &(hybuser[k]), &f_zero, sizeof(float)/sizeof(char)) ){
+      if( memcmp( &(hybuser[k]), &f_zero, sizeof(float)/sizeof(char)) == 0 ){
 	// Complete set
 	complete = 1;
 	hybtop = hyb;
