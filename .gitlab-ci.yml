@@ -16,9 +16,9 @@ before_script:
    - source ~/ci-admin/env/init.sh
    - export PIPELINE_SUBDIR=${ECCI_BUILD_DIR}/precaution/${CI_PROJECT_PATH}/${CI_BUILD_REF_NAME}/${CI_PIPELINE_ID}
 
-#----- rhel-8-icelake-64_inteloneapi-2024.0.1
+#----- rhel-8-icelake-64_inteloneapi-2024.2.0
 
-build:rhel-8-icelake-64_inteloneapi-2024.0.1:
+build:rhel-8-icelake-64_inteloneapi-2024.2.0:
    stage: build
    tags:
       - concurrent
@@ -28,17 +28,17 @@ build:rhel-8-icelake-64_inteloneapi-2024.0.1:
       - tags
    script:
       - set +e
-      - source ${ECCI_ENV}/latest/rhel-8-icelake-64/inteloneapi-2024.0.1.sh
+      - source ${ECCI_ENV}/latest/rhel-8-icelake-64/inteloneapi-2024.2.0.sh
       - . r.load.dot ${ECCI_PROCESS_SSM}/libs
       - set -e
-      - mkdir -pv ${PIPELINE_SUBDIR}/build_rhel-8-icelake-64_inteloneapi-2024.0.1
+      - mkdir -pv ${PIPELINE_SUBDIR}/build_rhel-8-icelake-64_inteloneapi-2024.2.0
       - SRC_DIR=$(pwd)
-      - cd ${PIPELINE_SUBDIR}/build_rhel-8-icelake-64_inteloneapi-2024.0.1
+      - cd ${PIPELINE_SUBDIR}/build_rhel-8-icelake-64_inteloneapi-2024.2.0
       - cmake ${SRC_DIR}
       - time make -j $NCPUS
    allow_failure: true
 
-test:rhel-8-icelake-64_inteloneapi-2024.0.1:
+test:rhel-8-icelake-64_inteloneapi-2024.2.0:
    stage: test
    tags:
       - concurrent
@@ -47,17 +47,17 @@ test:rhel-8-icelake-64_inteloneapi-2024.0.1:
       - dev
       - tags
    dependencies:
-      - build:rhel-8-icelake-64_inteloneapi-2024.0.1
+      - build:rhel-8-icelake-64_inteloneapi-2024.2.0
    script:
       - set +e
-      - source ${ECCI_ENV}/latest/rhel-8-icelake-64/inteloneapi-2024.0.1.sh
+      - source ${ECCI_ENV}/latest/rhel-8-icelake-64/inteloneapi-2024.2.0.sh
       - . r.load.dot ${ECCI_PROCESS_SSM}/libs ${ECCI_PROCESS_SSM}/utils
       - set -e
-      - cd ${PIPELINE_SUBDIR}/build_rhel-8-icelake-64_inteloneapi-2024.0.1
+      - cd ${PIPELINE_SUBDIR}/build_rhel-8-icelake-64_inteloneapi-2024.2.0
       - make check
    allow_failure: true
 
-package:rhel-8-icelake-64_inteloneapi-2024.0.1:
+package:rhel-8-icelake-64_inteloneapi-2024.2.0:
    stage: package
    tags:
       - concurrent
@@ -67,15 +67,15 @@ package:rhel-8-icelake-64_inteloneapi-2024.0.1:
       - tags
       - schedules
    dependencies:
-      - build:rhel-8-icelake-64_inteloneapi-2024.0.1
+      - build:rhel-8-icelake-64_inteloneapi-2024.2.0
    environment:
       name: testing
    script:
       - set +e
-      - source ${ECCI_ENV}/latest/rhel-8-icelake-64/inteloneapi-2024.0.1.sh
+      - source ${ECCI_ENV}/latest/rhel-8-icelake-64/inteloneapi-2024.2.0.sh
       - . r.load.dot ${ECCI_PROCESS_SSM}/libs
       - set -e
-      - cd ${PIPELINE_SUBDIR}/build_rhel-8-icelake-64_inteloneapi-2024.0.1
+      - cd ${PIPELINE_SUBDIR}/build_rhel-8-icelake-64_inteloneapi-2024.2.0
       - make package
       - ~/ci-admin-bundle/bin/ci-package-ssm.sh package ${ECCI_PROCESS}
    allow_failure: true
