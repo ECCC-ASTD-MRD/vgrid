@@ -66,7 +66,7 @@ static int similar_vec_r8(double *vec1, int n1, double *vec2, int n2, double pre
 	      return(-1);
 	    }
 	  } else {
-	    if ( fabs(vec1[i]-vec2[i])/fabs(vec1[i]) > precision ){
+	    if ( fabs((vec1[i]-vec2[i])/vec1[i]) > precision ){
 	      //printf("non zero, vec1[i] = %f, vec2[i] = %f, fabs(vec1[i]-vec2[i])/vec1[i]= %f\n", vec1[i], vec2[i], fabs(vec1[i]-vec2[i])/vec1[i]);
 	      return(-1);
 	    }
@@ -481,7 +481,7 @@ int check_gen_5005_5100_21001_21002(vgrid_descriptor *vgd, int vcode){
 		     NULL, &pref_8, &ptop_out_8, 0, 0, &dhm, &dht, 0) == VGD_ERROR) {
       return(VGD_ERROR);
     }
-    if( abs(ptop_out_8 - 5.611828)/5.611828 > 1.e-4){
+    if( fabs(ptop_out_8 - 5.611828)/5.611828 > 1.e-4){
       printf("   Error with ptop_out_8 for Vcode %d\n", vcode);
       return(VGD_ERROR);
     }
@@ -491,7 +491,7 @@ int check_gen_5005_5100_21001_21002(vgrid_descriptor *vgd, int vcode){
 		      NULL, &pref_8, &ptop_out_8, 0, 0, &dhm, &dht, NULL, 1) ){
       return(VGD_ERROR);
     }
-    if( abs(ptop_out_8 - 5.611828)/5.611828 > 1.e-4){
+    if( fabs(ptop_out_8 - 5.611828)/5.611828 > 1.e-4){
       printf("   Error with ptop_out_8 for Vcode %d\n", vcode);
       return(VGD_ERROR);
     }
