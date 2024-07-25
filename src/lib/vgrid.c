@@ -6149,7 +6149,7 @@ static int C_gen_legacy_desc(vgrid_descriptor **self, int unit, int *keylist , i
           Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: ptop from HY is %f while it is %f in PT record\n",__func__,ptop_8/100.,ptop);
           goto bomb;
         }
-	      Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: HY record consistent with PT\n",__func__);
+	      Lib_Log(APP_LIBVGRID,APP_INFO,"%s: HY record consistent with PT\n",__func__);
       }
       if( e1_key >= 0){
         Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: add support to 1004 etasef coordinate",__func__);
@@ -6202,7 +6202,7 @@ static int C_gen_legacy_desc(vgrid_descriptor **self, int unit, int *keylist , i
     }
     if( Cvgd_new_build_vert2(self, kind, 1, nb, var.ig1, var.ig2, NULL, NULL, NULL, NULL, NULL, NULL, a_m_8, b_m_8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ip1, NULL, NULL, nb, 0, 0) == VGD_ERROR ){
       goto bomb;
-    }	
+    }
   } else if ( kind == 5 ){
     App_Log(APP_INFO,"%s: Hybrid coordinate found\n",__func__);
     if( C_get_consistent_hy(unit, var, &va2, "HY  ") == VGD_ERROR ){
