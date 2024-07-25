@@ -112,7 +112,7 @@ contains
        call app_log(APP_INFO,app_msg)
       endif
     if(trim(val(2)).eq.'undef' .and. .not. cpg_samefile_L)then
-       write(app_msg,*) 'rgument -d (destination_file) is mandatory'
+       write(app_msg,*) 'argument -d (destination_file) is mandatory'
        call app_log(APP_ERROR,app_msg)
        call cpg_print_doc
        return
@@ -146,7 +146,7 @@ contains
       endif
     if(.not.cpg_samefile_L)then
        stat=fnom(cpg_lui,val(1),"RND+R/O",0)
-       stat=fnom(cpg_luo,val(2),'RND',0)
+       stat=fnom(cpg_luo,val(2),'RND+R/W',0)
        if(stat.lt.0)then
           write(app_msg,*) 'Problem with fnom on file ',trim(val(2))
           call app_log(APP_ERROR,app_msg)
