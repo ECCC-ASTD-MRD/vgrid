@@ -25,7 +25,7 @@ include(ec_doxygen)          # Doxygen target (-DWITH_DOC=TRUE)
 include(ec_compiler_presets)
 include(ec_openmp)           # Enable OpenMP (-DWITH_OPENMP=TRUE)
 
-# Needed since ubunut 20.04
+# Needed since ubuntu 20.04
 set(CMAKE_EXE_LINKER_FLAGS "-Wl,--no-as-needed -ldl")
 
 if (NOT rmn_FOUND)
@@ -42,14 +42,21 @@ add_subdirectory(src/utils utils)
 #add_subdirectory(src/examples examples)
 add_subdirectory(test test)
 
+set(VGRID_BUILD_SHARED ON)
+if (${RMN_LLVM_ADDRESS_SANITIZER})
+    set(VGRID_BUILD_SHARED OFF)
+endif()
+
 #----- Generate the config file for the project to be usable via cmake's find_package command
 set(INCLUDE_INSTALL_DIR include)
 set(LIB_INSTALL_DIR     lib)
 set(CONFIG_INSTALL_DIR  "${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME}-${PROJECT_VERSION}")
 
-install(EXPORT ${PROJECT_NAME}-shared-targets
+if (${VGRID_BUILD_SHARED})
+  install(EXPORT ${PROJECT_NAME}-shared-targets
     NAMESPACE ${PROJECT_NAME}::
     DESTINATION ${CONFIG_INSTALL_DIR})
+endif()
 install(EXPORT ${PROJECT_NAME}-static-targets
     NAMESPACE ${PROJECT_NAME}::
     DESTINATION ${CONFIG_INSTALL_DIR})
