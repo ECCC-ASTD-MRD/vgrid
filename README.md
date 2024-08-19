@@ -26,20 +26,16 @@ architecture.  This will load the specified compiler, set the
 . $ECCI_ENV/latest/ubuntu-22.04-amd-64/gnu.sh
 ```
 
-Since the default version of CMake available on ECCC systems is probably too
-old, you need to load a version newer than 3.20.  For example: `. ssmuse-sh
--d main/opt/cmake/cmake-3.21.1`.
-
-You will also need a version of librmn and optionally tdpack: either load
-them from ssm, both are in rpn/libs domain (. r.load.dot rpn/libs/...) or
-provide the path to cmake install directories if you compiled them.
+You also need a version of librmn and optionally tdpack: either load them
+from ssm, both are in rpn/libs domain (. r.load.dot rpn/libs/...) or provide
+the path to cmake install directories if you compiled them.
 
 ## Build and install
 
 ```
 mkdir build
 cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=[your  install path] [-Drmn_ROOT=[path to librmn] -Dtdpack_ROOT=[path to tdpack]]
+cmake .. -DCMAKE_INSTALL_PREFIX=[your install path] [-Drmn_ROOT=[path to librmn] -Dtdpack_ROOT=[path to tdpack]
 make -j 4
 make check
 make package
@@ -50,8 +46,8 @@ make package
 ## Build dependencies
 
 - CMake 3.20+
-- librmn with shared libraries (https://github.com/ECCC-ASTD-MRD/librmn/)
-- tdpack with shared libraries (https://github.com/ECCC-ASTD-MRD/tdpack/)
+- librmn: https://github.com/ECCC-ASTD-MRD/librmn/
+- tdpack: https://github.com/ECCC-ASTD-MRD/tdpack/
 
 `cmake_rpn` is included as a git submodule.  Please clone with the
 `--recursive` option or run `git submodule update --init --recursive` in the
