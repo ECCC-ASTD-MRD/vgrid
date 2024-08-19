@@ -37,15 +37,16 @@ if (NOT tdpack_FOUND)
 endif()
 
 link_libraries("-Wl,--disable-new-dtags")
-add_subdirectory(src/lib lib)
-add_subdirectory(src/utils utils)
-#add_subdirectory(src/examples examples)
-add_subdirectory(test test)
 
 set(VGRID_BUILD_SHARED ON)
 if (${RMN_LLVM_ADDRESS_SANITIZER})
     set(VGRID_BUILD_SHARED OFF)
 endif()
+
+add_subdirectory(src/lib lib)
+add_subdirectory(src/utils utils)
+#add_subdirectory(src/examples examples)
+add_subdirectory(test test)
 
 #----- Generate the config file for the project to be usable via cmake's find_package command
 set(INCLUDE_INSTALL_DIR include)
