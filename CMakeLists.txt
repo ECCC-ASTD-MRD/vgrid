@@ -24,6 +24,7 @@ endif()
 include(ec_doxygen)          # Doxygen target (-DWITH_DOC=TRUE)
 include(ec_compiler_presets)
 include(ec_openmp)           # Enable OpenMP (-DWITH_OPENMP=TRUE)
+set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O1")
 
 # Needed since ubuntu 20.04
 set(CMAKE_EXE_LINKER_FLAGS "-Wl,--no-as-needed -ldl")
