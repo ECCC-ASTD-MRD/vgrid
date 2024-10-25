@@ -123,6 +123,4 @@ program constructor
 
   call ut_report(ok,'Grid_Descriptors, vgd_get on DHM DHT')  
 
-  stat=fstfrm(lu)
-
 end program constructor

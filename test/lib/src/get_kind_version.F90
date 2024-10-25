@@ -60,6 +60,4 @@ program constructor
 
   call ut_report(ok,'Grid_Descriptors, vgd_get, LOGP 5002')  
 
-  stat=fstfrm(lu)
-
 end program constructor
