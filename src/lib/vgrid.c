@@ -3702,7 +3702,7 @@ static int C_genab_2001(float *pres, int nk, double **a_m_8, double **b_m_8, int
 
   // Andre Plante May 2015. 
   char ok = 1;
-  int k, ip1;
+  int k;
   
   if( my_alloc_double(a_m_8, nk, "C_genab_2001: malloc error with a_m_8") == VGD_ERROR )
     return(VGD_ERROR);
@@ -4167,7 +4167,7 @@ static int c_vgrid_genab_5005(float *hybuser, int nk, int *nl_m, int *nl_t, floa
   char ok = 1;
   int k;
   float hybtop, rcoef;
-  double zsrf_8, ztop_8, zeta_8, lamda_8, pr1, zetau_8, zeta2_8;
+  double zsrf_8, ztop_8, zeta_8, lamda_8, pr1, zetau_8;
   
   *nl_m = nk + 2;
   *nl_t = nk + 2;
@@ -5793,7 +5793,7 @@ int Cvgd_new_gen3(vgrid_descriptor **self, int kind, int version, float *hyb, in
   case 1:	
     Lib_Log(APP_LIBVGRID,APP_ERROR,"%s: kind=%d, version=%d\n cannot be generated, function to do this is in Nemo\n",__func__,kind,version);
     return(VGD_ERROR);
-    break;
+    /*    break; */
   case 1001:	
     nk   = size_hyb;
     nl_m = size_hyb;
@@ -5819,7 +5819,7 @@ int Cvgd_new_gen3(vgrid_descriptor **self, int kind, int version, float *hyb, in
   case 1003:
     Lib_Log(APP_LIBVGRID,APP_ERROR,"%s:  kind=%d, version=%d\n cannot be generated, please use kind 1 of version 2\n",__func__,kind,version);
     return(VGD_ERROR);
-    break;
+    /*    break; */
   case 2001:
     nk   = size_hyb;
     nl_m = size_hyb;
