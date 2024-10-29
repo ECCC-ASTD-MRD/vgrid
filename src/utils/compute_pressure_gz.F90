@@ -86,6 +86,7 @@ contains
          'YES        ','undef      ','undef      '/)
     npos=-111
     call ccard(cle,def,val,ncle,npos)
+    ! app_loglevel is by default set to ALWAYS, and can be raised to INFO with -verbose command line option
     stat=app_loglevel(trim(val(5))) 
 
     if(trim(val(10)).eq.'undef')then
@@ -516,7 +517,8 @@ contains
          return    
     end select
     !
-    if(app_loglevel('').gt.1)then
+    ! When -verbose option was given (APP_INFO = 5)
+    if(app_loglevel(' ').gt.1)then
        write(app_msg,*) 'There are ',nks,' sorted levels'
        call app_log(APP_INFO,app_msg)
        if(l_sort_as_kind.ne.-1) then
@@ -1404,7 +1406,7 @@ call app_start()
      stat=app_end(-1)
      error stop
   endif
-  if(app_loglevel('').gt.1)then
+  if(app_loglevel(' ').gt.1)then
      if(vgd_print(cpg_vgd) == VGD_ERROR)then
         stat=app_end(-1)
         error stop
