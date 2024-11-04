@@ -80,13 +80,13 @@ contains
     status=VGD_ERROR
     cle=(/'s.         ','d.         ','samefile   ','levels     ','verbose    ','kind       ','version    ',&
          'allow_sigma','etiket     ','compute    '/)
-    val=(/'undef      ','undef      ','undef      ','ALL_LEVELS ','undef      ','undef      ','undef      ',&
+    val=(/'undef      ','undef      ','undef      ','ALL_LEVELS ','WARNING    ','undef      ','undef      ',&
          'NO         ','undef      ','undef      '/)
-    def=(/'undef      ','undef      ','YES        ','ALL_LEVELS ','INFO       ','undef      ','undef      ',&
+    def=(/'undef      ','undef      ','YES        ','ALL_LEVELS ','DEBUG      ','undef      ','undef      ',&
          'YES        ','undef      ','undef      '/)
     npos=-111
     call ccard(cle,def,val,ncle,npos)
-    ! app_loglevel is by default set to ALWAYS, and can be raised to INFO with -verbose command line option
+    ! app_loglevel is by default set to WARNING, and can be raised to DEBUG with -verbose command line option
     stat=app_loglevel(trim(val(5))) 
 
     if(trim(val(10)).eq.'undef')then
@@ -120,17 +120,17 @@ contains
     endif
     cpg_levels_S=trim(val(4))
     if(trim(cpg_levels_S) == "ALL_LEVELS")then
-      call app_log(APP_INFO,'Results will be computed on all levels')
+      call app_log(APP_ALWAYS,'Results will be computed on all levels')
     else
        write(app_msg,*) 'Results will be computed on '//trim(cpg_levels_S)//' levels'
-       call app_log(APP_INFO,app_msg)
+       call app_log(APP_ALWAYS,app_msg)
       endif
     if(trim(val(6)).eq.'undef')then
        cpg_kind=-1
     else
        read(val(6),*)cpg_kind
        write(app_msg,*) 'Looking for vertical descriptor of kind ',cpg_kind
-       call app_log(APP_INFO,app_msg)
+       call app_log(APP_ALWAYS,app_msg)
       endif
     if(trim(val(7)).eq.'undef')then
        cpg_version=-1
@@ -143,7 +143,7 @@ contains
     endif
     if(cpg_version.ne.-1)then
        write(app_msg,*) 'Looking for vertical descriptor of version ',cpg_version
-       call app_log(APP_INFO,app_msg)
+       call app_log(APP_ALWAYS,app_msg)
       endif
     if(.not.cpg_samefile_L)then
        stat=fnom(cpg_lui,val(1),"RND+R/O",0)
@@ -189,7 +189,7 @@ contains
        cpg_zap_etiket_L=.true.
        cpg_etiket_S=trim(val(9))
        write(app_msg,*) 'Etiket of output records will be zap to ',cpg_etiket_S
-       call app_log(APP_ERROR,app_msg)
+       call app_log(APP_INFO,app_msg)
     endif
     status=VGD_OK
   end function cpg_process_arguments
@@ -319,7 +319,8 @@ contains
          rec%nk,rec%ip1,rec%ip2,rec%ip3,rec%typvar,rec%nomvar,rec%etiket,rec%grtyp,&
          rec%ig1,rec%ig2,rec%ig3,rec%ig4,rec%datyp,F_rewrit)
     if(ier.ne.0)then
-       write(6,*) 'ERROR: in cpg_fstecr, ier=',ier
+       write(app_msg,*) 'in cpg_fstecr, ier=',ier
+       call app_log(APP_ERROR,app_msg)
        return
     endif
     status = VGD_OK
@@ -348,12 +349,12 @@ contains
     if(.not.present(sorted_keys))then
        write(app_msg,*) 'cpg_sort_key_by_levels: argument sorted_keys must be passed'
        call app_log(APP_ERROR,app_msg)
-         return
+       return
     endif
     if(.not.present(unsorted_keys))then
        write(app_msg,*) 'cpg_sort_key_by_levels: argument unsorted_keys must be passed'
        call app_log(APP_ERROR,app_msg)
-        return
+       return
     endif
     l_remove_duplicate_L=.false.
     if(present(remove_duplicate_L))l_remove_duplicate_L=remove_duplicate_L
@@ -364,14 +365,14 @@ contains
     nkns=size(unsorted_keys)
     if(nkns == 0)then
        call app_log(APP_ERROR,'cpg_sort_key_by_levels: unsorted_keys list is empty')
-         return
+       return
     endif
     write(app_msg,*) 'There are ',nkns,' unsorted levels'
     call app_log(APP_INFO,app_msg)
     allocate(keys(nkns),hyb(nkns),ip1s(nkns),stat=ier)
     if (ier /= 0)then
       call app_log(APP_ERROR,'cpg_sort_key_by_levels: allocation problem 1 in cpg_sort_key_by_levels')
-       return         
+      return         
     endif
     keys=unsorted_keys
     ! Sort levels by hyb values
@@ -380,7 +381,7 @@ contains
        if (ier /= 0)then
           write(app_msg,*) 'cpg_sort_key_by_levels: with cpg_fstprm on unsorted_keys k=',k
           call app_log(APP_ERROR,app_msg)
-               return         
+          return         
        endif
        call convip(prm%ip1,hyb(k),kind,-1,dummy_S,.false.)
        ip1s(k)=prm%ip1
@@ -417,7 +418,7 @@ contains
           if(count.eq.0.and.k.eq.1)then
              write(app_msg,*) 'cpg_sort_key_by_levels: no level of kind ',l_only_kind,' found'
              call app_log(APP_WARNING,app_msg)
-                     if (associated(sorted_keys))deallocate(sorted_keys)
+             if(associated(sorted_keys))deallocate(sorted_keys)
              if(present(sorted_levels).and.associated(sorted_levels))deallocate(sorted_levels)
              if(present(sorted_ip1s).and.associated(sorted_ip1s))deallocate(sorted_ip1s)
              return
@@ -517,8 +518,8 @@ contains
          return    
     end select
     !
-    ! When -verbose option was given (APP_INFO = 5)
-    if(app_loglevel(' ').gt.1)then
+    ! When -verbose option was given
+    if(app_loglevel(' ').ge.APP_WARNING)then
        write(app_msg,*) 'There are ',nks,' sorted levels'
        call app_log(APP_INFO,app_msg)
        if(l_sort_as_kind.ne.-1) then
@@ -532,7 +533,7 @@ contains
        do k=1,nks
           ier=cpg_fstprm(sorted_keys(k),prm)
           if (ier /= 0)then
-             return         
+             return
           endif
           call convip(prm%ip1,hyb(k),kind,-1,dummy_S,.false.)      
           write(app_msg,*) 'Sorted levels, k=',k,hyb(k),ip1s(k)
@@ -582,8 +583,8 @@ contains
           error stop
        endif
     case DEFAULT
-      write(app_msg,*) 'Vcode ',vcode,' not supported, please contact developer to add this'
-      call app_log(APP_ERROR,app_msg)
+       write(app_msg,*) 'Vcode ',vcode,' not supported, please contact developer to add this'
+       call app_log(APP_ERROR,app_msg)
        stat=app_end(-1)
        error stop
     end select
@@ -644,7 +645,7 @@ contains
        endif
        if( infon == 0 )then
          write(app_msg,*) 'There is no VT or TT record in the input file'
-         call app_log(APP_ERROR,app_msg)
+         call app_log(APP_ALWAYS,app_msg)
           return
        endif
     endif
@@ -1367,7 +1368,8 @@ contains
          record%lng,record%dltf,record%ubc,record%extra1,record%extra2, &
          record%extra3)
     if (error < 0) then
-       write(6,*) 'ERROR: in cpg_fstprm, cannot fstprm for fstkey ',fstkey
+       write(app_msg,*) 'cpg_fstprm: cannot fstprm for fstkey ',fstkey
+       call app_log(APP_ERROR,app_msg)
        return
     end if
     nhours=record%deet*record%npas/3600.d0
@@ -1406,7 +1408,7 @@ call app_start()
      stat=app_end(-1)
      error stop
   endif
-  if(app_loglevel(' ').gt.1)then
+  if(app_loglevel(' ').gt.APP_WARNING)then
      if(vgd_print(cpg_vgd) == VGD_ERROR)then
         stat=app_end(-1)
         error stop
