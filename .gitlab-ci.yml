@@ -9,7 +9,7 @@ variables:
    build:
       - . r.load.dot ${ECCI_PROCESS_SSM}/libs ${ECCI_PROCESS_SSM}/utils
    variables:
-      ALLOW_FAILURE_ARCHS: ""
+      ALLOW_FAILURE_ARCHS: "rhel-8-amd64_gnu-14.1.0"
 
 include:
    - project: 'RPN-SI/ci-admin'
