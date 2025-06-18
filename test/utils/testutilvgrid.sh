@@ -23,10 +23,18 @@ BIN_PATH=${1}
 VALIDATION_DATA=${2}
 TMPDIR=$(pwd)/data_out
 
+   echo "==============="
+   printf "Multiple tests from util/testutilvgrid.sh\n"
+   printf "=====>  testutilvgrid.sh begins: $(date) ###########\n"
+   echo "==============="
+
 #===========================================================================
 #===========================================================================
 #===========================================================================
 if [ ${convert_toctoc_5002} = oui ];then
+   echo "==============="
+   printf "Testutils: convert_toctoc_5002 START\n"
+   echo "==============="
    rm -f ${TMPDIR}/dm2007050912-00-00_001_sans_p0
    editfst -s ${VALIDATION_DATA}/data_tests/dm2007050912-00-00_001 -d ${TMPDIR}/dm2007050912-00-00_001_sans_p0 <<EOF
       exclure(-1,P0)
@@ -75,6 +83,9 @@ EOF
          exit 1
       fi
    fi
+   echo "==============="
+   printf "Testutils: convert_toctoc_5002 END\n"
+   echo "==============="
 fi
 
 #===========================================================================
@@ -83,6 +94,8 @@ fi
 
 if [ ${add_toctoc} = oui ];then
 
+   echo "==============="
+   printf "Testutils: add_toctoc_ BEGIN\n"
    echo "==============="
    printf "${C_BLUE}Test add_toctoc${C_NC}"
    echo "---------------"
@@ -100,6 +113,9 @@ if [ ${add_toctoc} = oui ];then
          exit 1
       fi
    done
+   echo "==============="
+   printf "Testutils: add_toctoc_ END\n"
+   echo "==============="
 fi
 
 #===========================================================================
@@ -108,6 +124,9 @@ fi
 
 if [ ${compute_pressure_gz} = oui ];then
 
+   echo "==============="
+   printf "Testutils: compute_pressure_gz BEGIN\n"
+   echo "==============="
     function Get_Var_List(){
         VAR_LIST=MOMENTUM
 	if [ ${ITEM} = 2001_from_model_run ];then
@@ -129,7 +148,7 @@ if [ ${compute_pressure_gz} = oui ];then
 	fi
     }
     function Test_Comp_PX_GZ(){
-	set -x
+	#set -x
 	for VAR in $VAR_LIST;do	   
             rm -f $TMPDIR/px tempo
 	    if [ "${2}" = "" ];then
@@ -263,13 +282,18 @@ EOF
 	Test_Comp_PX_GZ pressure TT
     done
 
+   echo "==============="
+   printf "Testutils: compute_pressure_gz END\n"
+   echo "==============="
 fi
 #===========================================================================
 #===========================================================================
 #===========================================================================
 if [ ${print_toctoc} = oui ];then
     
-   echo =================
+   echo "================="
+   printf "Testutils: print_toctoc BEGIN \n"
+   echo "================="
    printf "${C_BLUE}Test print_toctoc${C_NC}"
    echo -----------------
 
@@ -332,6 +356,9 @@ EOF
    done
 
    #rm -f to_erase.txt
+   echo "================="
+   printf "Testutils: print_toctoc END\n"
+   echo "================="
 fi
 
 #===========================================================================
@@ -340,6 +367,9 @@ fi
 
 if [ ${vgrid_sample} = oui ];then
 
+   echo "==================="
+   printf "Testutils: vgrid_sample BEGIN (uses DIFF to compare!)\n"
+   printf "Testutils: If test fails, look for DIFF ERROR to review and judge the differences yourself!)\n"
    echo "==================="
    printf "${C_BLUE}Test r.vgrid_sample${C_NC}"
    echo "-------------------"
@@ -366,16 +396,16 @@ if [ ${vgrid_sample} = oui ];then
     for file in $(ls ${VALIDATION_DATA}/data_tests_res/vgrid_sample/${EC_ARCH}/out_dir/*);do
 	   ((n_file_checked=n_file_checked+1))
       ${BIN_PATH}/r.print_toctoc -no_box -fst out_dir/${file##*/} > ${file##*/}_tests.txt
-	   ${BIN_PATH}/r.print_toctoc -no_box -fst ${file} > ${file##*/}_ctrl.txt
-	   if diff  ${file##*/}_tests.txt ${file##*/}_ctrl.txt;then
+      ${BIN_PATH}/r.print_toctoc -no_box -fst ${file} > ${file##*/}_ctrl.txt
+      if diff  ${file##*/}_tests.txt ${file##*/}_ctrl.txt;then
          :
       else
-	      OK=0
-         printf "${C_RED}ERROR with ${file##*/} on r.vgrid_sample test 1${C_NC}"
+	 OK=0
+         printf "${C_RED} DIFF ERROR with ${file##*/} on r.vgrid_sample test 1${C_NC}"
       fi
    done
    if [ ${OK} = 0 ];then
-      printf "${C_RED}ERROR with r.vgrid_sample for r.vgrid_sample test 1 for some Vcode, see diff output above${C_NC}"
+      printf "${C_RED} DIFF ERROR with r.vgrid_sample for r.vgrid_sample test 1 for some Vcode, see diff output above${C_NC}"
       exit 1
    fi    
    if [ ${n_file_checked} = 0 ];then
@@ -414,11 +444,11 @@ EOF
          :
       else
 	  OK=0
-          printf "${C_RED}ERROR with ${file##*/} on r.vgrid_sample test 2${C_NC}"
+          printf "${C_RED} DIFF ERROR with ${file##*/} on r.vgrid_sample test 2${C_NC}"
       fi
    done
    if [ ${OK} = 0 ];then
-      printf "${C_RED}ERROR with r.vgrid_sample for r.vgrid_sample test 2 for some Vcode, see diff output above${C_NC}"
+      printf "${C_RED} DIFF ERROR with r.vgrid_sample for r.vgrid_sample test 2 for some Vcode, see diff output above${C_NC}"
       exit 1
    fi
    if [ ${n_file_checked} = 0 ];then
@@ -426,6 +456,9 @@ EOF
 	   exit 1
    fi
 
+   echo "==================="
+   printf "Testutils: vgrid_sample END   (uses DIFF to compare!)\n"
+   echo "==================="
 fi
 
 echo 

@@ -579,6 +579,7 @@ static int same_vec_i(int *vec1, int n1, int *vec2, int n2) {
 }
 
 static int same_vec_r8(double *vec1, int n1, double *vec2, int n2) {
+//VL this routine is only useful if comparing with same arch, compiler results
   if(vec1) {
     if (vec2) {
       if ( n1 == n2 ) {	
@@ -601,6 +602,7 @@ static int same_vec_r8(double *vec1, int n1, double *vec2, int n2) {
 }
 
 static int similar_vec_r8(double *vec1, int n1, double *vec2, int n2) {
+//VL this routine is good for comparing results expected to be non bit-reprod.
   int i;
   if(vec1) {
     if (vec2) {
@@ -612,7 +614,9 @@ static int similar_vec_r8(double *vec1, int n1, double *vec2, int n2) {
 	      return(-1);
 	    }
 	  } else {
-	    if ( fabs(vec1[i]-vec2[i])/fabs(vec1[i]) > 1.e-15 ){
+            // e-15 is too strict if comparing values between compilers,arch
+	    //if ( fabs(vec1[i]-vec2[i])/fabs(vec1[i]) > 1.e-15 ){
+	    if ( fabs(vec1[i]-vec2[i])/fabs(vec1[i]) > 1.e-5 ){
 	      //printf("non zero, vec1[i] = %f, vec2[i] = %f, fabs(vec1[i]-vec2[i])/vec1[i]= %f\n", vec1[i], vec2[i], fabs(vec1[i]-vec2[i])/vec1[i]);
 	      return(-1);
 	    }
@@ -805,15 +809,18 @@ int Cvgd_vgdcmp(vgrid_descriptor *vgd1, vgrid_descriptor *vgd2) {
   if(same_vec_i (vgd1->ip1_m, vgd1->nl_m, vgd2->ip1_m, vgd2->nl_m) != 0) return (-9);
   if(same_vec_i (vgd1->ip1_t, vgd1->nl_t, vgd2->ip1_t, vgd2->nl_t) != 0) return (-10);
   if(same_vec_i (vgd1->ip1_w, vgd1->nl_w, vgd2->ip1_w, vgd2->nl_w) != 0) return (-24);
-  if(same_vec_r8(vgd1->a_m_8, vgd1->nl_m, vgd2->a_m_8, vgd2->nl_m) != 0) return (-11);
+  //if(same_vec_r8(vgd1->a_m_8, vgd1->nl_m, vgd2->a_m_8, vgd2->nl_m) != 0) return (-11);
+  if(similar_vec_r8(vgd1->a_m_8, vgd1->nl_m, vgd2->a_m_8, vgd2->nl_m) != 0) return (-11);
   //if(same_vec_r8(vgd1->b_m_8, vgd1->nl_m, vgd2->b_m_8, vgd2->nl_m) != 0) return (-12);
   if(similar_vec_r8(vgd1->b_m_8, vgd1->nl_m, vgd2->b_m_8, vgd2->nl_m) != 0) return (-12);
   //if(same_vec_r8(vgd1->c_m_8, vgd1->nl_m, vgd2->c_m_8, vgd2->nl_m) != 0) return (-18);
-  if(same_vec_r8(vgd1->a_t_8, vgd1->nl_t, vgd2->a_t_8, vgd2->nl_t) != 0) return (-13);
+  //if(same_vec_r8(vgd1->a_t_8, vgd1->nl_t, vgd2->a_t_8, vgd2->nl_t) != 0) return (-13);
+  if(similar_vec_r8(vgd1->a_t_8, vgd1->nl_t, vgd2->a_t_8, vgd2->nl_t) != 0) return (-13);
   //if(same_vec_r8(vgd1->b_t_8, vgd1->nl_t, vgd2->b_t_8, vgd2->nl_t) != 0) return (-14);
   if(similar_vec_r8(vgd1->b_t_8, vgd1->nl_t, vgd2->b_t_8, vgd2->nl_t) != 0) return (-14);
   //if(same_vec_r8(vgd1->c_t_8, vgd1->nl_t, vgd2->c_t_8, vgd2->nl_t) != 0) return (-19);
-  if(same_vec_r8(vgd1->a_w_8, vgd1->nl_w, vgd2->a_w_8, vgd2->nl_w) != 0) return (-25);
+  //if(same_vec_r8(vgd1->a_w_8, vgd1->nl_w, vgd2->a_w_8, vgd2->nl_w) != 0) return (-25);
+  if(similar_vec_r8(vgd1->a_w_8, vgd1->nl_w, vgd2->a_w_8, vgd2->nl_w) != 0) return (-25);
   if(similar_vec_r8(vgd1->b_w_8, vgd1->nl_w, vgd2->b_w_8, vgd2->nl_w) != 0) return (-26);
   //if(same_vec_r8(vgd1->c_w_8, vgd1->nl_w, vgd2->c_w_8, vgd2->nl_w) != 0) return (-27);
  

@@ -31,6 +31,12 @@ from ssm, both are in rpn/libs domain (. r.load.dot rpn/libs/...) or provide
 the path to cmake install directories if you compiled them.
 
 ## Build and install
+## For <make check> this requires to load rpn/utils (editfst,fstcomp)
+## and data at: ECCI_DATA_DIR/vgrid/1.9.b3/data_tests_res/vgrid_sample/{EC_ARCH}
+## And listing of each test will be in build/Testing/Temporary/LastTest.log
+## To isolate specific test(s), limit files under test/lib/src
+## Note that the vgrid_sample tests uses 'diff' to compare
+## If the diff fails, it will be shown above the line DIFF ERROR
 
 ```
 mkdir build
