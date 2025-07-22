@@ -179,7 +179,7 @@ EOF
 		exit 1
 	    fi
             printf "${C_BLUE}TESTING ${1} computations${MESSAGE_TTVT}, for ${VAR} levels on file ${file}${C_NC}"
-	    printf "${C_BLUE}  Inpuit file is $PWD/tempo${C_NC}"
+	    printf "${C_BLUE}  Input file is $PWD/tempo${C_NC}"
             ${BIN_PATH}/r.compute_pressure_gz \
 		       -compute ${1}\
 		       -allow_sigma\

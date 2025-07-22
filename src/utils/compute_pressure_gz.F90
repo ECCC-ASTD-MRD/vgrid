@@ -282,7 +282,7 @@ contains
     if( .not. associated(F_f%data) )then
        allocate(F_f%data(ni,nj),stat=ier)
        if(ier /= 0)then
-          write(app_msg,*) 'cpg_get_rec, cannot alloacte F_f%data of size ->',ni,' x',nj
+          write(app_msg,*) 'cpg_get_rec, cannot allocate F_f%data of size ->',ni,' x',nj
           call app_log(APP_ERROR,app_msg)
               return
        endif
@@ -745,7 +745,8 @@ contains
     integer, dimension(:), pointer :: ip1s_m, ip1s_t
     integer :: i, j, ier, k, nk, nij, kp, ig1, ig2,vcode
     logical :: thermo_L, momentum_L, vt_L
-    external :: mfotvt
+    external :: mfotvt,fstinf
+    integer :: fstinf
     nullify(gzt, wa, wb, ptr_p1, ptr_p2, ptr_tempo, ip1s_m, ip1s_t, p0%data, p0ls%data, gz%data, prm%data, tt%data, hu%data, vt%data)
     status = VGD_ERROR
     if(vgd_get(cpg_vgd,"VCOD",vcode) == VGD_ERROR)then
@@ -837,7 +838,13 @@ contains
     vt_L = .true.
     ier = cpg_cp_params(prm,p0)
     prm%ip1=ip1s_t(1+kp);
-    if( cpg_get_rec(vt, cpg_lui, match_prm=prm) == VGD_ERROR )then
+    vt_L = fstinf(cpg_lui,vt%ni,vt%nj,vt%nk,-1,' ',-1,-1,-1,' ',vt%nomvar) >=0
+    if (vt_L) then
+       print *,'VIV: vt_L is true, now try to cpg_get_rec on vt'
+       if( cpg_get_rec(vt, cpg_lui, match_prm=prm) == VGD_ERROR ) vt_L = .false.
+    else
+       print *,'VIV: vt_L is false, print warning app_log'
+       call app_log(APP_WARNING,'get_gz_5002_5005: VT not found, using HU,TT to determine VT')
        vt_L = .false.
     endif
     
@@ -892,7 +899,7 @@ contains
        ptr_p2 => ptr_tempo
     end do
     if( F_Vcode == 5002 .and. thermo_L)then
-       ! Additional thermo level above the firt momentum level.
+       ! Additional thermo level above the first momentum level.
        prm%ip1=ip1s_t(1);
        if( vt_L )then
           if( cpg_get_rec(vt, cpg_lui, match_prm=prm) == VGD_ERROR )return
