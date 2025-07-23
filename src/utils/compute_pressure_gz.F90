@@ -840,10 +840,8 @@ contains
     prm%ip1=ip1s_t(1+kp);
     vt_L = fstinf(cpg_lui,vt%ni,vt%nj,vt%nk,-1,' ',-1,-1,-1,' ',vt%nomvar) >=0
     if (vt_L) then
-       print *,'VIV: vt_L is true, now try to cpg_get_rec on vt'
        if( cpg_get_rec(vt, cpg_lui, match_prm=prm) == VGD_ERROR ) vt_L = .false.
     else
-       print *,'VIV: vt_L is false, print warning app_log'
        call app_log(APP_WARNING,'get_gz_5002_5005: VT not found, using HU,TT to determine VT')
        vt_L = .false.
     endif
