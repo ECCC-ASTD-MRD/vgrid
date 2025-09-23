@@ -9,25 +9,30 @@ Vertical grids management library and tools
 
 ## Environment
 
-Source the right file from the `ECCI_ENV` variable, depending on the desired
-architecture.  This will load the specified compiler, set the
-`ECCI_DATA_DIR` variable for the test datasets, and set the
+Load the right environment, depending on the architecture you need.  This
+will load the specified compiler and its parameters, and set the
 `EC_CMAKE_MODULE_PATH` variable for the `cmake_rpn` modules.
 
-- Example for PPP5:
+- Example for ppp6/sc6 and icelake specific architecture:
 
 ```
-. $ECCI_ENV/latest/ppp5/inteloneapi-2022.1.2.sh
+. r.load.dot mrd/rpn/code-tools/latest/env/rhel-8-icelake-64@inteloneapi-2025.1.0
 ```
 
-- Example for CMC network and gnu 11.4.0:
+- Example for generic architecture on ppp6/sc6
 
 ```
-. $ECCI_ENV/latest/ubuntu-22.04-amd-64/gnu.sh
+. r.load.dot mrd/rpn/code-tools/latest/env/rhel-8-amd64-64@inteloneapi-2025.1.0
 ```
 
-You also need a version of librmn and optionally tdpack: either load them
-from ssm, both are in rpn/libs domain (. r.load.dot rpn/libs/...) or provide
+- Example for GNU on any architecture:
+
+```
+. r.load.dot mrd/rpn/code-tools/latest/env/gnu
+```
+
+You also need a version of librmn, and optionally tdpack: either load them
+from ssm, both are in rpn/libs domain (. r.load.dot rpn/libs/...), or provide
 the path to cmake install directories if you compiled them.
 
 ## Build and install
