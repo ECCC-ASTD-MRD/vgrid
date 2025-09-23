@@ -61,8 +61,8 @@ make package
 - tdpack: https://github.com/ECCC-ASTD-MRD/tdpack/
 
 `cmake_rpn` is included as a git submodule.  Please clone with the
-`--recursive` option or run `git submodule update --init --recursive` in the
-git repo after having cloned.
+`--recurse --remote-submodules` options, or run `git submodule update --init
+--remote` in the git repo after having cloned.
 
 ## Build and install
 
