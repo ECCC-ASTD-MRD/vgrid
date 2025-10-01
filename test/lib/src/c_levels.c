@@ -97,7 +97,7 @@ int main() {
     printf("Problem with fstluk for p0\n");
     return(1);
   }
-  for( ij = 0; ij < ni2*nj2; ij++, ijk++){
+  for( ij = 0; ij < ni2*nj2; ij++){
     p0[ij] = p0[ij]*100.;
     p0_8[ij] = p0[ij];
   }

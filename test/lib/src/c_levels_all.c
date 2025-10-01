@@ -107,7 +107,8 @@ int test_it(char *filename, char *ip1_name, int ind) {
 
   int ier, iun, vcode;
   int quiet=0, *i_val = NULL, in_log = 0, dpidpis = 0;
-  int nl, ni, nj, nk, ni2, nj2, nk2, key, ij, ijk, kind, ref1, ref2;
+  int nl, ni, nj, nk, ni2, nj2, nk2, key, ij, kind, ref1, ref2;
+//int ijk;
   char mode[]="RND", key_name[]="1234";
   char nomvar1[5], nomvar2[5];
   float *p0 = NULL, *p0ls = NULL, *levels = NULL, fact;
@@ -208,7 +209,7 @@ int test_it(char *filename, char *ip1_name, int ind) {
   if(! strcmp(nomvar1,"ME  ")){
     fact=1.f;
   }
-  for( ij = 0; ij < ni2*nj2; ij++, ijk++){    
+  for( ij = 0; ij < ni2*nj2; ij++){
     p0[ij] = p0[ij]*fact;
     p0_8[ij] = p0[ij];
   }
@@ -238,7 +239,7 @@ int test_it(char *filename, char *ip1_name, int ind) {
       printf("Problem with fstluk for p0\n");
       return(VGD_ERROR);
     }
-    for( ij = 0; ij < ni2*nj2; ij++, ijk++){
+    for( ij = 0; ij < ni2*nj2; ij++){
       p0ls[ij] = p0ls[ij]*fact;
       p0ls_8[ij] = p0ls[ij];
     }    
