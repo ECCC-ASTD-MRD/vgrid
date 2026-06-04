@@ -23,7 +23,7 @@ if (EC_INIT_DONE LESS 2)
          else()
             add_executable(${test} EXCLUDE_FROM_ALL ${testfile} lib/unit_testing.F90)
          endif()
-         add_dependencies(check ${test})
+         add_dependencies(test_execs ${test})
 
          target_link_libraries(${test} PRIVATE vgrid::vgrid)
          target_include_directories(${test} PRIVATE ${CMAKE_BINARY_DIR}/lib ${CMAKE_SOURCE_DIR}/src/lib ${CMAKE_CURRENT_SOURCE_DIR} ${RMN_INCLUDE_DIRS})

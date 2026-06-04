@@ -19,6 +19,8 @@ ec_build_info()            # Generate build information
 if (EC_INIT_DONE LESS 2)
    include(CTest)
    add_custom_target(check COMMAND CTEST_OUTPUT_ON_FAILURE=true ${CMAKE_CTEST_COMMAND})
+   add_custom_target(test_execs)
+   add_dependencies(check test_execs)
 endif()
 
 include(ec_doxygen)          # Doxygen target (-DWITH_DOC=TRUE)
