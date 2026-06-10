@@ -13,16 +13,16 @@ Load the right environment, depending on the architecture you need.  This
 will load the specified compiler and its parameters, and set the
 `EC_CMAKE_MODULE_PATH` variable for the `cmake_rpn` modules.
 
-- Example for ppp6/sc6 and icelake specific architecture:
+- Example for ppp7/sc7 and icelake specific architecture:
 
 ```
-. r.load.dot mrd/rpn/code-tools/latest/env/rhel-8-icelake-64@inteloneapi-2025.1.0
+. r.load.dot mrd/rpn/code-tools/latest/env/rhel-9-graniterapids-64@inteloneapi-2025.1.0
 ```
 
-- Example for generic architecture on ppp6/sc6
+- Example for generic architecture on ppp7/sc7
 
 ```
-. r.load.dot mrd/rpn/code-tools/latest/env/rhel-8-amd64-64@inteloneapi-2025.1.0
+. r.load.dot mrd/rpn/code-tools/latest/env/rhel-9-amd64-64@inteloneapi-2025.1.0
 ```
 
 - Example for GNU on any architecture:
@@ -46,7 +46,7 @@ the path to cmake install directories if you compiled them.
 ```
 mkdir build
 cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=[your install path] [-Drmn_ROOT=[path to librmn] -Dtdpack_ROOT=[path to tdpack]
+cmake .. -DCMAKE_INSTALL_PREFIX=[your_install_path] [-Drmn_ROOT=[librmn_install_path] -Dtdpack_ROOT=[tdpack_install_path]]
 make -j 4
 make check
 make package
@@ -69,7 +69,7 @@ make package
 ```
 mkdir build
 cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=${your_choice} -Drmn_ROOT=${librmn_install_path} -Dtdpack_ROOT=${tdpack_install_path}
+cmake .. -DCMAKE_INSTALL_PREFIX=[your_install_path] -Drmn_ROOT=[librmn_install_path] -Dtdpack_ROOT=[tdpack_install_path]
 make -j 4
 make install
 ```
