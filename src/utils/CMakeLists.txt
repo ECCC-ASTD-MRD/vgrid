@@ -4,6 +4,8 @@ set_source_files_properties(compute_pressure_gz.F90 convert_toctoc_5002.F90 add_
 PROPERTIES Fortran_PREPROCESS ON)
 set(CMAKE_EXE_LINKER_FLAGS "-Wl,--no-as-needed -ldl")
 
+add_custom_target(vgrid_utils)
+
 if (tdpack_FOUND)
    add_executable(r.compute_pressure_gz compute_pressure_gz.F90)
    add_dependencies(r.compute_pressure_gz ${PROJECT_NAME}_build_info)
@@ -42,11 +44,17 @@ target_link_libraries(r.vgrid_sample PRIVATE vgrid::vgrid rmn::rmn)
 target_include_directories(r.vgrid_sample PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/../lib ${CMAKE_CURRENT_SOURCE_DIR}/../lib ${CMAKE_CURRENT_SOURCE_DIR} ${rmn_INCLUDE_DIRS})
 set_target_properties(r.vgrid_sample PROPERTIES VERSION ${PROJECT_VERSION})
 
+
+add_dependencies(vgrid_utils r.convert_toctoc_5002 r.add_toctoc r.print_toctoc r.vcode r.vgrid_sample)
+if (tdpack_FOUND)
+   add_dependencies(vgrid_utils r.compute_pressure_gz)
+endif()
+
+install(TARGETS r.convert_toctoc_5002 r.add_toctoc r.print_toctoc r.vcode r.vgrid_sample
+    RUNTIME  DESTINATION bin)
 if (tdpack_FOUND)
    install(TARGETS r.compute_pressure_gz
        RUNTIME  DESTINATION bin)
 endif()
 
-install(TARGETS r.convert_toctoc_5002 r.add_toctoc r.print_toctoc r.vcode r.vgrid_sample
-    RUNTIME  DESTINATION bin)
  

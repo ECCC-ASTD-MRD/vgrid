@@ -4,6 +4,8 @@ if (EC_INIT_DONE LESS 2)
       #----- Library tests
       message(STATUS "(EC) Generating vgrid library and utilities tests")
 
+      add_dependencies(test_execs vgrid_utils)
+
       file(REMOVE_RECURSE ${CMAKE_BINARY_DIR}/Testing/data_out ${CMAKE_BINARY_DIR}/Testing/data)
       execute_process(COMMAND ln -s $ENV{ECCI_DATA_DIR}/vgrid/b_6.5/data ${CMAKE_BINARY_DIR}/Testing/data)
       execute_process(COMMAND rm -f -r ${CMAKE_BINARY_DIR}/Testing/data_out)
