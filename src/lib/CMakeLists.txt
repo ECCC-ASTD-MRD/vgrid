@@ -31,6 +31,7 @@ if (TARGET rmn::rmn-ompi)
   option(WITH_OMPI "Compile with OpenMP/MPI support" ON)
   add_library(${PROJECT_NAME}-ompi-static STATIC ${PROJECT_SOURCE_FILES})
   add_library(${PROJECT_NAME}::${PROJECT_NAME}-ompi-static ALIAS ${PROJECT_NAME}-ompi-static)
+  add_library(${PROJECT_NAME}::${PROJECT_NAME}-ompi ALIAS ${PROJECT_NAME}-ompi-static)  # Default to static
   target_link_libraries(${PROJECT_NAME}-ompi-static PUBLIC rmn::rmn-ompi-static)
   set(all_targets ${all_targets} ${PROJECT_NAME}-ompi-static)
   set(static_targets ${static_targets} ${PROJECT_NAME}-ompi-static)
